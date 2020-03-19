@@ -1,7 +1,7 @@
 package Agents;
 
-import LightStrategy.BasicLightStrategy;
-import LightStrategy.LightStrategy;
+import LightStrategies.BasicLightStrategy;
+import LightStrategies.LightStrategy;
 import jade.core.Agent;
 
 import java.util.ArrayList;
@@ -13,12 +13,16 @@ public class TrafficLightAgent extends Agent {
     LightStrategy strategy = new BasicLightStrategy();
 
     protected void setup() {
-        System.out.println("I'm a light!");
-        System.out.println("Red light.");
+        Print("I'm a traffic light.");
+        Print("Red light.");
         strategy.ApplyStrategy(this);
     }
 
     protected void takeDown() {
         super.takeDown();
+    }
+
+    public void Print(String message){
+        System.out.println(getLocalName() + ": " + message);
     }
 }

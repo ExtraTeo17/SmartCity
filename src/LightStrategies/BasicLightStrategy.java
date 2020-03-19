@@ -1,4 +1,4 @@
-package LightStrategy;
+package LightStrategies;
 
 import Agents.LightColor;
 import Agents.TrafficLightAgent;
@@ -9,7 +9,6 @@ import jade.core.behaviours.TickerBehaviour;
 import jade.lang.acl.ACLMessage;
 
 public class BasicLightStrategy extends LightStrategy {
-
     @Override
     public void ApplyStrategy(TrafficLightAgent agent) {
         Behaviour ReceiveMessage = new CyclicBehaviour() {
@@ -19,12 +18,12 @@ public class BasicLightStrategy extends LightStrategy {
                 if (msg != null) {
                     if(msg.getContent().equals("Pass"))
                     {
-                        System.out.println(msg.getSender().getLocalName()+" passes light.");
+                        agent.Print(msg.getSender().getLocalName()+" passes light.");
                         agent.queue.remove(msg.getSender().getLocalName());
                     }
                     else
                     {
-                        System.out.println("Message from "+ msg.getSender().getLocalName() + ": " + msg.getContent());
+                        agent.Print("Message from "+ msg.getSender().getLocalName() + ": " + msg.getContent());
                         agent.queue.add(msg.getSender().getLocalName());
                     }
 
@@ -46,7 +45,7 @@ public class BasicLightStrategy extends LightStrategy {
                         msg.addReceiver(dest);
                         agent.send(msg);
                     }
-                    System.out.println("Red light.");
+                    agent.Print("Red light.");
                 } else {
                     for(String name: agent.queue){
                         AID dest = new AID(name, AID.ISLOCALNAME);
@@ -54,8 +53,8 @@ public class BasicLightStrategy extends LightStrategy {
                         msg.setContent("Green");
                         msg.addReceiver(dest);
                         agent.send(msg);
-                        System.out.println("Green light.");
                     }
+                    agent.Print("Green light.");
                 }
             }
         };

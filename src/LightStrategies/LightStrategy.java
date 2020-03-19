@@ -1,4 +1,4 @@
-package LightStrategy;
+package LightStrategies;
 import Agents.TrafficLightAgent;
 
 public abstract class LightStrategy {

@@ -1,5 +1,7 @@
 package Agents;
 
+import Vehicles.BasicCar;
+import Vehicles.Vehicle;
 import jade.core.AID;
 import jade.core.Agent;
 import jade.core.behaviours.Behaviour;
@@ -7,41 +9,48 @@ import jade.core.behaviours.CyclicBehaviour;
 import jade.lang.acl.ACLMessage;
 
 public class VehicleAgent extends Agent {
-    BasicCar car; // TO DO: generalization
+    Vehicle vehicle;
     LightColor currentLightColor;
-    String nextLightName = "Light8";
-    public VehicleAgent() {
-        car = new BasicCar();
-    }
 
     protected void setup() {
-        System.out.println("I'm a "+ car.getName() +" with a name: " + getLocalName());
+        String type = (String) getArguments()[0];
+        if(type.equals("BasicCar")) // check created vehicle type
+        {
+            vehicle = new BasicCar();
+        }
+        else{ // if type was not found, create Basic Car
+            vehicle = new BasicCar();
+        }
+        Print("I'm a "+ vehicle.getVehicleType() + ".");
+        vehicle.CalculatePath();
+        GetNextStop();
         Behaviour move = new CyclicBehaviour() { // TO DO: generalization
             @Override
             public void action() {
-                if (car.Position == 0) {
-                    AID dest = new AID(nextLightName, AID.ISLOCALNAME);
-                    ACLMessage msg = new ACLMessage(ACLMessage.INFORM);
-                    msg.setContent("On my way.");
-                    msg.addReceiver(dest);
-                    send(msg);
-                }
-                if(car.Position == 8) //When car arrives at the traffic light
+                if(vehicle.isAtTrafficLights()) //When car arrives at the traffic light
                 {
                     if(currentLightColor == LightColor.GREEN){
-                        System.out.println("Passing green light.");
-                        AID dest = new AID(nextLightName, AID.ISLOCALNAME);
+                        Print("Passing green light.");
+                        AID dest = new AID("Light" + vehicle.getCurrentTrafficLightID(), AID.ISLOCALNAME);
                         ACLMessage msg = new ACLMessage(ACLMessage.INFORM);
                         msg.setContent("Pass");
                         msg.addReceiver(dest);
                         send(msg);
-                        car.Move();
+                        GetNextStop();
+                        vehicle.Move();
+                        Print(vehicle.getPositionString());
                     }
                     else
-                        System.out.println("Waiting for green.");
+                        Print("Waiting for green.");
                 }
-                else car.Move();
-                System.out.println("Position: " + car.Position);
+                else if(vehicle.isAtDestination()){
+                    Print("Reached destination.");
+                    doDelete();
+                }
+                else {
+                    vehicle.Move();
+                    Print(vehicle.getPositionString());
+                }
                 block(1000);
             }
         };
@@ -52,7 +61,7 @@ public class VehicleAgent extends Agent {
             public void action() {
                 ACLMessage msg = receive();
                 if (msg != null) {
-                    System.out.println("Message from "+ msg.getSender().getLocalName() + ": " + msg.getContent());
+                    Print("Message from "+ msg.getSender().getLocalName() + ": " + msg.getContent());
                     // receiving next color light
                     if(msg.getContent().equals("Green"))
                     {
@@ -69,7 +78,21 @@ public class VehicleAgent extends Agent {
         addBehaviour(receiveMessages);
     }
 
+    void GetNextStop(){ // finds next traffic light and announces his arrival
+        if(vehicle.findNextTrafficLight()) {
+            AID dest = new AID("Light" + vehicle.getCurrentTrafficLightID(), AID.ISLOCALNAME);
+            ACLMessage msg = new ACLMessage(ACLMessage.INFORM);
+            msg.setContent("On my way.");
+            msg.addReceiver(dest);
+            send(msg);
+        }
+    }
+
     protected void takeDown() {
         super.takeDown();
+    }
+
+    void Print(String message){
+        System.out.println(getLocalName() + ": " + message);
     }
 }
