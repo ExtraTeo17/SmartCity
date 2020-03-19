@@ -1,3 +1,5 @@
+package Agents;
+
 import jade.core.Agent;
 import jade.core.behaviours.SimpleBehaviour;
 

@@ -1,28 +1,26 @@
+package Agents;
+
 import jade.core.AID;
 import jade.core.Agent;
 import jade.core.behaviours.Behaviour;
 import jade.core.behaviours.CyclicBehaviour;
 import jade.lang.acl.ACLMessage;
-import javafx.scene.effect.Light;
 
 public class VehicleAgent extends Agent {
-    Car car;
-    LightColor nextLightColor;
+    BasicCar car; // TO DO: generalization
+    LightColor currentLightColor;
+    String nextLightName = "Light8";
     public VehicleAgent() {
-        car = new Car();
-    }
-
-    public VehicleAgent(Car car) {
-        this.car = car;
+        car = new BasicCar();
     }
 
     protected void setup() {
-        System.out.println("I'm a car with a name: " + getLocalName());
-        Behaviour move = new CyclicBehaviour() {
+        System.out.println("I'm a "+ car.getName() +" with a name: " + getLocalName());
+        Behaviour move = new CyclicBehaviour() { // TO DO: generalization
             @Override
             public void action() {
                 if (car.Position == 0) {
-                    AID dest = new AID("Light8", AID.ISLOCALNAME);
+                    AID dest = new AID(nextLightName, AID.ISLOCALNAME);
                     ACLMessage msg = new ACLMessage(ACLMessage.INFORM);
                     msg.setContent("On my way.");
                     msg.addReceiver(dest);
@@ -30,9 +28,9 @@ public class VehicleAgent extends Agent {
                 }
                 if(car.Position == 8) //When car arrives at the traffic light
                 {
-                    if(nextLightColor == LightColor.GREEN){
+                    if(currentLightColor == LightColor.GREEN){
                         System.out.println("Passing green light.");
-                        AID dest = new AID("Light8", AID.ISLOCALNAME);
+                        AID dest = new AID(nextLightName, AID.ISLOCALNAME);
                         ACLMessage msg = new ACLMessage(ACLMessage.INFORM);
                         msg.setContent("Pass");
                         msg.addReceiver(dest);
@@ -58,11 +56,11 @@ public class VehicleAgent extends Agent {
                     // receiving next color light
                     if(msg.getContent().equals("Green"))
                     {
-                        nextLightColor = LightColor.GREEN;
+                        currentLightColor = LightColor.GREEN;
                     }
                     else if(msg.getContent().equals("Red"))
                     {
-                        nextLightColor = LightColor.RED;
+                        currentLightColor = LightColor.RED;
                     }
                     block(200);
                 }
