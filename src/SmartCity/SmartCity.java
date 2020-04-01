@@ -1,12 +1,15 @@
+package SmartCity;
+
 import jade.Boot;
 import javax.swing.*;
 
 public class SmartCity {
-	private final static String[] defaultJadeArgs = { "-gui", "Light8:Agents.TrafficLightAgent;kotik:Agents.VehicleAgent(BasicCar)" };
+	private final static String[] defaultJadeArgs = { "-gui", "Light8:Agents.TrafficLightAgent;kotik:Agents.VehicleAgent(BasicCar);" };
 
 	public static void main(String[] args) {
+		//startJade();
 		Boot.main(parseJadeArguments(args));
-		displayMap();
+		displayGUI();
 	}
 	
 	private final static String[] parseJadeArguments(String[] args) {
@@ -17,10 +20,14 @@ public class SmartCity {
 		}
 	}
 	
-	private static void displayMap() {
+	private static void displayGUI() {
 		JFrame frame = new JFrame();
 		frame.setSize(500, 400);
 		frame.setLayout(null);
 		frame.setVisible(true);
+	}
+	
+	private static void startJade(AgentData data) {
+		Boot.main(data.toJadeArgs());
 	}
 }
