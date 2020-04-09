@@ -1,6 +1,6 @@
 package SmartCity;
 
-final class AgentCreator {
+final class AgentCandidate {
 	private static String COLON = ":";
 	private static String DOT = ".";
 	private static String COMMA = ",";
@@ -12,7 +12,7 @@ final class AgentCreator {
 	private int xPos, yPos;
 	private int id;
 	
-	public AgentCreator(AgentType agentType, int xPos, int yPos, int id) {
+	public AgentCandidate(AgentType agentType, int xPos, int yPos, int id) {
 		this.agentType = agentType;
 		this.xPos = xPos;
 		this.yPos = yPos;

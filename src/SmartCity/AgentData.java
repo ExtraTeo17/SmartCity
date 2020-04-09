@@ -1,12 +1,21 @@
 package SmartCity;
 
+import java.util.ArrayList;
 import java.util.List;
 
 final class AgentData {
 	private static int ARGS_AMOUNT = 2;
 	private static String SEMICOLON = ";";
 	
-	private List<AgentCreator> agentsToCreate;
+	private List<AgentCandidate> agentsToCreate;
+	
+	public AgentData() {
+		agentsToCreate = new ArrayList<>();
+	}
+	
+	public void Add(AgentCandidate candidate) {
+		agentsToCreate.add(candidate);
+	}
 	
 	public String[] toJadeArgs() {
 		String[] args = new String[ARGS_AMOUNT];
@@ -17,7 +26,7 @@ final class AgentData {
 	
 	private String getAgentsArgument() {
 		StringBuilder builder = new StringBuilder();
-		for (AgentCreator agent : agentsToCreate) {
+		for (AgentCandidate agent : agentsToCreate) {
 			builder.append(agent.toJadeArg() + SEMICOLON);
 		}
 		return builder.toString();
