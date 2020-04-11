@@ -33,6 +33,8 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
+import com.graphhopper.util.shapes.GHPoint3D;
+
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
@@ -44,6 +46,8 @@ import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
+
+import com.graphhopper.util.PointList;
 
 /**
  * 
@@ -157,7 +161,7 @@ public class MapAccessManager {
 		return MapAccessManager.getNodes(getNodesViaOverpass("<osm-script>\r\n" + 
 				"  <query into=\"_\" type=\"node\">\r\n" + 
 				"    <has-kv k=\"highway\" modv=\"\" v=\"traffic_signals\"/>\r\n" + 
-				"    <bbox-query s=\"53.690989188644\" w=\"19.96603935957\" n=\"53.692447170497\" e=\"19.96886909008\"/>\r\n" + 
+				"    <bbox-query s=\"" + (lon - vicinityRange) + "\" w=\"" + (lat - vicinityRange) + "\" n=\"" + (lon + vicinityRange) + "\" e=\"" + (lat + vicinityRange) + "\"/>\r\n" + 
 				"  </query>\r\n" + 
 				"  <print e=\"\" from=\"_\" geometry=\"skeleton\" ids=\"yes\" limit=\"\" mode=\"body\" n=\"\" order=\"id\" s=\"\" w=\"\"/>\r\n" + 
 				"</osm-script>"));
@@ -219,13 +223,28 @@ public class MapAccessManager {
 	 * @throws SAXException
 	 * @throws ParserConfigurationException
 	 */
-	public static void traverseDatabase() throws IOException, SAXException, ParserConfigurationException {
+	public static List<OSMNode> traverseDatabase(double lat, double lon, double vicinityRange) throws IOException, SAXException, ParserConfigurationException {
 		//Authenticator.setDefault(new java.net.CustomAuthenticator());
-		List<OSMNode> osmNodesInVicinity = getOSMNodesInVicinity(52.22995, 20.98343, 52.23001 - 52.22995);
-		System.out.println("Traffic lights from Robert's family town Ostróda:");
+		List<OSMNode> osmNodesInVicinity = getOSMNodesInVicinity(lat, lon, vicinityRange);
+		System.out.println("Traffic lights:");
 		for (OSMNode osmNode : osmNodesInVicinity) {
 			System.out.println(osmNode.getId() + ":" + osmNode.getLat() + ":" + osmNode.getLon());
 		}
+		return osmNodesInVicinity;
 	}
 	
+	public static List<List<OSMNode>> getLights(PointList route) throws IOException, SAXException, ParserConfigurationException {
+		List<List<OSMNode>> lights = new ArrayList<>();
+		for (int i = 0; i < route.size() - 2; ++i) {
+			lights.add(getLightListAround(route.toGHPoint(i), route.toGHPoint(i + 2)));
+		}
+		return lights;
+	}
+	
+	private static List<OSMNode> getLightListAround(GHPoint3D p1, GHPoint3D p2) throws IOException, SAXException, ParserConfigurationException {
+		double midLat = (p1.lat - p2.lat) / 2.0;
+		double midLon = (p1.lon - p2.lon) / 2.0;
+		double vicinityRange = Math.max(p1.lat - p2.lat, p1.lon - p2.lon);
+		return traverseDatabase(midLat, midLon, vicinityRange);
+	}
 }
