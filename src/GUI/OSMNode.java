@@ -1,4 +1,4 @@
-package SmartCity;
+package GUI;
 
 import java.util.Map;
 

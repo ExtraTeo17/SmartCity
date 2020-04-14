@@ -28,12 +28,15 @@ import java.net.URLEncoder;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
-import com.graphhopper.util.shapes.GHPoint3D;
+import com.graphhopper.util.shapes.GHPoint;
+
+import GUI.OSMNode;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -124,9 +127,11 @@ public class MapAccessManager {
 		NodeList osmXMLNodes = osmRoot.getChildNodes();
 		for (int i = 1; i < osmXMLNodes.getLength(); i++) {
 			Node item = osmXMLNodes.item(i);
-			if (item.getNodeName().equals("node")) {
+			if (item.getNodeName().equals("way")) {
 				NamedNodeMap attributes = item.getAttributes();
-				NodeList tagXMLNodes = item.getChildNodes();
+				Node namedItemID = attributes.getNamedItem("id");
+				String id = namedItemID.getNodeValue();
+				/*NodeList tagXMLNodes = item.getChildNodes();
 				Map<String, String> tags = new HashMap<String, String>();
 				for (int j = 1; j < tagXMLNodes.getLength(); j++) {
 					Node tagItem = tagXMLNodes.item(j);
@@ -147,11 +152,11 @@ public class MapAccessManager {
 				String version = "0";
 				if (namedItemVersion != null) {
 					version = namedItemVersion.getNodeValue();
-				}
+				}*/
 
-				osmNodes.add(new OSMNode(id, latitude, longitude, version, tags));
+				//osmNodes.add(new OSMNode(id, latitude, longitude, version, tags));
+				osmNodes.add(new OSMNode(id, "", "", "", null));
 			}
-
 		}
 		return osmNodes;
 	}
@@ -193,6 +198,36 @@ public class MapAccessManager {
 		DocumentBuilderFactory dbfac = DocumentBuilderFactory.newInstance();
 		DocumentBuilder docBuilder = dbfac.newDocumentBuilder();
 		return docBuilder.parse(connection.getInputStream());
+	}
+
+	public static List<OSMNode> sendHighwayOverpassQuery(PointList points) {
+		List<OSMNode> nodes = null;
+		try {
+		nodes = MapAccessManager.getNodes(getNodesViaOverpass("<osm-script>\r\n" + getHighwayQueries(points) + "</osm-script>"));
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally { }
+		return nodes;
+	}
+	
+	private static String getHighwayQueries(PointList points) {
+		StringBuilder builder = new StringBuilder();
+		for (GHPoint point : points) {
+			builder.append(getHighwayQuery(point));
+		}
+		return builder.toString();
+	}
+	
+	private static String getHighwayQuery(GHPoint point) {
+		return "<query into=\"_\" type=\"way\">\r\n" + 
+				"<has-kv k=\"highway\" modv=\"\" regv=\"^(primary|secondary|secondary_link|tertiary|residential)$\"/>\r\n" + 
+				"<around radius=\"5\" lat=\"" + point.lat + "\" lon=\"" + point.lon + "\"/>\r\n" + 
+				"</query>\r\n" + 
+				"<union into=\"_\">\r\n" + 
+				"<item from=\"_\" into=\"_\"/>\r\n" + 
+				"<recurse from=\"_\" into=\"_\" type=\"down\"/>\r\n" + 
+				"</union>\r\n" + 
+				"<print e=\"\" from=\"_\" geometry=\"skeleton\" ids=\"yes\" limit=\"\" mode=\"meta\" n=\"\" order=\"id\" s=\"\" w=\"\"/>\r\n";
 	}
 
 	/**
@@ -241,7 +276,7 @@ public class MapAccessManager {
 		return lights;
 	}
 	
-	private static List<OSMNode> getLightListAround(GHPoint3D p1, GHPoint3D p2) throws IOException, SAXException, ParserConfigurationException {
+	private static List<OSMNode> getLightListAround(GHPoint p1, GHPoint p2) throws IOException, SAXException, ParserConfigurationException {
 		double midLat = (p1.lat - p2.lat) / 2.0;
 		double midLon = (p1.lon - p2.lon) / 2.0;
 		double vicinityRange = Math.max(p1.lat - p2.lat, p1.lon - p2.lon);
