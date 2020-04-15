@@ -10,7 +10,7 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 
-public class HighwayAccessor {
+public class HighwayAccessor2 {
 	
 	public Set<Long> getHighways(PointList route) {
 		PointList doublePointedRoute = doubleAllPoints(route);
@@ -29,16 +29,16 @@ public class HighwayAccessor {
 		for (int i = 0; i < route.size() - 1; ++i) {
 			addPair(route, doubledRoute, i);
 		}
-		doubledRoute.add(route.toGHPoint(route.size() - 1));
+		//doubledRoute.add(route.toGHPoint(route.size() - 1));
 		return doubledRoute;
 	}
 	
 	private void addPair(PointList route, PointList doubledRoute, int i) {
-		GHPoint firstPoint = route.toGHPoint(i);
-		GHPoint secondPoint = route.toGHPoint(i + 1);
-		doubledRoute.add(firstPoint);
+		//GHPoint firstPoint = route.toGHPoint(i);
+		//GHPoint secondPoint = route.toGHPoint(i + 1);
+		//doubledRoute.add(firstPoint);
 		//if (getDistBetween(firstPoint, secondPoint) > 2) {
-			doubledRoute.add(getMiddlePoint(firstPoint, secondPoint));
+			//doubledRoute.add(getMiddlePoint(firstPoint, secondPoint));
 		//}
 	}
 	

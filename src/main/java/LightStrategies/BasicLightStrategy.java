@@ -10,7 +10,7 @@ import jade.lang.acl.ACLMessage;
 
 public class BasicLightStrategy extends LightStrategy {
     @Override
-    public void ApplyStrategy(TrafficLightAgent agent) {
+    public void ApplyStrategy(final TrafficLightAgent agent) {
         Behaviour ReceiveMessage = new CyclicBehaviour() {
             @Override
             public void action() {

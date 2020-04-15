@@ -127,7 +127,7 @@ public class MapAccessManager {
 		NodeList osmXMLNodes = osmRoot.getChildNodes();
 		for (int i = 1; i < osmXMLNodes.getLength(); i++) {
 			Node item = osmXMLNodes.item(i);
-			if (item.getNodeName().equals("way")) {
+			if (item.getNodeName().equals("node")) {
 				NamedNodeMap attributes = item.getAttributes();
 				Node namedItemID = attributes.getNamedItem("id");
 				String id = namedItemID.getNodeValue();
@@ -141,21 +141,21 @@ public class MapAccessManager {
 								.getNodeValue());
 					}
 				}
-				Node namedItemID = attributes.getNamedItem("id");
+				Node namedItemID = attributes.getNamedItem("id");*/
 				Node namedItemLat = attributes.getNamedItem("lat");
 				Node namedItemLon = attributes.getNamedItem("lon");
-				Node namedItemVersion = attributes.getNamedItem("version");
+				/*Node namedItemVersion = attributes.getNamedItem("version");
 
-				String id = namedItemID.getNodeValue();
+				String id = namedItemID.getNodeValue();*/
 				String latitude = namedItemLat.getNodeValue();
 				String longitude = namedItemLon.getNodeValue();
-				String version = "0";
+				/*String version = "0";
 				if (namedItemVersion != null) {
 					version = namedItemVersion.getNodeValue();
 				}*/
 
 				//osmNodes.add(new OSMNode(id, latitude, longitude, version, tags));
-				osmNodes.add(new OSMNode(id, "", "", "", null));
+				osmNodes.add(new OSMNode(id, latitude, longitude, "", null));
 			}
 		}
 		return osmNodes;
@@ -210,6 +210,16 @@ public class MapAccessManager {
 		return nodes;
 	}
 	
+	public static List<OSMNode> sendTrafficSignalOverpassQuery(List<Long> osmWayIds) {
+		List<OSMNode> nodes = null;
+		try {
+		nodes = MapAccessManager.getNodes(getNodesViaOverpass(getFullTrafficSignalQuery(osmWayIds)));
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally { }
+		return nodes;
+	}
+	
 	private static String getHighwayQueries(PointList points) {
 		StringBuilder builder = new StringBuilder();
 		for (GHPoint point : points) {
@@ -228,6 +238,25 @@ public class MapAccessManager {
 				"<recurse from=\"_\" into=\"_\" type=\"down\"/>\r\n" + 
 				"</union>\r\n" + 
 				"<print e=\"\" from=\"_\" geometry=\"skeleton\" ids=\"yes\" limit=\"\" mode=\"meta\" n=\"\" order=\"id\" s=\"\" w=\"\"/>\r\n";
+	}
+	
+	private static String getFullTrafficSignalQuery(List<Long> osmWayIds) {
+		StringBuilder builder = new StringBuilder();
+		builder.append("<osm-script>");
+		for (long id : osmWayIds) {
+			builder.append(getSingleTrafficSignalQuery(id));
+		}
+		builder.append("</osm-script>");
+		return builder.toString();
+	}
+	
+	private static String getSingleTrafficSignalQuery(long osmWayId) {
+		return "<id-query type=\"way\" ref=\"" + osmWayId + "\" into=\"minor\"/>\r\n" + 
+				"  <query into=\"_\" type=\"node\">\r\n" + 
+				"    <has-kv k=\"highway\" modv=\"\" v=\"traffic_signals\"/>\r\n" + 
+				"    <recurse from=\"minor\" type=\"way-node\"/>\r\n" + 
+				"  </query>\r\n" + 
+				"  <print e=\"\" from=\"_\" geometry=\"skeleton\" ids=\"yes\" limit=\"\" mode=\"body\" n=\"\" order=\"id\" s=\"\" w=\"\"/>";
 	}
 
 	/**
@@ -271,7 +300,7 @@ public class MapAccessManager {
 	public static List<List<OSMNode>> getLights(PointList route) throws IOException, SAXException, ParserConfigurationException {
 		List<List<OSMNode>> lights = new ArrayList<>();
 		for (int i = 0; i < route.size() - 2; ++i) {
-			lights.add(getLightListAround(route.toGHPoint(i), route.toGHPoint(i + 2)));
+			//lights.add(getLightListAround(route.toGHPoint(i), route.toGHPoint(i + 2)));
 		}
 		return lights;
 	}

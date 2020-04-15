@@ -1,16 +1,42 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
-	<classpathentry kind="src" path="src"/>
-	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-13">
+	<classpathentry kind="src" output="target/classes" path="src/main/java">
+		<attributes>
+			<attribute name="optional" value="true"/>
+			<attribute name="maven.pomderived" value="true"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry excluding="**" kind="src" output="target/classes" path="src/main/resources">
+		<attributes>
+			<attribute name="maven.pomderived" value="true"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="src" output="target/test-classes" path="src/test/java">
+		<attributes>
+			<attribute name="test" value="true"/>
+			<attribute name="optional" value="true"/>
+			<attribute name="maven.pomderived" value="true"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry excluding="**" kind="src" output="target/test-classes" path="src/test/resources">
+		<attributes>
+			<attribute name="test" value="true"/>
+			<attribute name="maven.pomderived" value="true"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.7">
 		<attributes>
 			<attribute name="module" value="true"/>
+			<attribute name="maven.pomderived" value="true"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="con" path="org.eclipse.m2e.MAVEN2_CLASSPATH_CONTAINER">
+		<attributes>
+			<attribute name="maven.pomderived" value="true"/>
 		</attributes>
 	</classpathentry>
 	<classpathentry kind="lib" path="dependencies/commons-codec-1.3.jar"/>
 	<classpathentry kind="lib" path="dependencies/commons-logging-1.2.jar"/>
-	<classpathentry kind="lib" path="dependencies/directions-api-client-hc-0.12.0.jar"/>
-	<classpathentry kind="lib" path="dependencies/graphhopper-api-0.12.0.jar"/>
-	<classpathentry kind="lib" path="dependencies/graphhopper-web-api-0.12.0.jar"/>
 	<classpathentry kind="lib" path="dependencies/jackson-annotations-2.9.0.jar"/>
 	<classpathentry kind="lib" path="dependencies/jackson-core-2.9.6.jar"/>
 	<classpathentry kind="lib" path="dependencies/jackson-databind-2.9.6.jar"/>
@@ -20,8 +46,7 @@
 	<classpathentry kind="lib" path="dependencies/jxmapviewer2-2.5.jar"/>
 	<classpathentry kind="lib" path="dependencies/okhttp-3.8.0.jar"/>
 	<classpathentry kind="lib" path="dependencies/okio-1.13.0.jar"/>
-	<classpathentry kind="lib" path="dependencies/slf4j-api-1.7.25.jar"/>
-	<classpathentry kind="lib" path="dependencies/slf4j-simple-1.7.25.jar"/>
 	<classpathentry kind="lib" path="dependencies/trove4j-3.0.3.jar"/>
-	<classpathentry kind="output" path="bin"/>
+	<classpathentry kind="lib" path="/graphhopper-osm-id-mapping/target/graphhopper-osm-id-mapping-1.0-SNAPSHOT.jar"/>
+	<classpathentry kind="output" path="target/classes"/>
 </classpath>

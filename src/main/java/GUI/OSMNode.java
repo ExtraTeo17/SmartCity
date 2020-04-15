@@ -26,11 +26,11 @@ public class OSMNode {
 		return id;
 	}
 	
-	public String getLat() {
-		return lat;
+	public double getLat() {
+		return Double.parseDouble(lat);
 	}
 	
-	public String getLon() {
-		return lon;
+	public double getLon() {
+		return Double.parseDouble(lon);
 	}
 }
