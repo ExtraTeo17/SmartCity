@@ -2,6 +2,7 @@ package SmartCity;
 
 import GUI.MapWindow;
 import GUI.OSMNode;
+import GUI.Router;
 
 import java.awt.geom.Point2D;
 import java.io.IOException;
@@ -20,13 +21,16 @@ import jade.wrapper.AgentController;
 import jade.wrapper.StaleProxyException;
 
 import org.jxmapviewer.*;
+import org.jxmapviewer.viewer.GeoPosition;
+
+import Agents.TrafficLightAgent;
 
 public class SmartCityAgent extends Agent {
 	public int AgentCount = 0;
 	private JXMapViewer mapViewer;
 	private AgentContainer container;
 	private MapWindow window;
-
+	
 	protected void setup() {
 		container = getContainerController();
 		displayGUI();
@@ -69,4 +73,11 @@ public class SmartCityAgent extends Agent {
 		AgentCount++;
 	}
 
+	public void AddLightAgents(Router router) throws StaleProxyException {
+		for (OSMNode light : router.lights) {
+			String name = "Light"+light.getId();
+			System.out.println(name);
+			AddNewAgent(name, new TrafficLightAgent());
+		}
+	}
 }

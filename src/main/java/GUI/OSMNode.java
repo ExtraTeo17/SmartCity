@@ -1,6 +1,7 @@
 package GUI;
 
 import java.util.Map;
+import java.util.Objects;
 
 public class OSMNode {
 	
@@ -22,8 +23,8 @@ public class OSMNode {
 
 	private String version;
 
-	public String getId() {
-		return id;
+	public Long getId() {
+		return Long.parseLong(id);
 	}
 	
 	public double getLat() {
@@ -33,4 +34,20 @@ public class OSMNode {
 	public double getLon() {
 		return Double.parseDouble(lon);
 	}
+	
+	 @Override
+	    public boolean equals(Object arg) {
+		 
+		 OSMNode obj=(OSMNode)arg;
+		 return this.getId().equals(obj.getId());
+	    }
+	 @Override
+	 public int hashCode() {
+	     int hash = 7;
+	     hash = 53 * hash + Objects.hashCode(this.id);
+	     hash = 53 * hash + Objects.hashCode(this.getLat());
+	     hash = 53 * hash + Objects.hashCode(this.getLon());
+	    
+	     return hash;
+	 }
 }

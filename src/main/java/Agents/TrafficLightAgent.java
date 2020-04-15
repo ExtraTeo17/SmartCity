@@ -15,7 +15,7 @@ public class TrafficLightAgent extends Agent {
     protected void setup() {
         Print("I'm a traffic light.");
         Print("Red light.");
-        strategy.ApplyStrategy(this);
+       // strategy.ApplyStrategy(this); kiedy strategy będzie gotowa, to odkomentować
     }
 
     protected void takeDown() {

@@ -78,9 +78,13 @@ public class MapWindow {
         MapPanel.revalidate();
         addTestCarButton.addActionListener(new ActionListener() {
             @Override
+            
+            //MOZE ZMIENIC NAZWE PRZYCISKU NA INITIALIZE?
             public void actionPerformed(ActionEvent e) {
                 try {
                     SmartCityAgent.AddNewAgent("Test" + SmartCityAgent.AgentCount, new TestCar());
+                    SmartCityAgent.AddLightAgents(router);
+                    
                 } catch (StaleProxyException ex) {
                     ex.printStackTrace();
                 }

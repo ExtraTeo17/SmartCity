@@ -65,7 +65,7 @@ public class HighwayAccessor2 {
 	private List<Long> highwayListToOsmIdList(List<OSMNode> highways) {
 		List<Long> osmIdList = new ArrayList<>();
 		for (OSMNode node : highways) {
-			osmIdList.add(Long.parseLong(node.getId()));
+			osmIdList.add(node.getId());
 		}
 		return osmIdList;
 	}

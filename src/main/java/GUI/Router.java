@@ -54,6 +54,7 @@ import com.graphhopper.storage.index.QueryResult;
 
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -63,7 +64,8 @@ public class Router {
     private HighwayAccessor2 accessor;
 	private GeoPosition pointA = null;
 	private GeoPosition pointB = null;
-	
+	public Set<OSMNode> lights = new LinkedHashSet();
+	public PointList route=null;
 	public Router() {
 		HighwayAccessor2 accessor = new HighwayAccessor2();
 	}
@@ -73,17 +75,27 @@ public class Router {
 			pointA = position;
 		} else {
 			pointB = position;
+			initializeRouteAndLights();
 			drawRouteAndLights(viewer);
 			pointA = null;
 			pointB = null;
 		}
 	}
 	
-	private void drawRouteAndLights(JXMapViewer viewer) {
+	private void initializeRouteAndLights() {
+		
 		Pair<List<Long>, PointList> osmWayIdsAndPointList = getRoute(pointA, pointB);
+		List<OSMNode> lights_list=MapAccessManager.sendTrafficSignalOverpassQuery(osmWayIdsAndPointList.getValue0());
+		lights=new LinkedHashSet<>(lights_list);
+		route=osmWayIdsAndPointList.getValue1();
+	}
+
+	private void drawRouteAndLights(JXMapViewer viewer) {
+		
 		List<Painter<JXMapViewer>> painters = new ArrayList<Painter<JXMapViewer>>();
-		drawRoute(painters, osmWayIdsAndPointList.getValue1());
-		drawLights(painters, MapAccessManager.sendTrafficSignalOverpassQuery(osmWayIdsAndPointList.getValue0()));
+		
+		drawRoute(painters,route);
+		drawLights(painters,lights);
         CompoundPainter<JXMapViewer> painter = new CompoundPainter<JXMapViewer>(painters);
         viewer.setOverlayPainter(painter);
 	}
@@ -108,96 +120,8 @@ public class Router {
 		return osmWayIdsAndPointList;
 	}
 	
-	private void testFunction() {
-		mainLol(new String[] { "config=config.properties" });
-	}
-	
-	private void lol2(GeoPosition pointA, GeoPosition pointB) {
-		/*FlagEncoder encoder = new CarFlagEncoder();
-		EncodingManager em = EncodingManager.create(encoder);
-		GraphHopperStorage gb = new GraphBuilder(em).setLocation("graphhopper_folder").setStore(true).build();
-		// Load index
-		LocationIndex index = new LocationIndexTree(gb.getBaseGraph(), new RAMDirectory("graphhopper_folder", true));
-		if (!index.loadExisting())
-		    throw new IllegalStateException("location index cannot be loaded!");
-		
-		QueryResult fromQR = index.findClosest(pointA.getLatitude(), pointA.getLongitude(), EdgeFilter.ALL_EDGES);
-		QueryResult toQR = index.findClosest(pointB.getLatitude(), pointB.getLongitude(), EdgeFilter.ALL_EDGES);
-		QueryGraph queryGraph = new QueryGraph(queryGraph);
-		queryGraph.lookup(fromQR, toQR);
-		AlgorithmOptions algoOpts = AlgorithmOptions.start().
-				   algorithm(Parameters.Algorithms.DIJKSTRA_BI).traversalMode(TraversalMode.NODE_BASED).weighting(new FastestWeighting(encoder)).
-				   build();
-		RoutingAlgorithm algorithm = pch.createAlgo(queryGraph, algoOpts);
-		Path path = algorithm.calcPath(fromQR.getClosestNode(), toQR.getClosestNode());*/
-	}
-	
-	private Path lol3(GeoPosition pointA, GeoPosition pointB) {
-		FlagEncoder encoder = new CarFlagEncoder();
-		EncodingManager em = EncodingManager.create(FlagEncoderFactory.DEFAULT, "graphhopper_folder");
-		Weighting weighting = new FastestWeighting(encoder);
-		// Creating and saving the graph
-		GraphBuilder gb = new GraphBuilder(em).
-		    setLocation("graphhopper_folder").
-		    setStore(true).
-		    setCHGraph(weighting);
-		GraphHopperStorage hopperStorage = gb.create();
-		CHGraph graph = gb.chGraphCreate(weighting);
-		Directory dir = new RAMDirectory("graphhopper_folder", true);
 
-		// Prepare the graph for fast querying ...
-		TraversalMode tMode = TraversalMode.NODE_BASED;
-		PrepareContractionHierarchies pch = new PrepareContractionHierarchies(dir, hopperStorage, graph, weighting, tMode);
-		pch.doWork();
 
-		// flush after preparation!
-		hopperStorage.flush();
-
-		// Load and use the graph
-		GraphStorage storage = gb.load();
-
-		// Load index
-		LocationIndex index = new LocationIndexTree(hopperStorage.getBaseGraph(), dir);
-		if (!index.loadExisting())
-		    throw new IllegalStateException("location index cannot be loaded!");
-
-		// calculate path is identical
-		QueryResult fromQR = index.findClosest(pointA.getLatitude(), pointA.getLongitude(), EdgeFilter.ALL_EDGES);
-		QueryResult toQR = index.findClosest(pointB.getLatitude(), pointB.getLongitude(), EdgeFilter.ALL_EDGES);
-	    QueryGraph queryGraph = new QueryGraph(graph);
-		queryGraph.lookup(fromQR, toQR);
-
-		// create the algorithm using the PrepareContractionHierarchies object
-		AlgorithmOptions algoOpts = AlgorithmOptions.start().
-		   algorithm(Parameters.Algorithms.DIJKSTRA_BI).traversalMode(tMode).weighting(weighting).
-		   build();
-		RoutingAlgorithm algorithm = pch.createAlgo(queryGraph, algoOpts);
-		Path path = algorithm.calcPath(fromQR.getClosestNode(), toQR.getClosestNode());
-		return path;
-	}
-	
-	private void mainLol(String[] args) {
-        /*MyGraphHopper graphHopper = new MyGraphHopper();
-        graphHopper.init(CmdArgs.read(args));
-        graphHopper.importOrLoad();
-
-        GHResponse rsp = new GHResponse();
-        List<Path> paths = graphHopper.calcPaths(new GHRequest(52.498668, 13.431473, 52.48947, 13.404007).
-                setWeighting("fastest").setVehicle("car"), rsp);
-        Path path0 = paths.get(0);
-        for (EdgeIteratorState edge : path0.calcEdges()) {
-            int edgeId = edge.getEdge();
-            String vInfo = "";
-            if (edge instanceof VirtualEdgeIteratorState) {
-                // first, via and last edges can be virtual
-                VirtualEdgeIteratorState vEdge = (VirtualEdgeIteratorState) edge;
-                edgeId = vEdge.getOriginalTraversalKey() / 2;
-                vInfo = "v";
-            }
-
-            System.out.println("(" + vInfo + edgeId + ") " + graphHopper.getOSMWay(edgeId) + ", " + edge.fetchWayGeometry(2));
-        }*/
-    }
 	
 	private GHPoint geoPosToGhPoint(GeoPosition position) {
 		return new GHPoint(position.getLatitude(), position.getLongitude());
@@ -212,7 +136,7 @@ public class Router {
 		drawLines(painters, track);
 	}
 	
-	private void drawLights(List<Painter<JXMapViewer>> painters, List<OSMNode> lights) {
+	private void drawLights(List<Painter<JXMapViewer>> painters, Set<OSMNode> lights) {
 		List<GeoPosition> track = new ArrayList<GeoPosition>();
 		for (OSMNode light : lights) {
 			track.add(new GeoPosition(light.getLat(), light.getLon()));
