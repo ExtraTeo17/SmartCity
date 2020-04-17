@@ -34,10 +34,10 @@
             <properties/>
             <border type="none"/>
             <children>
-              <component id="3606c" class="javax.swing.JButton" binding="addTestCarButton" default-binding="true">
+              <component id="19baa" class="javax.swing.JButton" binding="StartRouteButton">
                 <constraints/>
                 <properties>
-                  <text value="Add test car"/>
+                  <text value="Start vehicles"/>
                 </properties>
                 <clientProperties>
                   <hideActionText class="java.lang.Boolean" value="false"/>

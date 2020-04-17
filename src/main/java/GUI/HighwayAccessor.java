@@ -10,7 +10,7 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 
-public class HighwayAccessor2 {
+public class HighwayAccessor {
 	
 	public Set<Long> getHighways(PointList route) {
 		PointList doublePointedRoute = doubleAllPoints(route);

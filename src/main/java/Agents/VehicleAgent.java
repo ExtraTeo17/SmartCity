@@ -1,6 +1,6 @@
 package Agents;
 
-import Vehicles.BasicCar;
+import Vehicles.DummyCar;
 import Vehicles.Vehicle;
 import jade.core.AID;
 import jade.core.Agent;
@@ -9,52 +9,62 @@ import jade.core.behaviours.CyclicBehaviour;
 import jade.lang.acl.ACLMessage;
 
 public class VehicleAgent extends Agent {
-    Vehicle vehicle;
+    public Vehicle Vehicle;
     LightColor currentLightColor;
 
-    protected void setup() {
-        String type = (String) getArguments()[0];
-        if(type.equals("BasicCar")) // check created vehicle type
-        {
-            vehicle = new BasicCar();
-        }
-        else{ // if type was not found, create Basic Car
-            vehicle = new BasicCar();
-        }
-        Print("I'm a "+ vehicle.getVehicleType() + ".");
-        vehicle.CalculatePath();
-        GetNextStop();
-        Behaviour move = new CyclicBehaviour() { // TO DO: generalization
-            @Override
-            public void action() {
-                if(vehicle.isAtTrafficLights()) //When car arrives at the traffic light
-                {
-                    if(currentLightColor == LightColor.GREEN){
-                        Print("Passing green light.");
-                        AID dest = new AID("Light" + vehicle.getCurrentTrafficLightID(), AID.ISLOCALNAME);
-                        ACLMessage msg = new ACLMessage(ACLMessage.INFORM);
-                        msg.setContent("Pass");
-                        msg.addReceiver(dest);
-                        send(msg);
-                        GetNextStop();
-                        vehicle.Move();
-                        Print(vehicle.getPositionString());
-                    }
-                    else
-                        Print("Waiting for green.");
+
+    Behaviour move = new CyclicBehaviour() { // TO DO: generalization
+        @Override
+        public void action() {
+            if(Vehicle.isAtTrafficLights()) //When car arrives at the traffic light
+            {
+                if(currentLightColor == LightColor.GREEN){
+                    Print("Passing green light.");
+                    AID dest = new AID("Light" + Vehicle.getCurrentTrafficLightID(), AID.ISLOCALNAME);
+                    ACLMessage msg = new ACLMessage(ACLMessage.INFORM);
+                    msg.setContent("Pass");
+                    msg.addReceiver(dest);
+                    send(msg);
+                    GetNextStop();
+                    Vehicle.Move();
+                    Print(Vehicle.getPositionString());
                 }
-                else if(vehicle.isAtDestination()){
-                    Print("Reached destination.");
-                    doDelete();
-                }
-                else {
-                    vehicle.Move();
-                    Print(vehicle.getPositionString());
-                }
-                block(1000);
+                else
+                    Print("Waiting for green.");
             }
-        };
-        addBehaviour(move);
+            else if(Vehicle.isAtDestination()){
+                Print("Reached destination.");
+                doDelete();
+            }
+            else {
+                Vehicle.Move();
+                Print(Vehicle.getPositionString());
+            }
+            block(1000);
+        }
+    };
+
+    public void setVehicle(Vehicle v)
+    {
+        Vehicle = v;
+    }
+
+    protected void setup() {
+        if(Vehicle == null)
+        {
+            String type = (String) getArguments()[0];
+            if(type.equals("BasicCar")) // check created vehicle type
+            {
+                Vehicle = new DummyCar();
+            }
+            else{ // if type was not found, create Basic Car
+                Vehicle = new DummyCar();
+            }
+        }
+        Print("I'm a "+ Vehicle.getVehicleType() + ".");
+        Vehicle.CalculateRoute();
+        Print("Starting at: " + Vehicle.getPositionString());
+        GetNextStop();
 
         Behaviour receiveMessages = new CyclicBehaviour() {
             @Override
@@ -76,11 +86,12 @@ public class VehicleAgent extends Agent {
             }
         };
         addBehaviour(receiveMessages);
+        addBehaviour(move);
     }
 
     void GetNextStop(){ // finds next traffic light and announces his arrival
-        if(vehicle.findNextTrafficLight()) {
-            AID dest = new AID("Light" + vehicle.getCurrentTrafficLightID(), AID.ISLOCALNAME);
+        if(Vehicle.findNextTrafficLight()) {
+            AID dest = new AID("Light" + Vehicle.getCurrentTrafficLightID(), AID.ISLOCALNAME);
             ACLMessage msg = new ACLMessage(ACLMessage.INFORM);
             msg.setContent("On my way.");
             msg.addReceiver(dest);
@@ -88,7 +99,7 @@ public class VehicleAgent extends Agent {
         }
     }
 
-    protected void takeDown() {
+    public void takeDown() {
         super.takeDown();
     }
 
