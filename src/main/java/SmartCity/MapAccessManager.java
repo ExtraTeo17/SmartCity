@@ -1,5 +1,5 @@
 /**
- * (c) Jens Kübler
+ * (c) Jens Kbler
  * This software is public domain
  * 
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"

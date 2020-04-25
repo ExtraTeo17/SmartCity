@@ -155,7 +155,7 @@ public class MapWindow {
         }
         WaypointPainter<Waypoint> waypointPainter = new WaypointPainter<>();
         waypointPainter.setWaypoints(set);
-        waypointPainter.setRenderer(new CustomWaypointRenderer("blue_waypoint.png"));
+        waypointPainter.setRenderer(new CustomWaypointRenderer("cabriolet.png"));
         painters.add(waypointPainter);
     }
 

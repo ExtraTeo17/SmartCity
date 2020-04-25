@@ -1,6 +1,7 @@
 package LightStrategies;
-import Agents.TrafficLightAgent;
+import Agents.LightManager;
+
 
 public abstract class LightStrategy {
-    public abstract void ApplyStrategy(TrafficLightAgent agent);
+    public abstract void ApplyStrategy(LightManager agent);
 }

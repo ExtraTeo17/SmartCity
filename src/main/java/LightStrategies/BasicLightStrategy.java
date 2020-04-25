@@ -1,3 +1,4 @@
+/*
 package LightStrategies;
 
 import Agents.LightColor;
@@ -61,3 +62,4 @@ public class BasicLightStrategy extends LightStrategy {
         agent.addBehaviour(LightSwitch);
     }
 }
+*/

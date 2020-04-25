@@ -1,3 +1,4 @@
+/*
 package Agents;
 
 import LightStrategies.BasicLightStrategy;
@@ -38,3 +39,4 @@ public class TrafficLightAgent extends Agent {
         System.out.println(getLocalName() + ": " + message);
     }
 }
+*/
