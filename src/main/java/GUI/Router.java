@@ -22,7 +22,7 @@ public final class Router {
     }
 
     private static Pair<List<Long>, PointList> findRoute(GeoPosition pointA, GeoPosition pointB) {
-        Pair<List<Long>, PointList> osmWayIdsAndPointList = com.graphhopper.osmidexample.HighwayAccessor.getOsmWayIdsAndPointList(new String[]{"config=config.properties", "datareader.file=mazowieckie-latest.osm.pbf"},
+        Pair<List<Long>, PointList> osmWayIdsAndPointList = SmartCity.HighwayAccessor.getOsmWayIdsAndPointList(new String[]{"config=config.properties", "datareader.file=mazowieckie-latest.osm.pbf"},
                 pointA.getLatitude(), pointA.getLongitude(), pointB.getLatitude(), pointB.getLongitude());
         return osmWayIdsAndPointList;
     }

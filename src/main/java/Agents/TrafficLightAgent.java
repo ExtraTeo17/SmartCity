@@ -1,4 +1,3 @@
-/*
 package Agents;
 
 import LightStrategies.BasicLightStrategy;
@@ -15,7 +14,7 @@ public class TrafficLightAgent extends Agent {
     public LightColor lightColor = LightColor.RED;
     public List<String> queue = new ArrayList<>();
     private GeoPosition position;
-    LightStrategy strategy = new BasicLightStrategy();
+    BasicLightStrategy strategy = new BasicLightStrategy();
 
     public TrafficLightAgent(GeoPosition pos) {
         position = pos;
@@ -39,4 +38,3 @@ public class TrafficLightAgent extends Agent {
         System.out.println(getLocalName() + ": " + message);
     }
 }
-*/

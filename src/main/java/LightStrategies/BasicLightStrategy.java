@@ -1,4 +1,3 @@
-/*
 package LightStrategies;
 
 import Agents.LightColor;
@@ -9,8 +8,8 @@ import jade.core.behaviours.CyclicBehaviour;
 import jade.core.behaviours.TickerBehaviour;
 import jade.lang.acl.ACLMessage;
 
-public class BasicLightStrategy extends LightStrategy {
-    @Override
+public class BasicLightStrategy {
+
     public void ApplyStrategy(final TrafficLightAgent agent) {
         Behaviour ReceiveMessage = new CyclicBehaviour() {
             @Override
@@ -62,4 +61,3 @@ public class BasicLightStrategy extends LightStrategy {
         agent.addBehaviour(LightSwitch);
     }
 }
-*/

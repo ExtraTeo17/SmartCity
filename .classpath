@@ -1,13 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
-	<classpathentry kind="src" output="target/classes" path="src/main/java">
+	<classpathentry excluding="GUI/images/" kind="src" output="target/classes" path="src/main/java">
 		<attributes>
 			<attribute name="optional" value="true"/>
-			<attribute name="maven.pomderived" value="true"/>
-		</attributes>
-	</classpathentry>
-	<classpathentry excluding="**" kind="src" output="target/classes" path="src/main/resources">
-		<attributes>
 			<attribute name="maven.pomderived" value="true"/>
 		</attributes>
 	</classpathentry>
@@ -15,12 +10,6 @@
 		<attributes>
 			<attribute name="test" value="true"/>
 			<attribute name="optional" value="true"/>
-			<attribute name="maven.pomderived" value="true"/>
-		</attributes>
-	</classpathentry>
-	<classpathentry excluding="**" kind="src" output="target/test-classes" path="src/test/resources">
-		<attributes>
-			<attribute name="test" value="true"/>
 			<attribute name="maven.pomderived" value="true"/>
 		</attributes>
 	</classpathentry>
@@ -47,6 +36,6 @@
 	<classpathentry kind="lib" path="dependencies/okhttp-3.8.0.jar"/>
 	<classpathentry kind="lib" path="dependencies/okio-1.13.0.jar"/>
 	<classpathentry kind="lib" path="dependencies/trove4j-3.0.3.jar"/>
-	<classpathentry kind="lib" path="/graphhopper-osm-id-mapping/target/graphhopper-osm-id-mapping-1.0-SNAPSHOT.jar"/>
+	<classpathentry kind="lib" path="src/main/java/GUI/images"/>
 	<classpathentry kind="output" path="target/classes"/>
 </classpath>
