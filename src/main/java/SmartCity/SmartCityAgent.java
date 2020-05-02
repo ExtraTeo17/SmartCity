@@ -20,6 +20,7 @@ import jade.wrapper.ControllerException;
 import jade.wrapper.StaleProxyException;
 
 import org.jxmapviewer.*;
+import org.jxmapviewer.viewer.GeoPosition;
 
 import Agents.LightManager;
 import Agents.TrafficLightAgent;
@@ -27,6 +28,7 @@ import Agents.TrafficLightAgent;
 public class SmartCityAgent extends Agent {
     public Set<VehicleAgent> Vehicles = new LinkedHashSet<>();
     public Set<LightManager> lightManagers = new LinkedHashSet<>();
+    public Set<Station> stations = new LinkedHashSet<>();
     private JXMapViewer mapViewer;
     private AgentContainer container;
     private MapWindow window;
@@ -36,7 +38,7 @@ public class SmartCityAgent extends Agent {
         displayGUI();
     }
 
-    private void displayGUI() {
+	private void displayGUI() {
         window = new MapWindow(this);
         mapViewer = window.MapViewer;
         JFrame frame = new JFrame("Smart City by Katherine & Dominic & Robert");
@@ -59,6 +61,11 @@ public class SmartCityAgent extends Agent {
         }
     }
 
+    private void prepareLightManagers(GeoPosition middlePoint, int radius) {
+		lightManagers = MapAccessManager.getLightManagers(middlePoint, radius);
+	}
+    
+    @Deprecated
     public void AddLightManagerAgent(String localName, LightManager manager) throws StaleProxyException {
         try {
             container.getAgent(localName);

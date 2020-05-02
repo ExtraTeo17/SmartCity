@@ -2,7 +2,7 @@
 <city name="warsaw">
 	<district name="wola">
 		<crossroads>
-			<crossroad>
+			<crossroad lat="" lon="">
 				<group>
 					<light way="116934897" light="165106660" lat="" lon=""/>
 					<light way="430560538" light="165106660" lat="" lon=""/>
