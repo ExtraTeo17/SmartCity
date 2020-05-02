@@ -21,11 +21,12 @@ import jade.wrapper.StaleProxyException;
 
 import org.jxmapviewer.*;
 
+import Agents.LightManager;
 import Agents.TrafficLightAgent;
 
 public class SmartCityAgent extends Agent {
     public Set<VehicleAgent> Vehicles = new LinkedHashSet<>();
-    public Set<TrafficLightAgent> Lights = new LinkedHashSet<>();
+    public Set<LightManager> lightManagers = new LinkedHashSet<>();
     private JXMapViewer mapViewer;
     private AgentContainer container;
     private MapWindow window;
@@ -58,14 +59,14 @@ public class SmartCityAgent extends Agent {
         }
     }
 
-    public void AddLightAgent(String id, TrafficLightAgent agent) throws StaleProxyException {
+    public void AddLightManagerAgent(String localName, LightManager manager) throws StaleProxyException {
         try {
-            container.getAgent("Light" + id);
+            container.getAgent(localName);
         } catch (ControllerException e) {
-            AgentController controller = container.acceptNewAgent("Light" + id, agent);
+            AgentController controller = container.acceptNewAgent(localName, manager);
             controller.activate();
             controller.start();
-            Lights.add(agent);
+            lightManagers.add(manager);
         }
     }
 }

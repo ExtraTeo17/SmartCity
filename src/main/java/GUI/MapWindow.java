@@ -1,6 +1,7 @@
 package GUI;
 
 import Agents.LightColor;
+import Agents.LightManager;
 import Agents.TrafficLightAgent;
 import Agents.VehicleAgent;
 import SmartCity.RoutePainter;
@@ -71,12 +72,11 @@ public class MapWindow {
                     //create car, generate lights, add route to car, add car to agents
                     VehicleAgent vehicle = new VehicleAgent();
                     RouteInfo info = Router.generateRouteInfo(pointA, pointB);
-                    WaywardCar car = new WaywardCar(info.Route);
+                    WaywardCar car = new WaywardCar(info.route);
                     vehicle.setVehicle(car);
-                    for (OSMNode node : info.Lights) {
-                        TrafficLightAgent light = new TrafficLightAgent(node.getPosition());
+                    for (LightManager mgr : info.lightManagers) {
                         try {
-                            SmartCityAgent.AddLightAgent(node.getId().toString(), light);
+                            SmartCityAgent.AddLightManagerAgent(mgr.getLocalName(), mgr); // to optimize (only name instead of entire agent?)
                         } catch (StaleProxyException e) {
                             e.printStackTrace();
                         }
@@ -87,7 +87,7 @@ public class MapWindow {
                         e.printStackTrace();
                     }
                     System.out.println("Vehicles: " + SmartCityAgent.Vehicles.size());
-                    System.out.println("Lights: " + SmartCityAgent.Lights.size());
+                    System.out.println("Lights: " + SmartCityAgent.lightManagers.size());
                     pointA = null;
                     pointB = null;
                 }
@@ -128,26 +128,15 @@ public class MapWindow {
     }
 
     public void DrawLights(List painters) {
-        for (TrafficLightAgent a : SmartCityAgent.Lights) {
-            HashSet set = new HashSet();
-            set.add(new DefaultWaypoint(a.getPosition()));
+        for (LightManager mgr : SmartCityAgent.lightManagers) {
             WaypointPainter<Waypoint> waypointPainter = new WaypointPainter<>();
+            HashSet set = new HashSet();
             waypointPainter.setWaypoints(set);
-            switch (a.lightColor) {
-                case RED:
-                    waypointPainter.setRenderer(new CustomWaypointRenderer("light_red.png"));
-                    break;
-                case YELLOW:
-                    waypointPainter.setRenderer(new CustomWaypointRenderer("light_yellow.png"));
-                    break;
-                case GREEN:
-                    waypointPainter.setRenderer(new CustomWaypointRenderer("light_green.png"));
-                    break;
-            }
+            mgr.draw(set, waypointPainter);
             painters.add(waypointPainter);
         }
     }
-
+    
     public void DrawVehicles(List painters) {
         Set<Waypoint> set = new HashSet<>();
         for (VehicleAgent a : SmartCityAgent.Vehicles) {

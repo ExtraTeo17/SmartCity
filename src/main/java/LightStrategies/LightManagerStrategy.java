@@ -1,6 +1,11 @@
 package LightStrategies;
 
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
+
+import org.jxmapviewer.viewer.Waypoint;
+import org.jxmapviewer.viewer.WaypointPainter;
 
 import Agents.LightManager;
 import SmartCity.Crossroad;
@@ -101,5 +106,9 @@ public class LightManagerStrategy extends LightStrategy {
     
     private String getCarName(ACLMessage rcv) {
     	return rcv.getSender().getLocalName();
+    }
+    
+    public void drawCrossroad(HashSet lightSet, WaypointPainter<Waypoint> painter) {
+    	crossroad.draw(lightSet, painter);
     }
 }

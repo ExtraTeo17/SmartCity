@@ -13,4 +13,8 @@ public class OptimizationResult {
 	public void addCarGrantedPassthrough(String carName) {
 		carsFreeToProceedNames.add(carName);
 	}
+	
+	public static OptimizationResult empty() {
+		return new OptimizationResult();
+	}
 }

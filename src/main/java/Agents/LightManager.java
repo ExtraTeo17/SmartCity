@@ -1,5 +1,11 @@
 package Agents;
 
+import java.util.HashSet;
+
+import org.jxmapviewer.viewer.GeoPosition;
+import org.jxmapviewer.viewer.Waypoint;
+import org.jxmapviewer.viewer.WaypointPainter;
+
 import LightStrategies.LightManagerStrategy;
 import LightStrategies.LightStrategy;
 import jade.core.Agent;
@@ -20,4 +26,8 @@ public class LightManager extends Agent {
     public void print(String message) {
         System.out.println(getLocalName() + ": " + message);
     }
+
+	public void draw(HashSet set, WaypointPainter<Waypoint> waypointPainter) {
+		strategy.drawCrossroad(set, waypointPainter);
+	}
 }

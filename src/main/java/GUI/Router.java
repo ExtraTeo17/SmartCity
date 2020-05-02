@@ -16,11 +16,12 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 
-public final class Router {
+public final class Router { // BIG REFACTOR, MOVE GETMANAGERFORLIGHTS TO MAPACCESSMANAGER AND ADD XML PARSING
     public static RouteInfo generateRouteInfo(GeoPosition pointA, GeoPosition pointB) {
         Pair<List<Long>, PointList> osmWayIdsAndPointList = findRoute(pointA, pointB);
-        List<OSMNode> lights_list = MapAccessManager.sendTrafficSignalOverpassQuery(osmWayIdsAndPointList.getValue0());
-        return new RouteInfo(osmWayIdsAndPointList.getValue1(), new LinkedHashSet<>(lights_list));
+        List<OSMNode> lightsList = MapAccessManager.sendTrafficSignalOverpassQuery(osmWayIdsAndPointList.getValue0());
+        List<LightManager> managers = getManagersForLights(lightsList);
+        return new RouteInfo(osmWayIdsAndPointList.getValue1(), new LinkedHashSet<>(managers));
     }
 
     private static Pair<List<Long>, PointList> findRoute(GeoPosition pointA, GeoPosition pointB) {
@@ -31,6 +32,7 @@ public final class Router {
     
     private static List<LightManager> getManagersForLights(List<OSMNode> lights) {
     	List<LightManager> managers = new ArrayList<>();
+    	managers.add(new LightManager()); // TODO !!!
     	return managers;
     }
 }
