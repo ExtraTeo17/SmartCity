@@ -7,32 +7,30 @@ import java.util.Objects;
 
 public class OSMNode {
 
-    private final Map<String, String> tags;
-    private String id;
-
-    private String lat;
-
-    private String lon;
-    private String version;
+    protected final Map<String, String> tags;
+    protected long id;
+    protected double lat;
+    protected double lon;
+    protected String version;
 
     public OSMNode(String id2, String latitude, String longitude, String version2, Map<String, String> tags2) {
-        id = id2;
-        lat = latitude;
-        lon = longitude;
+        id = Long.parseLong(id2);
+        lat = Double.parseDouble(latitude);
+        lon = Double.parseDouble(longitude);
         version = version2;
         tags = tags2;
     }
 
     public Long getId() {
-        return Long.parseLong(id);
+        return id;
     }
 
     public double getLat() {
-        return Double.parseDouble(lat);
+        return lat;
     }
 
     public double getLon() {
-        return Double.parseDouble(lon);
+        return lon;
     }
 
     public GeoPosition getPosition() {

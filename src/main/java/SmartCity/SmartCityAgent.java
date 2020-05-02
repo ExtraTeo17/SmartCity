@@ -6,8 +6,10 @@ import GUI.OSMNode;
 import GUI.Router;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import javax.swing.*;
@@ -27,7 +29,9 @@ import Agents.TrafficLightAgent;
 
 public class SmartCityAgent extends Agent {
     public Set<VehicleAgent> Vehicles = new LinkedHashSet<>();
+    //public Set<Pedestrian> pedestrians = new LinkedHashSet<>();
     public Set<LightManager> lightManagers = new LinkedHashSet<>();
+    public static Map<Long, Long> lightIdToLightManagerId = new HashMap<>();
     public Set<Station> stations = new LinkedHashSet<>();
     private JXMapViewer mapViewer;
     private AgentContainer container;
@@ -61,8 +65,12 @@ public class SmartCityAgent extends Agent {
         }
     }
 
-    private void prepareLightManagers(GeoPosition middlePoint, int radius) {
+    public void prepareLightManagers(GeoPosition middlePoint, int radius) {
 		lightManagers = MapAccessManager.getLightManagers(middlePoint, radius);
+	}
+
+    public void prepareStations(GeoPosition middlePoint, int radius) {
+		stations = MapAccessManager.getStations(middlePoint, radius);
 	}
     
     @Deprecated
