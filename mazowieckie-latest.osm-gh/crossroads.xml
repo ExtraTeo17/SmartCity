@@ -2,16 +2,20 @@
 <city name="warsaw">
 	<district name="wola">
 		<crossroads>
-			<crossroad id="1" type="simple">
-				<lights group="1">
-					<light id="1" way="116934897" light="165106660"/>
-					<light id="2" way="430560538" light="165106660"/>
-				</lights>
-				<lights group="2">
-					<light id="1" way="132526998" light="165106660"/>
-					<light id="2" way="287080397" light="165106660"/>
-				</lights>
+			<crossroad>
+				<group>
+					<light way="116934897" light="165106660" lat="" lon=""/>
+					<light way="430560538" light="165106660" lat="" lon=""/>
+				</group>
+				<group>
+					<light way="132526998" light="165106660" lat="" lon=""/>
+					<light way="287080397" light="165106660" lat="" lon=""/>
+				</group>
 			</crossroad>
+		</crossroads>
+	</district>
+	<district name="wawer">
+		<crossroads>
 		</crossroads>
 	</district>
 </city>

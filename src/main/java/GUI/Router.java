@@ -16,7 +16,7 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 
-public final class Router { // BIG REFACTOR, MOVE GETMANAGERFORLIGHTS TO MAPACCESSMANAGER AND ADD XML PARSING
+public final class Router { // BIG REFACTOR, MOVE GETMANAGERFORLIGHTS TO MAPACCESSMANAGER AND ADD XML PARSING !!!
     public static RouteInfo generateRouteInfo(GeoPosition pointA, GeoPosition pointB) {
         Pair<List<Long>, PointList> osmWayIdsAndPointList = findRoute(pointA, pointB);
         List<OSMNode> lightsList = MapAccessManager.sendTrafficSignalOverpassQuery(osmWayIdsAndPointList.getValue0());

@@ -17,6 +17,7 @@ public class Light {
 	private LightColor color;
 	private Queue<String> carQueue = new LinkedList<>();
 	private GeoPosition position;
+	//private int adjacentOsmWayId;
 	
 	public Light(LightColor color) { // TODO: ADD GEOPOSITION !!!
 		this.color = color;
