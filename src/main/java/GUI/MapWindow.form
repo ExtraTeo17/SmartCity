@@ -31,9 +31,52 @@
             <constraints>
               <splitpane position="right"/>
             </constraints>
-            <properties/>
+            <properties>
+              <maximumSize width="400" height="32767"/>
+              <minimumSize width="400" height="40"/>
+              <preferredSize width="400" height="40"/>
+            </properties>
             <border type="none"/>
             <children>
+              <component id="7cbff" class="javax.swing.JLabel">
+                <constraints/>
+                <properties>
+                  <text value="Zone radius (in m)"/>
+                </properties>
+              </component>
+              <component id="7b524" class="javax.swing.JSpinner" binding="radiusSpinner">
+                <constraints/>
+                <properties>
+                  <maximumSize width="150" height="30"/>
+                  <minimumSize width="150" height="30"/>
+                </properties>
+              </component>
+              <component id="bac1b" class="javax.swing.JLabel">
+                <constraints/>
+                <properties>
+                  <text value="Car limit"/>
+                </properties>
+              </component>
+              <component id="7e699" class="javax.swing.JSpinner" binding="carLimitSpinner">
+                <constraints/>
+                <properties>
+                  <maximumSize width="150" height="30"/>
+                  <minimumSize width="150" height="30"/>
+                </properties>
+              </component>
+              <component id="28ae3" class="javax.swing.JLabel">
+                <constraints/>
+                <properties>
+                  <text value="Simulation seed"/>
+                </properties>
+              </component>
+              <component id="5ee0e" class="javax.swing.JSpinner" binding="seedSpinner">
+                <constraints/>
+                <properties>
+                  <maximumSize width="150" height="30"/>
+                  <minimumSize width="150" height="30"/>
+                </properties>
+              </component>
               <component id="19baa" class="javax.swing.JButton" binding="StartRouteButton">
                 <constraints/>
                 <properties>
