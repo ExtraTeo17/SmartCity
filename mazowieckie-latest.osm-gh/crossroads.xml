@@ -1,0 +1,17 @@
+<?xml version="1.0"?>
+<city name="warsaw">
+	<district name="wola">
+		<crossroads>
+			<crossroad id="1" type="simple">
+				<lights group="1">
+					<light id="1" way="116934897" light="165106660"/>
+					<light id="2" way="430560538" light="165106660"/>
+				</lights>
+				<lights group="2">
+					<light id="1" way="132526998" light="165106660"/>
+					<light id="2" way="287080397" light="165106660"/>
+				</lights>
+			</crossroad>
+		</crossroads>
+	</district>
+</city>

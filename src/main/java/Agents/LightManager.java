@@ -1,15 +1,15 @@
 package Agents;
 
-
 import LightStrategies.LightManagerStrategy;
 import LightStrategies.LightStrategy;
 import jade.core.Agent;
 
 public class LightManager extends Agent {
-    LightStrategy strategy = new LightManagerStrategy();
+	
+    private final LightStrategy strategy = new LightManagerStrategy();
+    
     protected void setup() {
-        Print("I'm a traffic manager.");
-
+        print("I'm a traffic manager.");
         strategy.ApplyStrategy(this);
     }
 
@@ -17,7 +17,7 @@ public class LightManager extends Agent {
         super.takeDown();
     }
 
-    public void Print(String message) {
+    public void print(String message) {
         System.out.println(getLocalName() + ": " + message);
     }
 }
