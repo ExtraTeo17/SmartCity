@@ -70,4 +70,16 @@ public class SimpleCrossroad extends Crossroad {
 		lightGroup1.drawLights(lightSet, painter);
 		lightGroup2.drawLights(lightSet, painter);
 	}
+
+	@Override
+	public void removeCarFromQueue(String carName, int adjacentOsmWayId) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void removePedestrianFromQueue(String pedestrianName, int adjacentOsmWayId) {
+		// TODO Auto-generated method stub
+		
+	}
 }

@@ -127,16 +127,16 @@ public class MapWindow {
         refreshTimer.scheduleAtFixedRate(new RefreshTask(), 0, 100);
     }
     
-    @Deprecated
+    /*@Deprecated
     private void addLightManagersFromRoute(RouteInfo info) {
-	    for (LightManager mgr : info.lightManagers) {
+	    for (Long mgrId : info.lightManagers) {
 	        try {
-	            SmartCityAgent.AddLightManagerAgent(mgr.getLocalName(), mgr); // to optimize (only name instead of entire agent?)
+	            SmartCityAgent.AddLightManagerAgent("LightManager" + mgrId, mgr); // to optimize (only name instead of entire agent?)
 	        } catch (StaleProxyException e) {
 	            e.printStackTrace();
 	        }
 	    }
-    }
+    }*/
 
     public MapWindow(SmartCityAgent agent) {
         this();

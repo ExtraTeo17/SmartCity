@@ -14,13 +14,15 @@ import GUI.CustomWaypointRenderer;
 
 public class Light {
 	
-	private LightColor color;
+	private LightColor carLightColor;
+	private LightColor pedestrianLightColor;
 	private Queue<String> carQueue = new LinkedList<>();
+	private Queue<String> pedestrianQueue = new LinkedList<>();
 	private GeoPosition position;
 	//private int adjacentOsmWayId;
 	
 	public Light(LightColor color) { // TODO: ADD GEOPOSITION !!!
-		this.color = color;
+		this.carLightColor = color;
 	}
 
 	public void addCarToQueue(String carName) {
@@ -32,12 +34,12 @@ public class Light {
 	}
 
 	public boolean isGreen() {
-		return color == LightColor.GREEN;
+		return carLightColor == LightColor.GREEN;
 	}
 
 	public void draw(HashSet lightSet, WaypointPainter<Waypoint> painter) {
         lightSet.add(new DefaultWaypoint(position));
-        switch (color) {
+        switch (carLightColor) {
             case RED:
                 painter.setRenderer(new CustomWaypointRenderer("light_red.png"));
                 break;
@@ -51,9 +53,9 @@ public class Light {
 	}
 
 	public void switchLight() {
-		if (color == LightColor.RED)
-			color = LightColor.GREEN;
-		else if (color == LightColor.GREEN)
-			color = LightColor.RED;
+		if (carLightColor == LightColor.RED)
+			carLightColor = LightColor.GREEN;
+		else if (carLightColor == LightColor.GREEN)
+			carLightColor = LightColor.RED;
 	}
 }

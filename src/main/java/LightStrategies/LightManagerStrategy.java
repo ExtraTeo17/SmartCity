@@ -20,51 +20,95 @@ import jade.lang.acl.ACLMessage;
 public class LightManagerStrategy extends LightStrategy {
 	
 	private final static String ADJACENT_OSM_WAY_ID = "adjacentOsmWayId";
+	private final static String TYPE = "type";
+	public final static String PEDESTRIAN = "Pedestrian";
+	public final static String VEHICLE = "Vehicle";
 	
 	private Crossroad crossroad = new SimpleCrossroad();
 	
     @Override
     public void ApplyStrategy(final LightManager agent) {
         Behaviour communication = new SimpleBehaviour() {
-
-            public void action() {
-                ACLMessage rcv = agent.receive();
-                if (rcv != null) {
-                	handleMessageFromCar(rcv);
-                } else
-                    block();
-            }
             
             public boolean done() {
                 return true;
             }
+
+            public void action() {
+                ACLMessage rcv = agent.receive();
+                if (rcv != null) {
+                	handleMessageFromRecipient(rcv);
+                } else
+                    block();
+            }
             
-            private void handleMessageFromCar(ACLMessage rcv) {
+            private void handleMessageFromRecipient(ACLMessage rcv) {
+            	String recipientType = rcv.getUserDefinedParameter(TYPE);
+            	switch (recipientType) {
+            	case VEHICLE:
+            		handleMessageFromVehicle(rcv);
+            		break;
+            	case PEDESTRIAN:
+            		handleMessageFromPedestrian(rcv);
+            		break;
+            	}
+            }
+            
+            private void handleMessageFromVehicle(ACLMessage rcv) {
                 switch (rcv.getPerformative()) {
 	                case ACLMessage.INFORM:
-	                    // System.out.println("Manager: Car is close");
-	                    //or
-	                    //people came to traffic
-	                    break;
+	                    System.out.println("Manager: Car has passed the previous crossroad.");
+	                    handleVehicleOnItsWay(rcv);
 	                case ACLMessage.REQUEST_WHEN:
-	                    System.out.println("Manger: Cat is waiting");
-	                    handleCarArrival(rcv);
+	                    System.out.println("Manager: Car is waiting");
+	                    handleVehicleArrival(rcv);
 	                    //Answer agree
 	                    break;
+	                case ACLMessage.AGREE:
+	                	//Vehicle answered agree and has successfully passed the crossroad on green light.
+	                	//Can remove vehicle from the queue.
 	                default:
 	                    System.out.println("Wait");
 	            }
             }
             
-            private void handleCarArrival(ACLMessage rcv) {
-            	if (crossroad.isLightGreen(getIntParameter(rcv, ADJACENT_OSM_WAY_ID))) {
-            		answerCanProceed(getCarName(rcv));
-            	} else {
-	            	crossroad.addCarToQueue(
-	            			getCarName(rcv),
-	            			getIntParameter(rcv, ADJACENT_OSM_WAY_ID));
-            	}
+            private void handleVehicleOnItsWay(ACLMessage rcv) {
+				// TODO Auto-generated method stub
+				
+			}
+
+			private void handleVehicleArrival(ACLMessage rcv) {
+				// TODO Auto-generated method stub
+				
+			}
+
+			private void handleMessageFromPedestrian(ACLMessage rcv) {
+                switch (rcv.getPerformative()) {
+	                case ACLMessage.INFORM:
+	                    System.out.println("Manager: Pedestrian has passed the previous crossing.");
+	                    handlePedestrianOnItsWay(rcv);
+	                case ACLMessage.REQUEST_WHEN:
+	                    System.out.println("Manager: Pedestrian is waiting.");
+	                    handlePedestrianArrival(rcv);
+	                    //Answer agree
+	                    break;
+	                case ACLMessage.AGREE:
+	                	//Pedestrian answered agree and has successfully passed the crossing on green light.
+	                	//Can remove pedestrian from the queue.
+	                default:
+	                    System.out.println("Wait");
+	            }
             }
+
+			private void handlePedestrianOnItsWay(ACLMessage rcv) {
+				// TODO Auto-generated method stub
+				
+			}
+
+			private void handlePedestrianArrival(ACLMessage rcv) {
+				// TODO Auto-generated method stub
+				
+			}
         };
         
         Behaviour checkState = new TickerBehaviour(agent, 1000) {
