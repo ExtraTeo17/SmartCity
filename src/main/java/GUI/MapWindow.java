@@ -75,8 +75,8 @@ public class MapWindow {
                 switch (state) {
                     case SETTING_ZONE:
                         zoneCenter = geoPosition;
-                        SmartCityAgent.prepareLightManagers(geoPosition, getZoneRadius());
                         SmartCityAgent.prepareStations(geoPosition, getZoneRadius());
+                        SmartCityAgent.prepareLightManagers(geoPosition, getZoneRadius());
                         break;
                     case RUNNING:
                         if (pointA == null) {
@@ -290,7 +290,6 @@ public class MapWindow {
         public void run() {
             List<Painter<JXMapViewer>> painters = new ArrayList<>();
             DrawRoutes(painters);
-            
             DrawLights(painters);
             DrawVehicles(painters);
             DrawZones(painters);

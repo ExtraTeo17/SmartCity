@@ -10,7 +10,9 @@ import org.jxmapviewer.viewer.WaypointPainter;
 
 public abstract class Crossroad {
 	public abstract void addCarToQueue(String carName, int adjacentOsmWayId);
-	public abstract void removeCarFromQueue(String carName, int adjacentOsmWayId);
+	public abstract void addCarToFarAwayQueue(String carName, int adjacentOsmWayId, int journeyTime);
+	public abstract void removeCarFromQueue(int adjacentOsmWayId);
+	public abstract void removeCarFromFarAwayQueue(String carName, int adjacentOsmWayId);
 	public abstract void addPedestrianToQueue(String pedestrianName, int adjacentOsmWayId);
 	public abstract void removePedestrianFromQueue(String pedestrianName, int adjacentOsmWayId);
 	public abstract OptimizationResult requestOptimizations();

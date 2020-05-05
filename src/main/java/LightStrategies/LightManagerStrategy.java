@@ -23,6 +23,7 @@ import jade.lang.acl.ACLMessage;
 public class LightManagerStrategy extends LightStrategy {
 	
 	private final static String ADJACENT_OSM_WAY_ID = "adjacentOsmWayId";
+	private final static String JOURNEY_TIME = "journeyTime";
 	private final static String TYPE = "type";
 	public final static String PEDESTRIAN = "Pedestrian";
 	public final static String VEHICLE = "Vehicle";
@@ -67,29 +68,30 @@ public class LightManagerStrategy extends LightStrategy {
                 switch (rcv.getPerformative()) {
 	                case ACLMessage.INFORM:
 	                    System.out.println("Manager: Car has passed the previous crossroad.");
-	                    handleVehicleOnItsWay(rcv);
+	                    crossroad.addCarToFarAwayQueue(getCarName(rcv),
+	                    		getIntParameter(rcv, ADJACENT_OSM_WAY_ID),
+	                    		getIntParameter(rcv, JOURNEY_TIME));
+	                    break;
 	                case ACLMessage.REQUEST_WHEN:
 	                    System.out.println("Manager: Car is waiting");
-	                    handleVehicleArrival(rcv);
-	                    //Answer agree
+	                    crossroad.removeCarFromFarAwayQueue(getCarName(rcv),
+	                    		getIntParameter(rcv, ADJACENT_OSM_WAY_ID));
+	                    ACLMessage agree = new ACLMessage(ACLMessage.AGREE);
+	                    agree.addReceiver(rcv.getSender());
+	                    agent.send(agree);
+	                    if (crossroad.isLightGreen(getIntParameter(rcv, ADJACENT_OSM_WAY_ID)))
+	                    	answerCanProceed(getCarName(rcv));
+	                    else
+	                    	crossroad.addCarToQueue(getCarName(rcv),
+	                    		getIntParameter(rcv, ADJACENT_OSM_WAY_ID));
 	                    break;
 	                case ACLMessage.AGREE:
-	                	//Vehicle answered agree and has successfully passed the crossroad on green light.
-	                	//Can remove vehicle from the queue.
+	                	crossroad.removeCarFromQueue(getIntParameter(rcv, ADJACENT_OSM_WAY_ID));
+	                	break;
 	                default:
 	                    System.out.println("Wait");
 	            }
             }
-            
-            private void handleVehicleOnItsWay(ACLMessage rcv) {
-				// TODO Auto-generated method stub
-				
-			}
-
-			private void handleVehicleArrival(ACLMessage rcv) {
-				// TODO Auto-generated method stub
-				
-			}
 
 			private void handleMessageFromPedestrian(ACLMessage rcv) {
                 switch (rcv.getPerformative()) {

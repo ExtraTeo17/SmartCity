@@ -53,20 +53,35 @@ public class SimpleCrossroad extends Crossroad {
 	}
 
 	@Override
-	public void addCarToQueue(String carName, int adjacentOsmWayId) {
-		lights.get(adjacentOsmWayId).addCarToQueue(carName);
-	}
-
-	@Override
 	public void addPedestrianToQueue(String pedestrianName, int adjacentOsmWayId) {
 		// TODO Auto-generated method stub
 	}
 
 	@Override
-	public OptimizationResult requestOptimizations() {
-		// TODO: Katsiaryna <33
-		return OptimizationResult.empty();
+	public void removePedestrianFromQueue(String pedestrianName, int adjacentOsmWayId) {
+		// TODO Auto-generated method stub
+		
 	}
+
+	@Override
+	public OptimizationResult requestOptimizations() {
+		OptimizationResult result = new OptimizationResult();
+		/*int allCarsWaitingInGroup1 = lightGroup1.getSumOfCarsWaiting();
+		int allCarsWaitingInGroup2 = lightGroup2.getSumOfCarsWaiting();
+		if (allCarsWaitingInGroup2 > allCarsWaitingInGroup1)
+			switchLightsIfRed(group2);
+		else
+			switchLightsIfRed(group1);*/
+		for (Light light : lights.values())
+			if (light.isGreen())
+				for (String carName : light.carQueue)
+					result.addCarGrantedPassthrough(carName);
+		return result;
+	}
+	
+	/*private void switchLightsIfRed(SimpleLightGroup group) {
+		group.
+	}*/
 
 	@Override
 	public boolean isLightGreen(int adjacentOsmWayId) {
@@ -86,24 +101,27 @@ public class SimpleCrossroad extends Crossroad {
 	}
 
 	@Override
-	public void removeCarFromQueue(String carName, int adjacentOsmWayId) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public void removePedestrianFromQueue(String pedestrianName, int adjacentOsmWayId) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
 	public void startLifetime() {
 		startTimer();
 	}
 
 	@Override
-	public void addArrivingCarToQueue(String carName, int adjacentOsmWayId) {
-		
+	public void addCarToFarAwayQueue(String carName, int adjacentOsmWayId, int journeyTime) {
+		lights.get(adjacentOsmWayId).addCarToFarAwayQueue(carName, journeyTime);
+	}
+
+	@Override
+	public void addCarToQueue(String carName, int adjacentOsmWayId) {
+		lights.get(adjacentOsmWayId).addCarToQueue(carName);
+	}
+
+	@Override
+	public void removeCarFromFarAwayQueue(String carName, int adjacentOsmWayId) {
+		lights.get(adjacentOsmWayId).removeCarFromFarAwayQueue(carName);
+	}
+
+	@Override
+	public void removeCarFromQueue(int adjacentOsmWayId) {
+		lights.get(adjacentOsmWayId).removeCarFromQueue();
 	}
 }
