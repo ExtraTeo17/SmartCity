@@ -1,4 +1,4 @@
-<?xml version="1.0"?>
+<?xml version="1.0" encoding="UTF-8"?>
 <city name="warsaw">
 	<district name="srodmiescie">
 		<crossroads>
@@ -14,17 +14,23 @@
 				<group>
 					<light way="121806330" light="1507263937" lat="52.258463" lon="21.0016117" />
 				</group>
+				<group>
+				</group>
 			</crossroad>
 			<crossroad>
 				<group>
 					<light way="415970529" light="1412551904" lat="52.2583929" lon="20.9969497" />
 					<light way="423101283" light="944569755" lat="52.2586026" lon="20.9970726" />
 				</group>
+					<group>
+				</group>
 			</crossroad>
 			<crossroad>
 				<group>
 					<light way="415970531" light="4021163477" lat="52.2579436" lon="20.9940169" />
 					<light way="263858883" light="4021163477" lat="52.25758" lon="20.99390" />
+				</group>
+					<group>
 				</group>
 			</crossroad>
 			<crossroad>
@@ -77,6 +83,8 @@
 					<light way="203749099" light="3707037587" lat="52.2533874" lon="20.9838525" />
 					<light way="584012947" light="3703649220" lat="52.2534238" lon="20.9833312 " />
 				</group>
+					<group>
+				</group>
 			</crossroad>
 			<crossroad>
 				<group>
@@ -92,6 +100,8 @@
 				<group>
 					<light way="258458820" light="99408505" lat="52.2519431" lon="20.9883485" />
 					<light way="366878186" light="282141338" lat="52.2518413" lon="20.9884711" />
+				</group>
+					<group>
 				</group>
 			</crossroad>
 			<crossroad>
@@ -228,6 +238,8 @@
 			<crossroad>
 				<group>
 					<light way="98856470" light="1143664231" lat="52.2454993" lon="21.0050433" />
+				</group>
+					<group>
 				</group>
 			</crossroad>
 			<crossroad>
@@ -488,6 +500,8 @@
 				<group>
                     <light way="514418887" light="32528278" lat="52.23949" lon="21.03061"/>
 				</group>
+					<group>
+				</group>
 			</crossroad>
 			<crossroad>
 				<group>
@@ -617,6 +631,8 @@
 				<group>
                     <light way="406718922" light="32529958" lat="52.2346579" lon="21.038381"/>
 				</group>
+					<group>
+				</group>
 			</crossroad>
 			<crossroad>
 				<group>
@@ -716,10 +732,7 @@
 			</crossroad>
 		</crossroads>
 	</district>
-	<district name="wawer">
-		<crossroads>
-		</crossroads>
-	</district>
+	
 	<district name="ochota">
 		<crossroads>
 			<crossroad lat="52.21"  lon="20.94921">
