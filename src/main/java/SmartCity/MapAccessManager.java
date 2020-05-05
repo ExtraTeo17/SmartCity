@@ -362,6 +362,7 @@ public class MapAccessManager {
 	
 	private static void addCrossroadIdIfDesired(SmartCityAgent smartCityAgent, Node crossroad, GeoPosition middlePoint, int radius) {
 		Pair<Double, Double> crossroadLatLon = calculateLatLonBasedOnInternalLights(crossroad);
+		
 		if (belongsToCircle(crossroadLatLon.getValue0(), crossroadLatLon.getValue1(), middlePoint, radius)) {
 			smartCityAgent.tryAddNewLightManagerAgent(crossroad);
 		}
@@ -407,7 +408,7 @@ public class MapAccessManager {
 	private static boolean belongsToCircle(double latToBelong, double lonToBelong, GeoPosition middlePoint, int radius) {
 		return (((latToBelong - middlePoint.getLatitude()) * (latToBelong - middlePoint.getLatitude()))
 				+ ((lonToBelong - middlePoint.getLongitude()) * (lonToBelong - middlePoint.getLongitude())))
-				< (radius * radius);
+				< (radius * radius)*0.0000089*0.0000089;
 	}
 	
 	private static Document getXmlDocument(String filepath) {

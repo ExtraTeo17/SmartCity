@@ -161,14 +161,17 @@ public class MapWindow {
         return (int) seedSpinner.getValue();
     }
 
-    public void DrawLights(List painters) {
+    public void DrawLights(List<Painter<JXMapViewer>> painters) {
+    	if (!SmartCityAgent.lightManagersUnderConstruction )
+    		return;
+    	
         for (LightManager mgr : SmartCityAgent.lightManagers) {
-            WaypointPainter<Waypoint> waypointPainter = new WaypointPainter<>();
-            HashSet set = new HashSet();
-            waypointPainter.setWaypoints(set);
-            mgr.draw(set, waypointPainter);
-            painters.add(waypointPainter);
+           
+             mgr.draw( painters);
+           // waypointPainter.setWaypoints(set);
+            
         }
+        
     }
 
     public void DrawVehicles(List painters) {
@@ -287,7 +290,8 @@ public class MapWindow {
         public void run() {
             List<Painter<JXMapViewer>> painters = new ArrayList<>();
             DrawRoutes(painters);
-            //DrawLights(painters);
+            
+            DrawLights(painters);
             DrawVehicles(painters);
             DrawZones(painters);
             DrawStations(painters);

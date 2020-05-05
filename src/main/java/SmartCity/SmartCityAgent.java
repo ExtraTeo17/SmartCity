@@ -7,6 +7,7 @@ import GUI.Router;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
@@ -33,7 +34,8 @@ public class SmartCityAgent extends Agent {
 	
     public Set<VehicleAgent> Vehicles = new LinkedHashSet<>();
     //public Set<Pedestrian> pedestrians = new LinkedHashSet<>();
-    public static Set<LightManager> lightManagers = new LinkedHashSet<>();
+    public static Set<LightManager> lightManagers = new HashSet<>();
+    public static boolean lightManagersUnderConstruction = false;
     public static Map<Long, Long> lightIdToLightManagerId = new HashMap<>();
     private static long nextLightManagerId;
     public Set<Station> stations = new LinkedHashSet<>();
@@ -77,7 +79,9 @@ public class SmartCityAgent extends Agent {
 
     public void prepareLightManagers(GeoPosition middlePoint, int radius) {
     	resetIdGenerator();
+    	lightManagersUnderConstruction =true;
 		MapAccessManager.prepareLightManagersInRadiusAndLightIdToLightManagerIdHashSet(this, middlePoint, radius);
+		lightManagersUnderConstruction =false;
 	}
     
     private void resetIdGenerator() {

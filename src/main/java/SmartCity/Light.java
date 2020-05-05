@@ -14,6 +14,10 @@ import Agents.LightColor;
 import GUI.CustomWaypointRenderer;
 
 public class Light {
+	private static final String OSM_LIGHT_ID = "light";
+	private static final String WAY_ID = "way";
+	private static final String LAT = "lat";
+	private static final String LON = "lon";
 	
 	private LightColor carLightColor;
 	private LightColor pedestrianLightColor;
@@ -21,10 +25,16 @@ public class Light {
 	private Queue<String> pedestrianQueue = new LinkedList<>();
 	private GeoPosition position;
 	private long adjacentOsmWayId;
+	private long osmId;
 	
-	public Light(Node node, LightColor color, Long managerId) { // TODO: ADD GEOPOSITION !!!
+	public Light(Node node, LightColor color, Long managerId) { 
 		this.carLightColor = color;
-		addLightOsmIdToLightIdToLightManagerIdHashSet(123, managerId);
+		osmId=Long.parseLong(node.getAttributes().getNamedItem(OSM_LIGHT_ID).getNodeValue());
+		addLightOsmIdToLightIdToLightManagerIdHashSet(osmId, managerId);
+		double lat = Double.parseDouble((node.getAttributes().getNamedItem(LAT).getNodeValue()));
+		double lon = Double.parseDouble((node.getAttributes().getNamedItem(LON).getNodeValue()));
+		position= new GeoPosition(lat,lon);
+		adjacentOsmWayId = Long.parseLong((node.getAttributes().getNamedItem(WAY_ID).getNodeValue()));
 	}
 	
 	private void addLightOsmIdToLightIdToLightManagerIdHashSet(long osmId, long managerId) {

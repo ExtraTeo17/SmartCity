@@ -22,10 +22,14 @@ public class SimpleLightGroup {
 		}
 	}
 	
-	public void drawLights(HashSet lightSet, WaypointPainter<Waypoint> painter) {
+	public void drawLights( WaypointPainter<Waypoint> painter) {
+		HashSet<Waypoint> set = new HashSet<>();
+		
 		for (Light light : lights) {
-			light.draw(lightSet, painter);
+		
+			light.draw(set, painter);
 		}
+		painter.setWaypoints(set);
 	}
 
 	public void switchLights() {

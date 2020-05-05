@@ -1,7 +1,10 @@
 package Agents;
 
 import java.util.HashSet;
+import java.util.List;
 
+import org.jxmapviewer.JXMapViewer;
+import org.jxmapviewer.painter.Painter;
 import org.jxmapviewer.viewer.GeoPosition;
 import org.jxmapviewer.viewer.Waypoint;
 import org.jxmapviewer.viewer.WaypointPainter;
@@ -34,8 +37,8 @@ public class LightManager extends Agent {
         System.out.println(getLocalName() + ": " + message);
     }
 
-	public void draw(HashSet set, WaypointPainter<Waypoint> waypointPainter) {
-		strategy.drawCrossroad(set, waypointPainter);
+	public void draw( List<Painter<JXMapViewer>> waypointPainter) {
+		strategy.drawCrossroad(waypointPainter);
 	}
 
 	public String getId() {

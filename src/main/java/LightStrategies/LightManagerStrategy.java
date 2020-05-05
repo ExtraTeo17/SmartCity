@@ -4,6 +4,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import org.jxmapviewer.JXMapViewer;
+import org.jxmapviewer.painter.Painter;
 import org.jxmapviewer.viewer.Waypoint;
 import org.jxmapviewer.viewer.WaypointPainter;
 import org.w3c.dom.Node;
@@ -159,7 +161,7 @@ public class LightManagerStrategy extends LightStrategy {
     	return rcv.getSender().getLocalName();
     }
     
-    public void drawCrossroad(HashSet lightSet, WaypointPainter<Waypoint> painter) {
-    	crossroad.draw(lightSet, painter);
+    public void drawCrossroad(List<Painter<JXMapViewer>> painter) {
+    	crossroad.draw(painter);
     }
 }

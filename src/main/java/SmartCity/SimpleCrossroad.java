@@ -3,10 +3,14 @@ package SmartCity;
 import java.util.Dictionary;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Timer;
 import java.util.TimerTask;
 import Agents.LightColor;
+
+import org.jxmapviewer.JXMapViewer;
+import org.jxmapviewer.painter.Painter;
 import org.jxmapviewer.viewer.Waypoint;
 import org.jxmapviewer.viewer.WaypointPainter;
 import org.w3c.dom.Node;
@@ -70,9 +74,15 @@ public class SimpleCrossroad extends Crossroad {
 	}
 
 	@Override
-	public void draw(HashSet lightSet, WaypointPainter<Waypoint> painter) {
-		lightGroup1.drawLights(lightSet, painter);
-		lightGroup2.drawLights(lightSet, painter);
+	public void draw(List<Painter<JXMapViewer>> painter) {
+		 WaypointPainter<Waypoint> painter1= new  WaypointPainter<Waypoint> ();
+		 WaypointPainter<Waypoint> painter2= new  WaypointPainter<Waypoint> ();
+			
+		lightGroup1.drawLights( painter1);
+		lightGroup2.drawLights( painter2);
+		painter.add(painter1);
+		painter.add(painter2);
+		
 	}
 
 	@Override
@@ -90,5 +100,10 @@ public class SimpleCrossroad extends Crossroad {
 	@Override
 	public void startLifetime() {
 		startTimer();
+	}
+
+	@Override
+	public void addArrivingCarToQueue(String carName, int adjacentOsmWayId) {
+		
 	}
 }
