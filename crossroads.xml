@@ -234,6 +234,7 @@
 					<light way="303165540" light="1118690303" lat="52.2452997" lon="21.003338" />
 					<light way="302956188" light="251851753" lat="52.2449008" lon="21.003684" />
 				</group>
+				<group/>
 			</crossroad>
 			<crossroad>
 				<group>
@@ -294,6 +295,7 @@
 					<light way="4936858" light="280797034" lat="52.2387921" lon="20.9957912"/>
 					<light way="130196846" light="280797035" lat="52.2386909" lon="20.9961727"/>
 				</group>
+				<group/>
 			</crossroad>
 			<crossroad>
 				<group>
@@ -347,6 +349,7 @@
 				<group>
 					<light way="4969141" light="416554658" lat="52.2419513" lon="21.011911"/>
 				</group>
+				<group/>
 			</crossroad>
 			<crossroad>
 				<group>

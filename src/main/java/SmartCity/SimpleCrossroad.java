@@ -24,8 +24,8 @@ public class SimpleCrossroad extends Crossroad {
 	}
 	
 	private void prepareLightGroups(Node crossroad, Long managerId) {
-		lightGroup1 = new SimpleLightGroup(MapAccessManager.getCrossroadGroup(crossroad, 0), LightColor.RED, managerId);
-		lightGroup2 = new SimpleLightGroup(MapAccessManager.getCrossroadGroup(crossroad, 1), LightColor.GREEN, managerId);
+		lightGroup1 = new SimpleLightGroup(MapAccessManager.getCrossroadGroup(crossroad, 1), LightColor.RED, managerId);
+		lightGroup2 = new SimpleLightGroup(MapAccessManager.getCrossroadGroup(crossroad, 3), LightColor.GREEN, managerId);
 	}
 	
 	private void prepareTimer() {

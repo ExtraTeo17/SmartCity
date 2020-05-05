@@ -183,6 +183,11 @@ public class MapWindow {
     }
 
     public void DrawRoutes(List painters) {
+    	
+    	Set<LightManager> set = SmartCity.SmartCityAgent.lightManagers;
+    	int sizelol = set.size();
+    	int sizelololol = SmartCity.SmartCityAgent.lightIdToLightManagerId.size();
+    	
         for (VehicleAgent a : SmartCityAgent.Vehicles) {
             List<GeoPosition> track = new ArrayList<GeoPosition>();
             for (GHPoint3D point : a.Vehicle.getFullRoute()) {

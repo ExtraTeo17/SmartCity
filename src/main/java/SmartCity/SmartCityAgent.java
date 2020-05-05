@@ -92,7 +92,7 @@ public class SmartCityAgent extends Agent {
 		stations = MapAccessManager.getStations(middlePoint, radius);
 	}
     
-    @Deprecated
+    /*@Deprecated
     public void AddLightManagerAgent(String localName, LightManager manager) throws StaleProxyException {
         try {
             container.getAgent(localName);
@@ -102,10 +102,11 @@ public class SmartCityAgent extends Agent {
             controller.start();
             lightManagers.add(manager);
         }
-    }
+    }*/
 
 	public void tryAddNewLightManagerAgent(Node crossroad) {
 		LightManager manager = new LightManager(crossroad, nextLightManagerId());
+		SmartCity.SmartCityAgent.lightManagers.add(manager);
 		try {
 			container.acceptNewAgent(LIGHT_MANAGER + manager.getId(), manager);
 		} catch (StaleProxyException e) {

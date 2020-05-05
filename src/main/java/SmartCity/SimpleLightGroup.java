@@ -17,7 +17,8 @@ public class SimpleLightGroup {
 		lights = new HashSet<>();
 		NodeList lightsInGroup = crossroadGroup.getChildNodes();
 		for (int i = 0; i < lightsInGroup.getLength(); ++i) {
-			lights.add(new Light(lightsInGroup.item(i), color, managerId));
+			if (lightsInGroup.item(i).getNodeName().equals("light"))
+				lights.add(new Light(lightsInGroup.item(i), color, managerId));
 		}
 	}
 	

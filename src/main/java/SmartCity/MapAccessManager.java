@@ -345,16 +345,18 @@ public class MapAccessManager {
 		Document xmlDocument = getXmlDocument(CROSSROADS);
 		Node osmRoot = xmlDocument.getFirstChild();
 		NodeList districtXMLNodes = osmRoot.getChildNodes();
-		for (int i = 1; i < districtXMLNodes.getLength(); i++) {
-			addAllDesiredIdsInDistrict(smartCityAgent, districtXMLNodes.item(i), middlePoint, radius);
+		for (int i = 0; i < districtXMLNodes.getLength(); i++) {
+			if (districtXMLNodes.item(i).getNodeName().equals("district"))
+				addAllDesiredIdsInDistrict(smartCityAgent, districtXMLNodes.item(i), middlePoint, radius);
 		}
 	}
 	
 	private static void addAllDesiredIdsInDistrict(SmartCityAgent smartCityAgent, Node districtRoot, GeoPosition middlePoint, int radius) {
-		Node crossroadsRoot = districtRoot.getFirstChild();
+		Node crossroadsRoot = districtRoot.getChildNodes().item(1);
 		NodeList crossroadXMLNodes = crossroadsRoot.getChildNodes();
 		for (int i = 0; i < crossroadXMLNodes.getLength(); ++i) {
-			addCrossroadIdIfDesired(smartCityAgent, crossroadXMLNodes.item(i), middlePoint, radius);
+			if (crossroadXMLNodes.item(i).getNodeName().equals("crossroad"))
+				addCrossroadIdIfDesired(smartCityAgent, crossroadXMLNodes.item(i), middlePoint, radius);
 		}
 	}
 	
@@ -366,10 +368,10 @@ public class MapAccessManager {
 	}
 	
 	private static Pair<Double, Double> calculateLatLonBasedOnInternalLights(Node crossroad) {
-		List<Double> latList = getParametersFromGroup(getCrossroadGroup(crossroad, 0),
-				getCrossroadGroup(crossroad, 1), LAT);
-		List<Double> lonList = getParametersFromGroup(getCrossroadGroup(crossroad, 0),
-				getCrossroadGroup(crossroad, 1), LON);
+		List<Double> latList = getParametersFromGroup(getCrossroadGroup(crossroad, 1),
+				getCrossroadGroup(crossroad, 3), LAT);
+		List<Double> lonList = getParametersFromGroup(getCrossroadGroup(crossroad, 1),
+				getCrossroadGroup(crossroad, 3), LON);
 		double latAverage = calculateAverage(latList);
 		double lonAverage = calculateAverage(lonList);
 		return Pair.with(latAverage, lonAverage);
@@ -385,7 +387,8 @@ public class MapAccessManager {
 	private static void addLightParametersFromGroup(List<Double> list, Node group, String parameterName) {
 		NodeList lightNodes = group.getChildNodes();
 		for (int i = 0; i < lightNodes.getLength(); ++i) {
-			list.add(Double.parseDouble(lightNodes.item(i).getAttributes().getNamedItem(parameterName).getNodeValue()));
+			if (lightNodes.item(i).getNodeName().equals("light"))
+				list.add(Double.parseDouble(lightNodes.item(i).getAttributes().getNamedItem(parameterName).getNodeValue()));
 		}
 	}
 	
