@@ -6,6 +6,7 @@ import java.util.Set;
 
 import org.jxmapviewer.viewer.Waypoint;
 import org.jxmapviewer.viewer.WaypointPainter;
+import org.w3c.dom.Node;
 
 import Agents.LightManager;
 import SmartCity.Crossroad;
@@ -24,10 +25,16 @@ public class LightManagerStrategy extends LightStrategy {
 	public final static String PEDESTRIAN = "Pedestrian";
 	public final static String VEHICLE = "Vehicle";
 	
-	private Crossroad crossroad = new SimpleCrossroad();
+	private Crossroad crossroad;
 	
-    @Override
+    public LightManagerStrategy(Node crossroad, Long managerId) {
+		this.crossroad = new SimpleCrossroad(crossroad, managerId);
+	}
+
+	@Override
     public void ApplyStrategy(final LightManager agent) {
+		crossroad.startLifetime();
+		
         Behaviour communication = new SimpleBehaviour() {
             
             public boolean done() {

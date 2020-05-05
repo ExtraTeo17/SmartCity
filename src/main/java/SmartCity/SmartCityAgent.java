@@ -23,15 +23,19 @@ import jade.wrapper.StaleProxyException;
 
 import org.jxmapviewer.*;
 import org.jxmapviewer.viewer.GeoPosition;
+import org.w3c.dom.Node;
 
 import Agents.LightManager;
 import Agents.TrafficLightAgent;
 
 public class SmartCityAgent extends Agent {
+	public final static String LIGHT_MANAGER = "LightManager";
+	
     public Set<VehicleAgent> Vehicles = new LinkedHashSet<>();
     //public Set<Pedestrian> pedestrians = new LinkedHashSet<>();
-    public Set<LightManager> lightManagers = new LinkedHashSet<>();
+    public static Set<LightManager> lightManagers = new LinkedHashSet<>();
     public static Map<Long, Long> lightIdToLightManagerId = new HashMap<>();
+    private static long nextLightManagerId;
     public Set<Station> stations = new LinkedHashSet<>();
     private JXMapViewer mapViewer;
     private AgentContainer container;
@@ -57,7 +61,7 @@ public class SmartCityAgent extends Agent {
         Vehicles.add(agent);
     }
 
-    public void ActivateAgent(VehicleAgent agent) {
+    public void ActivateAgent(Agent agent) {
         try {
             agent.getContainerController().getAgent(agent.getLocalName()).start();
         } catch (ControllerException e) {
@@ -65,9 +69,24 @@ public class SmartCityAgent extends Agent {
         }
     }
 
-    public void prepareLightManagers(GeoPosition middlePoint, int radius) {
-		lightManagers = MapAccessManager.getLightManagers(middlePoint, radius);
+	public void activateLightManagerAgents() {
+		for (LightManager lightManager : lightManagers) {
+			ActivateAgent(lightManager);
+		}
 	}
+
+    public void prepareLightManagers(GeoPosition middlePoint, int radius) {
+    	resetIdGenerator();
+		MapAccessManager.prepareLightManagersInRadiusAndLightIdToLightManagerIdHashSet(this, middlePoint, radius);
+	}
+    
+    private void resetIdGenerator() {
+    	nextLightManagerId = 1;
+    }
+    
+    private Long nextLightManagerId() {
+		return nextLightManagerId++;
+    }
 
     public void prepareStations(GeoPosition middlePoint, int radius) {
 		stations = MapAccessManager.getStations(middlePoint, radius);
@@ -84,4 +103,13 @@ public class SmartCityAgent extends Agent {
             lightManagers.add(manager);
         }
     }
+
+	public void tryAddNewLightManagerAgent(Node crossroad) {
+		LightManager manager = new LightManager(crossroad, nextLightManagerId());
+		try {
+			container.acceptNewAgent(LIGHT_MANAGER + manager.getId(), manager);
+		} catch (StaleProxyException e) {
+			e.printStackTrace();
+		}
+	}
 }

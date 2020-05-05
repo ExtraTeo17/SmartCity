@@ -9,6 +9,7 @@ import java.util.TimerTask;
 import Agents.LightColor;
 import org.jxmapviewer.viewer.Waypoint;
 import org.jxmapviewer.viewer.WaypointPainter;
+import org.w3c.dom.Node;
 
 public class SimpleCrossroad extends Crossroad {
 	
@@ -17,18 +18,21 @@ public class SimpleCrossroad extends Crossroad {
 	private SimpleLightGroup lightGroup2;
 	private Timer timer;
 	
-	public SimpleCrossroad() {
-		prepareLightGroups();
+	public SimpleCrossroad(Node crossroad, Long managerId) {
+		prepareLightGroups(crossroad, managerId);
 		prepareTimer();
 	}
 	
-	private void prepareLightGroups() {
-		lightGroup1 = new SimpleLightGroup(LightColor.RED);
-		lightGroup2 = new SimpleLightGroup(LightColor.GREEN);
+	private void prepareLightGroups(Node crossroad, Long managerId) {
+		lightGroup1 = new SimpleLightGroup(MapAccessManager.getCrossroadGroup(crossroad, 0), LightColor.RED, managerId);
+		lightGroup2 = new SimpleLightGroup(MapAccessManager.getCrossroadGroup(crossroad, 1), LightColor.GREEN, managerId);
 	}
 	
 	private void prepareTimer() {
 		timer = new Timer(true);
+	}
+
+	private void startTimer() {
 		int delayBeforeStart = 0;
 		int repeatIntervalInMillisecs = 5000;
 		timer.scheduleAtFixedRate(new SwitchLightsTask(), delayBeforeStart, repeatIntervalInMillisecs);
@@ -81,5 +85,10 @@ public class SimpleCrossroad extends Crossroad {
 	public void removePedestrianFromQueue(String pedestrianName, int adjacentOsmWayId) {
 		// TODO Auto-generated method stub
 		
+	}
+
+	@Override
+	public void startLifetime() {
+		startTimer();
 	}
 }

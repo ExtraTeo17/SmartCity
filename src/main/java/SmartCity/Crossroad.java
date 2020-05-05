@@ -13,4 +13,5 @@ public abstract class Crossroad {
 	public abstract OptimizationResult requestOptimizations();
 	public abstract boolean isLightGreen(int adjacentOsmWayId);
 	public abstract void draw(HashSet lightSet, WaypointPainter<Waypoint> painter);
+	public abstract void startLifetime();
 }

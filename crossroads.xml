@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <city name="warsaw">
-	<district name="śródmieście">
+	<district name="srodmiescie">
 		<crossroads>
 			<crossroad>
 				<group>
@@ -1083,8 +1083,6 @@
 				<group>
 					<light way="364707332" light="3687531170" lat="52.21386" lon="20.96863"/>
 					<light way="385080256" light=" 3687531170" lat="52.21396" lon="20.96838"/>
-					<light way="364707329" light=" 3687531170" lat="52.21396" lon="20.96838"/>
-
 				</group>
 			</crossroad>
 			<crossroad lat="" lon="">

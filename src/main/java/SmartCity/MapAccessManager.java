@@ -18,6 +18,7 @@ package SmartCity;
 
 import java.io.BufferedReader;
 import java.io.DataOutputStream;
+import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
@@ -30,6 +31,7 @@ import java.text.DecimalFormatSymbols;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Locale;
@@ -45,6 +47,7 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
+import org.javatuples.Pair;
 import org.jxmapviewer.viewer.GeoPosition;
 //import org.osm.lights.diff.OSMNode;
 //import org.osm.lights.upload.BasicAuthenticator;
@@ -63,6 +66,10 @@ public class MapAccessManager {
 
 	private static final String OVERPASS_API = "http://www.overpass-api.de/api/interpreter";
 	private static final String OPENSTREETMAP_API_06 = "http://www.openstreetmap.org/api/0.6/";
+	private static final String LAT = "lat";
+	private static final String LON = "lon";
+	private static final String ID = "id";
+	private static final String CROSSROADS = "crossroads.xml";
 
 	public static OSMNode getNode(String nodeId) throws IOException, ParserConfigurationException, SAXException {
 		String string = "http://www.openstreetmap.org/api/0.6/node/" + nodeId;
@@ -211,6 +218,16 @@ public class MapAccessManager {
 		} finally { }
 		return nodes;
 	}
+
+	private static List<OSMNode> sendLightAroundOverpassQuery(String lightAroundOverpassQuery) {
+		List<OSMNode> nodes = null;
+		try {
+			nodes = MapAccessManager.getNodes(getNodesViaOverpass(lightAroundOverpassQuery));
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally { }
+		return nodes;
+	}
 	
 	public static List<OSMNode> sendTrafficSignalOverpassQuery(List<Long> osmWayIds) {
 		List<OSMNode> nodes = null;
@@ -324,9 +341,86 @@ public class MapAccessManager {
 		return traverseDatabase(midLat, midLon, vicinityRange);
 	}
 
-	public static Set<LightManager> getLightManagers(GeoPosition middlePoint, int radius) {
-		// TODO Auto-generated method stub
-		return null;
+	public static void prepareLightManagersInRadiusAndLightIdToLightManagerIdHashSet(SmartCityAgent smartCityAgent, GeoPosition middlePoint, int radius) {
+		Document xmlDocument = getXmlDocument(CROSSROADS);
+		Node osmRoot = xmlDocument.getFirstChild();
+		NodeList districtXMLNodes = osmRoot.getChildNodes();
+		for (int i = 1; i < districtXMLNodes.getLength(); i++) {
+			addAllDesiredIdsInDistrict(smartCityAgent, districtXMLNodes.item(i), middlePoint, radius);
+		}
+	}
+	
+	private static void addAllDesiredIdsInDistrict(SmartCityAgent smartCityAgent, Node districtRoot, GeoPosition middlePoint, int radius) {
+		Node crossroadsRoot = districtRoot.getFirstChild();
+		NodeList crossroadXMLNodes = crossroadsRoot.getChildNodes();
+		for (int i = 0; i < crossroadXMLNodes.getLength(); ++i) {
+			addCrossroadIdIfDesired(smartCityAgent, crossroadXMLNodes.item(i), middlePoint, radius);
+		}
+	}
+	
+	private static void addCrossroadIdIfDesired(SmartCityAgent smartCityAgent, Node crossroad, GeoPosition middlePoint, int radius) {
+		Pair<Double, Double> crossroadLatLon = calculateLatLonBasedOnInternalLights(crossroad);
+		if (belongsToCircle(crossroadLatLon.getValue0(), crossroadLatLon.getValue1(), middlePoint, radius)) {
+			smartCityAgent.tryAddNewLightManagerAgent(crossroad);
+		}
+	}
+	
+	private static Pair<Double, Double> calculateLatLonBasedOnInternalLights(Node crossroad) {
+		List<Double> latList = getParametersFromGroup(getCrossroadGroup(crossroad, 0),
+				getCrossroadGroup(crossroad, 1), LAT);
+		List<Double> lonList = getParametersFromGroup(getCrossroadGroup(crossroad, 0),
+				getCrossroadGroup(crossroad, 1), LON);
+		double latAverage = calculateAverage(latList);
+		double lonAverage = calculateAverage(lonList);
+		return Pair.with(latAverage, lonAverage);
+	}
+	
+	private static List<Double> getParametersFromGroup(Node group1, Node group2, String parameterName) {
+		List<Double> parameterList = new ArrayList<>();
+		addLightParametersFromGroup(parameterList, group1, parameterName);
+		addLightParametersFromGroup(parameterList, group2, parameterName);
+		return parameterList;
+	}
+	
+	private static void addLightParametersFromGroup(List<Double> list, Node group, String parameterName) {
+		NodeList lightNodes = group.getChildNodes();
+		for (int i = 0; i < lightNodes.getLength(); ++i) {
+			list.add(Double.parseDouble(lightNodes.item(i).getAttributes().getNamedItem(parameterName).getNodeValue()));
+		}
+	}
+	
+	private static double calculateAverage(List<Double> doubleList) {
+		double sum = 0;
+		for (double value : doubleList) {
+			sum += value;
+		}
+		return sum / (double)(doubleList.size());
+	}
+	
+	public static Node getCrossroadGroup(Node crossroad, int index) {
+		return crossroad.getChildNodes().item(index);
+	}
+
+	private static boolean belongsToCircle(double latToBelong, double lonToBelong, GeoPosition middlePoint, int radius) {
+		return (((latToBelong - middlePoint.getLatitude()) * (latToBelong - middlePoint.getLatitude()))
+				+ ((lonToBelong - middlePoint.getLongitude()) * (lonToBelong - middlePoint.getLongitude())))
+				< (radius * radius);
+	}
+	
+	private static Document getXmlDocument(String filepath) {
+		DocumentBuilderFactory dbfac = DocumentBuilderFactory.newInstance();
+		Document document = null;
+		try {
+			DocumentBuilder docBuilder = dbfac.newDocumentBuilder();
+			document = docBuilder.parse(new File(filepath));
+		} catch (SAXException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		} catch (ParserConfigurationException e) {
+			e.printStackTrace();
+		} finally { }
+		return document;
 	}
 
 	public static Set<Station> getStations(GeoPosition middlePoint, int radius) {
@@ -344,6 +438,19 @@ public class MapAccessManager {
 				"    <around radius=\"" + radius + "\" lat=\"" + middlePoint.getLatitude() + "\" lon=\"" + middlePoint.getLongitude() + "\"/>\r\n" + 
 				"  </query>\r\n" + 
 				"  <print e=\"\" from=\"_\" geometry=\"skeleton\" ids=\"yes\" limit=\"\" mode=\"body\" n=\"\" order=\"id\" s=\"\" w=\"\"/>\r\n" + 
+				"</osm-script>";
+	}
+
+	private static String getLightAroundOverpassQuery(GeoPosition middlePoint, int radius) {
+		return "<osm-script>\n" + 
+				"  <query into=\"_\" type=\"area\">\n" + 
+				"    <has-kv k=\"name\" modv=\"\" v=\"Warszawa\"/>\n" + 
+				"  </query>\n" + 
+				"  <query into=\"_\" type=\"node\">\n" + 
+				"    <has-kv k=\"highway\" modv=\"\" v=\"traffic_signals\"/>\n" + 
+				"    <around radius=\"" + radius + "\" lat=\"" + middlePoint.getLatitude() + "\" lon=\"" + middlePoint.getLongitude() + "\"/>\n" + 
+				"  </query>\n" + 
+				"  <print e=\"\" from=\"_\" geometry=\"skeleton\" ids=\"yes\" limit=\"\" mode=\"body\" n=\"\" order=\"id\" s=\"\" w=\"\"/>\n" + 
 				"</osm-script>";
 	}
 }

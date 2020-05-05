@@ -115,14 +115,20 @@ public class MapWindow {
         MapPanel.add(MapViewer);
         MapPanel.revalidate();
         StartRouteButton.addActionListener(new ActionListener() {
+        	
             @Override
             public void actionPerformed(ActionEvent e) {
                 carLimitSpinner.setEnabled(false);
                 seedSpinner.setEnabled(false);
                 radiusSpinner.setEnabled(false);
                 random.setSeed(getSeed());
+                startLightManagerAgents();
                 spawnTimer.scheduleAtFixedRate(new CreateCarTask(), 0, 100);
             }
+
+			private void startLightManagerAgents() {
+				SmartCityAgent.activateLightManagerAgents();
+			}
         });
         refreshTimer.scheduleAtFixedRate(new RefreshTask(), 0, 100);
     }

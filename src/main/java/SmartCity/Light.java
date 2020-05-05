@@ -8,6 +8,7 @@ import org.jxmapviewer.viewer.DefaultWaypoint;
 import org.jxmapviewer.viewer.GeoPosition;
 import org.jxmapviewer.viewer.Waypoint;
 import org.jxmapviewer.viewer.WaypointPainter;
+import org.w3c.dom.Node;
 
 import Agents.LightColor;
 import GUI.CustomWaypointRenderer;
@@ -19,10 +20,16 @@ public class Light {
 	private Queue<String> carQueue = new LinkedList<>();
 	private Queue<String> pedestrianQueue = new LinkedList<>();
 	private GeoPosition position;
-	//private int adjacentOsmWayId;
+	private long adjacentOsmWayId;
 	
-	public Light(LightColor color) { // TODO: ADD GEOPOSITION !!!
+	public Light(Node node, LightColor color, Long managerId) { // TODO: ADD GEOPOSITION !!!
 		this.carLightColor = color;
+		addLightOsmIdToLightIdToLightManagerIdHashSet(123, managerId);
+	}
+	
+	private void addLightOsmIdToLightIdToLightManagerIdHashSet(long osmId, long managerId) {
+		SmartCityAgent.lightIdToLightManagerId.put(osmId, managerId);
+		// MAKE SURE THE KEY AND VALUE IS ADDED ONCE !!!
 	}
 
 	public void addCarToQueue(String carName) {
