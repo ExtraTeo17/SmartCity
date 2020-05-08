@@ -8,6 +8,8 @@ public class WaywardCar extends Vehicle {
     PointList route;
     int index = 0;
 
+    boolean passCheck = false;
+
     public WaywardCar(PointList list) {
         route = list;
     }
@@ -54,11 +56,25 @@ public class WaywardCar extends Vehicle {
 
     @Override
     public void Move() {
-        index++;
+        if(!isAtTrafficLights() || (isAtTrafficLights() && isAllowedToPass()))
+        {
+            index++;
+            setAllowedToPass(false);
+        }
     }
 
     @Override
     public PointList getFullRoute() {
         return route;
+    }
+
+    @Override
+    public boolean isAllowedToPass() {
+        return passCheck;
+    }
+
+    @Override
+    public void setAllowedToPass(boolean value) {
+        passCheck = value;
     }
 }

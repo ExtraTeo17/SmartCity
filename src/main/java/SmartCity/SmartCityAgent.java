@@ -30,8 +30,8 @@ import Agents.LightManager;
 import Agents.TrafficLightAgent;
 
 public class SmartCityAgent extends Agent {
-	public final static String LIGHT_MANAGER = "LightManager";
-	
+    public final static String LIGHT_MANAGER = "LightManager";
+
     public Set<VehicleAgent> Vehicles = new LinkedHashSet<>();
     //public Set<Pedestrian> pedestrians = new LinkedHashSet<>();
     public static Set<LightManager> lightManagers = new HashSet<>();
@@ -48,7 +48,7 @@ public class SmartCityAgent extends Agent {
         displayGUI();
     }
 
-	private void displayGUI() {
+    private void displayGUI() {
         window = new MapWindow(this);
         mapViewer = window.MapViewer;
         JFrame frame = new JFrame("Smart City by Katherine & Dominic & Robert");
@@ -71,30 +71,31 @@ public class SmartCityAgent extends Agent {
         }
     }
 
-	public void activateLightManagerAgents() {
-		for (LightManager lightManager : lightManagers) {
-			ActivateAgent(lightManager);
-		}
-	}
+    public void activateLightManagerAgents() {
+        for (LightManager lightManager : lightManagers) {
+            ActivateAgent(lightManager);
+        }
+    }
 
     public void prepareLightManagers(GeoPosition middlePoint, int radius) {
-    	resetIdGenerator();
-    	lightManagersUnderConstruction =true;
-		MapAccessManager.prepareLightManagersInRadiusAndLightIdToLightManagerIdHashSet(this, middlePoint, radius);
-		lightManagersUnderConstruction =false;
-	}
-    
-    private void resetIdGenerator() {
-    	nextLightManagerId = 1;
+        resetIdGenerator();
+        lightManagersUnderConstruction = true;
+            MapAccessManager.prepareLightManagersInRadiusAndLightIdToLightManagerIdHashSet(this, middlePoint, radius);
+
+        lightManagersUnderConstruction = false;
     }
-    
+
+    private void resetIdGenerator() {
+        nextLightManagerId = 1;
+    }
+
     private Long nextLightManagerId() {
-		return nextLightManagerId++;
+        return nextLightManagerId++;
     }
 
     public void prepareStations(GeoPosition middlePoint, int radius) {
-		stations = MapAccessManager.getStations(middlePoint, radius);
-	}
+        stations = MapAccessManager.getStations(middlePoint, radius);
+    }
     
     /*@Deprecated
     public void AddLightManagerAgent(String localName, LightManager manager) throws StaleProxyException {
@@ -108,13 +109,13 @@ public class SmartCityAgent extends Agent {
         }
     }*/
 
-	public void tryAddNewLightManagerAgent(Node crossroad) {
-		LightManager manager = new LightManager(crossroad, nextLightManagerId());
-		SmartCity.SmartCityAgent.lightManagers.add(manager);
-		try {
-			container.acceptNewAgent(LIGHT_MANAGER + manager.getId(), manager);
-		} catch (StaleProxyException e) {
-			e.printStackTrace();
-		}
-	}
+    public void tryAddNewLightManagerAgent(Node crossroad) {
+        LightManager manager = new LightManager(crossroad, nextLightManagerId());
+        SmartCity.SmartCityAgent.lightManagers.add(manager);
+        try {
+            container.acceptNewAgent(LIGHT_MANAGER + manager.getId(), manager);
+        } catch (StaleProxyException e) {
+            e.printStackTrace();
+        }
+    }
 }

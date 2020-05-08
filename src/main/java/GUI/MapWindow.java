@@ -162,14 +162,11 @@ public class MapWindow {
     }
 
     public void DrawLights(List<Painter<JXMapViewer>> painters) {
-    	if (!SmartCityAgent.lightManagersUnderConstruction )
+    	if (SmartCityAgent.lightManagersUnderConstruction )
     		return;
     	
         for (LightManager mgr : SmartCityAgent.lightManagers) {
-           
              mgr.draw( painters);
-           // waypointPainter.setWaypoints(set);
-            
         }
         
     }
@@ -186,11 +183,7 @@ public class MapWindow {
     }
 
     public void DrawRoutes(List painters) {
-    	
-    	Set<LightManager> set = SmartCity.SmartCityAgent.lightManagers;
-    	int sizelol = set.size();
-    	int sizelololol = SmartCity.SmartCityAgent.lightIdToLightManagerId.size();
-    	
+
         for (VehicleAgent a : SmartCityAgent.Vehicles) {
             List<GeoPosition> track = new ArrayList<GeoPosition>();
             for (GHPoint3D point : a.Vehicle.getFullRoute()) {
@@ -309,8 +302,17 @@ public class MapWindow {
 
             GeoPosition A = new GeoPosition(zoneCenter.getLatitude() + lat, zoneCenter.getLongitude() + lon);
             GeoPosition B = new GeoPosition(zoneCenter.getLatitude() - lat, zoneCenter.getLongitude() - lon);
+            RouteInfo info;
+            try
+            {
+                info = Router.generateRouteInfo(A, B);
+            }
+            catch (Exception e)
+            {
+                return;
+            }
+
             VehicleAgent vehicle = new VehicleAgent();
-            RouteInfo info = Router.generateRouteInfo(A, B);
             WaywardCar car = new WaywardCar(info.route);
             vehicle.setVehicle(car);
             try {

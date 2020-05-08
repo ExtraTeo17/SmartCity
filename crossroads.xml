@@ -721,21 +721,6 @@
 			</crossroad>
 		</crossroads>
 	</district>
-	<district name="wola">
-		<crossroads>
-			<crossroad lat="" lon="">
-				<group>
-					<light way="116934897" light="165106660" lat="" lon=""/>
-					<light way="430560538" light="165106660" lat="" lon=""/>
-				</group>
-				<group>
-					<light way="132526998" light="165106660" lat="" lon=""/>
-					<light way="287080397" light="165106660" lat="" lon=""/>
-				</group>
-			</crossroad>
-		</crossroads>
-	</district>
-	
 	<district name="ochota">
 		<crossroads>
 			<crossroad lat="52.21"  lon="20.94921">

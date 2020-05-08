@@ -429,21 +429,6 @@ public class MapAccessManager {
 
 	public static Set<Station> getStations(GeoPosition middlePoint, int radius) {
 		List<Station> stationNodes = sendStationOverpassQuery(getStationsInRadiusQuery(middlePoint, radius));
-		System.out.println();
-		System.out.println();
-		System.out.println();
-		System.out.println();
-		System.out.println();
-		System.out.println();
-		System.out.println();
-		System.out.println("SDGSDGJHASDGJHSDGAJHSDGJHASDGJHSDGAJHSDGAJHSDGJHSDGJHSDGJHSDGJHASDGJHSDGAJHSDGAJHSDGAJHSDGAJHSDGJHSDGSDGSDGSDGSDG");
-		System.out.println();
-		System.out.println();
-		System.out.println();
-		System.out.println();
-		System.out.println(stationNodes.size());
-		System.out.println();
-		System.out.println();
 		return new LinkedHashSet<>(stationNodes);
 	}
 

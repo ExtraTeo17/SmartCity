@@ -14,4 +14,6 @@ public abstract class Vehicle {
     public abstract boolean isAtDestination();
     public abstract void Move();
     public abstract PointList getFullRoute();
+    public abstract boolean isAllowedToPass();
+    public abstract void setAllowedToPass(boolean value);
 }

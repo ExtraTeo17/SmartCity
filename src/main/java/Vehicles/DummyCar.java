@@ -54,4 +54,14 @@ public class DummyCar extends Vehicle {
     public PointList getFullRoute() {
         return null;
     }
+
+    @Override
+    public boolean isAllowedToPass() {
+        return false;
+    }
+
+    @Override
+    public void setAllowedToPass(boolean value) {
+
+    }
 }
