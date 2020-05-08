@@ -162,13 +162,12 @@ public class MapWindow {
     }
 
     public void DrawLights(List<Painter<JXMapViewer>> painters) {
-    	if (SmartCityAgent.lightManagersUnderConstruction )
+    	if (SmartCity.SmartCityAgent.lightManagersUnderConstruction)
     		return;
     	
-        for (LightManager mgr : SmartCityAgent.lightManagers) {
-             mgr.draw( painters);
+        for (LightManager mgr : SmartCity.SmartCityAgent.lightManagers) {
+             mgr.draw(painters);
         }
-        
     }
 
     public void DrawVehicles(List painters) {
