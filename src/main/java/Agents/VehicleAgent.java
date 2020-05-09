@@ -43,7 +43,7 @@ public class VehicleAgent extends Agent { // TO ADD SOME WRAPPER AROUND POINTLIS
         @Override
         public void action() {
             ACLMessage rcv = receive();
-            if(rcv != null)
+            if (rcv != null)
             {
                 switch (rcv.getPerformative()) {
                     case ACLMessage.REQUEST:
@@ -91,8 +91,9 @@ public class VehicleAgent extends Agent { // TO ADD SOME WRAPPER AROUND POINTLIS
     }
 
     void GetNextStop() { // finds next traffic light and announces his arrival
-        if (Vehicle.findNextTrafficLight()) {
-            AID dest = new AID("LightManager" + Vehicle.getCurrentTrafficLightID(), AID.ISLOCALNAME);
+    	String nextManagerId = Vehicle.findNextTrafficLight();
+        if (nextManagerId.length() > 0) {
+            AID dest = new AID("LightManager" + nextManagerId, AID.ISLOCALNAME);
             ACLMessage msg = new ACLMessage(ACLMessage.INFORM);
             msg.addReceiver(dest);
             Properties properties = new Properties();

@@ -16,6 +16,7 @@ import org.w3c.dom.Node;
 
 import Agents.LightColor;
 import GUI.CustomWaypointRenderer;
+import Routing.LightManagerNode;
 
 public class Light {
 	private static final String OSM_LIGHT_ID = "light";
@@ -35,15 +36,15 @@ public class Light {
 	public Light(Node node, LightColor color, Long managerId) { 
 		this.carLightColor = color;
 		osmId=Long.parseLong(node.getAttributes().getNamedItem(OSM_LIGHT_ID).getNodeValue());
-		addLightOsmIdToLightIdToLightManagerIdHashSet(osmId, managerId);
 		double lat = Double.parseDouble((node.getAttributes().getNamedItem(LAT).getNodeValue()));
 		double lon = Double.parseDouble((node.getAttributes().getNamedItem(LON).getNodeValue()));
-		position= new GeoPosition(lat,lon);
+		position= new GeoPosition(lat, lon);
 		adjacentOsmWayId = Long.parseLong((node.getAttributes().getNamedItem(WAY_ID).getNodeValue()));
+		addLightOsmIdToLightIdToLightManagerIdHashSet(osmId, managerId, position, adjacentOsmWayId);
 	}
 	
-	private void addLightOsmIdToLightIdToLightManagerIdHashSet(long osmId, long managerId) {
-		SmartCityAgent.lightIdToLightManagerId.put(osmId, managerId);
+	private void addLightOsmIdToLightIdToLightManagerIdHashSet(long osmId, long managerId, GeoPosition pos, long osmWayId) {
+		SmartCityAgent.lightIdToLightManagerNode.put(osmId, new LightManagerNode(pos.getLatitude(), pos.getLongitude(), osmWayId, Long.toString(managerId)));
 		// MAKE SURE THE KEY AND VALUE IS ADDED ONCE !!!
 	}
 

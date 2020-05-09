@@ -4,6 +4,7 @@ import Agents.VehicleAgent;
 import GUI.MapWindow;
 import GUI.OSMNode;
 import GUI.Router;
+import Routing.LightManagerNode;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -36,7 +37,7 @@ public class SmartCityAgent extends Agent {
     //public Set<Pedestrian> pedestrians = new LinkedHashSet<>();
     public static Set<LightManager> lightManagers = new HashSet<>();
     public static boolean lightManagersUnderConstruction = false;
-    public static Map<Long, Long> lightIdToLightManagerId = new HashMap<>();
+    public static Map<Long, LightManagerNode> lightIdToLightManagerNode = new HashMap<>();
     private static long nextLightManagerId;
     public Set<Station> stations = new LinkedHashSet<>();
     private JXMapViewer mapViewer;

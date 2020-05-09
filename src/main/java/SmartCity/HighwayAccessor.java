@@ -25,6 +25,8 @@ import com.graphhopper.util.CmdArgs;
 import com.graphhopper.util.EdgeIteratorState;
 import com.graphhopper.util.PointList;
 
+import Routing.RouteNode;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -41,9 +43,9 @@ import org.slf4j.LoggerFactory;
  */
 public class HighwayAccessor {
 
-    public static Pair<List<Long>, PointList> getOsmWayIdsAndPointList(String[] args, double fromLat, double fromLon, double toLat, double toLon) {
+    public static Pair<List<Long>, List<RouteNode>> getOsmWayIdsAndPointList(String[] args, double fromLat, double fromLon, double toLat, double toLon) {
         List<Long> osmWayIds = new ArrayList<>();
-        PointList pointList = new PointList();
+        List<RouteNode> pointList = new ArrayList<>();
     	
     	MyGraphHopper graphHopper = new MyGraphHopper();
         graphHopper.init(CmdArgs.read(args));
@@ -72,9 +74,18 @@ public class HighwayAccessor {
                 previousWayId = osmWayIdToAdd;
             }
             
-            pointList.add(edge.fetchWayGeometry(2));
+            pointList.addAll(getRouteNodeList(edge.fetchWayGeometry(2), osmWayIdToAdd));
+            
         }
         
-        return new Pair<List<Long>, PointList>(osmWayIds, pointList);
+        return new Pair<List<Long>, List<RouteNode>>(osmWayIds, pointList);
+    }
+    
+    private static List<RouteNode> getRouteNodeList(PointList pointList, long osmWayId) {
+    	List<RouteNode> nodeList = new ArrayList<>();
+    	for (int i = 0; i < pointList.size(); ++i) {
+    		nodeList.add(new RouteNode(pointList.toGHPoint(i).lat, pointList.toGHPoint(i).lon, osmWayId));
+    	}
+    	return nodeList;
     }
 }

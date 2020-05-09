@@ -42,6 +42,7 @@ import com.graphhopper.util.shapes.GHPoint;
 
 import Agents.LightManager;
 import GUI.OSMNode;
+import Routing.RouteNode;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -169,6 +170,26 @@ public class MapAccessManager {
 		}
 		return stationNodes;
 	}
+	
+	public static List<RouteNode> getRouteNodes(Document xmlDocument) {
+		List<RouteNode> routeNodes = new ArrayList<RouteNode>();
+		Node osmRoot = xmlDocument.getFirstChild();
+		NodeList osmXMLNodes = osmRoot.getChildNodes();
+		for (int i = 1; i < osmXMLNodes.getLength(); i++) {
+			Node item = osmXMLNodes.item(i);
+			if (item.getNodeName().equals("node")) {
+				NamedNodeMap attributes = item.getAttributes();
+				Node namedItemID = attributes.getNamedItem("id");
+				String id = namedItemID.getNodeValue();
+				Node namedItemLat = attributes.getNamedItem("lat");
+				Node namedItemLon = attributes.getNamedItem("lon");
+				String latitude = namedItemLat.getNodeValue();
+				String longitude = namedItemLon.getNodeValue();
+				//routeNodes.add(new Station(id, latitude, longitude, "", null));
+			}
+		}
+		return routeNodes;
+	}
 
 	public static List<OSMNode> getOSMNodesInVicinity(double lat, double lon, double vicinityRange) throws IOException,
 			SAXException, ParserConfigurationException {
@@ -229,7 +250,17 @@ public class MapAccessManager {
 		return nodes;
 	}
 	
-	public static List<OSMNode> sendTrafficSignalOverpassQuery(List<Long> osmWayIds) {
+	public static List<RouteNode> sendFullWayAndItsTrafficSignalsQuery(List<Long> osmWayIds) {
+		List<RouteNode> nodes = null;
+		try {
+			nodes = MapAccessManager.getRouteNodes(getNodesViaOverpass(getFullWayAndItsTrafficSignalsQuery(osmWayIds)));
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally { }
+		return nodes;
+	}
+	
+	public static List<OSMNode> sendFullTrafficSignalQuery(List<Long> osmWayIds) {
 		List<OSMNode> nodes = null;
 		try {
 			nodes = MapAccessManager.getNodes(getNodesViaOverpass(getFullTrafficSignalQuery(osmWayIds)));
@@ -269,6 +300,16 @@ public class MapAccessManager {
 				"<print e=\"\" from=\"_\" geometry=\"skeleton\" ids=\"yes\" limit=\"\" mode=\"meta\" n=\"\" order=\"id\" s=\"\" w=\"\"/>\r\n";
 	}
 	
+	private static String getFullWayAndItsTrafficSignalsQuery(List<Long> osmWayIds) {
+		StringBuilder builder = new StringBuilder();
+		builder.append("<osm-script>");
+		for (long id : osmWayIds) {
+			builder.append(getSingleWayAndItsTrafficSignalsQuery(id));
+		}
+		builder.append("</osm-script>");
+		return builder.toString();
+	}
+	
 	private static String getFullTrafficSignalQuery(List<Long> osmWayIds) {
 		StringBuilder builder = new StringBuilder();
 		builder.append("<osm-script>");
@@ -279,13 +320,23 @@ public class MapAccessManager {
 		return builder.toString();
 	}
 	
-	private static String getSingleTrafficSignalQuery(long osmWayId) {
-		return "<id-query type=\"way\" ref=\"" + osmWayId + "\" into=\"minor\"/>\r\n" + 
+	private static String getSingleWayAndItsTrafficSignalsQuery(long osmWayId) {
+		return "  <id-query type=\"way\" ref=\"" + osmWayId + "\" into=\"minor\"/>\r\n" + 
+				"  <print e=\"\" from=\"minor\" geometry=\"skeleton\" ids=\"yes\" limit=\"\" mode=\"skeleton\" n=\"\" order=\"id\" s=\"\" w=\"\"/>\r\n" + 
 				"  <query into=\"_\" type=\"node\">\r\n" + 
 				"    <has-kv k=\"highway\" modv=\"\" v=\"traffic_signals\"/>\r\n" + 
 				"    <recurse from=\"minor\" type=\"way-node\"/>\r\n" + 
 				"  </query>\r\n" + 
-				"  <print e=\"\" from=\"_\" geometry=\"skeleton\" ids=\"yes\" limit=\"\" mode=\"body\" n=\"\" order=\"id\" s=\"\" w=\"\"/>";
+				"  <print e=\"\" from=\"_\" geometry=\"skeleton\" ids=\"yes\" limit=\"\" mode=\"skeleton\" n=\"\" order=\"id\" s=\"\" w=\"\"/>\r\n";
+	}
+	
+	private static String getSingleTrafficSignalQuery(long osmWayId) {
+		return "  <id-query type=\"way\" ref=\"" + osmWayId + "\" into=\"minor\"/>\r\n" + 
+				"  <query into=\"_\" type=\"node\">\r\n" + 
+				"    <has-kv k=\"highway\" modv=\"\" v=\"traffic_signals\"/>\r\n" + 
+				"    <recurse from=\"minor\" type=\"way-node\"/>\r\n" + 
+				"  </query>\r\n" + 
+				"  <print e=\"\" from=\"_\" geometry=\"skeleton\" ids=\"yes\" limit=\"\" mode=\"skeleton\" n=\"\" order=\"id\" s=\"\" w=\"\"/>\r\n";
 	}
 
 	/**

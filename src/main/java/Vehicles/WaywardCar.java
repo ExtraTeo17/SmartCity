@@ -1,17 +1,23 @@
 package Vehicles;
 
 import com.graphhopper.util.PointList;
+
+import Routing.LightManagerNode;
+import Routing.RouteNode;
+
+import java.util.List;
+
+import org.javatuples.Pair;
 import org.jxmapviewer.viewer.GeoPosition;
 
 public class WaywardCar extends Vehicle {
 
-    PointList route;
-    int index = 0;
+    private List<RouteNode> route;
+    private int index = 0;
+    private boolean passCheck = false;
 
-    boolean passCheck = false;
-
-    public WaywardCar(PointList list) {
-        route = list;
+    public WaywardCar(List<RouteNode> info) {
+        route = info;
     }
 
     @Override
@@ -19,34 +25,34 @@ public class WaywardCar extends Vehicle {
         return "WaywardCar";
     }
 
+    @Deprecated
     @Override
-    public void CalculateRoute() {
-
-    }
+    public void CalculateRoute() { }
 
     @Override
-    public boolean findNextTrafficLight() {
-        return false;
+    public String findNextTrafficLight() {
+        //return index == 0 || route.get(index - 1) instanceof LightManagerNode;
+    	return "";
     }
 
     @Override
     public String getPositionString() {
-        return "Lat: " + route.getLat(index) + " Lon: " + route.getLon(index);
+        return "Lat: " + route.get(index).lat + " Lon: " + route.get(index).lon;
     }
 
     @Override
     public GeoPosition getPosition() {
-        return new GeoPosition(route.getLat(index), route.getLon(index));
+        return new GeoPosition(route.get(index).lat, route.get(index).lon);
     }
 
     @Override
-    public int getCurrentTrafficLightID() {
-        return 0;
+    public String getCurrentTrafficLightID() {
+        return ((LightManagerNode)(route.get(index))).lightManagerId;
     }
 
     @Override
     public boolean isAtTrafficLights() {
-        return false;
+        return route.get(index) instanceof LightManagerNode;
     }
 
     @Override
@@ -56,7 +62,7 @@ public class WaywardCar extends Vehicle {
 
     @Override
     public void Move() {
-        if(!isAtTrafficLights() || (isAtTrafficLights() && isAllowedToPass()))
+        if (!isAtTrafficLights() || (isAtTrafficLights() && isAllowedToPass()))
         {
             index++;
             setAllowedToPass(false);
@@ -64,7 +70,7 @@ public class WaywardCar extends Vehicle {
     }
 
     @Override
-    public PointList getFullRoute() {
+    public List<RouteNode> getFullRoute() {
         return route;
     }
 
@@ -78,3 +84,10 @@ public class WaywardCar extends Vehicle {
         passCheck = value;
     }
 }
+
+/*
+13 elementowa (3 light managery):
+
+x x M x x x x x M x x M x x
+
+*/

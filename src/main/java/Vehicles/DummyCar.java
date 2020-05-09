@@ -1,6 +1,11 @@
 package Vehicles;
 
 import com.graphhopper.util.PointList;
+
+import Routing.RouteNode;
+
+import java.util.List;
+
 import org.jxmapviewer.viewer.GeoPosition;
 
 public class DummyCar extends Vehicle {
@@ -16,8 +21,8 @@ public class DummyCar extends Vehicle {
     }
 
     @Override
-    public boolean findNextTrafficLight() {
-        return false;
+    public String findNextTrafficLight() {
+        return "";
     }
 
     @Override
@@ -31,8 +36,8 @@ public class DummyCar extends Vehicle {
     }
 
     @Override
-    public int getCurrentTrafficLightID() {
-        return 0;
+    public String getCurrentTrafficLightID() {
+        return "";
     }
 
     @Override
@@ -51,7 +56,7 @@ public class DummyCar extends Vehicle {
     }
 
     @Override
-    public PointList getFullRoute() {
+    public List<RouteNode> getFullRoute() {
         return null;
     }
 

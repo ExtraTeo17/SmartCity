@@ -2,13 +2,18 @@ package GUI;
 
 import Agents.LightManager;
 import Agents.VehicleAgent;
+import Routing.RouteNode;
 import SmartCity.RoutePainter;
 import SmartCity.SmartCityAgent;
 import SmartCity.Station;
 import SmartCity.ZonePainter;
 import Vehicles.WaywardCar;
+
+import com.graphhopper.util.PointList;
 import com.graphhopper.util.shapes.GHPoint3D;
 import jade.wrapper.StaleProxyException;
+
+import org.javatuples.Pair;
 import org.jxmapviewer.JXMapViewer;
 import org.jxmapviewer.OSMTileFactoryInfo;
 import org.jxmapviewer.input.*;
@@ -85,8 +90,8 @@ public class MapWindow {
                             pointB = geoPosition;
                             //create car, generate lights, add route to car, add car to agents
                             VehicleAgent vehicle = new VehicleAgent();
-                            RouteInfo info = Router.generateRouteInfo(pointA, pointB); /// ?????????? WTF
-                            WaywardCar car = new WaywardCar(info.route);
+                            List<RouteNode> info = Router.generateRouteInfo(pointA, pointB);
+                            WaywardCar car = new WaywardCar(info);
                             vehicle.setVehicle(car);
                             try {
                                 SmartCityAgent.AddNewVehicleAgent("WaywardCar" + SmartCityAgent.Vehicles.size(), vehicle);
@@ -123,14 +128,14 @@ public class MapWindow {
                 radiusSpinner.setEnabled(false);
                 random.setSeed(getSeed());
                 startLightManagerAgents();
-                spawnTimer.scheduleAtFixedRate(new CreateCarTask(), 0, 100);
+                spawnTimer.scheduleAtFixedRate(new CreateCarTask(), 0, 100000000);
             }
 
 			private void startLightManagerAgents() {
 				SmartCityAgent.activateLightManagerAgents();
 			}
         });
-        refreshTimer.scheduleAtFixedRate(new RefreshTask(), 0, 100);
+        refreshTimer.scheduleAtFixedRate(new RefreshTask(), 0, 500);
     }
     
     /*@Deprecated
@@ -185,7 +190,7 @@ public class MapWindow {
 
         for (VehicleAgent a : SmartCityAgent.Vehicles) {
             List<GeoPosition> track = new ArrayList<GeoPosition>();
-            for (GHPoint3D point : a.Vehicle.getFullRoute()) {
+            for (RouteNode point : a.Vehicle.getFullRoute()) {
                 track.add(new GeoPosition(point.lat, point.lon));
             }
             Random r = new Random(a.hashCode());
@@ -301,18 +306,19 @@ public class MapWindow {
 
             GeoPosition A = new GeoPosition(zoneCenter.getLatitude() + lat, zoneCenter.getLongitude() + lon);
             GeoPosition B = new GeoPosition(zoneCenter.getLatitude() - lat, zoneCenter.getLongitude() - lon);
-            RouteInfo info;
+            List<RouteNode> info;
             try
             {
                 info = Router.generateRouteInfo(A, B);
             }
             catch (Exception e)
             {
+            	e.printStackTrace();
                 return;
             }
 
             VehicleAgent vehicle = new VehicleAgent();
-            WaywardCar car = new WaywardCar(info.route);
+            WaywardCar car = new WaywardCar(info);
             vehicle.setVehicle(car);
             try {
                 SmartCityAgent.AddNewVehicleAgent("WaywardCar" + SmartCityAgent.Vehicles.size(), vehicle);
