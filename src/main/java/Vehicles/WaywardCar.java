@@ -19,7 +19,11 @@ public class WaywardCar extends Vehicle {
     public WaywardCar(List<RouteNode> info) {
         route = info;
     }
-
+    @Override
+    public long getAdjacentOsmWayId() {
+    	System.out.println(index);
+    	return route.get(index).osmWayId;
+    }
     @Override
     public String getVehicleType() {
         return "WaywardCar";
@@ -30,9 +34,24 @@ public class WaywardCar extends Vehicle {
     public void CalculateRoute() { }
 
     @Override
-    public String findNextTrafficLight() {
+    public LightManagerNode findNextTrafficLight() {
+    	if((isAtTrafficLights() && isAllowedToPass())) {
+    		index++;
+    	}
+    	int i=index;
+    	while(i<route.size() && !(route.get(i) instanceof LightManagerNode) ) {
+    		i++;
+    	}
+    	if(i>=route.size()) {
+    		return null;
+    	
+    	}
+    	else {
+    		return (LightManagerNode)(route.get(i));
+    	}
         //return index == 0 || route.get(index - 1) instanceof LightManagerNode;
-    	return "";
+    	//return "";
+    	
     }
 
     @Override
@@ -65,6 +84,7 @@ public class WaywardCar extends Vehicle {
         if (!isAtTrafficLights() || (isAtTrafficLights() && isAllowedToPass()))
         {
             index++;
+            System.out.println("TRaffic?"+isAtTrafficLights());
             setAllowedToPass(false);
         }
     }

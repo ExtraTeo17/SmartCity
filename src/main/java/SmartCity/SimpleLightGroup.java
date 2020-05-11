@@ -1,6 +1,8 @@
 package SmartCity;
 
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 
 import Agents.LightColor;
@@ -36,5 +38,13 @@ public class SimpleLightGroup {
 		for (Light light : lights) {
 			light.switchLight();
 		}
+	}
+
+	public Map<? extends Long, ? extends Light> prepareMap() {
+		Map<Long, Light> lightMap=new HashMap<>();
+		for(Light light : lights) {
+			lightMap.put(light.getAdjacentOSMWayId(),light);
+		}
+		return lightMap;
 	}
 }

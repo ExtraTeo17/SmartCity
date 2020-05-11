@@ -14,6 +14,8 @@ import Agents.LightManager;
 import SmartCity.Crossroad;
 import SmartCity.OptimizationResult;
 import SmartCity.SimpleCrossroad;
+import jade.core.AID;
+import jade.core.Agent;
 import jade.core.behaviours.Behaviour;
 import jade.core.behaviours.CyclicBehaviour;
 import jade.core.behaviours.SimpleBehaviour;
@@ -41,18 +43,21 @@ public class LightManagerStrategy extends LightStrategy {
         Behaviour communication = new SimpleBehaviour() {
             
             public boolean done() {
-                return true;
+                return false;
             }
 
             public void action() {
+            	System.out.println("LM:In action");
                 ACLMessage rcv = agent.receive();
                 if (rcv != null) {
+                	System.out.println("LM:Get message");
                 	handleMessageFromRecipient(rcv);
                 } else
                     block();
             }
             
             private void handleMessageFromRecipient(ACLMessage rcv) {
+            	
             	String recipientType = rcv.getUserDefinedParameter(TYPE);
             	switch (recipientType) {
             	case VEHICLE:
@@ -79,13 +84,14 @@ public class LightManagerStrategy extends LightStrategy {
 	                    ACLMessage agree = new ACLMessage(ACLMessage.AGREE);
 	                    agree.addReceiver(rcv.getSender());
 	                    agent.send(agree);
-	                    if (crossroad.isLightGreen(getIntParameter(rcv, ADJACENT_OSM_WAY_ID)))
-	                    	answerCanProceed(getCarName(rcv));
-	                    else
+	                   // if (crossroad.isLightGreen(getIntParameter(rcv, ADJACENT_OSM_WAY_ID)))
+	                    //	answerCanProceed(getCarName(rcv),agent);
+	                   // else
 	                    	crossroad.addCarToQueue(getCarName(rcv),
 	                    		getIntParameter(rcv, ADJACENT_OSM_WAY_ID));
 	                    break;
 	                case ACLMessage.AGREE:
+	                	System.out.println("Remove car from Queue");
 	                	crossroad.removeCarFromQueue(getIntParameter(rcv, ADJACENT_OSM_WAY_ID));
 	                	break;
 	                default:
@@ -134,26 +140,31 @@ public class LightManagerStrategy extends LightStrategy {
                 // if queue is empty
                 // apply strategy
                 //for elemnts in queue (if there are elements in queue, make green)
-				
+				System.out.println("Optimization");
 				OptimizationResult result = crossroad.requestOptimizations();
+				System.out.println("Len: "+result.carsFreeToProceed().size());
 				handleOptimizationResult(result);
 			}
 			
 			private void handleOptimizationResult(OptimizationResult result) {
 				List<String> carNames = result.carsFreeToProceed();
 				for (String carName : carNames) {
-					answerCanProceed(carName);
+					answerCanProceed(carName,agent);
 				}
 			}
+			  
         };
         
         agent.addBehaviour(communication);
         agent.addBehaviour(checkState);
     }
     
-    private void answerCanProceed(String carName) {
-    	// TODO: Katsiaryna <33
-    }
+	private void answerCanProceed(String carName, Agent agent) {
+		System.out.println("LM:Can proceed");
+   	 ACLMessage msg = new ACLMessage(ACLMessage.REQUEST);
+        msg.addReceiver(new AID(carName, AID.ISLOCALNAME));
+        agent.send(msg);
+   }
     
     private int getIntParameter(ACLMessage rcv, String param) {
     	return Integer.parseInt(rcv.getUserDefinedParameter(param));

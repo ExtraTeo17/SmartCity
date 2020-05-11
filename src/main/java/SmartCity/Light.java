@@ -33,6 +33,7 @@ public class Light {
 	private long adjacentOsmWayId;
 	private long osmId;
 	
+	
 	public Light(Node node, LightColor color, Long managerId) { 
 		this.carLightColor = color;
 		osmId=Long.parseLong(node.getAttributes().getNamedItem(OSM_LIGHT_ID).getNodeValue());
@@ -41,6 +42,9 @@ public class Light {
 		position= new GeoPosition(lat, lon);
 		adjacentOsmWayId = Long.parseLong((node.getAttributes().getNamedItem(WAY_ID).getNodeValue()));
 		addLightOsmIdToLightIdToLightManagerIdHashSet(osmId, managerId, position, adjacentOsmWayId);
+	}
+	public long getAdjacentOSMWayId() {
+		return adjacentOsmWayId;
 	}
 	
 	private void addLightOsmIdToLightIdToLightManagerIdHashSet(long osmId, long managerId, GeoPosition pos, long osmWayId) {

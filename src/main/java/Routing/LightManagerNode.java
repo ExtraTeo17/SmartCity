@@ -8,4 +8,5 @@ public class LightManagerNode extends RouteNode {
 		super(lat, lon, osmWayId);
 		this.lightManagerId = lightManagerId;
 	}
+
 }

@@ -2,6 +2,7 @@ package Vehicles;
 
 import com.graphhopper.util.PointList;
 
+import Routing.LightManagerNode;
 import Routing.RouteNode;
 
 import java.util.List;
@@ -20,11 +21,7 @@ public class DummyCar extends Vehicle {
 
     }
 
-    @Override
-    public String findNextTrafficLight() {
-        return "";
-    }
-
+    
     @Override
     public String getPositionString() {
         return null;
@@ -69,4 +66,16 @@ public class DummyCar extends Vehicle {
     public void setAllowedToPass(boolean value) {
 
     }
+
+	@Override
+	public long getAdjacentOsmWayId() {
+		// TODO Auto-generated method stub
+		return 0;
+	}
+
+	@Override
+	public LightManagerNode findNextTrafficLight() {
+		// TODO Auto-generated method stub
+		return null;
+	}
 }

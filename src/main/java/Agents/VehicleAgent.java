@@ -1,5 +1,6 @@
 package Agents;
 
+import Routing.LightManagerNode;
 import Vehicles.DummyCar;
 import Vehicles.Vehicle;
 import jade.core.AID;
@@ -13,20 +14,23 @@ public class VehicleAgent extends Agent { // TO ADD SOME WRAPPER AROUND POINTLIS
     public Vehicle Vehicle;
 
     boolean sentRequestWhen = false;
-
+	public final static String VEHICLE = "Vehicle";
     Behaviour move = new CyclicBehaviour() { // TO DO: generalization
         @Override
         public void action() {
             if (Vehicle.isAtTrafficLights()) //When car arrives at the traffic light
             {
+            	System.out.println("kotik");
                 if (!sentRequestWhen) {
                     ACLMessage msg = new ACLMessage(ACLMessage.REQUEST_WHEN);
                     msg.addReceiver(new AID("LightManager" + Vehicle.getCurrentTrafficLightID(), AID.ISLOCALNAME));
                     Properties properties = new Properties();
-                    properties.setProperty("adjacentOsmWayId", "123");
+                    properties.setProperty("type", VEHICLE);
+                    properties.setProperty("adjacentOsmWayId", Long.toString(Vehicle.getAdjacentOsmWayId()));
                     msg.setAllUserDefinedParameters(properties);
                     send(msg);
                     sentRequestWhen = true;
+                    System.out.println("Car: Send message "+msg.getAllUserDefinedParameters());
                 }
             } else if (Vehicle.isAtDestination()) {
                 Print("Reached destination.");
@@ -47,11 +51,14 @@ public class VehicleAgent extends Agent { // TO ADD SOME WRAPPER AROUND POINTLIS
             {
                 switch (rcv.getPerformative()) {
                     case ACLMessage.REQUEST:
+                    	 System.out.println("Car: Get message"+rcv.getAllUserDefinedParameters());
                         Vehicle.setAllowedToPass(true);
                         ACLMessage response = new ACLMessage(ACLMessage.AGREE);
                         response.addReceiver(rcv.getSender());
                         Properties properties = new Properties();
-                        properties.setProperty("adjacentOsmWayId", "123");
+                       
+                        properties.setProperty("type", VEHICLE);
+                        properties.setProperty("adjacentOsmWayId", Long.toString(Vehicle.getAdjacentOsmWayId()));
                         response.setAllUserDefinedParameters(properties);
                         send(response);
 
@@ -59,6 +66,7 @@ public class VehicleAgent extends Agent { // TO ADD SOME WRAPPER AROUND POINTLIS
                         sentRequestWhen = false;
                         break;
                     case ACLMessage.AGREE:
+                    	 System.out.println("Car:Czekam"+rcv.getAllUserDefinedParameters());
                         Vehicle.setAllowedToPass(false);
                         break;
                 }
@@ -91,17 +99,21 @@ public class VehicleAgent extends Agent { // TO ADD SOME WRAPPER AROUND POINTLIS
     }
 
     void GetNextStop() { // finds next traffic light and announces his arrival
-    	String nextManagerId = Vehicle.findNextTrafficLight();
-        if (nextManagerId.length() > 0) {
-            AID dest = new AID("LightManager" + nextManagerId, AID.ISLOCALNAME);
+    	LightManagerNode nextManager = Vehicle.findNextTrafficLight();
+    	//System.out.println(nextManagerId);
+        if (nextManager!=null) {
+        	
+            AID dest = new AID("LightManager" + nextManager.lightManagerId, AID.ISLOCALNAME);
             ACLMessage msg = new ACLMessage(ACLMessage.INFORM);
             msg.addReceiver(dest);
             Properties properties = new Properties();
+            properties.setProperty("type", VEHICLE);
             properties.setProperty("journeyTime", "10000");
-            properties.setProperty("adjacentOsmWayId", "123");
+            properties.setProperty("adjacentOsmWayId",Long.toString(nextManager.osmWayId));
             msg.setAllUserDefinedParameters(properties);
 
             send(msg);
+            System.out.println("Car: Zaraz będę"+msg.getAllUserDefinedParameters());
         }
     }
 

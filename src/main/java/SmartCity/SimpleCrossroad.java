@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Timer;
 import java.util.TimerTask;
 import Agents.LightColor;
@@ -17,7 +18,7 @@ import org.w3c.dom.Node;
 
 public class SimpleCrossroad extends Crossroad {
 	
-	private Map<Integer, Light> lights = new HashMap<>();
+	private Map<Long, Light> lights = new HashMap<>();
 	private SimpleLightGroup lightGroup1;
 	private SimpleLightGroup lightGroup2;
 	private Timer timer;
@@ -25,8 +26,14 @@ public class SimpleCrossroad extends Crossroad {
 	public SimpleCrossroad(Node crossroad, Long managerId) {
 		prepareLightGroups(crossroad, managerId);
 		prepareTimer();
+		prepareLightMap();
 	}
 	
+	private void prepareLightMap() {
+        lights.putAll(lightGroup1.prepareMap());
+        lights.putAll(lightGroup2.prepareMap());
+	}
+
 	private void prepareLightGroups(Node crossroad, Long managerId) {
 		lightGroup1 = new SimpleLightGroup(MapAccessManager.getCrossroadGroup(crossroad, 1), LightColor.RED, managerId);
 		lightGroup2 = new SimpleLightGroup(MapAccessManager.getCrossroadGroup(crossroad, 3), LightColor.GREEN, managerId);
@@ -53,12 +60,12 @@ public class SimpleCrossroad extends Crossroad {
 	}
 
 	@Override
-	public void addPedestrianToQueue(String pedestrianName, int adjacentOsmWayId) {
+	public void addPedestrianToQueue(String pedestrianName, long adjacentOsmWayId) {
 		// TODO Auto-generated method stub
 	}
 
 	@Override
-	public void removePedestrianFromQueue(String pedestrianName, int adjacentOsmWayId) {
+	public void removePedestrianFromQueue(String pedestrianName, long adjacentOsmWayId) {
 		// TODO Auto-generated method stub
 		
 	}
@@ -84,7 +91,7 @@ public class SimpleCrossroad extends Crossroad {
 	}*/
 
 	@Override
-	public boolean isLightGreen(int adjacentOsmWayId) {
+	public boolean isLightGreen(long adjacentOsmWayId) {
 		return lights.get(adjacentOsmWayId).isGreen();
 	}
 
@@ -106,22 +113,42 @@ public class SimpleCrossroad extends Crossroad {
 	}
 
 	@Override
-	public void addCarToFarAwayQueue(String carName, int adjacentOsmWayId, int journeyTime) {
+	public void addCarToFarAwayQueue(String carName, long adjacentOsmWayId, int journeyTime) {
+	
+	try {
+		
 		lights.get(adjacentOsmWayId).addCarToFarAwayQueue(carName, journeyTime);
+		}
+	catch (Exception e){
+		System.out.println("ADD");
+		System.out.println(adjacentOsmWayId);
+		for(Entry<Long, Light> l: lights.entrySet()) {
+			System.out.println("-------------");
+			System.out.println(l.getKey());
+			System.out.println(l.getValue().getAdjacentOSMWayId());
+			
+		}
+	System.out.println(carName);
+		
+		}
+	finally {
+		
+	}
 	}
 
 	@Override
-	public void addCarToQueue(String carName, int adjacentOsmWayId) {
+	public void addCarToQueue(String carName, long adjacentOsmWayId) {
 		lights.get(adjacentOsmWayId).addCarToQueue(carName);
 	}
 
 	@Override
-	public void removeCarFromFarAwayQueue(String carName, int adjacentOsmWayId) {
+	public void removeCarFromFarAwayQueue(String carName, long adjacentOsmWayId) {
+		
 		lights.get(adjacentOsmWayId).removeCarFromFarAwayQueue(carName);
 	}
 
 	@Override
-	public void removeCarFromQueue(int adjacentOsmWayId) {
+	public void removeCarFromQueue(long adjacentOsmWayId) {
 		lights.get(adjacentOsmWayId).removeCarFromQueue();
 	}
 }
