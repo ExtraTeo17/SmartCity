@@ -2,11 +2,14 @@ package Routing;
 
 public class LightManagerNode extends RouteNode {
 
-	public String lightManagerId;
+	private long lightManagerId;
 	
-	public LightManagerNode(double lat, double lon, long osmWayId, String lightManagerId) {
+	public LightManagerNode(double lat, double lon, long osmWayId, long lightManagerId) {
 		super(lat, lon, osmWayId);
 		this.lightManagerId = lightManagerId;
 	}
 
+	public long getLightManagerId() {
+		return lightManagerId;
+	}
 }

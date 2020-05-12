@@ -6,6 +6,8 @@ import GUI.OSMNode;
 import GUI.Router;
 import Routing.LightManagerNode;
 
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -54,7 +56,57 @@ public class SmartCityAgent extends Agent {
         mapViewer = window.MapViewer;
         JFrame frame = new JFrame("Smart City by Katherine & Dominic & Robert");
         frame.getContentPane().add(window.MainPanel);
-        frame.setSize(800, 600);
+        JMenuBar menuBar = new JMenuBar();
+        JMenu view = new JMenu("View");
+
+        final JCheckBoxMenuItem cars = new JCheckBoxMenuItem("Render cars", true);
+        cars.addItemListener(new ItemListener() {
+            @Override
+            public void itemStateChanged(ItemEvent e) {
+                window.renderCars = cars.getState();
+            }
+        });
+        view.add(cars);
+
+        final JCheckBoxMenuItem routes = new JCheckBoxMenuItem("Render car routes", true);
+        routes.addItemListener(new ItemListener() {
+            @Override
+            public void itemStateChanged(ItemEvent e) {
+                window.renderCarRoutes = routes.getState();
+            }
+        });
+        view.add(routes);
+
+        final JCheckBoxMenuItem lights = new JCheckBoxMenuItem("Render lights", true);
+        lights.addItemListener(new ItemListener() {
+            @Override
+            public void itemStateChanged(ItemEvent e) {
+                window.renderLights = lights.getState();
+            }
+        });
+        view.add(lights);
+
+        final JCheckBoxMenuItem zone = new JCheckBoxMenuItem("Render zone", true);
+        zone.addItemListener(new ItemListener() {
+            @Override
+            public void itemStateChanged(ItemEvent e) {
+                window.renderZone = zone.getState();
+            }
+        });
+        view.add(zone);
+
+        final JCheckBoxMenuItem stations = new JCheckBoxMenuItem("Render stations", true);
+        stations.addItemListener(new ItemListener() {
+            @Override
+            public void itemStateChanged(ItemEvent e) {
+                window.renderStations = stations.getState();
+            }
+        });
+        view.add(stations);
+
+        menuBar.add(view);
+        frame.setJMenuBar(menuBar);
+        frame.setSize(1200, 600);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setVisible(true);
     }
@@ -97,18 +149,6 @@ public class SmartCityAgent extends Agent {
     public void prepareStations(GeoPosition middlePoint, int radius) {
         stations = MapAccessManager.getStations(middlePoint, radius);
     }
-    
-    /*@Deprecated
-    public void AddLightManagerAgent(String localName, LightManager manager) throws StaleProxyException {
-        try {
-            container.getAgent(localName);
-        } catch (ControllerException e) {
-            AgentController controller = container.acceptNewAgent(localName, manager);
-            controller.activate();
-            controller.start();
-            lightManagers.add(manager);
-        }
-    }*/
 
     public void tryAddNewLightManagerAgent(Node crossroad) {
         LightManager manager = new LightManager(crossroad, nextLightManagerId());

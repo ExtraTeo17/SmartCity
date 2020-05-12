@@ -12,7 +12,7 @@
       <splitpane id="bda57">
         <constraints border-constraint="Center"/>
         <properties>
-          <dividerLocation value="600"/>
+          <dividerLocation value="565"/>
           <dividerSize value="10"/>
         </properties>
         <border type="none"/>
@@ -27,64 +27,166 @@
             <border type="none"/>
             <children/>
           </grid>
-          <grid id="8da6b" binding="SidePanel" layout-manager="FlowLayout" hgap="5" vgap="5" flow-align="1">
+          <grid id="8da6b" binding="SidePanel" layout-manager="GridBagLayout">
             <constraints>
               <splitpane position="right"/>
             </constraints>
             <properties>
-              <maximumSize width="400" height="32767"/>
-              <minimumSize width="400" height="40"/>
-              <preferredSize width="400" height="40"/>
+              <maximumSize width="300" height="32767"/>
+              <minimumSize width="300" height="40"/>
+              <preferredSize width="300" height="40"/>
             </properties>
-            <border type="none"/>
+            <border type="empty"/>
             <children>
-              <component id="7cbff" class="javax.swing.JLabel">
-                <constraints/>
-                <properties>
-                  <text value="Zone radius (in m)"/>
-                </properties>
-              </component>
-              <component id="7b524" class="javax.swing.JSpinner" binding="radiusSpinner">
-                <constraints/>
-                <properties>
-                  <maximumSize width="150" height="30"/>
-                  <minimumSize width="150" height="30"/>
-                </properties>
-              </component>
-              <component id="bac1b" class="javax.swing.JLabel">
-                <constraints/>
+              <vspacer id="7e4e4">
+                <constraints>
+                  <grid row="5" column="0" row-span="1" col-span="1" vsize-policy="6" hsize-policy="1" anchor="0" fill="2" indent="0" use-parent-layout="false"/>
+                  <gridbag top="25" left="0" bottom="0" right="0" weightx="0.0" weighty="0.0"/>
+                </constraints>
+              </vspacer>
+              <component id="b9ffc" class="javax.swing.JLabel">
+                <constraints>
+                  <grid row="6" column="0" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="0" fill="0" indent="0" use-parent-layout="false"/>
+                  <gridbag top="0" left="0" bottom="10" right="0" weightx="0.0" weighty="0.0"/>
+                </constraints>
                 <properties>
                   <text value="Car limit"/>
                 </properties>
               </component>
-              <component id="7e699" class="javax.swing.JSpinner" binding="carLimitSpinner">
-                <constraints/>
+              <component id="a21d6" class="javax.swing.JSpinner" binding="carLimitSpinner">
+                <constraints>
+                  <grid row="6" column="1" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="0" fill="0" indent="0" use-parent-layout="false"/>
+                  <gridbag top="0" left="0" bottom="10" right="0" weightx="0.0" weighty="0.0"/>
+                </constraints>
                 <properties>
                   <maximumSize width="150" height="30"/>
                   <minimumSize width="150" height="30"/>
                 </properties>
               </component>
-              <component id="28ae3" class="javax.swing.JLabel">
-                <constraints/>
+              <component id="231a4" class="javax.swing.JLabel">
+                <constraints>
+                  <grid row="7" column="0" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="0" fill="3" indent="0" use-parent-layout="false"/>
+                  <gridbag top="0" left="0" bottom="10" right="0" weightx="0.0" weighty="0.0"/>
+                </constraints>
                 <properties>
                   <text value="Simulation seed"/>
                 </properties>
               </component>
-              <component id="5ee0e" class="javax.swing.JSpinner" binding="seedSpinner">
-                <constraints/>
+              <component id="c8c87" class="javax.swing.JSpinner" binding="seedSpinner">
+                <constraints>
+                  <grid row="7" column="1" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="0" fill="0" indent="0" use-parent-layout="false"/>
+                  <gridbag top="0" left="0" bottom="10" right="0" weightx="0.0" weighty="0.0"/>
+                </constraints>
                 <properties>
                   <maximumSize width="150" height="30"/>
                   <minimumSize width="150" height="30"/>
                 </properties>
               </component>
-              <component id="19baa" class="javax.swing.JButton" binding="StartRouteButton">
-                <constraints/>
+              <component id="d523e" class="javax.swing.JButton" binding="StartRouteButton">
+                <constraints>
+                  <grid row="10" column="1" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="0" fill="0" indent="0" use-parent-layout="false"/>
+                  <gridbag top="0" left="0" bottom="10" right="0" weightx="0.0" weighty="0.0"/>
+                </constraints>
                 <properties>
                   <text value="Start vehicles"/>
                 </properties>
                 <clientProperties>
                   <hideActionText class="java.lang.Boolean" value="false"/>
                 </clientProperties>
+              </component>
+              <component id="9e754" class="javax.swing.JLabel">
+                <constraints>
+                  <grid row="0" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+                  <gridbag top="0" left="0" bottom="10" right="0" weightx="0.0" weighty="0.0"/>
+                </constraints>
+                <properties>
+                  <text value="Zone center:"/>
+                </properties>
+              </component>
+              <component id="825b5" class="javax.swing.JSpinner" binding="latSpinner">
+                <constraints>
+                  <grid row="1" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="6" anchor="8" fill="1" indent="0" use-parent-layout="false"/>
+                  <gridbag top="0" left="0" bottom="10" right="0" weightx="0.0" weighty="0.0"/>
+                </constraints>
+                <properties/>
+              </component>
+              <component id="e0528" class="javax.swing.JSpinner" binding="lonSpinner">
+                <constraints>
+                  <grid row="2" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="6" anchor="8" fill="1" indent="0" use-parent-layout="false"/>
+                  <gridbag top="0" left="0" bottom="10" right="0" weightx="0.0" weighty="0.0"/>
+                </constraints>
+                <properties/>
+              </component>
+              <component id="d89db" class="javax.swing.JLabel">
+                <constraints>
+                  <grid row="1" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+                  <gridbag top="0" left="0" bottom="10" right="0" weightx="0.0" weighty="0.0"/>
+                </constraints>
+                <properties>
+                  <text value="Latitude"/>
+                </properties>
+              </component>
+              <component id="5dadf" class="javax.swing.JLabel">
+                <constraints>
+                  <grid row="2" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+                  <gridbag top="0" left="0" bottom="10" right="0" weightx="0.0" weighty="0.0"/>
+                </constraints>
+                <properties>
+                  <text value="Longitude"/>
+                </properties>
+              </component>
+              <component id="b630d" class="javax.swing.JLabel">
+                <constraints>
+                  <grid row="3" column="0" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="0" fill="0" indent="0" use-parent-layout="false"/>
+                  <gridbag top="0" left="0" bottom="10" right="0" weightx="0.0" weighty="0.0"/>
+                </constraints>
+                <properties>
+                  <text value="Zone radius (in m)"/>
+                </properties>
+              </component>
+              <component id="14142" class="javax.swing.JSpinner" binding="radiusSpinner">
+                <constraints>
+                  <grid row="3" column="1" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="0" fill="0" indent="0" use-parent-layout="false"/>
+                  <gridbag top="0" left="0" bottom="10" right="0" weightx="0.0" weighty="0.0"/>
+                </constraints>
+                <properties>
+                  <maximumSize width="150" height="30"/>
+                  <minimumSize width="150" height="30"/>
+                </properties>
+              </component>
+              <vspacer id="74e72">
+                <constraints>
+                  <grid row="9" column="0" row-span="1" col-span="1" vsize-policy="6" hsize-policy="1" anchor="0" fill="2" indent="0" use-parent-layout="false"/>
+                  <gridbag top="25" left="0" bottom="0" right="0" weightx="0.0" weighty="0.0"/>
+                </constraints>
+              </vspacer>
+              <component id="568ee" class="javax.swing.JButton" binding="setZoneButton" default-binding="true">
+                <constraints>
+                  <grid row="4" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
+                  <gridbag weightx="0.0" weighty="0.0"/>
+                </constraints>
+                <properties>
+                  <text value="Set zone"/>
+                </properties>
+              </component>
+              <component id="bf4de" class="javax.swing.JLabel">
+                <constraints>
+                  <grid row="8" column="0" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="0" fill="0" indent="0" use-parent-layout="false"/>
+                  <gridbag top="0" left="0" bottom="10" right="0" weightx="0.0" weighty="0.0"/>
+                </constraints>
+                <properties>
+                  <text value="Test car ID"/>
+                </properties>
+              </component>
+              <component id="25947" class="javax.swing.JSpinner" binding="testCarIdSpinner">
+                <constraints>
+                  <grid row="8" column="1" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="0" fill="0" indent="0" use-parent-layout="false"/>
+                  <gridbag top="0" left="0" bottom="10" right="0" weightx="0.0" weighty="0.0"/>
+                </constraints>
+                <properties>
+                  <maximumSize width="150" height="30"/>
+                  <minimumSize width="150" height="30"/>
+                </properties>
               </component>
             </children>
           </grid>

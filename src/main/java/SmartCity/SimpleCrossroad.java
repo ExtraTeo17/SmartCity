@@ -143,7 +143,6 @@ public class SimpleCrossroad extends Crossroad {
 
 	@Override
 	public void removeCarFromFarAwayQueue(String carName, long adjacentOsmWayId) {
-		
 		lights.get(adjacentOsmWayId).removeCarFromFarAwayQueue(carName);
 	}
 

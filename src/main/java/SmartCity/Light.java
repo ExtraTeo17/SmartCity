@@ -48,7 +48,7 @@ public class Light {
 	}
 	
 	private void addLightOsmIdToLightIdToLightManagerIdHashSet(long osmId, long managerId, GeoPosition pos, long osmWayId) {
-		SmartCityAgent.lightIdToLightManagerNode.put(osmId, new LightManagerNode(pos.getLatitude(), pos.getLongitude(), osmWayId, Long.toString(managerId)));
+		SmartCityAgent.lightIdToLightManagerNode.put(osmId, new LightManagerNode(pos.getLatitude(), pos.getLongitude(), osmWayId, managerId));
 		// MAKE SURE THE KEY AND VALUE IS ADDED ONCE !!!
 	}
 
