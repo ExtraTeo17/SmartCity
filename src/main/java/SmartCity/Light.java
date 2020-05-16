@@ -26,7 +26,7 @@ public class Light {
 	
 	private LightColor carLightColor;
 	private LightColor pedestrianLightColor;
-	private Map<String, Integer> farAwayCarMap = new HashMap<>();
+	public Map<String, Integer> farAwayCarMap = new HashMap<>();
 	public Queue<String> carQueue = new LinkedList<>();
 	private Queue<String> pedestrianQueue = new LinkedList<>();
 	private GeoPosition position;

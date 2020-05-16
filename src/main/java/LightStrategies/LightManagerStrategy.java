@@ -112,7 +112,7 @@ public class LightManagerStrategy extends LightStrategy {
             }
         };
 
-        Behaviour checkState = new TickerBehaviour(agent, 1000) {
+        Behaviour checkState = new TickerBehaviour(agent, 100) {
 
             @Override
             protected void onTick() {

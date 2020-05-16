@@ -19,8 +19,8 @@ public class VehicleAgent extends Agent { // TO ADD SOME WRAPPER AROUND POINTLIS
     }
 
     protected void setup() {
-        Print("I'm a " + Vehicle.getVehicleType() + ".");
-        Print("Starting at: " + Vehicle.getPositionString());
+        //Print("I'm a " + Vehicle.getVehicleType() + ".");
+        //Print("Starting at: " + Vehicle.getPositionString());
         GetNextStop();
         Vehicle.setState(DrivingState.MOVING);
 

@@ -39,6 +39,13 @@ public class SimpleLightGroup {
 			light.switchLight();
 		}
 	}
+	
+	public boolean areLightsGreen() {
+		for (Light light : lights) {
+			return light.isGreen();
+		}
+		throw new RuntimeException("Something is not properly initialized.");
+	}
 
 	public Map<? extends Long, ? extends Light> prepareMap() {
 		Map<Long, Light> lightMap=new HashMap<>();

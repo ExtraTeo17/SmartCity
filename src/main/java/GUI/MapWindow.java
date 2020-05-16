@@ -31,6 +31,9 @@ import java.util.List;
 import java.util.Timer;
 
 public class MapWindow {
+	private final static int REFRESH_MAP_INTERVAL_MILLISECONDS = 100;
+	private final static int CREATE_CAR_INTERVAL_MILLISECONDS = 500;
+	
     public JPanel MainPanel;
     public JXMapViewer MapViewer;
     private JPanel MapPanel;
@@ -162,14 +165,14 @@ public class MapWindow {
                 StartRouteButton.setEnabled(false);
                 random.setSeed(getSeed());
                 startLightManagerAgents();
-                spawnTimer.scheduleAtFixedRate(new CreateCarTask(), 0, 500);
+                spawnTimer.scheduleAtFixedRate(new CreateCarTask(), 0, CREATE_CAR_INTERVAL_MILLISECONDS);
             }
 
             private void startLightManagerAgents() {
                 SmartCityAgent.activateLightManagerAgents();
             }
         });
-        refreshTimer.scheduleAtFixedRate(new RefreshTask(), 0, 100);
+        refreshTimer.scheduleAtFixedRate(new RefreshTask(), 0, REFRESH_MAP_INTERVAL_MILLISECONDS);
     }
 
     public void SetZone() {

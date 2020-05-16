@@ -45,7 +45,7 @@ public class SimpleCrossroad extends Crossroad {
 
 	private void startTimer() {
 		int delayBeforeStart = 0;
-		int repeatIntervalInMillisecs = 5000;
+		int repeatIntervalInMillisecs = 20000;
 		timer.scheduleAtFixedRate(new SwitchLightsTask(), delayBeforeStart, repeatIntervalInMillisecs);
 	}
 	
@@ -53,8 +53,12 @@ public class SimpleCrossroad extends Crossroad {
 
 		@Override
 		public void run() {
-			lightGroup1.switchLights();
-			lightGroup2.switchLights();
+			if (shouldExtendGreenLight()) {
+				return;
+			} else {
+				lightGroup1.switchLights();
+				lightGroup2.switchLights();
+			}
 		}
 		
 	}
@@ -72,13 +76,33 @@ public class SimpleCrossroad extends Crossroad {
 
 	@Override
 	public OptimizationResult requestOptimizations() {
+		return allCarsOnGreen();
+	}
+	
+	private boolean shouldExtendGreenLight() {
+		int greenGroupCars = 0;
+		int redGroupCars = 0;
+		for (Light light : lights.values()) {
+			if (light.isGreen())
+				greenGroupCars += light.carQueue.size(); // temporarily only close queue
+			else
+				redGroupCars += light.carQueue.size();
+		}
+		if (greenGroupCars > redGroupCars)
+			System.out.println("CROSSROAD HAS PROLONGED GREEN LIGHT FOR " + greenGroupCars + " CARS AS OPPOSED TO " + redGroupCars);
+		return greenGroupCars > redGroupCars; // should check if two base green intervals have passed (also temporary, because it also sucks)
+	}
+	
+	private SimpleLightGroup currentGreenGroup() {
+		if (lightGroup1.areLightsGreen()) {
+			return lightGroup1;
+		} else {
+			return lightGroup2;
+		}
+	}
+
+	private OptimizationResult allCarsOnGreen() {
 		OptimizationResult result = new OptimizationResult();
-		/*int allCarsWaitingInGroup1 = lightGroup1.getSumOfCarsWaiting();
-		int allCarsWaitingInGroup2 = lightGroup2.getSumOfCarsWaiting();
-		if (allCarsWaitingInGroup2 > allCarsWaitingInGroup1)
-			switchLightsIfRed(group2);
-		else
-			switchLightsIfRed(group1);*/
 		for (Light light : lights.values())
 			if (light.isGreen())
 				for (String carName : light.carQueue)
