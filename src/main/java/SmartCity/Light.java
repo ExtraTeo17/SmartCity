@@ -1,5 +1,6 @@
 package SmartCity;
 
+import java.time.Instant;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -26,7 +27,7 @@ public class Light {
 	
 	private LightColor carLightColor;
 	private LightColor pedestrianLightColor;
-	public Map<String, Integer> farAwayCarMap = new HashMap<>();
+	public Map<String, Instant> farAwayCarMap = new HashMap<>();
 	public Queue<String> carQueue = new LinkedList<>();
 	private Queue<String> pedestrianQueue = new LinkedList<>();
 	private GeoPosition position;
@@ -78,7 +79,7 @@ public class Light {
 			carLightColor = LightColor.RED;
 	}
 
-	public void addCarToFarAwayQueue(String carName, int journeyTime) {
+	public void addCarToFarAwayQueue(String carName, Instant journeyTime) {
 		farAwayCarMap.put(carName, journeyTime);
 	}
 

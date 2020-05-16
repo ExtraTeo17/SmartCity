@@ -1,5 +1,6 @@
 package LightStrategies;
 
+import java.time.Instant;
 import java.util.List;
 
 import Agents.MessageParameter;
@@ -56,10 +57,10 @@ public class LightManagerStrategy extends LightStrategy {
             private void handleMessageFromVehicle(ACLMessage rcv) {
                 switch (rcv.getPerformative()) {
                     case ACLMessage.INFORM:
-                        Print(rcv.getSender().getLocalName() + " is approaching in " + getIntParameter(rcv, MessageParameter.ARRIVAL_TIME) + "ms.");
+                        Print(rcv.getSender().getLocalName() + " is approaching in " + getInstantParameter(rcv, MessageParameter.ARRIVAL_TIME) + "ms.");
                         crossroad.addCarToFarAwayQueue(getCarName(rcv),
                                 getIntParameter(rcv, MessageParameter.ADJACENT_OSM_WAY_ID),
-                                getIntParameter(rcv, MessageParameter.ARRIVAL_TIME));
+                                getInstantParameter(rcv, MessageParameter.ARRIVAL_TIME));
                         break;
                     case ACLMessage.REQUEST_WHEN:
                         Print(rcv.getSender().getLocalName() + " is waiting on way " + getIntParameter(rcv, MessageParameter.ADJACENT_OSM_WAY_ID) + ".");
@@ -152,6 +153,9 @@ public class LightManagerStrategy extends LightStrategy {
 
     private int getIntParameter(ACLMessage rcv, String param) {
         return Integer.parseInt(rcv.getUserDefinedParameter(param));
+    }
+    private Instant getInstantParameter(ACLMessage rcv, String param) {
+        return Instant.parse(rcv.getUserDefinedParameter(param));
     }
 
     private String getCarName(ACLMessage rcv) {

@@ -1,5 +1,6 @@
 package SmartCity;
 
+import java.time.Instant;
 import java.util.Dictionary;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -22,7 +23,8 @@ public class SimpleCrossroad extends Crossroad {
 	private SimpleLightGroup lightGroup1;
 	private SimpleLightGroup lightGroup2;
 	private Timer timer;
-	
+	final public static int EXTEND_TIME = 5;
+	private boolean already_extended_green =false;
 	public SimpleCrossroad(Node crossroad, Long managerId) {
 		prepareLightGroups(crossroad, managerId);
 		prepareTimer();
@@ -45,7 +47,7 @@ public class SimpleCrossroad extends Crossroad {
 
 	private void startTimer() {
 		int delayBeforeStart = 0;
-		int repeatIntervalInMillisecs = 20000;
+		int repeatIntervalInMillisecs = 5000;
 		timer.scheduleAtFixedRate(new SwitchLightsTask(), delayBeforeStart, repeatIntervalInMillisecs);
 	}
 	
@@ -53,12 +55,44 @@ public class SimpleCrossroad extends Crossroad {
 
 		@Override
 		public void run() {
-			if (shouldExtendGreenLight()) {
-				return;
-			} else {
-				lightGroup1.switchLights();
-				lightGroup2.switchLights();
+			if(!already_extended_green)
+			{
+				if (shouldExtendGreenLightBecauseOfCarsOnLight()) {
+					already_extended_green=true;
+					return;
+				} 
+				else if(shouldExtendBecauseOfFarAwayQueque()) {
+					timer.cancel();
+					timer.schedule(new SwitchLightsTask(), EXTEND_TIME*1000 );
+					already_extended_green=true;
+				}
 			}
+			else {
+				
+				startTimer();
+				already_extended_green=false;
+			
+			}
+			lightGroup1.switchLights();
+			lightGroup2.switchLights();
+		}
+
+		private boolean shouldExtendBecauseOfFarAwayQueque() {
+			
+			for (Light light : lights.values()) {
+				if (light.isGreen())
+				{
+					Instant current_time = Instant.now();
+					for (Instant time_of_car: light.farAwayCarMap.values()) {
+						// If current time + EXTEND_TIME > time_of_car
+						if(current_time.plusSeconds(EXTEND_TIME).isAfter(time_of_car)) {
+							return true;
+						}
+					}
+				}
+			}
+			
+			return false;
 		}
 		
 	}
@@ -79,7 +113,7 @@ public class SimpleCrossroad extends Crossroad {
 		return allCarsOnGreen();
 	}
 	
-	private boolean shouldExtendGreenLight() {
+	private boolean shouldExtendGreenLightBecauseOfCarsOnLight() {
 		int greenGroupCars = 0;
 		int redGroupCars = 0;
 		for (Light light : lights.values()) {
@@ -88,8 +122,9 @@ public class SimpleCrossroad extends Crossroad {
 			else
 				redGroupCars += light.carQueue.size();
 		}
+		System.out.println("LM:Check number of cars");
 		if (greenGroupCars > redGroupCars)
-			System.out.println("CROSSROAD HAS PROLONGED GREEN LIGHT FOR " + greenGroupCars + " CARS AS OPPOSED TO " + redGroupCars);
+			System.out.println("LM:CROSSROAD HAS PROLONGED GREEN LIGHT FOR " + greenGroupCars + " CARS AS OPPOSED TO " + redGroupCars);
 		return greenGroupCars > redGroupCars; // should check if two base green intervals have passed (also temporary, because it also sucks)
 	}
 	
@@ -137,7 +172,7 @@ public class SimpleCrossroad extends Crossroad {
 	}
 
 	@Override
-	public void addCarToFarAwayQueue(String carName, long adjacentOsmWayId, int journeyTime) {
+	public void addCarToFarAwayQueue(String carName, long adjacentOsmWayId, Instant journeyTime) {
 	
 	try {
 		

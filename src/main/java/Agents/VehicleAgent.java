@@ -1,5 +1,7 @@
 package Agents;
 
+import java.time.Instant;
+
 import Routing.LightManagerNode;
 import Vehicles.DrivingState;
 import Vehicles.Vehicle;
@@ -44,8 +46,10 @@ public class VehicleAgent extends Agent { // TO ADD SOME WRAPPER AROUND POINTLIS
                             Print("Asking LightManager" + light.getLightManagerId() + " for right to passage.");
                             break;
                         case WAITING:
+                        	
                             break;
                         case PASSING:
+                        	Print("Passing");
                             Vehicle.Move();
                             Vehicle.setState(DrivingState.MOVING);
                             break;
@@ -67,6 +71,7 @@ public class VehicleAgent extends Agent { // TO ADD SOME WRAPPER AROUND POINTLIS
                 if (rcv != null) {
                     switch (rcv.getPerformative()) {
                         case ACLMessage.REQUEST:
+                        	System.out.println("Car:I can move further, I got request ");
                             ACLMessage response = new ACLMessage(ACLMessage.AGREE);
                             response.addReceiver(rcv.getSender());
                             Properties properties = new Properties();
@@ -80,6 +85,7 @@ public class VehicleAgent extends Agent { // TO ADD SOME WRAPPER AROUND POINTLIS
                             Vehicle.setState(DrivingState.PASSING);
                             break;
                         case ACLMessage.AGREE:
+                        	System.out.println("Car:Okej, poczekamy");
                             Vehicle.setState(DrivingState.WAITING);
                             break;
                     }
@@ -100,8 +106,9 @@ public class VehicleAgent extends Agent { // TO ADD SOME WRAPPER AROUND POINTLIS
             ACLMessage msg = new ACLMessage(ACLMessage.INFORM);
             msg.addReceiver(dest);
             Properties properties = new Properties();
+            Instant time= Instant.now().plusMillis( Vehicle.getMilisecondsToNextLight());
             properties.setProperty(MessageParameter.TYPE, MessageParameter.VEHICLE);
-            properties.setProperty(MessageParameter.ARRIVAL_TIME, "" + Vehicle.getMilisecondsToNextLight());
+            properties.setProperty(MessageParameter.ARRIVAL_TIME, "" +time);
             properties.setProperty(MessageParameter.ADJACENT_OSM_WAY_ID, "" + nextManager.getOsmWayId());
             msg.setAllUserDefinedParameters(properties);
 

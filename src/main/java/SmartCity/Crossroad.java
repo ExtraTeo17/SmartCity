@@ -1,5 +1,6 @@
 package SmartCity;
 
+import java.time.Instant;
 import java.util.HashSet;
 import java.util.List;
 
@@ -10,7 +11,7 @@ import org.jxmapviewer.viewer.WaypointPainter;
 
 public abstract class Crossroad {
 	public abstract void addCarToQueue(String carName, long adjacentOsmWayId);
-	public abstract void addCarToFarAwayQueue(String carName, long adjacentOsmWayId, int journeyTime);
+	public abstract void addCarToFarAwayQueue(String carName, long adjacentOsmWayId, Instant journeyTime);
 	public abstract void removeCarFromQueue(long adjacentOsmWayId);
 	public abstract void removeCarFromFarAwayQueue(String carName, long adjacentOsmWayId);
 	public abstract void addPedestrianToQueue(String pedestrianName, long adjacentOsmWayId);
