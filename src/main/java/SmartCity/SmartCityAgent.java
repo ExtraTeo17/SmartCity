@@ -42,6 +42,7 @@ public class SmartCityAgent extends Agent {
     public static Map<Long, LightManagerNode> lightIdToLightManagerNode = new HashMap<>();
     private static long nextLightManagerId;
     public Set<Station> stations = new LinkedHashSet<>();
+    public Set<BusAgent> buses = new LinkedHashSet<>();
     private JXMapViewer mapViewer;
     private AgentContainer container;
     private MapWindow window;
@@ -146,17 +147,38 @@ public class SmartCityAgent extends Agent {
         return nextLightManagerId++;
     }
 
-    public void prepareStations(GeoPosition middlePoint, int radius) {
+    public void prepareStationsAndBuses(GeoPosition middlePoint, int radius) {
         stations = MapAccessManager.getStations(middlePoint, radius);
+        buses = prepareBuses();
+    }
+    
+    private Set<BusAgent> prepareBuses() {
+    	Set<BusAgent> busSet = new LinkedHashSet<>();
+    	for (Station station : stations) {
+    		busSet.addAll(getBusesIfNearby(station));
+    	}
+    	return busSet;
+    }
+    
+    private Set<BusAgent> getBusesIfNearby(Station station) {
+    	Set<BusAgent> busesOnStation = new LinkedHashSet<>();
+    	List<Integer> linesOnStation = getLinesOnStation(station.getWawId(), station.getWawNr());
+    	BusAgent busAgent = new BusAgent(nextBusId(), busNumber, timetable);
+    	tryAddAgent(busAgent);
+    	return busAgent;
+    }
+    
+    private void tryAddAgent(Agent agent, String agentName) {
+    	try {
+            container.acceptNewAgent(agentName, agent);
+        } catch (StaleProxyException e) {
+            e.printStackTrace();
+        }
     }
 
     public void tryAddNewLightManagerAgent(Node crossroad) {
         LightManager manager = new LightManager(crossroad, nextLightManagerId());
         SmartCity.SmartCityAgent.lightManagers.add(manager);
-        try {
-            container.acceptNewAgent(LIGHT_MANAGER + manager.getId(), manager);
-        } catch (StaleProxyException e) {
-            e.printStackTrace();
-        }
+        tryAddAgent(manager, LIGHT_MANAGER + manager.getId());
     }
 }
