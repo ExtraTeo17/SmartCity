@@ -26,14 +26,20 @@ import javax.swing.event.MouseInputListener;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.time.Duration;
+import java.time.Instant;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.*;
 import java.util.List;
 import java.util.Timer;
 
 public class MapWindow {
-	private final static int REFRESH_MAP_INTERVAL_MILLISECONDS = 100;
-	private final static int CREATE_CAR_INTERVAL_MILLISECONDS = 500;
-	
+    private final static int REFRESH_MAP_INTERVAL_MILLISECONDS = 100;
+    private final static int CREATE_CAR_INTERVAL_MILLISECONDS = 500;
+
     public JPanel MainPanel;
     public JXMapViewer MapViewer;
     private JPanel MapPanel;
@@ -46,6 +52,9 @@ public class MapWindow {
     private JSpinner lonSpinner;
     private JButton setZoneButton;
     private JSpinner testCarIdSpinner;
+    private JSpinner setTimeSpinner;
+    private JLabel currentTimeLabel;
+    private JLabel currentTimeTitle;
     private SmartCityAgent SmartCityAgent;
 
     private Timer refreshTimer = new Timer(true);
@@ -59,6 +68,8 @@ public class MapWindow {
     private Random random = new Random();
     private GeoPosition zoneCenter;
 
+    private Instant simulationStart;
+
     public boolean renderCars = true;
     public boolean renderCarRoutes = true;
     public boolean renderZone = true;
@@ -67,6 +78,8 @@ public class MapWindow {
 
     public MapWindow() {
         MapViewer = new JXMapViewer();
+        currentTimeLabel.setVisible(false);
+        currentTimeTitle.setVisible(false);
         TileFactoryInfo info = new OSMTileFactoryInfo();
         DefaultTileFactory tileFactory = new DefaultTileFactory(info);
         tileFactory.setThreadPoolSize(8);
@@ -101,8 +114,14 @@ public class MapWindow {
             @Override
             public void actionPerformed(ActionEvent e) {
                 SetZone();
+                state = SimulationState.READY_TO_RUN;
             }
         });
+
+        setTimeSpinner.setModel(new SpinnerDateModel());
+        JSpinner.DateEditor dateTimeEditor = new JSpinner.DateEditor(setTimeSpinner, "HH:mm:ss dd-MM-yyyy");
+        setTimeSpinner.setEditor(dateTimeEditor);
+        setTimeSpinner.setValue(new Date());
 
         //Left click event
         MapViewer.addMouseListener(new MapClickListener(MapViewer) {
@@ -111,9 +130,11 @@ public class MapWindow {
                 System.out.println("Lat: " + geoPosition.getLatitude() + " Lon: " + geoPosition.getLongitude());
                 switch (state) {
                     case SETTING_ZONE:
+                    case READY_TO_RUN:
                         latSpinner.setValue(geoPosition.getLatitude());
                         lonSpinner.setValue(geoPosition.getLongitude());
                         SetZone();
+                        state = SimulationState.READY_TO_RUN;
                         break;
                     case RUNNING:
                         if (pointA == null) {
@@ -155,6 +176,7 @@ public class MapWindow {
 
             @Override
             public void actionPerformed(ActionEvent e) {
+                if(state != SimulationState.READY_TO_RUN) return;
                 carLimitSpinner.setEnabled(false);
                 seedSpinner.setEnabled(false);
                 radiusSpinner.setEnabled(false);
@@ -163,9 +185,14 @@ public class MapWindow {
                 testCarIdSpinner.setEnabled(false);
                 setZoneButton.setEnabled(false);
                 StartRouteButton.setEnabled(false);
+                setTimeSpinner.setEnabled(false);
                 random.setSeed(getSeed());
                 startLightManagerAgents();
+                currentTimeTitle.setVisible(true);
+                currentTimeLabel.setVisible(true);
                 spawnTimer.scheduleAtFixedRate(new CreateCarTask(), 0, CREATE_CAR_INTERVAL_MILLISECONDS);
+                simulationStart = Instant.now();
+                state = SimulationState.RUNNING;
             }
 
             private void startLightManagerAgents() {
@@ -177,7 +204,7 @@ public class MapWindow {
 
     public void SetZone() {
         zoneCenter = new GeoPosition((double) latSpinner.getValue(), (double) lonSpinner.getValue());
-        SmartCityAgent.prepareStations(zoneCenter, getZoneRadius());
+        //SmartCityAgent.prepareStations(zoneCenter, getZoneRadius());
         SmartCityAgent.prepareLightManagers(zoneCenter, getZoneRadius());
     }
 
@@ -211,6 +238,21 @@ public class MapWindow {
 
     private int getSeed() {
         return (int) seedSpinner.getValue();
+    }
+
+    private Date getSimulationStartTime() {
+        return (Date) setTimeSpinner.getValue();
+    }
+
+    private void RefreshTime() {
+        Date date = getSimulationStartTime();
+        Duration timeDiff = Duration.between(simulationStart, Instant.now());
+        Instant inst = date.toInstant();
+        inst = inst.plus(timeDiff);
+        DateFormat dateFormat = new SimpleDateFormat("kk:mm:ss dd-MM-yyyy");
+        String strDate = dateFormat.format(Date.from(inst));
+        currentTimeLabel.setText(strDate);
+
     }
 
     public void DrawLights(List<Painter<JXMapViewer>> painters) {
@@ -469,6 +511,7 @@ public class MapWindow {
             if (renderStations) DrawStations(painters);
             CompoundPainter<JXMapViewer> painter = new CompoundPainter<>(painters);
             MapViewer.setOverlayPainter(painter);
+            if (state == SimulationState.RUNNING) RefreshTime();
         }
     }
 
@@ -497,7 +540,8 @@ public class MapWindow {
             } else car = new RegularCar(info);
             vehicle.setVehicle(car);
             try {
-                SmartCityAgent.AddNewVehicleAgent(car.getVehicleType() + SmartCityAgent.Vehicles.size(), vehicle);
+                SmartCityAgent.AddNewVehicleAgent(car.getVehicleType() + SmartCityAgent.carId, vehicle);
+                SmartCityAgent.carId++;
                 SmartCityAgent.ActivateAgent(vehicle);
             } catch (StaleProxyException e) {
                 e.printStackTrace();

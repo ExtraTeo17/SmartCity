@@ -57,6 +57,14 @@ public class VehicleAgent extends Agent { // TO ADD SOME WRAPPER AROUND POINTLIS
                 } else if (Vehicle.isAtDestination()) {
                     Vehicle.setState(DrivingState.AT_DESTINATION);
                     Print("Reached destination.");
+
+                    ACLMessage msg = new ACLMessage(ACLMessage.INFORM);
+                    msg.addReceiver(new AID("SmartCityAgent", AID.ISLOCALNAME));
+                    Properties prop = new Properties();
+                    prop.setProperty(MessageParameter.TYPE, MessageParameter.VEHICLE);
+                    prop.setProperty(MessageParameter.AT_DESTINATION, String.valueOf(Boolean.TRUE));
+                    msg.setAllUserDefinedParameters(prop);
+                    send(msg);
                     doDelete();
                 } else {
                     Vehicle.Move();

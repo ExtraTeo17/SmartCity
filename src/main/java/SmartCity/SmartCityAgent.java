@@ -1,6 +1,6 @@
 package SmartCity;
 
-import Agents.VehicleAgent;
+import Agents.*;
 import GUI.MapWindow;
 import GUI.OSMNode;
 import GUI.Router;
@@ -20,6 +20,9 @@ import javax.swing.*;
 
 import Vehicles.Vehicle;
 import jade.core.Agent;
+import jade.core.behaviours.Behaviour;
+import jade.core.behaviours.CyclicBehaviour;
+import jade.lang.acl.ACLMessage;
 import jade.wrapper.AgentContainer;
 import jade.wrapper.AgentController;
 import jade.wrapper.ControllerException;
@@ -29,13 +32,10 @@ import org.jxmapviewer.*;
 import org.jxmapviewer.viewer.GeoPosition;
 import org.w3c.dom.Node;
 
-import Agents.LightManager;
-import Agents.TrafficLightAgent;
-
 public class SmartCityAgent extends Agent {
     public final static String LIGHT_MANAGER = "LightManager";
 
-    public Set<VehicleAgent> Vehicles = new LinkedHashSet<>();
+    public List<VehicleAgent> Vehicles = new ArrayList<>();
     //public Set<Pedestrian> pedestrians = new LinkedHashSet<>();
     public static Set<LightManager> lightManagers = new HashSet<>();
     public static boolean lightManagersUnderConstruction = false;
@@ -47,9 +47,31 @@ public class SmartCityAgent extends Agent {
     private AgentContainer container;
     private MapWindow window;
 
+    public int carId = 0;
+
+    CyclicBehaviour receiveMessage = new CyclicBehaviour() {
+        @Override
+        public void action() {
+            ACLMessage rcv = receive();
+            if(rcv != null)
+            {
+                System.out.println("SmartCity: " + rcv.getSender().getLocalName() + " arrived at destination.");
+                String type = rcv.getUserDefinedParameter(MessageParameter.TYPE);
+                switch(type)
+                {
+                    case MessageParameter.VEHICLE:
+                        Vehicles.removeIf(v -> v.getLocalName().equals(rcv.getSender().getLocalName()));
+                        break;
+                }
+            }
+            block(1000);
+        }
+    };
+
     protected void setup() {
         container = getContainerController();
         displayGUI();
+        addBehaviour(receiveMessage);
     }
 
     private void displayGUI() {
@@ -155,18 +177,19 @@ public class SmartCityAgent extends Agent {
     private Set<BusAgent> prepareBuses() {
     	Set<BusAgent> busSet = new LinkedHashSet<>();
     	for (Station station : stations) {
-    		busSet.addAll(getBusesIfNearby(station));
+    		//busSet.addAll(getBusesIfNearby(station));
     	}
     	return busSet;
     }
     
-    private Set<BusAgent> getBusesIfNearby(Station station) {
-    	Set<BusAgent> busesOnStation = new LinkedHashSet<>();
-    	List<Integer> linesOnStation = getLinesOnStation(station.getWawId(), station.getWawNr());
-    	BusAgent busAgent = new BusAgent(nextBusId(), busNumber, timetable);
-    	tryAddAgent(busAgent);
-    	return busAgent;
-    }
+//    private Set<BusAgent> getBusesIfNearby(Station station) {
+//    	Set<BusAgent> busesOnStation = new LinkedHashSet<>();
+//    	List<Integer> linesOnStation = getLinesOnStation(station.getWawId(), station.getWawNr());
+//    	BusAgent busAgent = new BusAgent(nextBusId(), busNumber, timetable);
+//    	tryAddAgent(busAgent);
+//    	return busAgent;
+//    }
+
     
     private void tryAddAgent(Agent agent, String agentName) {
     	try {
