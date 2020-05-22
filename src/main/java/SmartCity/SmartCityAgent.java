@@ -170,17 +170,25 @@ public class SmartCityAgent extends Agent {
     }
 
     public void prepareStationsAndBuses(GeoPosition middlePoint, int radius) {
-        stations = MapAccessManager.getStations(middlePoint, radius);
-        buses = prepareBuses();
+        //stations = MapAccessManager.getStations(middlePoint, radius);
+        prepareBuses();
     }
     
-    private Set<BusAgent> prepareBuses() {
+    private void prepareBuses() {
+    	buses = new LinkedHashSet<>();
+    	Set<BusInfo> busInfoSet = MapAccessManager.getBusInfo();
+    	for (BusInfo info : busInfoSet) {
+    		tryAddAgent(new BusAgent(info));
+    	}
+    }
+    
+    /*private Set<BusAgent> prepareBusesV0() {
     	Set<BusAgent> busSet = new LinkedHashSet<>();
     	for (Station station : stations) {
     		//busSet.addAll(getBusesIfNearby(station));
     	}
     	return busSet;
-    }
+    }*/
     
 //    private Set<BusAgent> getBusesIfNearby(Station station) {
 //    	Set<BusAgent> busesOnStation = new LinkedHashSet<>();

@@ -24,6 +24,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.Authenticator;
 import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLEncoder;
 import java.text.DecimalFormat;
@@ -36,7 +37,11 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Scanner;
 import java.util.Set;
+
+import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
 
 import com.graphhopper.util.shapes.GHPoint;
 
@@ -191,6 +196,10 @@ public class MapAccessManager {
 		return routeNodes;
 	}
 
+	private static void parseBusInfo(BusInfo info, JSONObject nodesViaWarszawskie) {
+		System.out.println(nodesViaWarszawskie);
+	}
+
 	public static List<OSMNode> getOSMNodesInVicinity(double lat, double lon, double vicinityRange) throws IOException,
 			SAXException, ParserConfigurationException {
 		return MapAccessManager.getNodes(getNodesViaOverpass("<osm-script>\r\n" + 
@@ -228,6 +237,24 @@ public class MapAccessManager {
 		DocumentBuilderFactory dbfac = DocumentBuilderFactory.newInstance();
 		DocumentBuilder docBuilder = dbfac.newDocumentBuilder();
 		return docBuilder.parse(connection.getInputStream());
+	}
+	
+	public static JSONObject getNodesViaWarszawskie(String query) {
+		URL nieOsm;
+		Scanner scanner;
+		String json = "";
+		JSONParser parser = new JSONParser();
+		JSONObject jObject= null;
+		try {
+			nieOsm = new URL(query);
+			scanner = new Scanner(nieOsm.openStream());
+			while (scanner.hasNext())
+				json += scanner.nextLine();
+			jObject = (JSONObject)parser.parse(json);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return jObject;
 	}
 
 	public static List<OSMNode> sendHighwayOverpassQuery(PointList points) {
@@ -507,5 +534,63 @@ public class MapAccessManager {
 				"  </query>\n" + 
 				"  <print e=\"\" from=\"_\" geometry=\"skeleton\" ids=\"yes\" limit=\"\" mode=\"body\" n=\"\" order=\"id\" s=\"\" w=\"\"/>\n" + 
 				"</osm-script>";
+	}
+
+	public static Set<BusInfo> getBusInfo(int radius, double middleLat, double middleLon) {
+		Set<BusInfo> infoSet = sendBusOverpassQuery(radius, middleLat, middleLon);
+		for (BusInfo info : infoSet) {
+			sendBusWarszawskieQuery(info);
+		}
+		return infoSet;
+	}
+
+	private static Set<BusInfo> sendBusOverpassQuery(int radius, double middleLat, double middleLon) {
+		Set<BusInfo> infoSet = null;
+		try {
+			infoSet = MapAccessManager.parseBusInfo(getNodesViaOverpass(getBusOverpassQuery(radius, middleLat, middleLon)));
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return infoSet;
+	}
+
+	private static Set<BusInfo> parseBusInfo(Document nodesViaOverpass) {
+		Set<BusInfo> infoSet = new LinkedHashSet<>();
+		Node osmRoot = nodesViaOverpass.getFirstChild();
+		NodeList osmXMLNodes = osmRoot.getChildNodes();
+		for (int i = 1; i < osmXMLNodes.getLength(); i++) {
+			Node item = osmXMLNodes.item(i);
+			if (item.getNodeName().equals("relation")) {
+				NamedNodeMap attributes = item.getAttributes();
+				Node namedItemID = attributes.getNamedItem("id");
+				String id = namedItemID.getNodeValue();
+				Node namedItemLat = attributes.getNamedItem("lat");
+				Node namedItemLon = attributes.getNamedItem("lon");
+				String latitude = namedItemLat.getNodeValue();
+				String longitude = namedItemLon.getNodeValue();
+				//infoSet.add(new OSMNode(id, latitude, longitude, "", null));
+			}
+		}
+		return infoSet;
+	}
+
+	private static String getBusOverpassQuery(int radius, double middleLat, double middleLon) {
+		return "<osm-script>\r\n" + 
+				"  <query into=\"_\" type=\"relation\">\r\n" + 
+				"    <has-kv k=\"route\" modv=\"\" v=\"bus\"/>\r\n" + 
+				"    <around radius=\"" + radius + "\" lat=\"" + middleLat + "\" lon=\"" + middleLon + "\"/>\r\n" + 
+				"  </query>\r\n" + 
+				"  <print e=\"\" from=\"_\" geometry=\"skeleton\" ids=\"yes\" limit=\"\" mode=\"body\" n=\"\" order=\"id\" s=\"\" w=\"\"/>\r\n" + 
+				"</osm-script>";
+	}
+
+	private static void sendBusWarszawskieQuery(BusInfo info) {
+		for (Station station : info.getStations()) {
+			MapAccessManager.parseBusInfo(info, getNodesViaWarszawskie(getBusWarszawskieQuery(station.getBusStopId(), station.getBusStopNr(), info.getBusLine())));
+		}
+	}
+
+	private static String getBusWarszawskieQuery(int busStopId, int busStopNr, int busLine) {
+		return "https://api.um.warszawa.pl/api/action/dbtimetable_get/?id=e923fa0e-d96c-43f9-ae6e-60518c9f3238&busstopId=" + busStopId + "&busstopNr=" + busStopNr + "&line=" + busLine + "&apikey=400dacf8-9cc4-4d6c-82cc-88d9311401a5";
 	}
 }

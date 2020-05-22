@@ -204,7 +204,7 @@ public class MapWindow {
 
     public void SetZone() {
         zoneCenter = new GeoPosition((double) latSpinner.getValue(), (double) lonSpinner.getValue());
-        //SmartCityAgent.prepareStations(zoneCenter, getZoneRadius());
+        SmartCityAgent.prepareStationsAndBuses(zoneCenter, getZoneRadius());
         SmartCityAgent.prepareLightManagers(zoneCenter, getZoneRadius());
     }
 

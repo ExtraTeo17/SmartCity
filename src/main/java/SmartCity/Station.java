@@ -16,4 +16,14 @@ public class Station extends OSMNode {
 		super(id2, latitude, longitude, version2, tags2);
 		// TODO Auto-generated constructor stub
 	}
+
+	public int getBusStopId() {
+		// TODO Auto-generated method stub
+		return 0;
+	}
+
+	public int getBusStopNr() {
+		// TODO Auto-generated method stub
+		return 0;
+	}
 }
