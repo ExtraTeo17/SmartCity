@@ -41,7 +41,7 @@ public class SmartCityAgent extends Agent {
     public static boolean lightManagersUnderConstruction = false;
     public static Map<Long, LightManagerNode> lightIdToLightManagerNode = new HashMap<>();
     private static long nextLightManagerId;
-    public Set<Station> stations = new LinkedHashSet<>();
+    public static Map<Long,Station> stations = new HashMap<>();
     public Set<BusAgent> buses = new LinkedHashSet<>();
     private JXMapViewer mapViewer;
     private AgentContainer container;

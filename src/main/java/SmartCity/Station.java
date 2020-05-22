@@ -17,6 +17,14 @@ public class Station extends OSMNode {
 		// TODO Auto-generated constructor stub
 	}
 
+	public Station(String string, double lat, double lng, String nodeValue) {
+		// TODO Auto-generated constructor stub
+	}
+
+	public Station(double lat, double lng, String nodeValue) {
+		// TODO Auto-generated constructor stub
+	}
+
 	public int getBusStopId() {
 		// TODO Auto-generated method stub
 		return 0;
@@ -26,4 +34,5 @@ public class Station extends OSMNode {
 		// TODO Auto-generated method stub
 		return 0;
 	}
+	
 }

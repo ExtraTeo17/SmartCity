@@ -561,25 +561,131 @@ public class MapAccessManager {
 		for (int i = 1; i < osmXMLNodes.getLength(); i++) {
 			Node item = osmXMLNodes.item(i);
 			if (item.getNodeName().equals("relation")) {
+				BusInfo info = new BusInfo();
+				infoSet.add(info);
+				NodeList member_list=item.getChildNodes();
+				StringBuilder builder = new StringBuilder();
+				for(int j=0;j<member_list.getLength();j++) {
+					Node member = member_list.item(j);
+					if(member.getNodeName().equals("member") )
+					{
+						NamedNodeMap attributes = member.getAttributes();
+						Node namedItemID = attributes.getNamedItem("ref");
+						if(attributes.getNamedItem("role").getNodeValue().length()!=0) 
+						{
+							
+							info.addStation(namedItemID.getNodeValue());
+						}
+						else {
+							
+							appendSingleBusWayOverpassQuery(builder, Long.parseLong(namedItemID.getNodeValue()));
+							
+						}
+						
+						
+					}
+					else if(member.getNodeName().equals("tag")) {
+						NamedNodeMap attributes = member.getAttributes();
+						Node namedItemID = attributes.getNamedItem("k");
+					    if(namedItemID.getNodeValue().equals("ref")) {
+					    	Node number_of_line=attributes.getNamedItem("v");
+					    	info.setBusLine(number_of_line.getNodeValue());
+					    }
+					}
+				}
+				
+				//String query_full=getBusWayOverpassQueryWithPayload(builder);
+		       try {
+				info.setList(MapAccessManager.parseOsmWay(getNodesViaOverpass(getBusWayOverpassQueryWithPayload(builder))));
+			} catch (Exception e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} 
+				
+			}
+			if (item.getNodeName().equals("node")) {
 				NamedNodeMap attributes = item.getAttributes();
 				Node namedItemID = attributes.getNamedItem("id");
-				String id = namedItemID.getNodeValue();
-				Node namedItemLat = attributes.getNamedItem("lat");
-				Node namedItemLon = attributes.getNamedItem("lon");
-				String latitude = namedItemLat.getNodeValue();
-				String longitude = namedItemLon.getNodeValue();
-				//infoSet.add(new OSMNode(id, latitude, longitude, "", null));
+				double lat = Double.parseDouble(attributes.getNamedItem("lat").getNodeValue());
+				double lng = Double.parseDouble(attributes.getNamedItem("lon").getNodeValue());
+				Station station = null;
+				if(!SmartCityAgent.stations.containsKey(Long.parseLong(namedItemID.getNodeValue()))) 
+				{
+					NodeList list_tags = item.getChildNodes();
+					
+					for( int z=0; z<list_tags.getLength();z++ )
+					{
+						Node tag = list_tags.item(z);
+						if(tag.getNodeName().equals("tag") )
+						{
+							NamedNodeMap attr = tag.getAttributes();
+							Node nam= attr.getNamedItem("k");
+						    if(nam.getNodeValue().equals("ref")) {
+						    	Node number_of_station=attr.getNamedItem("v");
+						    	station= new Station(namedItemID.getNodeValue(),lat, lng, number_of_station.getNodeValue());
+						    	SmartCityAgent.stations.put(station.getId(),station);
+						    }
+						}
+					}
+					
+				}
 			}
+		
+			
 		}
 		return infoSet;
 	}
 
+	  private static List<OSMWay> parseOsmWay(Document nodesViaOverpass) {
+		  List<OSMWay> route = new ArrayList<>();
+		  Node osmRoot = nodesViaOverpass.getFirstChild();
+			NodeList osmXMLNodes = osmRoot.getChildNodes();
+			for (int i = 1; i < osmXMLNodes.getLength(); i++) 
+			{
+				Node item = osmXMLNodes.item(i);
+				if (item.getNodeName().equals("way")) 
+				{
+					OSMWay way = new OSMWay(item.getAttributes().getNamedItem("id").getNodeValue());
+					NodeList way_list = item.getChildNodes();
+					for(int k=0;k<way_list.getLength();k++) 
+					{
+						Node el = way_list.item(k);
+						if(el.getNodeName().equals("nd")) 
+						{
+							NamedNodeMap attributes = el.getAttributes();
+						
+							double lat = Double.parseDouble(attributes.getNamedItem("lat").getNodeValue());
+							double lng = Double.parseDouble(attributes.getNamedItem("lon").getNodeValue());
+							way.addPoint(lat,lng);
+						}
+						
+					}
+					
+					route.add(way);
+					
+				}
+		    }
+		return route;
+	}
+
+	private static void appendSingleBusWayOverpassQuery(StringBuilder query, long osmWayId) {
+	        query.append("<id-query type=\"way\" ref=\"" + osmWayId + "\"/>\r\n" +
+	                "  <print e=\"\" from=\"_\" geometry=\"full\" ids=\"yes\" limit=\"\" mode=\"skeleton\" n=\"\" order=\"id\" s=\"\" w=\"\"/>");
+	    }
+	   
+	    private static String getBusWayOverpassQueryWithPayload(StringBuilder query) {
+	        return "<osm-script>\r\n" +
+	                query.toString() +
+	                "</osm-script>";
+	    }
 	private static String getBusOverpassQuery(int radius, double middleLat, double middleLon) {
 		return "<osm-script>\r\n" + 
 				"  <query into=\"_\" type=\"relation\">\r\n" + 
 				"    <has-kv k=\"route\" modv=\"\" v=\"bus\"/>\r\n" + 
-				"    <around radius=\"" + radius + "\" lat=\"" + middleLat + "\" lon=\"" + middleLon + "\"/>\r\n" + 
+				"    <around radius=\""+radius+"\" lat=\""+middleLat+"\" lon=\""+middleLon+"\"/>\r\n" + 
 				"  </query>\r\n" + 
+				"  <print e=\"\" from=\"_\" geometry=\"skeleton\" ids=\"yes\" limit=\"\" mode=\"body\" n=\"\" order=\"id\" s=\"\" w=\"\"/>\r\n" + 
+				"  <recurse type=\"relation-node\"/>\r\n" + 
 				"  <print e=\"\" from=\"_\" geometry=\"skeleton\" ids=\"yes\" limit=\"\" mode=\"body\" n=\"\" order=\"id\" s=\"\" w=\"\"/>\r\n" + 
 				"</osm-script>";
 	}
