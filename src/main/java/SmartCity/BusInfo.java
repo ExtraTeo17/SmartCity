@@ -7,50 +7,32 @@ import java.util.Map;
 
 public class BusInfo {
 
-	Long bus_line;
-	List<OSMWay> route = new ArrayList<>();
-	Timetable timetable = new Timetable();
+	private int busLine;
+	private List<OSMWay> route = new ArrayList<>();
+	private List<Timetable> timetable = new ArrayList<>();
+	private List<Long> stationsOnRouteOsmIds = new ArrayList<>();
+
+	public void setBusLine(String nodeValue) {
+		busLine = Integer.parseInt(nodeValue);
+	}
+	
 	public int getBusLine() {
-		
-		return bus_line;
+		return busLine;
 	}
 
 	public void addStation(String nodeValue) {
-	
+		stationsOnRouteOsmIds.add(Long.parseLong(nodeValue));
 	}
 
-	public void addWay(String nodeValue) {
-	    
-		
-	}
-
-	public void setBusLine(String nodeValue) {
-		
-	}
-
-	public Object getStations() {
-		
-		return null;
+	public List<Station> getStations() {
+		List<Station> stations = new ArrayList<>();
+		for (long osmId : stationsOnRouteOsmIds) {
+			stations.add(SmartCityAgent.stations.get(osmId));
+		}
+		return stations;
 	}
 
 	public void setList(List<OSMWay> parseOsmWay) {
-		// TODO Auto-generated method stub
-		
+		route = parseOsmWay;
 	}
-
-	public void addStation(String nodeValue) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	public void setBusLine(String nodeValue) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	public void addStation(String nodeValue) {
-		// TODO Auto-generated method stub
-		
-	}
-
 }

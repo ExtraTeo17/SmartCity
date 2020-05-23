@@ -35,6 +35,8 @@ import org.w3c.dom.Node;
 public class SmartCityAgent extends Agent {
     public final static String LIGHT_MANAGER = "LightManager";
 
+	private static final String BUS = "Bus";
+
     public List<VehicleAgent> Vehicles = new ArrayList<>();
     //public Set<Pedestrian> pedestrians = new LinkedHashSet<>();
     public static Set<LightManager> lightManagers = new HashSet<>();
@@ -42,7 +44,7 @@ public class SmartCityAgent extends Agent {
     public static Map<Long, LightManagerNode> lightIdToLightManagerNode = new HashMap<>();
     private static long nextLightManagerId;
     public static Map<Long,Station> stations = new HashMap<>();
-    public Set<BusAgent> buses = new LinkedHashSet<>();
+    public static Set<BusAgent> buses = new LinkedHashSet<>();
     private JXMapViewer mapViewer;
     private AgentContainer container;
     private MapWindow window;
@@ -67,6 +69,8 @@ public class SmartCityAgent extends Agent {
             block(1000);
         }
     };
+
+	private int nextBusId;
 
     protected void setup() {
         container = getContainerController();
@@ -164,6 +168,10 @@ public class SmartCityAgent extends Agent {
     private void resetIdGenerator() {
         nextLightManagerId = 1;
     }
+    
+    private void resetBusIdGen() {
+    	nextBusId = 1;
+    }
 
     private Long nextLightManagerId() {
         return nextLightManagerId++;
@@ -171,14 +179,11 @@ public class SmartCityAgent extends Agent {
 
     public void prepareStationsAndBuses(GeoPosition middlePoint, int radius) {
         //stations = MapAccessManager.getStations(middlePoint, radius);
-        prepareBuses();
-    }
-    
-    private void prepareBuses() {
-    	buses = new LinkedHashSet<>();
-    	Set<BusInfo> busInfoSet = MapAccessManager.getBusInfo();
+    	resetBusIdGen();
+        buses = new LinkedHashSet<>();
+    	Set<BusInfo> busInfoSet = MapAccessManager.getBusInfo(radius, middlePoint.getLatitude(), middlePoint.getLongitude());
     	for (BusInfo info : busInfoSet) {
-    		tryAddAgent(new BusAgent(info));
+    		tryAddNewBusAgent(info);
     	}
     }
     
@@ -206,8 +211,18 @@ public class SmartCityAgent extends Agent {
             e.printStackTrace();
         }
     }
+    
+    private void tryAddNewBusAgent(BusInfo info) {
+    	BusAgent agent = new BusAgent(info, nextBusId());
+    	SmartCity.SmartCityAgent.buses.add(agent);
+    	tryAddAgent(agent, BUS + agent.getId());
+    }
 
-    public void tryAddNewLightManagerAgent(Node crossroad) {
+    private int nextBusId() {
+		return nextBusId++;
+	}
+
+	public void tryAddNewLightManagerAgent(Node crossroad) {
         LightManager manager = new LightManager(crossroad, nextLightManagerId());
         SmartCity.SmartCityAgent.lightManagers.add(manager);
         tryAddAgent(manager, LIGHT_MANAGER + manager.getId());

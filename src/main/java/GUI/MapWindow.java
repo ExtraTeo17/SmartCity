@@ -318,7 +318,7 @@ public class MapWindow {
 
     private void DrawStations(List painters) {
         Set<Waypoint> set = new HashSet<>();
-        for (Station station : SmartCityAgent.stations) {
+        for (Station station : SmartCityAgent.stations.values()) {
             set.add(new DefaultWaypoint(station.getPosition()));
         }
         WaypointPainter<Waypoint> waypointPainter = new WaypointPainter<>();
