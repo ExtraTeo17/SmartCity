@@ -33,6 +33,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Locale;
@@ -40,6 +41,7 @@ import java.util.Map;
 import java.util.Scanner;
 import java.util.Set;
 
+import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 
@@ -196,9 +198,37 @@ public class MapAccessManager {
 		return routeNodes;
 	}
 
-	private static void parseBusInfo(BusInfo info, JSONObject nodesViaWarszawskie) {
-		
-		
+	private static void parseBusInfo(Station station,BusInfo info, JSONObject jsonObject) {
+		 
+		Map<Integer,BrigadeInfo> brigadas = new HashMap<>();
+       
+        
+        // loop array
+        JSONArray msg = (JSONArray) jsonObject.get("result");
+        Iterator<JSONArray> iterator = msg.iterator();
+        while (iterator.hasNext()) {
+        	JSONArray values =  (JSONArray)iterator.next();
+        	Iterator<JSONObject> values_iterator = values.iterator();
+        	
+        	int brigada_number = 0;
+        	 while (values_iterator.hasNext()) {
+        		 
+        		 JSONObject value =  (JSONObject)values_iterator.next();
+        	     if(value.get("key").equals("brygada"))
+        	     {
+        	    	if( !brigadas.containsKey((value.get("value")))) 
+        	    	{
+        	    		brigadas.put((Integer)value.get("value"), new BrigadeInfo());
+        	    	}
+        	    	brigada_number = (Integer)value.get("value");
+        	     }
+        	     else if (value.get("key").equals("czas")) 
+        	     {
+        	    	 brigadas.get(brigada_number).addToTimeTable(station.getId(),value.get("value"));
+        	     }
+        	 }
+        }
+				
 		
 	}
 
@@ -694,7 +724,7 @@ public class MapAccessManager {
 
 	private static void sendBusWarszawskieQuery(BusInfo info) {
 		for (Station station : info.getStations()) {
-			MapAccessManager.parseBusInfo(info, getNodesViaWarszawskie(getBusWarszawskieQuery(station.getBusStopId(), station.getBusStopNr(), info.getBusLine())));
+			MapAccessManager.parseBusInfo(station,info, getNodesViaWarszawskie(getBusWarszawskieQuery(station.getBusStopId(), station.getBusStopNr(), info.getBusLine())));
 		}
 	}
 

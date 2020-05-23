@@ -1,15 +1,14 @@
 package SmartCity;
 
 import java.util.ArrayList;
-import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map;
-
+// Bus Lines
 public class BusInfo {
 
 	private int busLine;
 	private List<OSMWay> route = new ArrayList<>();
-	private List<Timetable> timetable = new ArrayList<>();
+	//private List<Timetable> timetable = new ArrayList<>();
+	private List<BrigadeInfo> brigada_list = new ArrayList<>(); 
 	private List<Long> stationsOnRouteOsmIds = new ArrayList<>();
 
 	public void setBusLine(String nodeValue) {

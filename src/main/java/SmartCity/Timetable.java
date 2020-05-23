@@ -20,6 +20,7 @@ public class Timetable {
 	public void addEntryToTimetable(long stationOsmId, String time) {
 		try {
 			stationOsmIdToTime.put(stationOsmId, new SimpleDateFormat("HH:mm:ss").parse(time));
+			
 		} catch (ParseException e) {
 			e.printStackTrace();
 		}
