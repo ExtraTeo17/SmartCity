@@ -10,7 +10,7 @@ public class BusInfo {
 	Long bus_line;
 	List<OSMWay> route = new ArrayList<>();
 	
-	public Long getBusLine() {
+	public int getBusLine() {
 		
 		return bus_line;
 	}
