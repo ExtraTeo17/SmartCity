@@ -197,7 +197,9 @@ public class MapAccessManager {
 	}
 
 	private static void parseBusInfo(BusInfo info, JSONObject nodesViaWarszawskie) {
-		System.out.println(nodesViaWarszawskie);
+		
+		
+		
 	}
 
 	public static List<OSMNode> getOSMNodesInVicinity(double lat, double lon, double vicinityRange) throws IOException,

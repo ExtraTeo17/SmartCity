@@ -9,7 +9,7 @@ public class BusInfo {
 
 	Long bus_line;
 	List<OSMWay> route = new ArrayList<>();
-	
+	Timetable timetable = new Timetable();
 	public int getBusLine() {
 		
 		return bus_line;
