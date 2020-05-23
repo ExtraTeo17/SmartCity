@@ -4,12 +4,15 @@ import java.util.List;
 
 import Routing.RouteNode;
 import Vehicles.RegularCar;
+import SmartCity.Timetable;
 
 public class Bus extends RegularCar {
+	
+	private final Timetable timetable;
 
-	public Bus(List<RouteNode> info) {
-		super(info);
-		// TODO Auto-generated constructor stub
+	public Bus(final List<RouteNode> route, final Timetable timetable) {
+		super(route);
+		this.timetable = timetable;
 	}
 
 }

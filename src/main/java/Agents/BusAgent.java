@@ -1,16 +1,18 @@
 package Agents;
 
-import SmartCity.BusInfo;
-import jade.core.Agent;
+import java.util.List;
+
+import Routing.RouteNode;
+import SmartCity.Timetable;
 
 public class BusAgent extends VehicleAgent {
 
     private final long agentId;
     private final Bus bus;
     
-	public BusAgent(BusInfo info, int busId) {
+	public BusAgent(final List<RouteNode> route, final Timetable timetable, final int busId) {
 		agentId = busId;
-		bus = new Bus(null);
+		bus = new Bus(route, timetable);
 	}
 
 	public String getId() {

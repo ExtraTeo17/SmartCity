@@ -1,14 +1,16 @@
 package SmartCity;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
+
+import jade.wrapper.AgentContainer;
 // Bus Lines
 public class BusInfo {
 
 	private int busLine;
 	private List<OSMWay> route = new ArrayList<>();
-	//private List<Timetable> timetable = new ArrayList<>();
-	private List<BrigadeInfo> brigada_list = new ArrayList<>(); 
+	private List<BrigadeInfo> brigadeList = new ArrayList<>(); 
 	private List<Long> stationsOnRouteOsmIds = new ArrayList<>();
 
 	public void setBusLine(String nodeValue) {
@@ -31,7 +33,17 @@ public class BusInfo {
 		return stations;
 	}
 
-	public void setList(List<OSMWay> parseOsmWay) {
+	public void setRoute(List<OSMWay> parseOsmWay) {
 		route = parseOsmWay;
+	}
+
+	public void setBrigadeList(Collection<BrigadeInfo> values) {
+		brigadeList = new ArrayList<>(values);
+	}
+
+	public void prepareAgents(AgentContainer container) {
+		for (BrigadeInfo brigade : brigadeList) {
+			brigade.prepareAgents(container);
+		}
 	}
 }

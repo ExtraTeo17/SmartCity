@@ -198,38 +198,28 @@ public class MapAccessManager {
 		return routeNodes;
 	}
 
-	private static void parseBusInfo(Station station,BusInfo info, JSONObject jsonObject) {
-		 
-		Map<Integer,BrigadeInfo> brigadas = new HashMap<>();
-       
-        
-        // loop array
+	private static void parseBusInfo(Map<String, BrigadeInfo> brigadeNrToBrigadeInfo, Station station, JSONObject jsonObject) {
         JSONArray msg = (JSONArray) jsonObject.get("result");
         Iterator<JSONArray> iterator = msg.iterator();
         while (iterator.hasNext()) {
         	JSONArray values =  (JSONArray)iterator.next();
         	Iterator<JSONObject> values_iterator = values.iterator();
-        	
-        	int brigada_number = 0;
-        	 while (values_iterator.hasNext()) {
-        		 
-        		 JSONObject value =  (JSONObject)values_iterator.next();
-        	     if(value.get("key").equals("brygada"))
-        	     {
-        	    	if( !brigadas.containsKey((value.get("value")))) 
-        	    	{
-        	    		brigadas.put((Integer)value.get("value"), new BrigadeInfo());
+        	String currentBrigadeNr = "";
+        	while (values_iterator.hasNext()) {
+        		JSONObject valueObject =  (JSONObject)values_iterator.next();
+        		String key = (String)valueObject.get("key");
+        		String value = (String)valueObject.get("value");
+        	    if (key.equals("brygada")) {
+        	    	currentBrigadeNr = value;
+        	    	if (!brigadeNrToBrigadeInfo.containsKey(value)) {
+        	    		brigadeNrToBrigadeInfo.put(value, new BrigadeInfo(value));
         	    	}
-        	    	brigada_number = (Integer)value.get("value");
-        	     }
-        	     else if (value.get("key").equals("czas")) 
-        	     {
-        	    	 brigadas.get(brigada_number).addToTimeTable(station.getId(),value.get("value"));
-        	     }
-        	 }
+        	    }
+        	    else if (key.equals("czas")) {
+        	    	 brigadeNrToBrigadeInfo.get(currentBrigadeNr).addToTimetable(station.getId(), value);
+        	    }
+        	}
         }
-				
-		
 	}
 
 	public static List<OSMNode> getOSMNodesInVicinity(double lat, double lon, double vicinityRange) throws IOException,
@@ -474,7 +464,7 @@ public class MapAccessManager {
 		Pair<Double, Double> crossroadLatLon = calculateLatLonBasedOnInternalLights(crossroad);
 		
 		if (belongsToCircle(crossroadLatLon.getValue0(), crossroadLatLon.getValue1(), middlePoint, radius)) {
-			smartCityAgent.tryAddNewLightManagerAgent(crossroad);
+			SmartCityAgent.tryAddNewLightManagerAgent(crossroad);
 		}
 	}
 	
@@ -597,43 +587,31 @@ public class MapAccessManager {
 				infoSet.add(info);
 				NodeList member_list=item.getChildNodes();
 				StringBuilder builder = new StringBuilder();
-				for(int j=0;j<member_list.getLength();j++) {
+				for (int j=0;j<member_list.getLength();j++) {
 					Node member = member_list.item(j);
-					if(member.getNodeName().equals("member") )
-					{
+					if (member.getNodeName().equals("member") ) {
 						NamedNodeMap attributes = member.getAttributes();
 						Node namedItemID = attributes.getNamedItem("ref");
-						if(attributes.getNamedItem("role").getNodeValue().length()!=0) 
-						{
-							
+						if(attributes.getNamedItem("role").getNodeValue().length()!=0) {
 							info.addStation(namedItemID.getNodeValue());
-						}
-						else {
-							
+						} else {
 							appendSingleBusWayOverpassQuery(builder, Long.parseLong(namedItemID.getNodeValue()));
-							
 						}
-						
-						
 					}
-					else if(member.getNodeName().equals("tag")) {
+					else if (member.getNodeName().equals("tag")) {
 						NamedNodeMap attributes = member.getAttributes();
 						Node namedItemID = attributes.getNamedItem("k");
-					    if(namedItemID.getNodeValue().equals("ref")) {
+					    if (namedItemID.getNodeValue().equals("ref")) {
 					    	Node number_of_line=attributes.getNamedItem("v");
 					    	info.setBusLine(number_of_line.getNodeValue());
 					    }
 					}
 				}
-				
-				//String query_full=getBusWayOverpassQueryWithPayload(builder);
-		       try {
-				info.setList(MapAccessManager.parseOsmWay(getNodesViaOverpass(getBusWayOverpassQueryWithPayload(builder))));
-			} catch (Exception e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			} 
-				
+		        try {
+		        	info.setRoute(MapAccessManager.parseOsmWay(getNodesViaOverpass(getBusWayOverpassQueryWithPayload(builder))));
+		        } catch (Exception e) {
+		        	e.printStackTrace();
+		        }
 			}
 			if (item.getNodeName().equals("node")) {
 				NamedNodeMap attributes = item.getAttributes();
@@ -641,34 +619,27 @@ public class MapAccessManager {
 				double lat = Double.parseDouble(attributes.getNamedItem("lat").getNodeValue());
 				double lng = Double.parseDouble(attributes.getNamedItem("lon").getNodeValue());
 				Station station = null;
-				if(!SmartCityAgent.stations.containsKey(Long.parseLong(namedItemID.getNodeValue()))) 
-				{
+				if (!SmartCityAgent.stations.containsKey(Long.parseLong(namedItemID.getNodeValue()))) {
 					NodeList list_tags = item.getChildNodes();
-					
-					for( int z=0; z<list_tags.getLength();z++ )
-					{
+					for (int z=0; z<list_tags.getLength();z++) {
 						Node tag = list_tags.item(z);
-						if(tag.getNodeName().equals("tag") )
-						{
+						if (tag.getNodeName().equals("tag") ) {
 							NamedNodeMap attr = tag.getAttributes();
 							Node nam= attr.getNamedItem("k");
-						    if(nam.getNodeValue().equals("ref")) {
+						    if (nam.getNodeValue().equals("ref")) {
 						    	Node number_of_station=attr.getNamedItem("v");
 						    	station= new Station(namedItemID.getNodeValue(),lat, lng, number_of_station.getNodeValue());
 						    	SmartCityAgent.stations.put(station.getId(),station);
 						    }
 						}
 					}
-					
 				}
 			}
-		
-			
 		}
 		return infoSet;
 	}
 
-	  private static List<OSMWay> parseOsmWay(Document nodesViaOverpass) {
+	private static List<OSMWay> parseOsmWay(Document nodesViaOverpass) {
 		  List<OSMWay> route = new ArrayList<>();
 		  Node osmRoot = nodesViaOverpass.getFirstChild();
 			NodeList osmXMLNodes = osmRoot.getChildNodes();
@@ -723,9 +694,11 @@ public class MapAccessManager {
 	}
 
 	private static void sendBusWarszawskieQuery(BusInfo info) {
+		Map<String, BrigadeInfo> brigadeNrToBrigadeInfo = new HashMap<>();
 		for (Station station : info.getStations()) {
-			MapAccessManager.parseBusInfo(station,info, getNodesViaWarszawskie(getBusWarszawskieQuery(station.getBusStopId(), station.getBusStopNr(), info.getBusLine())));
+			MapAccessManager.parseBusInfo(brigadeNrToBrigadeInfo, station, getNodesViaWarszawskie(getBusWarszawskieQuery(station.getBusStopId(), station.getBusStopNr(), info.getBusLine())));
 		}
+		info.setBrigadeList(brigadeNrToBrigadeInfo.values());
 	}
 
 	private static String getBusWarszawskieQuery(int busStopId, int busStopNr, int busLine) {

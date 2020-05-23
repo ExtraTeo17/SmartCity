@@ -9,6 +9,7 @@ import Routing.LightManagerNode;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
@@ -46,7 +47,7 @@ public class SmartCityAgent extends Agent {
     public static Map<Long,Station> stations = new HashMap<>();
     public static Set<BusAgent> buses = new LinkedHashSet<>();
     private JXMapViewer mapViewer;
-    private AgentContainer container;
+    private static AgentContainer container;
     private MapWindow window;
 
     public int carId = 0;
@@ -70,7 +71,7 @@ public class SmartCityAgent extends Agent {
         }
     };
 
-	private int nextBusId;
+	private static int nextBusId;
 
     protected void setup() {
         container = getContainerController();
@@ -173,7 +174,7 @@ public class SmartCityAgent extends Agent {
     	nextBusId = 1;
     }
 
-    private Long nextLightManagerId() {
+    private static long nextLightManagerId() {
         return nextLightManagerId++;
     }
 
@@ -183,7 +184,7 @@ public class SmartCityAgent extends Agent {
         buses = new LinkedHashSet<>();
     	Set<BusInfo> busInfoSet = MapAccessManager.getBusInfo(radius, middlePoint.getLatitude(), middlePoint.getLongitude());
     	for (BusInfo info : busInfoSet) {
-    		tryAddNewBusAgent(info);
+    		info.prepareAgents(container);
     	}
     }
     
@@ -203,8 +204,7 @@ public class SmartCityAgent extends Agent {
 //    	return busAgent;
 //    }
 
-    
-    private void tryAddAgent(Agent agent, String agentName) {
+	private static void tryAddAgent(Agent agent, String agentName) {
     	try {
             container.acceptNewAgent(agentName, agent);
         } catch (StaleProxyException e) {
@@ -212,17 +212,17 @@ public class SmartCityAgent extends Agent {
         }
     }
     
-    private void tryAddNewBusAgent(BusInfo info) {
-    	BusAgent agent = new BusAgent(info, nextBusId());
+    public static void tryAddNewBusAgent(final Timetable timetable) {
+    	BusAgent agent = new BusAgent(route, timetable, nextBusId());
     	SmartCity.SmartCityAgent.buses.add(agent);
     	tryAddAgent(agent, BUS + agent.getId());
     }
 
-    private int nextBusId() {
+    private static int nextBusId() {
 		return nextBusId++;
 	}
 
-	public void tryAddNewLightManagerAgent(Node crossroad) {
+	public static void tryAddNewLightManagerAgent(Node crossroad) {
         LightManager manager = new LightManager(crossroad, nextLightManagerId());
         SmartCity.SmartCityAgent.lightManagers.add(manager);
         tryAddAgent(manager, LIGHT_MANAGER + manager.getId());
