@@ -13,6 +13,8 @@ public class BusAgent extends VehicleAgent {
 		bus = new Bus(null);
 	}
 
+	public Bus getBus() { return bus;}
+
 	public String getId() {
 		return Long.toString(agentId);
 	}

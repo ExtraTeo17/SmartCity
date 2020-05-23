@@ -22,7 +22,7 @@ public class BrigadeInfo {
 		if(timetable.get(counter_of_timetables).wasAltered()) {
 			stampCounter();
 		}
-		timetable.get(counter_of_timetables).addEntryToTimetable(stationOsmId, date);
+		timetable.get(counter_of_timetables).addEntryToTimetable(stationOsmId, date.toString());
 	}
 	
 }

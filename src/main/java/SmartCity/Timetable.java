@@ -25,4 +25,8 @@ public class Timetable {
 			e.printStackTrace();
 		}
 	}
+
+    public boolean wasAltered() {
+		return false;
+    }
 }

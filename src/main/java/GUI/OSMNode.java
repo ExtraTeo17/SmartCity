@@ -7,7 +7,7 @@ import java.util.Objects;
 
 public class OSMNode {
 
-    protected final Map<String, String> tags;
+    protected Map<String, String> tags = null;
     protected long id;
     protected double lat;
     protected double lon;
@@ -19,6 +19,9 @@ public class OSMNode {
         lon = Double.parseDouble(longitude);
         version = version2;
         tags = tags2;
+    }
+
+    public OSMNode() {
     }
 
     public Long getId() {

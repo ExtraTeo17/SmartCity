@@ -29,17 +29,7 @@ import java.net.URL;
 import java.net.URLEncoder;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-import java.util.Scanner;
-import java.util.Set;
+import java.util.*;
 
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
@@ -224,7 +214,7 @@ public class MapAccessManager {
         	     }
         	     else if (value.get("key").equals("czas")) 
         	     {
-        	    	 brigadas.get(brigada_number).addToTimeTable(station.getId(),value.get("value"));
+        	    	 brigadas.get(brigada_number).addToTimeTable(station.getId(),(Date) value.get("value"));
         	     }
         	 }
         }
