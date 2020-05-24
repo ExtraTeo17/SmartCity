@@ -11,28 +11,31 @@ import GUI.CustomWaypointRenderer;
 import GUI.OSMNode;
 
 public class Station extends OSMNode {
+	
+	private int stopWawId;
+	private int stopWawNr;
 
 	public Station(String id2, String latitude, String longitude, String version2, Map<String, String> tags2) {
 		super(id2, latitude, longitude, version2, tags2);
 		// TODO Auto-generated constructor stub
 	}
 
-	public Station(String string, double lat, double lng, String nodeValue) {
-		// TODO Auto-generated constructor stub
+	public Station(final String osmId, final String lat, final String lon, final String stationRef) {
+		super(osmId, lat, lon);
+		fillStopWawIdNr(stationRef);
 	}
 
-	public Station(double lat, double lng, String nodeValue) {
-		// TODO Auto-generated constructor stub
+	private final void fillStopWawIdNr(String stationRef) {
+		stopWawNr = Integer.parseInt(stationRef.substring(stationRef.length() - 2, stationRef.length()));
+		stopWawId = Integer.parseInt(stationRef.substring(0, stationRef.length() - 2));
 	}
 
 	public int getBusStopId() {
-		// TODO Auto-generated method stub
-		return 0;
+		return stopWawId;
 	}
 
 	public int getBusStopNr() {
-		// TODO Auto-generated method stub
-		return 0;
+		return stopWawNr;
 	}
 	
 }

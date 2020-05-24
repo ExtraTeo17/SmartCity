@@ -13,15 +13,20 @@ public class OSMNode {
     protected double lon;
     protected String version;
 
-    public OSMNode(String id2, String latitude, String longitude, String version2, Map<String, String> tags2) {
-        id = Long.parseLong(id2);
-        lat = Double.parseDouble(latitude);
-        lon = Double.parseDouble(longitude);
-        version = version2;
-        tags = tags2;
+    public OSMNode(String id, String latitude, String longitude, String version, Map<String, String> tags) {
+    	fillIdLatLon(id, latitude, longitude);
+        this.version = version;
+        this.tags = tags;
     }
 
-    public OSMNode() {
+    public OSMNode(String id, String latitude, String longitude) {
+    	fillIdLatLon(id, latitude, longitude);
+    }
+    
+    private void fillIdLatLon(String id, String latitude, String longitude) {
+        this.id = Long.parseLong(id);
+        lat = Double.parseDouble(latitude);
+        lon = Double.parseDouble(longitude);
     }
 
     public Long getId() {

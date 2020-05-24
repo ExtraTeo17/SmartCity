@@ -296,6 +296,7 @@ public class SmartCityAgent extends Agent {
     	for (BusInfo info : busInfoSet) {
     		info.prepareAgents(container);
     	}
+    	System.out.println("NUMBER OF BUS AGENTS: " + buses.size());
     }
     
     /*private Set<BusAgent> prepareBusesV0() {

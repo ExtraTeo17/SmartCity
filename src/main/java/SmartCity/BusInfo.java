@@ -50,5 +50,11 @@ public class BusInfo {
 		}
 	}
 
+	public Long getLastStation() {
+		if (stationsOnRouteOsmIds.size() == 0)
+			return (long) 0;
+		return stationsOnRouteOsmIds.get(stationsOnRouteOsmIds.size() - 1);
+	}
+
 	
 }

@@ -559,22 +559,19 @@ public class MapAccessManager {
 	private static Set<BusInfo> sendBusOverpassQuery(int radius, double middleLat, double middleLon) {
 		Set<BusInfo> infoSet = null;
 		try {
-			String query=getBusOverpassQuery(radius, middleLat, middleLon);
-			Document query2= getNodesViaOverpass(query);
-			
-			infoSet = MapAccessManager.parseBusInfo(query2);
+			infoSet = MapAccessManager.parseBusInfo(getNodesViaOverpass(getBusOverpassQuery(radius, middleLat, middleLon)), radius, middleLat, middleLon);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
 		return infoSet;
 	}
 
-	private static Set<BusInfo> parseBusInfo(Document nodesViaOverpass) {
+	private static Set<BusInfo> parseBusInfo(Document nodesViaOverpass, int radius, double middleLat, double middleLon) {
 		Set<BusInfo> infoSet = new LinkedHashSet<>();
 		Node osmRoot = nodesViaOverpass.getFirstChild();
 		NodeList osmXMLNodes = osmRoot.getChildNodes();
 		// WRÓCIĆ osmXMLNodes.getLength()
-		for (int i = 1; i <15; i++) {
+		for (int i = 1; i < osmXMLNodes.getLength(); i++) {
 			Node item = osmXMLNodes.item(i);
 			if (item.getNodeName().equals("relation")) {
 				BusInfo info = new BusInfo();
@@ -586,9 +583,9 @@ public class MapAccessManager {
 					if (member.getNodeName().equals("member") ) {
 						NamedNodeMap attributes = member.getAttributes();
 						Node namedItemID = attributes.getNamedItem("ref");
-						if(attributes.getNamedItem("role").getNodeValue().length()!=0) {
+						if(attributes.getNamedItem("role").getNodeValue().length()!=0 && attributes.getNamedItem("type").getNodeValue().equals("node")) {
 							info.addStation(namedItemID.getNodeValue());
-						} else {
+						} else if (attributes.getNamedItem("role").getNodeValue().length() == 0 && attributes.getNamedItem("type").getNodeValue().equals("way")) {
 							appendSingleBusWayOverpassQuery(builder, Long.parseLong(namedItemID.getNodeValue()));
 						}
 					}
@@ -610,11 +607,13 @@ public class MapAccessManager {
 			}
 			if (item.getNodeName().equals("node")) {
 				NamedNodeMap attributes = item.getAttributes();
-				Node namedItemID = attributes.getNamedItem("id");
-				double lat = Double.parseDouble(attributes.getNamedItem("lat").getNodeValue());
-				double lng = Double.parseDouble(attributes.getNamedItem("lon").getNodeValue());
+				
+				String osmId = attributes.getNamedItem("id").getNodeValue();
+				String lat = attributes.getNamedItem("lat").getNodeValue();
+				String lon = attributes.getNamedItem("lon").getNodeValue();
+				
 				Station station = null;
-				if (!SmartCityAgent.stations.containsKey(Long.parseLong(namedItemID.getNodeValue()))) {
+				if (!SmartCityAgent.stations.containsKey(Long.parseLong(osmId))) {
 					NodeList list_tags = item.getChildNodes();
 					for (int z=0; z<list_tags.getLength();z++) {
 						Node tag = list_tags.item(z);
@@ -623,7 +622,7 @@ public class MapAccessManager {
 							Node nam= attr.getNamedItem("k");
 						    if (nam.getNodeValue().equals("ref")) {
 						    	Node number_of_station=attr.getNamedItem("v");
-						    	station= new Station(namedItemID.getNodeValue(),lat, lng, number_of_station.getNodeValue());
+						    	station = new Station(osmId, lat, lon, number_of_station.getNodeValue());
 						    	SmartCityAgent.stations.put(station.getId(),station);
 						    }
 						}
@@ -692,8 +691,11 @@ public class MapAccessManager {
 	private static void sendBusWarszawskieQuery(BusInfo info) {
 		Map<String, BrigadeInfo> brigadeNrToBrigadeInfo = new HashMap<>();
 		for (Station station : info.getStations()) {
-			String query = getBusWarszawskieQuery(station.getBusStopId(), station.getBusStopNr(), info.getBusLine());
-			MapAccessManager.parseBusInfo(brigadeNrToBrigadeInfo, station, getNodesViaWarszawskie(query));
+			try {
+				MapAccessManager.parseBusInfo(brigadeNrToBrigadeInfo, station, getNodesViaWarszawskie(getBusWarszawskieQuery(station.getBusStopId(), station.getBusStopNr(), info.getBusLine())));
+			} catch (NullPointerException gowno) {
+				gowno.printStackTrace();
+			}
 		}
 		info.setBrigadeList(brigadeNrToBrigadeInfo.values());
 	}
