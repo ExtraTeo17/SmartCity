@@ -559,7 +559,10 @@ public class MapAccessManager {
 	private static Set<BusInfo> sendBusOverpassQuery(int radius, double middleLat, double middleLon) {
 		Set<BusInfo> infoSet = null;
 		try {
-			infoSet = MapAccessManager.parseBusInfo(getNodesViaOverpass(getBusOverpassQuery(radius, middleLat, middleLon)));
+			String query=getBusOverpassQuery(radius, middleLat, middleLon);
+			Document query2= getNodesViaOverpass(query);
+			
+			infoSet = MapAccessManager.parseBusInfo(query2);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -570,7 +573,8 @@ public class MapAccessManager {
 		Set<BusInfo> infoSet = new LinkedHashSet<>();
 		Node osmRoot = nodesViaOverpass.getFirstChild();
 		NodeList osmXMLNodes = osmRoot.getChildNodes();
-		for (int i = 1; i < osmXMLNodes.getLength(); i++) {
+		// WRÓCIĆ osmXMLNodes.getLength()
+		for (int i = 1; i <15; i++) {
 			Node item = osmXMLNodes.item(i);
 			if (item.getNodeName().equals("relation")) {
 				BusInfo info = new BusInfo();
@@ -599,6 +603,7 @@ public class MapAccessManager {
 				}
 		        try {
 		        	info.setRoute(MapAccessManager.parseOsmWay(getNodesViaOverpass(getBusWayOverpassQueryWithPayload(builder))));
+		        	
 		        } catch (Exception e) {
 		        	e.printStackTrace();
 		        }
@@ -626,6 +631,7 @@ public class MapAccessManager {
 				}
 			}
 		}
+		
 		return infoSet;
 	}
 
@@ -686,12 +692,13 @@ public class MapAccessManager {
 	private static void sendBusWarszawskieQuery(BusInfo info) {
 		Map<String, BrigadeInfo> brigadeNrToBrigadeInfo = new HashMap<>();
 		for (Station station : info.getStations()) {
-			MapAccessManager.parseBusInfo(brigadeNrToBrigadeInfo, station, getNodesViaWarszawskie(getBusWarszawskieQuery(station.getBusStopId(), station.getBusStopNr(), info.getBusLine())));
+			String query = getBusWarszawskieQuery(station.getBusStopId(), station.getBusStopNr(), info.getBusLine());
+			MapAccessManager.parseBusInfo(brigadeNrToBrigadeInfo, station, getNodesViaWarszawskie(query));
 		}
 		info.setBrigadeList(brigadeNrToBrigadeInfo.values());
 	}
 
-	private static String getBusWarszawskieQuery(int busStopId, int busStopNr, int busLine) {
+	private static String getBusWarszawskieQuery(int busStopId, int busStopNr, String busLine) {
 		return "https://api.um.warszawa.pl/api/action/dbtimetable_get/?id=e923fa0e-d96c-43f9-ae6e-60518c9f3238&busstopId=" + busStopId + "&busstopNr=" + busStopNr + "&line=" + busLine + "&apikey=400dacf8-9cc4-4d6c-82cc-88d9311401a5";
 	}
 }

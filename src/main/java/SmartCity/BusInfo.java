@@ -10,16 +10,16 @@ import jade.wrapper.AgentContainer;
 // Bus Lines
 public class BusInfo {
 
-	private int busLine;
+	private String busLine;
 	private List<OSMWay> route = new ArrayList<>();
 	private List<BrigadeInfo> brigadeList = new ArrayList<>(); 
 	private List<Long> stationsOnRouteOsmIds = new ArrayList<>();
 
 	public void setBusLine(String nodeValue) {
-		busLine = Integer.parseInt(nodeValue);
+		busLine =nodeValue;
 	}
 	
-	public int getBusLine() {
+	public String getBusLine() {
 		return busLine;
 	}
 
