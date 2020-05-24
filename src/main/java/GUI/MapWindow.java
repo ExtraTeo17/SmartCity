@@ -420,7 +420,7 @@ public class MapWindow {
         StartRouteButton.putClientProperty("hideActionText", Boolean.FALSE);
         gbc = new GridBagConstraints();
         gbc.gridx = 1;
-        gbc.gridy = 10;
+        gbc.gridy = 12;
         gbc.insets = new Insets(0, 0, 10, 0);
         SidePanel.add(StartRouteButton, gbc);
         final JLabel label3 = new JLabel();
@@ -481,7 +481,7 @@ public class MapWindow {
         final JPanel spacer2 = new JPanel();
         gbc = new GridBagConstraints();
         gbc.gridx = 0;
-        gbc.gridy = 9;
+        gbc.gridy = 11;
         gbc.fill = GridBagConstraints.VERTICAL;
         gbc.insets = new Insets(25, 0, 0, 0);
         SidePanel.add(spacer2, gbc);
@@ -507,6 +507,42 @@ public class MapWindow {
         gbc.gridy = 8;
         gbc.insets = new Insets(0, 0, 10, 0);
         SidePanel.add(testCarIdSpinner, gbc);
+        final JLabel label8 = new JLabel();
+        label8.setText("Simulation time");
+        gbc = new GridBagConstraints();
+        gbc.gridx = 0;
+        gbc.gridy = 10;
+        gbc.anchor = GridBagConstraints.WEST;
+        SidePanel.add(label8, gbc);
+        setTimeSpinner = new JSpinner();
+        gbc = new GridBagConstraints();
+        gbc.gridx = 1;
+        gbc.gridy = 10;
+        gbc.anchor = GridBagConstraints.WEST;
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+        SidePanel.add(setTimeSpinner, gbc);
+        final JPanel spacer3 = new JPanel();
+        gbc = new GridBagConstraints();
+        gbc.gridx = 0;
+        gbc.gridy = 9;
+        gbc.fill = GridBagConstraints.VERTICAL;
+        gbc.insets = new Insets(25, 0, 0, 0);
+        SidePanel.add(spacer3, gbc);
+        currentTimeLabel = new JLabel();
+        currentTimeLabel.setHorizontalAlignment(0);
+        currentTimeLabel.setHorizontalTextPosition(0);
+        currentTimeLabel.setText("...");
+        gbc = new GridBagConstraints();
+        gbc.gridx = 1;
+        gbc.gridy = 13;
+        SidePanel.add(currentTimeLabel, gbc);
+        currentTimeTitle = new JLabel();
+        currentTimeTitle.setText("Current time");
+        gbc = new GridBagConstraints();
+        gbc.gridx = 0;
+        gbc.gridy = 13;
+        gbc.anchor = GridBagConstraints.WEST;
+        SidePanel.add(currentTimeTitle, gbc);
     }
 
     /**
