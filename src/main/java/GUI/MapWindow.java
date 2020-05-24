@@ -1,5 +1,6 @@
 package GUI;
 
+import Agents.BusAgent;
 import Agents.LightManager;
 import Agents.VehicleAgent;
 import Routing.RouteNode;
@@ -30,8 +31,6 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.time.Duration;
 import java.time.Instant;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.*;
 import java.util.List;
 import java.util.Timer;
@@ -72,6 +71,8 @@ public class MapWindow {
 
     public boolean renderCars = true;
     public boolean renderCarRoutes = true;
+    public boolean renderBuses = true;
+    public boolean renderBusRoutes = true;
     public boolean renderZone = true;
     public boolean renderLights = true;
     public boolean renderStations = true;
@@ -113,7 +114,7 @@ public class MapWindow {
         setZoneButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                SetZone();
+                SetZone((double) latSpinner.getValue(), (double) lonSpinner.getValue(), getZoneRadius());
                 state = SimulationState.READY_TO_RUN;
             }
         });
@@ -133,7 +134,7 @@ public class MapWindow {
                     case READY_TO_RUN:
                         latSpinner.setValue(geoPosition.getLatitude());
                         lonSpinner.setValue(geoPosition.getLongitude());
-                        SetZone();
+                        SetZone(geoPosition.getLatitude(), geoPosition.getLongitude(), getZoneRadius());
                         state = SimulationState.READY_TO_RUN;
                         break;
                     case RUNNING:
@@ -176,48 +177,37 @@ public class MapWindow {
 
             @Override
             public void actionPerformed(ActionEvent e) {
-                if(state != SimulationState.READY_TO_RUN) return;
-                carLimitSpinner.setEnabled(false);
-                seedSpinner.setEnabled(false);
-                radiusSpinner.setEnabled(false);
-                latSpinner.setEnabled(false);
-                lonSpinner.setEnabled(false);
-                testCarIdSpinner.setEnabled(false);
-                setZoneButton.setEnabled(false);
-                StartRouteButton.setEnabled(false);
-                setTimeSpinner.setEnabled(false);
-                random.setSeed(getSeed());
-                startLightManagerAgents();
+                if (state != SimulationState.READY_TO_RUN) return;
+                setInputEnabled(false);
                 currentTimeTitle.setVisible(true);
                 currentTimeLabel.setVisible(true);
+                SmartCityAgent.activateLightManagerAgents();
                 spawnTimer.scheduleAtFixedRate(new CreateCarTask(), 0, CREATE_CAR_INTERVAL_MILLISECONDS);
                 simulationStart = Instant.now();
                 state = SimulationState.RUNNING;
-            }
-
-            private void startLightManagerAgents() {
-                SmartCityAgent.activateLightManagerAgents();
             }
         });
         refreshTimer.scheduleAtFixedRate(new RefreshTask(), 0, REFRESH_MAP_INTERVAL_MILLISECONDS);
     }
 
-    public void SetZone() {
-        zoneCenter = new GeoPosition((double) latSpinner.getValue(), (double) lonSpinner.getValue());
-        SmartCityAgent.prepareStationsAndBuses(zoneCenter, getZoneRadius());
-        SmartCityAgent.prepareLightManagers(zoneCenter, getZoneRadius());
+    public void setInputEnabled(boolean check) {
+        carLimitSpinner.setEnabled(check);
+        seedSpinner.setEnabled(check);
+        radiusSpinner.setEnabled(check);
+        latSpinner.setEnabled(check);
+        lonSpinner.setEnabled(check);
+        testCarIdSpinner.setEnabled(check);
+        setZoneButton.setEnabled(check);
+        StartRouteButton.setEnabled(check);
+        setTimeSpinner.setEnabled(check);
     }
 
-    /*@Deprecated
-    private void addLightManagersFromRoute(RouteInfo info) {
-	    for (Long mgrId : info.lightManagers) {
-	        try {
-	            SmartCityAgent.AddLightManagerAgent("LightManager" + mgrId, mgr); // to optimize (only name instead of entire agent?)
-	        } catch (StaleProxyException e) {
-	            e.printStackTrace();
-	        }
-	    }
-    }*/
+    public void SetZone(double lat, double lon, int radius) {
+        zoneCenter = new GeoPosition(lat, lon);
+        SmartCityAgent.prepareStationsAndBuses(zoneCenter, getZoneRadius());
+        SmartCityAgent.prepareLightManagers(zoneCenter, getZoneRadius());
+        state = SimulationState.READY_TO_RUN;
+    }
 
     public MapWindow(SmartCityAgent agent) {
         this();
@@ -298,6 +288,32 @@ public class MapWindow {
                 RoutePainter routePainter = new RoutePainter(track, new Color(r.nextInt(255), r.nextInt(255), r.nextInt(255)));
                 painters.add(routePainter);
             }
+        } catch (Exception e) {
+
+        }
+    }
+
+    public void DrawBuses(List painters) {
+        try {
+            Set<Waypoint> set = new HashSet<>();
+            for (BusAgent a : SmartCityAgent.Buses) {
+                set.add(new DefaultWaypoint(a.getBus().getPosition()));
+            }
+            WaypointPainter<Waypoint> waypointPainter = new WaypointPainter<>();
+            waypointPainter.setWaypoints(set);
+            waypointPainter.setRenderer(new CustomWaypointRenderer("bus.png"));
+            painters.add(waypointPainter);
+        } catch (Exception e) {
+
+        }
+    }
+
+    public void DrawBusRoutes(List painters) {
+        try {
+            for (BusAgent a : SmartCityAgent.Buses) {
+
+            }
+
         } catch (Exception e) {
 
         }
@@ -504,9 +520,11 @@ public class MapWindow {
         @Override
         public void run() {
             List<Painter<JXMapViewer>> painters = new ArrayList<>();
+            if (renderBusRoutes) DrawBusRoutes(painters);
             if (renderCarRoutes) DrawRoutes(painters);
             if (renderLights) DrawLights(painters);
             if (renderCars) DrawVehicles(painters);
+            if (renderBuses) DrawBuses(painters);
             if (renderZone) DrawZones(painters);
             if (renderStations) DrawStations(painters);
             CompoundPainter<JXMapViewer> painter = new CompoundPainter<>(painters);
