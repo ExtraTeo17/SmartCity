@@ -187,14 +187,40 @@ public class MapAccessManager {
 		}
 		return routeNodes;
 	}
-
-	private static void parseBusInfo(Map<String, BrigadeInfo> brigadeNrToBrigadeInfo, Station station, JSONObject jsonObject) {
+	   private static void parseBusInfo(Map<String, BrigadeInfo> brigadeNrToBrigadeInfo, Station station, JSONObject jsonObject) {
+	        JSONArray msg = (JSONArray) jsonObject.get("result");
+	        Iterator iterator = msg.iterator();
+	        while (iterator.hasNext()) {
+	            JSONObject values =  (JSONObject) iterator.next();
+	            JSONArray valuesArray = (JSONArray) values.get("values");
+	            Iterator values_iterator = valuesArray.iterator();
+	            String currentBrigadeNr = "";
+	            while (values_iterator.hasNext()) {
+	                JSONObject valueObject =  (JSONObject) values_iterator.next();
+	                String key = (String)valueObject.get("key");
+	                String value = (String)valueObject.get("value");
+	                if (key.equals("brygada")) {
+	                    currentBrigadeNr = value;
+	                    if (!brigadeNrToBrigadeInfo.containsKey(value)) {
+	                        brigadeNrToBrigadeInfo.put(value, new BrigadeInfo(value));
+	                    }
+	                }
+	                else if (key.equals("czas")) {
+	                     brigadeNrToBrigadeInfo.get(currentBrigadeNr).addToTimetable(station.getId(), value);
+	                }
+	            }
+	        }
+	    }
+	/*private static void parseBusInfo(Map<String, BrigadeInfo> brigadeNrToBrigadeInfo, Station station, JSONObject jsonObject) {
         JSONArray msg = (JSONArray) jsonObject.get("result");
         Iterator<JSONArray> iterator = msg.iterator();
         while (iterator.hasNext()) {
-        	JSONArray values =  (JSONArray)iterator.next();
+        	
+        	JSONObject values = iterator.next();
+        	
         	Iterator<JSONObject> values_iterator = values.iterator();
         	String currentBrigadeNr = "";
+        	
         	while (values_iterator.hasNext()) {
         		JSONObject valueObject =  (JSONObject)values_iterator.next();
         		String key = (String)valueObject.get("key");
@@ -210,7 +236,7 @@ public class MapAccessManager {
         	    }
         	}
         }
-	}
+	}*/
 
 	public static List<OSMNode> getOSMNodesInVicinity(double lat, double lon, double vicinityRange) throws IOException,
 			SAXException, ParserConfigurationException {

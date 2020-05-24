@@ -9,12 +9,12 @@ import jade.wrapper.AgentContainer;
 public class BrigadeInfo {
 	
 	private List<Timetable> timetables = new ArrayList<>();
-	private final int brigadeNr;
+	private final String brigadeNr;
 	private int timetablesCounter;
 	private long currentlyConsideredStation = -1;
 	
 	public BrigadeInfo(final String brigadeNr) {
-		this.brigadeNr = Integer.parseInt(brigadeNr);
+		this.brigadeNr = brigadeNr;
 	}
 	
 	private void stampCounterAndUpdateTimetableList(final long stationOsmId) {
