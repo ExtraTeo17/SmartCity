@@ -4,8 +4,10 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
+import Routing.RouteNode;
 import jade.wrapper.AgentContainer;
 
 public class Timetable {
@@ -24,7 +26,7 @@ public class Timetable {
 		}
 	}
 
-	public void createAgent(AgentContainer container) {
-		SmartCityAgent.tryAddNewBusAgent(this);
+	public void createAgent(AgentContainer container, List<RouteNode> route) {
+		SmartCityAgent.tryAddNewBusAgent(this,route);
 	}
 }

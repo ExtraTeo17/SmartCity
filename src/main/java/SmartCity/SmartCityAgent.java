@@ -322,7 +322,8 @@ public class SmartCityAgent extends Agent {
         }
     }
     
-    public static void tryAddNewBusAgent(final Timetable timetable) {
+    public static void tryAddNewBusAgent(final Timetable timetable, List<RouteNode> route) {
+    	
     	BusAgent agent = new BusAgent(route, timetable, nextBusId());
     	SmartCity.SmartCityAgent.buses.add(agent);
     	tryAddAgent(agent, BUS + agent.getId());

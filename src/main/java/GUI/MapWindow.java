@@ -296,7 +296,7 @@ public class MapWindow {
     public void DrawBuses(List painters) {
         try {
             Set<Waypoint> set = new HashSet<>();
-            for (BusAgent a : SmartCityAgent.Buses) {
+            for (BusAgent a : SmartCityAgent.buses) {
                 set.add(new DefaultWaypoint(a.getBus().getPosition()));
             }
             WaypointPainter<Waypoint> waypointPainter = new WaypointPainter<>();
@@ -310,7 +310,7 @@ public class MapWindow {
 
     public void DrawBusRoutes(List painters) {
         try {
-            for (BusAgent a : SmartCityAgent.Buses) {
+            for (BusAgent a : SmartCityAgent.buses) {
 
             }
 

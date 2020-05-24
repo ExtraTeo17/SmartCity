@@ -1,15 +1,28 @@
 package SmartCity;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import org.jxmapviewer.viewer.GeoPosition;
+
 public class OSMWay {
 
-
+	List<GeoPosition> coordinates = new ArrayList<>();
+     Long ID ;
 	public OSMWay(String nodeValue) {
-		// TODO Auto-generated constructor stub
+		ID=Long.parseLong(nodeValue);
 	}
 
 	public void addPoint(double lat, double lng) {
-		// TODO Auto-generated method stub
+		coordinates.add(new GeoPosition(lat, lng));
 		
 	}
 
+	public long getOsmWayId() {
+		return ID;
+	}
+	public List<GeoPosition> getCoordinates()
+		{
+		return coordinates;
+		}
 }

@@ -3,6 +3,7 @@ package SmartCity;
 import java.util.ArrayList;
 import java.util.List;
 
+import Routing.RouteNode;
 import jade.wrapper.AgentContainer;
 
 public class BrigadeInfo {
@@ -43,9 +44,9 @@ public class BrigadeInfo {
 		timetables.get(timetablesCounter).addEntryToTimetable(stationOsmId, time);
 	}
 
-	public void prepareAgents(AgentContainer container) {
+	public void prepareAgents(AgentContainer container, List<RouteNode> route) {
 		for (Timetable timetable : timetables) {
-			timetable.createAgent(container);
+			timetable.createAgent(container,route);
 		}
 	}
 }
