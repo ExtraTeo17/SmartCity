@@ -88,7 +88,7 @@ public class MapWindow {
         GeoPosition warsaw = new GeoPosition(52.24, 21.02);
         MapViewer.setZoom(7);
         MapViewer.setAddressLocation(warsaw);
-        radiusSpinner.setModel(new SpinnerNumberModel(1000, 100, 50000, 100));
+        radiusSpinner.setModel(new SpinnerNumberModel(100, 100, 50000, 100));
         carLimitSpinner.setModel(new SpinnerNumberModel(50, 1, 1000, 1));
         carLimitSpinner.addChangeListener(new ChangeListener() {
             @Override
@@ -99,8 +99,8 @@ public class MapWindow {
             }
         });
         seedSpinner.setModel(new SpinnerNumberModel(69, 0, 999999, 1));
-        latSpinner.setModel(new SpinnerNumberModel(52.236831254066644, -90, 90, 1));
-        lonSpinner.setModel(new SpinnerNumberModel(21.016789376735687, -180, 180, 0.001));
+        latSpinner.setModel(new SpinnerNumberModel(52.201830, -90, 90, 1));
+        lonSpinner.setModel(new SpinnerNumberModel(20.979191, -180, 180, 0.001));
 
         testCarIdSpinner.setModel(new SpinnerNumberModel(40, 0, 100, 1));
         testCarIdSpinner.addChangeListener(new ChangeListener() {
@@ -301,7 +301,7 @@ public class MapWindow {
             }
             WaypointPainter<Waypoint> waypointPainter = new WaypointPainter<>();
             waypointPainter.setWaypoints(set);
-            waypointPainter.setRenderer(new CustomWaypointRenderer("bus.png"));
+            waypointPainter.setRenderer(new CustomWaypointRenderer("cabriolet.png"));
             painters.add(waypointPainter);
         } catch (Exception e) {
 

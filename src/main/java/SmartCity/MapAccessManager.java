@@ -296,7 +296,7 @@ public class MapAccessManager {
 	}
 
 	public static List<OSMNode> sendHighwayOverpassQuery(PointList points) {
-		List<OSMNode> nodes = null;
+		List<OSMNode> nodes = new ArrayList<>();
 		try {
 			nodes = MapAccessManager.getNodes(getNodesViaOverpass("<osm-script>\r\n" + getHighwayQueries(points) + "</osm-script>"));
 		} catch (Exception e) {
@@ -306,7 +306,7 @@ public class MapAccessManager {
 	}
 
 	private static List<OSMNode> sendLightAroundOverpassQuery(String lightAroundOverpassQuery) {
-		List<OSMNode> nodes = null;
+		List<OSMNode> nodes = new ArrayList<>();
 		try {
 			nodes = MapAccessManager.getNodes(getNodesViaOverpass(lightAroundOverpassQuery));
 		} catch (Exception e) {
@@ -316,7 +316,7 @@ public class MapAccessManager {
 	}
 	
 	public static List<RouteNode> sendFullWayAndItsTrafficSignalsQuery(List<Long> osmWayIds) {
-		List<RouteNode> nodes = null;
+		List<RouteNode> nodes = new ArrayList<>();
 		try {
 			nodes = MapAccessManager.getRouteNodes(getNodesViaOverpass(getFullWayAndItsTrafficSignalsQuery(osmWayIds)));
 		} catch (Exception e) {
@@ -326,7 +326,7 @@ public class MapAccessManager {
 	}
 	
 	public static List<OSMNode> sendFullTrafficSignalQuery(List<Long> osmWayIds) {
-		List<OSMNode> nodes = null;
+		List<OSMNode> nodes = new ArrayList<>();
 		try {
 			nodes = MapAccessManager.getNodes(getNodesViaOverpass(getFullTrafficSignalQuery(osmWayIds)));
 		} catch (Exception e) {
@@ -336,7 +336,7 @@ public class MapAccessManager {
 	}
 	
 	public static List<Station> sendStationOverpassQuery(String query) {
-		List<Station> nodes = null;
+		List<Station> nodes = new ArrayList<>();
 		try {
 			nodes = MapAccessManager.getStationNodes(getNodesViaOverpass(query));
 		} catch (Exception e) {
@@ -596,7 +596,6 @@ public class MapAccessManager {
 		Set<BusInfo> infoSet = new LinkedHashSet<>();
 		Node osmRoot = nodesViaOverpass.getFirstChild();
 		NodeList osmXMLNodes = osmRoot.getChildNodes();
-		// WRÓCIĆ osmXMLNodes.getLength()
 		for (int i = 1; i < osmXMLNodes.getLength(); i++) {
 			Node item = osmXMLNodes.item(i);
 			if (item.getNodeName().equals("relation")) {
