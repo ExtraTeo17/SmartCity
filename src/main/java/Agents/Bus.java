@@ -14,5 +14,4 @@ public class Bus extends RegularCar {
 		super(route);
 		this.timetable = timetable;
 	}
-
 }
