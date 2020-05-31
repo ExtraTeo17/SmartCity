@@ -70,11 +70,13 @@ public class SimpleCrossroad extends Crossroad {
 			if(!already_extended_green)
 			{
 				if (shouldExtendGreenLightBecauseOfCarsOnLight()) {
+					System.out.println("-------------------------------------shouldExtendGreenLightBecauseOfCarsOnLight--------------");
 					already_extended_green=true;
 					return;
 				} 
 				else if(shouldExtendBecauseOfFarAwayQueque()) {
 					prepareTimer();
+					System.out.println("-------------------------------------shouldExtendBecauseOfFarAwayQueque--------------");
 					timer.schedule(new SwitchLightsTask(), EXTEND_TIME*1000 );
 				    already_extended_green=true;
 				    return;
@@ -100,6 +102,7 @@ public class SimpleCrossroad extends Crossroad {
 					for (Instant time_of_car: light.farAwayCarMap.values()) {
 						// If current time + EXTEND_TIME > time_of_car
 						if(current_time.plusSeconds(EXTEND_TIME).isAfter(time_of_car)) {
+							System.out.println("---------------------------------------------WHY WE should extend "+ time_of_car +"----------Curent time"+current_time);
 							return true;
 						}
 					}
