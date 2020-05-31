@@ -29,6 +29,7 @@ import jade.wrapper.AgentContainer;
 import jade.wrapper.ControllerException;
 import jade.wrapper.StaleProxyException;
 
+import org.javatuples.Pair;
 import org.jxmapviewer.*;
 import org.jxmapviewer.viewer.GeoPosition;
 import org.w3c.dom.Node;
@@ -42,7 +43,8 @@ public class SmartCityAgent extends Agent {
     //public Set<Pedestrian> pedestrians = new LinkedHashSet<>();
     public static Set<LightManager> lightManagers = new HashSet<>();
     public static boolean lightManagersUnderConstruction = false;
-    public static Map<Long, LightManagerNode> lightIdToLightManagerNode = new HashMap<>();
+    //public static Map<Long, LightManagerNode> lightIdToLightManagerNode = new HashMap<>();
+    public static Map<Pair<Long, Long>, LightManagerNode> wayIdLightIdToLightManagerNode = new HashMap<>();
     private static long nextLightManagerId;
     public static Map<Long, Station> stations = new HashMap<>();
     public static Set<BusAgent> buses = new LinkedHashSet<>();

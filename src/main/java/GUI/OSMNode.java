@@ -23,7 +23,13 @@ public class OSMNode {
     	fillIdLatLon(id, latitude, longitude);
     }
     
-    private void fillIdLatLon(String id, String latitude, String longitude) {
+    public OSMNode(OSMNode node) {
+		id = node.id;
+		lat = node.lat;
+		lon = node.lon;
+	}
+
+	private void fillIdLatLon(String id, String latitude, String longitude) {
         this.id = Long.parseLong(id);
         lat = Double.parseDouble(latitude);
         lon = Double.parseDouble(longitude);

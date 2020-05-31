@@ -1,6 +1,7 @@
 package SmartCity;
 
 import java.time.Instant;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -49,8 +50,17 @@ public class Light {
 	}
 	
 	private void addLightOsmIdToLightIdToLightManagerIdHashSet(long osmId, long managerId, GeoPosition pos, long osmWayId) {
-		SmartCityAgent.lightIdToLightManagerNode.put(osmId, new LightManagerNode(pos.getLatitude(), pos.getLongitude(), osmWayId, managerId));
-		// MAKE SURE THE KEY AND VALUE IS ADDED ONCE !!!
+		SmartCityAgent.wayIdLightIdToLightManagerNode.put(Pair.with(osmWayId, osmId),
+				new LightManagerNode(pos.getLatitude(), pos.getLongitude(), osmWayId, managerId));
+		
+		/*int size = SmartCityAgent.lightIdToLightManagerNode.values().size();
+		if (size == 5) {
+			System.out.println("STAAAAAAAAAAAAAARTING PRIIIIIIIIIIIIIIINTING");
+			Collection<LightManagerNode> values = SmartCityAgent.lightIdToLightManagerNode.values();
+			for (LightManagerNode node : values) {
+				System.out.println(node.getLightManagerId());
+			}
+		}*/
 	}
 
 	public boolean isGreen() {

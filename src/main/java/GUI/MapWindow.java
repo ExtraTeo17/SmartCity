@@ -88,7 +88,7 @@ public class MapWindow {
         GeoPosition warsaw = new GeoPosition(52.24, 21.02);
         MapViewer.setZoom(7);
         MapViewer.setAddressLocation(warsaw);
-        radiusSpinner.setModel(new SpinnerNumberModel(100, 100, 50000, 100));
+        radiusSpinner.setModel(new SpinnerNumberModel(500, 100, 50000, 100));
         carLimitSpinner.setModel(new SpinnerNumberModel(1, 1, 1000, 1));
         carLimitSpinner.addChangeListener(new ChangeListener() {
             @Override

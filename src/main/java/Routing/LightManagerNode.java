@@ -12,4 +12,10 @@ public class LightManagerNode extends RouteNode {
 	public long getLightManagerId() {
 		return lightManagerId;
 	}
+
+	@Override
+	public boolean equals(Object obj) {
+		LightManagerNode node = (LightManagerNode)obj;
+		return node.getLightManagerId() == getLightManagerId() && node.getOsmWayId() == getOsmWayId();
+	}
 }
