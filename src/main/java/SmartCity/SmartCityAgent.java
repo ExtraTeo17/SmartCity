@@ -159,8 +159,10 @@ public class SmartCityAgent extends Agent {
                 RegularCar car = new RegularCar(info);
                 vehicle.setVehicle(car);
                 try {
-                    AddNewVehicleAgent(car.getVehicleType() + carId, vehicle);
+                		AddNewVehicleAgent(car.getVehicleType() + carId, vehicle);
                     carId++;
+                   
+                	
                 } catch (StaleProxyException ex) {
                     ex.printStackTrace();
                 }

@@ -58,9 +58,11 @@ public class LightManagerStrategy extends LightStrategy {
                 switch (rcv.getPerformative()) {
                     case ACLMessage.INFORM:
                         Print(rcv.getSender().getLocalName() + " is approaching in " + getInstantParameter(rcv, MessageParameter.ARRIVAL_TIME) + "ms.");
+                    
                         crossroad.addCarToFarAwayQueue(getCarName(rcv),
                                 getIntParameter(rcv, MessageParameter.ADJACENT_OSM_WAY_ID),
                                 getInstantParameter(rcv, MessageParameter.ARRIVAL_TIME));
+                       
                         break;
                     case ACLMessage.REQUEST_WHEN:
                         Print(rcv.getSender().getLocalName() + " is waiting on way " + getIntParameter(rcv, MessageParameter.ADJACENT_OSM_WAY_ID) + ".");

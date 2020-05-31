@@ -42,10 +42,22 @@ public class SimpleCrossroad extends Crossroad {
 	}
 	
 	private void prepareTimer() {
-		timer = new Timer(true);
+		
+		try
+		{
+			if(timer!=null) {
+			   timer.cancel();
+			}
+			timer = new Timer(true);
+		}
+		catch (IllegalStateException e)
+		{
+			System.out.println("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAa");
+			return;
+		}
 	}
 
-	private void startTimer() {
+	private void startTimer( ) {
 		int delayBeforeStart = 0;
 		int repeatIntervalInMillisecs = 5000;
 		timer.scheduleAtFixedRate(new SwitchLightsTask(), delayBeforeStart, repeatIntervalInMillisecs);
@@ -62,19 +74,21 @@ public class SimpleCrossroad extends Crossroad {
 					return;
 				} 
 				else if(shouldExtendBecauseOfFarAwayQueque()) {
-					timer.cancel();
+					prepareTimer();
 					timer.schedule(new SwitchLightsTask(), EXTEND_TIME*1000 );
-					already_extended_green=true;
+				    already_extended_green=true;
+				    return;
 				}
 			}
 			else {
-				
+				prepareTimer();
 				startTimer();
 				already_extended_green=false;
 			
 			}
 			lightGroup1.switchLights();
 			lightGroup2.switchLights();
+			
 		}
 
 		private boolean shouldExtendBecauseOfFarAwayQueque() {

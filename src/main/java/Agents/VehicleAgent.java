@@ -66,7 +66,8 @@ public class VehicleAgent extends Agent { // TO ADD SOME WRAPPER AROUND POINTLIS
                     msg.setAllUserDefinedParameters(prop);
                     send(msg);
                     doDelete();
-                } else {
+                } 
+                else {
                     Vehicle.Move();
                 }
             }
@@ -106,8 +107,11 @@ public class VehicleAgent extends Agent { // TO ADD SOME WRAPPER AROUND POINTLIS
         addBehaviour(communication);
     }
 
-    void GetNextStop() { // finds next traffic light and announces his arrival
+    void GetNextStop() { 
+    	System.out.println("GEEEEEEEEEEEEEEEEEEET NEEEEEEEEEEEXT stop");
+    	// finds next traffic light and announces his arrival
         LightManagerNode nextManager = Vehicle.findNextTrafficLight();
+        
         if (nextManager != null) {
 
             AID dest = new AID("LightManager" + nextManager.getLightManagerId(), AID.ISLOCALNAME);

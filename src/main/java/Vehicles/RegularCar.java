@@ -24,6 +24,10 @@ public class RegularCar extends Vehicle {
     public RegularCar(List<RouteNode> info) {
         displayRoute = info;
         route = Router.uniformRoute(displayRoute);
+        for(RouteNode r : route) {
+        	if(!r.getClass().getCanonicalName().equals("Routing.RouteNode"))
+        	System.out.println(r.getClass().getCanonicalName());
+        }
     }
 
     @Override
@@ -41,6 +45,7 @@ public class RegularCar extends Vehicle {
         for (int i = index + 1; i < route.size(); i++) {
             if (route.get(i) instanceof LightManagerNode) {
                 closestLightIndex = i;
+                System.out.println("FOUND NEW LIGHT MANAGER QQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQ");
                 return getCurrentTrafficLightNode();
             }
         }
@@ -66,12 +71,16 @@ public class RegularCar extends Vehicle {
 
     @Override
     public boolean isAtTrafficLights() {
+    if(index==route.size())
+    {
+    	return false;
+    }
         return route.get(index) instanceof LightManagerNode;
     }
 
     @Override
     public boolean isAtDestination() {
-        return index == route.size() - 1;
+        return index == route.size() ;
     }
 
     @Override

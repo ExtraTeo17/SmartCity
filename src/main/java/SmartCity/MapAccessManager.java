@@ -62,7 +62,9 @@ import com.graphhopper.util.PointList;
  */
 public class MapAccessManager {
 
-	private static final String OVERPASS_API = "http://www.overpass-api.de/api/interpreter";
+	//private static final String OVERPASS_API = "http://www.overpass-api.de/api/interpreter";
+	private static final String OVERPASS_API = "https://lz4.overpass-api.de/api/interpreter";
+
 	private static final String OPENSTREETMAP_API_06 = "http://www.openstreetmap.org/api/0.6/";
 	private static final String LAT = "lat";
 	private static final String LON = "lon";
