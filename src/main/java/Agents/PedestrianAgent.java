@@ -4,22 +4,23 @@ import java.util.List;
 
 import Routing.RouteNode;
 import Vehicles.Pedestrian;
+import jade.core.Agent;
 
-public class PedestrianAgent {
+public class PedestrianAgent extends Agent {
 
 	private final long agentId;
 	private final Pedestrian pedestrian;
 	
-	public PedestrianAgent(final List<RouteNode> route, final int agentId) {
+	public PedestrianAgent(final Pedestrian pedestrian, final int agentId) {
+		this.pedestrian = pedestrian;
 		this.agentId = agentId;
-		pedestrian = new Pedestrian(route);
 	}
 	
 	public Pedestrian getPedestrian() {
 		return pedestrian;
 	}
 	
-	public String getId() {
+	public String getAgentId() {
 		return Long.toString(agentId);
 	}
 }

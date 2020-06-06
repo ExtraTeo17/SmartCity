@@ -44,9 +44,9 @@ public class BrigadeInfo {
 		timetables.get(timetablesCounter).addEntryToTimetable(stationOsmId, time);
 	}
 
-	public void prepareAgents(AgentContainer container, List<RouteNode> route) {
+	public void prepareAgents(AgentContainer container, List<RouteNode> route, final String busLine) {
 		for (Timetable timetable : timetables) {
-			timetable.createAgent(container,route);
+			timetable.createAgent(container, route, busLine, brigadeNr);
 		}
 	}
 }

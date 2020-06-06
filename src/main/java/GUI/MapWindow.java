@@ -2,17 +2,21 @@ package GUI;
 
 import Agents.BusAgent;
 import Agents.LightManager;
+import Agents.PedestrianAgent;
+import Agents.StationAgent;
 import Agents.VehicleAgent;
 import Routing.RouteNode;
+import Routing.StationNode;
 import SmartCity.RoutePainter;
 import SmartCity.SmartCityAgent;
-import SmartCity.Station;
+import SmartCity.StationOSMNode;
 import SmartCity.ZonePainter;
 import Vehicles.MovingObjectImpl;
-
+import Vehicles.Pedestrian;
 import Vehicles.TestCar;
 import jade.wrapper.StaleProxyException;
 
+import org.javatuples.Pair;
 import org.jxmapviewer.JXMapViewer;
 import org.jxmapviewer.OSMTileFactoryInfo;
 import org.jxmapviewer.input.*;
@@ -24,9 +28,13 @@ import javax.swing.*;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import javax.swing.event.MouseInputListener;
+
+import static org.junit.Assert.assertArrayEquals;
+
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.lang.reflect.Array;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.time.Duration;
@@ -38,6 +46,8 @@ import java.util.Timer;
 public class MapWindow {
     private final static int REFRESH_MAP_INTERVAL_MILLISECONDS = 100;
     private final static int CREATE_CAR_INTERVAL_MILLISECONDS = 500;
+	private static final long CREATE_PEDESTRIAN_INTERVAL_MILLISECONDS = 2000000000;
+	private final static int PEDESTRIAN_STATION_RADIUS = 300;
 
     public JPanel MainPanel;
     public JXMapViewer MapViewer;
@@ -114,7 +124,7 @@ public class MapWindow {
         setZoneButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                SetZone((double) latSpinner.getValue(), (double) lonSpinner.getValue(), getZoneRadius());
+                prepareAgentsAndSetZone((double) latSpinner.getValue(), (double) lonSpinner.getValue(), getZoneRadius());
                 state = SimulationState.READY_TO_RUN;
             }
         });
@@ -134,7 +144,7 @@ public class MapWindow {
                     case READY_TO_RUN:
                         latSpinner.setValue(geoPosition.getLatitude());
                         lonSpinner.setValue(geoPosition.getLongitude());
-                        SetZone(geoPosition.getLatitude(), geoPosition.getLongitude(), getZoneRadius());
+                        prepareAgentsAndSetZone(geoPosition.getLatitude(), geoPosition.getLongitude(), getZoneRadius());
                         state = SimulationState.READY_TO_RUN;
                         break;
                     case RUNNING:
@@ -183,6 +193,7 @@ public class MapWindow {
                 currentTimeLabel.setVisible(true);
                 SmartCityAgent.activateLightManagerAgents();
                 spawnTimer.scheduleAtFixedRate(new CreateCarTask(), 0, CREATE_CAR_INTERVAL_MILLISECONDS);
+                spawnTimer.scheduleAtFixedRate(new CreatePedestrianTask(), 0, CREATE_PEDESTRIAN_INTERVAL_MILLISECONDS);
                 simulationStart = Instant.now();
                 state = SimulationState.RUNNING;
             }
@@ -202,7 +213,7 @@ public class MapWindow {
         setTimeSpinner.setEnabled(check);
     }
 
-    public void SetZone(double lat, double lon, int radius) {
+    public void prepareAgentsAndSetZone(double lat, double lon, int radius) {
         refreshTimer.cancel();
         refreshTimer = new Timer();
 
@@ -340,8 +351,8 @@ public class MapWindow {
 
     private void DrawStations(List painters) {
         Set<Waypoint> set = new HashSet<>();
-        for (Station station : SmartCityAgent.stations.values()) {
-            set.add(new DefaultWaypoint(station.getPosition()));
+        for (StationOSMNode stationOSMNode : SmartCityAgent.osmIdToStationOSMNode.values()) {
+            set.add(new DefaultWaypoint(stationOSMNode.getPosition()));
         }
         WaypointPainter<Waypoint> waypointPainter = new WaypointPainter<>();
         waypointPainter.setWaypoints(set);
@@ -580,15 +591,15 @@ public class MapWindow {
     }
 
     public class CreateCarTask extends TimerTask {
+    	
         @Override
         public void run() {
             if (SmartCityAgent.Vehicles.size() >= getCarLimit()) return;
-            double angle = random.nextDouble() * Math.PI * 2;
-            double lat = Math.sin(angle) * getZoneRadius() * 0.0000089;
-            double lon = Math.cos(angle) * getZoneRadius() * 0.0000089 * Math.cos(lat);
-
-            GeoPosition A = new GeoPosition(zoneCenter.getLatitude() + lat, zoneCenter.getLongitude() + lon);
-            GeoPosition B = new GeoPosition(zoneCenter.getLatitude() - lat, zoneCenter.getLongitude() - lon);
+            final Pair<Double, Double> geoPosInZoneCircle = generateRandomGeoPosOffsetWithRadius(getZoneRadius());
+            GeoPosition A = new GeoPosition(zoneCenter.getLatitude() + geoPosInZoneCircle.getValue0(),
+            		zoneCenter.getLongitude() + geoPosInZoneCircle.getValue1());
+            GeoPosition B = new GeoPosition(zoneCenter.getLatitude() - geoPosInZoneCircle.getValue0(),
+            		zoneCenter.getLongitude() - geoPosInZoneCircle.getValue1());
             List<RouteNode> info;
             try {
                 info = Router.generateRouteInfo(A, B);
@@ -614,4 +625,42 @@ public class MapWindow {
         }
     }
 
+    public class CreatePedestrianTask extends TimerTask {
+
+		@Override
+		public void run() {
+			// add people limit
+			final Pair<Pair<StationNode, StationNode>, String> stationNodePairAndBusLine = getStationPairAndLineFromRandomBus();
+			final StationNode startStation = stationNodePairAndBusLine.getValue0().getValue0();
+			final StationNode finishStation = stationNodePairAndBusLine.getValue0().getValue1();
+			final Pair<Double, Double> geoPosInFirstStationCircle = generateRandomGeoPosOffsetWithRadius(MapWindow.PEDESTRIAN_STATION_RADIUS);
+			GeoPosition pedestrianStartPoint = new GeoPosition(startStation.getLatitude() + geoPosInFirstStationCircle.getValue0(),
+					startStation.getLongitude() + geoPosInFirstStationCircle.getValue1());
+			GeoPosition pedestrianGetOnStation = new GeoPosition(startStation.getLatitude(), finishStation.getLongitude());
+			GeoPosition pedestrianDisembarkStation = new GeoPosition(startStation.getLatitude(), finishStation.getLongitude());
+			GeoPosition pedestrianFinishPoint = new GeoPosition(finishStation.getLatitude() + geoPosInFirstStationCircle.getValue0(),
+					finishStation.getLongitude() + geoPosInFirstStationCircle.getValue1());
+			List<RouteNode> routeToStation = Router.generateRouteInfoForPedestrians(pedestrianStartPoint, pedestrianGetOnStation);
+			List<RouteNode> routeFromStation = Router.generateRouteInfoForPedestrians(pedestrianDisembarkStation, pedestrianFinishPoint);
+			final Pedestrian pedestrian = new Pedestrian(routeFromStation, routeToStation, startStation.getStationId(), stationNodePairAndBusLine.getValue1());
+			SmartCityAgent.ActivateAgent(SmartCity.SmartCityAgent.tryAddNewPedestrianAgent(pedestrian));
+		}
+
+		private Pair<Pair<StationNode, StationNode>, String> getStationPairAndLineFromRandomBus() {
+			final BusAgent randomBusAgent = getRandomBusAgent();
+			return Pair.with(randomBusAgent.getTwoSubsequentStations(random), randomBusAgent.getLine());
+		}
+
+		private BusAgent getRandomBusAgent() {
+			final List<BusAgent> busArray = new ArrayList<>(SmartCity.SmartCityAgent.buses); // TODO RETHINK!!!
+			return busArray.get(random.nextInt(busArray.size()));
+		}
+    }
+    
+    private Pair<Double, Double> generateRandomGeoPosOffsetWithRadius(final int radius) {
+        double angle = random.nextDouble() * Math.PI * 2;
+        double lat = Math.sin(angle) * radius * 0.0000089;
+        double lon = Math.cos(angle) * radius * 0.0000089 * Math.cos(lat);
+        return Pair.with(lat, lon);
+    }
 }

@@ -38,6 +38,7 @@ import org.json.simple.parser.JSONParser;
 import com.graphhopper.util.shapes.GHPoint;
 
 import Agents.LightManager;
+import Agents.StationAgent;
 import GUI.OSMLight;
 import GUI.OSMNode;
 import Routing.RouteNode;
@@ -189,8 +190,8 @@ public class MapAccessManager {
 		}
 	}
 
-	public static List<Station> getStationNodes(Document xmlDocument) {
-		List<Station> stationNodes = new ArrayList<Station>();
+	public static List<StationOSMNode> getStationNodes(Document xmlDocument) {
+		List<StationOSMNode> stationNodes = new ArrayList<StationOSMNode>();
 		Node osmRoot = xmlDocument.getFirstChild();
 		NodeList osmXMLNodes = osmRoot.getChildNodes();
 		for (int i = 1; i < osmXMLNodes.getLength(); i++) {
@@ -203,7 +204,7 @@ public class MapAccessManager {
 				Node namedItemLon = attributes.getNamedItem("lon");
 				String latitude = namedItemLat.getNodeValue();
 				String longitude = namedItemLon.getNodeValue();
-				stationNodes.add(new Station(id, latitude, longitude, "", null));
+				stationNodes.add(new StationOSMNode(id, latitude, longitude, "", null));
 			}
 		}
 		return stationNodes;
@@ -228,7 +229,7 @@ public class MapAccessManager {
 		}
 		return routeNodes;
 	}
-	   private static void parseBusInfo(Map<String, BrigadeInfo> brigadeNrToBrigadeInfo, Station station, JSONObject jsonObject) {
+	   private static void parseBusInfo(Map<String, BrigadeInfo> brigadeNrToBrigadeInfo, StationOSMNode station, JSONObject jsonObject) {
 	        JSONArray msg = (JSONArray) jsonObject.get("result");
 	        Iterator iterator = msg.iterator();
 	        while (iterator.hasNext()) {
@@ -376,8 +377,8 @@ public class MapAccessManager {
 		return nodes;
 	}
 	
-	public static List<Station> sendStationOverpassQuery(String query) {
-		List<Station> nodes = new ArrayList<>();
+	public static List<StationOSMNode> sendStationOverpassQuery(String query) {
+		List<StationOSMNode> nodes = new ArrayList<>();
 		try {
 			nodes = MapAccessManager.getStationNodes(getNodesViaOverpass(query));
 		} catch (Exception e) {
@@ -597,8 +598,8 @@ public class MapAccessManager {
 		return document;
 	}
 
-	public static Set<Station> getStations(GeoPosition middlePoint, int radius) {
-		List<Station> stationNodes = sendStationOverpassQuery(getStationsInRadiusQuery(middlePoint, radius));
+	public static Set<StationOSMNode> getStations(GeoPosition middlePoint, int radius) {
+		List<StationOSMNode> stationNodes = sendStationOverpassQuery(getStationsInRadiusQuery(middlePoint, radius));
 		return new LinkedHashSet<>(stationNodes);
 	}
 
@@ -696,8 +697,8 @@ public class MapAccessManager {
 				String lat = attributes.getNamedItem("lat").getNodeValue();
 				String lon = attributes.getNamedItem("lon").getNodeValue();
 				
-				Station station = null;
-				if (!SmartCityAgent.stations.containsKey(Long.parseLong(osmId))) {
+				
+				if (!SmartCityAgent.osmIdToStationOSMNode.containsKey(Long.parseLong(osmId))) {
 					NodeList list_tags = item.getChildNodes();
 					for (int z=0; z<list_tags.getLength();z++) {
 						Node tag = list_tags.item(z);
@@ -706,8 +707,8 @@ public class MapAccessManager {
 							Node nam= attr.getNamedItem("k");
 						    if (nam.getNodeValue().equals("ref")) {
 						    	Node number_of_station=attr.getNamedItem("v");
-						    	station = new Station(osmId, lat, lon, number_of_station.getNodeValue());
-						    	SmartCityAgent.stations.put(station.getId(),station);
+						    	StationOSMNode stationOSMNode = new StationOSMNode(osmId, lat, lon, number_of_station.getNodeValue());
+						    	SmartCityAgent.tryAddNewStationAgent(stationOSMNode);
 						    }
 						}
 					}
@@ -774,7 +775,7 @@ public class MapAccessManager {
 
 	private static void sendBusWarszawskieQuery(BusInfo info) {
 		Map<String, BrigadeInfo> brigadeNrToBrigadeInfo = new HashMap<>();
-		for (Station station : info.getStations()) {
+		for (StationOSMNode station : info.getStations()) {
 			try {
 				MapAccessManager.parseBusInfo(brigadeNrToBrigadeInfo, station, getNodesViaWarszawskie(getBusWarszawskieQuery(station.getBusStopId(), station.getBusStopNr(), info.getBusLine())));
 			} catch (NullPointerException gowno) {
