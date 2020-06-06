@@ -4,6 +4,8 @@ import java.util.List;
 
 import Routing.RouteNode;
 import SmartCity.Timetable;
+import Vehicles.Bus;
+
 import org.jxmapviewer.viewer.GeoPosition;
 
 public class BusAgent extends VehicleAgent {
@@ -16,7 +18,7 @@ public class BusAgent extends VehicleAgent {
 		bus = new Bus(route, timetable);
 	}
 
-	public Bus getBus() { return bus;}
+	public Bus getBus() { return bus; }
 
 	public String getId() {
 		return Long.toString(agentId);

@@ -629,8 +629,12 @@ public class MapAccessManager {
 	}
 
 	public static Set<BusInfo> getBusInfo(int radius, double middleLat, double middleLon) {
+		System.out.println("STEP 2/" + SmartCityAgent.STEPS + ": Sending bus overpass query");
 		Set<BusInfo> infoSet = sendBusOverpassQuery(radius, middleLat, middleLon);
+		System.out.println("STEP 4/" + SmartCityAgent.STEPS + ": Starting warzawskie query and parsing");
+		int i = 0;
 		for (BusInfo info : infoSet) {
+			System.out.println("STEP 4/" + SmartCityAgent.STEPS + " (SUBSTEP " + (++i) + "/" + infoSet.size() + "): Warszawskie query sending & parsing substep");
 			sendBusWarszawskieQuery(info);
 		}
 		return infoSet;
@@ -647,6 +651,7 @@ public class MapAccessManager {
 	}
 
 	private static Set<BusInfo> parseBusInfo(Document nodesViaOverpass, int radius, double middleLat, double middleLon) {
+		System.out.println("STEP 3/" + SmartCityAgent.STEPS + ": Starting overpass bus info parsing");
 		Set<BusInfo> infoSet = new LinkedHashSet<>();
 		Node osmRoot = nodesViaOverpass.getFirstChild();
 		NodeList osmXMLNodes = osmRoot.getChildNodes();

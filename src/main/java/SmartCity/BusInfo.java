@@ -44,7 +44,7 @@ public class BusInfo {
 	}
 
 	public void prepareAgents(AgentContainer container) {
-		List<RouteNode> routeWithNodes = Router.generateRouteInfoForBuses(route,stationsOnRouteOsmIds);
+		List<RouteNode> routeWithNodes = Router.generateRouteInfoForBuses(route, stationsOnRouteOsmIds);
 		for (BrigadeInfo brigade : brigadeList) {
 			brigade.prepareAgents(container,routeWithNodes);
 		}

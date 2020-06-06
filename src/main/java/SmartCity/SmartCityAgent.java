@@ -21,7 +21,7 @@ import java.util.Set;
 import javax.swing.*;
 
 import Routing.RouteNode;
-import Vehicles.RegularCar;
+import Vehicles.MovingObjectImpl;
 import jade.core.Agent;
 import jade.core.behaviours.CyclicBehaviour;
 import jade.lang.acl.ACLMessage;
@@ -37,9 +37,14 @@ import org.w3c.dom.Node;
 public class SmartCityAgent extends Agent {
     public final static String LIGHT_MANAGER = "LightManager";
 
+	public static boolean shouldGenerateBuses = false;
+
     private static final String BUS = "Bus";
 
+	public static final String STEPS = "6";
+
     public List<VehicleAgent> Vehicles = new ArrayList<>();
+    public List<PedestrianAgent> pedestrians = new ArrayList<>();
     //public Set<Pedestrian> pedestrians = new LinkedHashSet<>();
     public static Set<LightManager> lightManagers = new HashSet<>();
     public static boolean lightManagersUnderConstruction = false;
@@ -158,7 +163,7 @@ public class SmartCityAgent extends Agent {
         runTest.addActionListener(new ActionListener() {
             private void prepareCar(List<RouteNode> info) {
                 VehicleAgent vehicle = new VehicleAgent();
-                RegularCar car = new RegularCar(info);
+                MovingObjectImpl car = new MovingObjectImpl(info);
                 vehicle.setVehicle(car);
                 try {
                 		AddNewVehicleAgent(car.getVehicleType() + carId, vehicle);
@@ -293,13 +298,18 @@ public class SmartCityAgent extends Agent {
     }
 
     public void prepareStationsAndBuses(GeoPosition middlePoint, int radius) {
-        //stations = MapAccessManager.getStations(middlePoint, radius);
+        //stations = MapAccessManager.getStations(middlePoint, radius); NOT NEEDED ANYMORE, BECAUSE OF FILLING STATIONS DURING PARSING!
+    	System.out.println("STEP 1/" + SmartCityAgent.STEPS + ": Starting bus preparation");
     	resetBusIdGen();
         buses = new LinkedHashSet<>();
     	Set<BusInfo> busInfoSet = MapAccessManager.getBusInfo(radius, middlePoint.getLatitude(), middlePoint.getLongitude());
+    	System.out.println("STEP 5/" + SmartCityAgent.STEPS + ": Starting agent preparation based on queries");
+    	int i = 0;
     	for (BusInfo info : busInfoSet) {
+    		System.out.println("STEP 5/" + SmartCityAgent.STEPS + " (SUBSTEP " + (++i) + "/" + busInfoSet.size() + "): Agent preparation substep");
     		info.prepareAgents(container);
     	}
+    	System.out.println("STEP 6/" + SmartCityAgent.STEPS + ": Buses are created!");
     	System.out.println("NUMBER OF BUS AGENTS: " + buses.size());
     }
     

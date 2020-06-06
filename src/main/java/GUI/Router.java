@@ -143,13 +143,12 @@ public final class Router { // BIG REFACTOR, MOVE GETMANAGERFORLIGHTS TO MAPACCE
     public static List<RouteNode> generateRouteInfoForBuses(List<OSMWay> router, List<Long>  stations) {
     	   Pair<List<Long>, List<RouteNode>> osmWayIdsAndPointList = findBusRoute(router);
     	 // REPAIR BUSES AFTER 01.06.2020 CHANGES
-           /*List<OSMLight> lightsOnRoute = MapAccessManager.sendFullTrafficSignalQuery(osmWayIdsAndPointList.getValue0());
+           List<OSMLight> lightsOnRoute = MapAccessManager.sendFullTrafficSignalQuery(osmWayIdsAndPointList.getValue0());
            List<RouteNode> managers = getManagersForLights(lightsOnRoute, osmWayIdsAndPointList.getValue1());
            List<RouteNode> stat = getAgentStationsForRoute(getOSMNodesForStations(stations), osmWayIdsAndPointList.getValue1());
            managers.addAll(stat);
            List<RouteNode> routeWithManagers = getRouteWithAdditionalNodes(osmWayIdsAndPointList.getValue1(), managers);
-           return routeWithManagers;*/
-    	   return new ArrayList<>();
+           return routeWithManagers;
     }
 
     

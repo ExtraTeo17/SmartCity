@@ -6,7 +6,7 @@ import java.time.Duration;
 import java.time.Instant;
 import java.util.List;
 
-public class TestCar extends RegularCar {
+public class TestCar extends MovingObjectImpl {
     Instant start;
 
     public TestCar(List<RouteNode> info) {

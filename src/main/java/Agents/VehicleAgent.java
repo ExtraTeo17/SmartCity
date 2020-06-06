@@ -4,7 +4,7 @@ import java.time.Instant;
 
 import Routing.LightManagerNode;
 import Vehicles.DrivingState;
-import Vehicles.Vehicle;
+import Vehicles.MovingObject;
 import jade.core.AID;
 import jade.core.Agent;
 import jade.core.behaviours.Behaviour;
@@ -14,9 +14,9 @@ import jade.lang.acl.ACLMessage;
 import jade.util.leap.Properties;
 
 public class VehicleAgent extends Agent { // TO ADD SOME WRAPPER AROUND POINTLIST IN VEHICLE SO IT CONTAINS ADJACENTWAYIDS AND ITS CONSECUTIVE MANAGERS ALL ALONG !!!
-    public Vehicle Vehicle;
+    public MovingObject Vehicle;
 
-    public void setVehicle(Vehicle v) {
+    public void setVehicle(MovingObject v) {
         Vehicle = v;
     }
 

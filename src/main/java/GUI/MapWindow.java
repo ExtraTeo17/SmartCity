@@ -8,7 +8,7 @@ import SmartCity.RoutePainter;
 import SmartCity.SmartCityAgent;
 import SmartCity.Station;
 import SmartCity.ZonePainter;
-import Vehicles.RegularCar;
+import Vehicles.MovingObjectImpl;
 
 import Vehicles.TestCar;
 import jade.wrapper.StaleProxyException;
@@ -145,7 +145,7 @@ public class MapWindow {
                             //create car, generate lights, add route to car, add car to agents
                             VehicleAgent vehicle = new VehicleAgent();
                             List<RouteNode> info = Router.generateRouteInfo(pointA, pointB);
-                            RegularCar car = new RegularCar(info);
+                            MovingObjectImpl car = new MovingObjectImpl(info);
                             vehicle.setVehicle(car);
                             try {
                                 SmartCityAgent.AddNewVehicleAgent(car.getVehicleType() + SmartCityAgent.Vehicles.size(), vehicle);
@@ -207,7 +207,8 @@ public class MapWindow {
         refreshTimer = new Timer();
 
         zoneCenter = new GeoPosition(lat, lon);
-    //    SmartCityAgent.prepareStationsAndBuses(zoneCenter, getZoneRadius());
+        if (SmartCityAgent.shouldGenerateBuses)
+        	SmartCityAgent.prepareStationsAndBuses(zoneCenter, getZoneRadius());
         SmartCityAgent.prepareLightManagers(zoneCenter, getZoneRadius());
         state = SimulationState.READY_TO_RUN;
 
@@ -597,10 +598,10 @@ public class MapWindow {
             }
 
             VehicleAgent vehicle = new VehicleAgent();
-            RegularCar car;
+            MovingObjectImpl car;
             if (getTestCarId() == SmartCityAgent.Vehicles.size()) {
                 car = new TestCar(info);
-            } else car = new RegularCar(info);
+            } else car = new MovingObjectImpl(info);
             vehicle.setVehicle(car);
             try {
                 SmartCityAgent.AddNewVehicleAgent(car.getVehicleType() + SmartCityAgent.carId, vehicle);

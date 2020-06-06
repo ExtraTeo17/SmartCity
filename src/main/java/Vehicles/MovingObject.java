@@ -10,7 +10,7 @@ import java.util.List;
 
 import org.jxmapviewer.viewer.GeoPosition;
 
-public abstract class Vehicle {
+public abstract class MovingObject {
     public abstract String getVehicleType();
     public abstract LightManagerNode findNextTrafficLight();
     public abstract String getPositionString();

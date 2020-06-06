@@ -1,12 +1,11 @@
-package Agents;
+package Vehicles;
 
 import java.util.List;
 
 import Routing.RouteNode;
-import Vehicles.RegularCar;
 import SmartCity.Timetable;
 
-public class Bus extends RegularCar {
+public class Bus extends MovingObjectImpl {
 	
 	private final Timetable timetable;
 
