@@ -7,6 +7,7 @@ import Routing.LightManagerNode;
 import Routing.RouteNode;
 import Routing.StationNode;
 import SmartCity.Timetable;
+import Vehicles.Bus;
 import Vehicles.DrivingState;
 import jade.core.AID;
 import jade.core.Agent;
