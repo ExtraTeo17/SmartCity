@@ -2,6 +2,7 @@ package Agents;
 
 import java.time.Instant;
 import java.util.List;
+import java.util.Random;
 
 import Routing.LightManagerNode;
 import Routing.RouteNode;
@@ -17,14 +18,31 @@ import jade.core.behaviours.TickerBehaviour;
 import jade.lang.acl.ACLMessage;
 import jade.util.leap.Properties;
 
+
+import org.javatuples.Pair;
+import org.jxmapviewer.viewer.GeoPosition;
+
+
 public class BusAgent extends Agent {
+
+    public final Pair<StationNode, StationNode> getTwoSubsequentStations(final Random random) {
+        List<StationNode> stationsOnRoute = bus.getStationNodesOnRoute();
+        final int halfIndex = stationsOnRoute.size() / 2;
+        return Pair.with(stationsOnRoute.get(random.nextInt(halfIndex)),
+                stationsOnRoute.get(halfIndex + random.nextInt(halfIndex) - 1));
+    }
+
+    public final String getLine() {
+        return bus.getLine();
+    }
 
     private final long agentId;
     private Bus bus;
 
-    public BusAgent(final List<RouteNode> route, final Timetable timetable, final int busId) {
+    public BusAgent(final List<RouteNode> route, final Timetable timetable,
+                    final String busLine, final String brigadeNr, final int busId) {
         agentId = busId;
-        bus = new Bus(route, timetable);
+        bus = new Bus(route, timetable, busLine, brigadeNr);
 
         StationNode station = bus.getCurrentStationNode();
         Print("Started at station " + station.getStationId() + ".");

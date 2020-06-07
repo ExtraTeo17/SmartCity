@@ -7,19 +7,41 @@ import Routing.LightManagerNode;
 import Routing.RouteNode;
 import Routing.StationNode;
 import Vehicles.DrivingState;
-import Vehicles.RegularCar;
 import SmartCity.Timetable;
-import Vehicles.Vehicle;
 import org.jxmapviewer.viewer.GeoPosition;
 
-public class Bus extends Vehicle {
-	
-	private final Timetable timetable;
+public class Bus extends MovingObject {
 
-	public Bus(final List<RouteNode> route, final Timetable timetable) {
+	private final Timetable timetable;
+	private final List<StationNode> stationNodesOnRoute;
+	private final String busLine;
+	private final String brigadeNr;
+
+	public Bus(final List<RouteNode> route, final Timetable timetable, final String busLine,
+			   final String brigadeNr) {
 		displayRoute = route;
-		this.route = Router.uniformRoute(displayRoute);
 		this.timetable = timetable;
+		stationNodesOnRoute = extractStationsFromRoute();
+		this.busLine = busLine;
+		this.brigadeNr = brigadeNr;
+	}
+
+	private List<StationNode> extractStationsFromRoute() {
+		try {
+			throw new Exception("Not implemented!");
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return null;
+	}
+
+	public final String getLine() {
+		return busLine;
+	}
+
+	public final List<StationNode> getStationNodesOnRoute() {
+		return stationNodesOnRoute;
+
 	}
 
 	private List<RouteNode> displayRoute;
@@ -69,7 +91,7 @@ public class Bus extends Vehicle {
 		return null;
 	}
 
-	public RouteNode findNextStop(){
+	public RouteNode findNextStop() {
 		for (int i = index + 1; i < route.size(); i++) {
 			if (route.get(i) instanceof StationNode) {
 				return (StationNode) route.get(i);
@@ -93,40 +115,38 @@ public class Bus extends Vehicle {
 
 	@Override
 	public LightManagerNode getCurrentTrafficLightNode() {
-		if(closestLightIndex == -1) return null;
+		if (closestLightIndex == -1) return null;
 		return (LightManagerNode) (route.get(closestLightIndex));
 	}
 
 	@Override
 	public boolean isAtTrafficLights() {
-		if(index==route.size())
-		{
+		if (index == route.size()) {
 			return false;
 		}
 		return route.get(index) instanceof LightManagerNode;
 	}
 
 	public boolean isAtStation() {
-		if(index==route.size())
-		{
+		if (index == route.size()) {
 			return true;
 		}
 		return route.get(index) instanceof StationNode;
 	}
 
 	public StationNode getCurrentStationNode() {
-		if(closestStationIndex == -1) return null;
+		if (closestStationIndex == -1) return null;
 		return (StationNode) (route.get(closestLightIndex));
 	}
 
 	@Override
 	public boolean isAtDestination() {
-		return index == route.size() ;
+		return index == route.size();
 	}
 
 	@Override
 	public void Move() {
-		if(isAtDestination()) index = 0;
+		if (isAtDestination()) index = 0;
 		else index++;
 	}
 
@@ -140,7 +160,9 @@ public class Bus extends Vehicle {
 		return ((closestLightIndex - index) * 3600) / getSpeed();
 	}
 
-	public int getMilisecondsToNextStation() { return ((closestStationIndex - index) * 3600) / getSpeed();}
+	public int getMilisecondsToNextStation() {
+		return ((closestStationIndex - index) * 3600) / getSpeed();
+	}
 
 	@Override
 	public int getSpeed() {

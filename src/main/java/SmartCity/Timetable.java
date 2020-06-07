@@ -26,7 +26,8 @@ public class Timetable {
 		}
 	}
 
-	public void createAgent(AgentContainer container, List<RouteNode> route) {
-		SmartCityAgent.tryAddNewBusAgent(this,route);
+	public void createAgent(AgentContainer container, List<RouteNode> route, final String busLine,
+			final String brigadeNr) {
+		SmartCityAgent.tryAddNewBusAgent(this, route, busLine, brigadeNr);
 	}
 }

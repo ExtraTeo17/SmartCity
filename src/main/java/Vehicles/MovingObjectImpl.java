@@ -8,7 +8,7 @@ import java.util.List;
 
 import org.jxmapviewer.viewer.GeoPosition;
 
-public class RegularCar extends Vehicle {
+public class MovingObjectImpl extends MovingObject {
 
     private List<RouteNode> displayRoute;
 
@@ -21,7 +21,7 @@ public class RegularCar extends Vehicle {
 
     public DrivingState State = DrivingState.STARTING;
 
-    public RegularCar(List<RouteNode> info) {
+    public MovingObjectImpl(List<RouteNode> info) {
         displayRoute = info;
         route = Router.uniformRoute(displayRoute);
         for(RouteNode r : route) {

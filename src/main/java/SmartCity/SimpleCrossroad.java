@@ -139,7 +139,6 @@ public class SimpleCrossroad extends Crossroad {
 			else
 				redGroupCars += light.carQueue.size();
 		}
-		System.out.println("LM:Check number of cars");
 		if (greenGroupCars > redGroupCars)
 			System.out.println("LM:CROSSROAD HAS PROLONGED GREEN LIGHT FOR " + greenGroupCars + " CARS AS OPPOSED TO " + redGroupCars);
 		return greenGroupCars > redGroupCars; // should check if two base green intervals have passed (also temporary, because it also sucks)

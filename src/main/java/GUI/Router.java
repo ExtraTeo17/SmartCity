@@ -140,16 +140,15 @@ public final class Router { // BIG REFACTOR, MOVE GETMANAGERFORLIGHTS TO MAPACCE
     }
     
     
-    public static List<RouteNode> generateRouteInfoForBuses(List<OSMWay> router, List<Long>  stations) {
+    public static List<RouteNode> generateRouteInfoForBuses(List<OSMWay> router, List<Long> osmStationIds) {
     	   Pair<List<Long>, List<RouteNode>> osmWayIdsAndPointList = findBusRoute(router);
     	 // REPAIR BUSES AFTER 01.06.2020 CHANGES
-           /*List<OSMLight> lightsOnRoute = MapAccessManager.sendFullTrafficSignalQuery(osmWayIdsAndPointList.getValue0());
+           List<OSMLight> lightsOnRoute = MapAccessManager.sendFullTrafficSignalQuery(osmWayIdsAndPointList.getValue0());
            List<RouteNode> managers = getManagersForLights(lightsOnRoute, osmWayIdsAndPointList.getValue1());
-           List<RouteNode> stat = getAgentStationsForRoute(getOSMNodesForStations(stations), osmWayIdsAndPointList.getValue1());
-           managers.addAll(stat);
+           List<RouteNode> stationNodes = getAgentStationsForRoute(getOSMNodesForStations(osmStationIds), osmWayIdsAndPointList.getValue1());
+           managers.addAll(stationNodes);
            List<RouteNode> routeWithManagers = getRouteWithAdditionalNodes(osmWayIdsAndPointList.getValue1(), managers);
-           return routeWithManagers;*/
-    	   return new ArrayList<>();
+           return routeWithManagers;
     }
 
     
@@ -158,7 +157,7 @@ public final class Router { // BIG REFACTOR, MOVE GETMANAGERFORLIGHTS TO MAPACCE
     	List<OSMNode> listOsmNodes = new ArrayList<>();
 		for (long station : stationsIDs)
 		{
-			listOsmNodes.add(SmartCityAgent.stations.get(station));
+			listOsmNodes.add(SmartCityAgent.osmIdToStationOSMNode.get(station));
 		}
 		return listOsmNodes;
 	}
@@ -188,4 +187,14 @@ public final class Router { // BIG REFACTOR, MOVE GETMANAGERFORLIGHTS TO MAPACCE
         // UNCOMMENT AFTER FIXING !!!
         return managers;
     }
+
+	public static List<RouteNode> generateRouteInfoForPedestrians(GeoPosition pedestrianStartPoint,
+			GeoPosition pedestrianGetOnStation) {
+		try {
+			throw new Exception("Not implemented!");
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return null;
+	}
 }

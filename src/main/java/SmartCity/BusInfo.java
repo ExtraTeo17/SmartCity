@@ -16,7 +16,7 @@ public class BusInfo {
 	private List<Long> stationsOnRouteOsmIds = new ArrayList<>();
 
 	public void setBusLine(String nodeValue) {
-		busLine =nodeValue;
+		busLine = nodeValue;
 	}
 	
 	public String getBusLine() {
@@ -27,10 +27,10 @@ public class BusInfo {
 		stationsOnRouteOsmIds.add(Long.parseLong(nodeValue));
 	}
 
-	public List<Station> getStations() {
-		List<Station> stations = new ArrayList<>();
+	public List<StationOSMNode> getStations() {
+		List<StationOSMNode> stations = new ArrayList<>();
 		for (long osmId : stationsOnRouteOsmIds) {
-			stations.add(SmartCityAgent.stations.get(osmId));
+			stations.add(SmartCityAgent.osmIdToStationOSMNode.get(osmId));
 		}
 		return stations;
 	}
@@ -44,9 +44,9 @@ public class BusInfo {
 	}
 
 	public void prepareAgents(AgentContainer container) {
-		List<RouteNode> routeWithNodes = Router.generateRouteInfoForBuses(route,stationsOnRouteOsmIds);
+		List<RouteNode> routeWithNodes = Router.generateRouteInfoForBuses(route, stationsOnRouteOsmIds);
 		for (BrigadeInfo brigade : brigadeList) {
-			brigade.prepareAgents(container,routeWithNodes);
+			brigade.prepareAgents(container, routeWithNodes, busLine);
 		}
 	}
 

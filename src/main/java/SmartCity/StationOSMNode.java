@@ -10,17 +10,17 @@ import org.jxmapviewer.viewer.WaypointPainter;
 import GUI.CustomWaypointRenderer;
 import GUI.OSMNode;
 
-public class Station extends OSMNode {
+public class StationOSMNode extends OSMNode {
 	
 	private int stopWawId;
 	private int stopWawNr;
 
-	public Station(String id2, String latitude, String longitude, String version2, Map<String, String> tags2) {
+	public StationOSMNode(String id2, String latitude, String longitude, String version2, Map<String, String> tags2) {
 		super(id2, latitude, longitude, version2, tags2);
 		// TODO Auto-generated constructor stub
 	}
 
-	public Station(final String osmId, final String lat, final String lon, final String stationRef) {
+	public StationOSMNode(final String osmId, final String lat, final String lon, final String stationRef) {
 		super(osmId, lat, lon);
 		fillStopWawIdNr(stationRef);
 	}
