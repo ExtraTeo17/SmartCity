@@ -13,7 +13,7 @@ import jade.core.behaviours.TickerBehaviour;
 import jade.lang.acl.ACLMessage;
 import jade.util.leap.Properties;
 
-public class VehicleAgent extends Agent { // TO ADD SOME WRAPPER AROUND POINTLIST IN VEHICLE SO IT CONTAINS ADJACENTWAYIDS AND ITS CONSECUTIVE MANAGERS ALL ALONG !!!
+public class VehicleAgent extends Agent {
     public Vehicle Vehicle;
 
     public void setVehicle(Vehicle v) {
@@ -26,7 +26,7 @@ public class VehicleAgent extends Agent { // TO ADD SOME WRAPPER AROUND POINTLIS
         GetNextStop();
         Vehicle.setState(DrivingState.MOVING);
 
-        Behaviour move = new TickerBehaviour(this, 3600 / Vehicle.getSpeed()) { // TO DO: generalization
+        Behaviour move = new TickerBehaviour(this, 3600 / Vehicle.getSpeed()) {
             @Override
             public void onTick() {
                 if (Vehicle.isAtTrafficLights())
@@ -42,13 +42,13 @@ public class VehicleAgent extends Agent { // TO ADD SOME WRAPPER AROUND POINTLIS
                             properties.setProperty(MessageParameter.ADJACENT_OSM_WAY_ID, Long.toString(Vehicle.getAdjacentOsmWayId()));
                             msg.setAllUserDefinedParameters(properties);
                             send(msg);
-                            Vehicle.setState(DrivingState.WAITING);
+                            Vehicle.setState(DrivingState.WAITING_AT_LIGHT);
                             Print("Asking LightManager" + light.getLightManagerId() + " for right to passage.");
                             break;
-                        case WAITING:
+                        case WAITING_AT_LIGHT:
                         	
                             break;
-                        case PASSING:
+                        case PASSING_LIGHT:
                         	Print("Passing");
                             Vehicle.Move();
                             Vehicle.setState(DrivingState.MOVING);
@@ -80,7 +80,6 @@ public class VehicleAgent extends Agent { // TO ADD SOME WRAPPER AROUND POINTLIS
                 if (rcv != null) {
                     switch (rcv.getPerformative()) {
                         case ACLMessage.REQUEST:
-                        	System.out.println("Car:I can move further, I got request ");
                             ACLMessage response = new ACLMessage(ACLMessage.AGREE);
                             response.addReceiver(rcv.getSender());
                             Properties properties = new Properties();
@@ -91,11 +90,10 @@ public class VehicleAgent extends Agent { // TO ADD SOME WRAPPER AROUND POINTLIS
                             send(response);
 
                             GetNextStop();
-                            Vehicle.setState(DrivingState.PASSING);
+                            Vehicle.setState(DrivingState.PASSING_LIGHT);
                             break;
                         case ACLMessage.AGREE:
-                        	System.out.println("Car:Okej, poczekamy");
-                            Vehicle.setState(DrivingState.WAITING);
+                            Vehicle.setState(DrivingState.WAITING_AT_LIGHT);
                             break;
                     }
                 }
@@ -107,8 +105,7 @@ public class VehicleAgent extends Agent { // TO ADD SOME WRAPPER AROUND POINTLIS
         addBehaviour(communication);
     }
 
-    void GetNextStop() { 
-    	System.out.println("GEEEEEEEEEEEEEEEEEEET NEEEEEEEEEEEXT stop");
+    void GetNextStop() {
     	// finds next traffic light and announces his arrival
         LightManagerNode nextManager = Vehicle.findNextTrafficLight();
         

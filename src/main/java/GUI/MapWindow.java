@@ -100,7 +100,7 @@ public class MapWindow {
         });
         seedSpinner.setModel(new SpinnerNumberModel(69, 0, 999999, 1));
         latSpinner.setModel(new SpinnerNumberModel(52.206466, -90, 90, 1));
-        lonSpinner.setModel(new SpinnerNumberModel( 20.969933, -180, 180, 0.001));
+        lonSpinner.setModel(new SpinnerNumberModel(20.969933, -180, 180, 0.001));
 
         testCarIdSpinner.setModel(new SpinnerNumberModel(40, 0, 100, 1));
         testCarIdSpinner.addChangeListener(new ChangeListener() {
@@ -207,7 +207,7 @@ public class MapWindow {
         refreshTimer = new Timer();
 
         zoneCenter = new GeoPosition(lat, lon);
-    //    SmartCityAgent.prepareStationsAndBuses(zoneCenter, getZoneRadius());
+        //    SmartCityAgent.prepareStationsAndBuses(zoneCenter, getZoneRadius());
         SmartCityAgent.prepareLightManagers(zoneCenter, getZoneRadius());
         state = SimulationState.READY_TO_RUN;
 
@@ -316,6 +316,13 @@ public class MapWindow {
     public void DrawBusRoutes(List painters) {
         try {
             for (BusAgent a : SmartCityAgent.buses) {
+                List<GeoPosition> track = new ArrayList<GeoPosition>();
+                for (RouteNode point : a.getBus().getDisplayRoute()) {
+                    track.add(new GeoPosition(point.getLatitude(), point.getLongitude()));
+                }
+                Random r = new Random(a.hashCode());
+                RoutePainter routePainter = new RoutePainter(track, new Color(r.nextInt(255), r.nextInt(255), r.nextInt(255)));
+                painters.add(routePainter);
 
             }
 
@@ -563,13 +570,13 @@ public class MapWindow {
             try {
 
                 List<Painter<JXMapViewer>> painters = new ArrayList<>();
-             //   if (renderBusRoutes) DrawBusRoutes(painters);
+                if (renderBusRoutes) DrawBusRoutes(painters);
                 if (renderCarRoutes) DrawRoutes(painters);
                 if (renderZone) DrawZones(painters);
                 if (renderStations) DrawStations(painters);
                 if (renderLights) DrawLights(painters);
                 if (renderCars) DrawVehicles(painters);
-             //   if (renderBuses) DrawBuses(painters);
+                if (renderBuses) DrawBuses(painters);
                 CompoundPainter<JXMapViewer> painter = new CompoundPainter<>(painters);
                 MapViewer.setOverlayPainter(painter);
                 if (state == SimulationState.RUNNING) RefreshTime();
