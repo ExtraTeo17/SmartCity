@@ -6,6 +6,7 @@ import Agents.PedestrianAgent;
 import Agents.StationAgent;
 import Agents.VehicleAgent;
 import Routing.RouteNode;
+import Routing.Router;
 import Routing.StationNode;
 import SmartCity.RoutePainter;
 import SmartCity.SmartCityAgent;
@@ -45,7 +46,7 @@ import java.util.Timer;
 
 public class MapWindow {
     private final static int REFRESH_MAP_INTERVAL_MILLISECONDS = 100;
-    private final static int CREATE_CAR_INTERVAL_MILLISECONDS = 500;
+    private final static int CREATE_CAR_INTERVAL_MILLISECONDS = 2000000000;//500;
 	private static final long CREATE_PEDESTRIAN_INTERVAL_MILLISECONDS = 2000000000;
 	private final static int PEDESTRIAN_STATION_RADIUS = 300;
 
@@ -193,7 +194,8 @@ public class MapWindow {
                 currentTimeLabel.setVisible(true);
                 SmartCityAgent.activateLightManagerAgents();
                 spawnTimer.scheduleAtFixedRate(new CreateCarTask(), 0, CREATE_CAR_INTERVAL_MILLISECONDS);
-                spawnTimer.scheduleAtFixedRate(new CreatePedestrianTask(), 0, CREATE_PEDESTRIAN_INTERVAL_MILLISECONDS);
+                if (SmartCity.SmartCityAgent.shouldGeneratePedestrians)
+                	spawnTimer.scheduleAtFixedRate(new CreatePedestrianTask(), 0, CREATE_PEDESTRIAN_INTERVAL_MILLISECONDS);
                 simulationStart = Instant.now();
                 state = SimulationState.RUNNING;
             }
@@ -218,7 +220,7 @@ public class MapWindow {
         refreshTimer = new Timer();
 
         zoneCenter = new GeoPosition(lat, lon);
-        if (SmartCityAgent.shouldGenerateBuses)
+        if (SmartCityAgent.shouldPrepareBuses)
         	SmartCityAgent.prepareStationsAndBuses(zoneCenter, getZoneRadius());
         SmartCityAgent.prepareLightManagers(zoneCenter, getZoneRadius());
         state = SimulationState.READY_TO_RUN;
@@ -594,7 +596,8 @@ public class MapWindow {
     	
         @Override
         public void run() {
-            if (SmartCityAgent.Vehicles.size() >= getCarLimit()) return;
+            if (SmartCityAgent.Vehicles.size() >= getCarLimit())
+            	return;
             final Pair<Double, Double> geoPosInZoneCircle = generateRandomGeoPosOffsetWithRadius(getZoneRadius());
             GeoPosition A = new GeoPosition(zoneCenter.getLatitude() + geoPosInZoneCircle.getValue0(),
             		zoneCenter.getLongitude() + geoPosInZoneCircle.getValue1());
@@ -602,7 +605,7 @@ public class MapWindow {
             		zoneCenter.getLongitude() - geoPosInZoneCircle.getValue1());
             List<RouteNode> info;
             try {
-                info = Router.generateRouteInfo(A, B);
+                info = Router.generateRouteInfo(A, B);//(new GeoPosition(52.228275, 20.986557), new GeoPosition(52.234908, 20.981210));
             } catch (Exception e) {
                 e.printStackTrace();
                 return;

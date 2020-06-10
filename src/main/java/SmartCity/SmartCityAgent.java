@@ -2,7 +2,8 @@ package SmartCity;
 
 import Agents.*;
 import GUI.MapWindow;
-import GUI.Router;
+import OSMProxy.MapAccessManager;
+import OSMProxy.Elements.OSMNode;
 import Routing.LightManagerNode;
 
 import java.awt.event.ActionEvent;
@@ -21,6 +22,7 @@ import java.util.Set;
 import javax.swing.*;
 
 import Routing.RouteNode;
+import Routing.Router;
 import Vehicles.MovingObjectImpl;
 import Vehicles.Pedestrian;
 import jade.core.Agent;
@@ -41,7 +43,8 @@ public class SmartCityAgent extends Agent {
     public final static String STATION = "Station";
     public final static String PEDESTRIAN = "Pedestrian";
 
-	public static boolean shouldGenerateBuses = false;
+	public static boolean shouldPrepareBuses = false;
+	public static boolean shouldGeneratePedestrians = false;
 
 	public static final String STEPS = "6";
 
@@ -283,12 +286,22 @@ public class SmartCityAgent extends Agent {
     public void prepareLightManagers(GeoPosition middlePoint, int radius) {
         resetIdGenerator();
         lightManagersUnderConstruction = true;
-        MapAccessManager.prepareLightManagersInRadiusAndLightIdToLightManagerIdHashSet(this, middlePoint, radius);
+        //MapAccessManager.prepareLightManagersInRadiusAndLightIdToLightManagerIdHashSet(this, middlePoint, radius);
+        tryPrepareLightManagersInRadiusAndLightIdToLightManagerIdHashSetBeta(this, middlePoint, radius);
 
         lightManagersUnderConstruction = false;
     }
 
-    private void resetIdGenerator() {
+    private void tryPrepareLightManagersInRadiusAndLightIdToLightManagerIdHashSetBeta(SmartCityAgent smartCityAgent,
+			GeoPosition middlePoint, int radius) {
+		try {
+	        MapAccessManager.prepareLightManagersInRadiusAndLightIdToLightManagerIdHashSetBeta(this, middlePoint, radius);
+		} catch (Exception exception) {
+			exception.printStackTrace();
+		}
+	}
+
+	private void resetIdGenerator() {
         nextLightManagerId = 1;
     }
 
@@ -370,6 +383,12 @@ public class SmartCityAgent extends Agent {
 
 	public static void tryAddNewLightManagerAgent(Node crossroad) {
         LightManager manager = new LightManager(crossroad, nextLightManagerId());
+        SmartCity.SmartCityAgent.lightManagers.add(manager);
+        tryAddAgent(manager, LIGHT_MANAGER + manager.getId());
+    }
+	
+	public static void tryAddNewLightManagerAgent(final OSMNode centerCrossroadNode) {
+        LightManager manager = new LightManager(centerCrossroadNode, nextLightManagerId());
         SmartCity.SmartCityAgent.lightManagers.add(manager);
         tryAddAgent(manager, LIGHT_MANAGER + manager.getId());
     }

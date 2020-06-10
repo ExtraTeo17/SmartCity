@@ -14,7 +14,7 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * 
  */
-package SmartCity;
+package OSMProxy;
 
 import java.io.BufferedReader;
 import java.io.DataOutputStream;
@@ -39,9 +39,14 @@ import com.graphhopper.util.shapes.GHPoint;
 
 import Agents.LightManager;
 import Agents.StationAgent;
-import GUI.OSMLight;
-import GUI.OSMNode;
+import OSMProxy.Elements.OSMLight;
+import OSMProxy.Elements.OSMNode;
+import OSMProxy.Elements.OSMWay;
 import Routing.RouteNode;
+import SmartCity.BrigadeInfo;
+import SmartCity.BusInfo;
+import SmartCity.SmartCityAgent;
+import SmartCity.StationOSMNode;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -63,6 +68,9 @@ import com.graphhopper.util.PointList;
  * 
  */
 public class MapAccessManager {
+	
+	private static final String DELIMITER_RELATION = "3838046";
+	private static final String DELIMITER_WAY = "48439275";
 
 	//private static final String OVERPASS_API = "http://www.overpass-api.de/api/interpreter";
 	private static final String OVERPASS_API = "https://lz4.overpass-api.de/api/interpreter";
@@ -146,7 +154,7 @@ public class MapAccessManager {
 				Node namedItemLon = attributes.getNamedItem("lon");
 				String latitude = namedItemLat.getNodeValue();
 				String longitude = namedItemLon.getNodeValue();
-				osmNodes.add(new OSMNode(id, latitude, longitude, "", null));
+				osmNodes.add(new OSMNode(id, latitude, longitude));
 			}
 		}
 		return osmNodes;
@@ -522,6 +530,142 @@ public class MapAccessManager {
 		}
 	}
 	
+	public static void prepareLightManagersInRadiusAndLightIdToLightManagerIdHashSetBeta(SmartCityAgent smartCityAgent,
+			GeoPosition middlePoint, int radius) throws IOException, ParserConfigurationException, SAXException {
+		List<OSMNode> lightsAround = sendLightsAroundOverpassQueryBeta(radius, middlePoint.getLatitude(), middlePoint.getLongitude());
+		List<OSMNode> lightNodeList = sendParentWaysOfLightOverpassQueryBeta(lightsAround);
+		List<OSMNode> lightsOfTypeA = filterByTypeA(lightNodeList);
+		//fillChildNodesOfWays(lightsOfTypeA);
+		prepareLightManagers(lightsOfTypeA);
+	}
+
+	private static List<OSMNode> sendLightsAroundOverpassQueryBeta(int radius, double middleLat, double middleLon) throws IOException, ParserConfigurationException, SAXException {
+		List<OSMNode> lightNodes = getNodes(getNodesViaOverpass(getLightsAroundOverpassQueryBeta(radius, middleLat, middleLon)));
+		return lightNodes;
+	}
+	
+	private static String getLightsAroundOverpassQueryBeta(int radius, double lat, double lon) {
+		return "<osm-script>\r\n" + 
+				"  <query into=\"_\" type=\"node\">\r\n" + 
+				"    <has-kv k=\"highway\" modv=\"\" v=\"traffic_signals\"/>\r\n" + 
+				"    <around radius=\"" + radius + "\" lat=\"" + lat + "\" lon=\"" + lon + "\"/>\r\n" + 
+				"  </query>\r\n" + 
+				"  <print e=\"\" from=\"_\" geometry=\"skeleton\" ids=\"yes\" limit=\"\" mode=\"skeleton\" n=\"\" order=\"id\" s=\"\" w=\"\"/>\r\n" + 
+				"</osm-script>";
+	}
+
+	private static List<OSMNode> sendParentWaysOfLightOverpassQueryBeta(final List<OSMNode> lightsAround)
+			throws IOException, ParserConfigurationException, SAXException {
+		final List<OSMNode> lightInfoList = parseLightNodeList(getNodesViaOverpass(getParentWaysOfLightOverpassQueryBeta(lightsAround)));
+		return lightInfoList;
+	}
+
+	private static String getParentWaysOfLightOverpassQueryBeta(final List<OSMNode> lightsAround) {
+		StringBuilder builder = new StringBuilder();
+		builder.append("<osm-script>");
+		for (final OSMNode light : lightsAround)
+			builder.append(getSingleParentWaysOfLightOverpassQueryBeta(light.getId()));
+		builder.append("</osm-script>");
+		return builder.toString();
+	}
+
+	private static String getSingleParentWaysOfLightOverpassQueryBeta(final long osmLightId) {
+		return "<id-query type=\"node\" ref=\"" + osmLightId + "\" into=\"crossroad\"/>\r\n" + 
+				"  <union into=\"_\">\r\n" + 
+				"    <item from=\"crossroad\" into=\"_\"/>\r\n" + 
+				"    <recurse from=\"crossroad\" type=\"node-way\"/>\r\n" + 
+				"  </union>\r\n" + 
+				"  <print e=\"\" from=\"_\" geometry=\"full\" ids=\"yes\" limit=\"\" mode=\"body\" n=\"\" order=\"id\" s=\"\" w=\"\"/>";
+	}
+
+	private static List<OSMNode> parseLightNodeList(Document nodesViaOverpass) {
+		List<OSMNode> lightNodeList = new ArrayList<>();
+		Node osmRoot = nodesViaOverpass.getFirstChild();
+		NodeList osmXMLNodes = osmRoot.getChildNodes();
+		for (int i = 1; i < osmXMLNodes.getLength(); i++)
+			parseLightNode(lightNodeList, osmXMLNodes.item(i));
+		return lightNodeList;
+	}
+
+	private static void parseLightNode(List<OSMNode> lightNodeList, Node item) {
+		if (item.getNodeName().equals("node")) {
+			final OSMNode nodeWithParents = new OSMNode(item.getAttributes());
+			lightNodeList.add(nodeWithParents);
+		} else if (item.getNodeName().equals("way")) {
+			final OSMWay osmWay = new OSMWay(item);
+			lightNodeList.get(lightNodeList.size() - 1).addParentWay(osmWay);
+		}
+	}
+
+	private static List<OSMNode> filterByTypeA(List<OSMNode> lightNodeList) {
+		final List<OSMNode> typeAlightNodeList = new ArrayList<>();
+		for (final OSMNode light : lightNodeList)
+			if (light.isTypeA())
+				typeAlightNodeList.add(light);
+		return typeAlightNodeList;
+	}
+
+	private static void fillChildNodesOfWays(final List<OSMNode> lightsOfTypeA)
+			throws IOException, ParserConfigurationException, SAXException {
+		parseChildNodesOfWays(getNodesViaOverpass(getChildNodesOfWaysOverpassQueryBeta(lightsOfTypeA)), lightsOfTypeA); 
+	}
+
+	private static String getChildNodesOfWaysOverpassQueryBeta(final List<OSMNode> lightsOfTypeA) {
+		StringBuilder builder = new StringBuilder();
+		builder.append("<osm-script>");
+		for (int i = 0; i < lightsOfTypeA.size(); ++i)
+			builder.append(getSingleChildNodesOfWaysOverpassQueryBeta(lightsOfTypeA.get(i).getParentWayIds()));
+		builder.append("</osm-script>");
+		return builder.toString();
+	}
+
+	private static String getSingleChildNodesOfWaysOverpassQueryBeta(final List<Long> parentWayIds) {
+		StringBuilder builder = new StringBuilder();
+		for (int i = 0; i < parentWayIds.size(); ++i)
+			builder.append(getSingleChildNodesOfSingleWayOverpassQueryBeta(parentWayIds.get(i)));
+		builder.append(getSingleWayDelimiterOverpassQueryBeta());
+		return builder.toString();
+	}
+
+	private static Object getSingleWayDelimiterOverpassQueryBeta() {
+		return "<id-query type=\"way\" ref=\"" + DELIMITER_WAY + "\"/>\r\n" + 
+				"  <print e=\"\" from=\"_\" geometry=\"skeleton\" ids=\"yes\" limit=\"\" mode=\"ids_only\" n=\"\" order=\"id\" s=\"\" w=\"\"/>\r\n";
+	}
+
+	private static String getSingleChildNodesOfSingleWayOverpassQueryBeta(final long osmWayId) {
+		return "<id-query type=\"way\" ref=\"" + osmWayId + "\" into=\"crossroadEntrance\"/>\r\n" + 
+				"  <union into=\"_\">\r\n" + 
+				"    <recurse from=\"crossroadEntrance\" type=\"way-node\"/>\r\n" + 
+				"    <id-query type=\"relation\" ref=\"" + DELIMITER_RELATION + "\"/>\r\n" + 
+				"  </union>\r\n" + 
+				"  <print e=\"\" from=\"_\" geometry=\"skeleton\" ids=\"yes\" limit=\"\" mode=\"ids_only\" n=\"\" order=\"id\" s=\"\" w=\"\"/>";
+	}
+
+	private static void parseChildNodesOfWays(Document childNodesOfWays, List<OSMNode> lightsOfTypeA) {
+		Node osmRoot = childNodesOfWays.getFirstChild();
+		NodeList osmXMLNodes = osmRoot.getChildNodes();
+		int lightIndex = 0, parentWayIndex = 0;
+		for (int i = 1; i < osmXMLNodes.getLength(); i++) {
+			final Node item = osmXMLNodes.item(i);
+			if (item.getNodeName().equals("node")) {
+				lightsOfTypeA.get(lightIndex).addChildNodeIdForParentWay(parentWayIndex,
+						item.getAttributes().getNamedItem("id").getNodeValue());
+			} else if (item.getNodeName().equals("relation")) {
+				++parentWayIndex;
+			} else if (item.getNodeName().equals("way")) {
+				++lightIndex;
+				parentWayIndex = 0;
+			}
+		}
+	}
+
+	private static void prepareLightManagers(List<OSMNode> lightsOfTypeA) {
+		for (final OSMNode centerCrossroadNode : lightsOfTypeA) {
+			if (centerCrossroadNode.determineParentOrientationsTowardsCrossroad())
+				SmartCityAgent.tryAddNewLightManagerAgent(centerCrossroadNode);
+		}
+	}
+	
 	private static void addAllDesiredIdsInDistrict(SmartCityAgent smartCityAgent, Node districtRoot, GeoPosition middlePoint, int radius) {
 		Node crossroadsRoot = districtRoot.getChildNodes().item(1);
 		NodeList crossroadXMLNodes = crossroadsRoot.getChildNodes();
@@ -728,21 +872,7 @@ public class MapAccessManager {
 				Node item = osmXMLNodes.item(i);
 				if (item.getNodeName().equals("way")) 
 				{
-					OSMWay way = new OSMWay(item.getAttributes().getNamedItem("id").getNodeValue());
-					NodeList way_list = item.getChildNodes();
-					for(int k=0;k<way_list.getLength();k++) 
-					{
-						Node el = way_list.item(k);
-						if(el.getNodeName().equals("nd")) 
-						{
-							NamedNodeMap attributes = el.getAttributes();
-						
-							double lat = Double.parseDouble(attributes.getNamedItem("lat").getNodeValue());
-							double lng = Double.parseDouble(attributes.getNamedItem("lon").getNodeValue());
-							way.addPoint(lat,lng);
-						}
-						
-					}
+					OSMWay way = new OSMWay(item);
 					
 					route.add(way);
 					

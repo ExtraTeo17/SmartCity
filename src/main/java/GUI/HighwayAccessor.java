@@ -3,7 +3,8 @@ package GUI;
 import com.graphhopper.util.PointList;
 import com.graphhopper.util.shapes.GHPoint;
 
-import SmartCity.MapAccessManager;
+import OSMProxy.MapAccessManager;
+import OSMProxy.Elements.OSMNode;
 
 import java.util.ArrayList;
 import java.util.LinkedHashSet;

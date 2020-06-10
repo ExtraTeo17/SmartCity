@@ -108,7 +108,6 @@ public class VehicleAgent extends Agent { // TO ADD SOME WRAPPER AROUND POINTLIS
     }
 
     void GetNextStop() { 
-    	System.out.println("GEEEEEEEEEEEEEEEEEEET NEEEEEEEEEEEXT stop");
     	// finds next traffic light and announces his arrival
         LightManagerNode nextManager = Vehicle.findNextTrafficLight();
         

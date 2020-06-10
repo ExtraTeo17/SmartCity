@@ -1,16 +1,16 @@
-package GUI;
+package Routing;
 
-import SmartCity.MapAccessManager;
-import SmartCity.OSMWay;
 import SmartCity.SmartCityAgent;
 
 import org.javatuples.Pair;
 import org.jxmapviewer.viewer.GeoPosition;
 import com.graphhopper.util.PointList;
 
-import Routing.LightManagerNode;
-import Routing.RouteNode;
-import Routing.StationNode;
+import OSMProxy.MapAccessManager;
+import OSMProxy.Elements.OSMLight;
+import OSMProxy.Elements.OSMNode;
+import OSMProxy.Elements.OSMWay;
+import OSMProxy.Elements.OSMWaypoint;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -21,8 +21,8 @@ public final class Router { // BIG REFACTOR, MOVE GETMANAGERFORLIGHTS TO MAPACCE
 
     public static List<RouteNode> generateRouteInfo(GeoPosition pointA, GeoPosition pointB) {
         Pair<List<Long>, List<RouteNode>> osmWayIdsAndPointList = findRoute(pointA, pointB);
-        List<OSMLight> lightsOnRoute = MapAccessManager.sendFullTrafficSignalQuery(osmWayIdsAndPointList.getValue0());
-        List<RouteNode> managers = getManagersForLights(lightsOnRoute, osmWayIdsAndPointList.getValue1());
+        final List<OSMLight> lightInfo = MapAccessManager.sendFullTrafficSignalQuery(osmWayIdsAndPointList.getValue0());
+        List<RouteNode> managers = getManagersForLights(lightInfo, osmWayIdsAndPointList.getValue1());
         List<RouteNode> routeWithManagers = getRouteWithAdditionalNodes(osmWayIdsAndPointList.getValue1(), managers);
         return routeWithManagers;
     }
@@ -42,7 +42,7 @@ public final class Router { // BIG REFACTOR, MOVE GETMANAGERFORLIGHTS TO MAPACCE
     }
 
     private static void addLightManagerNodeToManagersListIfItsNotNullAfterGettingItFromSmartCityAgentById(List<RouteNode> managers, OSMLight light, List<RouteNode> route) {
-    	Pair<Long, Long> osmWayIdOsmLightId = Pair.with(light.adherentOsmWayId, light.id);
+    	Pair<Long, Long> osmWayIdOsmLightId = Pair.with(light.getAdherentOsmWayId(), light.getId());
     	RouteNode nodeToAdd = SmartCityAgent.wayIdLightIdToLightManagerNode.get(osmWayIdOsmLightId);
     	/*Long lightManagerIdToAdd = SmartCityAgent.lightIdToLightManagerId.get(light.getId());
     	if (lightManagerIdToAdd == null)
@@ -139,7 +139,6 @@ public final class Router { // BIG REFACTOR, MOVE GETMANAGERFORLIGHTS TO MAPACCE
                 + ((node2.getLongitude() - node1.getLongitude()) * (node2.getLongitude() - node1.getLongitude())));
     }
     
-    
     public static List<RouteNode> generateRouteInfoForBuses(List<OSMWay> router, List<Long> osmStationIds) {
     	   Pair<List<Long>, List<RouteNode>> osmWayIdsAndPointList = findBusRoute(router);
     	 // REPAIR BUSES AFTER 01.06.2020 CHANGES
@@ -150,34 +149,26 @@ public final class Router { // BIG REFACTOR, MOVE GETMANAGERFORLIGHTS TO MAPACCE
            List<RouteNode> routeWithManagers = getRouteWithAdditionalNodes(osmWayIdsAndPointList.getValue1(), managers);
            return routeWithManagers;
     }
-
-    
     
     private static List<OSMNode> getOSMNodesForStations(List<Long> stationsIDs) {
     	List<OSMNode> listOsmNodes = new ArrayList<>();
-		for (long station : stationsIDs)
-		{
+		for (long station : stationsIDs) {
 			listOsmNodes.add(SmartCityAgent.osmIdToStationOSMNode.get(station));
 		}
 		return listOsmNodes;
 	}
 
 	private static Pair<List<Long>, List<RouteNode>> findBusRoute(List<OSMWay> router) {
-    	
     	List<Long> osmWayIds_list = new ArrayList<>();
     	List<RouteNode> RouteNodes_list = new ArrayList<>();
-		for(OSMWay el : router)
-		{
-			osmWayIds_list.add(el.getOsmWayId());
-			for(GeoPosition point : el.getCoordinates()) {
-				RouteNodes_list.add(new RouteNode(point.getLatitude(),point.getLongitude(),el.getOsmWayId()));
+		for (OSMWay el : router) {
+			osmWayIds_list.add(el.getId());
+			for(OSMWaypoint point : el.getWaypoints()) {
+				RouteNodes_list.add(new RouteNode(point.getLat(),point.getLon(),el.getId()));
 			}
-
 		}
-		   
-		return  new Pair<List<Long>, List<RouteNode>>(osmWayIds_list,RouteNodes_list);
+		return new Pair<List<Long>, List<RouteNode>>(osmWayIds_list,RouteNodes_list);
 	}
-
 
     private static List<RouteNode> getAgentStationsForRoute(List<OSMNode> stations, List<RouteNode> route) {
         List<RouteNode> managers = new ArrayList<>();

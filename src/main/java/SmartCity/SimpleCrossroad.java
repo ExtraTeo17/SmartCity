@@ -10,6 +10,8 @@ import java.util.Map.Entry;
 import java.util.Timer;
 import java.util.TimerTask;
 import Agents.LightColor;
+import OSMProxy.MapAccessManager;
+import OSMProxy.Elements.OSMNode;
 
 import org.jxmapviewer.JXMapViewer;
 import org.jxmapviewer.painter.Painter;
@@ -19,18 +21,26 @@ import org.w3c.dom.Node;
 
 public class SimpleCrossroad extends Crossroad {
 	
+	final public static int EXTEND_TIME = 5;
+	
 	private Map<Long, Light> lights = new HashMap<>();
 	private SimpleLightGroup lightGroup1;
 	private SimpleLightGroup lightGroup2;
 	private Timer timer;
-	final public static int EXTEND_TIME = 5;
-	private boolean already_extended_green =false;
+	private boolean already_extended_green = false;
+	
 	public SimpleCrossroad(Node crossroad, Long managerId) {
 		prepareLightGroups(crossroad, managerId);
 		prepareTimer();
 		prepareLightMap();
 	}
 	
+	public SimpleCrossroad(OSMNode centerCrossroadNode, long managerId) {
+		prepareLightGroups(centerCrossroadNode, managerId);
+		prepareTimer();
+		prepareLightMap();
+	}
+
 	private void prepareLightMap() {
         lights.putAll(lightGroup1.prepareMap());
         lights.putAll(lightGroup2.prepareMap());
@@ -40,12 +50,16 @@ public class SimpleCrossroad extends Crossroad {
 		lightGroup1 = new SimpleLightGroup(MapAccessManager.getCrossroadGroup(crossroad, 1), LightColor.RED, managerId);
 		lightGroup2 = new SimpleLightGroup(MapAccessManager.getCrossroadGroup(crossroad, 3), LightColor.GREEN, managerId);
 	}
+
+	private void prepareLightGroups(OSMNode centerCrossroadNode, long managerId) {
+		CrossroadInfo info = new CrossroadInfo(centerCrossroadNode);
+		lightGroup1 = new SimpleLightGroup(info.getFirstLightGroupInfo(), LightColor.RED, managerId);
+		lightGroup2 = new SimpleLightGroup(info.getSecondLightGroupInfo(), LightColor.GREEN, managerId);
+	}
 	
 	private void prepareTimer() {
-		
-		try
-		{
-			if(timer!=null) {
+		try {
+			if (timer != null) {
 			   timer.cancel();
 			}
 			timer = new Timer(true);

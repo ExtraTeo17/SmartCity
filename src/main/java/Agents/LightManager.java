@@ -12,6 +12,7 @@ import org.w3c.dom.Node;
 
 import LightStrategies.LightManagerStrategy;
 import LightStrategies.LightStrategy;
+import OSMProxy.Elements.OSMNode;
 import jade.core.Agent;
 
 public class LightManager extends Agent {
@@ -22,6 +23,11 @@ public class LightManager extends Agent {
     public LightManager(Node crossroad, Long id) {
     	agentId = id;
 		strategy = new LightManagerStrategy(crossroad, id);
+	}
+
+	public LightManager(OSMNode centerCrossroadNode, long id) {
+		agentId = id;
+		strategy = new LightManagerStrategy(centerCrossroadNode, id);
 	}
 
 	protected void setup() {
