@@ -4,6 +4,8 @@ import java.time.Instant;
 import java.util.List;
 
 import Agents.MessageParameter;
+import OSMProxy.Elements.OSMNode;
+
 import org.jxmapviewer.JXMapViewer;
 import org.jxmapviewer.painter.Painter;
 import org.w3c.dom.Node;
@@ -29,7 +31,11 @@ public class LightManagerStrategy extends LightStrategy {
         this.crossroad = new SimpleCrossroad(crossroad, managerId);
     }
 
-    @Override
+	public LightManagerStrategy(OSMNode centerCrossroadNode, long managerId) {
+		this.crossroad = new SimpleCrossroad(centerCrossroadNode, managerId);
+	}
+
+	@Override
     public void ApplyStrategy(final LightManager agent) {
         crossroad.startLifetime();
         this.agent = agent;

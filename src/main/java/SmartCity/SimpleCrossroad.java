@@ -10,6 +10,8 @@ import java.util.Map.Entry;
 import java.util.Timer;
 import java.util.TimerTask;
 import Agents.LightColor;
+import OSMProxy.MapAccessManager;
+import OSMProxy.Elements.OSMNode;
 
 import org.jxmapviewer.JXMapViewer;
 import org.jxmapviewer.painter.Painter;
@@ -19,18 +21,26 @@ import org.w3c.dom.Node;
 
 public class SimpleCrossroad extends Crossroad {
 	
+	final public static int EXTEND_TIME = 5;
+	
 	private Map<Long, Light> lights = new HashMap<>();
 	private SimpleLightGroup lightGroup1;
 	private SimpleLightGroup lightGroup2;
 	private Timer timer;
-	final public static int EXTEND_TIME = 5;
-	private boolean already_extended_green =false;
+	private boolean alreadyExtendedGreen = false;
+	
 	public SimpleCrossroad(Node crossroad, Long managerId) {
 		prepareLightGroups(crossroad, managerId);
 		prepareTimer();
 		prepareLightMap();
 	}
 	
+	public SimpleCrossroad(OSMNode centerCrossroadNode, long managerId) {
+		prepareLightGroups(centerCrossroadNode, managerId);
+		prepareTimer();
+		prepareLightMap();
+	}
+
 	private void prepareLightMap() {
         lights.putAll(lightGroup1.prepareMap());
         lights.putAll(lightGroup2.prepareMap());
@@ -40,18 +50,20 @@ public class SimpleCrossroad extends Crossroad {
 		lightGroup1 = new SimpleLightGroup(MapAccessManager.getCrossroadGroup(crossroad, 1), LightColor.RED, managerId);
 		lightGroup2 = new SimpleLightGroup(MapAccessManager.getCrossroadGroup(crossroad, 3), LightColor.GREEN, managerId);
 	}
+
+	private void prepareLightGroups(OSMNode centerCrossroadNode, long managerId) {
+		CrossroadInfo info = new CrossroadInfo(centerCrossroadNode);
+		lightGroup1 = new SimpleLightGroup(info.getFirstLightGroupInfo(), LightColor.RED, managerId);
+		lightGroup2 = new SimpleLightGroup(info.getSecondLightGroupInfo(), LightColor.GREEN, managerId);
+	}
 	
 	private void prepareTimer() {
-		
-		try
-		{
-			if(timer!=null) {
+		try {
+			if (timer != null) {
 			   timer.cancel();
 			}
 			timer = new Timer(true);
-		}
-		catch (IllegalStateException e)
-		{
+		} catch (IllegalStateException e) {
 			System.out.println("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAa");
 			return;
 		}
@@ -67,51 +79,42 @@ public class SimpleCrossroad extends Crossroad {
 
 		@Override
 		public void run() {
-			if(!already_extended_green)
-			{
+			if (!alreadyExtendedGreen) {
 				if (shouldExtendGreenLightBecauseOfCarsOnLight()) {
 					System.out.println("-------------------------------------shouldExtendGreenLightBecauseOfCarsOnLight--------------");
-					already_extended_green=true;
+					alreadyExtendedGreen = true;
 					return;
-				} 
-				else if(shouldExtendBecauseOfFarAwayQueque()) {
+				} else if (shouldExtendBecauseOfFarAwayQueque()) {
 					prepareTimer();
 					System.out.println("-------------------------------------shouldExtendBecauseOfFarAwayQueque--------------");
 					timer.schedule(new SwitchLightsTask(), EXTEND_TIME*1000 );
-				    already_extended_green=true;
+				    alreadyExtendedGreen = true;
 				    return;
 				}
-			}
-			else {
+			} else {
 				prepareTimer();
 				startTimer();
-				already_extended_green=false;
-			
+				alreadyExtendedGreen = false;
 			}
 			lightGroup1.switchLights();
 			lightGroup2.switchLights();
-			
 		}
 
 		private boolean shouldExtendBecauseOfFarAwayQueque() {
-			
 			for (Light light : lights.values()) {
-				if (light.isGreen())
-				{
+				if (light.isGreen()) {
 					Instant current_time = Instant.now();
 					for (Instant time_of_car: light.farAwayCarMap.values()) {
 						// If current time + EXTEND_TIME > time_of_car
-						if(current_time.plusSeconds(EXTEND_TIME).isAfter(time_of_car)) {
+						if (current_time.plusSeconds(EXTEND_TIME).isAfter(time_of_car)) {
 							System.out.println("---------------------------------------------WHY WE should extend "+ time_of_car +"----------Curent time"+current_time);
 							return true;
 						}
 					}
 				}
 			}
-			
 			return false;
 		}
-		
 	}
 
 	@Override
@@ -172,14 +175,12 @@ public class SimpleCrossroad extends Crossroad {
 
 	@Override
 	public void draw(List<Painter<JXMapViewer>> painter) {
-		 WaypointPainter<Waypoint> painter1= new  WaypointPainter<Waypoint> ();
-		 WaypointPainter<Waypoint> painter2= new  WaypointPainter<Waypoint> ();
-			
-		lightGroup1.drawLights( painter1);
-		lightGroup2.drawLights( painter2);
+		WaypointPainter<Waypoint> painter1 = new  WaypointPainter<Waypoint>();
+		WaypointPainter<Waypoint> painter2 = new  WaypointPainter<Waypoint>();
+		lightGroup1.drawLights(painter1);
+		lightGroup2.drawLights(painter2);
 		painter.add(painter1);
 		painter.add(painter2);
-		
 	}
 
 	@Override
@@ -189,26 +190,18 @@ public class SimpleCrossroad extends Crossroad {
 
 	@Override
 	public void addCarToFarAwayQueue(String carName, long adjacentOsmWayId, Instant journeyTime) {
-	
-	try {
-		
-		lights.get(adjacentOsmWayId).addCarToFarAwayQueue(carName, journeyTime);
+		try {
+			lights.get(adjacentOsmWayId).addCarToFarAwayQueue(carName, journeyTime);
+		} catch (Exception e) {
+			System.out.println("ADD");
+			System.out.println(adjacentOsmWayId);
+			for (Entry<Long, Light> l : lights.entrySet()) {
+				System.out.println("-------------");
+				System.out.println(l.getKey());
+				System.out.println(l.getValue().getAdjacentOSMWayId());	
+			}
+			System.out.println(carName);
 		}
-	catch (Exception e){
-		System.out.println("ADD");
-		System.out.println(adjacentOsmWayId);
-		for(Entry<Long, Light> l: lights.entrySet()) {
-			System.out.println("-------------");
-			System.out.println(l.getKey());
-			System.out.println(l.getValue().getAdjacentOSMWayId());
-			
-		}
-	System.out.println(carName);
-		
-		}
-	finally {
-		
-	}
 	}
 
 	@Override

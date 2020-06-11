@@ -2,6 +2,7 @@ package SmartCity;
 
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -21,6 +22,13 @@ public class SimpleLightGroup {
 		for (int i = 0; i < lightsInGroup.getLength(); ++i) {
 			if (lightsInGroup.item(i).getNodeName().equals("light"))
 				lights.add(new Light(lightsInGroup.item(i), color, managerId));
+		}
+	}
+	
+	public SimpleLightGroup(List<LightInfo> infoList, LightColor color, Long managerId) {
+		lights = new HashSet<>();
+		for (LightInfo info : infoList) {
+			lights.add(new Light(info, color, managerId));
 		}
 	}
 	

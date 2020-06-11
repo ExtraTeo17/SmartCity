@@ -1,8 +1,8 @@
 package Vehicles;
 
-import GUI.Router;
 import Routing.LightManagerNode;
 import Routing.RouteNode;
+import Routing.Router;
 
 import java.util.List;
 
@@ -15,7 +15,7 @@ public class MovingObjectImpl extends MovingObject {
     private List<RouteNode> route;
     private int index = 0;
 
-    private int speed = 40;
+    private int speed = 200;
 
     private int closestLightIndex = 0;
 
@@ -24,10 +24,10 @@ public class MovingObjectImpl extends MovingObject {
     public MovingObjectImpl(List<RouteNode> info) {
         displayRoute = info;
         route = Router.uniformRoute(displayRoute);
-        for(RouteNode r : route) {
+        /*for(RouteNode r : route) {
         	if(!r.getClass().getCanonicalName().equals("Routing.RouteNode"))
         	System.out.println(r.getClass().getCanonicalName());
-        }
+        }*/
     }
 
     @Override
@@ -45,7 +45,6 @@ public class MovingObjectImpl extends MovingObject {
         for (int i = index + 1; i < route.size(); i++) {
             if (route.get(i) instanceof LightManagerNode) {
                 closestLightIndex = i;
-                System.out.println("FOUND NEW LIGHT MANAGER QQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQ");
                 return getCurrentTrafficLightNode();
             }
         }

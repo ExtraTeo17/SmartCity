@@ -1,23 +1,16 @@
 package SmartCity;
 
-import java.util.HashSet;
 import java.util.Map;
 
-import org.jxmapviewer.viewer.DefaultWaypoint;
-import org.jxmapviewer.viewer.Waypoint;
-import org.jxmapviewer.viewer.WaypointPainter;
-
-import GUI.CustomWaypointRenderer;
-import GUI.OSMNode;
+import OSMProxy.Elements.OSMNode;
 
 public class StationOSMNode extends OSMNode {
 	
 	private int stopWawId;
 	private int stopWawNr;
 
-	public StationOSMNode(String id2, String latitude, String longitude, String version2, Map<String, String> tags2) {
-		super(id2, latitude, longitude, version2, tags2);
-		// TODO Auto-generated constructor stub
+	public StationOSMNode(String id, String latitude, String longitude, String version2, Map<String, String> tags2) {
+		super(id, latitude, longitude);
 	}
 
 	public StationOSMNode(final String osmId, final String lat, final String lon, final String stationRef) {
@@ -37,5 +30,4 @@ public class StationOSMNode extends OSMNode {
 	public int getBusStopNr() {
 		return stopWawNr;
 	}
-	
 }

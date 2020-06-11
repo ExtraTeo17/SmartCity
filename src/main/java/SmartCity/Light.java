@@ -38,13 +38,24 @@ public class Light {
 	
 	public Light(Node node, LightColor color, Long managerId) { 
 		this.carLightColor = color;
-		osmId=Long.parseLong(node.getAttributes().getNamedItem(OSM_LIGHT_ID).getNodeValue());
+		osmId = Long.parseLong(node.getAttributes().getNamedItem(OSM_LIGHT_ID).getNodeValue());
 		double lat = Double.parseDouble((node.getAttributes().getNamedItem(LAT).getNodeValue()));
 		double lon = Double.parseDouble((node.getAttributes().getNamedItem(LON).getNodeValue()));
 		position= new GeoPosition(lat, lon);
 		adjacentOsmWayId = Long.parseLong((node.getAttributes().getNamedItem(WAY_ID).getNodeValue()));
 		addLightOsmIdToLightIdToLightManagerIdHashSet(osmId, managerId, position, adjacentOsmWayId);
 	}
+	
+	public Light(LightInfo info, LightColor color, Long managerId) {
+		this.carLightColor = color;
+		osmId = Long.parseLong(info.getOsmLightId());
+		double lat = Double.parseDouble(info.getLat());
+		double lon = Double.parseDouble(info.getLon());
+		position= new GeoPosition(lat, lon);
+		adjacentOsmWayId = Long.parseLong(info.getAdjacentOsmWayId());
+		addLightOsmIdToLightIdToLightManagerIdHashSet(osmId, managerId, position, adjacentOsmWayId);
+	}
+	
 	public long getAdjacentOSMWayId() {
 		return adjacentOsmWayId;
 	}

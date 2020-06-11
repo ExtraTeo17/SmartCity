@@ -2,7 +2,9 @@ package SmartCity;
 
 import Agents.*;
 import GUI.MapWindow;
-import GUI.Router;
+import OSMProxy.LightAccessManager;
+import OSMProxy.MapAccessManager;
+import OSMProxy.Elements.OSMNode;
 import Routing.LightManagerNode;
 
 import java.awt.event.ActionEvent;
@@ -10,7 +12,6 @@ import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
@@ -21,6 +22,7 @@ import java.util.Set;
 import javax.swing.*;
 
 import Routing.RouteNode;
+import Routing.Router;
 import Vehicles.MovingObjectImpl;
 import Vehicles.Pedestrian;
 import jade.core.Agent;
@@ -40,8 +42,10 @@ public class SmartCityAgent extends Agent {
     public final static String BUS = "Bus";
     public final static String STATION = "Station";
     public final static String PEDESTRIAN = "Pedestrian";
+    private final static boolean USE_DEPRECATED_XML_FOR_LIGHT_MANAGERS = true;
 
-	public static boolean shouldGenerateBuses = false;
+	public static boolean shouldPrepareBuses = false;
+	public static boolean shouldGeneratePedestrians = false;
 
 	public static final String STEPS = "6";
 
@@ -69,7 +73,7 @@ public class SmartCityAgent extends Agent {
         public void action() {
             ACLMessage rcv = receive();
             if (rcv != null) {
-                System.out.println("SmartCity: " + rcv.getSender().getLocalName() + " arrived at destination.");
+                System.out.println("SmartCity: " + rcv.getSender().getLocalName() + " arrived at destination."); // TODO: Does it work?? (can't see it in the logs)
                 String type = rcv.getUserDefinedParameter(MessageParameter.TYPE);
                 switch (type) {
                     case MessageParameter.VEHICLE:
@@ -283,12 +287,23 @@ public class SmartCityAgent extends Agent {
     public void prepareLightManagers(GeoPosition middlePoint, int radius) {
         resetIdGenerator();
         lightManagersUnderConstruction = true;
-        MapAccessManager.prepareLightManagersInRadiusAndLightIdToLightManagerIdHashSet(this, middlePoint, radius);
-
+        if (USE_DEPRECATED_XML_FOR_LIGHT_MANAGERS)
+        	MapAccessManager.prepareLightManagersInRadiusAndLightIdToLightManagerIdHashSet(this, middlePoint, radius);
+        else
+        	tryPrepareLightManagersInRadiusAndLightIdToLightManagerIdHashSetBeta(this, middlePoint, radius);
         lightManagersUnderConstruction = false;
     }
 
-    private void resetIdGenerator() {
+    private void tryPrepareLightManagersInRadiusAndLightIdToLightManagerIdHashSetBeta(SmartCityAgent smartCityAgent,
+			GeoPosition middlePoint, int radius) {
+		try {
+	        LightAccessManager.prepareLightManagersInRadiusAndLightIdToLightManagerIdHashSetBeta(this, middlePoint, radius);
+		} catch (Exception exception) {
+			exception.printStackTrace();
+		}
+	}
+
+	private void resetIdGenerator() {
         nextLightManagerId = 1;
     }
 
@@ -370,6 +385,12 @@ public class SmartCityAgent extends Agent {
 
 	public static void tryAddNewLightManagerAgent(Node crossroad) {
         LightManager manager = new LightManager(crossroad, nextLightManagerId());
+        SmartCity.SmartCityAgent.lightManagers.add(manager);
+        tryAddAgent(manager, LIGHT_MANAGER + manager.getId());
+    }
+	
+	public static void tryAddNewLightManagerAgent(final OSMNode centerCrossroadNode) {
+        LightManager manager = new LightManager(centerCrossroadNode, nextLightManagerId());
         SmartCity.SmartCityAgent.lightManagers.add(manager);
         tryAddAgent(manager, LIGHT_MANAGER + manager.getId());
     }

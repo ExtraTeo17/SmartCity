@@ -6,6 +6,7 @@ import Agents.PedestrianAgent;
 import Agents.StationAgent;
 import Agents.VehicleAgent;
 import Routing.RouteNode;
+import Routing.Router;
 import Routing.StationNode;
 import SmartCity.RoutePainter;
 import SmartCity.SmartCityAgent;
@@ -28,13 +29,9 @@ import javax.swing.*;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import javax.swing.event.MouseInputListener;
-
-import static org.junit.Assert.assertArrayEquals;
-
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.lang.reflect.Array;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.time.Duration;
@@ -45,9 +42,9 @@ import java.util.Timer;
 
 public class MapWindow {
     private final static int REFRESH_MAP_INTERVAL_MILLISECONDS = 100;
-    private final static int CREATE_CAR_INTERVAL_MILLISECONDS = 500;
-    private static final long CREATE_PEDESTRIAN_INTERVAL_MILLISECONDS = 2000000000;
-    private final static int PEDESTRIAN_STATION_RADIUS = 300;
+    private final static int CREATE_CAR_INTERVAL_MILLISECONDS = 500;//2000000000;
+	private static final long CREATE_PEDESTRIAN_INTERVAL_MILLISECONDS = 2000000000;
+	private final static int PEDESTRIAN_STATION_RADIUS = 300;
 
     public JPanel MainPanel;
     public JXMapViewer MapViewer;
@@ -65,20 +62,14 @@ public class MapWindow {
     private JLabel currentTimeLabel;
     private JLabel currentTimeTitle;
     private SmartCityAgent SmartCityAgent;
-
     private Timer refreshTimer = new Timer(true);
-
     private Timer spawnTimer = new Timer(true);
-
     private GeoPosition pointA;
     private GeoPosition pointB;
-
     private SimulationState state = SimulationState.SETTING_ZONE;
     private Random random = new Random();
     private GeoPosition zoneCenter;
-
     private Instant simulationStart;
-
     public boolean renderCars = true;
     public boolean renderCarRoutes = true;
     public boolean renderBuses = true;
@@ -193,7 +184,8 @@ public class MapWindow {
                 currentTimeLabel.setVisible(true);
                 SmartCityAgent.activateLightManagerAgents();
                 spawnTimer.scheduleAtFixedRate(new CreateCarTask(), 0, CREATE_CAR_INTERVAL_MILLISECONDS);
-                spawnTimer.scheduleAtFixedRate(new CreatePedestrianTask(), 0, CREATE_PEDESTRIAN_INTERVAL_MILLISECONDS);
+                if (SmartCity.SmartCityAgent.shouldGeneratePedestrians)
+                	spawnTimer.scheduleAtFixedRate(new CreatePedestrianTask(), 0, CREATE_PEDESTRIAN_INTERVAL_MILLISECONDS);
                 simulationStart = Instant.now();
                 state = SimulationState.RUNNING;
             }
@@ -602,7 +594,8 @@ public class MapWindow {
 
         @Override
         public void run() {
-            if (SmartCityAgent.Vehicles.size() >= getCarLimit()) return;
+            if (SmartCityAgent.Vehicles.size() >= getCarLimit())
+            	return;
             final Pair<Double, Double> geoPosInZoneCircle = generateRandomGeoPosOffsetWithRadius(getZoneRadius());
             GeoPosition A = new GeoPosition(zoneCenter.getLatitude() + geoPosInZoneCircle.getValue0(),
                     zoneCenter.getLongitude() + geoPosInZoneCircle.getValue1());
@@ -610,7 +603,7 @@ public class MapWindow {
                     zoneCenter.getLongitude() - geoPosInZoneCircle.getValue1());
             List<RouteNode> info;
             try {
-                info = Router.generateRouteInfo(A, B);
+                info = Router.generateRouteInfo(A, B);//(new GeoPosition(52.228275, 20.986557), new GeoPosition(52.234908, 20.981210));
             } catch (Exception e) {
                 e.printStackTrace();
                 return;

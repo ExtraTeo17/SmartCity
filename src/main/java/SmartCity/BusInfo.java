@@ -4,8 +4,9 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-import GUI.Router;
+import OSMProxy.Elements.OSMWay;
 import Routing.RouteNode;
+import Routing.Router;
 import jade.wrapper.AgentContainer;
 // Bus Lines
 public class BusInfo {
