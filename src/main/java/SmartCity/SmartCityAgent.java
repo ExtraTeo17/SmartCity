@@ -42,6 +42,7 @@ public class SmartCityAgent extends Agent {
     public final static String BUS = "Bus";
     public final static String STATION = "Station";
     public final static String PEDESTRIAN = "Pedestrian";
+    private final static boolean USE_DEPRECATED_XML_FOR_LIGHT_MANAGERS = true;
 
 	public static boolean shouldPrepareBuses = false;
 	public static boolean shouldGeneratePedestrians = false;
@@ -72,7 +73,7 @@ public class SmartCityAgent extends Agent {
         public void action() {
             ACLMessage rcv = receive();
             if (rcv != null) {
-                System.out.println("SmartCity: " + rcv.getSender().getLocalName() + " arrived at destination.");
+                System.out.println("SmartCity: " + rcv.getSender().getLocalName() + " arrived at destination."); // TODO: Does it work?? (can't see it in the logs)
                 String type = rcv.getUserDefinedParameter(MessageParameter.TYPE);
                 switch (type) {
                     case MessageParameter.VEHICLE:
@@ -286,9 +287,10 @@ public class SmartCityAgent extends Agent {
     public void prepareLightManagers(GeoPosition middlePoint, int radius) {
         resetIdGenerator();
         lightManagersUnderConstruction = true;
-        //MapAccessManager.prepareLightManagersInRadiusAndLightIdToLightManagerIdHashSet(this, middlePoint, radius);
-        tryPrepareLightManagersInRadiusAndLightIdToLightManagerIdHashSetBeta(this, middlePoint, radius);
-
+        if (USE_DEPRECATED_XML_FOR_LIGHT_MANAGERS)
+        	MapAccessManager.prepareLightManagersInRadiusAndLightIdToLightManagerIdHashSet(this, middlePoint, radius);
+        else
+        	tryPrepareLightManagersInRadiusAndLightIdToLightManagerIdHashSetBeta(this, middlePoint, radius);
         lightManagersUnderConstruction = false;
     }
 

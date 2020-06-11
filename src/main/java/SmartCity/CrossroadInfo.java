@@ -20,7 +20,8 @@ public class CrossroadInfo {
 		firstLightGroupInfo = new ArrayList<>();
 		secondLightGroupInfo = new ArrayList<>();
 		final OSMWay firstParentWay = centerCrossroadNode.getParentWay(0);
-		firstLightGroupInfo.add(new LightInfo(firstParentWay, centerCrossroadNode.getId()));
+		firstLightGroupInfo.add(new LightInfo(firstParentWay, centerCrossroadNode,
+				calculateDistance(firstParentWay.getLightNeighborPos(), centerCrossroadNode.getPosition())));
 		for (int i = 1; i < centerCrossroadNode.getParentWayCount(); ++i) {
 			determineLightGroup(firstParentWay, centerCrossroadNode.getParentWay(i), centerCrossroadNode);
 		}
@@ -31,9 +32,9 @@ public class CrossroadInfo {
 		double b = calculateDistance(anotherWay.getLightNeighborPos(), centerNode.getPosition());
 		double c = calculateDistance(wayFromFirstGroup.getLightNeighborPos(), anotherWay.getLightNeighborPos());
 		if (cosineFromLawOfCosinesInTriangle(a, b, c) < cosineOf135degrees)
-			firstLightGroupInfo.add(new LightInfo(anotherWay, centerNode.getId()));
+			firstLightGroupInfo.add(new LightInfo(anotherWay, centerNode, b));
 		else
-			secondLightGroupInfo.add(new LightInfo(anotherWay, centerNode.getId()));
+			secondLightGroupInfo.add(new LightInfo(anotherWay, centerNode, b));
 	}
 
 	public List<LightInfo> getFirstLightGroupInfo() {
