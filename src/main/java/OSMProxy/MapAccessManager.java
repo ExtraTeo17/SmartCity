@@ -69,8 +69,8 @@ import com.graphhopper.util.PointList;
  */
 public class MapAccessManager {
 	
-	private static final String DELIMITER_RELATION = "3838046";
-	private static final String DELIMITER_WAY = "48439275";
+	protected static final String DELIMITER_RELATION = "3838046";
+	protected static final String DELIMITER_WAY = "48439275";
 
 	//private static final String OVERPASS_API = "http://www.overpass-api.de/api/interpreter";
 	private static final String OVERPASS_API = "https://lz4.overpass-api.de/api/interpreter";

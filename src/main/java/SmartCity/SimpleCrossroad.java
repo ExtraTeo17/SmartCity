@@ -27,7 +27,7 @@ public class SimpleCrossroad extends Crossroad {
 	private SimpleLightGroup lightGroup1;
 	private SimpleLightGroup lightGroup2;
 	private Timer timer;
-	private boolean already_extended_green = false;
+	private boolean alreadyExtendedGreen = false;
 	
 	public SimpleCrossroad(Node crossroad, Long managerId) {
 		prepareLightGroups(crossroad, managerId);
@@ -63,9 +63,7 @@ public class SimpleCrossroad extends Crossroad {
 			   timer.cancel();
 			}
 			timer = new Timer(true);
-		}
-		catch (IllegalStateException e)
-		{
+		} catch (IllegalStateException e) {
 			System.out.println("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAa");
 			return;
 		}
@@ -81,51 +79,42 @@ public class SimpleCrossroad extends Crossroad {
 
 		@Override
 		public void run() {
-			if(!already_extended_green)
-			{
+			if (!alreadyExtendedGreen) {
 				if (shouldExtendGreenLightBecauseOfCarsOnLight()) {
 					System.out.println("-------------------------------------shouldExtendGreenLightBecauseOfCarsOnLight--------------");
-					already_extended_green=true;
+					alreadyExtendedGreen = true;
 					return;
-				} 
-				else if(shouldExtendBecauseOfFarAwayQueque()) {
+				} else if (shouldExtendBecauseOfFarAwayQueque()) {
 					prepareTimer();
 					System.out.println("-------------------------------------shouldExtendBecauseOfFarAwayQueque--------------");
 					timer.schedule(new SwitchLightsTask(), EXTEND_TIME*1000 );
-				    already_extended_green=true;
+				    alreadyExtendedGreen = true;
 				    return;
 				}
-			}
-			else {
+			} else {
 				prepareTimer();
 				startTimer();
-				already_extended_green=false;
-			
+				alreadyExtendedGreen = false;
 			}
 			lightGroup1.switchLights();
 			lightGroup2.switchLights();
-			
 		}
 
 		private boolean shouldExtendBecauseOfFarAwayQueque() {
-			
 			for (Light light : lights.values()) {
-				if (light.isGreen())
-				{
+				if (light.isGreen()) {
 					Instant current_time = Instant.now();
 					for (Instant time_of_car: light.farAwayCarMap.values()) {
 						// If current time + EXTEND_TIME > time_of_car
-						if(current_time.plusSeconds(EXTEND_TIME).isAfter(time_of_car)) {
+						if (current_time.plusSeconds(EXTEND_TIME).isAfter(time_of_car)) {
 							System.out.println("---------------------------------------------WHY WE should extend "+ time_of_car +"----------Curent time"+current_time);
 							return true;
 						}
 					}
 				}
 			}
-			
 			return false;
 		}
-		
 	}
 
 	@Override
@@ -186,14 +175,12 @@ public class SimpleCrossroad extends Crossroad {
 
 	@Override
 	public void draw(List<Painter<JXMapViewer>> painter) {
-		 WaypointPainter<Waypoint> painter1= new  WaypointPainter<Waypoint> ();
-		 WaypointPainter<Waypoint> painter2= new  WaypointPainter<Waypoint> ();
-			
-		lightGroup1.drawLights( painter1);
-		lightGroup2.drawLights( painter2);
+		WaypointPainter<Waypoint> painter1 = new  WaypointPainter<Waypoint>();
+		WaypointPainter<Waypoint> painter2 = new  WaypointPainter<Waypoint>();
+		lightGroup1.drawLights(painter1);
+		lightGroup2.drawLights(painter2);
 		painter.add(painter1);
 		painter.add(painter2);
-		
 	}
 
 	@Override
@@ -203,26 +190,18 @@ public class SimpleCrossroad extends Crossroad {
 
 	@Override
 	public void addCarToFarAwayQueue(String carName, long adjacentOsmWayId, Instant journeyTime) {
-	
-	try {
-		
-		lights.get(adjacentOsmWayId).addCarToFarAwayQueue(carName, journeyTime);
+		try {
+			lights.get(adjacentOsmWayId).addCarToFarAwayQueue(carName, journeyTime);
+		} catch (Exception e) {
+			System.out.println("ADD");
+			System.out.println(adjacentOsmWayId);
+			for (Entry<Long, Light> l : lights.entrySet()) {
+				System.out.println("-------------");
+				System.out.println(l.getKey());
+				System.out.println(l.getValue().getAdjacentOSMWayId());	
+			}
+			System.out.println(carName);
 		}
-	catch (Exception e){
-		System.out.println("ADD");
-		System.out.println(adjacentOsmWayId);
-		for(Entry<Long, Light> l: lights.entrySet()) {
-			System.out.println("-------------");
-			System.out.println(l.getKey());
-			System.out.println(l.getValue().getAdjacentOSMWayId());
-			
-		}
-	System.out.println(carName);
-		
-		}
-	finally {
-		
-	}
 	}
 
 	@Override

@@ -2,6 +2,7 @@ package SmartCity;
 
 import Agents.*;
 import GUI.MapWindow;
+import OSMProxy.LightAccessManager;
 import OSMProxy.MapAccessManager;
 import OSMProxy.Elements.OSMNode;
 import Routing.LightManagerNode;
@@ -11,7 +12,6 @@ import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
@@ -295,7 +295,7 @@ public class SmartCityAgent extends Agent {
     private void tryPrepareLightManagersInRadiusAndLightIdToLightManagerIdHashSetBeta(SmartCityAgent smartCityAgent,
 			GeoPosition middlePoint, int radius) {
 		try {
-	        MapAccessManager.prepareLightManagersInRadiusAndLightIdToLightManagerIdHashSetBeta(this, middlePoint, radius);
+	        LightAccessManager.prepareLightManagersInRadiusAndLightIdToLightManagerIdHashSetBeta(this, middlePoint, radius);
 		} catch (Exception exception) {
 			exception.printStackTrace();
 		}

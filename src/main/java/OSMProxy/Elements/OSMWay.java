@@ -14,11 +14,14 @@ public class OSMWay extends OSMElement {
 		LIGHT_AT_ENTRY,
 		LIGHT_AT_EXIT
 	}
+	
+	private static final String YES = "yes";
+	private static final String NO = "no";
 
-	//final List<GeoPosition> waypoints;
-	final List<OSMWaypoint> waypoints;
-	final List<String> childNodeIds;
-	OSMWayOrientation orientation = null;
+	private final List<OSMWaypoint> waypoints;
+	private final List<String> childNodeIds;
+	private OSMWayOrientation orientation = null;
+	private boolean isOneWay;
 	
 	public OSMWay(final String id) {
 		super(id);
@@ -38,10 +41,24 @@ public class OSMWay extends OSMElement {
 				double lat = Double.parseDouble(attributes.getNamedItem("lat").getNodeValue());
 				double lng = Double.parseDouble(attributes.getNamedItem("lon").getNodeValue());
 				addPoint(new OSMWaypoint(nodeRef, lat, lng));
+			} else if (el.getNodeName().equals("tag") &&
+					el.getAttributes().getNamedItem("k").getNodeValue().equals("oneway")) {
+				fillOneWay(el.getAttributes().getNamedItem("v").getNodeValue());
 			}
+			// consider adding other tags
 		}
 		childNodeIds = new ArrayList<>();
-		// consider adding other tags
+	}
+
+	public boolean isOneWayAndLightContiguous(final long osmLightId) {
+		return !(isOneWay && Long.parseLong(waypoints.get(0).getOsmNodeRef()) == osmLightId);
+	}
+
+	private void fillOneWay(final String nodeValue) {
+		if (nodeValue.equals(YES))
+			isOneWay = true;
+		else if (nodeValue.equals(NO))
+			isOneWay = false;
 	}
 
 	public void addPoint(final OSMWaypoint waypoint) {
