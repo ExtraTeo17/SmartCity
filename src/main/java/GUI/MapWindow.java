@@ -101,7 +101,7 @@ public class MapWindow {
         });
         seedSpinner.setModel(new SpinnerNumberModel(69, 0, 999999, 1));
         latSpinner.setModel(new SpinnerNumberModel(52.206466, -90, 90, 1));
-        lonSpinner.setModel(new SpinnerNumberModel( 20.969933, -180, 180, 0.001));
+        lonSpinner.setModel(new SpinnerNumberModel(20.969933, -180, 180, 0.001));
 
         testCarIdSpinner.setModel(new SpinnerNumberModel(40, 0, 100, 1));
         testCarIdSpinner.addChangeListener(new ChangeListener() {
@@ -210,8 +210,9 @@ public class MapWindow {
         refreshTimer = new Timer();
 
         zoneCenter = new GeoPosition(lat, lon);
-        if (SmartCityAgent.shouldPrepareBuses)
-        	SmartCityAgent.prepareStationsAndBuses(zoneCenter, getZoneRadius());
+
+        if (SmartCityAgent.shouldGenerateBuses)
+            SmartCityAgent.prepareStationsAndBuses(zoneCenter, getZoneRadius());
         SmartCityAgent.prepareLightManagers(zoneCenter, getZoneRadius());
         state = SimulationState.READY_TO_RUN;
 
@@ -320,6 +321,13 @@ public class MapWindow {
     public void DrawBusRoutes(List painters) {
         try {
             for (BusAgent a : SmartCityAgent.buses) {
+                List<GeoPosition> track = new ArrayList<GeoPosition>();
+                for (RouteNode point : a.getBus().getDisplayRoute()) {
+                    track.add(new GeoPosition(point.getLatitude(), point.getLongitude()));
+                }
+                Random r = new Random(a.hashCode());
+                RoutePainter routePainter = new RoutePainter(track, new Color(r.nextInt(255), r.nextInt(255), r.nextInt(255)));
+                painters.add(routePainter);
 
             }
 
@@ -567,13 +575,13 @@ public class MapWindow {
             try {
 
                 List<Painter<JXMapViewer>> painters = new ArrayList<>();
-             //   if (renderBusRoutes) DrawBusRoutes(painters);
+                if (renderBusRoutes) DrawBusRoutes(painters);
                 if (renderCarRoutes) DrawRoutes(painters);
                 if (renderZone) DrawZones(painters);
                 if (renderStations) DrawStations(painters);
                 if (renderLights) DrawLights(painters);
                 if (renderCars) DrawVehicles(painters);
-             //   if (renderBuses) DrawBuses(painters);
+                if (renderBuses) DrawBuses(painters);
                 CompoundPainter<JXMapViewer> painter = new CompoundPainter<>(painters);
                 MapViewer.setOverlayPainter(painter);
                 if (state == SimulationState.RUNNING) RefreshTime();
@@ -583,16 +591,16 @@ public class MapWindow {
     }
 
     public class CreateCarTask extends TimerTask {
-    	
+
         @Override
         public void run() {
             if (SmartCityAgent.Vehicles.size() >= getCarLimit())
             	return;
             final Pair<Double, Double> geoPosInZoneCircle = generateRandomGeoPosOffsetWithRadius(getZoneRadius());
             GeoPosition A = new GeoPosition(zoneCenter.getLatitude() + geoPosInZoneCircle.getValue0(),
-            		zoneCenter.getLongitude() + geoPosInZoneCircle.getValue1());
+                    zoneCenter.getLongitude() + geoPosInZoneCircle.getValue1());
             GeoPosition B = new GeoPosition(zoneCenter.getLatitude() - geoPosInZoneCircle.getValue0(),
-            		zoneCenter.getLongitude() - geoPosInZoneCircle.getValue1());
+                    zoneCenter.getLongitude() - geoPosInZoneCircle.getValue1());
             List<RouteNode> info;
             try {
                 info = Router.generateRouteInfo(A, B);//(new GeoPosition(52.228275, 20.986557), new GeoPosition(52.234908, 20.981210));
@@ -620,36 +628,36 @@ public class MapWindow {
 
     public class CreatePedestrianTask extends TimerTask {
 
-		@Override
-		public void run() {
-			// add people limit
-			final Pair<Pair<StationNode, StationNode>, String> stationNodePairAndBusLine = getStationPairAndLineFromRandomBus();
-			final StationNode startStation = stationNodePairAndBusLine.getValue0().getValue0();
-			final StationNode finishStation = stationNodePairAndBusLine.getValue0().getValue1();
-			final Pair<Double, Double> geoPosInFirstStationCircle = generateRandomGeoPosOffsetWithRadius(MapWindow.PEDESTRIAN_STATION_RADIUS);
-			GeoPosition pedestrianStartPoint = new GeoPosition(startStation.getLatitude() + geoPosInFirstStationCircle.getValue0(),
-					startStation.getLongitude() + geoPosInFirstStationCircle.getValue1());
-			GeoPosition pedestrianGetOnStation = new GeoPosition(startStation.getLatitude(), finishStation.getLongitude());
-			GeoPosition pedestrianDisembarkStation = new GeoPosition(startStation.getLatitude(), finishStation.getLongitude());
-			GeoPosition pedestrianFinishPoint = new GeoPosition(finishStation.getLatitude() + geoPosInFirstStationCircle.getValue0(),
-					finishStation.getLongitude() + geoPosInFirstStationCircle.getValue1());
-			List<RouteNode> routeToStation = Router.generateRouteInfoForPedestrians(pedestrianStartPoint, pedestrianGetOnStation);
-			List<RouteNode> routeFromStation = Router.generateRouteInfoForPedestrians(pedestrianDisembarkStation, pedestrianFinishPoint);
-			final Pedestrian pedestrian = new Pedestrian(routeFromStation, routeToStation, startStation.getStationId(), stationNodePairAndBusLine.getValue1());
-			SmartCityAgent.ActivateAgent(SmartCity.SmartCityAgent.tryAddNewPedestrianAgent(pedestrian));
-		}
+        @Override
+        public void run() {
+            // add people limit
+            final Pair<Pair<StationNode, StationNode>, String> stationNodePairAndBusLine = getStationPairAndLineFromRandomBus();
+            final StationNode startStation = stationNodePairAndBusLine.getValue0().getValue0();
+            final StationNode finishStation = stationNodePairAndBusLine.getValue0().getValue1();
+            final Pair<Double, Double> geoPosInFirstStationCircle = generateRandomGeoPosOffsetWithRadius(MapWindow.PEDESTRIAN_STATION_RADIUS);
+            GeoPosition pedestrianStartPoint = new GeoPosition(startStation.getLatitude() + geoPosInFirstStationCircle.getValue0(),
+                    startStation.getLongitude() + geoPosInFirstStationCircle.getValue1());
+            GeoPosition pedestrianGetOnStation = new GeoPosition(startStation.getLatitude(), finishStation.getLongitude());
+            GeoPosition pedestrianDisembarkStation = new GeoPosition(startStation.getLatitude(), finishStation.getLongitude());
+            GeoPosition pedestrianFinishPoint = new GeoPosition(finishStation.getLatitude() + geoPosInFirstStationCircle.getValue0(),
+                    finishStation.getLongitude() + geoPosInFirstStationCircle.getValue1());
+            List<RouteNode> routeToStation = Router.generateRouteInfoForPedestrians(pedestrianStartPoint, pedestrianGetOnStation);
+            List<RouteNode> routeFromStation = Router.generateRouteInfoForPedestrians(pedestrianDisembarkStation, pedestrianFinishPoint);
+            final Pedestrian pedestrian = new Pedestrian(routeFromStation, routeToStation, startStation.getStationId(), stationNodePairAndBusLine.getValue1());
+            SmartCityAgent.ActivateAgent(SmartCity.SmartCityAgent.tryAddNewPedestrianAgent(pedestrian));
+        }
 
-		private Pair<Pair<StationNode, StationNode>, String> getStationPairAndLineFromRandomBus() {
-			final BusAgent randomBusAgent = getRandomBusAgent();
-			return Pair.with(randomBusAgent.getTwoSubsequentStations(random), randomBusAgent.getLine());
-		}
+        private Pair<Pair<StationNode, StationNode>, String> getStationPairAndLineFromRandomBus() {
+            final BusAgent randomBusAgent = getRandomBusAgent();
+            return Pair.with(randomBusAgent.getTwoSubsequentStations(random), randomBusAgent.getLine());
+        }
 
-		private BusAgent getRandomBusAgent() {
-			final List<BusAgent> busArray = new ArrayList<>(SmartCity.SmartCityAgent.buses); // TODO RETHINK!!!
-			return busArray.get(random.nextInt(busArray.size()));
-		}
+        private BusAgent getRandomBusAgent() {
+            final List<BusAgent> busArray = new ArrayList<>(SmartCity.SmartCityAgent.buses); // TODO RETHINK!!!
+            return busArray.get(random.nextInt(busArray.size()));
+        }
     }
-    
+
     private Pair<Double, Double> generateRandomGeoPosOffsetWithRadius(final int radius) {
         double angle = random.nextDouble() * Math.PI * 2;
         double lat = Math.sin(angle) * radius * 0.0000089;
