@@ -28,7 +28,7 @@ public final class Router { // BIG REFACTOR, MOVE GETMANAGERFORLIGHTS TO MAPACCE
     }
 
     private static Pair<List<Long>, List<RouteNode>> findRoute(GeoPosition pointA, GeoPosition pointB) {
-        Pair<List<Long>, List<RouteNode>> osmWayIdsAndPointList = SmartCity.HighwayAccessor.getOsmWayIdsAndPointList(new String[]{"config=config.properties", "datareader.file=mazowieckie-latest.osm.pbf"},
+        Pair<List<Long>, List<RouteNode>> osmWayIdsAndPointList = OSMProxy.HighwayAccessor.getOsmWayIdsAndPointList(new String[]{"config=config.properties", "datareader.file=mazowieckie-latest.osm.pbf"},
                 pointA.getLatitude(), pointA.getLongitude(), pointB.getLatitude(), pointB.getLongitude());
         return osmWayIdsAndPointList;
     }
@@ -36,12 +36,12 @@ public final class Router { // BIG REFACTOR, MOVE GETMANAGERFORLIGHTS TO MAPACCE
     private static List<RouteNode> getManagersForLights(List<OSMLight> lights, List<RouteNode> route) {
         List<RouteNode> managers = new ArrayList<>();
         for (OSMLight light : lights) {
-            addLightManagerNodeToManagersListIfItsNotNullAfterGettingItFromSmartCityAgentById(managers, light, route);
+            addLightManagerNodeToManagersList(managers, light, route);
         }
         return managers;
     }
 
-    private static void addLightManagerNodeToManagersListIfItsNotNullAfterGettingItFromSmartCityAgentById(List<RouteNode> managers, OSMLight light, List<RouteNode> route) {
+    private static void addLightManagerNodeToManagersList(List<RouteNode> managers, OSMLight light, List<RouteNode> route) {
     	Pair<Long, Long> osmWayIdOsmLightId = Pair.with(light.getAdherentOsmWayId(), light.getId());
     	RouteNode nodeToAdd = SmartCityAgent.wayIdLightIdToLightManagerNode.get(osmWayIdOsmLightId);
     	/*Long lightManagerIdToAdd = SmartCityAgent.lightIdToLightManagerId.get(light.getId());
@@ -74,7 +74,7 @@ public final class Router { // BIG REFACTOR, MOVE GETMANAGERFORLIGHTS TO MAPACCE
         return route;
     }
 
-    private static void findPositionOfElementOnRoute(List<RouteNode> route, RouteNode manager) {
+    /*private static void findPositionOfElementOnRoute(List<RouteNode> route, RouteNode manager) { // BUGFIXED VERSION UNDERNEATH!!!
         int minIndex1 = -1, minIndex2 = -1;
         double minDistance1 = Double.MAX_VALUE, minDistance2 = Double.MAX_VALUE;
 
@@ -97,6 +97,28 @@ public final class Router { // BIG REFACTOR, MOVE GETMANAGERFORLIGHTS TO MAPACCE
         } else {
             route.add(minIndex2 + 1, manager);
         }
+    }*/
+	
+	private static void findPositionOfElementOnRoute(List<RouteNode> route, RouteNode manager) {
+        int minIndex = -1;
+        double minDistance = Double.MAX_VALUE;
+        for (int i = 0; i < route.size(); ++i) {
+            double distance = calculateDistance(route.get(i), manager);
+            if (distance < minDistance) {
+                minDistance = distance;
+                minIndex = i;
+            }
+        }
+        if (minIndex == 0) {
+        	route.add(minIndex + 1, manager);
+        	return;
+        }
+        double distMgrToMinPrev = calculateDistance(route.get(minIndex - 1), manager);
+        double distMinToMinPrev = calculateDistance(route.get(minIndex - 1), route.get(minIndex));
+        if (distMgrToMinPrev < distMinToMinPrev)
+        	route.add(minIndex, manager);
+        else
+        	route.add(minIndex + 1, manager);
     }
 
     public static List<RouteNode> uniformRoute(List<RouteNode> route) {

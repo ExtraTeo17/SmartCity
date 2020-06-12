@@ -1,4 +1,4 @@
-package GUI;
+package Deprecated;
 
 import com.graphhopper.util.PointList;
 import com.graphhopper.util.shapes.GHPoint;

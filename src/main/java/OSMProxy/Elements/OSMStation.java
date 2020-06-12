@@ -1,19 +1,17 @@
-package SmartCity;
+package OSMProxy.Elements;
 
 import java.util.Map;
 
-import OSMProxy.Elements.OSMNode;
-
-public class StationOSMNode extends OSMNode {
+public class OSMStation extends OSMNode {
 	
 	private int stopWawId;
 	private int stopWawNr;
 
-	public StationOSMNode(String id, String latitude, String longitude, String version2, Map<String, String> tags2) {
+	public OSMStation(String id, String latitude, String longitude, String version2, Map<String, String> tags2) {
 		super(id, latitude, longitude);
 	}
 
-	public StationOSMNode(final String osmId, final String lat, final String lon, final String stationRef) {
+	public OSMStation(final String osmId, final String lat, final String lon, final String stationRef) {
 		super(osmId, lat, lon);
 		fillStopWawIdNr(stationRef);
 	}

@@ -1,5 +1,7 @@
 package Routing;
 
+import org.jxmapviewer.viewer.GeoPosition;
+
 public class RouteNode {
 
 	private double lat;
@@ -22,5 +24,9 @@ public class RouteNode {
 
 	public long getOsmWayId() {
 		return osmWayId;
+	}
+	
+	public final GeoPosition getPosition() {
+		return new GeoPosition(getLatitude(), getLongitude());
 	}
 }

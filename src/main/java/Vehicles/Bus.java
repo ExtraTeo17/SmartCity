@@ -1,13 +1,14 @@
 package Vehicles;
 
+import java.util.ArrayList;
 import java.util.List;
 
-import GUI.Router;
 import Routing.LightManagerNode;
 import Routing.RouteNode;
+import Routing.Router;
 import Routing.StationNode;
-import Vehicles.DrivingState;
-import SmartCity.Timetable;
+import SmartCity.Buses.Timetable;
+
 import org.jxmapviewer.viewer.GeoPosition;
 
 public class Bus extends MovingObject {
@@ -16,10 +17,17 @@ public class Bus extends MovingObject {
 	private final List<StationNode> stationNodesOnRoute;
 	private final String busLine;
 	private final String brigadeNr;
+	private List<RouteNode> displayRoute;
+	private List<RouteNode> route;
+	private int index = 0;
+	private int speed = 30;
+	private int closestLightIndex = -1;
+	private int closestStationIndex = -1;
 
 	public Bus(final List<RouteNode> route, final Timetable timetable, final String busLine,
 			   final String brigadeNr) {
 		displayRoute = route;
+		this.route = Router.uniformRoute(displayRoute);
 		this.timetable = timetable;
 		stationNodesOnRoute = extractStationsFromRoute();
 		this.busLine = busLine;
@@ -27,12 +35,12 @@ public class Bus extends MovingObject {
 	}
 
 	private List<StationNode> extractStationsFromRoute() {
-		try {
-			throw new Exception("Not implemented!");
-		} catch (Exception e) {
-			e.printStackTrace();
+		List<StationNode> stationsOnRoute = new ArrayList<>();
+		for (final RouteNode node : route) {
+			if (node instanceof StationNode)
+				stationsOnRoute.add((StationNode)node);
 		}
-		return null;
+		return stationsOnRoute;
 	}
 
 	public final String getLine() {
@@ -43,18 +51,6 @@ public class Bus extends MovingObject {
 		return stationNodesOnRoute;
 
 	}
-
-	private List<RouteNode> displayRoute;
-
-	private List<RouteNode> route;
-
-	private int index = 0;
-
-	private int speed = 30;
-
-	private int closestLightIndex = -1;
-
-	private int closestStationIndex = 0;
 
 	public DrivingState State = DrivingState.STARTING;
 
@@ -136,7 +132,7 @@ public class Bus extends MovingObject {
 
 	public StationNode getCurrentStationNode() {
 		if (closestStationIndex == -1) return null;
-		return (StationNode) (route.get(closestLightIndex));
+		return (StationNode) (route.get(closestStationIndex));
 	}
 
 	@Override

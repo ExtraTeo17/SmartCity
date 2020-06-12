@@ -1,4 +1,4 @@
-package SmartCity;
+package SmartCity.Buses;
 
 import java.util.ArrayList;
 import java.util.List;

@@ -1,4 +1,4 @@
-package SmartCity;
+package SmartCity.Buses;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Map;
 
 import Routing.RouteNode;
+import SmartCity.SmartCityAgent;
 import jade.wrapper.AgentContainer;
 
 public class Timetable {

@@ -5,12 +5,12 @@ import Agents.LightManager;
 import Agents.PedestrianAgent;
 import Agents.StationAgent;
 import Agents.VehicleAgent;
+import OSMProxy.Elements.OSMStation;
 import Routing.RouteNode;
 import Routing.Router;
 import Routing.StationNode;
 import SmartCity.RoutePainter;
 import SmartCity.SmartCityAgent;
-import SmartCity.StationOSMNode;
 import SmartCity.ZonePainter;
 import Vehicles.MovingObjectImpl;
 import Vehicles.Pedestrian;
@@ -183,6 +183,7 @@ public class MapWindow {
                 currentTimeTitle.setVisible(true);
                 currentTimeLabel.setVisible(true);
                 SmartCityAgent.activateLightManagerAgents();
+                SmartCityAgent.activateBuses();
                 spawnTimer.scheduleAtFixedRate(new CreateCarTask(), 0, CREATE_CAR_INTERVAL_MILLISECONDS);
                 if (SmartCity.SmartCityAgent.shouldGeneratePedestrians)
                 	spawnTimer.scheduleAtFixedRate(new CreatePedestrianTask(), 0, CREATE_PEDESTRIAN_INTERVAL_MILLISECONDS);
@@ -211,7 +212,7 @@ public class MapWindow {
 
         zoneCenter = new GeoPosition(lat, lon);
 
-        if (SmartCityAgent.shouldGenerateBuses)
+        if (SmartCityAgent.shouldPrepareBuses)
             SmartCityAgent.prepareStationsAndBuses(zoneCenter, getZoneRadius());
         SmartCityAgent.prepareLightManagers(zoneCenter, getZoneRadius());
         state = SimulationState.READY_TO_RUN;
@@ -268,15 +269,15 @@ public class MapWindow {
         try {
             Set<Waypoint> set = new HashSet<>();
             for (VehicleAgent a : SmartCityAgent.Vehicles) {
-                if (a.Vehicle instanceof TestCar) {
+                if (a.getVehicle() instanceof TestCar) {
                     Set<Waypoint> testCarWaypoint = new HashSet<>();
-                    testCarWaypoint.add(new DefaultWaypoint(a.Vehicle.getPosition()));
+                    testCarWaypoint.add(new DefaultWaypoint(a.getVehicle().getPosition()));
 
                     WaypointPainter<Waypoint> testPainter = new WaypointPainter<>();
                     testPainter.setWaypoints(testCarWaypoint);
                     testPainter.setRenderer(new CustomWaypointRenderer("test_car.png"));
                     painters.add(testPainter);
-                } else set.add(new DefaultWaypoint(a.Vehicle.getPosition()));
+                } else set.add(new DefaultWaypoint(a.getVehicle().getPosition()));
             }
             WaypointPainter<Waypoint> waypointPainter = new WaypointPainter<>();
             waypointPainter.setWaypoints(set);
@@ -291,7 +292,7 @@ public class MapWindow {
         try {
             for (VehicleAgent a : SmartCityAgent.Vehicles) {
                 List<GeoPosition> track = new ArrayList<GeoPosition>();
-                for (RouteNode point : a.Vehicle.getDisplayRoute()) {
+                for (RouteNode point : a.getVehicle().getDisplayRoute()) {
                     track.add(new GeoPosition(point.getLatitude(), point.getLongitude()));
                 }
                 Random r = new Random(a.hashCode());
@@ -351,7 +352,7 @@ public class MapWindow {
 
     private void DrawStations(List painters) {
         Set<Waypoint> set = new HashSet<>();
-        for (StationOSMNode stationOSMNode : SmartCityAgent.osmIdToStationOSMNode.values()) {
+        for (OSMStation stationOSMNode : SmartCityAgent.osmIdToStationOSMNode.values()) {
             set.add(new DefaultWaypoint(stationOSMNode.getPosition()));
         }
         WaypointPainter<Waypoint> waypointPainter = new WaypointPainter<>();
@@ -603,7 +604,7 @@ public class MapWindow {
                     zoneCenter.getLongitude() - geoPosInZoneCircle.getValue1());
             List<RouteNode> info;
             try {
-                info = Router.generateRouteInfo(A, B);//(new GeoPosition(52.228275, 20.986557), new GeoPosition(52.234908, 20.981210));
+                info = Router.generateRouteInfo(A, B);//(new GeoPosition(52.179977, 21.071040), new GeoPosition(52.178759, 21.070854));//(new GeoPosition(52.228275, 20.986557), new GeoPosition(52.234908, 20.981210));
             } catch (Exception e) {
                 e.printStackTrace();
                 return;
@@ -611,9 +612,10 @@ public class MapWindow {
 
             VehicleAgent vehicle = new VehicleAgent();
             MovingObjectImpl car;
-            if (getTestCarId() == SmartCityAgent.Vehicles.size()) {
+            if (getTestCarId() == SmartCityAgent.Vehicles.size())
                 car = new TestCar(info);
-            } else car = new MovingObjectImpl(info);
+            else
+            	car = new MovingObjectImpl(info);
             vehicle.setVehicle(car);
             try {
                 SmartCityAgent.AddNewVehicleAgent(car.getVehicleType() + SmartCityAgent.carId, vehicle);

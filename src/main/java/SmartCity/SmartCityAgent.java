@@ -5,6 +5,7 @@ import GUI.MapWindow;
 import OSMProxy.LightAccessManager;
 import OSMProxy.MapAccessManager;
 import OSMProxy.Elements.OSMNode;
+import OSMProxy.Elements.OSMStation;
 import Routing.LightManagerNode;
 
 import java.awt.event.ActionEvent;
@@ -23,6 +24,8 @@ import javax.swing.*;
 
 import Routing.RouteNode;
 import Routing.Router;
+import SmartCity.Buses.BusInfo;
+import SmartCity.Buses.Timetable;
 import Vehicles.MovingObjectImpl;
 import Vehicles.Pedestrian;
 import jade.core.Agent;
@@ -42,10 +45,9 @@ public class SmartCityAgent extends Agent {
     public final static String BUS = "Bus";
     public final static String STATION = "Station";
     public final static String PEDESTRIAN = "Pedestrian";
-    private final static boolean USE_DEPRECATED_XML_FOR_LIGHT_MANAGERS = true;
-
-	public static boolean shouldPrepareBuses = false;
-	public static boolean shouldGeneratePedestrians = false;
+    private final static boolean USE_DEPRECATED_XML_FOR_LIGHT_MANAGERS = false;
+	public final static boolean shouldPrepareBuses = false;
+	public final static boolean shouldGeneratePedestrians = false;
 
 	public static final String STEPS = "6";
 
@@ -60,7 +62,7 @@ public class SmartCityAgent extends Agent {
     private static long nextStationAgentId;
 	private static int nextBusId;
 	private static int nextPedestrianAgentId;
-    public static Map<Long, StationOSMNode> osmIdToStationOSMNode = new HashMap<>();
+    public static Map<Long, OSMStation> osmIdToStationOSMNode = new HashMap<>();
     public static Set<BusAgent> buses = new LinkedHashSet<>();
     private JXMapViewer mapViewer;
     private static AgentContainer container;
@@ -283,6 +285,12 @@ public class SmartCityAgent extends Agent {
             ActivateAgent(lightManager);
         }
     }
+    
+    public void activateBuses() {
+        for (final BusAgent agent : buses) {
+            ActivateAgent(agent);
+        }
+    }
 
     public void prepareLightManagers(GeoPosition middlePoint, int radius) {
         resetIdGenerator();
@@ -378,9 +386,11 @@ public class SmartCityAgent extends Agent {
     
     public static void tryAddNewBusAgent(final Timetable timetable, List<RouteNode> route,
     		final String busLine, final String brigadeNr) {
-    	BusAgent agent = new BusAgent(route, timetable, busLine, brigadeNr, nextBusId());
+    	BusAgent agent = new BusAgent();
+    	final int busAgentId = nextBusId();
+    	agent.setArguments(new Object[] { route, timetable, busLine, brigadeNr, busAgentId });
     	SmartCity.SmartCityAgent.buses.add(agent);
-    	tryAddAgent(agent, BUS + agent.getId());
+    	tryAddAgent(agent, BUS + busAgentId);
     }
 
 	public static void tryAddNewLightManagerAgent(Node crossroad) {
@@ -395,7 +405,7 @@ public class SmartCityAgent extends Agent {
         tryAddAgent(manager, LIGHT_MANAGER + manager.getId());
     }
 
-	public static void tryAddNewStationAgent(StationOSMNode stationOSMNode) {
+	public static void tryAddNewStationAgent(OSMStation stationOSMNode) {
 		StationAgent stationAgent = new StationAgent(stationOSMNode, nextStationAgentId());
 		SmartCity.SmartCityAgent.osmIdToStationOSMNode.put(stationOSMNode.getId(), stationOSMNode);
 		tryAddAgent(stationAgent, STATION + stationAgent.getAgentId());

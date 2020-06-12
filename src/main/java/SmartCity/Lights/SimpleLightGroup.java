@@ -1,4 +1,4 @@
-package SmartCity;
+package SmartCity.Lights;
 
 import java.util.HashMap;
 import java.util.HashSet;
@@ -7,6 +7,7 @@ import java.util.Map;
 import java.util.Set;
 
 import Agents.LightColor;
+
 import org.jxmapviewer.viewer.Waypoint;
 import org.jxmapviewer.viewer.WaypointPainter;
 import org.w3c.dom.Node;

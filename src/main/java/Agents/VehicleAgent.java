@@ -13,17 +13,13 @@ import jade.core.behaviours.TickerBehaviour;
 import jade.lang.acl.ACLMessage;
 import jade.util.leap.Properties;
 
+@SuppressWarnings("serial")
 public class VehicleAgent extends Agent {
-    public MovingObject Vehicle;
+	
+    private MovingObject Vehicle;
 
-
-    public void setVehicle(MovingObject v) {
-        Vehicle = v;
-    }
-
+    @Override
     protected void setup() {
-        //Print("I'm a " + Vehicle.getVehicleType() + ".");
-        //Print("Starting at: " + Vehicle.getPositionString());
         GetNextStop();
         Vehicle.setState(DrivingState.MOVING);
 
@@ -126,7 +122,16 @@ public class VehicleAgent extends Agent {
             Print("Sending INFORM to LightManager" + nextManager.getLightManagerId() + ".");
         }
     }
+    
+    public MovingObject getVehicle() {
+    	return Vehicle;
+    }
 
+    public void setVehicle(MovingObject v) {
+        Vehicle = v;
+    }
+
+    @Override
     public void takeDown() {
         super.takeDown();
     }

@@ -23,7 +23,6 @@ public abstract class MovingObject {
     public abstract long getAdjacentOsmWayId();
     public abstract int getMilisecondsToNextLight();
     public abstract int getSpeed();
-
     public abstract void setState(DrivingState state);
     public abstract DrivingState getState();
 }

@@ -1,4 +1,4 @@
-package SmartCity;
+package SmartCity.Lights;
 
 import java.time.Instant;
 import java.util.Dictionary;

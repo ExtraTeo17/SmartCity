@@ -11,9 +11,9 @@ import org.jxmapviewer.painter.Painter;
 import org.w3c.dom.Node;
 
 import Agents.LightManager;
-import SmartCity.Crossroad;
-import SmartCity.OptimizationResult;
-import SmartCity.SimpleCrossroad;
+import SmartCity.Lights.Crossroad;
+import SmartCity.Lights.OptimizationResult;
+import SmartCity.Lights.SimpleCrossroad;
 import jade.core.AID;
 import jade.core.Agent;
 import jade.core.behaviours.Behaviour;

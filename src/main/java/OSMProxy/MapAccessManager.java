@@ -42,11 +42,11 @@ import Agents.StationAgent;
 import OSMProxy.Elements.OSMLight;
 import OSMProxy.Elements.OSMNode;
 import OSMProxy.Elements.OSMWay;
+import OSMProxy.Elements.OSMStation;
 import Routing.RouteNode;
-import SmartCity.BrigadeInfo;
-import SmartCity.BusInfo;
 import SmartCity.SmartCityAgent;
-import SmartCity.StationOSMNode;
+import SmartCity.Buses.BrigadeInfo;
+import SmartCity.Buses.BusInfo;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -198,8 +198,8 @@ public class MapAccessManager {
 		}
 	}
 
-	public static List<StationOSMNode> getStationNodes(Document xmlDocument) {
-		List<StationOSMNode> stationNodes = new ArrayList<StationOSMNode>();
+	public static List<OSMStation> getStationNodes(Document xmlDocument) {
+		List<OSMStation> stationNodes = new ArrayList<OSMStation>();
 		Node osmRoot = xmlDocument.getFirstChild();
 		NodeList osmXMLNodes = osmRoot.getChildNodes();
 		for (int i = 1; i < osmXMLNodes.getLength(); i++) {
@@ -212,7 +212,7 @@ public class MapAccessManager {
 				Node namedItemLon = attributes.getNamedItem("lon");
 				String latitude = namedItemLat.getNodeValue();
 				String longitude = namedItemLon.getNodeValue();
-				stationNodes.add(new StationOSMNode(id, latitude, longitude, "", null));
+				stationNodes.add(new OSMStation(id, latitude, longitude, "", null));
 			}
 		}
 		return stationNodes;
@@ -237,7 +237,7 @@ public class MapAccessManager {
 		}
 		return routeNodes;
 	}
-	   private static void parseBusInfo(Map<String, BrigadeInfo> brigadeNrToBrigadeInfo, StationOSMNode station, JSONObject jsonObject) {
+	   private static void parseBusInfo(Map<String, BrigadeInfo> brigadeNrToBrigadeInfo, OSMStation station, JSONObject jsonObject) {
 	        JSONArray msg = (JSONArray) jsonObject.get("result");
 	        Iterator iterator = msg.iterator();
 	        while (iterator.hasNext()) {
@@ -385,8 +385,8 @@ public class MapAccessManager {
 		return nodes;
 	}
 	
-	public static List<StationOSMNode> sendStationOverpassQuery(String query) {
-		List<StationOSMNode> nodes = new ArrayList<>();
+	public static List<OSMStation> sendStationOverpassQuery(String query) {
+		List<OSMStation> nodes = new ArrayList<>();
 		try {
 			nodes = MapAccessManager.getStationNodes(getNodesViaOverpass(query));
 		} catch (Exception e) {
@@ -742,8 +742,8 @@ public class MapAccessManager {
 		return document;
 	}
 
-	public static Set<StationOSMNode> getStations(GeoPosition middlePoint, int radius) {
-		List<StationOSMNode> stationNodes = sendStationOverpassQuery(getStationsInRadiusQuery(middlePoint, radius));
+	public static Set<OSMStation> getStations(GeoPosition middlePoint, int radius) {
+		List<OSMStation> stationNodes = sendStationOverpassQuery(getStationsInRadiusQuery(middlePoint, radius));
 		return new LinkedHashSet<>(stationNodes);
 	}
 
@@ -851,7 +851,7 @@ public class MapAccessManager {
 							Node nam= attr.getNamedItem("k");
 						    if (nam.getNodeValue().equals("ref")) {
 						    	Node number_of_station=attr.getNamedItem("v");
-						    	StationOSMNode stationOSMNode = new StationOSMNode(osmId, lat, lon, number_of_station.getNodeValue());
+						    	OSMStation stationOSMNode = new OSMStation(osmId, lat, lon, number_of_station.getNodeValue());
 						    	SmartCityAgent.tryAddNewStationAgent(stationOSMNode);
 						    }
 						}
@@ -905,7 +905,7 @@ public class MapAccessManager {
 
 	private static void sendBusWarszawskieQuery(BusInfo info) {
 		Map<String, BrigadeInfo> brigadeNrToBrigadeInfo = new HashMap<>();
-		for (StationOSMNode station : info.getStations()) {
+		for (OSMStation station : info.getStations()) {
 			try {
 				MapAccessManager.parseBusInfo(brigadeNrToBrigadeInfo, station, getNodesViaWarszawskie(getBusWarszawskieQuery(station.getBusStopId(), station.getBusStopNr(), info.getBusLine())));
 			} catch (NullPointerException gowno) {

@@ -1,4 +1,4 @@
-package SmartCity;
+package SmartCity.Lights;
 
 import java.time.Instant;
 import java.util.Collection;
@@ -19,6 +19,7 @@ import org.w3c.dom.Node;
 import Agents.LightColor;
 import GUI.CustomWaypointRenderer;
 import Routing.LightManagerNode;
+import SmartCity.SmartCityAgent;
 
 public class Light {
 	private static final String OSM_LIGHT_ID = "light";
@@ -41,7 +42,7 @@ public class Light {
 		osmId = Long.parseLong(node.getAttributes().getNamedItem(OSM_LIGHT_ID).getNodeValue());
 		double lat = Double.parseDouble((node.getAttributes().getNamedItem(LAT).getNodeValue()));
 		double lon = Double.parseDouble((node.getAttributes().getNamedItem(LON).getNodeValue()));
-		position= new GeoPosition(lat, lon);
+		position = new GeoPosition(lat, lon);
 		adjacentOsmWayId = Long.parseLong((node.getAttributes().getNamedItem(WAY_ID).getNodeValue()));
 		addLightOsmIdToLightIdToLightManagerIdHashSet(osmId, managerId, position, adjacentOsmWayId);
 	}
@@ -51,7 +52,7 @@ public class Light {
 		osmId = Long.parseLong(info.getOsmLightId());
 		double lat = Double.parseDouble(info.getLat());
 		double lon = Double.parseDouble(info.getLon());
-		position= new GeoPosition(lat, lon);
+		position = new GeoPosition(lat, lon);
 		adjacentOsmWayId = Long.parseLong(info.getAdjacentOsmWayId());
 		addLightOsmIdToLightIdToLightManagerIdHashSet(osmId, managerId, position, adjacentOsmWayId);
 	}

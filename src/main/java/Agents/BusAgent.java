@@ -7,7 +7,7 @@ import java.util.Random;
 import Routing.LightManagerNode;
 import Routing.RouteNode;
 import Routing.StationNode;
-import SmartCity.Timetable;
+import SmartCity.Buses.Timetable;
 import Vehicles.Bus;
 import Vehicles.DrivingState;
 import jade.core.AID;
@@ -18,32 +18,19 @@ import jade.core.behaviours.TickerBehaviour;
 import jade.lang.acl.ACLMessage;
 import jade.util.leap.Properties;
 
-
 import org.javatuples.Pair;
-import org.jxmapviewer.viewer.GeoPosition;
 
-
+@SuppressWarnings("serial")
 public class BusAgent extends Agent {
 
-    public final Pair<StationNode, StationNode> getTwoSubsequentStations(final Random random) {
-        List<StationNode> stationsOnRoute = bus.getStationNodesOnRoute();
-        final int halfIndex = stationsOnRoute.size() / 2;
-        return Pair.with(stationsOnRoute.get(random.nextInt(halfIndex)),
-                stationsOnRoute.get(halfIndex + random.nextInt(halfIndex) - 1));
-    }
-
-    public final String getLine() {
-        return bus.getLine();
-    }
-
-    private final long agentId;
+	private long agentId;
     private Bus bus;
 
-    public BusAgent(final List<RouteNode> route, final Timetable timetable,
-                    final String busLine, final String brigadeNr, final int busId) {
-        agentId = busId;
-        bus = new Bus(route, timetable, busLine, brigadeNr);
-
+    @Override
+	protected void setup() {
+    	readArgumentsAndCreateBus();
+    	
+    	GetNextStation();
         StationNode station = bus.getCurrentStationNode();
         Print("Started at station " + station.getStationId() + ".");
         bus.setState(DrivingState.WAITING_AT_STATION);
@@ -127,8 +114,7 @@ public class BusAgent extends Agent {
                                 send(response);
                                 if(bus.findNextStop() instanceof LightManagerNode) GetNextLight();
                                 bus.setState(DrivingState.PASSING_LIGHT);
-                            }
-                            else if(bus.getState() == DrivingState.WAITING_AT_STATION){
+                            } else if (bus.getState() == DrivingState.WAITING_AT_STATION) {
                             	GetNextStation();
                             	bus.setState(DrivingState.PASSING_STATION);
 							}
@@ -141,9 +127,17 @@ public class BusAgent extends Agent {
 
         addBehaviour(move);
         addBehaviour(communication);
-    }
+	}
 
-    void GetNextLight() {
+    @SuppressWarnings("unchecked")
+	private void readArgumentsAndCreateBus() {
+		final Object[] args = getArguments();
+        bus = new Bus((List<RouteNode>)args[0], (Timetable)args[1],
+        		(String)args[2], (String)args[3]);
+    	agentId = (int)args[4];
+	}
+
+	void GetNextLight() {
         // finds next traffic light and announces his arrival
         LightManagerNode nextManager = bus.findNextTrafficLight();
 
@@ -191,8 +185,23 @@ public class BusAgent extends Agent {
         return Long.toString(agentId);
     }
 
+    public final String getLine() {
+        return bus.getLine();
+    }
+
+    public final Pair<StationNode, StationNode> getTwoSubsequentStations(final Random random) {
+        List<StationNode> stationsOnRoute = bus.getStationNodesOnRoute();
+        final int halfIndex = stationsOnRoute.size() / 2;
+        return Pair.with(stationsOnRoute.get(random.nextInt(halfIndex)),
+                stationsOnRoute.get(halfIndex + random.nextInt(halfIndex) - 1));
+    }
+
+	@Override
+	protected void takeDown() {
+		super.takeDown();
+	}
+
     void Print(String message) {
         System.out.println(getLocalName() + ": " + message);
     }
-
 }

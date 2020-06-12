@@ -4,14 +4,14 @@ import jade.core.Agent;
 
 import org.jxmapviewer.viewer.GeoPosition;
 
-import SmartCity.StationOSMNode;
+import OSMProxy.Elements.OSMStation;
 
 public class StationAgent extends Agent {
 	
-	private final StationOSMNode stationOSMNode;
+	private final OSMStation stationOSMNode;
 	private final long agentId;
 	
-	public StationAgent(final StationOSMNode stationOSMNode, final long agentId) { // REMEMBER TO PRUNE BEYOND CIRCLE
+	public StationAgent(final OSMStation stationOSMNode, final long agentId) { // REMEMBER TO PRUNE BEYOND CIRCLE
 		this.stationOSMNode = stationOSMNode;
 		this.agentId = agentId;
 	}

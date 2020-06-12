@@ -1,12 +1,14 @@
-package SmartCity;
+package SmartCity.Buses;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
 import OSMProxy.Elements.OSMWay;
+import OSMProxy.Elements.OSMStation;
 import Routing.RouteNode;
 import Routing.Router;
+import SmartCity.SmartCityAgent;
 import jade.wrapper.AgentContainer;
 // Bus Lines
 public class BusInfo {
@@ -28,8 +30,8 @@ public class BusInfo {
 		stationsOnRouteOsmIds.add(Long.parseLong(nodeValue));
 	}
 
-	public List<StationOSMNode> getStations() {
-		List<StationOSMNode> stations = new ArrayList<>();
+	public List<OSMStation> getStations() {
+		List<OSMStation> stations = new ArrayList<>();
 		for (long osmId : stationsOnRouteOsmIds) {
 			stations.add(SmartCityAgent.osmIdToStationOSMNode.get(osmId));
 		}

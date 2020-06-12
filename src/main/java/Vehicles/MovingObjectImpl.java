@@ -11,14 +11,10 @@ import org.jxmapviewer.viewer.GeoPosition;
 public class MovingObjectImpl extends MovingObject {
 
     private List<RouteNode> displayRoute;
-
     private List<RouteNode> route;
     private int index = 0;
-
     private int speed = 200;
-
     private int closestLightIndex = 0;
-
     public DrivingState State = DrivingState.STARTING;
 
     public MovingObjectImpl(List<RouteNode> info) {
@@ -64,16 +60,15 @@ public class MovingObjectImpl extends MovingObject {
 
     @Override
     public LightManagerNode getCurrentTrafficLightNode() {
-        if(closestLightIndex == -1) return null;
-        return (LightManagerNode) (route.get(closestLightIndex));
+        if (closestLightIndex == -1)
+        	return null;
+        return (LightManagerNode)(route.get(closestLightIndex));
     }
 
     @Override
     public boolean isAtTrafficLights() {
-    if(index==route.size())
-    {
-    	return false;
-    }
+	    if (index == route.size())
+	    	return false;
         return route.get(index) instanceof LightManagerNode;
     }
 

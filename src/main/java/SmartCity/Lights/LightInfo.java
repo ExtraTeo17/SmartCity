@@ -1,4 +1,4 @@
-package SmartCity;
+package SmartCity.Lights;
 
 import org.jxmapviewer.viewer.GeoPosition;
 
@@ -7,7 +7,7 @@ import OSMProxy.Elements.OSMWay;
 
 public class LightInfo {
 	
-	private static final double DISTANCE_THRESHOLD = 0.0001;
+	private static final double DISTANCE_THRESHOLD = 0.00008;
 	
 	private String osmLightId;
 	private GeoPosition position;
