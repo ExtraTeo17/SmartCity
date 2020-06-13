@@ -29,13 +29,18 @@ public class BusAgent extends Agent {
     @Override
 	protected void setup() {
     	readArgumentsAndCreateBus();
-    	
-    	GetNextStation();
+
         StationNode station = bus.getCurrentStationNode();
         Print("Started at station " + station.getStationId() + ".");
+
+        ACLMessage msg = new ACLMessage(ACLMessage.REQUEST_WHEN);
+        msg.addReceiver(new AID("Station" + station.getStationId(), AID.ISLOCALNAME));
+        Properties properties = new Properties();
+        properties.setProperty(MessageParameter.TYPE, MessageParameter.BUS);
+        msg.setAllUserDefinedParameters(properties);
+        send(msg);
+
         bus.setState(DrivingState.WAITING_AT_STATION);
-        // send info to correct passengers to leave
-        // set stuff regarding waiting for passengers (communicate with station)
 
         Behaviour move = new TickerBehaviour(this, 3600 / bus.getSpeed()) {
             @Override
@@ -58,7 +63,7 @@ public class BusAgent extends Agent {
 
                             break;
                         case PASSING_LIGHT:
-                            Print("Passing");
+                            Print("Passing the light.");
                             bus.Move();
                             bus.setState(DrivingState.MOVING);
                             break;
@@ -66,22 +71,29 @@ public class BusAgent extends Agent {
                 } else if (bus.isAtStation()) {
                     switch (bus.getState()) {
                         case MOVING:
+
+                            // TODO Send info to correct passengers to leave
+
                             StationNode station = bus.getCurrentStationNode();
+                            ACLMessage msg = new ACLMessage(ACLMessage.REQUEST_WHEN);
+                            msg.addReceiver(new AID("Station" + station.getStationId(), AID.ISLOCALNAME));
+                            Properties properties = new Properties();
+                            properties.setProperty(MessageParameter.TYPE, MessageParameter.BUS);
+                            msg.setAllUserDefinedParameters(properties);
+                            send(msg);
+
                             Print("Arrived at station " + station.getStationId() + ".");
                             bus.setState(DrivingState.WAITING_AT_STATION);
-                            // send info to correct passengers to leave
-                            // set stuff regarding waiting for passengers (communicate with station)
                             break;
                         case WAITING_AT_STATION:
                             // waiting for passengers...
 
-                            // this should be set by communication with station
-                            bus.setState(DrivingState.PASSING_STATION);
+                            // if you want to skip waiting (for tests) use this:
+                            // bus.setState(DrivingState.PASSING_STATION);
                             break;
                         case PASSING_STATION:
                             RouteNode node = bus.findNextStop();
-                            if(node instanceof LightManagerNode)
-                            {
+                            if (node instanceof LightManagerNode) {
                                 GetNextLight();
                             }
                             GetNextStation();
@@ -101,24 +113,57 @@ public class BusAgent extends Agent {
             public void action() {
                 ACLMessage rcv = receive();
                 if (rcv != null) {
-                    switch (rcv.getPerformative()) {
-                        case ACLMessage.REQUEST:
-                            if (bus.getState() == DrivingState.WAITING_AT_LIGHT) {
+                    String type = rcv.getUserDefinedParameter(MessageParameter.TYPE);
+                    if (type == MessageParameter.LIGHT) {
+                        switch (rcv.getPerformative()) {
+                            case ACLMessage.REQUEST:
+                                if (bus.getState() == DrivingState.WAITING_AT_LIGHT) {
+                                    ACLMessage response = new ACLMessage(ACLMessage.AGREE);
+                                    response.addReceiver(rcv.getSender());
+                                    Properties properties = new Properties();
+
+                                    properties.setProperty(MessageParameter.TYPE, MessageParameter.VEHICLE);
+                                    properties.setProperty(MessageParameter.ADJACENT_OSM_WAY_ID, Long.toString(bus.getAdjacentOsmWayId()));
+                                    response.setAllUserDefinedParameters(properties);
+                                    send(response);
+                                    if (bus.findNextStop() instanceof LightManagerNode) GetNextLight();
+                                    bus.setState(DrivingState.PASSING_LIGHT);
+                                }
+                                break;
+                        }
+                    } else if (type == MessageParameter.STATION) {
+                        switch (rcv.getPerformative()) {
+                            case ACLMessage.REQUEST:
+                                if (bus.getState() == DrivingState.WAITING_AT_STATION) {
+                                    ACLMessage response = new ACLMessage(ACLMessage.AGREE);
+                                    response.addReceiver(rcv.getSender());
+
+                                    Properties properties = new Properties();
+                                    properties.setProperty(MessageParameter.TYPE, MessageParameter.BUS);
+                                    response.setAllUserDefinedParameters(properties);
+                                    send(response);
+
+                                    GetNextStation();
+                                    bus.setState(DrivingState.PASSING_STATION);
+                                }
+                                break;
+                        }
+                    } else if (type == MessageParameter.PEDESTRIAN) {
+                        switch (rcv.getPerformative())
+                        {
+                            case ACLMessage.REQUEST_WHEN:
+                                // TODO Add passenger to list (needed to ask him to leave when at destination)
+                                //  use MessageParameter.STATION_ID
+
                                 ACLMessage response = new ACLMessage(ACLMessage.AGREE);
                                 response.addReceiver(rcv.getSender());
-                                Properties properties = new Properties();
 
-                                properties.setProperty(MessageParameter.TYPE, MessageParameter.VEHICLE);
-                                properties.setProperty(MessageParameter.ADJACENT_OSM_WAY_ID, Long.toString(bus.getAdjacentOsmWayId()));
+                                Properties properties = new Properties();
+                                properties.setProperty(MessageParameter.TYPE, MessageParameter.BUS);
                                 response.setAllUserDefinedParameters(properties);
                                 send(response);
-                                if(bus.findNextStop() instanceof LightManagerNode) GetNextLight();
-                                bus.setState(DrivingState.PASSING_LIGHT);
-                            } else if (bus.getState() == DrivingState.WAITING_AT_STATION) {
-                            	GetNextStation();
-                            	bus.setState(DrivingState.PASSING_STATION);
-							}
-                            break;
+                                break;
+                        }
                     }
                 }
                 block(100);
@@ -137,7 +182,7 @@ public class BusAgent extends Agent {
     	agentId = (int)args[4];
 	}
 
-	void GetNextLight() {
+    void GetNextLight() {
         // finds next traffic light and announces his arrival
         LightManagerNode nextManager = bus.findNextTrafficLight();
 
@@ -169,6 +214,7 @@ public class BusAgent extends Agent {
             msg.addReceiver(dest);
             Properties properties = new Properties();
             Instant time = Instant.now().plusMillis(bus.getMilisecondsToNextStation());
+            properties.setProperty(MessageParameter.TYPE, MessageParameter.BUS);
             properties.setProperty(MessageParameter.ARRIVAL_TIME, "" + time);
             msg.setAllUserDefinedParameters(properties);
 
