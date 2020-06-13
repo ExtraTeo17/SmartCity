@@ -812,7 +812,7 @@ public class MapAccessManager {
 					if (member.getNodeName().equals("member") ) {
 						NamedNodeMap attributes = member.getAttributes();
 						Node namedItemID = attributes.getNamedItem("ref");
-						if(attributes.getNamedItem("role").getNodeValue().length()!=0 && attributes.getNamedItem("type").getNodeValue().equals("node")) {
+						if (attributes.getNamedItem("role").getNodeValue().contains("stop") && attributes.getNamedItem("type").getNodeValue().equals("node")) {
 							info.addStation(namedItemID.getNodeValue());
 						} else if (attributes.getNamedItem("role").getNodeValue().length() == 0 && attributes.getNamedItem("type").getNodeValue().equals("way")) {
 							appendSingleBusWayOverpassQuery(builder, Long.parseLong(namedItemID.getNodeValue()));
@@ -915,7 +915,7 @@ public class MapAccessManager {
 		info.setBrigadeList(brigadeNrToBrigadeInfo.values());
 	}
 
-	private static String getBusWarszawskieQuery(int busStopId, int busStopNr, String busLine) {
+	private static String getBusWarszawskieQuery(String busStopId, String busStopNr, String busLine) {
 		return "https://api.um.warszawa.pl/api/action/dbtimetable_get/?id=e923fa0e-d96c-43f9-ae6e-60518c9f3238&busstopId=" + busStopId + "&busstopNr=" + busStopNr + "&line=" + busLine + "&apikey=400dacf8-9cc4-4d6c-82cc-88d9311401a5";
 	}
 }
