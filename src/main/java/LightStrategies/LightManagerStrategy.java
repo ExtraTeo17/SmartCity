@@ -6,6 +6,7 @@ import java.util.List;
 import Agents.MessageParameter;
 import OSMProxy.Elements.OSMNode;
 
+import jade.util.leap.Properties;
 import org.jxmapviewer.JXMapViewer;
 import org.jxmapviewer.painter.Painter;
 import org.w3c.dom.Node;
@@ -76,6 +77,9 @@ public class LightManagerStrategy extends LightStrategy {
                                 getIntParameter(rcv, MessageParameter.ADJACENT_OSM_WAY_ID));
                         ACLMessage agree = new ACLMessage(ACLMessage.AGREE);
                         agree.addReceiver(rcv.getSender());
+                        Properties properties = new Properties();
+                        properties.setProperty(MessageParameter.TYPE, MessageParameter.LIGHT);
+                        agree.setAllUserDefinedParameters(properties);
                         agent.send(agree);
                         // if (crossroad.isLightGreen(getIntParameter(rcv, ADJACENT_OSM_WAY_ID)))
                         //	answerCanProceed(getCarName(rcv),agent);
@@ -156,6 +160,9 @@ public class LightManagerStrategy extends LightStrategy {
         Print(carName + " can proceed.");
         ACLMessage msg = new ACLMessage(ACLMessage.REQUEST);
         msg.addReceiver(new AID(carName, AID.ISLOCALNAME));
+        Properties properties = new Properties();
+        properties.setProperty(MessageParameter.TYPE, MessageParameter.LIGHT);
+        msg.setAllUserDefinedParameters(properties);
         agent.send(msg);
     }
 
