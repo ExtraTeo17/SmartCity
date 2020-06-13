@@ -24,6 +24,7 @@ import javax.swing.*;
 
 import Routing.RouteNode;
 import Routing.Router;
+import Routing.StationNode;
 import SmartCity.Buses.BusInfo;
 import SmartCity.Buses.Timetable;
 import Vehicles.MovingObjectImpl;
@@ -55,9 +56,11 @@ public class SmartCityAgent extends Agent {
     public static List<PedestrianAgent> pedestrians = new ArrayList<>();
     //public Set<Pedestrian> pedestrians = new LinkedHashSet<>();
     public static Set<LightManager> lightManagers = new HashSet<>();
+    public static Set<StationAgent> stationAgents = new HashSet<>();
     public static boolean lightManagersUnderConstruction = false;
     //public static Map<Long, LightManagerNode> lightIdToLightManagerNode = new HashMap<>();
     public static Map<Pair<Long, Long>, LightManagerNode> wayIdLightIdToLightManagerNode = new HashMap<>();
+    public static Map<Long, StationNode> osmStationIdToStationNode = new HashMap<>();
     private static long nextLightManagerId;
     private static long nextStationAgentId;
 	private static int nextBusId;
@@ -406,7 +409,7 @@ public class SmartCityAgent extends Agent {
     }
 
 	public static void tryAddNewStationAgent(OSMStation stationOSMNode) {
-		StationAgent stationAgent = new StationAgent(stationOSMNode, nextStationAgentId());
+		StationAgent stationAgent = new StationAgent(stationOSMNode,nextStationAgentId());
 		SmartCity.SmartCityAgent.osmIdToStationOSMNode.put(stationOSMNode.getId(), stationOSMNode);
 		tryAddAgent(stationAgent, STATION + stationAgent.getAgentId());
 	}

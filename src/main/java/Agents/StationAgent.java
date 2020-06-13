@@ -5,14 +5,16 @@ import jade.core.Agent;
 import org.jxmapviewer.viewer.GeoPosition;
 
 import OSMProxy.Elements.OSMStation;
+import SmartCity.Stations.StationStrategy;
 
 public class StationAgent extends Agent {
-	
-	private final OSMStation stationOSMNode;
+	private final StationStrategy stationStrategy;
+	//private final OSMStation stationOSMNode;
 	private final long agentId;
 	
-	public StationAgent(final OSMStation stationOSMNode, final long agentId) { // REMEMBER TO PRUNE BEYOND CIRCLE
-		this.stationOSMNode = stationOSMNode;
+	public StationAgent( OSMStation stationOSMNode, final long agentId) { // REMEMBER TO PRUNE BEYOND CIRCLE
+		this.stationStrategy = new StationStrategy(stationOSMNode,agentId);	
+		
 		this.agentId = agentId;
 	}
 	
@@ -32,7 +34,7 @@ public class StationAgent extends Agent {
         System.out.println(getLocalName() + ": " + message);
     }
 
-	public GeoPosition getPosition() {
-		return stationOSMNode.getPosition();
-	}
+	//public GeoPosition getPosition() {
+	//	return stationOSMNode.getPosition();
+//	}
 }

@@ -64,16 +64,7 @@ public class Light {
 	private void addLightOsmIdToLightIdToLightManagerIdHashSet(long osmId, long managerId, GeoPosition pos, long osmWayId) {
 		SmartCityAgent.wayIdLightIdToLightManagerNode.put(Pair.with(osmWayId, osmId),
 				new LightManagerNode(pos.getLatitude(), pos.getLongitude(), osmWayId, managerId));
-		
-		/*int size = SmartCityAgent.lightIdToLightManagerNode.values().size();
-		if (size == 5) {
-			System.out.println("STAAAAAAAAAAAAAARTING PRIIIIIIIIIIIIIIINTING");
-			Collection<LightManagerNode> values = SmartCityAgent.lightIdToLightManagerNode.values();
-			for (LightManagerNode node : values) {
-				System.out.println(node.getLightManagerId());
-			}
-		}*/
-	}
+		}
 
 	public boolean isGreen() {
 		return carLightColor == LightColor.GREEN;

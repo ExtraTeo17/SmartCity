@@ -84,7 +84,7 @@ public class HighwayAccessor {
     private static List<RouteNode> getRouteNodeList(PointList pointList, long osmWayId) {
     	List<RouteNode> nodeList = new ArrayList<>();
     	for (int i = 0; i < pointList.size(); ++i) {
-    		nodeList.add(new RouteNode(pointList.toGHPoint(i).lat, pointList.toGHPoint(i).lon, osmWayId));
+    		nodeList.add(new RouteNode(pointList.toGHPoint(i).lat, pointList.toGHPoint(i).lon));
     	}
     	return nodeList;
     }

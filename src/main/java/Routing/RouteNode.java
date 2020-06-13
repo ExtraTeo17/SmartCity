@@ -6,12 +6,12 @@ public class RouteNode {
 
 	private double lat;
 	private double lon;
-	private long osmWayId;
 	
-	public RouteNode(double lat, double lon, long osmWayId) {
+	
+	public RouteNode(double lat, double lon) {
 		this.lat = lat;
 		this.lon = lon;
-		this.osmWayId = osmWayId;
+	
 	}
 
 	public double getLatitude() {
@@ -22,9 +22,6 @@ public class RouteNode {
 		return lon;
 	}
 
-	public long getOsmWayId() {
-		return osmWayId;
-	}
 	
 	public final GeoPosition getPosition() {
 		return new GeoPosition(getLatitude(), getLongitude());

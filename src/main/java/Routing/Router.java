@@ -44,11 +44,8 @@ public final class Router { // BIG REFACTOR, MOVE GETMANAGERFORLIGHTS TO MAPACCE
     private static void addLightManagerNodeToManagersList(List<RouteNode> managers, OSMLight light, List<RouteNode> route) {
     	Pair<Long, Long> osmWayIdOsmLightId = Pair.with(light.getAdherentOsmWayId(), light.getId());
     	RouteNode nodeToAdd = SmartCityAgent.wayIdLightIdToLightManagerNode.get(osmWayIdOsmLightId);
-    	/*Long lightManagerIdToAdd = SmartCityAgent.lightIdToLightManagerId.get(light.getId());
-    	if (lightManagerIdToAdd == null)
-    		return;*/
-    	//RouteNode nodeToAdd = new LightManagerNode(light.lat, light.lon, light.adherentOsmWayId, lightManagerIdToAdd);
-        if (nodeToAdd != null && !lastManagerIdEqualTo(managers, nodeToAdd)/* && routeContainsOsmWayId(nodeToAdd.getOsmWayId(), route)*/)
+    	
+        if (nodeToAdd != null && !lastManagerIdEqualTo(managers, nodeToAdd))
             managers.add(nodeToAdd);
     }
 
@@ -59,13 +56,6 @@ public final class Router { // BIG REFACTOR, MOVE GETMANAGERFORLIGHTS TO MAPACCE
 		return lastNodeOnList.getLightManagerId() == ((LightManagerNode)nodeToAdd).getLightManagerId();
 	}
 
-	private static boolean routeContainsOsmWayId(long osmWayId, List<RouteNode> route) {
-		for (RouteNode node : route) {
-			if (node.getOsmWayId() == osmWayId)
-				return true;
-		}
-		return false;
-	}
 
 	private static List<RouteNode> getRouteWithAdditionalNodes(List<RouteNode> route, List<RouteNode> more_nodes) {
         for (RouteNode node : more_nodes) {
@@ -74,31 +64,7 @@ public final class Router { // BIG REFACTOR, MOVE GETMANAGERFORLIGHTS TO MAPACCE
         return route;
     }
 
-    /*private static void findPositionOfElementOnRoute(List<RouteNode> route, RouteNode manager) { // BUGFIXED VERSION UNDERNEATH!!!
-        int minIndex1 = -1, minIndex2 = -1;
-        double minDistance1 = Double.MAX_VALUE, minDistance2 = Double.MAX_VALUE;
-
-        for (int i = 0; i < route.size(); ++i) {
-            double distance = calculateDistance(route.get(i), manager);
-            if (distance < minDistance1) {
-                minDistance1 = distance;
-                minIndex1 = i;
-            }
-        }
-        for (int i = 0; i < route.size(); ++i) {
-            double distance = calculateDistance(route.get(i), manager);
-            if (distance < minDistance2 && minDistance2 != minDistance1) {
-                minDistance2 = distance;
-                minIndex2 = i;
-            }
-        }
-        if (minIndex1 < minIndex2) {
-            route.add(minIndex1 + 1, manager);
-        } else {
-            route.add(minIndex2 + 1, manager);
-        }
-    }*/
-	
+ 
 	private static void findPositionOfElementOnRoute(List<RouteNode> route, RouteNode manager) {
         int minIndex = -1;
         double minDistance = Double.MAX_VALUE;
@@ -146,7 +112,7 @@ public final class Router { // BIG REFACTOR, MOVE GETMANAGERFORLIGHTS TO MAPACCE
             for (int p = 1; p < distance; p++) {
                 lon = lon + dx;
                 lat = lat + dy;
-                RouteNode node = new RouteNode(lat, lon, A.getOsmWayId());
+                RouteNode node = new RouteNode(lat, lon/*, A.getOsmWayId()*/);
                 newRoute.add(node);
             }
         }
@@ -186,7 +152,7 @@ public final class Router { // BIG REFACTOR, MOVE GETMANAGERFORLIGHTS TO MAPACCE
 		for (OSMWay el : router) {
 			osmWayIds_list.add(el.getId());
 			for(OSMWaypoint point : el.getWaypoints()) {
-				RouteNodes_list.add(new RouteNode(point.getLat(),point.getLon(),el.getId()));
+				RouteNodes_list.add(new RouteNode(point.getLat(),point.getLon()));
 			}
 		}
 		return new Pair<List<Long>, List<RouteNode>>(osmWayIds_list,RouteNodes_list);
@@ -194,12 +160,20 @@ public final class Router { // BIG REFACTOR, MOVE GETMANAGERFORLIGHTS TO MAPACCE
 
     private static List<RouteNode> getAgentStationsForRoute(List<OSMNode> stations, List<RouteNode> route) {
         List<RouteNode> managers = new ArrayList<>();
-        /*for (OSMNode station : stations) {
-            addLightManagerNodeToManagersListIfItsNotNullAfterGettingItFromSmartCityAgentById(managers, station, route);
-        }*/
+        for (OSMNode station : stations) {
+          addStationNodeToList(managers, station, route);
+       }
+        
+      
         // UNCOMMENT AFTER FIXING !!!
         return managers;
     }
+
+	private static void addStationNodeToList(List<RouteNode> stations, OSMNode station, List<RouteNode> route) {
+	
+    	RouteNode nodeToAdd = SmartCityAgent.osmStationIdToStationNode.get(station.getId());
+    	stations.add(nodeToAdd);
+	}
 
 	public static List<RouteNode> generateRouteInfoForPedestrians(GeoPosition pedestrianStartPoint,
 			GeoPosition pedestrianGetOnStation) {

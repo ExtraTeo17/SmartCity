@@ -2,14 +2,14 @@ package Routing;
 
 public class StationNode extends RouteNode {
 
-	private long stationId;
+	private long stationAgentId;
 	
-	public StationNode(double lat, double lon, long osmWayId, long stationId) {
-		super(lat, lon, osmWayId);
-		this.stationId = stationId;
+	public StationNode(double lat, double lon,  long stationAgentId) {
+		super(lat, lon);
+		this.stationAgentId = stationAgentId;
 	}
 
 	public long getStationId() {
-		return stationId;
+		return stationAgentId;
 	}
 }
