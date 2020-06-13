@@ -30,6 +30,7 @@ public class BusAgent extends Agent {
 	protected void setup() {
     	readArgumentsAndCreateBus();
 
+    	GetNextStation();
         StationNode station = bus.getCurrentStationNode();
         Print("Started at station " + station.getStationId() + ".");
 

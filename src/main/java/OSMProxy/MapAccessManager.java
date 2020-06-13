@@ -848,8 +848,12 @@ public class MapAccessManager {
 						Node tag = list_tags.item(z);
 						if (tag.getNodeName().equals("tag") ) {
 							NamedNodeMap attr = tag.getAttributes();
-							Node nam= attr.getNamedItem("k");
-						    if (nam.getNodeValue().equals("ref")) {
+							Node kAttr= attr.getNamedItem("k");
+							if (kAttr.getNodeValue().equals("public_transport")) {
+								Node vAttr = attr.getNamedItem("v");
+								if (!vAttr.getNodeValue().contains("stop"))
+									break;
+							} else if (kAttr.getNodeValue().equals("ref")) {
 						    	Node number_of_station=attr.getNamedItem("v");
 						    	OSMStation stationOSMNode = new OSMStation(osmId, lat, lon, number_of_station.getNodeValue());
 						    	SmartCityAgent.tryAddNewStationAgent(stationOSMNode);
