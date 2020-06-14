@@ -1,6 +1,8 @@
 package Vehicles;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 
 import Routing.LightManagerNode;
@@ -14,6 +16,7 @@ import org.jxmapviewer.viewer.GeoPosition;
 public class Bus extends MovingObject {
 
 	private final Timetable timetable;
+	private final HashMap<Long, List<String>> stationsForPassengers = new HashMap<>();
 	private final List<StationNode> stationNodesOnRoute;
 	private final String busLine;
 	private final String brigadeNr;
@@ -27,11 +30,36 @@ public class Bus extends MovingObject {
 	public Bus(final List<RouteNode> route, final Timetable timetable, final String busLine,
 			   final String brigadeNr) {
 		displayRoute = route;
+
+		for(RouteNode node : route)
+		{
+			if(node instanceof StationNode)
+			{
+				StationNode station = (StationNode)node;
+				stationsForPassengers.put(station.getStationId(), new ArrayList<>());
+			}
+		}
+
 		this.route = Router.uniformRoute(displayRoute);
 		this.timetable = timetable;
 		stationNodesOnRoute = extractStationsFromRoute();
 		this.busLine = busLine;
 		this.brigadeNr = brigadeNr;
+	}
+
+	public void addPassengerToStation(Long id, String passenger)
+	{
+		stationsForPassengers.get(id).add(passenger);
+	}
+
+	public boolean removePassengerFromStation(Long id, String passenger)
+	{
+		return stationsForPassengers.get(id).remove(passenger);
+	}
+
+	public List<String> getPassengersToLeave(Long id)
+	{
+		return stationsForPassengers.get(id);
 	}
 
 	private List<StationNode> extractStationsFromRoute() {

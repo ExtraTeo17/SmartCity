@@ -16,6 +16,7 @@ import jade.core.behaviours.Behaviour;
 import jade.core.behaviours.CyclicBehaviour;
 import jade.core.behaviours.TickerBehaviour;
 import jade.lang.acl.ACLMessage;
+import jade.tools.sniffer.Message;
 import jade.util.leap.Properties;
 
 import org.javatuples.Pair;
@@ -23,14 +24,14 @@ import org.javatuples.Pair;
 @SuppressWarnings("serial")
 public class BusAgent extends Agent {
 
-	private long agentId;
+    private long agentId;
     private Bus bus;
 
     @Override
-	protected void setup() {
-    	readArgumentsAndCreateBus();
+    protected void setup() {
+        readArgumentsAndCreateBus();
 
-    	GetNextStation();
+        GetNextStation();
         StationNode station = bus.getCurrentStationNode();
         Print("Started at station " + station.getStationId() + ".");
 
@@ -72,13 +73,24 @@ public class BusAgent extends Agent {
                 } else if (bus.isAtStation()) {
                     switch (bus.getState()) {
                         case MOVING:
-
-                            // TODO Send info to correct passengers to leave
-
                             StationNode station = bus.getCurrentStationNode();
+
+                            List<String> passengers = bus.getPassengersToLeave(station.getStationId());
+
+                            ACLMessage leave = new ACLMessage(ACLMessage.REQUEST);
+
+                            for (String name : passengers) {
+                                leave.addReceiver(new AID(name, AID.ISLOCALNAME));
+                            }
+
+                            Properties properties = new Properties();
+                            properties.setProperty(MessageParameter.TYPE, MessageParameter.BUS);
+                            properties.setProperty(MessageParameter.STATION_ID, String.valueOf(station.getStationId()));
+                            leave.setAllUserDefinedParameters(properties);
+
                             ACLMessage msg = new ACLMessage(ACLMessage.REQUEST_WHEN);
                             msg.addReceiver(new AID("Station" + station.getStationId(), AID.ISLOCALNAME));
-                            Properties properties = new Properties();
+                            properties = new Properties();
                             properties.setProperty(MessageParameter.TYPE, MessageParameter.BUS);
                             msg.setAllUserDefinedParameters(properties);
                             send(msg);
@@ -150,11 +162,12 @@ public class BusAgent extends Agent {
                                 break;
                         }
                     } else if (type == MessageParameter.PEDESTRIAN) {
-                        switch (rcv.getPerformative())
-                        {
+                        switch (rcv.getPerformative()) {
                             case ACLMessage.REQUEST_WHEN:
-                                // TODO Add passenger to list (needed to ask him to leave when at destination)
-                                //  use MessageParameter.STATION_ID
+
+                                Long stationId = Long.parseLong(rcv.getUserDefinedParameter(MessageParameter.STATION_ID));
+                                Print("Passenger " + rcv.getSender().getLocalName() + " entered the bus.");
+                                bus.addPassengerToStation(stationId, rcv.getSender().getLocalName());
 
                                 ACLMessage response = new ACLMessage(ACLMessage.AGREE);
                                 response.addReceiver(rcv.getSender());
@@ -164,7 +177,13 @@ public class BusAgent extends Agent {
                                 response.setAllUserDefinedParameters(properties);
                                 send(response);
                                 break;
+                            case ACLMessage.AGREE:
+                                stationId = Long.parseLong(rcv.getUserDefinedParameter(MessageParameter.STATION_ID));
+                                Print("Passenger " + rcv.getSender().getLocalName() + " left the bus.");
+                                bus.removePassengerFromStation(stationId, rcv.getSender().getLocalName());
+                                break;
                         }
+
                     }
                 }
                 block(100);
@@ -173,15 +192,15 @@ public class BusAgent extends Agent {
 
         addBehaviour(move);
         addBehaviour(communication);
-	}
+    }
 
     @SuppressWarnings("unchecked")
-	private void readArgumentsAndCreateBus() {
-		final Object[] args = getArguments();
-        bus = new Bus((List<RouteNode>)args[0], (Timetable)args[1],
-        		(String)args[2], (String)args[3]);
-    	agentId = (int)args[4];
-	}
+    private void readArgumentsAndCreateBus() {
+        final Object[] args = getArguments();
+        bus = new Bus((List<RouteNode>) args[0], (Timetable) args[1],
+                (String) args[2], (String) args[3]);
+        agentId = (int) args[4];
+    }
 
     void GetNextLight() {
         // finds next traffic light and announces his arrival
@@ -243,10 +262,10 @@ public class BusAgent extends Agent {
                 stationsOnRoute.get(halfIndex + random.nextInt(halfIndex) - 1));
     }
 
-	@Override
-	protected void takeDown() {
-		super.takeDown();
-	}
+    @Override
+    protected void takeDown() {
+        super.takeDown();
+    }
 
     void Print(String message) {
         System.out.println(getLocalName() + ": " + message);
