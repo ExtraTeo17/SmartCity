@@ -42,6 +42,7 @@ import java.util.Timer;
 
 public class MapWindow {
     private final static int REFRESH_MAP_INTERVAL_MILLISECONDS = 100;
+    private final static int BUS_CONTROL_INTERVAL_MILLISECONDS = 60000;
     private final static int CREATE_CAR_INTERVAL_MILLISECONDS = 500;//2000000000;
 	private static final long CREATE_PEDESTRIAN_INTERVAL_MILLISECONDS = 2000000000;
 	private final static int PEDESTRIAN_STATION_RADIUS = 300;
@@ -89,7 +90,7 @@ public class MapWindow {
         GeoPosition warsaw = new GeoPosition(52.24, 21.02);
         MapViewer.setZoom(7);
         MapViewer.setAddressLocation(warsaw);
-        radiusSpinner.setModel(new SpinnerNumberModel(500, 100, 50000, 100));
+        radiusSpinner.setModel(new SpinnerNumberModel(100, 100, 50000, 100));
         carLimitSpinner.setModel(new SpinnerNumberModel(1, 1, 1000, 1));
         carLimitSpinner.addChangeListener(new ChangeListener() {
             @Override
@@ -99,9 +100,11 @@ public class MapWindow {
                 }
             }
         });
+        
+       
         seedSpinner.setModel(new SpinnerNumberModel(69, 0, 999999, 1));
-        latSpinner.setModel(new SpinnerNumberModel(52.206466, -90, 90, 1));
-        lonSpinner.setModel(new SpinnerNumberModel(20.969933, -180, 180, 0.001));
+        latSpinner.setModel(new SpinnerNumberModel(52.205155, -90, 90, 1));
+        lonSpinner.setModel(new SpinnerNumberModel(20.859244, -180, 180, 0.001));
 
         testCarIdSpinner.setModel(new SpinnerNumberModel(40, 0, 100, 1));
         testCarIdSpinner.addChangeListener(new ChangeListener() {
@@ -183,15 +186,17 @@ public class MapWindow {
                 currentTimeTitle.setVisible(true);
                 currentTimeLabel.setVisible(true);
                 SmartCityAgent.activateLightManagerAgents();
-                SmartCityAgent.activateBuses();
+               
                 spawnTimer.scheduleAtFixedRate(new CreateCarTask(), 0, CREATE_CAR_INTERVAL_MILLISECONDS);
                 if (SmartCity.SmartCityAgent.shouldGeneratePedestrians)
                 	spawnTimer.scheduleAtFixedRate(new CreatePedestrianTask(), 0, CREATE_PEDESTRIAN_INTERVAL_MILLISECONDS);
                 simulationStart = Instant.now();
+                refreshTimer.scheduleAtFixedRate(new BusControlTask(), 0,BUS_CONTROL_INTERVAL_MILLISECONDS);
                 state = SimulationState.RUNNING;
             }
         });
         refreshTimer.scheduleAtFixedRate(new RefreshTask(), 0, REFRESH_MAP_INTERVAL_MILLISECONDS);
+       
     }
 
     public void setInputEnabled(boolean check) {
@@ -253,6 +258,7 @@ public class MapWindow {
         DateFormat dateFormat = new SimpleDateFormat("kk:mm:ss dd-MM-yyyy");
         String strDate = dateFormat.format(Date.from(inst));
         currentTimeLabel.setText(strDate);
+        
 
     }
 
@@ -587,10 +593,31 @@ public class MapWindow {
                 MapViewer.setOverlayPainter(painter);
                 if (state == SimulationState.RUNNING) RefreshTime();
             } catch (Exception e) {
+            	e.printStackTrace();
             }
         }
     }
 
+    public class BusControlTask extends TimerTask { // OCB ?????? TOO OFTEN
+        @Override
+        public void run() {
+            try {             
+                if (state == SimulationState.RUNNING) RunBusBasedOnTimeTable();
+            } catch (Exception e) {
+            	e.printStackTrace();
+            }
+        }
+
+		private void RunBusBasedOnTimeTable() {
+			
+			for (BusAgent busAgent : SmartCityAgent.buses) {
+				busAgent.runBasedOnTimetable(getSimulationStartTime());
+			}
+			
+		}
+    }
+    
+    
     public class CreateCarTask extends TimerTask {
 
         @Override

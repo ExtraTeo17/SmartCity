@@ -275,7 +275,7 @@ public class SmartCityAgent extends Agent {
         Vehicles.add(agent);
     }
 
-    public void ActivateAgent(Agent agent) {
+    public static void ActivateAgent(Agent agent) {
         try {
             agent.getContainerController().getAgent(agent.getLocalName()).start();
         } catch (ControllerException e) {
@@ -289,11 +289,7 @@ public class SmartCityAgent extends Agent {
         }
     }
     
-    public void activateBuses() {
-        for (final BusAgent agent : buses) {
-            ActivateAgent(agent);
-        }
-    }
+    
 
     public void prepareLightManagers(GeoPosition middlePoint, int radius) {
         resetIdGenerator();
