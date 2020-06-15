@@ -22,6 +22,9 @@ public class Timetable {
 	private Date getTimeOnStation(final long stationOsmId) {
 		return stationOsmIdToTime.get(stationOsmId);
 	}
+	public Date getBoardingTime() {
+		return timeOnStationChronological.get(0).getValue0();
+	}
 	
 	public void addEntryToTimetable(long stationOsmId, String time) {
 		Date timeOnStation = null;

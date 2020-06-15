@@ -1,6 +1,7 @@
 package Vehicles;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -23,7 +24,7 @@ public class Bus extends MovingObject {
 	private List<RouteNode> displayRoute;
 	private List<RouteNode> route;
 	private int index = 0;
-	private int speed = 30;
+	private int speed = 400;
 	private int closestLightIndex = -1;
 	private int closestStationIndex = -1;
 
@@ -202,4 +203,9 @@ public class Bus extends MovingObject {
 	public DrivingState getState() {
 		return State;
 	}
+
+	public Date getBoardingTime() {
+		return timetable.getBoardingTime();
+	}
+	
 }

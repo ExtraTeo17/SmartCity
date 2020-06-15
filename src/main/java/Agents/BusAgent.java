@@ -1,17 +1,20 @@
 package Agents;
 
 import java.time.Instant;
+import java.util.Date;
 import java.util.List;
 import java.util.Random;
 
 import Routing.LightManagerNode;
 import Routing.RouteNode;
 import Routing.StationNode;
+import SmartCity.SmartCityAgent;
 import SmartCity.Buses.Timetable;
 import Vehicles.Bus;
 import Vehicles.DrivingState;
 import jade.core.AID;
 import jade.core.Agent;
+import jade.core.AgentState;
 import jade.core.behaviours.Behaviour;
 import jade.core.behaviours.CyclicBehaviour;
 import jade.core.behaviours.TickerBehaviour;
@@ -26,10 +29,11 @@ public class BusAgent extends Agent {
 
     private long agentId;
     private Bus bus;
+    
 
     @Override
     protected void setup() {
-        readArgumentsAndCreateBus();
+      
 
         GetNextStation();
         StationNode station = bus.getCurrentStationNode();
@@ -102,7 +106,7 @@ public class BusAgent extends Agent {
                             // waiting for passengers...
 
                             // if you want to skip waiting (for tests) use this:
-                            // bus.setState(DrivingState.PASSING_STATION);
+                            bus.setState(DrivingState.PASSING_STATION);
                             break;
                         case PASSING_STATION:
                             RouteNode node = bus.findNextStop();
@@ -247,6 +251,7 @@ public class BusAgent extends Agent {
         return bus;
     }
 
+   
     public String getId() {
         return Long.toString(agentId);
     }
@@ -270,4 +275,16 @@ public class BusAgent extends Agent {
     void Print(String message) {
         System.out.println(getLocalName() + ": " + message);
     }
+
+	
+	public void runBasedOnTimetable(Date date) {
+		if(this.getAgentState().getValue() != jade.wrapper.AgentState.cAGENT_STATE_INITIATED)
+			return;
+		  readArgumentsAndCreateBus();
+		long hours = bus.getBoardingTime().getHours();
+		long minutes = bus.getBoardingTime().getMinutes();
+	    if(hours == date.getHours() && minutes == date.getMinutes()) {
+	    	SmartCityAgent.ActivateAgent(this);
+	    }
+	}
 }
