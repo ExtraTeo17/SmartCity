@@ -42,8 +42,8 @@ import java.util.Timer;
 
 public class MapWindow {
     private final static int REFRESH_MAP_INTERVAL_MILLISECONDS = 100;
-    private final static int BUS_CONTROL_INTERVAL_MILLISECONDS = 60000;
-    private final static int CREATE_CAR_INTERVAL_MILLISECONDS = 500;//2000000000;
+    private final static int BUS_CONTROL_INTERVAL_MILLISECONDS = 2000; //60000
+    private final static int CREATE_CAR_INTERVAL_MILLISECONDS = 500;
 	private static final long CREATE_PEDESTRIAN_INTERVAL_MILLISECONDS = 2000000000;
 	private final static int PEDESTRIAN_STATION_RADIUS = 300;
 
@@ -252,13 +252,14 @@ public class MapWindow {
 
     private void RefreshTime() {
         Date date = getSimulationStartTime();
-        Duration timeDiff = Duration.between(simulationStart, Instant.now());
+        //Duration timeDiff = Duration.between(simulationStart, Instant.now());
+        Duration timeDiff = Duration.ofSeconds(3);
         Instant inst = date.toInstant();
         inst = inst.plus(timeDiff);
         DateFormat dateFormat = new SimpleDateFormat("kk:mm:ss dd-MM-yyyy");
         String strDate = dateFormat.format(Date.from(inst));
         currentTimeLabel.setText(strDate);
-        
+        setTimeSpinner.setValue(Date.from(inst));
 
     }
 
@@ -291,6 +292,21 @@ public class MapWindow {
             painters.add(waypointPainter);
         } catch (Exception e) {
         	
+        }
+    }
+    
+    public void DrawPedestrians(List painters) {
+        try {
+            Set<Waypoint> set = new HashSet<>();
+            for (PedestrianAgent a : SmartCityAgent.pedestrians) {
+                set.add(new DefaultWaypoint(a.getPedestrian().getPosition()));
+            }
+            WaypointPainter<Waypoint> waypointPainter = new WaypointPainter<>();
+            waypointPainter.setWaypoints(set);
+            waypointPainter.setRenderer(new CustomWaypointRenderer("pedestrian.png"));
+            painters.add(waypointPainter);
+        } catch (Exception e) {
+
         }
     }
 
@@ -589,6 +605,9 @@ public class MapWindow {
                 if (renderLights) DrawLights(painters);
                 if (renderCars) DrawVehicles(painters);
                 if (renderBuses) DrawBuses(painters);
+                
+                DrawPedestrians(painters);
+                
                 CompoundPainter<JXMapViewer> painter = new CompoundPainter<>(painters);
                 MapViewer.setOverlayPainter(painter);
                 if (state == SimulationState.RUNNING) RefreshTime();
@@ -683,7 +702,16 @@ public class MapWindow {
 
         private BusAgent getRandomBusAgent() {
             final List<BusAgent> busArray = new ArrayList<>(SmartCity.SmartCityAgent.buses); // TODO RETHINK!!!
-            return busArray.get(random.nextInt(busArray.size()));
+            try {
+            	return busArray.get(random.nextInt(busArray.size()));
+            } catch (Exception e) {
+            	try {
+            		throw new Exception("The 'shouldPrepareBuses' toggle in SmartCityAgent is probably switched off (pedestrians cannot exist without buses)");
+            	} catch (Exception e2) {
+            		e2.printStackTrace();
+            		return null;
+            	}
+            }
         }
     }
 

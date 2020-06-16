@@ -4,7 +4,6 @@ import SmartCity.SmartCityAgent;
 
 import org.javatuples.Pair;
 import org.jxmapviewer.viewer.GeoPosition;
-import com.graphhopper.util.PointList;
 
 import OSMProxy.MapAccessManager;
 import OSMProxy.Elements.OSMLight;
@@ -15,23 +14,43 @@ import OSMProxy.Elements.OSMWaypoint;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 
-public final class Router { // BIG REFACTOR, MOVE GETMANAGERFORLIGHTS TO MAPACCESSMANAGER AND ADD XML PARSING !!!
+public final class Router {
 
     public static List<RouteNode> generateRouteInfo(GeoPosition pointA, GeoPosition pointB) {
-        Pair<List<Long>, List<RouteNode>> osmWayIdsAndPointList = findRoute(pointA, pointB);
+        Pair<List<Long>, List<RouteNode>> osmWayIdsAndPointList = findRoute(pointA, pointB, false);
         final List<OSMLight> lightInfo = MapAccessManager.sendFullTrafficSignalQuery(osmWayIdsAndPointList.getValue0());
         List<RouteNode> managers = getManagersForLights(lightInfo, osmWayIdsAndPointList.getValue1());
         List<RouteNode> routeWithManagers = getRouteWithAdditionalNodes(osmWayIdsAndPointList.getValue1(), managers);
         return routeWithManagers;
     }
 
-    private static Pair<List<Long>, List<RouteNode>> findRoute(GeoPosition pointA, GeoPosition pointB) {
+	public static List<RouteNode> generateRouteInfoForPedestrians(GeoPosition pointA, GeoPosition pointB) { // TODO: Merge with function for cars if testing proves they are identical
+		Pair<List<Long>, List<RouteNode>> osmWayIdsAndPointList = findRoute(pointA, pointB, true);
+		final List<OSMLight> lightInfo = MapAccessManager.sendFullTrafficSignalQuery(osmWayIdsAndPointList.getValue0());
+		List<RouteNode> managers = getManagersForLights(lightInfo, osmWayIdsAndPointList.getValue1());
+		List<RouteNode> routeWithMgrs = getRouteWithAdditionalNodes(osmWayIdsAndPointList.getValue1(), managers);
+		return routeWithMgrs;
+	}
+
+	public static List<RouteNode> generateRouteInfoForBuses(List<OSMWay> router, List<Long> osmStationIds) {
+	    Pair<List<Long>, List<RouteNode>> osmWayIdsAndPointList = findBusRoute(router);
+	    List<OSMLight> lightsOnRoute = MapAccessManager.sendFullTrafficSignalQuery(osmWayIdsAndPointList.getValue0());
+	    List<RouteNode> managers = getManagersForLights(lightsOnRoute, osmWayIdsAndPointList.getValue1());
+	    List<RouteNode> stationNodes = getAgentStationsForRoute(getOSMNodesForStations(osmStationIds), osmWayIdsAndPointList.getValue1());
+	    managers.addAll(stationNodes);
+	    List<RouteNode> routeWithManagers = getRouteWithAdditionalNodes(osmWayIdsAndPointList.getValue1(), managers);
+	    return routeWithManagers;
+    }
+    
+    /////////////////////////////////////////////////////////////
+    //  HELPERS
+    /////////////////////////////////////////////////////////////
+
+    private static Pair<List<Long>, List<RouteNode>> findRoute(GeoPosition pointA, GeoPosition pointB, boolean onFoot) {
         Pair<List<Long>, List<RouteNode>> osmWayIdsAndPointList = OSMProxy.HighwayAccessor.getOsmWayIdsAndPointList(new String[]{"config=config.properties", "datareader.file=mazowieckie-latest.osm.pbf"},
-                pointA.getLatitude(), pointA.getLongitude(), pointB.getLatitude(), pointB.getLongitude());
+                pointA.getLatitude(), pointA.getLongitude(), pointB.getLatitude(), pointB.getLongitude(), onFoot);
         return osmWayIdsAndPointList;
     }
 
@@ -129,17 +148,6 @@ public final class Router { // BIG REFACTOR, MOVE GETMANAGERFORLIGHTS TO MAPACCE
                 + ((node2.getLongitude() - node1.getLongitude()) * (node2.getLongitude() - node1.getLongitude())));
     }
     
-    public static List<RouteNode> generateRouteInfoForBuses(List<OSMWay> router, List<Long> osmStationIds) {
-    	   Pair<List<Long>, List<RouteNode>> osmWayIdsAndPointList = findBusRoute(router);
-    	 // REPAIR BUSES AFTER 01.06.2020 CHANGES
-           List<OSMLight> lightsOnRoute = MapAccessManager.sendFullTrafficSignalQuery(osmWayIdsAndPointList.getValue0());
-           List<RouteNode> managers = getManagersForLights(lightsOnRoute, osmWayIdsAndPointList.getValue1());
-           List<RouteNode> stationNodes = getAgentStationsForRoute(getOSMNodesForStations(osmStationIds), osmWayIdsAndPointList.getValue1());
-           managers.addAll(stationNodes);
-           List<RouteNode> routeWithManagers = getRouteWithAdditionalNodes(osmWayIdsAndPointList.getValue1(), managers);
-           return routeWithManagers;
-    }
-    
     private static List<OSMNode> getOSMNodesForStations(List<Long> stationsIDs) {
     	List<OSMNode> listOsmNodes = new ArrayList<>();
 		for (long station : stationsIDs) {
@@ -189,25 +197,12 @@ public final class Router { // BIG REFACTOR, MOVE GETMANAGERFORLIGHTS TO MAPACCE
         for (OSMNode station : stations) {
           addStationNodeToList(managers, station, route);
        }
-        
-      
-        // UNCOMMENT AFTER FIXING !!!
-        return managers;
+       return managers;
     }
 
 	private static void addStationNodeToList(List<RouteNode> stations, OSMNode station, List<RouteNode> route) {
 	
     	RouteNode nodeToAdd = SmartCityAgent.osmStationIdToStationNode.get(station.getId());
     	stations.add(nodeToAdd);
-	}
-
-	public static List<RouteNode> generateRouteInfoForPedestrians(GeoPosition pedestrianStartPoint,
-			GeoPosition pedestrianGetOnStation) {
-		try {
-			throw new Exception("Not implemented!");
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-		return null;
 	}
 }

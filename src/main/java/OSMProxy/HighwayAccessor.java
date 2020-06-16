@@ -43,7 +43,7 @@ import org.slf4j.LoggerFactory;
  */
 public class HighwayAccessor {
 
-    public static Pair<List<Long>, List<RouteNode>> getOsmWayIdsAndPointList(String[] args, double fromLat, double fromLon, double toLat, double toLon) {
+    public static Pair<List<Long>, List<RouteNode>> getOsmWayIdsAndPointList(String[] args, double fromLat, double fromLon, double toLat, double toLon, boolean onFoot) {
         List<Long> osmWayIds = new ArrayList<>();
         List<RouteNode> pointList = new ArrayList<>();
     	
@@ -53,7 +53,7 @@ public class HighwayAccessor {
 
         GHResponse rsp = new GHResponse();
         List<Path> paths = graphHopper.calcPaths(new GHRequest(fromLat, fromLon, toLat, toLon).
-                setWeighting("fastest").setVehicle("car"), rsp);
+                setWeighting("fastest").setVehicle(onFoot ? "foot" : "car"), rsp);
         Path path0 = paths.get(0);
         
         long previousWayId = 0;

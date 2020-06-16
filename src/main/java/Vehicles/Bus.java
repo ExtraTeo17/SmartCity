@@ -24,7 +24,7 @@ public class Bus extends MovingObject {
 	private List<RouteNode> displayRoute;
 	private List<RouteNode> route;
 	private int index = 0;
-	private int speed = 400;
+	private int speed = 200;
 	private int closestLightIndex = -1;
 	private int closestStationIndex = -1;
 

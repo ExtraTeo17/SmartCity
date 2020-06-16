@@ -260,7 +260,7 @@ public class BusAgent extends Agent {
         return bus.getLine();
     }
 
-    public final Pair<StationNode, StationNode> getTwoSubsequentStations(final Random random) {
+    public final Pair<StationNode, StationNode> getTwoSubsequentStations(final Random random) { // TODO: Fix situation where bus route contains only one station and pedestrians tries to choose two
         List<StationNode> stationsOnRoute = bus.getStationNodesOnRoute();
         final int halfIndex = stationsOnRoute.size() / 2;
         return Pair.with(stationsOnRoute.get(random.nextInt(halfIndex)),
