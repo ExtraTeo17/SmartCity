@@ -290,7 +290,7 @@ public class MapWindow {
             waypointPainter.setRenderer(new CustomWaypointRenderer("cabriolet.png"));
             painters.add(waypointPainter);
         } catch (Exception e) {
-
+        	
         }
     }
 

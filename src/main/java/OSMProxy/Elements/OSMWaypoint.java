@@ -2,6 +2,8 @@ package OSMProxy.Elements;
 
 import org.jxmapviewer.viewer.GeoPosition;
 
+import OSMProxy.MapAccessManager;
+
 public class OSMWaypoint {
 	
 	private final String osmNodeRef;
@@ -26,5 +28,9 @@ public class OSMWaypoint {
 	
 	public final GeoPosition getPosition() {
 		return geoPos;
+	}
+
+	public boolean containedInCircle(int radius, double middleLat, double middleLon) {
+		return MapAccessManager.belongsToCircle(geoPos.getLatitude(), geoPos.getLongitude(), new GeoPosition(middleLat, middleLon), radius);
 	}
 }

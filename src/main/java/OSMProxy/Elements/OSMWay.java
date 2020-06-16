@@ -115,4 +115,8 @@ public class OSMWay extends OSMElement {
 		}
 		return null;
 	}
+
+	public boolean startsInCircle(int radius, double middleLat, double middleLon) {
+		return getWaypoint(0).containedInCircle(radius, middleLat, middleLon);
+	}
 }

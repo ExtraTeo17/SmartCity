@@ -4,7 +4,10 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
+import org.jxmapviewer.viewer.GeoPosition;
+
 import OSMProxy.Elements.OSMWay;
+import OSMProxy.MapAccessManager;
 import OSMProxy.Elements.OSMStation;
 import Routing.RouteNode;
 import Routing.Router;
@@ -59,5 +62,15 @@ public class BusInfo {
 		return stationsOnRouteOsmIds.get(stationsOnRouteOsmIds.size() - 1);
 	}
 
-	
+	public void filterStationsByCircle(double middleLat, double middleLon, int radius) {
+		List<Long> filteredStationOsmIds = new ArrayList<>();
+		for (Long osmStationId : stationsOnRouteOsmIds) {
+			OSMStation station = SmartCityAgent.osmIdToStationOSMNode.get(osmStationId);
+			if (MapAccessManager.belongsToCircle(station.getLat(), station.getLon(),
+					new GeoPosition(middleLat, middleLon), radius)) {
+				filteredStationOsmIds.add(osmStationId);
+			}
+		}
+		stationsOnRouteOsmIds = filteredStationOsmIds;
+	}
 }

@@ -720,7 +720,7 @@ public class MapAccessManager {
 		return crossroad.getChildNodes().item(index);
 	}
 
-	private static boolean belongsToCircle(double latToBelong, double lonToBelong, GeoPosition middlePoint, int radius) {
+	public static boolean belongsToCircle(double latToBelong, double lonToBelong, GeoPosition middlePoint, int radius) {
 		return (((latToBelong - middlePoint.getLatitude()) * (latToBelong - middlePoint.getLatitude()))
 				+ ((lonToBelong - middlePoint.getLongitude()) * (lonToBelong - middlePoint.getLongitude())))
 				< (radius * radius)*0.0000089*0.0000089;
@@ -828,7 +828,7 @@ public class MapAccessManager {
 					}
 				}
 		        try {
-		        	info.setRoute(MapAccessManager.parseOsmWay(getNodesViaOverpass(getBusWayOverpassQueryWithPayload(builder))));
+		        	info.setRoute(MapAccessManager.parseOsmWay(getNodesViaOverpass(getBusWayOverpassQueryWithPayload(builder)), radius, middleLat, middleLon));
 		        	
 		        } catch (Exception e) {
 		        	e.printStackTrace();
@@ -840,7 +840,6 @@ public class MapAccessManager {
 				String osmId = attributes.getNamedItem("id").getNodeValue();
 				String lat = attributes.getNamedItem("lat").getNodeValue();
 				String lon = attributes.getNamedItem("lon").getNodeValue();
-				
 				
 				if (!SmartCityAgent.osmIdToStationOSMNode.containsKey(Long.parseLong(osmId))) {
 					NodeList list_tags = item.getChildNodes();
@@ -864,10 +863,14 @@ public class MapAccessManager {
 			}
 		}
 		
+		for (BusInfo info : infoSet) {
+			info.filterStationsByCircle(middleLat, middleLon, radius);
+		}
+		
 		return infoSet;
 	}
 
-	private static List<OSMWay> parseOsmWay(Document nodesViaOverpass) {
+	private static List<OSMWay> parseOsmWay(Document nodesViaOverpass, int radius, double middleLat, double middleLon) {
 		  List<OSMWay> route = new ArrayList<>();
 		  Node osmRoot = nodesViaOverpass.getFirstChild();
 			NodeList osmXMLNodes = osmRoot.getChildNodes();
@@ -877,9 +880,8 @@ public class MapAccessManager {
 				if (item.getNodeName().equals("way")) 
 				{
 					OSMWay way = new OSMWay(item);
-					
-					route.add(way);
-					
+					if (way.startsInCircle(radius, middleLat, middleLon)) // TODO CORRECT POTENTIAL BUGS CAUSING ROUTE TO BE CUT INTO PIECES BECAUSE OF RZĄŻEWSKI CASE
+						route.add(way);
 				}
 		    }
 		return route;

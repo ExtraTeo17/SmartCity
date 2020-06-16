@@ -75,7 +75,7 @@ public final class Router { // BIG REFACTOR, MOVE GETMANAGERFORLIGHTS TO MAPACCE
                 minIndex = i;
             }
         }
-        if (minIndex == 0) {
+        if (minIndex <= 0) {
         	route.add(minIndex + 1, manager);
         	return;
         }
