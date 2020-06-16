@@ -96,8 +96,8 @@ public class OSMNode extends OSMElement {
 
 	public final boolean determineParentOrientationsTowardsCrossroad() {
 		for (final OSMWay way : parentWays) {
-			way.determineOrientationTowardsCrossroad(Long.toString(id));
-			if (!way.isOriented())
+			way.determineLightOrientationTowardsCrossroad(Long.toString(id));
+			if (!way.isLightOriented())
 				return false;
 		}
 		return true;

@@ -829,7 +829,6 @@ public class MapAccessManager {
 				}
 		        try {
 		        	info.setRoute(MapAccessManager.parseOsmWay(getNodesViaOverpass(getBusWayOverpassQueryWithPayload(builder)), radius, middleLat, middleLon));
-		        	
 		        } catch (Exception e) {
 		        	e.printStackTrace();
 		        }
@@ -874,17 +873,40 @@ public class MapAccessManager {
 		  List<OSMWay> route = new ArrayList<>();
 		  Node osmRoot = nodesViaOverpass.getFirstChild();
 			NodeList osmXMLNodes = osmRoot.getChildNodes();
-			for (int i = 1; i < osmXMLNodes.getLength(); i++) 
-			{
+			Pair<OSMWay, String> wayAdjacentNodeRef = determineInitialWayRelOrientation(osmXMLNodes);
+			String adjacentNodeRef = wayAdjacentNodeRef.getValue1();
+			boolean isFirst = true;
+			for (int i = 1; i < osmXMLNodes.getLength(); i++) {
 				Node item = osmXMLNodes.item(i);
-				if (item.getNodeName().equals("way")) 
-				{
-					OSMWay way = new OSMWay(item);
+				if (item.getNodeName().equals("way")) {
+					OSMWay way;
+					if (isFirst) {
+						way = wayAdjacentNodeRef.getValue0();
+						isFirst = false;
+					} else {
+						way = new OSMWay(item);
+						adjacentNodeRef = way.determineRelationOrientation(adjacentNodeRef);
+					}
 					if (way.startsInCircle(radius, middleLat, middleLon)) // TODO CORRECT POTENTIAL BUGS CAUSING ROUTE TO BE CUT INTO PIECES BECAUSE OF RZĄŻEWSKI CASE
 						route.add(way);
 				}
 		    }
 		return route;
+	}
+
+	private static Pair<OSMWay, String> determineInitialWayRelOrientation(final NodeList osmXMLNodes) {
+		String firstWayOsmNodeRef, lastWayOsmNodeRef;
+		List<OSMWay> twoFirstWays = new ArrayList<>();
+		OSMWay way = null;
+		int i = 0;
+		while (twoFirstWays.size() < 2) {
+			Node item = osmXMLNodes.item(++i);
+			if (item.getNodeName().equals("way")) {
+				way = new OSMWay(item);
+				twoFirstWays.add(way);
+			}
+		}
+		return Pair.with(way, twoFirstWays.get(0).determineRelationOrientation(twoFirstWays.get(1)));
 	}
 
 	private static void appendSingleBusWayOverpassQuery(StringBuilder query, long osmWayId) {

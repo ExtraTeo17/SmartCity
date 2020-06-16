@@ -10,9 +10,14 @@ import org.w3c.dom.NodeList;
 
 public class OSMWay extends OSMElement {
 	
-	public enum OSMWayOrientation {
+	public enum LightOrientation {
 		LIGHT_AT_ENTRY,
 		LIGHT_AT_EXIT
+	}
+	
+	public enum RelationOrientation {
+		HOMOSEXUAL,
+		HETEROSEXUAL
 	}
 	
 	private static final String YES = "yes";
@@ -20,7 +25,8 @@ public class OSMWay extends OSMElement {
 
 	private final List<OSMWaypoint> waypoints;
 	private final List<String> childNodeIds;
-	private OSMWayOrientation orientation = null;
+	private LightOrientation lightOrientation = null;
+	private RelationOrientation relationOrientation = null;
 	private boolean isOneWay;
 	
 	public OSMWay(final String id) {
@@ -81,12 +87,20 @@ public class OSMWay extends OSMElement {
 		return waypoints.size();
 	}
 	
-	public final boolean isOriented() {
-		return orientation != null;
+	public final boolean isLightOriented() {
+		return lightOrientation != null;
 	}
 	
-	public final OSMWayOrientation getOrientation() {
-		return orientation;
+	public final boolean isRelationOriented() {
+		return relationOrientation != null;
+	}
+	
+	public final LightOrientation getLightOrientation() {
+		return lightOrientation;
+	}
+	
+	public final RelationOrientation getRelationOrientation() {
+		return relationOrientation;
 	}
 
 	@Override
@@ -99,15 +113,57 @@ public class OSMWay extends OSMElement {
 		return builder.append("\n").toString();
 	}
 
-	public void determineOrientationTowardsCrossroad(final String osmLightId) {
+	public void determineLightOrientationTowardsCrossroad(final String osmLightId) {
 		if (waypoints.get(0).getOsmNodeRef().equals(osmLightId))
-			orientation = OSMWayOrientation.LIGHT_AT_ENTRY;
+			lightOrientation = LightOrientation.LIGHT_AT_ENTRY;
 		else if (waypoints.get(waypoints.size() - 1).getOsmNodeRef().equals(osmLightId))
-			orientation = OSMWayOrientation.LIGHT_AT_EXIT;
+			lightOrientation = LightOrientation.LIGHT_AT_EXIT;
+	}
+	
+	public String determineRelationOrientation(final String adjacentNodeRef) {
+		String firstWayFirstOsmNodeRef = getWaypoint(0).getOsmNodeRef();
+		String firstWayLastOsmNodeRef = getWaypoint(getWaypointCount() - 1).getOsmNodeRef();
+		if (firstWayFirstOsmNodeRef.equals(adjacentNodeRef)) {
+			relationOrientation = RelationOrientation.HETEROSEXUAL;
+			return firstWayLastOsmNodeRef;
+		} else if (firstWayLastOsmNodeRef.equals(adjacentNodeRef)) {
+			relationOrientation = RelationOrientation.HOMOSEXUAL;
+			return firstWayFirstOsmNodeRef;
+		} else {
+			try {
+				throw new Exception("This orientation is not yet known :(");
+			} catch (Exception e) {
+				e.printStackTrace();
+				return null;
+			}
+		}
+	}
+	
+	public String determineRelationOrientation(final OSMWay nextWay) {
+		String firstWayFirstOsmNodeRef = getWaypoint(0).getOsmNodeRef();
+		String firstWayLastOsmNodeRef = getWaypoint(getWaypointCount() - 1).getOsmNodeRef();
+		String secondWayFirstOsmNodeRef = nextWay.getWaypoint(0).getOsmNodeRef();
+		String secondWayLastOsmNodeRef = nextWay.getWaypoint(nextWay.getWaypointCount() - 1).getOsmNodeRef();
+		if (firstWayFirstOsmNodeRef.equals(secondWayFirstOsmNodeRef) ||
+				firstWayFirstOsmNodeRef.equals(secondWayLastOsmNodeRef)) {
+			relationOrientation = RelationOrientation.HOMOSEXUAL;
+			return firstWayFirstOsmNodeRef;
+		} else if (firstWayLastOsmNodeRef.equals(secondWayFirstOsmNodeRef) ||
+				firstWayLastOsmNodeRef.equals(secondWayLastOsmNodeRef)) {
+			relationOrientation = RelationOrientation.HETEROSEXUAL;
+			return firstWayLastOsmNodeRef;
+		} else {
+			try {
+				throw new Exception("This orientation is not yet known :(");
+			} catch (Exception e) {
+				e.printStackTrace();
+				return null;
+			}
+		}
 	}
 
 	public GeoPosition getLightNeighborPos() {
-		switch (orientation) {
+		switch (lightOrientation) {
 		case LIGHT_AT_ENTRY:
 			return waypoints.get(0 + 1).getPosition();
 		case LIGHT_AT_EXIT:

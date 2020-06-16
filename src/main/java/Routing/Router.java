@@ -10,9 +10,11 @@ import OSMProxy.MapAccessManager;
 import OSMProxy.Elements.OSMLight;
 import OSMProxy.Elements.OSMNode;
 import OSMProxy.Elements.OSMWay;
+import OSMProxy.Elements.OSMWay.RelationOrientation;
 import OSMProxy.Elements.OSMWaypoint;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -151,14 +153,38 @@ public final class Router { // BIG REFACTOR, MOVE GETMANAGERFORLIGHTS TO MAPACCE
     	List<RouteNode> RouteNodes_list = new ArrayList<>();
 		for (OSMWay el : router) {
 			osmWayIds_list.add(el.getId());
-			for(OSMWaypoint point : el.getWaypoints()) {
-				RouteNodes_list.add(new RouteNode(point.getLat(),point.getLon()));
-			}
+			addRouteNodesBasedOnOrientation(el, RouteNodes_list);
 		}
 		return new Pair<List<Long>, List<RouteNode>>(osmWayIds_list,RouteNodes_list);
 	}
+	
+	private static void addRouteNodesBasedOnOrientation(OSMWay el, List<RouteNode> routeNodes_list) {
+		if (el.getRelationOrientation() == RelationOrientation.HETEROSEXUAL) {
+			addRouteNodesToList(el.getWaypoints(), routeNodes_list);
+		} else if (el.getRelationOrientation() == RelationOrientation.HOMOSEXUAL) {
+			addRouteNodesToList(reverse(el.getWaypoints()), routeNodes_list);
+		} else {
+			try {
+				throw new Exception("Orientation was not known :(");
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		}
+	}
 
-    private static List<RouteNode> getAgentStationsForRoute(List<OSMNode> stations, List<RouteNode> route) {
+    private static List<OSMWaypoint> reverse(List<OSMWaypoint> waypoints) {
+		List<OSMWaypoint> waypointsCopy = new ArrayList<>(waypoints);
+		Collections.reverse(waypointsCopy);
+		return waypointsCopy;
+	}
+
+	private static void addRouteNodesToList(List<OSMWaypoint> waypoints, List<RouteNode> routeNodes_list) {
+		for (OSMWaypoint point : waypoints) {
+			routeNodes_list.add(new RouteNode(point.getLat(),point.getLon()));
+		}
+	}
+
+	private static List<RouteNode> getAgentStationsForRoute(List<OSMNode> stations, List<RouteNode> route) {
         List<RouteNode> managers = new ArrayList<>();
         for (OSMNode station : stations) {
           addStationNodeToList(managers, station, route);

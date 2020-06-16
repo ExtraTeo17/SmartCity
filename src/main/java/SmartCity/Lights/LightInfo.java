@@ -22,7 +22,7 @@ public class LightInfo {
 	}
 
 	private void fillLightPosition(OSMWay adjacentOsmWay) {
-		switch (adjacentOsmWay.getOrientation()) {
+		switch (adjacentOsmWay.getLightOrientation()) {
 		case LIGHT_AT_ENTRY:
 			position = new GeoPosition(adjacentOsmWay.getWaypoint(0 + 1).getLat(),
 					adjacentOsmWay.getWaypoint(0 + 1).getLon());
