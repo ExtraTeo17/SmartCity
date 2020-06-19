@@ -33,7 +33,7 @@ public class Light {
 	public Map<String, Instant> farAwayCarMap = new HashMap<>();
 	public Map<String, Instant> farAwayPedestrianMap = new HashMap<>();
 	public Queue<String> carQueue = new LinkedList<>();
-	private Queue<String> pedestrianQueue = new LinkedList<>();
+	public Queue<String> pedestrianQueue = new LinkedList<>();
 	private GeoPosition position;
 	private long adjacentOsmWayId;
 	private String adjacentCrossingOsmId1;

@@ -141,7 +141,7 @@ public class SmartCityAgent extends Agent {
         });
         view.add(busRoutes);
 
-        final JCheckBoxMenuItem pedestrian = new JCheckBoxMenuItem("Render bus routes", true);
+        final JCheckBoxMenuItem pedestrian = new JCheckBoxMenuItem("Render pedestrians", true);
         pedestrian.addItemListener(new ItemListener() {
             @Override
             public void itemStateChanged(ItemEvent e) {
@@ -150,7 +150,7 @@ public class SmartCityAgent extends Agent {
         });
         view.add(pedestrian);
 
-        final JCheckBoxMenuItem pedestrianRoutes = new JCheckBoxMenuItem("Render bus routes", true);
+        final JCheckBoxMenuItem pedestrianRoutes = new JCheckBoxMenuItem("Render pedestrian routes", true);
         pedestrianRoutes.addItemListener(new ItemListener() {
             @Override
             public void itemStateChanged(ItemEvent e) {
