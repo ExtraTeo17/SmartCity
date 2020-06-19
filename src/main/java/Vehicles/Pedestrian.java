@@ -18,7 +18,7 @@ public class Pedestrian extends MovingObject { // TODO: Remember to create a ded
     private List<RouteNode> routeBeforeBus, routeAfterBus;
     private List<RouteNode> route = new ArrayList<>();
     private int index = 0;
-    private int speed = 40;
+    private int speed = 600;
     private int closestLightIndex = 0;
     private int stationIndex = 0;
     public DrivingState state = DrivingState.STARTING;
