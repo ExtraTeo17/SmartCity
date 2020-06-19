@@ -39,10 +39,11 @@ public class RouteInfo {
 		lightOsmIds.add(Long.parseLong(lightOsmId));
 	}
 
-	public void determineRouteOrientationsAndFilterRelevantNodes() {
-		Integer startingNodeIndex = null;
-		for (int i = 0; i < ways.size() - 1; ++i) {
-			startingNodeIndex = ways.get(i).determineRouteOrientationAndFilterRelevantNodes(ways.get(i + 1), startingNodeIndex);
+	public void determineRouteOrientationsAndFilterRelevantNodes(String startingOsmNodeRef, String finishingOsmNodeRef) {
+		Integer startingNodeIndex = ways.get(0).determineRouteOrientationAndFilterRelevantNodes(ways.size() > 1 ? ways.get(1) : null, ways.get(0).indexOf(startingOsmNodeRef), null);
+		for (int i = 1; i < ways.size() - 1; ++i) {
+			startingNodeIndex = ways.get(i).determineRouteOrientationAndFilterRelevantNodes(ways.get(i + 1), startingNodeIndex, null);
 		}
+		ways.get(ways.size() - 1).determineRouteOrientationAndFilterRelevantNodes(null, startingNodeIndex, ways.get(ways.size() - 1).indexOf(finishingOsmNodeRef));
 	}
 }

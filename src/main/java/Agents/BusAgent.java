@@ -29,7 +29,6 @@ public class BusAgent extends Agent {
 
     private long agentId;
     private Bus bus;
-    
 
     @Override
     protected void setup() {

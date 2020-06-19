@@ -195,15 +195,21 @@ public class OSMWay extends OSMElement {
 		return getWaypoint(0).containedInCircle(radius, middleLat, middleLon);
 	}
 
-	public Integer determineRouteOrientationAndFilterRelevantNodes(OSMWay osmWay, Integer startingNodeIndex) {
+	public Integer determineRouteOrientationAndFilterRelevantNodes(OSMWay osmWay, Integer startingNodeIndex, Integer finishingNodeIndex) {
 		Pair<Pair<Integer, Integer>, Pair<Integer, Integer>> tangentialNodes = determineTangentialNodes(osmWay);
-		if (startingNodeIndex == null)
-			return determineStartingNodeRefAndFilterRelevantNodes(tangentialNodes);
-		else
+		if (startingNodeIndex == null) {
+			//return determineStartingNodeRefAndFilterRelevantNodes(tangentialNodes);
+			return filterRelevantNodes(startingNodeIndex == null ? getWaypointCount() - 1 : startingNodeIndex, tangentialNodes);
+		} else if (tangentialNodes == null) {
+			return filterRelevantNodes(startingNodeIndex, finishingNodeIndex == null ? 0 : finishingNodeIndex);
+		} else {
 			return filterRelevantNodes(startingNodeIndex, tangentialNodes);
+		}
 	}
 
 	private Pair<Pair<Integer, Integer>, Pair<Integer, Integer>> determineTangentialNodes(OSMWay osmWay) {
+		if (osmWay == null)
+			return null;
 		Pair<Pair<Integer, Integer>, Pair<Integer, Integer>> tangentialNodesOursAndNext = Pair.with(null, null);
 		for (int i = 0; i < osmWay.getWaypointCount(); ++i) {
 			for (int j = 0; j < getWaypointCount(); ++j) {
@@ -245,22 +251,35 @@ public class OSMWay extends OSMElement {
 	}
 
 	private Integer filterRelevantNodes(int index1, Pair<Integer, Integer> index2pair) {
-		int index2 = index2pair.getValue0();
-		if (index1 > index2) {
-			int tmp = index1;
-			index1 = index2;
-			index2 = tmp;
+		filterRelevantNodes(index1, index2pair.getValue0());
+		return index2pair.getValue1();
+	}
+
+	private Integer filterRelevantNodes(Integer startingNodeIndex, Integer finishingNodeIndex) {
+		if (startingNodeIndex > finishingNodeIndex) {
+			int tmp = startingNodeIndex;
+			startingNodeIndex = finishingNodeIndex;
+			finishingNodeIndex = tmp;
 			routeOrientation = RouteOrientation.HOMOSEXUAL;
 		}
 		final List<OSMWaypoint> newWaypoints = new ArrayList<>();
-		for (int i = index1; i < index2; ++i) {
+		for (int i = startingNodeIndex; i <= finishingNodeIndex; ++i) {
 			newWaypoints.add(getWaypoint(i));
 		}
 		waypoints = newWaypoints;
-		return index2pair.getValue1();
+		return null;
 	}
 
 	private int wayCountBetween(int index1, int index2) {
 		return Math.abs(index1 - index2);
+	}
+
+	public Integer indexOf(final String osmNodeRef) {
+		for (int i = 0; i < getWaypointCount(); ++i) {
+			if (waypoints.get(i).getOsmNodeRef().equals(osmNodeRef)) {
+				return i;
+			}
+		}
+		return null;
 	}
 }

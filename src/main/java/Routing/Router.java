@@ -37,24 +37,25 @@ public final class Router {
 		return routeWithMgrs;
 	}
     
-    public static List<RouteNode> generateRouteInfoForPedestriansBeta(GeoPosition pointA, GeoPosition pointB) {
+    public static List<RouteNode> generateRouteInfoForPedestriansBeta(GeoPosition pointA, GeoPosition pointB, // TODO: Improve routing to consider random OSM nodes as start/end points instead of random lat/lons
+    		String startingOsmNodeRef, String finishingOsmNodeRef) {
     	Pair<List<Long>, List<RouteNode>> osmWayIdsAndPointList = findRoute(pointA, pointB, true);
     	final RouteInfo routeInfo = MapAccessManager.sendMultipleWayAndItsNodesQuery(osmWayIdsAndPointList.getValue0());
-    	return createRouteNodeList(routeInfo, true);
+    	return createRouteNodeList(routeInfo, startingOsmNodeRef, finishingOsmNodeRef);
     }
 
-	private static List<RouteNode> createRouteNodeList(RouteInfo routeInfo, boolean transformCrossingsToWays) {
-		routeInfo.determineRouteOrientationsAndFilterRelevantNodes();
+	private static List<RouteNode> createRouteNodeList(RouteInfo routeInfo, String startingOsmNodeRef, String finishingOsmNodeRef) {
+		routeInfo.determineRouteOrientationsAndFilterRelevantNodes(startingOsmNodeRef, finishingOsmNodeRef);
 		List<RouteNode> routeNodes = new ArrayList<>();
 		List<Long> crossingOsmIdsToTransform = new ArrayList<>();
 		for (int i = 0; i < routeInfo.getWayCount(); ++i) {
 			if (routeInfo.getWay(i).getRouteOrientation() == RouteOrientation.HETEROSEXUAL) {
 				for (int j = 0; j < routeInfo.getWay(i).getWaypointCount(); ++j) {
-					addRouteNode(routeNodes, routeInfo.getWay(i).getWaypoint(j), routeInfo, crossingOsmIdsToTransform, transformCrossingsToWays);
+					addRouteNode(routeNodes, routeInfo.getWay(i).getWaypoint(j), routeInfo, crossingOsmIdsToTransform);
 				}
 			} else {
 				for (int j = routeInfo.getWay(i).getWaypointCount() - 1; j >= 0; --j) {
-					addRouteNode(routeNodes, routeInfo.getWay(i).getWaypoint(j), routeInfo, crossingOsmIdsToTransform, transformCrossingsToWays);
+					addRouteNode(routeNodes, routeInfo.getWay(i).getWaypoint(j), routeInfo, crossingOsmIdsToTransform);
 				}
 			}
 		}
@@ -62,7 +63,7 @@ public final class Router {
 	}
 
 	private static void addRouteNode(List<RouteNode> routeNodes, OSMWaypoint waypoint, RouteInfo routeInfo,
-			List<Long> crossingOsmIdsToTransform, boolean transformCrossingsToWays) {
+			List<Long> crossingOsmIdsToTransform) {
 		if (routeInfo.removeIfContains(waypoint.getOsmNodeRef())) {
 			routeNodes.add(SmartCityAgent.crossingOsmIdToLightManagerNode.get(Long.parseLong(waypoint.getOsmNodeRef())));
 		} else {

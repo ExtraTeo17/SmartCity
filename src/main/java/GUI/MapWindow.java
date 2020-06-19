@@ -73,10 +73,10 @@ public class MapWindow {
     private Instant simulationStart;
     public boolean renderPedestrians = true;
     public boolean renderPedestrianRoutes = true;
-    public boolean renderCars = true;
-    public boolean renderCarRoutes = true;
-    public boolean renderBuses = true;
-    public boolean renderBusRoutes = true;
+    public boolean renderCars = false;
+    public boolean renderCarRoutes = false;
+    public boolean renderBuses = false;
+    public boolean renderBusRoutes = false;
     public boolean renderZone = true;
     public boolean renderLights = true;
     public boolean renderStations = true;
@@ -707,14 +707,12 @@ public class MapWindow {
             final StationNode startStation = stationNodePairAndBusLine.getValue0().getValue0();
             final StationNode finishStation = stationNodePairAndBusLine.getValue0().getValue1();
             final Pair<Double, Double> geoPosInFirstStationCircle = generateRandomGeoPosOffsetWithRadius(MapWindow.PEDESTRIAN_STATION_RADIUS);
-            GeoPosition pedestrianStartPoint = new GeoPosition(startStation.getLatitude() + geoPosInFirstStationCircle.getValue0(),
-                    startStation.getLongitude() + geoPosInFirstStationCircle.getValue1());
+            GeoPosition pedestrianStartPoint = new GeoPosition(52.202739, 20.866067/*startStation.getLatitude() + geoPosInFirstStationCircle.getValue0(), startStation.getLongitude() + geoPosInFirstStationCircle.getValue1()*/);
             GeoPosition pedestrianGetOnStation = new GeoPosition(startStation.getLatitude(), startStation.getLongitude());
             GeoPosition pedestrianDisembarkStation = new GeoPosition(finishStation.getLatitude(), finishStation.getLongitude());
-            GeoPosition pedestrianFinishPoint = new GeoPosition(finishStation.getLatitude() + geoPosInFirstStationCircle.getValue0(),
-                    finishStation.getLongitude() + geoPosInFirstStationCircle.getValue1());
-            List<RouteNode> routeToStation = Router.generateRouteInfoForPedestriansBeta(pedestrianStartPoint, pedestrianGetOnStation);
-            List<RouteNode> routeFromStation = Router.generateRouteInfoForPedestriansBeta(pedestrianDisembarkStation, pedestrianFinishPoint);
+            GeoPosition pedestrianFinishPoint = new GeoPosition(52.204369, 20.860928/*finishStation.getLatitude() + geoPosInFirstStationCircle.getValue0(), finishStation.getLongitude() + geoPosInFirstStationCircle.getValue1()*/);
+            List<RouteNode> routeToStation = Router.generateRouteInfoForPedestriansBeta(pedestrianStartPoint, pedestrianGetOnStation, null, startStation.getOsmStationId());
+            List<RouteNode> routeFromStation = Router.generateRouteInfoForPedestriansBeta(pedestrianDisembarkStation, pedestrianFinishPoint, finishStation.getOsmStationId(), null);
             final Pedestrian pedestrian = new Pedestrian(routeToStation, routeFromStation, startStation.getStationId(), stationNodePairAndBusLine.getValue1());
             SmartCityAgent.ActivateAgent(SmartCity.SmartCityAgent.tryAddNewPedestrianAgent(pedestrian));
         }
@@ -740,7 +738,7 @@ public class MapWindow {
     }
 
     private Pair<Double, Double> generateRandomGeoPosOffsetWithRadius(final int radius) {
-        double angle = random.nextDouble() * Math.PI * 2;
+        double angle = /*random.nextDouble()*/ 123 * Math.PI * 2;
         double lat = Math.sin(angle) * radius * 0.0000089;
         double lon = Math.cos(angle) * radius * 0.0000089 * Math.cos(lat);
         return Pair.with(lat, lon);
