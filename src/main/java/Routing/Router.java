@@ -44,6 +44,16 @@ public final class Router {
     	return createRouteNodeList(routeInfo, startingOsmNodeRef, finishingOsmNodeRef);
     }
 
+	public static List<RouteNode> generateRouteInfoForBuses(List<OSMWay> router, List<Long> osmStationIds) {
+	    Pair<List<Long>, List<RouteNode>> osmWayIdsAndPointList = findBusRoute(router);
+	    List<OSMLight> lightsOnRoute = MapAccessManager.sendFullTrafficSignalQuery(osmWayIdsAndPointList.getValue0());
+	    List<RouteNode> managers = getManagersForLights(lightsOnRoute, osmWayIdsAndPointList.getValue1());
+	    List<RouteNode> stationNodes = getAgentStationsForRoute(getOSMNodesForStations(osmStationIds), osmWayIdsAndPointList.getValue1());
+	    managers.addAll(stationNodes);
+	    List<RouteNode> routeWithManagers = getRouteWithAdditionalNodes(osmWayIdsAndPointList.getValue1(), managers);
+	    return routeWithManagers;
+    }
+
 	private static List<RouteNode> createRouteNodeList(RouteInfo routeInfo, String startingOsmNodeRef, String finishingOsmNodeRef) {
 		routeInfo.determineRouteOrientationsAndFilterRelevantNodes(startingOsmNodeRef, finishingOsmNodeRef);
 		List<RouteNode> routeNodes = new ArrayList<>();
@@ -70,16 +80,6 @@ public final class Router {
 			routeNodes.add(new RouteNode(waypoint.getPosition()));
 		}
 	}
-
-	public static List<RouteNode> generateRouteInfoForBuses(List<OSMWay> router, List<Long> osmStationIds) {
-	    Pair<List<Long>, List<RouteNode>> osmWayIdsAndPointList = findBusRoute(router);
-	    List<OSMLight> lightsOnRoute = MapAccessManager.sendFullTrafficSignalQuery(osmWayIdsAndPointList.getValue0());
-	    List<RouteNode> managers = getManagersForLights(lightsOnRoute, osmWayIdsAndPointList.getValue1());
-	    List<RouteNode> stationNodes = getAgentStationsForRoute(getOSMNodesForStations(osmStationIds), osmWayIdsAndPointList.getValue1());
-	    managers.addAll(stationNodes);
-	    List<RouteNode> routeWithManagers = getRouteWithAdditionalNodes(osmWayIdsAndPointList.getValue1(), managers);
-	    return routeWithManagers;
-    }
     
     /////////////////////////////////////////////////////////////
     //  HELPERS
