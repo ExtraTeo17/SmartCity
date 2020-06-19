@@ -141,6 +141,24 @@ public class SmartCityAgent extends Agent {
         });
         view.add(busRoutes);
 
+        final JCheckBoxMenuItem pedestrian = new JCheckBoxMenuItem("Render bus routes", true);
+        pedestrian.addItemListener(new ItemListener() {
+            @Override
+            public void itemStateChanged(ItemEvent e) {
+                window.renderPedestrians = pedestrian.getState();
+            }
+        });
+        view.add(pedestrian);
+
+        final JCheckBoxMenuItem pedestrianRoutes = new JCheckBoxMenuItem("Render bus routes", true);
+        pedestrianRoutes.addItemListener(new ItemListener() {
+            @Override
+            public void itemStateChanged(ItemEvent e) {
+                window.renderPedestrianRoutes = pedestrianRoutes.getState();
+            }
+        });
+        view.add(pedestrianRoutes);
+
         final JCheckBoxMenuItem lights = new JCheckBoxMenuItem("Render lights", true);
         lights.addItemListener(new ItemListener() {
             @Override

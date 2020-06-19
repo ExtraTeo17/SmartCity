@@ -112,20 +112,20 @@ public class SimpleCrossroad extends Crossroad {
 						}
 					}
 				}
+				else
+				{
+					Instant current_time = Instant.now();
+					for (Instant time_of_pedestrian: light.farAwayPedestrianMap.values()) {
+						// If current time + EXTEND_TIME > time_of_car
+						if (current_time.plusSeconds(EXTEND_TIME).isAfter(time_of_pedestrian)) {
+							System.out.println("---------------------------------------------WHY WE should extend "+ time_of_pedestrian +"----------Curent time"+current_time);
+							return true;
+						}
+					}
+				}
 			}
 			return false;
 		}
-	}
-
-	@Override
-	public void addPedestrianToQueue(String pedestrianName, long adjacentOsmWayId) {
-		// TODO Auto-generated method stub
-	}
-
-	@Override
-	public void removePedestrianFromQueue(String pedestrianName, long adjacentOsmWayId) {
-		// TODO Auto-generated method stub
-		
 	}
 
 	@Override
@@ -163,10 +163,6 @@ public class SimpleCrossroad extends Crossroad {
 					result.addCarGrantedPassthrough(carName);
 		return result;
 	}
-	
-	/*private void switchLightsIfRed(SimpleLightGroup group) {
-		group.
-	}*/
 
 	@Override
 	public boolean isLightGreen(long adjacentOsmWayId) {
@@ -217,5 +213,37 @@ public class SimpleCrossroad extends Crossroad {
 	@Override
 	public void removeCarFromQueue(long adjacentOsmWayId) {
 		lights.get(adjacentOsmWayId).removeCarFromQueue();
+	}
+
+
+	@Override
+	public void addPedestrianToQueue(String pedestrianName, long adjacentOsmWayId) {
+		lights.get(adjacentOsmWayId).addPedestrianToQueue(pedestrianName);
+	}
+
+	@Override
+	public void addPedestrianToFarAwayQueue(String pedestrianName, long adjacentOsmWayId, Instant journeyTime) {
+		try {
+			lights.get(adjacentOsmWayId).addPedestrianToFarAwayQueue(pedestrianName, journeyTime);
+		} catch (Exception e) {
+			System.out.println("ADD");
+			System.out.println(adjacentOsmWayId);
+			for (Entry<Long, Light> l : lights.entrySet()) {
+				System.out.println("-------------");
+				System.out.println(l.getKey());
+				System.out.println(l.getValue().getAdjacentOSMWayId());
+			}
+			System.out.println(pedestrianName);
+		}
+	}
+
+	@Override
+	public void removePedestrianFromQueue(long adjacentOsmWayId) {
+		lights.get(adjacentOsmWayId).removePedestrianFromQueue();
+	}
+
+	@Override
+	public void removePedestrianFromFarAwayQueue(String pedestrianName, long adjacentOsmWayId) {
+		lights.get(adjacentOsmWayId).removePedestrianFromFarAwayQueue(pedestrianName);
 	}
 }
