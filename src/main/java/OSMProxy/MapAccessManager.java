@@ -43,6 +43,7 @@ import OSMProxy.Elements.OSMLight;
 import OSMProxy.Elements.OSMNode;
 import OSMProxy.Elements.OSMWay;
 import OSMProxy.Elements.OSMStation;
+import Routing.RouteInfo;
 import Routing.RouteNode;
 import SmartCity.SmartCityAgent;
 import SmartCity.Buses.BrigadeInfo;
@@ -237,30 +238,57 @@ public class MapAccessManager {
 		}
 		return routeNodes;
 	}
-	   private static void parseBusInfo(Map<String, BrigadeInfo> brigadeNrToBrigadeInfo, OSMStation station, JSONObject jsonObject) {
-	        JSONArray msg = (JSONArray) jsonObject.get("result");
-	        Iterator iterator = msg.iterator();
-	        while (iterator.hasNext()) {
-	            JSONObject values =  (JSONObject) iterator.next();
-	            JSONArray valuesArray = (JSONArray) values.get("values");
-	            Iterator values_iterator = valuesArray.iterator();
-	            String currentBrigadeNr = "";
-	            while (values_iterator.hasNext()) {
-	                JSONObject valueObject =  (JSONObject) values_iterator.next();
-	                String key = (String)valueObject.get("key");
-	                String value = (String)valueObject.get("value");
-	                if (key.equals("brygada")) {
-	                    currentBrigadeNr = value;
-	                    if (!brigadeNrToBrigadeInfo.containsKey(value)) {
-	                        brigadeNrToBrigadeInfo.put(value, new BrigadeInfo(value));
-	                    }
-	                }
-	                else if (key.equals("czas")) {
-	                     brigadeNrToBrigadeInfo.get(currentBrigadeNr).addToTimetable(station.getId(), value);
-	                }
-	            }
-	        }
-	    }
+	
+	private static RouteInfo parseWayAndNodes(Document nodesViaOverpass) {
+		final RouteInfo info = new RouteInfo();
+		Node osmRoot = nodesViaOverpass.getFirstChild();
+		NodeList osmXMLNodes = osmRoot.getChildNodes();
+		for (int i = 1; i < osmXMLNodes.getLength(); i++) {
+			Node item = osmXMLNodes.item(i);
+			if (item.getNodeName().equals("way")) {
+				info.addWay(new OSMWay(item));
+			} else if (item.getNodeName().equals("node")) { // TODO: for further future: add support for rare way-traffic-signal-crossings cases
+				NodeList nodeChildren = item.getChildNodes();
+				for (int j = 0; j < nodeChildren.getLength(); ++j) {
+					Node nodeChild = nodeChildren.item(j);
+					if (nodeChild.getNodeName().equals("tag") &&
+							nodeChild.getAttributes().getNamedItem("k").getNodeValue().equals("crossing") &&
+							nodeChild.getAttributes().getNamedItem("v").getNodeValue().equals("traffic_signals")) {
+						info.addLightOsmId(item.getAttributes().getNamedItem("id").getNodeValue());
+					}
+				}
+			}
+		}
+		return info;
+	}
+	
+
+   private static void parseBusInfo(Map<String, BrigadeInfo> brigadeNrToBrigadeInfo, OSMStation station, JSONObject jsonObject) {
+        JSONArray msg = (JSONArray) jsonObject.get("result");
+        Iterator iterator = msg.iterator();
+        while (iterator.hasNext()) {
+            JSONObject values =  (JSONObject) iterator.next();
+            JSONArray valuesArray = (JSONArray) values.get("values");
+            Iterator values_iterator = valuesArray.iterator();
+            String currentBrigadeNr = "";
+            while (values_iterator.hasNext()) {
+                JSONObject valueObject =  (JSONObject) values_iterator.next();
+                String key = (String)valueObject.get("key");
+                String value = (String)valueObject.get("value");
+                if (key.equals("brygada")) {
+                    currentBrigadeNr = value;
+                    if (!brigadeNrToBrigadeInfo.containsKey(value)) {
+                        brigadeNrToBrigadeInfo.put(value, new BrigadeInfo(value));
+                    }
+                }
+                else if (key.equals("czas")) {
+                     brigadeNrToBrigadeInfo.get(currentBrigadeNr).addToTimetable(station.getId(), value);
+                }
+            }
+        }
+    }
+		
+	   
 	/*private static void parseBusInfo(Map<String, BrigadeInfo> brigadeNrToBrigadeInfo, Station station, JSONObject jsonObject) {
         JSONArray msg = (JSONArray) jsonObject.get("result");
         Iterator<JSONArray> iterator = msg.iterator();
@@ -381,10 +409,20 @@ public class MapAccessManager {
 			nodes = MapAccessManager.getLights(getNodesViaOverpass(getFullTrafficSignalQuery(osmWayIds)));
 		} catch (Exception e) {
 			e.printStackTrace();
-		} finally { }
+		}
 		return nodes;
 	}
 	
+	public static RouteInfo sendMultipleWayAndItsNodesQuery(List<Long> osmWayIds) {
+		RouteInfo info = null;
+		try {
+			info = MapAccessManager.parseWayAndNodes(getNodesViaOverpass(getMultipleWayAndItsNodesQuery(osmWayIds)));
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return info;
+	}
+
 	public static List<OSMStation> sendStationOverpassQuery(String query) {
 		List<OSMStation> nodes = new ArrayList<>();
 		try {
@@ -433,6 +471,24 @@ public class MapAccessManager {
 		}
 		builder.append("</osm-script>");
 		return builder.toString();
+	}
+	
+	private static String getMultipleWayAndItsNodesQuery(List<Long> osmWayIds) {
+		StringBuilder builder = new StringBuilder();
+		builder.append("<osm-script>");
+		for (long id : osmWayIds) {
+			builder.append(getSingleTrafficSignalQuery(id));
+		}
+		builder.append("</osm-script>");
+		return builder.toString();
+	}
+	
+	private static String getSingleWayAndItsNodesQuery(long osmWayId) {
+		return "<id-query type=\"way\" ref=\"" + osmWayId + "\" into=\"minor\"/>\r\n" + 
+				"  <item from=\"minor\" into=\"_\"/>\r\n" + 
+				"  <print e=\"\" from=\"_\" geometry=\"full\" ids=\"yes\" limit=\"\" mode=\"body\" n=\"\" order=\"id\" s=\"\" w=\"\"/>\r\n" + 
+				"  <recurse from=\"minor\" type=\"way-node\"/>\r\n" + 
+				"  <print e=\"\" from=\"_\" geometry=\"skeleton\" ids=\"yes\" limit=\"\" mode=\"tags\" n=\"\" order=\"id\" s=\"\" w=\"\"/>\r\n";
 	}
 	
 	private static String getSingleWayAndItsTrafficSignalsQuery(long osmWayId) {

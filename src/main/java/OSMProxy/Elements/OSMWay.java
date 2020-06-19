@@ -3,6 +3,7 @@ package OSMProxy.Elements;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.javatuples.Pair;
 import org.jxmapviewer.viewer.GeoPosition;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
@@ -20,13 +21,19 @@ public class OSMWay extends OSMElement {
 		HETEROSEXUAL
 	}
 	
+	public enum RouteOrientation {
+		HOMOSEXUAL,
+		HETEROSEXUAL
+	}
+	
 	private static final String YES = "yes";
 	private static final String NO = "no";
 
-	private final List<OSMWaypoint> waypoints;
+	private List<OSMWaypoint> waypoints;
 	private final List<String> childNodeIds;
 	private LightOrientation lightOrientation = null;
 	private RelationOrientation relationOrientation = null;
+	private RouteOrientation routeOrientation = RouteOrientation.HETEROSEXUAL;
 	private boolean isOneWay;
 	
 	public OSMWay(final String id) {
@@ -83,6 +90,14 @@ public class OSMWay extends OSMElement {
 		return waypoints.get(i);
 	}
 	
+	public final OSMWaypoint getFirstWaypoint() {
+		return getWaypoint(0);
+	}
+	
+	public final OSMWaypoint getLastWaypoint() {
+		return getWaypoint(getWaypointCount() - 1);
+	}
+	
 	public final int getWaypointCount() {
 		return waypoints.size();
 	}
@@ -101,6 +116,10 @@ public class OSMWay extends OSMElement {
 	
 	public final RelationOrientation getRelationOrientation() {
 		return relationOrientation;
+	}
+	
+	public final RouteOrientation getRouteOrientation() {
+		return routeOrientation;
 	}
 
 	@Override
@@ -174,5 +193,74 @@ public class OSMWay extends OSMElement {
 
 	public boolean startsInCircle(int radius, double middleLat, double middleLon) {
 		return getWaypoint(0).containedInCircle(radius, middleLat, middleLon);
+	}
+
+	public Integer determineRouteOrientationAndFilterRelevantNodes(OSMWay osmWay, Integer startingNodeIndex) {
+		Pair<Pair<Integer, Integer>, Pair<Integer, Integer>> tangentialNodes = determineTangentialNodes(osmWay);
+		if (startingNodeIndex == null)
+			return determineStartingNodeRefAndFilterRelevantNodes(tangentialNodes);
+		else
+			return filterRelevantNodes(startingNodeIndex, tangentialNodes);
+	}
+
+	private Pair<Pair<Integer, Integer>, Pair<Integer, Integer>> determineTangentialNodes(OSMWay osmWay) {
+		Pair<Pair<Integer, Integer>, Pair<Integer, Integer>> tangentialNodesOursAndNext = Pair.with(null, null);
+		for (int i = 0; i < osmWay.getWaypointCount(); ++i) {
+			for (int j = 0; j < getWaypointCount(); ++j) {
+				if (osmWay.getWaypoint(i).getOsmNodeRef().equals(getWaypoint(j).getOsmNodeRef())) {
+					if (tangentialNodesOursAndNext.getValue0() == null) {
+						tangentialNodesOursAndNext.setAt0(Pair.with(j, i));
+					} else if (tangentialNodesOursAndNext.getValue1() == null) {
+						tangentialNodesOursAndNext.setAt1(Pair.with(j, i));
+					} else {
+						return tangentialNodesOursAndNext;
+					}
+				}
+			}
+		}
+		return tangentialNodesOursAndNext;
+	}
+
+	private Integer determineStartingNodeRefAndFilterRelevantNodes(Pair<Pair<Integer, Integer>, Pair<Integer, Integer>> tangentialNodes) {
+		final int startFirstCount = wayCountBetween(0, tangentialNodes.getValue0().getValue0());
+		final int endFirstCount = wayCountBetween(getWaypointCount() - 1, tangentialNodes.getValue0().getValue0());
+		final int startSecondCount = wayCountBetween(0, tangentialNodes.getValue1().getValue0());
+		final int endSecondCount = wayCountBetween(getWaypointCount() - 1, tangentialNodes.getValue1().getValue0());
+		if ((startFirstCount < endFirstCount && startFirstCount < endSecondCount) ||
+				startSecondCount < endFirstCount && startSecondCount < endSecondCount) {
+			return filterRelevantNodes(0, tangentialNodes);
+		} else {
+			return filterRelevantNodes(getWaypointCount() - 1, tangentialNodes);
+		}
+	}
+
+	private Integer filterRelevantNodes(Integer startingNodeIndex, Pair<Pair<Integer, Integer>, Pair<Integer, Integer>> tangentialNodes) {
+		if (tangentialNodes.getValue1() != null &&
+				wayCountBetween(startingNodeIndex, tangentialNodes.getValue1().getValue0()) <
+				wayCountBetween(startingNodeIndex, tangentialNodes.getValue0().getValue0())) {
+			return filterRelevantNodes(startingNodeIndex, tangentialNodes.getValue1());
+		} else {
+			return filterRelevantNodes(startingNodeIndex, tangentialNodes.getValue0());
+		}
+	}
+
+	private Integer filterRelevantNodes(int index1, Pair<Integer, Integer> index2pair) {
+		int index2 = index2pair.getValue0();
+		if (index1 > index2) {
+			int tmp = index1;
+			index1 = index2;
+			index2 = tmp;
+			routeOrientation = RouteOrientation.HOMOSEXUAL;
+		}
+		final List<OSMWaypoint> newWaypoints = new ArrayList<>();
+		for (int i = index1; i < index2; ++i) {
+			newWaypoints.add(getWaypoint(i));
+		}
+		waypoints = newWaypoints;
+		return index2pair.getValue1();
+	}
+
+	private int wayCountBetween(int index1, int index2) {
+		return Math.abs(index1 - index2);
 	}
 }

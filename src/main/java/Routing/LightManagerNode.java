@@ -5,7 +5,7 @@ public class LightManagerNode extends RouteNode {
 	private long lightManagerId;
 	private long osmWayId;
 	
-	public LightManagerNode(double lat, double lon, long osmWayId, long lightManagerId) {
+	public LightManagerNode(double lat, double lon, Long osmWayId, long lightManagerId) {
 		super(lat, lon);
 		this.lightManagerId = lightManagerId;
 		this.osmWayId=osmWayId;
@@ -14,9 +14,15 @@ public class LightManagerNode extends RouteNode {
 	public long getLightManagerId() {
 		return lightManagerId;
 	}
+	
 	public long getOsmWayId() {
 		return osmWayId;
 	}
+	
+	public void setOsmWayId(final long osmWayId) {
+		this.osmWayId = osmWayId;
+	}
+	
 	@Override
 	public boolean equals(Object obj) {
 		LightManagerNode node = (LightManagerNode)obj;

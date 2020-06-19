@@ -10,10 +10,12 @@ import OSMProxy.Elements.OSMLight;
 import OSMProxy.Elements.OSMNode;
 import OSMProxy.Elements.OSMWay;
 import OSMProxy.Elements.OSMWay.RelationOrientation;
+import OSMProxy.Elements.OSMWay.RouteOrientation;
 import OSMProxy.Elements.OSMWaypoint;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Iterator;
 import java.util.List;
 
 public final class Router {
@@ -26,12 +28,46 @@ public final class Router {
         return routeWithManagers;
     }
 
+    @Deprecated
 	public static List<RouteNode> generateRouteInfoForPedestrians(GeoPosition pointA, GeoPosition pointB) { // TODO: Merge with function for cars if testing proves they are identical
 		Pair<List<Long>, List<RouteNode>> osmWayIdsAndPointList = findRoute(pointA, pointB, true);
 		final List<OSMLight> lightInfo = MapAccessManager.sendFullTrafficSignalQuery(osmWayIdsAndPointList.getValue0());
 		List<RouteNode> managers = getManagersForLights(lightInfo, osmWayIdsAndPointList.getValue1());
 		List<RouteNode> routeWithMgrs = getRouteWithAdditionalNodes(osmWayIdsAndPointList.getValue1(), managers);
 		return routeWithMgrs;
+	}
+    
+    public static List<RouteNode> generateRouteInfoForPedestriansBeta(GeoPosition pointA, GeoPosition pointB) {
+    	Pair<List<Long>, List<RouteNode>> osmWayIdsAndPointList = findRoute(pointA, pointB, true);
+    	final RouteInfo routeInfo = MapAccessManager.sendMultipleWayAndItsNodesQuery(osmWayIdsAndPointList.getValue0());
+    	return createRouteNodeList(routeInfo, true);
+    }
+
+	private static List<RouteNode> createRouteNodeList(RouteInfo routeInfo, boolean transformCrossingsToWays) {
+		routeInfo.determineRouteOrientationsAndFilterRelevantNodes();
+		List<RouteNode> routeNodes = new ArrayList<>();
+		List<Long> crossingOsmIdsToTransform = new ArrayList<>();
+		for (int i = 0; i < routeInfo.getWayCount(); ++i) {
+			if (routeInfo.getWay(i).getRouteOrientation() == RouteOrientation.HETEROSEXUAL) {
+				for (int j = 0; j < routeInfo.getWay(i).getWaypointCount(); ++j) {
+					addRouteNode(routeNodes, routeInfo.getWay(i).getWaypoint(j), routeInfo, crossingOsmIdsToTransform, transformCrossingsToWays);
+				}
+			} else {
+				for (int j = routeInfo.getWay(i).getWaypointCount() - 1; j >= 0; --j) {
+					addRouteNode(routeNodes, routeInfo.getWay(i).getWaypoint(j), routeInfo, crossingOsmIdsToTransform, transformCrossingsToWays);
+				}
+			}
+		}
+		correctLMsOsmWayIds(crossingOsmIdsToTransform, routeNodes);
+		return routeNodes;
+	}
+
+	private static void addRouteNode(List<RouteNode> routeNodes, OSMWaypoint waypoint, RouteInfo routeInfo,
+			List<Long> crossingOsmIdsToTransform, boolean transformCrossingsToWays) {
+		RouteNode nodeToAdd = null;
+		if (routeInfo.removeIfContains(waypoint.getOsmNodeRef())) {
+			nodeToAdd = new LightManagerNode(waypoint.getLat(), waypoint.getLon(), null, )
+		}
 	}
 
 	public static List<RouteNode> generateRouteInfoForBuses(List<OSMWay> router, List<Long> osmStationIds) {
