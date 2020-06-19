@@ -60,6 +60,7 @@ public class SmartCityAgent extends Agent {
     public static boolean lightManagersUnderConstruction = false;
     //public static Map<Long, LightManagerNode> lightIdToLightManagerNode = new HashMap<>();
     public static Map<Pair<Long, Long>, LightManagerNode> wayIdLightIdToLightManagerNode = new HashMap<>();
+	public static Map<Long, LightManagerNode> crossingOsmIdToLightManagerNode = new HashMap<>();
     public static Map<Long, StationNode> osmStationIdToStationNode = new HashMap<>();
     private static long nextLightManagerId;
     private static long nextStationAgentId;

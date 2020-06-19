@@ -58,15 +58,15 @@ public final class Router {
 				}
 			}
 		}
-		correctLMsOsmWayIds(crossingOsmIdsToTransform, routeNodes);
 		return routeNodes;
 	}
 
 	private static void addRouteNode(List<RouteNode> routeNodes, OSMWaypoint waypoint, RouteInfo routeInfo,
 			List<Long> crossingOsmIdsToTransform, boolean transformCrossingsToWays) {
-		RouteNode nodeToAdd = null;
 		if (routeInfo.removeIfContains(waypoint.getOsmNodeRef())) {
-			nodeToAdd = new LightManagerNode(waypoint.getLat(), waypoint.getLon(), null, )
+			routeNodes.add(SmartCityAgent.crossingOsmIdToLightManagerNode.get(Long.parseLong(waypoint.getOsmNodeRef())));
+		} else {
+			routeNodes.add(new RouteNode(waypoint.getPosition()));
 		}
 	}
 

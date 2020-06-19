@@ -689,8 +689,8 @@ public class MapWindow {
             GeoPosition pedestrianDisembarkStation = new GeoPosition(startStation.getLatitude(), finishStation.getLongitude());
             GeoPosition pedestrianFinishPoint = new GeoPosition(finishStation.getLatitude() + geoPosInFirstStationCircle.getValue0(),
                     finishStation.getLongitude() + geoPosInFirstStationCircle.getValue1());
-            List<RouteNode> routeToStation = Router.generateRouteInfoForPedestrians(pedestrianStartPoint, pedestrianGetOnStation);
-            List<RouteNode> routeFromStation = Router.generateRouteInfoForPedestrians(pedestrianDisembarkStation, pedestrianFinishPoint);
+            List<RouteNode> routeToStation = Router.generateRouteInfoForPedestriansBeta(pedestrianStartPoint, pedestrianGetOnStation);
+            List<RouteNode> routeFromStation = Router.generateRouteInfoForPedestriansBeta(pedestrianDisembarkStation, pedestrianFinishPoint);
             final Pedestrian pedestrian = new Pedestrian(routeFromStation, routeToStation, startStation.getStationId(), stationNodePairAndBusLine.getValue1());
             SmartCityAgent.ActivateAgent(SmartCity.SmartCityAgent.tryAddNewPedestrianAgent(pedestrian));
         }
