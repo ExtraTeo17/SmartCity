@@ -44,8 +44,8 @@ public class MapWindow {
     private final static int REFRESH_MAP_INTERVAL_MILLISECONDS = 100;
     private final static int BUS_CONTROL_INTERVAL_MILLISECONDS = 2000; //60000
     private final static int CREATE_CAR_INTERVAL_MILLISECONDS = 500;
-	private static final long CREATE_PEDESTRIAN_INTERVAL_MILLISECONDS = 2000000000;
-	private final static int PEDESTRIAN_STATION_RADIUS = 300;
+    private static final long CREATE_PEDESTRIAN_INTERVAL_MILLISECONDS = 2000000000;
+    private final static int PEDESTRIAN_STATION_RADIUS = 300;
 
     public JPanel MainPanel;
     public JXMapViewer MapViewer;
@@ -71,6 +71,8 @@ public class MapWindow {
     private Random random = new Random();
     private GeoPosition zoneCenter;
     private Instant simulationStart;
+    public boolean renderPedestrians = true;
+    public boolean renderPedestrianRoutes = true;
     public boolean renderCars = true;
     public boolean renderCarRoutes = true;
     public boolean renderBuses = true;
@@ -100,6 +102,7 @@ public class MapWindow {
                 }
             }
         });
+
         
         seedSpinner.setModel(new SpinnerNumberModel(69, 0, 999999, 1));
         latSpinner.setModel(new SpinnerNumberModel(52.203342, -90, 90, 1));
@@ -185,17 +188,17 @@ public class MapWindow {
                 currentTimeTitle.setVisible(true);
                 currentTimeLabel.setVisible(true);
                 SmartCityAgent.activateLightManagerAgents();
-               
+
                 spawnTimer.scheduleAtFixedRate(new CreateCarTask(), 0, CREATE_CAR_INTERVAL_MILLISECONDS);
                 if (SmartCity.SmartCityAgent.shouldGeneratePedestrians)
-                	spawnTimer.scheduleAtFixedRate(new CreatePedestrianTask(), 0, CREATE_PEDESTRIAN_INTERVAL_MILLISECONDS);
+                    spawnTimer.scheduleAtFixedRate(new CreatePedestrianTask(), 0, CREATE_PEDESTRIAN_INTERVAL_MILLISECONDS);
                 simulationStart = Instant.now();
-                refreshTimer.scheduleAtFixedRate(new BusControlTask(), 0,BUS_CONTROL_INTERVAL_MILLISECONDS);
+                refreshTimer.scheduleAtFixedRate(new BusControlTask(), 0, BUS_CONTROL_INTERVAL_MILLISECONDS);
                 state = SimulationState.RUNNING;
             }
         });
         refreshTimer.scheduleAtFixedRate(new RefreshTask(), 0, REFRESH_MAP_INTERVAL_MILLISECONDS);
-       
+
     }
 
     public void setInputEnabled(boolean check) {
@@ -290,15 +293,15 @@ public class MapWindow {
             waypointPainter.setRenderer(new CustomWaypointRenderer("cabriolet.png"));
             painters.add(waypointPainter);
         } catch (Exception e) {
-        	
+
         }
     }
-    
+
     public void DrawPedestrians(List painters) {
         try {
             Set<Waypoint> set = new HashSet<>();
             for (PedestrianAgent a : SmartCityAgent.pedestrians) {
-                set.add(new DefaultWaypoint(a.getPedestrian().getPosition()));
+                if (!a.isInBus()) set.add(new DefaultWaypoint(a.getPedestrian().getPosition()));
             }
             WaypointPainter<Waypoint> waypointPainter = new WaypointPainter<>();
             waypointPainter.setWaypoints(set);
@@ -314,6 +317,25 @@ public class MapWindow {
             for (VehicleAgent a : SmartCityAgent.Vehicles) {
                 List<GeoPosition> track = new ArrayList<GeoPosition>();
                 for (RouteNode point : a.getVehicle().getDisplayRoute()) {
+                    track.add(new GeoPosition(point.getLatitude(), point.getLongitude()));
+                }
+                Random r = new Random(a.hashCode());
+                RoutePainter routePainter = new RoutePainter(track, new Color(r.nextInt(255), r.nextInt(255), r.nextInt(255)));
+                painters.add(routePainter);
+            }
+        } catch (Exception e) {
+
+        }
+    }
+
+    public void DrawPedestrianRoutes(List painters) {
+        try {
+            for (PedestrianAgent a : SmartCityAgent.pedestrians) {
+                List<GeoPosition> track = new ArrayList<GeoPosition>();
+                for (RouteNode point : a.getPedestrian().getDisplayRouteBeforeBus()) {
+                    track.add(new GeoPosition(point.getLatitude(), point.getLongitude()));
+                }
+                for (RouteNode point : a.getPedestrian().getDisplayRouteAfterBus()) {
                     track.add(new GeoPosition(point.getLatitude(), point.getLongitude()));
                 }
                 Random r = new Random(a.hashCode());
@@ -599,19 +621,19 @@ public class MapWindow {
                 List<Painter<JXMapViewer>> painters = new ArrayList<>();
                 if (renderBusRoutes) DrawBusRoutes(painters);
                 if (renderCarRoutes) DrawRoutes(painters);
+                if (renderPedestrianRoutes) DrawPedestrianRoutes(painters);
                 if (renderZone) DrawZones(painters);
                 if (renderStations) DrawStations(painters);
                 if (renderLights) DrawLights(painters);
                 if (renderCars) DrawVehicles(painters);
                 if (renderBuses) DrawBuses(painters);
-                
-                DrawPedestrians(painters);
-                
+                if (renderPedestrians) DrawPedestrians(painters);
+
                 CompoundPainter<JXMapViewer> painter = new CompoundPainter<>(painters);
                 MapViewer.setOverlayPainter(painter);
                 if (state == SimulationState.RUNNING) RefreshTime();
             } catch (Exception e) {
-            	e.printStackTrace();
+                e.printStackTrace();
             }
         }
     }
@@ -619,29 +641,29 @@ public class MapWindow {
     public class BusControlTask extends TimerTask { // OCB ?????? TOO OFTEN
         @Override
         public void run() {
-            try {             
+            try {
                 if (state == SimulationState.RUNNING) RunBusBasedOnTimeTable();
             } catch (Exception e) {
-            	e.printStackTrace();
+                e.printStackTrace();
             }
         }
 
-		private void RunBusBasedOnTimeTable() {
-			
-			for (BusAgent busAgent : SmartCityAgent.buses) {
-				busAgent.runBasedOnTimetable(getSimulationStartTime());
-			}
-			
-		}
+        private void RunBusBasedOnTimeTable() {
+
+            for (BusAgent busAgent : SmartCityAgent.buses) {
+                busAgent.runBasedOnTimetable(getSimulationStartTime());
+            }
+
+        }
     }
-    
-    
+
+
     public class CreateCarTask extends TimerTask {
 
         @Override
         public void run() {
             if (SmartCityAgent.Vehicles.size() >= getCarLimit())
-            	return;
+                return;
             final Pair<Double, Double> geoPosInZoneCircle = generateRandomGeoPosOffsetWithRadius(getZoneRadius());
             GeoPosition A = new GeoPosition(zoneCenter.getLatitude() + geoPosInZoneCircle.getValue0(),
                     zoneCenter.getLongitude() + geoPosInZoneCircle.getValue1());
@@ -660,7 +682,7 @@ public class MapWindow {
             if (getTestCarId() == SmartCityAgent.Vehicles.size())
                 car = new TestCar(info);
             else
-            	car = new MovingObjectImpl(info);
+                car = new MovingObjectImpl(info);
             vehicle.setVehicle(car);
             try {
                 SmartCityAgent.AddNewVehicleAgent(car.getVehicleType() + SmartCityAgent.carId, vehicle);
@@ -702,14 +724,14 @@ public class MapWindow {
         private BusAgent getRandomBusAgent() {
             final List<BusAgent> busArray = new ArrayList<>(SmartCity.SmartCityAgent.buses); // TODO RETHINK!!!
             try {
-            	return busArray.get(random.nextInt(busArray.size()));
+                return busArray.get(random.nextInt(busArray.size()));
             } catch (Exception e) {
-            	try {
-            		throw new Exception("The 'shouldPrepareBuses' toggle in SmartCityAgent is probably switched off (pedestrians cannot exist without buses)");
-            	} catch (Exception e2) {
-            		e2.printStackTrace();
-            		return null;
-            	}
+                try {
+                    throw new Exception("The 'shouldPrepareBuses' toggle in SmartCityAgent is probably switched off (pedestrians cannot exist without buses)");
+                } catch (Exception e2) {
+                    e2.printStackTrace();
+                    return null;
+                }
             }
         }
     }

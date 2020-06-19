@@ -15,7 +15,9 @@ public abstract class Crossroad {
 	public abstract void removeCarFromQueue(long adjacentOsmWayId);
 	public abstract void removeCarFromFarAwayQueue(String carName, long adjacentOsmWayId);
 	public abstract void addPedestrianToQueue(String pedestrianName, long adjacentOsmWayId);
-	public abstract void removePedestrianFromQueue(String pedestrianName, long adjacentOsmWayId);
+	public abstract void addPedestrianToFarAwayQueue(String pedestrianName, long adjacentOsmWayId, Instant journeyTime);
+	public abstract void removePedestrianFromQueue(long adjacentOsmWayId);
+	public abstract void removePedestrianFromFarAwayQueue(String pedestrianName, long adjacentOsmWayId);
 	public abstract OptimizationResult requestOptimizations();
 	public abstract boolean isLightGreen(long adjacentOsmWayId);
 	public abstract void draw( List<Painter<JXMapViewer>>painter);

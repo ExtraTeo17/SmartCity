@@ -31,6 +31,7 @@ public class Light {
 	private LightColor carLightColor;
 	private LightColor pedestrianLightColor;
 	public Map<String, Instant> farAwayCarMap = new HashMap<>();
+	public Map<String, Instant> farAwayPedestrianMap = new HashMap<>();
 	public Queue<String> carQueue = new LinkedList<>();
 	private Queue<String> pedestrianQueue = new LinkedList<>();
 	private GeoPosition position;
@@ -95,10 +96,15 @@ public class Light {
 	}
 
 	public void switchLight() {
-		if (carLightColor == LightColor.RED)
+		if (carLightColor == LightColor.RED) {
+			pedestrianLightColor = LightColor.RED;
 			carLightColor = LightColor.GREEN;
+		}
 		else if (carLightColor == LightColor.GREEN)
+		{
 			carLightColor = LightColor.RED;
+			pedestrianLightColor = LightColor.GREEN;
+		}
 	}
 
 	public void addCarToFarAwayQueue(String carName, Instant journeyTime) {
@@ -112,8 +118,24 @@ public class Light {
 	public void removeCarFromFarAwayQueue(String carName) {
 		farAwayCarMap.remove(carName);
 	}
-	
+
 	public void removeCarFromQueue() {
 		carQueue.remove();
+	}
+
+	public void addPedestrianToFarAwayQueue(String pedestrianName, Instant journeyTime) {
+		farAwayPedestrianMap.put(pedestrianName, journeyTime);
+	}
+
+	public void addPedestrianToQueue(String pedestrianName) {
+		pedestrianQueue.add(pedestrianName);
+	}
+
+	public void removePedestrianFromFarAwayQueue(String pedestrianName) {
+		farAwayPedestrianMap.remove(pedestrianName);
+	}
+
+	public void removePedestrianFromQueue() {
+		pedestrianQueue.remove();
 	}
 }

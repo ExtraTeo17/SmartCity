@@ -99,11 +99,15 @@ public class LightManagerStrategy extends LightStrategy {
             private void handleMessageFromPedestrian(ACLMessage rcv) {
                 switch (rcv.getPerformative()) {
                     case ACLMessage.INFORM:
-                        Print(rcv.getSender().getLocalName() + " is approaching.");
-                        handlePedestrianOnItsWay(rcv);
+                        Print(rcv.getSender().getLocalName() + " is approaching in " + getInstantParameter(rcv, MessageParameter.ARRIVAL_TIME) + "ms.");
+
+                        crossroad.addPedestrianToFarAwayQueue(rcv.getSender().getLocalName(),
+                                getIntParameter(rcv, MessageParameter.ADJACENT_OSM_WAY_ID),
+                                getInstantParameter(rcv, MessageParameter.ARRIVAL_TIME));
+
                     case ACLMessage.REQUEST_WHEN:
                         Print(rcv.getSender().getLocalName() + " is waiting.");
-                        handlePedestrianArrival(rcv);
+                        crossroad.addPedestrianToQueue(rcv.getSender().getLocalName(), getIntParameter(rcv, MessageParameter.ADJACENT_OSM_WAY_ID));
                         //Answer agree
                         break;
                     case ACLMessage.AGREE:
@@ -114,13 +118,7 @@ public class LightManagerStrategy extends LightStrategy {
                 }
             }
 
-            private void handlePedestrianOnItsWay(ACLMessage rcv) {
-                // TODO Auto-generated method stub
-
-            }
-
             private void handlePedestrianArrival(ACLMessage rcv) {
-                // TODO Auto-generated method stub
 
             }
         };
