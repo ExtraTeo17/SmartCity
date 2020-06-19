@@ -331,16 +331,19 @@ public class MapWindow {
     public void DrawPedestrianRoutes(List painters) {
         try {
             for (PedestrianAgent a : SmartCityAgent.pedestrians) {
-                List<GeoPosition> track = new ArrayList<GeoPosition>();
+                List<GeoPosition> trackBefore = new ArrayList<GeoPosition>();
+                List<GeoPosition> trackAfter = new ArrayList<>();
                 for (RouteNode point : a.getPedestrian().getDisplayRouteBeforeBus()) {
-                    track.add(new GeoPosition(point.getLatitude(), point.getLongitude()));
+                	trackBefore.add(new GeoPosition(point.getLatitude(), point.getLongitude()));
                 }
                 for (RouteNode point : a.getPedestrian().getDisplayRouteAfterBus()) {
-                    track.add(new GeoPosition(point.getLatitude(), point.getLongitude()));
+                	trackAfter.add(new GeoPosition(point.getLatitude(), point.getLongitude()));
                 }
                 Random r = new Random(a.hashCode());
-                RoutePainter routePainter = new RoutePainter(track, new Color(r.nextInt(255), r.nextInt(255), r.nextInt(255)));
-                painters.add(routePainter);
+                RoutePainter routePainterBefore = new RoutePainter(trackBefore, new Color(r.nextInt(255), r.nextInt(255), r.nextInt(255)));
+                RoutePainter routePainterAfter = new RoutePainter(trackAfter, new Color(r.nextInt(255), r.nextInt(255), r.nextInt(255)));
+                painters.add(routePainterBefore);
+                painters.add(routePainterAfter);
             }
         } catch (Exception e) {
 
