@@ -50,7 +50,7 @@ public class Pedestrian extends MovingObject { // TODO: Remember to create a ded
 
     @Override
     public long getAdjacentOsmWayId() {
-        return ((LightManagerNode) route.get(index)).getOsmWayId();
+        return ((LightManagerNode) route.get(index)).getCrossingOsmId1();
     }
 
     @Override

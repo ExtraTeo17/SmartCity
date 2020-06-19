@@ -106,20 +106,25 @@ public class LightManagerStrategy extends LightStrategy {
                                 getInstantParameter(rcv, MessageParameter.ARRIVAL_TIME));
 
                     case ACLMessage.REQUEST_WHEN:
-                        Print(rcv.getSender().getLocalName() + " is waiting.");
-                        crossroad.addPedestrianToQueue(rcv.getSender().getLocalName(), getIntParameter(rcv, MessageParameter.ADJACENT_OSM_WAY_ID));
-                        //Answer agree
+                        Print(rcv.getSender().getLocalName() + " is waiting on way " + getIntParameter(rcv, MessageParameter.ADJACENT_OSM_WAY_ID) + ".");
+                        crossroad.removePedestrianFromFarAwayQueue(rcv.getSender().getLocalName(),
+                                getIntParameter(rcv, MessageParameter.ADJACENT_OSM_WAY_ID));
+                        ACLMessage agree = new ACLMessage(ACLMessage.AGREE);
+                        agree.addReceiver(rcv.getSender());
+                        Properties properties = new Properties();
+                        properties.setProperty(MessageParameter.TYPE, MessageParameter.LIGHT);
+                        agree.setAllUserDefinedParameters(properties);
+                        agent.send(agree);
+
+                        crossroad.addPedestrianToQueue(rcv.getSender().getLocalName(),
+                                getIntParameter(rcv, MessageParameter.ADJACENT_OSM_WAY_ID));
                         break;
                     case ACLMessage.AGREE:
-                        //Pedestrian answered agree and has successfully passed the crossing on green light.
-                        //Can remove pedestrian from the queue.
+                        Print(rcv.getSender().getLocalName() + " passed the light.");
+                        crossroad.removePedestrianFromQueue(getIntParameter(rcv, MessageParameter.ADJACENT_OSM_WAY_ID));
                     default:
                         Print("Wait");
                 }
-            }
-
-            private void handlePedestrianArrival(ACLMessage rcv) {
-
             }
         };
 
