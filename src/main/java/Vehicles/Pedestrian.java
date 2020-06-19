@@ -1,6 +1,7 @@
 package Vehicles;
 
 import java.util.List;
+import java.util.ArrayList;
 
 import Routing.StationNode;
 import org.jxmapviewer.viewer.GeoPosition;
@@ -10,11 +11,12 @@ import Routing.RouteNode;
 import Routing.Router;
 import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
+@SuppressWarnings("restriction")
 public class Pedestrian extends MovingObject { // TODO: Remember to create a dedicated super-class for all moving types
 
     private List<RouteNode> displayRouteBeforeBus, displayRouteAfterBus;
     private List<RouteNode> routeBeforeBus, routeAfterBus;
-    private List<RouteNode> route;
+    private List<RouteNode> route = new ArrayList<>();
     private int index = 0;
     private int speed = 40;
     private int closestLightIndex = 0;
