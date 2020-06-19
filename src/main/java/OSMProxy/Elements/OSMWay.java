@@ -209,9 +209,9 @@ public class OSMWay extends OSMElement {
 			for (int j = 0; j < getWaypointCount(); ++j) {
 				if (osmWay.getWaypoint(i).getOsmNodeRef().equals(getWaypoint(j).getOsmNodeRef())) {
 					if (tangentialNodesOursAndNext.getValue0() == null) {
-						tangentialNodesOursAndNext.setAt0(Pair.with(j, i));
+						tangentialNodesOursAndNext = tangentialNodesOursAndNext.setAt0(Pair.with(j, i));
 					} else if (tangentialNodesOursAndNext.getValue1() == null) {
-						tangentialNodesOursAndNext.setAt1(Pair.with(j, i));
+						tangentialNodesOursAndNext = tangentialNodesOursAndNext.setAt1(Pair.with(j, i));
 					} else {
 						return tangentialNodesOursAndNext;
 					}
@@ -224,8 +224,8 @@ public class OSMWay extends OSMElement {
 	private Integer determineStartingNodeRefAndFilterRelevantNodes(Pair<Pair<Integer, Integer>, Pair<Integer, Integer>> tangentialNodes) {
 		final int startFirstCount = wayCountBetween(0, tangentialNodes.getValue0().getValue0());
 		final int endFirstCount = wayCountBetween(getWaypointCount() - 1, tangentialNodes.getValue0().getValue0());
-		final int startSecondCount = wayCountBetween(0, tangentialNodes.getValue1().getValue0());
-		final int endSecondCount = wayCountBetween(getWaypointCount() - 1, tangentialNodes.getValue1().getValue0());
+		final int startSecondCount = tangentialNodes.getValue1() != null ? wayCountBetween(0, tangentialNodes.getValue1().getValue0()) : Integer.MAX_VALUE;
+		final int endSecondCount = tangentialNodes.getValue1() != null ? wayCountBetween(getWaypointCount() - 1, tangentialNodes.getValue1().getValue0()) : Integer.MAX_VALUE;
 		if ((startFirstCount < endFirstCount && startFirstCount < endSecondCount) ||
 				startSecondCount < endFirstCount && startSecondCount < endSecondCount) {
 			return filterRelevantNodes(0, tangentialNodes);

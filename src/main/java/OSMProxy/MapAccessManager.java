@@ -261,9 +261,8 @@ public class MapAccessManager {
 		}
 		return info;
 	}
-	
 
-   private static void parseBusInfo(Map<String, BrigadeInfo> brigadeNrToBrigadeInfo, OSMStation station, JSONObject jsonObject) {
+    private static void parseBusInfo(Map<String, BrigadeInfo> brigadeNrToBrigadeInfo, OSMStation station, JSONObject jsonObject) {
         JSONArray msg = (JSONArray) jsonObject.get("result");
         Iterator iterator = msg.iterator();
         while (iterator.hasNext()) {
@@ -477,7 +476,7 @@ public class MapAccessManager {
 		StringBuilder builder = new StringBuilder();
 		builder.append("<osm-script>");
 		for (long id : osmWayIds) {
-			builder.append(getSingleTrafficSignalQuery(id));
+			builder.append(getSingleWayAndItsNodesQuery(id));
 		}
 		builder.append("</osm-script>");
 		return builder.toString();

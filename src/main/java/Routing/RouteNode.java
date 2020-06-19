@@ -28,4 +28,9 @@ public class RouteNode {
 	public final GeoPosition getPosition() {
 		return new GeoPosition(getLatitude(), getLongitude());
 	}
+
+	@Override
+	public String toString() {
+		return "(" + Double.toString(lat) + ", " + Double.toString(lon) + ")\n";
+	}
 }

@@ -264,7 +264,7 @@ public class BusAgent extends Agent {
         List<StationNode> stationsOnRoute = bus.getStationNodesOnRoute();
         final int halfIndex = stationsOnRoute.size() / 2;
         return Pair.with(stationsOnRoute.get(random.nextInt(halfIndex)),
-                stationsOnRoute.get(halfIndex + random.nextInt(halfIndex) - 1));
+                stationsOnRoute.get(halfIndex + random.nextInt(halfIndex)));
     }
 
     @Override

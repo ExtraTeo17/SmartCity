@@ -90,7 +90,7 @@ public class MapWindow {
         GeoPosition warsaw = new GeoPosition(52.24, 21.02);
         MapViewer.setZoom(7);
         MapViewer.setAddressLocation(warsaw);
-        radiusSpinner.setModel(new SpinnerNumberModel(100, 100, 50000, 100));
+        radiusSpinner.setModel(new SpinnerNumberModel(200, 100, 50000, 100));
         carLimitSpinner.setModel(new SpinnerNumberModel(1, 1, 1000, 1));
         carLimitSpinner.addChangeListener(new ChangeListener() {
             @Override
@@ -101,10 +101,9 @@ public class MapWindow {
             }
         });
         
-       
         seedSpinner.setModel(new SpinnerNumberModel(69, 0, 999999, 1));
-        latSpinner.setModel(new SpinnerNumberModel(52.205155, -90, 90, 1));
-        lonSpinner.setModel(new SpinnerNumberModel(20.859244, -180, 180, 0.001));
+        latSpinner.setModel(new SpinnerNumberModel(52.203342, -90, 90, 1));
+        lonSpinner.setModel(new SpinnerNumberModel(20.861213, -180, 180, 0.001));
 
         testCarIdSpinner.setModel(new SpinnerNumberModel(40, 0, 100, 1));
         testCarIdSpinner.addChangeListener(new ChangeListener() {
@@ -685,8 +684,8 @@ public class MapWindow {
             final Pair<Double, Double> geoPosInFirstStationCircle = generateRandomGeoPosOffsetWithRadius(MapWindow.PEDESTRIAN_STATION_RADIUS);
             GeoPosition pedestrianStartPoint = new GeoPosition(startStation.getLatitude() + geoPosInFirstStationCircle.getValue0(),
                     startStation.getLongitude() + geoPosInFirstStationCircle.getValue1());
-            GeoPosition pedestrianGetOnStation = new GeoPosition(startStation.getLatitude(), finishStation.getLongitude());
-            GeoPosition pedestrianDisembarkStation = new GeoPosition(startStation.getLatitude(), finishStation.getLongitude());
+            GeoPosition pedestrianGetOnStation = new GeoPosition(startStation.getLatitude(), startStation.getLongitude());
+            GeoPosition pedestrianDisembarkStation = new GeoPosition(finishStation.getLatitude(), finishStation.getLongitude());
             GeoPosition pedestrianFinishPoint = new GeoPosition(finishStation.getLatitude() + geoPosInFirstStationCircle.getValue0(),
                     finishStation.getLongitude() + geoPosInFirstStationCircle.getValue1());
             List<RouteNode> routeToStation = Router.generateRouteInfoForPedestriansBeta(pedestrianStartPoint, pedestrianGetOnStation);
