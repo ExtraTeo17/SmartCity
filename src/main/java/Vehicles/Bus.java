@@ -115,7 +115,12 @@ public class Bus extends MovingObject {
 		closestStationIndex = -1;
 		return null;
 	}
-
+	public Date getTimeOnStation(String osmStationId) {
+		return timetable.getTimeOnStation(Long.parseLong(osmStationId));
+		
+	}
+	
+	
 	public RouteNode findNextStop() {
 		for (int i = index + 1; i < route.size(); i++) {
 			if (route.get(i) instanceof StationNode) {
@@ -207,5 +212,7 @@ public class Bus extends MovingObject {
 	public Date getBoardingTime() {
 		return timetable.getBoardingTime();
 	}
+
+	
 	
 }

@@ -19,7 +19,7 @@ public class Timetable {
 	private Map<Long, Date> stationOsmIdToTime = new HashMap<>();
 	private List<Pair<Date, Long>> timeOnStationChronological = new ArrayList<>();
 	
-	private Date getTimeOnStation(final long stationOsmId) {
+	public Date getTimeOnStation(final long stationOsmId) {
 		return stationOsmIdToTime.get(stationOsmId);
 	}
 	public Date getBoardingTime() {

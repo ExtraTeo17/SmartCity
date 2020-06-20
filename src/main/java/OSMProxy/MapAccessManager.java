@@ -48,6 +48,7 @@ import Routing.RouteNode;
 import SmartCity.SmartCityAgent;
 import SmartCity.Buses.BrigadeInfo;
 import SmartCity.Buses.BusInfo;
+import jade.core.Agent;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -847,6 +848,7 @@ public class MapAccessManager {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
+	
 		return infoSet;
 	}
 
@@ -909,7 +911,9 @@ public class MapAccessManager {
 							} else if (kAttr.getNodeValue().equals("ref")) {
 						    	Node number_of_station=attr.getNamedItem("v");
 						    	OSMStation stationOSMNode = new OSMStation(osmId, lat, lon, number_of_station.getNodeValue());
-						    	SmartCityAgent.tryAddNewStationAgent(stationOSMNode);
+						    	Agent agent = SmartCityAgent.tryAddNewStationAgent(stationOSMNode);
+						    	SmartCityAgent.ActivateAgent(agent);
+						    	
 						    }
 						}
 					}
@@ -920,7 +924,7 @@ public class MapAccessManager {
 		for (BusInfo info : infoSet) {
 			info.filterStationsByCircle(middleLat, middleLon, radius);
 		}
-		
+		 
 		return infoSet;
 	}
 

@@ -16,24 +16,31 @@ public class Pedestrian extends MovingObject { // TODO: Remember to create a ded
 
     private List<RouteNode> displayRouteBeforeBus, displayRouteAfterBus;
     private List<RouteNode> routeBeforeBus, routeAfterBus;
+    private StationNode stationStart;
+    private StationNode stationFinish;
     private List<RouteNode> route = new ArrayList<>();
     private int index = 0;
     private int speed = 200;
     private int closestLightIndex = 0;
+ 
     private int stationIndex = 0;
     public DrivingState state = DrivingState.STARTING;
     private final String preferredBusLine;
 
     public Pedestrian(List<RouteNode> routeToStation, List<RouteNode> routeFromStation,
-                      final long startingStationId, final String preferredBusLine) {
+                      final long startingStationId, final String preferredBusLine, StationNode startStation, StationNode finishStation) {
         displayRouteBeforeBus = routeToStation;
         displayRouteAfterBus = routeFromStation;
         routeBeforeBus = Router.uniformRoute(displayRouteBeforeBus);
+        routeBeforeBus.add(startStation);
         routeAfterBus = Router.uniformRoute(displayRouteAfterBus);
+        routeAfterBus.add(0,finishStation);
         route.addAll(routeBeforeBus);
         route.addAll(routeAfterBus);
         stationIndex = routeBeforeBus.size() - 1;
         this.preferredBusLine = preferredBusLine;
+        stationStart = startStation;
+        stationFinish = finishStation;
     }
 
     public StationNode getStartingStation() {
@@ -139,7 +146,7 @@ public class Pedestrian extends MovingObject { // TODO: Remember to create a ded
 
     @Override
     public void setState(DrivingState state) {
-        state = state;
+        this.state = state;
     }
 
     @Override
@@ -154,4 +161,13 @@ public class Pedestrian extends MovingObject { // TODO: Remember to create a ded
     public List<RouteNode> getDisplayRouteAfterBus() {
         return displayRouteAfterBus;
     }
+
+	public long getMilisecondsToNextStation() {
+		return ((routeBeforeBus.size()-1 - index) * 3600) / getSpeed();
+	
+	}
+
+	public StationNode findNextStation() {
+		return stationStart;
+	}
 }

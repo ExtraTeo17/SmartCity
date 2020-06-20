@@ -13,6 +13,7 @@ import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
@@ -70,8 +71,8 @@ public class SmartCityAgent extends Agent {
     public static Set<BusAgent> buses = new LinkedHashSet<>();
     private JXMapViewer mapViewer;
     private static AgentContainer container;
-    private MapWindow window;
-
+    private static MapWindow window;
+    
     public int carId = 0;
 
     CyclicBehaviour receiveMessage = new CyclicBehaviour() {
@@ -90,7 +91,9 @@ public class SmartCityAgent extends Agent {
             block(1000);
         }
     };
-
+    public static final Date getSimulationTime() {
+        return window.getSimulationStartTime();
+    }
     protected void setup() {
         container = getContainerController();
         displayGUI();
@@ -277,6 +280,7 @@ public class SmartCityAgent extends Agent {
                 for (VehicleAgent agent : Vehicles) {
                     ActivateAgent(agent);
                 }
+               
             }
         });
 
@@ -423,10 +427,11 @@ public class SmartCityAgent extends Agent {
         tryAddAgent(manager, LIGHT_MANAGER + manager.getId());
     }
 
-	public static void tryAddNewStationAgent(OSMStation stationOSMNode) {
+	public static Agent tryAddNewStationAgent(OSMStation stationOSMNode) {
 		StationAgent stationAgent = new StationAgent(stationOSMNode,nextStationAgentId());
 		SmartCity.SmartCityAgent.osmIdToStationOSMNode.put(stationOSMNode.getId(), stationOSMNode);
-		tryAddAgent(stationAgent, STATION + stationAgent.getAgentId());
+		 tryAddAgent(stationAgent, STATION + stationAgent.getAgentId());
+		 return stationAgent;
 	}
 
 	public static Agent tryAddNewPedestrianAgent(Pedestrian pedestrian) {

@@ -3,6 +3,7 @@ package Agents;
 import Routing.LightManagerNode;
 import Routing.RouteNode;
 import Routing.StationNode;
+import SmartCity.SmartCityAgent;
 import Vehicles.DrivingState;
 import Vehicles.Pedestrian;
 import jade.core.AID;
@@ -26,24 +27,31 @@ public class PedestrianAgent extends Agent {
 	public PedestrianAgent(final Pedestrian pedestrian, final int agentId) {
 		this.pedestrian = pedestrian;
 		this.agentId = agentId;
-
+		GetNextStation();
+	
+	
+	} 
+	@Override
+    protected void setup() {
+		pedestrian.setState(DrivingState.MOVING);
 		Behaviour move = new TickerBehaviour(this, 3600 / pedestrian.getSpeed()) {
 			@Override
 			public void onTick() {
 				if (pedestrian.isAtTrafficLights()) {
 					switch (pedestrian.getState()) {
-						case MOVING:
-							LightManagerNode light = pedestrian.getCurrentTrafficLightNode();
-							ACLMessage msg = new ACLMessage(ACLMessage.REQUEST_WHEN);
-							msg.addReceiver(new AID("LightManager" + light.getLightManagerId(), AID.ISLOCALNAME));
-							Properties properties = new Properties();
-							properties.setProperty(MessageParameter.TYPE, MessageParameter.PEDESTRIAN);
-							properties.setProperty(MessageParameter.ADJACENT_OSM_WAY_ID, Long.toString(pedestrian.getAdjacentOsmWayId()));
-							msg.setAllUserDefinedParameters(properties);
-							send(msg);
-							pedestrian.setState(DrivingState.WAITING_AT_LIGHT);
-							Print("Asking LightManager" + light.getLightManagerId() + " for right to passage.");
-							break;
+					case MOVING:
+						LightManagerNode light = pedestrian.getCurrentTrafficLightNode();
+						ACLMessage msg = new ACLMessage(ACLMessage.REQUEST_WHEN);
+						msg.addReceiver(new AID("LightManager" + light.getLightManagerId(), AID.ISLOCALNAME));
+						Properties properties = new Properties();
+						properties.setProperty(MessageParameter.TYPE, MessageParameter.PEDESTRIAN);
+						properties.setProperty(MessageParameter.ADJACENT_OSM_WAY_ID, Long.toString(pedestrian.getAdjacentOsmWayId()));
+						msg.setAllUserDefinedParameters(properties);
+						send(msg);
+						pedestrian.setState(DrivingState.WAITING_AT_LIGHT);
+						Print("Asking LightManager" + light.getLightManagerId() + " for right to passage.");
+						break;
+						
 						case WAITING_AT_LIGHT:
 
 							break;
@@ -62,11 +70,12 @@ public class PedestrianAgent extends Agent {
 							msg.addReceiver(new AID("Station" + station.getStationId(), AID.ISLOCALNAME));
 							Properties properties = new Properties();
 							properties.setProperty(MessageParameter.TYPE, MessageParameter.PEDESTRIAN);
-							properties.setProperty(MessageParameter.BUS_ID, pedestrian.getPreferredBusLine());
+							properties.setProperty(MessageParameter.DESIRED_BUS,pedestrian.getPreferredBusLine());
+							properties.setProperty(MessageParameter.ARRIVAL_TIME,"" + SmartCityAgent.getSimulationTime().toInstant());
 							msg.setAllUserDefinedParameters(properties);
 							send(msg);
-
-							Print("Arrived at station " + station.getStationId() + ".");
+							   System.out.println("Pedestrian: Send REQUEST_WHEN to Station");
+							
 							pedestrian.setState(DrivingState.WAITING_AT_STATION);
 							break;
 						case WAITING_AT_STATION:
@@ -78,6 +87,7 @@ public class PedestrianAgent extends Agent {
 
 							break;
 						case PASSING_STATION:
+						
 							pedestrian.Move();
 							pedestrian.setState(DrivingState.MOVING);
 							break;
@@ -126,12 +136,12 @@ public class PedestrianAgent extends Agent {
 								send(response);
 
 								ACLMessage msg = new ACLMessage(ACLMessage.REQUEST_WHEN);
-								Long busId = Long.parseLong(rcv.getUserDefinedParameter(MessageParameter.BUS_ID));
-								msg.addReceiver(new AID("Bus" + busId, AID.ISLOCALNAME));
+								String busAgentId =rcv.getUserDefinedParameter(MessageParameter.BUS_ID);
+								msg.addReceiver(new AID(busAgentId, AID.ISLOCALNAME));
 								properties = new Properties();
 								properties.setProperty(MessageParameter.TYPE, MessageParameter.PEDESTRIAN);
 								properties.setProperty(MessageParameter.STATION_ID, "" + pedestrian.getTargetStation().getStationId());
-
+								System.out.println("Pedestrian: send Agree to Station and send Request WHen to bus");
 								msg.setAllUserDefinedParameters(properties);
 								send(msg);
 								break;
@@ -145,6 +155,7 @@ public class PedestrianAgent extends Agent {
 								Properties properties = new Properties();
 
 								properties.setProperty(MessageParameter.TYPE, MessageParameter.PEDESTRIAN);
+								properties.setProperty(MessageParameter.STATION_ID,""+pedestrian.getTargetStation().getStationId());
 								response.setAllUserDefinedParameters(properties);
 								send(response);
 								pedestrian.Move();
@@ -162,6 +173,27 @@ public class PedestrianAgent extends Agent {
 		addBehaviour(move);
 		addBehaviour(communication);
 	}
+	 void GetNextStation() {
+	        // finds next station and announces his arrival
+	        StationNode nextStation = pedestrian.findNextStation();
+	    	pedestrian.setState(DrivingState.MOVING);
+	        if (nextStation != null) {
+	        	System.out.println("Pedestrian: send INFORM to station");
+	            AID dest = new AID("Station" + nextStation.getStationId(), AID.ISLOCALNAME);
+	            ACLMessage msg = new ACLMessage(ACLMessage.INFORM);
+	            msg.addReceiver(dest);
+	            Properties properties = new Properties();
+	            Instant currentTime = SmartCityAgent.getSimulationTime().toInstant();
+	            Instant time =currentTime.plusMillis(pedestrian.getMilisecondsToNextStation());
+	            properties.setProperty(MessageParameter.TYPE, MessageParameter.PEDESTRIAN);
+	            properties.setProperty(MessageParameter.ARRIVAL_TIME, "" + time);
+	            properties.setProperty(MessageParameter.DESIRED_BUS, "" + pedestrian.getPreferredBusLine());
+	            msg.setAllUserDefinedParameters(properties);
+
+	            send(msg);
+	            System.out.println("Pedestrian: Send Inform to Station");
+	        }
+	    }
 
 	void GetNextLight() {
 		// finds next traffic light and announces his arrival

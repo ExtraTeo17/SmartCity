@@ -37,15 +37,15 @@ public class BusAgent extends Agent {
         GetNextStation();
         StationNode station = bus.getCurrentStationNode();
         Print("Started at station " + station.getStationId() + ".");
+     //  System.out.println("BUS: send REQUEST_WHEN to station WTF");
+      //  ACLMessage msg = new ACLMessage(ACLMessage.REQUEST_WHEN);
+      //  msg.addReceiver(new AID("Station" + station.getStationId(), AID.ISLOCALNAME));
+      //  Properties properties = new Properties();
+      //  properties.setProperty(MessageParameter.TYPE, MessageParameter.BUS);
+      //  msg.setAllUserDefinedParameters(properties);
+      //  send(msg);
 
-        ACLMessage msg = new ACLMessage(ACLMessage.REQUEST_WHEN);
-        msg.addReceiver(new AID("Station" + station.getStationId(), AID.ISLOCALNAME));
-        Properties properties = new Properties();
-        properties.setProperty(MessageParameter.TYPE, MessageParameter.BUS);
-        msg.setAllUserDefinedParameters(properties);
-        send(msg);
-
-        bus.setState(DrivingState.WAITING_AT_STATION);
+        bus.setState(DrivingState.MOVING);
 
         Behaviour move = new TickerBehaviour(this, 3600 / bus.getSpeed()) {
             @Override
@@ -63,6 +63,7 @@ public class BusAgent extends Agent {
                             send(msg);
                             bus.setState(DrivingState.WAITING_AT_LIGHT);
                             Print("Asking LightManager" + light.getLightManagerId() + " for right to passage.");
+                       
                             break;
                         case WAITING_AT_LIGHT:
 
@@ -90,11 +91,17 @@ public class BusAgent extends Agent {
                             properties.setProperty(MessageParameter.TYPE, MessageParameter.BUS);
                             properties.setProperty(MessageParameter.STATION_ID, String.valueOf(station.getStationId()));
                             leave.setAllUserDefinedParameters(properties);
-
+                            // ЧТО ЗА %?:*?( ?????
+                            send(leave);
+                            
+                            
                             ACLMessage msg = new ACLMessage(ACLMessage.REQUEST_WHEN);
                             msg.addReceiver(new AID("Station" + station.getStationId(), AID.ISLOCALNAME));
                             properties = new Properties();
                             properties.setProperty(MessageParameter.TYPE, MessageParameter.BUS);
+                            properties.setProperty(MessageParameter.SCHEDULE_ARRIVAL, "" + bus.getTimeOnStation(station.getOsmStationId()).toInstant());
+                            properties.setProperty(MessageParameter.ARRIVAL_TIME, "" + SmartCityAgent.getSimulationTime().toInstant());
+                            System.out.println("BUS: send REQUEST_WHEN to station");
                             msg.setAllUserDefinedParameters(properties);
                             send(msg);
 
@@ -105,13 +112,13 @@ public class BusAgent extends Agent {
                             // waiting for passengers...
 
                             // if you want to skip waiting (for tests) use this:
-                            bus.setState(DrivingState.PASSING_STATION);
+                            //bus.setState(DrivingState.PASSING_STATION);
                             break;
                         case PASSING_STATION:
                             RouteNode node = bus.findNextStop();
                             if (node instanceof LightManagerNode) {
                                 GetNextLight();
-                            }
+                            } 
                             GetNextStation();
 
                             bus.setState(DrivingState.MOVING);
@@ -122,8 +129,18 @@ public class BusAgent extends Agent {
                     bus.Move();
                 }
             }
+            private void sendAgreeMsg() {
+            	StationNode station = bus.getCurrentStationNode();
+
+            	ACLMessage msg = new ACLMessage(ACLMessage.REQUEST_WHEN);
+                msg.addReceiver(new AID("Station" + station.getStationId(), AID.ISLOCALNAME));
+                Properties properties = new Properties();
+                properties = new Properties();
+                properties.setProperty(MessageParameter.TYPE, MessageParameter.BUS);
+            }
         };
 
+        
         Behaviour communication = new CyclicBehaviour() {
             @Override
             public void action() {
@@ -158,7 +175,7 @@ public class BusAgent extends Agent {
                                     properties.setProperty(MessageParameter.TYPE, MessageParameter.BUS);
                                     response.setAllUserDefinedParameters(properties);
                                     send(response);
-
+                                    System.out.println("BUS: get REQUEST from station");
                                     GetNextStation();
                                     bus.setState(DrivingState.PASSING_STATION);
                                 }
@@ -231,13 +248,16 @@ public class BusAgent extends Agent {
         StationNode nextStation = bus.findNextStation();
 
         if (nextStation != null) {
-
+        	System.out.println("BUS: send INFORM to station");
             AID dest = new AID("Station" + nextStation.getStationId(), AID.ISLOCALNAME);
             ACLMessage msg = new ACLMessage(ACLMessage.INFORM);
             msg.addReceiver(dest);
             Properties properties = new Properties();
-            Instant time = Instant.now().plusMillis(bus.getMilisecondsToNextStation());
+            Instant currentTime = SmartCityAgent.getSimulationTime().toInstant();
+            Instant time =currentTime.plusMillis(bus.getMilisecondsToNextStation());
             properties.setProperty(MessageParameter.TYPE, MessageParameter.BUS);
+            properties.setProperty(MessageParameter.BUS_LINE, "" + bus.getLine());
+            properties.setProperty(MessageParameter.SCHEDULE_ARRIVAL, "" + bus.getTimeOnStation(nextStation.getOsmStationId()).toInstant());
             properties.setProperty(MessageParameter.ARRIVAL_TIME, "" + time);
             msg.setAllUserDefinedParameters(properties);
 

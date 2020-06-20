@@ -44,7 +44,7 @@ public class MapWindow {
     private final static int REFRESH_MAP_INTERVAL_MILLISECONDS = 100;
     private final static int BUS_CONTROL_INTERVAL_MILLISECONDS = 2000; //60000
     private final static int CREATE_CAR_INTERVAL_MILLISECONDS = 500;
-    private static final long CREATE_PEDESTRIAN_INTERVAL_MILLISECONDS = 3000;
+    private static final long CREATE_PEDESTRIAN_INTERVAL_MILLISECONDS = 300;
     private final static int PEDESTRIAN_STATION_RADIUS = 300;
 
     public JPanel MainPanel;
@@ -75,7 +75,7 @@ public class MapWindow {
     public boolean renderPedestrianRoutes = true;
     public boolean renderCars = false;
     public boolean renderCarRoutes = false;
-    public boolean renderBuses = false;
+    public boolean renderBuses = true;
     public boolean renderBusRoutes = false;
     public boolean renderZone = true;
     public boolean renderLights = true;
@@ -248,7 +248,7 @@ public class MapWindow {
         return (int) seedSpinner.getValue();
     }
 
-    private Date getSimulationStartTime() {
+    public Date getSimulationStartTime() {
         return (Date) setTimeSpinner.getValue();
     }
 
@@ -713,7 +713,8 @@ public class MapWindow {
             GeoPosition pedestrianFinishPoint = new GeoPosition(finishStation.getLatitude() + geoPosInFirstStationCircle.getValue0(), finishStation.getLongitude() + geoPosInFirstStationCircle.getValue1());
             List<RouteNode> routeToStation = Router.generateRouteInfoForPedestriansBeta(pedestrianStartPoint, pedestrianGetOnStation, null, startStation.getOsmStationId());
             List<RouteNode> routeFromStation = Router.generateRouteInfoForPedestriansBeta(pedestrianDisembarkStation, pedestrianFinishPoint, finishStation.getOsmStationId(), null);
-            final Pedestrian pedestrian = new Pedestrian(routeToStation, routeFromStation, startStation.getStationId(), stationNodePairAndBusLine.getValue1());
+            final Pedestrian pedestrian = new Pedestrian(routeToStation, routeFromStation, startStation.getStationId(), stationNodePairAndBusLine.getValue1(),
+            		stationNodePairAndBusLine.getValue0().getValue0(),stationNodePairAndBusLine.getValue0().getValue1());
             SmartCityAgent.ActivateAgent(SmartCity.SmartCityAgent.tryAddNewPedestrianAgent(pedestrian));
         }
 
