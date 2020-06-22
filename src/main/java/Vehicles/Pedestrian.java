@@ -3,6 +3,7 @@ package Vehicles;
 import java.util.List;
 import java.util.ArrayList;
 
+import GUI.MapWindow;
 import Routing.StationNode;
 import org.jxmapviewer.viewer.GeoPosition;
 
@@ -20,7 +21,7 @@ public class Pedestrian extends MovingObject { // TODO: Remember to create a ded
     private StationNode stationFinish;
     private List<RouteNode> route = new ArrayList<>();
     private int index = 0;
-    private int speed = 200;
+    private int speed = 10;
     private int closestLightIndex = 0;
  
     private int stationIndex = 0;
@@ -141,7 +142,7 @@ public class Pedestrian extends MovingObject { // TODO: Remember to create a ded
 
     @Override
     public int getSpeed() {
-        return speed;
+        return speed * MapWindow.getTimeScale();
     }
 
     @Override

@@ -12,6 +12,7 @@ import Routing.StationNode;
 import SmartCity.RoutePainter;
 import SmartCity.SmartCityAgent;
 import SmartCity.ZonePainter;
+import Vehicles.Bus;
 import Vehicles.MovingObjectImpl;
 import Vehicles.Pedestrian;
 import Vehicles.TestCar;
@@ -44,8 +45,13 @@ public class MapWindow {
     private final static int REFRESH_MAP_INTERVAL_MILLISECONDS = 100;
     private final static int BUS_CONTROL_INTERVAL_MILLISECONDS = 2000; //60000
     private final static int CREATE_CAR_INTERVAL_MILLISECONDS = 500;
-    private static final long CREATE_PEDESTRIAN_INTERVAL_MILLISECONDS = 300;
-    private final static int PEDESTRIAN_STATION_RADIUS = 300;
+    private static final long CREATE_PEDESTRIAN_INTERVAL_MILLISECONDS = 100;
+    private final static int PEDESTRIAN_STATION_RADIUS = 200;
+    private final static int TIME_SCALE = 30;
+
+    public static int getTimeScale() {
+        return TIME_SCALE;
+    }
 
     public JPanel MainPanel;
     public JXMapViewer MapViewer;
@@ -103,7 +109,7 @@ public class MapWindow {
             }
         });
 
-        
+
         seedSpinner.setModel(new SpinnerNumberModel(69, 0, 999999, 1));
         latSpinner.setModel(new SpinnerNumberModel(52.203342, -90, 90, 1));
         lonSpinner.setModel(new SpinnerNumberModel(20.861213, -180, 180, 0.001));
@@ -255,7 +261,7 @@ public class MapWindow {
     private void RefreshTime() {
         Date date = getSimulationStartTime();
         //Duration timeDiff = Duration.between(simulationStart, Instant.now());
-        Duration timeDiff = Duration.ofSeconds(3);
+        Duration timeDiff = Duration.ofSeconds((TIME_SCALE * REFRESH_MAP_INTERVAL_MILLISECONDS) / 1000);
         Instant inst = date.toInstant();
         inst = inst.plus(timeDiff);
         DateFormat dateFormat = new SimpleDateFormat("kk:mm:ss dd-MM-yyyy");
@@ -297,21 +303,6 @@ public class MapWindow {
         }
     }
 
-    public void DrawPedestrians(List painters) {
-        try {
-            Set<Waypoint> set = new HashSet<>();
-            for (PedestrianAgent a : SmartCityAgent.pedestrians) {
-                if (!a.isInBus()) set.add(new DefaultWaypoint(a.getPedestrian().getPosition()));
-            }
-            WaypointPainter<Waypoint> waypointPainter = new WaypointPainter<>();
-            waypointPainter.setWaypoints(set);
-            waypointPainter.setRenderer(new CustomWaypointRenderer("pedestrian.png"));
-            painters.add(waypointPainter);
-        } catch (Exception e) {
-
-        }
-    }
-
     public void DrawRoutes(List painters) {
         try {
             for (VehicleAgent a : SmartCityAgent.Vehicles) {
@@ -328,20 +319,36 @@ public class MapWindow {
         }
     }
 
+    public void DrawPedestrians(List painters) {
+        try {
+            Set<Waypoint> set = new HashSet<>();
+            for (PedestrianAgent a : SmartCityAgent.pedestrians) {
+                if (!a.isInBus()) set.add(new DefaultWaypoint(a.getPedestrian().getPosition()));
+            }
+            WaypointPainter<Waypoint> waypointPainter = new WaypointPainter<>();
+            waypointPainter.setWaypoints(set);
+            waypointPainter.setRenderer(new CustomWaypointRenderer("pedestrian_small.png"));
+            painters.add(waypointPainter);
+        } catch (Exception e) {
+
+        }
+    }
+
     public void DrawPedestrianRoutes(List painters) {
         try {
             for (PedestrianAgent a : SmartCityAgent.pedestrians) {
                 List<GeoPosition> trackBefore = new ArrayList<GeoPosition>();
                 List<GeoPosition> trackAfter = new ArrayList<>();
                 for (RouteNode point : a.getPedestrian().getDisplayRouteBeforeBus()) {
-                	trackBefore.add(new GeoPosition(point.getLatitude(), point.getLongitude()));
+                    trackBefore.add(new GeoPosition(point.getLatitude(), point.getLongitude()));
                 }
                 for (RouteNode point : a.getPedestrian().getDisplayRouteAfterBus()) {
-                	trackAfter.add(new GeoPosition(point.getLatitude(), point.getLongitude()));
+                    trackAfter.add(new GeoPosition(point.getLatitude(), point.getLongitude()));
                 }
                 Random r = new Random(a.hashCode());
-                RoutePainter routePainterBefore = new RoutePainter(trackBefore, new Color(r.nextInt(255), r.nextInt(255), r.nextInt(255)));
-                RoutePainter routePainterAfter = new RoutePainter(trackAfter, new Color(r.nextInt(255), r.nextInt(255), r.nextInt(255)));
+                Color c = new Color(r.nextInt(255), r.nextInt(255), r.nextInt(255));
+                RoutePainter routePainterBefore = new RoutePainter(trackBefore, c);
+                RoutePainter routePainterAfter = new RoutePainter(trackAfter, c);
                 painters.add(routePainterBefore);
                 painters.add(routePainterAfter);
             }
@@ -352,14 +359,34 @@ public class MapWindow {
 
     public void DrawBuses(List painters) {
         try {
-            Set<Waypoint> set = new HashSet<>();
+            Set<Waypoint> set_low = new HashSet<>();
+            Set<Waypoint> set_mid = new HashSet<>();
+            Set<Waypoint> set_high = new HashSet<>();
             for (BusAgent a : SmartCityAgent.buses) {
-                set.add(new DefaultWaypoint(a.getBus().getPosition()));
+                int count = a.getBus().getPassengersCount();
+                if (count > Bus.CAPACITY_HIGH) {
+                    set_high.add(new DefaultWaypoint(a.getBus().getPosition()));
+                } else if (count > Bus.CAPACITY_MID) {
+                    set_mid.add(new DefaultWaypoint(a.getBus().getPosition()));
+                } else {
+                    set_low.add(new DefaultWaypoint(a.getBus().getPosition()));
+                }
             }
-            WaypointPainter<Waypoint> waypointPainter = new WaypointPainter<>();
-            waypointPainter.setWaypoints(set);
-            waypointPainter.setRenderer(new CustomWaypointRenderer("bus.png"));
-            painters.add(waypointPainter);
+
+            WaypointPainter<Waypoint> painter_low = new WaypointPainter<>();
+            painter_low.setWaypoints(set_low);
+            painter_low.setRenderer(new CustomWaypointRenderer("bus_low.png"));
+            painters.add(painter_low);
+
+            WaypointPainter<Waypoint> painter_mid = new WaypointPainter<>();
+            painter_mid.setWaypoints(set_mid);
+            painter_mid.setRenderer(new CustomWaypointRenderer("bus.png"));
+            painters.add(painter_mid);
+
+            WaypointPainter<Waypoint> painter_high = new WaypointPainter<>();
+            painter_high.setWaypoints(set_high);
+            painter_high.setRenderer(new CustomWaypointRenderer("bus_high.png"));
+            painters.add(painter_high);
         } catch (Exception e) {
 
         }
@@ -702,20 +729,23 @@ public class MapWindow {
 
         @Override
         public void run() {
-            // add people limit
-            final Pair<Pair<StationNode, StationNode>, String> stationNodePairAndBusLine = getStationPairAndLineFromRandomBus();
-            final StationNode startStation = stationNodePairAndBusLine.getValue0().getValue0();
-            final StationNode finishStation = stationNodePairAndBusLine.getValue0().getValue1();
-            final Pair<Double, Double> geoPosInFirstStationCircle = generateRandomGeoPosOffsetWithRadius(MapWindow.PEDESTRIAN_STATION_RADIUS); // TODO: Generating this offset doesn't work!
-            GeoPosition pedestrianStartPoint = new GeoPosition(startStation.getLatitude() + geoPosInFirstStationCircle.getValue0(), startStation.getLongitude() + geoPosInFirstStationCircle.getValue1());
-            GeoPosition pedestrianGetOnStation = new GeoPosition(startStation.getLatitude(), startStation.getLongitude());
-            GeoPosition pedestrianDisembarkStation = new GeoPosition(finishStation.getLatitude(), finishStation.getLongitude());
-            GeoPosition pedestrianFinishPoint = new GeoPosition(finishStation.getLatitude() + geoPosInFirstStationCircle.getValue0(), finishStation.getLongitude() + geoPosInFirstStationCircle.getValue1());
-            List<RouteNode> routeToStation = Router.generateRouteInfoForPedestriansBeta(pedestrianStartPoint, pedestrianGetOnStation, null, startStation.getOsmStationId());
-            List<RouteNode> routeFromStation = Router.generateRouteInfoForPedestriansBeta(pedestrianDisembarkStation, pedestrianFinishPoint, finishStation.getOsmStationId(), null);
-            final Pedestrian pedestrian = new Pedestrian(routeToStation, routeFromStation, startStation.getStationId(), stationNodePairAndBusLine.getValue1(),
-            		stationNodePairAndBusLine.getValue0().getValue0(),stationNodePairAndBusLine.getValue0().getValue1());
-            SmartCityAgent.ActivateAgent(SmartCity.SmartCityAgent.tryAddNewPedestrianAgent(pedestrian));
+            try {
+                // add people limit
+                final Pair<Pair<StationNode, StationNode>, String> stationNodePairAndBusLine = getStationPairAndLineFromRandomBus();
+                final StationNode startStation = stationNodePairAndBusLine.getValue0().getValue0();
+                final StationNode finishStation = stationNodePairAndBusLine.getValue0().getValue1();
+                final Pair<Double, Double> geoPosInFirstStationCircle = generateRandomGeoPosOffsetWithRadius(MapWindow.PEDESTRIAN_STATION_RADIUS); // TODO: Generating this offset doesn't work!
+                GeoPosition pedestrianStartPoint = new GeoPosition(startStation.getLatitude() + geoPosInFirstStationCircle.getValue0(), startStation.getLongitude() + geoPosInFirstStationCircle.getValue1());
+                GeoPosition pedestrianGetOnStation = new GeoPosition(startStation.getLatitude(), startStation.getLongitude());
+                GeoPosition pedestrianDisembarkStation = new GeoPosition(finishStation.getLatitude(), finishStation.getLongitude());
+                GeoPosition pedestrianFinishPoint = new GeoPosition(finishStation.getLatitude() + geoPosInFirstStationCircle.getValue0(), finishStation.getLongitude() + geoPosInFirstStationCircle.getValue1());
+                List<RouteNode> routeToStation = Router.generateRouteInfoForPedestriansBeta(pedestrianStartPoint, pedestrianGetOnStation, null, startStation.getOsmStationId());
+                List<RouteNode> routeFromStation = Router.generateRouteInfoForPedestriansBeta(pedestrianDisembarkStation, pedestrianFinishPoint, finishStation.getOsmStationId(), null);
+                final Pedestrian pedestrian = new Pedestrian(routeToStation, routeFromStation, startStation.getStationId(), stationNodePairAndBusLine.getValue1(),
+                        stationNodePairAndBusLine.getValue0().getValue0(), stationNodePairAndBusLine.getValue0().getValue1());
+                SmartCityAgent.ActivateAgent(SmartCity.SmartCityAgent.tryAddNewPedestrianAgent(pedestrian));
+            } catch (Exception e) {
+            }
         }
 
         private Pair<Pair<StationNode, StationNode>, String> getStationPairAndLineFromRandomBus() {

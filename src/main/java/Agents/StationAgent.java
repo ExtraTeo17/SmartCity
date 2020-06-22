@@ -66,7 +66,7 @@ public class StationAgent extends Agent {
                                getInstantParameter(rcv, MessageParameter.ARRIVAL_TIME), 
                                getInstantParameter(rcv,MessageParameter.SCHEDULE_ARRIVAL ));
 					stationStrategy.addMappingOfBusAndTheirAgent(agentBusName,busLine);
-					System.out.println("Station: get INFORM from bus");
+					Print("Got INFORM from " + rcv.getSender().getLocalName());
                     // TO DO: SEND MESSAGE ABOUT PASSENGERS  
 				} else if (rcv.getPerformative() == ACLMessage.REQUEST_WHEN) {
 					
@@ -77,14 +77,14 @@ public class StationAgent extends Agent {
 							getInstantParameter(rcv,MessageParameter.SCHEDULE_ARRIVAL ));
 					ACLMessage msg = new ACLMessage(ACLMessage.AGREE);
 					msg.addReceiver(rcv.getSender());
-					
-					System.out.println("Station: get REQUEST_WHEN from bus");
-					System.out.println("Station: send Agree after REQUEST_WHEN from bus");
+
+
+					Print("Got REQUEST_WHEN from " + rcv.getSender().getLocalName());
 					send(msg);
 				}
 				else if (rcv.getPerformative() == ACLMessage.AGREE) {
 					stationStrategy.removeBusFromBusOnStationQueue(rcv.getSender().getLocalName());
-					System.out.println("Station: get AGREE from bus");
+					Print("Got AGREE from " + rcv.getSender().getLocalName());
                   
 				}
 				else {
@@ -180,10 +180,8 @@ public class StationAgent extends Agent {
 	public void takeDown() {
 		super.takeDown();
 	}
-	
-    void print(String message){
-        System.out.println(getLocalName() + ": " + message);
-    }
 
-	
+	void Print(String message) {
+		System.out.println(getLocalName() + ": " + message);
+	}
 }

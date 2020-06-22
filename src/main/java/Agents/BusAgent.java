@@ -74,30 +74,45 @@ public class BusAgent extends Agent {
                             bus.setState(DrivingState.MOVING);
                             break;
                     }
-                } else if (bus.isAtStation()) {
+                } else if(bus.isAtDestination())                {
+                    bus.setState(DrivingState.AT_DESTINATION);
+                    Print("Reached destination.");
+
+                    ACLMessage msg = new ACLMessage(ACLMessage.INFORM);
+                    msg.addReceiver(new AID("SmartCityAgent", AID.ISLOCALNAME));
+                    Properties prop = new Properties();
+                    prop.setProperty(MessageParameter.TYPE, MessageParameter.BUS);
+                    prop.setProperty(MessageParameter.AT_DESTINATION, String.valueOf(Boolean.TRUE));
+                    msg.setAllUserDefinedParameters(prop);
+                    send(msg);
+                    doDelete();
+                }
+                else if (bus.isAtStation()) {
                     switch (bus.getState()) {
                         case MOVING:
                             StationNode station = bus.getCurrentStationNode();
 
                             List<String> passengers = bus.getPassengersToLeave(station.getStationId());
 
-                            ACLMessage leave = new ACLMessage(ACLMessage.REQUEST);
+                            if(passengers.size() != 0)
+                            {
+                                ACLMessage leave = new ACLMessage(ACLMessage.REQUEST);
 
-                            for (String name : passengers) {
-                                leave.addReceiver(new AID(name, AID.ISLOCALNAME));
+                                for (String name : passengers) {
+                                    leave.addReceiver(new AID(name, AID.ISLOCALNAME));
+                                }
+
+                                Properties properties = new Properties();
+                                properties.setProperty(MessageParameter.TYPE, MessageParameter.BUS);
+                                properties.setProperty(MessageParameter.STATION_ID, String.valueOf(station.getStationId()));
+                                leave.setAllUserDefinedParameters(properties);
+                                send(leave);
                             }
-
-                            Properties properties = new Properties();
-                            properties.setProperty(MessageParameter.TYPE, MessageParameter.BUS);
-                            properties.setProperty(MessageParameter.STATION_ID, String.valueOf(station.getStationId()));
-                            leave.setAllUserDefinedParameters(properties);
-                            // ЧТО ЗА %?:*?( ?????
-                            send(leave);
                             
                             
                             ACLMessage msg = new ACLMessage(ACLMessage.REQUEST_WHEN);
                             msg.addReceiver(new AID("Station" + station.getStationId(), AID.ISLOCALNAME));
-                            properties = new Properties();
+                            Properties properties = new Properties();
                             properties.setProperty(MessageParameter.TYPE, MessageParameter.BUS);
                             properties.setProperty(MessageParameter.SCHEDULE_ARRIVAL, "" + bus.getTimeOnStation(station.getOsmStationId()).toInstant());
                             properties.setProperty(MessageParameter.ARRIVAL_TIME, "" + SmartCityAgent.getSimulationTime().toInstant());
@@ -196,11 +211,13 @@ public class BusAgent extends Agent {
                                 properties.setProperty(MessageParameter.TYPE, MessageParameter.BUS);
                                 response.setAllUserDefinedParameters(properties);
                                 send(response);
+                                Print("Passengers: " + bus.getPassengersCount());
                                 break;
                             case ACLMessage.AGREE:
                                 stationId = Long.parseLong(rcv.getUserDefinedParameter(MessageParameter.STATION_ID));
                                 Print("Passenger " + rcv.getSender().getLocalName() + " left the bus.");
                                 bus.removePassengerFromStation(stationId, rcv.getSender().getLocalName());
+                                Print("Passengers: " + bus.getPassengersCount());
                                 break;
                         }
 
@@ -248,7 +265,6 @@ public class BusAgent extends Agent {
         StationNode nextStation = bus.findNextStation();
 
         if (nextStation != null) {
-        	System.out.println("BUS: send INFORM to station");
             AID dest = new AID("Station" + nextStation.getStationId(), AID.ISLOCALNAME);
             ACLMessage msg = new ACLMessage(ACLMessage.INFORM);
             msg.addReceiver(dest);

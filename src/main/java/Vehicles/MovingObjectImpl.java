@@ -1,5 +1,6 @@
 package Vehicles;
 
+import GUI.MapWindow;
 import Routing.LightManagerNode;
 import Routing.RouteNode;
 import Routing.Router;
@@ -13,7 +14,7 @@ public class MovingObjectImpl extends MovingObject {
     private List<RouteNode> displayRoute;
     private List<RouteNode> route;
     private int index = 0;
-    private int speed = 200;
+    private int speed = 50;
     private int closestLightIndex = 0;
     public DrivingState State = DrivingState.STARTING;
 
@@ -94,7 +95,7 @@ public class MovingObjectImpl extends MovingObject {
 
     @Override
     public int getSpeed() {
-        return speed;
+        return speed * MapWindow.getTimeScale();
     }
 
     @Override

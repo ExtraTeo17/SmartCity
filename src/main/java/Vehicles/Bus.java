@@ -6,6 +6,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 
+import GUI.MapWindow;
 import Routing.LightManagerNode;
 import Routing.RouteNode;
 import Routing.Router;
@@ -16,6 +17,9 @@ import org.jxmapviewer.viewer.GeoPosition;
 
 public class Bus extends MovingObject {
 
+	public static int CAPACITY_MID = 10;
+	public static int CAPACITY_HIGH = 25;
+
 	private final Timetable timetable;
 	private final HashMap<Long, List<String>> stationsForPassengers = new HashMap<>();
 	private final List<StationNode> stationNodesOnRoute;
@@ -24,9 +28,10 @@ public class Bus extends MovingObject {
 	private List<RouteNode> displayRoute;
 	private List<RouteNode> route;
 	private int index = 0;
-	private int speed = 200;
+	private int speed = 40;
 	private int closestLightIndex = -1;
 	private int closestStationIndex = -1;
+	private int passengersCount = 0;
 
 	public Bus(final List<RouteNode> route, final Timetable timetable, final String busLine,
 			   final String brigadeNr) {
@@ -48,14 +53,24 @@ public class Bus extends MovingObject {
 		this.brigadeNr = brigadeNr;
 	}
 
+	public int getPassengersCount(){
+		return passengersCount;
+	}
+
 	public void addPassengerToStation(Long id, String passenger)
 	{
 		stationsForPassengers.get(id).add(passenger);
+		passengersCount++;
 	}
 
 	public boolean removePassengerFromStation(Long id, String passenger)
 	{
-		return stationsForPassengers.get(id).remove(passenger);
+		if(stationsForPassengers.get(id).remove(passenger))
+		{
+			passengersCount--;
+			return true;
+		}
+		return false;
 	}
 
 	public List<String> getPassengersToLeave(Long id)
@@ -196,7 +211,7 @@ public class Bus extends MovingObject {
 
 	@Override
 	public int getSpeed() {
-		return speed;
+		return speed * MapWindow.getTimeScale();
 	}
 
 	@Override

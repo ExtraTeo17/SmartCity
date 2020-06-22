@@ -86,6 +86,12 @@ public class SmartCityAgent extends Agent {
                     case MessageParameter.VEHICLE:
                         Vehicles.removeIf(v -> v.getLocalName().equals(rcv.getSender().getLocalName()));
                         break;
+                    case MessageParameter.PEDESTRIAN:
+                        pedestrians.removeIf(v -> v.getLocalName().equals(rcv.getSender().getLocalName()));
+                        break;
+                    case MessageParameter.BUS:
+                        buses.removeIf(v -> v.getLocalName().equals(rcv.getSender().getLocalName()));
+                        break;
                 }
             }
             block(1000);
@@ -108,7 +114,7 @@ public class SmartCityAgent extends Agent {
         JMenuBar menuBar = new JMenuBar();
         JMenu view = new JMenu("View");
 
-        final JCheckBoxMenuItem cars = new JCheckBoxMenuItem("Render cars", true);
+        final JCheckBoxMenuItem cars = new JCheckBoxMenuItem("Render cars", window.renderCars);
         cars.addItemListener(new ItemListener() {
             @Override
             public void itemStateChanged(ItemEvent e) {
@@ -117,7 +123,7 @@ public class SmartCityAgent extends Agent {
         });
         view.add(cars);
 
-        final JCheckBoxMenuItem routes = new JCheckBoxMenuItem("Render car routes", true);
+        final JCheckBoxMenuItem routes = new JCheckBoxMenuItem("Render car routes", window.renderCarRoutes);
         routes.addItemListener(new ItemListener() {
             @Override
             public void itemStateChanged(ItemEvent e) {
@@ -126,7 +132,7 @@ public class SmartCityAgent extends Agent {
         });
         view.add(routes);
 
-        final JCheckBoxMenuItem buses = new JCheckBoxMenuItem("Render buses", true);
+        final JCheckBoxMenuItem buses = new JCheckBoxMenuItem("Render buses", window.renderBuses);
         cars.addItemListener(new ItemListener() {
             @Override
             public void itemStateChanged(ItemEvent e) {
@@ -135,7 +141,7 @@ public class SmartCityAgent extends Agent {
         });
         view.add(buses);
 
-        final JCheckBoxMenuItem busRoutes = new JCheckBoxMenuItem("Render bus routes", true);
+        final JCheckBoxMenuItem busRoutes = new JCheckBoxMenuItem("Render bus routes", window.renderBusRoutes);
         busRoutes.addItemListener(new ItemListener() {
             @Override
             public void itemStateChanged(ItemEvent e) {
@@ -144,7 +150,7 @@ public class SmartCityAgent extends Agent {
         });
         view.add(busRoutes);
 
-        final JCheckBoxMenuItem pedestrian = new JCheckBoxMenuItem("Render pedestrians", true);
+        final JCheckBoxMenuItem pedestrian = new JCheckBoxMenuItem("Render pedestrians", window.renderPedestrians);
         pedestrian.addItemListener(new ItemListener() {
             @Override
             public void itemStateChanged(ItemEvent e) {
@@ -153,7 +159,7 @@ public class SmartCityAgent extends Agent {
         });
         view.add(pedestrian);
 
-        final JCheckBoxMenuItem pedestrianRoutes = new JCheckBoxMenuItem("Render pedestrian routes", true);
+        final JCheckBoxMenuItem pedestrianRoutes = new JCheckBoxMenuItem("Render pedestrian routes", window.renderPedestrianRoutes);
         pedestrianRoutes.addItemListener(new ItemListener() {
             @Override
             public void itemStateChanged(ItemEvent e) {
@@ -162,7 +168,7 @@ public class SmartCityAgent extends Agent {
         });
         view.add(pedestrianRoutes);
 
-        final JCheckBoxMenuItem lights = new JCheckBoxMenuItem("Render lights", true);
+        final JCheckBoxMenuItem lights = new JCheckBoxMenuItem("Render lights", window.renderLights);
         lights.addItemListener(new ItemListener() {
             @Override
             public void itemStateChanged(ItemEvent e) {
@@ -171,7 +177,7 @@ public class SmartCityAgent extends Agent {
         });
         view.add(lights);
 
-        final JCheckBoxMenuItem zone = new JCheckBoxMenuItem("Render zone", true);
+        final JCheckBoxMenuItem zone = new JCheckBoxMenuItem("Render zone", window.renderZone);
         zone.addItemListener(new ItemListener() {
             @Override
             public void itemStateChanged(ItemEvent e) {
@@ -180,7 +186,7 @@ public class SmartCityAgent extends Agent {
         });
         view.add(zone);
 
-        final JCheckBoxMenuItem stations = new JCheckBoxMenuItem("Render stations", true);
+        final JCheckBoxMenuItem stations = new JCheckBoxMenuItem("Render stations", window.renderStations);
         stations.addItemListener(new ItemListener() {
             @Override
             public void itemStateChanged(ItemEvent e) {

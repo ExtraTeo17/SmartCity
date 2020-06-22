@@ -2,6 +2,21 @@
 <project version="4">
   <component name="Encoding">
     <file url="file://$PROJECT_DIR$/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/target/classes/blue_waypoint.png" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/target/classes/bus.png" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/target/classes/bus_high.png" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/target/classes/bus_low.png" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/target/classes/bus_stop.png" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/target/classes/cabriolet.png" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/target/classes/green_waypoint.png" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/target/classes/light_green.png" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/target/classes/light_red.png" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/target/classes/light_yellow.png" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/target/classes/pedestrian.png" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/target/classes/pedestrian_small.png" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/target/classes/red_waypoint.png" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/target/classes/test_car.png" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/target/classes/yellow_waypoint.png" charset="UTF-8" />
     <file url="PROJECT" charset="windows-1252" />
   </component>
 </project>

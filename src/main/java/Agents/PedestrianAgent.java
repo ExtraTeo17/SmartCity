@@ -92,7 +92,21 @@ public class PedestrianAgent extends Agent {
 							pedestrian.setState(DrivingState.MOVING);
 							break;
 					}
-				} else {
+				} else if(pedestrian.isAtDestination())
+				{
+					pedestrian.setState(DrivingState.AT_DESTINATION);
+					Print("Reached destination.");
+
+					ACLMessage msg = new ACLMessage(ACLMessage.INFORM);
+					msg.addReceiver(new AID("SmartCityAgent", AID.ISLOCALNAME));
+					Properties prop = new Properties();
+					prop.setProperty(MessageParameter.TYPE, MessageParameter.PEDESTRIAN);
+					prop.setProperty(MessageParameter.AT_DESTINATION, String.valueOf(Boolean.TRUE));
+					msg.setAllUserDefinedParameters(prop);
+					send(msg);
+					doDelete();
+				}
+				else {
 					pedestrian.Move();
 				}
 			}
@@ -141,8 +155,8 @@ public class PedestrianAgent extends Agent {
 								properties = new Properties();
 								properties.setProperty(MessageParameter.TYPE, MessageParameter.PEDESTRIAN);
 								properties.setProperty(MessageParameter.STATION_ID, "" + pedestrian.getTargetStation().getStationId());
-								System.out.println("Pedestrian: send Agree to Station and send Request WHen to bus");
 								msg.setAllUserDefinedParameters(properties);
+								pedestrian.setState(DrivingState.IN_BUS);
 								send(msg);
 								break;
 						}
