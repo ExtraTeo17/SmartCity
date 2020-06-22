@@ -32,19 +32,9 @@ public class BusAgent extends Agent {
 
     @Override
     protected void setup() {
-      
-
         GetNextStation();
         StationNode station = bus.getCurrentStationNode();
         Print("Started at station " + station.getStationId() + ".");
-     //  System.out.println("BUS: send REQUEST_WHEN to station WTF");
-      //  ACLMessage msg = new ACLMessage(ACLMessage.REQUEST_WHEN);
-      //  msg.addReceiver(new AID("Station" + station.getStationId(), AID.ISLOCALNAME));
-      //  Properties properties = new Properties();
-      //  properties.setProperty(MessageParameter.TYPE, MessageParameter.BUS);
-      //  msg.setAllUserDefinedParameters(properties);
-      //  send(msg);
-
         bus.setState(DrivingState.MOVING);
 
         Behaviour move = new TickerBehaviour(this, 3600 / bus.getSpeed()) {
@@ -74,7 +64,7 @@ public class BusAgent extends Agent {
                             bus.setState(DrivingState.MOVING);
                             break;
                     }
-                } else if(bus.isAtDestination())                {
+                } else if(bus.isAtDestination()) {
                     bus.setState(DrivingState.AT_DESTINATION);
                     Print("Reached destination.");
 

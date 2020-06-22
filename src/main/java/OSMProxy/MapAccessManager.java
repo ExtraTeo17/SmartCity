@@ -287,34 +287,6 @@ public class MapAccessManager {
             }
         }
     }
-		
-	   
-	/*private static void parseBusInfo(Map<String, BrigadeInfo> brigadeNrToBrigadeInfo, Station station, JSONObject jsonObject) {
-        JSONArray msg = (JSONArray) jsonObject.get("result");
-        Iterator<JSONArray> iterator = msg.iterator();
-        while (iterator.hasNext()) {
-        	
-        	JSONObject values = iterator.next();
-        	
-        	Iterator<JSONObject> values_iterator = values.iterator();
-        	String currentBrigadeNr = "";
-        	
-        	while (values_iterator.hasNext()) {
-        		JSONObject valueObject =  (JSONObject)values_iterator.next();
-        		String key = (String)valueObject.get("key");
-        		String value = (String)valueObject.get("value");
-        	    if (key.equals("brygada")) {
-        	    	currentBrigadeNr = value;
-        	    	if (!brigadeNrToBrigadeInfo.containsKey(value)) {
-        	    		brigadeNrToBrigadeInfo.put(value, new BrigadeInfo(value));
-        	    	}
-        	    }
-        	    else if (key.equals("czas")) {
-        	    	 brigadeNrToBrigadeInfo.get(currentBrigadeNr).addToTimetable(station.getId(), value);
-        	    }
-        	}
-        }
-	}*/
 
 	public static List<OSMNode> getOSMNodesInVicinity(double lat, double lon, double vicinityRange) throws IOException,
 			SAXException, ParserConfigurationException {
@@ -897,7 +869,8 @@ public class MapAccessManager {
 				String lat = attributes.getNamedItem("lat").getNodeValue();
 				String lon = attributes.getNamedItem("lon").getNodeValue();
 				
-				if (!SmartCityAgent.osmIdToStationOSMNode.containsKey(Long.parseLong(osmId))) {
+				if (belongsToCircle(Double.parseDouble(lat), Double.parseDouble(lon), new GeoPosition(middleLat, middleLon), radius) &&
+						!SmartCityAgent.osmIdToStationOSMNode.containsKey(Long.parseLong(osmId))) {
 					NodeList list_tags = item.getChildNodes();
 					for (int z=0; z<list_tags.getLength();z++) {
 						Node tag = list_tags.item(z);

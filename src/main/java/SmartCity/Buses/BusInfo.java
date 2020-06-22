@@ -66,7 +66,7 @@ public class BusInfo {
 		List<Long> filteredStationOsmIds = new ArrayList<>();
 		for (Long osmStationId : stationsOnRouteOsmIds) {
 			OSMStation station = SmartCityAgent.osmIdToStationOSMNode.get(osmStationId);
-			if (MapAccessManager.belongsToCircle(station.getLat(), station.getLon(),
+			if (station != null && MapAccessManager.belongsToCircle(station.getLat(), station.getLon(),
 					new GeoPosition(middleLat, middleLon), radius)) {
 				filteredStationOsmIds.add(osmStationId);
 			}
