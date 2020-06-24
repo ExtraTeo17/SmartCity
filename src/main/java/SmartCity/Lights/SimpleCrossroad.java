@@ -14,6 +14,7 @@ import Agents.LightColor;
 import OSMProxy.MapAccessManager;
 import OSMProxy.Elements.OSMNode;
 
+import SmartCity.SmartCityAgent;
 import org.jxmapviewer.JXMapViewer;
 import org.jxmapviewer.painter.Painter;
 import org.jxmapviewer.viewer.Waypoint;
@@ -104,7 +105,7 @@ public class SimpleCrossroad extends Crossroad {
         private boolean shouldExtendBecauseOfFarAwayQueque() {
             for (Light light : lights.values()) {
                 if (light.isGreen()) {
-                    Instant current_time = Instant.now();
+                    Instant current_time = SmartCityAgent.getSimulationTime().toInstant();
                     for (Instant time_of_car : light.farAwayCarMap.values()) {
                         // If current time + EXTEND_TIME > time_of_car
                         if (current_time.plusSeconds(EXTEND_TIME).isAfter(time_of_car)) {
@@ -113,7 +114,7 @@ public class SimpleCrossroad extends Crossroad {
                         }
                     }
                 } else {
-                    Instant current_time = Instant.now();
+                    Instant current_time = SmartCityAgent.getSimulationTime().toInstant();
                     for (Instant time_of_pedestrian : light.farAwayPedestrianMap.values()) {
                         // If current time + EXTEND_TIME > time_of_car
                         if (current_time.plusSeconds(EXTEND_TIME).isAfter(time_of_pedestrian)) {

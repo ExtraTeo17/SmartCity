@@ -3,8 +3,8 @@ package GUI;
 import Agents.BusAgent;
 import Agents.LightManager;
 import Agents.PedestrianAgent;
-import Agents.StationAgent;
 import Agents.VehicleAgent;
+import LightStrategies.LightManagerStrategy;
 import OSMProxy.Elements.OSMStation;
 import Routing.RouteNode;
 import Routing.Router;
@@ -33,6 +33,8 @@ import javax.swing.event.MouseInputListener;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.time.Duration;
@@ -68,6 +70,9 @@ public class MapWindow {
     private JSpinner setTimeSpinner;
     private JLabel currentTimeLabel;
     private JLabel currentTimeTitle;
+    private JLabel ResultTimeLabel;
+    private JCheckBox UseStrategyCheckBox;
+    private JLabel ResultTimeTitle;
     private SmartCityAgent SmartCityAgent;
     private Timer refreshTimer = new Timer(true);
     private Timer spawnTimer = new Timer(true);
@@ -91,6 +96,8 @@ public class MapWindow {
         MapViewer = new JXMapViewer();
         currentTimeLabel.setVisible(false);
         currentTimeTitle.setVisible(false);
+        ResultTimeLabel.setVisible(false);
+        ResultTimeTitle.setVisible(false);
         TileFactoryInfo info = new OSMTileFactoryInfo();
         DefaultTileFactory tileFactory = new DefaultTileFactory(info);
         tileFactory.setThreadPoolSize(8);
@@ -109,6 +116,12 @@ public class MapWindow {
             }
         });
 
+        UseStrategyCheckBox.addItemListener(new ItemListener() {
+            @Override
+            public void itemStateChanged(ItemEvent e) {
+                LightManagerStrategy.STRATEGY_ACTIVE = UseStrategyCheckBox.isSelected();
+            }
+        });
 
         seedSpinner.setModel(new SpinnerNumberModel(69, 0, 999999, 1));
         latSpinner.setModel(new SpinnerNumberModel(52.203342, -90, 90, 1));
@@ -193,18 +206,25 @@ public class MapWindow {
                 setInputEnabled(false);
                 currentTimeTitle.setVisible(true);
                 currentTimeLabel.setVisible(true);
+                ResultTimeLabel.setVisible(true);
+                ResultTimeTitle.setVisible(true);
                 SmartCityAgent.activateLightManagerAgents();
 
-                spawnTimer.scheduleAtFixedRate(new CreateCarTask(), 0, CREATE_CAR_INTERVAL_MILLISECONDS);
-                if (SmartCity.SmartCityAgent.shouldGeneratePedestrians)
+                if (SmartCity.SmartCityAgent.SHOULD_GENERATE_CARS)
+                    spawnTimer.scheduleAtFixedRate(new CreateCarTask(), 0, CREATE_CAR_INTERVAL_MILLISECONDS);
+                if (SmartCity.SmartCityAgent.SHOULD_GENERATE_PEDESTRIANS_AND_BUSES)
                     spawnTimer.scheduleAtFixedRate(new CreatePedestrianTask(), 0, CREATE_PEDESTRIAN_INTERVAL_MILLISECONDS);
-                simulationStart = Instant.now();
+                simulationStart = SmartCity.SmartCityAgent.getSimulationTime().toInstant();
                 refreshTimer.scheduleAtFixedRate(new BusControlTask(), 0, BUS_CONTROL_INTERVAL_MILLISECONDS);
                 state = SimulationState.RUNNING;
             }
         });
         refreshTimer.scheduleAtFixedRate(new RefreshTask(), 0, REFRESH_MAP_INTERVAL_MILLISECONDS);
 
+    }
+
+    public void setResultTime(String val) {
+        ResultTimeLabel.setText(val);
     }
 
     public void setInputEnabled(boolean check) {
@@ -225,7 +245,7 @@ public class MapWindow {
 
         zoneCenter = new GeoPosition(lat, lon);
 
-        if (SmartCityAgent.shouldPrepareBuses)
+        if (SmartCityAgent.SHOULD_GENERATE_PEDESTRIANS_AND_BUSES)
             SmartCityAgent.prepareStationsAndBuses(zoneCenter, getZoneRadius());
         SmartCityAgent.prepareLightManagers(zoneCenter, getZoneRadius());
         state = SimulationState.READY_TO_RUN;
@@ -260,7 +280,6 @@ public class MapWindow {
 
     private void RefreshTime() {
         Date date = getSimulationStartTime();
-        //Duration timeDiff = Duration.between(simulationStart, Instant.now());
         Duration timeDiff = Duration.ofSeconds((TIME_SCALE * REFRESH_MAP_INTERVAL_MILLISECONDS) / 1000);
         Instant inst = date.toInstant();
         inst = inst.plus(timeDiff);
@@ -268,7 +287,6 @@ public class MapWindow {
         String strDate = dateFormat.format(Date.from(inst));
         currentTimeLabel.setText(strDate);
         setTimeSpinner.setValue(Date.from(inst));
-
     }
 
     public void DrawLights(List<Painter<JXMapViewer>> painters) {
@@ -511,7 +529,7 @@ public class MapWindow {
         StartRouteButton.putClientProperty("hideActionText", Boolean.FALSE);
         gbc = new GridBagConstraints();
         gbc.gridx = 1;
-        gbc.gridy = 12;
+        gbc.gridy = 13;
         gbc.insets = new Insets(0, 0, 10, 0);
         SidePanel.add(StartRouteButton, gbc);
         final JLabel label3 = new JLabel();
@@ -572,7 +590,7 @@ public class MapWindow {
         final JPanel spacer2 = new JPanel();
         gbc = new GridBagConstraints();
         gbc.gridx = 0;
-        gbc.gridy = 11;
+        gbc.gridy = 12;
         gbc.fill = GridBagConstraints.VERTICAL;
         gbc.insets = new Insets(25, 0, 0, 0);
         SidePanel.add(spacer2, gbc);
@@ -602,13 +620,13 @@ public class MapWindow {
         label8.setText("Simulation time");
         gbc = new GridBagConstraints();
         gbc.gridx = 0;
-        gbc.gridy = 10;
+        gbc.gridy = 11;
         gbc.anchor = GridBagConstraints.WEST;
         SidePanel.add(label8, gbc);
         setTimeSpinner = new JSpinner();
         gbc = new GridBagConstraints();
         gbc.gridx = 1;
-        gbc.gridy = 10;
+        gbc.gridy = 11;
         gbc.anchor = GridBagConstraints.WEST;
         gbc.fill = GridBagConstraints.HORIZONTAL;
         SidePanel.add(setTimeSpinner, gbc);
@@ -625,15 +643,38 @@ public class MapWindow {
         currentTimeLabel.setText("...");
         gbc = new GridBagConstraints();
         gbc.gridx = 1;
-        gbc.gridy = 13;
+        gbc.gridy = 14;
         SidePanel.add(currentTimeLabel, gbc);
         currentTimeTitle = new JLabel();
         currentTimeTitle.setText("Current time");
         gbc = new GridBagConstraints();
         gbc.gridx = 0;
-        gbc.gridy = 13;
+        gbc.gridy = 14;
         gbc.anchor = GridBagConstraints.WEST;
         SidePanel.add(currentTimeTitle, gbc);
+        ResultTimeTitle = new JLabel();
+        ResultTimeTitle.setText("Result");
+        gbc = new GridBagConstraints();
+        gbc.gridx = 0;
+        gbc.gridy = 15;
+        gbc.anchor = GridBagConstraints.WEST;
+        SidePanel.add(ResultTimeTitle, gbc);
+        ResultTimeLabel = new JLabel();
+        ResultTimeLabel.setHorizontalAlignment(0);
+        ResultTimeLabel.setHorizontalTextPosition(0);
+        ResultTimeLabel.setText("...");
+        gbc = new GridBagConstraints();
+        gbc.gridx = 1;
+        gbc.gridy = 15;
+        SidePanel.add(ResultTimeLabel, gbc);
+        UseStrategyCheckBox = new JCheckBox();
+        UseStrategyCheckBox.setSelected(true);
+        UseStrategyCheckBox.setText("Use LightStrategy");
+        gbc = new GridBagConstraints();
+        gbc.gridx = 1;
+        gbc.gridy = 10;
+        gbc.anchor = GridBagConstraints.WEST;
+        SidePanel.add(UseStrategyCheckBox, gbc);
     }
 
     /**
@@ -692,7 +733,7 @@ public class MapWindow {
 
         @Override
         public void run() {
-            if (SmartCityAgent.Vehicles.size() >= getCarLimit())
+            if (!SmartCity.SmartCityAgent.SHOULD_GENERATE_CARS || SmartCityAgent.Vehicles.size() >= getCarLimit())
                 return;
             final Pair<Double, Double> geoPosInZoneCircle = generateRandomGeoPosOffsetWithRadius(getZoneRadius());
             GeoPosition A = new GeoPosition(zoneCenter.getLatitude() + geoPosInZoneCircle.getValue0(),
@@ -730,6 +771,7 @@ public class MapWindow {
         @Override
         public void run() {
             try {
+                if (!SmartCity.SmartCityAgent.SHOULD_GENERATE_PEDESTRIANS_AND_BUSES) return;
                 // add people limit
                 final Pair<Pair<StationNode, StationNode>, String> stationNodePairAndBusLine = getStationPairAndLineFromRandomBus();
                 final StationNode startStation = stationNodePairAndBusLine.getValue0().getValue0();

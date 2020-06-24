@@ -12,6 +12,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -30,6 +31,7 @@ import SmartCity.Buses.BusInfo;
 import SmartCity.Buses.Timetable;
 import Vehicles.MovingObjectImpl;
 import Vehicles.Pedestrian;
+import Vehicles.TestCar;
 import jade.core.Agent;
 import jade.core.behaviours.CyclicBehaviour;
 import jade.lang.acl.ACLMessage;
@@ -48,8 +50,8 @@ public class SmartCityAgent extends Agent {
     public final static String STATION = "Station";
     public final static String PEDESTRIAN = "Pedestrian";
     private final static boolean USE_DEPRECATED_XML_FOR_LIGHT_MANAGERS = false;
-	public final static boolean shouldPrepareBuses = true;
-	public final static boolean shouldGeneratePedestrians = true;
+	public static boolean SHOULD_GENERATE_PEDESTRIANS_AND_BUSES = true;
+	public static boolean SHOULD_GENERATE_CARS = true;
 
 	public static final String STEPS = "6";
 
@@ -84,7 +86,26 @@ public class SmartCityAgent extends Agent {
                 String type = rcv.getUserDefinedParameter(MessageParameter.TYPE);
                 switch (type) {
                     case MessageParameter.VEHICLE:
-                        Vehicles.removeIf(v -> v.getLocalName().equals(rcv.getSender().getLocalName()));
+                        for(int i=0; i<Vehicles.size(); i++)
+                        {
+                            VehicleAgent v = Vehicles.get(i);
+                            if(v.getLocalName().equals(rcv.getSender().getLocalName()))
+                            {
+                                if(v.getVehicle() instanceof TestCar)
+                                {
+                                    TestCar car = (TestCar)v.getVehicle();
+                                    Long seconds = Duration.between(car.start, car.end).getSeconds();
+                                    String time = String.format(
+                                            "%d:%02d:%02d",
+                                            seconds / 3600,
+                                            (seconds % 3600) / 60,
+                                            seconds % 60);
+                                    window.setResultTime(time);
+                                }
+                                Vehicles.remove(i);
+                                break;
+                            }
+                        }
                         break;
                     case MessageParameter.PEDESTRIAN:
                         pedestrians.removeIf(v -> v.getLocalName().equals(rcv.getSender().getLocalName()));
@@ -293,6 +314,29 @@ public class SmartCityAgent extends Agent {
         debug.add(runTest);
 
         menuBar.add(debug);
+
+        JMenu generation = new JMenu("Generation");
+
+        final JCheckBoxMenuItem car_gen = new JCheckBoxMenuItem("Cars", SHOULD_GENERATE_CARS);
+        car_gen.addItemListener(new ItemListener() {
+            @Override
+            public void itemStateChanged(ItemEvent e) {
+                SHOULD_GENERATE_CARS = car_gen.getState();
+            }
+        });
+        generation.add(car_gen);
+
+        final JCheckBoxMenuItem pedestrians = new JCheckBoxMenuItem("Pedestrians", SHOULD_GENERATE_PEDESTRIANS_AND_BUSES);
+        pedestrians.addItemListener(new ItemListener() {
+            @Override
+            public void itemStateChanged(ItemEvent e) {
+                SHOULD_GENERATE_PEDESTRIANS_AND_BUSES = pedestrians.getState();
+            }
+        });
+        generation.add(pedestrians);
+
+        menuBar.add(generation);
+
         frame.setJMenuBar(menuBar);
         frame.setSize(1200, 600);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);

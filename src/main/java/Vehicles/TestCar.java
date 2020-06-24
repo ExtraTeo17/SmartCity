@@ -1,14 +1,18 @@
 package Vehicles;
 
+import Agents.MessageParameter;
 import Routing.RouteNode;
 import SmartCity.SmartCityAgent;
+import jade.lang.acl.ACLMessage;
+import jade.util.leap.Properties;
 
 import java.time.Duration;
 import java.time.Instant;
 import java.util.List;
 
 public class TestCar extends MovingObjectImpl {
-    Instant start;
+    public Instant start;
+    public Instant end;
 
     public TestCar(List<RouteNode> info) {
         super(info);
@@ -21,8 +25,7 @@ public class TestCar extends MovingObjectImpl {
         super.setState(state);
         if(state == DrivingState.AT_DESTINATION)
         {
-            Instant end = SmartCityAgent.getSimulationTime().toInstant();
-            System.out.println("Test finished in time: " + Duration.between(start, end));
+            end = SmartCityAgent.getSimulationTime().toInstant();
         }
     }
 }
