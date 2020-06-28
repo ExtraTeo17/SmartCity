@@ -14,7 +14,7 @@ public class MovingObjectImpl extends MovingObject {
     private List<RouteNode> displayRoute;
     private List<RouteNode> route;
     private int index = 0;
-    private int speed = 50;
+    private int speed = 10;
     private int closestLightIndex = 0;
     public DrivingState State = DrivingState.STARTING;
 

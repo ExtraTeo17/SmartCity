@@ -12,6 +12,7 @@ import Routing.StationNode;
 import SmartCity.RoutePainter;
 import SmartCity.SmartCityAgent;
 import SmartCity.ZonePainter;
+import SmartCity.Lights.Crossroad;
 import Vehicles.Bus;
 import Vehicles.MovingObjectImpl;
 import Vehicles.Pedestrian;
@@ -84,10 +85,10 @@ public class MapWindow {
     private Instant simulationStart;
     public boolean renderPedestrians = true;
     public boolean renderPedestrianRoutes = true;
-    public boolean renderCars = false;
-    public boolean renderCarRoutes = false;
+    public boolean renderCars = true;
+    public boolean renderCarRoutes = true;
     public boolean renderBuses = true;
-    public boolean renderBusRoutes = false;
+    public boolean renderBusRoutes = true;
     public boolean renderZone = true;
     public boolean renderLights = true;
     public boolean renderStations = true;
@@ -119,7 +120,7 @@ public class MapWindow {
         UseStrategyCheckBox.addItemListener(new ItemListener() {
             @Override
             public void itemStateChanged(ItemEvent e) {
-                LightManagerStrategy.STRATEGY_ACTIVE = UseStrategyCheckBox.isSelected();
+                Crossroad.STRATEGY_ACTIVE = UseStrategyCheckBox.isSelected();
             }
         });
 
@@ -742,7 +743,7 @@ public class MapWindow {
                     zoneCenter.getLongitude() - geoPosInZoneCircle.getValue1());
             List<RouteNode> info;
             try {
-                info = Router.generateRouteInfo(A, B);//(new GeoPosition(52.179977, 21.071040), new GeoPosition(52.178759, 21.070854));//(new GeoPosition(52.228275, 20.986557), new GeoPosition(52.234908, 20.981210));
+                info = Router.generateRouteInfo/*(A, B);*/(new GeoPosition(52.233652, 21.015165), new GeoPosition(52.238449, 21.012806));//(new GeoPosition(52.228275, 20.986557), new GeoPosition(52.234908, 20.981210));
             } catch (Exception e) {
                 e.printStackTrace();
                 return;

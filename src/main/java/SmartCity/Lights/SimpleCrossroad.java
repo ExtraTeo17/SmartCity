@@ -11,6 +11,7 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 import Agents.LightColor;
+import LightStrategies.LightManagerStrategy;
 import OSMProxy.MapAccessManager;
 import OSMProxy.Elements.OSMNode;
 
@@ -30,6 +31,7 @@ public class SimpleCrossroad extends Crossroad {
     private SimpleLightGroup lightGroup2;
     private Timer timer;
     private boolean alreadyExtendedGreen = false;
+    public boolean useStrategy = true;
 
     public SimpleCrossroad(Node crossroad, Long managerId) {
         prepareLightGroups(crossroad, managerId);
@@ -81,23 +83,25 @@ public class SimpleCrossroad extends Crossroad {
 
         @Override
         public void run() {
-            if (!alreadyExtendedGreen) {
-                if (shouldExtendGreenLightBecauseOfCarsOnLight()) {
-                    System.out.println("-------------------------------------shouldExtendGreenLightBecauseOfCarsOnLight--------------");
-                    alreadyExtendedGreen = true;
-                    return;
-                } else if (shouldExtendBecauseOfFarAwayQueque()) {
+        	if (STRATEGY_ACTIVE) {
+        		if (!alreadyExtendedGreen) {
+                    if (shouldExtendGreenLightBecauseOfCarsOnLight()) {
+                        System.out.println("-------------------------------------shouldExtendGreenLightBecauseOfCarsOnLight--------------");
+                        alreadyExtendedGreen = true;
+                        return;
+                    } else if (shouldExtendBecauseOfFarAwayQueque()) {
+                        prepareTimer();
+                        System.out.println("-------------------------------------shouldExtendBecauseOfFarAwayQueque--------------");
+                        timer.schedule(new SwitchLightsTask(), EXTEND_TIME * 1000);
+                        alreadyExtendedGreen = true;
+                        return;
+                    }
+                } else {
                     prepareTimer();
-                    System.out.println("-------------------------------------shouldExtendBecauseOfFarAwayQueque--------------");
-                    timer.schedule(new SwitchLightsTask(), EXTEND_TIME * 1000);
-                    alreadyExtendedGreen = true;
-                    return;
+                    startTimer();
+                    alreadyExtendedGreen = false;
                 }
-            } else {
-                prepareTimer();
-                startTimer();
-                alreadyExtendedGreen = false;
-            }
+        	}
             lightGroup1.switchLights();
             lightGroup2.switchLights();
         }

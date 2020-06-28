@@ -24,8 +24,6 @@ import jade.lang.acl.ACLMessage;
 
 public class LightManagerStrategy extends LightStrategy {
 
-    public static boolean STRATEGY_ACTIVE = true;
-
     private Crossroad crossroad;
 
     private LightManager agent;

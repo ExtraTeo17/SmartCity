@@ -10,6 +10,9 @@ import org.jxmapviewer.viewer.Waypoint;
 import org.jxmapviewer.viewer.WaypointPainter;
 
 public abstract class Crossroad {
+	
+	public static boolean STRATEGY_ACTIVE = true;
+	
 	public abstract void addCarToQueue(String carName, long adjacentOsmWayId);
 	public abstract void addCarToFarAwayQueue(String carName, long adjacentOsmWayId, Instant journeyTime);
 	public abstract void removeCarFromQueue(long adjacentOsmWayId);

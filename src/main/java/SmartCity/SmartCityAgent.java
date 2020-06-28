@@ -49,8 +49,8 @@ public class SmartCityAgent extends Agent {
     public final static String BUS = "Bus";
     public final static String STATION = "Station";
     public final static String PEDESTRIAN = "Pedestrian";
-    private final static boolean USE_DEPRECATED_XML_FOR_LIGHT_MANAGERS = false;
-	public static boolean SHOULD_GENERATE_PEDESTRIANS_AND_BUSES = true;
+    public final static boolean USE_DEPRECATED_XML_FOR_LIGHT_MANAGERS = false;
+	public static boolean SHOULD_GENERATE_PEDESTRIANS_AND_BUSES = false;
 	public static boolean SHOULD_GENERATE_CARS = true;
 
 	public static final String STEPS = "6";
