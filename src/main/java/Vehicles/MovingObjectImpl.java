@@ -1,5 +1,6 @@
 package Vehicles;
 
+import Agents.LightManager;
 import GUI.MapWindow;
 import Routing.LightManagerNode;
 import Routing.RouteNode;
@@ -14,7 +15,7 @@ public class MovingObjectImpl extends MovingObject {
     private List<RouteNode> displayRoute;
     private List<RouteNode> route;
     private int index = 0;
-    private int speed = 10;
+    private int speed = 50;
     private int closestLightIndex = 0;
     public DrivingState State = DrivingState.STARTING;
 
@@ -29,7 +30,10 @@ public class MovingObjectImpl extends MovingObject {
 
     @Override
     public long getAdjacentOsmWayId() {
-        return ((LightManagerNode)route.get(index)).getOsmWayId();
+        while (!(route.get(index) instanceof LightManagerNode)) {
+            index--;
+        }
+        return ((LightManagerNode) route.get(index)).getOsmWayId();
     }
 
     @Override
@@ -62,25 +66,25 @@ public class MovingObjectImpl extends MovingObject {
     @Override
     public LightManagerNode getCurrentTrafficLightNode() {
         if (closestLightIndex == -1)
-        	return null;
-        return (LightManagerNode)(route.get(closestLightIndex));
+            return null;
+        return (LightManagerNode) (route.get(closestLightIndex));
     }
 
     @Override
     public boolean isAtTrafficLights() {
-	    if (index == route.size())
-	    	return false;
+        if (index == route.size())
+            return false;
         return route.get(index) instanceof LightManagerNode;
     }
 
     @Override
     public boolean isAtDestination() {
-        return index == route.size() ;
+        return index == route.size();
     }
 
     @Override
     public void Move() {
-            index++;
+        index++;
     }
 
     @Override

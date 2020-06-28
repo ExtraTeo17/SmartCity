@@ -1,11 +1,9 @@
 package SmartCity.Stations;
 
 import java.time.Instant;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
+import GUI.MapWindow;
 import org.javatuples.Pair;
 
 import OSMProxy.Elements.OSMStation;
@@ -21,7 +19,7 @@ public class StationStrategy {
 	final private Map<String, String> busAgentNameToBusNumberMap = new HashMap<>();
 	final private Map<String,PedestrianArrivalInfo> farAwayPedestrianMap = new HashMap<>();
 	final private Map<String, PedestrianArrivalInfo> pedestrianOnStationMap = new HashMap<>();
-	final private static int MINUTE = 60;
+	final private static int MINUTE = 60 * MapWindow.getTimeScale() * 2;
 	//private final OSMStation stationOSMNode;
 	public StationStrategy(OSMStation stationOSMNode, long agentId) {
 		SmartCityAgent.osmStationIdToStationNode.put(stationOSMNode.getId(), new StationNode(stationOSMNode.getLat(),
@@ -61,7 +59,7 @@ public class StationStrategy {
 		  pedestrianOnStationMap.get(desiredBus).putPedestrianOnList( new Pair<String,Instant>(agentName,arrivalTime));
 		
 	    }
-	  //TODO : CHANGE DOESN@T MATCH THE LOGIC
+
 	  public void removePedestrianFromFarAwayQueue(String agentName) {
 		  farAwayPedestrianMap.remove(agentName);
 	    }
@@ -75,6 +73,17 @@ public class StationStrategy {
 		for(String bus : busOnStationMap.keySet() )
 	      {
 	    	  Pair<Instant,Instant> scheduleAndArrivalTime = busOnStationMap.get(bus);
+	    	  Date scheduleTime = Date.from(scheduleAndArrivalTime.getValue0());
+	    	  Date arrivalTime = Date.from(scheduleAndArrivalTime.getValue1());
+
+	    	  Calendar arrivalCalendar = Calendar.getInstance();
+	    	  arrivalCalendar.setTime(arrivalTime);
+
+			  Calendar scheduleCalendar = Calendar.getInstance();
+			  scheduleCalendar.set(arrivalCalendar.get(Calendar.YEAR), arrivalCalendar.get(Calendar.MONTH), arrivalCalendar.get(Calendar.DAY_OF_MONTH), scheduleTime.getHours(), scheduleTime.getMinutes());
+
+			  scheduleAndArrivalTime = new Pair<Instant, Instant>(scheduleCalendar.toInstant(), arrivalTime.toInstant());
+
 	    	  if(scheduleAndArrivalTime.getValue1().isAfter(scheduleAndArrivalTime.getValue0().plusSeconds(MINUTE)))
 	    	  {
 	    		  
@@ -86,10 +95,10 @@ public class StationStrategy {
 	    			  scheduleAndArrivalTime.getValue1().isBefore((scheduleAndArrivalTime.getValue0().plusSeconds(MINUTE)))) 
 	    	  {
 	    		  System.out.println("------------------BUS WAS ON TIME-----------------------");
-	    		  List<String> passengersThatCanLeave =  checkPassengersWhoAreReadyToGo(bus);
-	    		  passengersThatCanLeave.addAll(checkPassengersWhoAreFar(bus, scheduleAndArrivalTime.getValue0().plusSeconds(MINUTE)));
+	    		  List<String> passengersThatCanLeave = checkPassengersWhoAreReadyToGo(bus);
+	    		  List<String> farPassengers = checkPassengersWhoAreFar(bus, scheduleAndArrivalTime.getValue0().plusSeconds(MINUTE));
+	    		  passengersThatCanLeave.addAll(farPassengers);
 	    		  result.addBusAndPedestrianGrantedPassthrough(bus,passengersThatCanLeave);
-	    	  
 	    	  }
 	    	  else if (scheduleAndArrivalTime.getValue1().isBefore((scheduleAndArrivalTime.getValue0().minusSeconds(MINUTE)))) {
 	    		  System.out.println("------------------BUS TOO EARLY-----------------------");

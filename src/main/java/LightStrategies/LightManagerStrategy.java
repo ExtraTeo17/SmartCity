@@ -4,6 +4,7 @@ import java.time.Instant;
 import java.util.List;
 
 import Agents.MessageParameter;
+import GUI.MapWindow;
 import OSMProxy.Elements.OSMNode;
 
 import jade.util.leap.Properties;
@@ -128,7 +129,7 @@ public class LightManagerStrategy extends LightStrategy {
             }
         };
 
-        Behaviour checkState = new TickerBehaviour(agent, 100) {
+        Behaviour checkState = new TickerBehaviour(agent, 100 / MapWindow.getTimeScale()) {
 
             @Override
             protected void onTick() {

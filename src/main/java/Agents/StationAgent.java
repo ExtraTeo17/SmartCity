@@ -94,15 +94,12 @@ public class StationAgent extends Agent {
 			}
 			private void handleMessageFromPedestrian(ACLMessage rcv) {
 				if (rcv.getPerformative() == ACLMessage.INFORM) {
-					// TODO Handle inform from Pedestrian (has anticipated time of arrival)
 					stationStrategy.addPedestrianToFarAwayQueue(rcv.getSender().getLocalName(),
 							rcv.getUserDefinedParameter(MessageParameter.DESIRED_BUS),
 							getInstantParameter(rcv, MessageParameter.ARRIVAL_TIME));
 				}
 				
 				else if (rcv.getPerformative() == ACLMessage.REQUEST_WHEN) {
-					// TODO Handle request_when from Pedestrian (arrived and awaits request for departure)
-					//  use MessageParameter.STATION_ID
 					System.out.println("GET MESSAGE FROM PEDESTIAN REQUEST_WHEN");
 					stationStrategy.removePedestrianFromFarAwayQueue(rcv.getSender().getLocalName());
 					stationStrategy.addPedestrianToQueue(rcv.getSender().getLocalName(),

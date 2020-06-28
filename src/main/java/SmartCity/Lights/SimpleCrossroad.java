@@ -11,6 +11,7 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 import Agents.LightColor;
+import GUI.MapWindow;
 import LightStrategies.LightManagerStrategy;
 import OSMProxy.MapAccessManager;
 import OSMProxy.Elements.OSMNode;
@@ -24,7 +25,7 @@ import org.w3c.dom.Node;
 
 public class SimpleCrossroad extends Crossroad {
 
-    final public static int EXTEND_TIME = 5;
+    final public static int EXTEND_TIME = 30;
 
     private Map<Long, Light> lights = new HashMap<>();
     private SimpleLightGroup lightGroup1;
@@ -75,7 +76,7 @@ public class SimpleCrossroad extends Crossroad {
 
     private void startTimer() {
         int delayBeforeStart = 0;
-        int repeatIntervalInMillisecs = 5000;
+        int repeatIntervalInMillisecs = EXTEND_TIME * 1000 / MapWindow.getTimeScale();
         timer.scheduleAtFixedRate(new SwitchLightsTask(), delayBeforeStart, repeatIntervalInMillisecs);
     }
 
@@ -92,7 +93,7 @@ public class SimpleCrossroad extends Crossroad {
                     } else if (shouldExtendBecauseOfFarAwayQueque()) {
                         prepareTimer();
                         System.out.println("-------------------------------------shouldExtendBecauseOfFarAwayQueque--------------");
-                        timer.schedule(new SwitchLightsTask(), EXTEND_TIME * 1000);
+                        timer.schedule(new SwitchLightsTask(), EXTEND_TIME * 1000 / MapWindow.getTimeScale());
                         alreadyExtendedGreen = true;
                         return;
                     }

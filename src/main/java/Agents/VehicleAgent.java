@@ -32,6 +32,7 @@ public class VehicleAgent extends Agent {
                     switch (Vehicle.getState())
                     {
                         case MOVING:
+                            Vehicle.setState(DrivingState.WAITING_AT_LIGHT);
                             LightManagerNode light = Vehicle.getCurrentTrafficLightNode();
                             ACLMessage msg = new ACLMessage(ACLMessage.REQUEST_WHEN);
                             msg.addReceiver(new AID("LightManager" + light.getLightManagerId(), AID.ISLOCALNAME));
@@ -40,7 +41,6 @@ public class VehicleAgent extends Agent {
                             properties.setProperty(MessageParameter.ADJACENT_OSM_WAY_ID, Long.toString(Vehicle.getAdjacentOsmWayId()));
                             msg.setAllUserDefinedParameters(properties);
                             send(msg);
-                            Vehicle.setState(DrivingState.WAITING_AT_LIGHT);
                             Print("Asking LightManager" + light.getLightManagerId() + " for right to passage.");
                             break;
                         case WAITING_AT_LIGHT:
@@ -138,6 +138,6 @@ public class VehicleAgent extends Agent {
     }
 
     void Print(String message) {
-        System.out.println(getLocalName() + ": " + message);
+         //System.out.println(getLocalName() + ": " + message);
     }
 }

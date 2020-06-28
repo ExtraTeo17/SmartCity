@@ -154,7 +154,7 @@ public class SmartCityAgent extends Agent {
         view.add(routes);
 
         final JCheckBoxMenuItem buses = new JCheckBoxMenuItem("Render buses", window.renderBuses);
-        cars.addItemListener(new ItemListener() {
+        buses.addItemListener(new ItemListener() {
             @Override
             public void itemStateChanged(ItemEvent e) {
                 window.renderBuses = buses.getState();

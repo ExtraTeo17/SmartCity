@@ -50,7 +50,7 @@ public class MapWindow {
     private final static int CREATE_CAR_INTERVAL_MILLISECONDS = 500;
     private static final long CREATE_PEDESTRIAN_INTERVAL_MILLISECONDS = 100;
     private final static int PEDESTRIAN_STATION_RADIUS = 200;
-    private final static int TIME_SCALE = 30;
+    private final static int TIME_SCALE = 10;
 
     public static int getTimeScale() {
         return TIME_SCALE;
@@ -74,6 +74,8 @@ public class MapWindow {
     private JLabel ResultTimeLabel;
     private JCheckBox UseStrategyCheckBox;
     private JLabel ResultTimeTitle;
+    private JButton testBusZoneButton;
+    private JButton testCarZoneButton;
     private SmartCityAgent SmartCityAgent;
     private Timer refreshTimer = new Timer(true);
     private Timer spawnTimer = new Timer(true);
@@ -81,6 +83,7 @@ public class MapWindow {
     private GeoPosition pointB;
     private SimulationState state = SimulationState.SETTING_ZONE;
     private Random random = new Random();
+    private Random testCarRandom = new Random(96);
     private GeoPosition zoneCenter;
     private Instant simulationStart;
     public boolean renderPedestrians = true;
@@ -145,6 +148,27 @@ public class MapWindow {
             }
         });
 
+        testCarZoneButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                latSpinner.setValue(52.23682);
+                lonSpinner.setValue(21.01681);
+                seedSpinner.setValue(34);
+                radiusSpinner.setValue(600);
+                prepareAgentsAndSetZone(52.23682, 21.01681, getZoneRadius());
+            }
+        });
+
+        testBusZoneButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                latSpinner.setValue(52.203342);
+                lonSpinner.setValue(20.861213);
+                radiusSpinner.setValue(300);
+                prepareAgentsAndSetZone(52.203342, 20.861213, getZoneRadius());
+            }
+        });
+
         setTimeSpinner.setModel(new SpinnerDateModel());
         JSpinner.DateEditor dateTimeEditor = new JSpinner.DateEditor(setTimeSpinner, "HH:mm:ss dd-MM-yyyy");
         setTimeSpinner.setEditor(dateTimeEditor);
@@ -200,7 +224,6 @@ public class MapWindow {
         MapPanel.add(MapViewer);
         MapPanel.revalidate();
         StartRouteButton.addActionListener(new ActionListener() {
-
             @Override
             public void actionPerformed(ActionEvent e) {
                 if (state != SimulationState.READY_TO_RUN) return;
@@ -210,6 +233,7 @@ public class MapWindow {
                 ResultTimeLabel.setVisible(true);
                 ResultTimeTitle.setVisible(true);
                 SmartCityAgent.activateLightManagerAgents();
+                random.setSeed(getSeed());
 
                 if (SmartCity.SmartCityAgent.SHOULD_GENERATE_CARS)
                     spawnTimer.scheduleAtFixedRate(new CreateCarTask(), 0, CREATE_CAR_INTERVAL_MILLISECONDS);
@@ -238,6 +262,8 @@ public class MapWindow {
         setZoneButton.setEnabled(check);
         StartRouteButton.setEnabled(check);
         setTimeSpinner.setEnabled(check);
+        testCarZoneButton.setEnabled(check);
+        testBusZoneButton.setEnabled(check);
     }
 
     public void prepareAgentsAndSetZone(double lat, double lon, int radius) {
@@ -490,7 +516,7 @@ public class MapWindow {
         GridBagConstraints gbc;
         gbc = new GridBagConstraints();
         gbc.gridx = 0;
-        gbc.gridy = 5;
+        gbc.gridy = 7;
         gbc.fill = GridBagConstraints.VERTICAL;
         gbc.insets = new Insets(25, 0, 0, 0);
         SidePanel.add(spacer1, gbc);
@@ -498,7 +524,7 @@ public class MapWindow {
         label1.setText("Car limit");
         gbc = new GridBagConstraints();
         gbc.gridx = 0;
-        gbc.gridy = 6;
+        gbc.gridy = 8;
         gbc.insets = new Insets(0, 0, 10, 0);
         SidePanel.add(label1, gbc);
         carLimitSpinner = new JSpinner();
@@ -506,14 +532,14 @@ public class MapWindow {
         carLimitSpinner.setMinimumSize(new Dimension(150, 30));
         gbc = new GridBagConstraints();
         gbc.gridx = 1;
-        gbc.gridy = 6;
+        gbc.gridy = 8;
         gbc.insets = new Insets(0, 0, 10, 0);
         SidePanel.add(carLimitSpinner, gbc);
         final JLabel label2 = new JLabel();
         label2.setText("Simulation seed");
         gbc = new GridBagConstraints();
         gbc.gridx = 0;
-        gbc.gridy = 7;
+        gbc.gridy = 9;
         gbc.fill = GridBagConstraints.BOTH;
         gbc.insets = new Insets(0, 0, 10, 0);
         SidePanel.add(label2, gbc);
@@ -522,7 +548,7 @@ public class MapWindow {
         seedSpinner.setMinimumSize(new Dimension(150, 30));
         gbc = new GridBagConstraints();
         gbc.gridx = 1;
-        gbc.gridy = 7;
+        gbc.gridy = 9;
         gbc.insets = new Insets(0, 0, 10, 0);
         SidePanel.add(seedSpinner, gbc);
         StartRouteButton = new JButton();
@@ -530,7 +556,7 @@ public class MapWindow {
         StartRouteButton.putClientProperty("hideActionText", Boolean.FALSE);
         gbc = new GridBagConstraints();
         gbc.gridx = 1;
-        gbc.gridy = 13;
+        gbc.gridy = 15;
         gbc.insets = new Insets(0, 0, 10, 0);
         SidePanel.add(StartRouteButton, gbc);
         final JLabel label3 = new JLabel();
@@ -591,7 +617,7 @@ public class MapWindow {
         final JPanel spacer2 = new JPanel();
         gbc = new GridBagConstraints();
         gbc.gridx = 0;
-        gbc.gridy = 12;
+        gbc.gridy = 14;
         gbc.fill = GridBagConstraints.VERTICAL;
         gbc.insets = new Insets(25, 0, 0, 0);
         SidePanel.add(spacer2, gbc);
@@ -606,7 +632,7 @@ public class MapWindow {
         label7.setText("Test car ID");
         gbc = new GridBagConstraints();
         gbc.gridx = 0;
-        gbc.gridy = 8;
+        gbc.gridy = 10;
         gbc.insets = new Insets(0, 0, 10, 0);
         SidePanel.add(label7, gbc);
         testCarIdSpinner = new JSpinner();
@@ -614,27 +640,27 @@ public class MapWindow {
         testCarIdSpinner.setMinimumSize(new Dimension(150, 30));
         gbc = new GridBagConstraints();
         gbc.gridx = 1;
-        gbc.gridy = 8;
+        gbc.gridy = 10;
         gbc.insets = new Insets(0, 0, 10, 0);
         SidePanel.add(testCarIdSpinner, gbc);
         final JLabel label8 = new JLabel();
         label8.setText("Simulation time");
         gbc = new GridBagConstraints();
         gbc.gridx = 0;
-        gbc.gridy = 11;
+        gbc.gridy = 13;
         gbc.anchor = GridBagConstraints.WEST;
         SidePanel.add(label8, gbc);
         setTimeSpinner = new JSpinner();
         gbc = new GridBagConstraints();
         gbc.gridx = 1;
-        gbc.gridy = 11;
+        gbc.gridy = 13;
         gbc.anchor = GridBagConstraints.WEST;
         gbc.fill = GridBagConstraints.HORIZONTAL;
         SidePanel.add(setTimeSpinner, gbc);
         final JPanel spacer3 = new JPanel();
         gbc = new GridBagConstraints();
         gbc.gridx = 0;
-        gbc.gridy = 9;
+        gbc.gridy = 11;
         gbc.fill = GridBagConstraints.VERTICAL;
         gbc.insets = new Insets(25, 0, 0, 0);
         SidePanel.add(spacer3, gbc);
@@ -644,20 +670,20 @@ public class MapWindow {
         currentTimeLabel.setText("...");
         gbc = new GridBagConstraints();
         gbc.gridx = 1;
-        gbc.gridy = 14;
+        gbc.gridy = 16;
         SidePanel.add(currentTimeLabel, gbc);
         currentTimeTitle = new JLabel();
         currentTimeTitle.setText("Current time");
         gbc = new GridBagConstraints();
         gbc.gridx = 0;
-        gbc.gridy = 14;
+        gbc.gridy = 16;
         gbc.anchor = GridBagConstraints.WEST;
         SidePanel.add(currentTimeTitle, gbc);
         ResultTimeTitle = new JLabel();
         ResultTimeTitle.setText("Result");
         gbc = new GridBagConstraints();
         gbc.gridx = 0;
-        gbc.gridy = 15;
+        gbc.gridy = 17;
         gbc.anchor = GridBagConstraints.WEST;
         SidePanel.add(ResultTimeTitle, gbc);
         ResultTimeLabel = new JLabel();
@@ -666,16 +692,37 @@ public class MapWindow {
         ResultTimeLabel.setText("...");
         gbc = new GridBagConstraints();
         gbc.gridx = 1;
-        gbc.gridy = 15;
+        gbc.gridy = 17;
         SidePanel.add(ResultTimeLabel, gbc);
         UseStrategyCheckBox = new JCheckBox();
         UseStrategyCheckBox.setSelected(true);
         UseStrategyCheckBox.setText("Use LightStrategy");
         gbc = new GridBagConstraints();
         gbc.gridx = 1;
-        gbc.gridy = 10;
+        gbc.gridy = 12;
         gbc.anchor = GridBagConstraints.WEST;
         SidePanel.add(UseStrategyCheckBox, gbc);
+        testBusZoneButton = new JButton();
+        testBusZoneButton.setText("Test Bus zone");
+        gbc = new GridBagConstraints();
+        gbc.gridx = 0;
+        gbc.gridy = 6;
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+        SidePanel.add(testBusZoneButton, gbc);
+        testCarZoneButton = new JButton();
+        testCarZoneButton.setText("Test Car zone");
+        gbc = new GridBagConstraints();
+        gbc.gridx = 1;
+        gbc.gridy = 6;
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+        SidePanel.add(testCarZoneButton, gbc);
+        final JPanel spacer4 = new JPanel();
+        gbc = new GridBagConstraints();
+        gbc.gridx = 0;
+        gbc.gridy = 5;
+        gbc.fill = GridBagConstraints.VERTICAL;
+        gbc.insets = new Insets(25, 0, 0, 0);
+        SidePanel.add(spacer4, gbc);
     }
 
     /**
@@ -743,7 +790,7 @@ public class MapWindow {
                     zoneCenter.getLongitude() - geoPosInZoneCircle.getValue1());
             List<RouteNode> info;
             try {
-                info = Router.generateRouteInfo/*(A, B);*/(new GeoPosition(52.233652, 21.015165), new GeoPosition(52.238449, 21.012806));//(new GeoPosition(52.228275, 20.986557), new GeoPosition(52.234908, 20.981210));
+                info = Router.generateRouteInfo(A, B);
             } catch (Exception e) {
                 e.printStackTrace();
                 return;
@@ -751,7 +798,7 @@ public class MapWindow {
 
             VehicleAgent vehicle = new VehicleAgent();
             MovingObjectImpl car;
-            if (getTestCarId() == SmartCityAgent.Vehicles.size())
+            if (getTestCarId() == SmartCityAgent.carId)
                 car = new TestCar(info);
             else
                 car = new MovingObjectImpl(info);
@@ -813,6 +860,8 @@ public class MapWindow {
 
     private Pair<Double, Double> generateRandomGeoPosOffsetWithRadius(final int radius) {
         double angle = random.nextDouble() * Math.PI * 2;
+        if (getTestCarId() == SmartCityAgent.carId)
+            angle = testCarRandom.nextDouble() * Math.PI * 2;
         double lat = Math.sin(angle) * radius * 0.0000089;
         double lon = Math.cos(angle) * radius * 0.0000089 * Math.cos(lat);
         return Pair.with(lat, lon);
