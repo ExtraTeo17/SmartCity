@@ -27,12 +27,12 @@ public class PedestrianAgent extends Agent {
 	public PedestrianAgent(final Pedestrian pedestrian, final int agentId) {
 		this.pedestrian = pedestrian;
 		this.agentId = agentId;
-		GetNextStation();
-	
-	
-	} 
+	}
+
 	@Override
     protected void setup() {
+		GetNextStation();
+
 		pedestrian.setState(DrivingState.MOVING);
 		Behaviour move = new TickerBehaviour(this, 3600 / pedestrian.getSpeed()) {
 			@Override
@@ -70,8 +70,8 @@ public class PedestrianAgent extends Agent {
 							msg.addReceiver(new AID("Station" + station.getStationId(), AID.ISLOCALNAME));
 							Properties properties = new Properties();
 							properties.setProperty(MessageParameter.TYPE, MessageParameter.PEDESTRIAN);
-							properties.setProperty(MessageParameter.DESIRED_BUS,pedestrian.getPreferredBusLine());
-							properties.setProperty(MessageParameter.ARRIVAL_TIME,"" + SmartCityAgent.getSimulationTime().toInstant());
+							properties.setProperty(MessageParameter.DESIRED_BUS, "" + pedestrian.getPreferredBusLine());
+							properties.setProperty(MessageParameter.ARRIVAL_TIME, "" + SmartCityAgent.getSimulationTime().toInstant());
 							msg.setAllUserDefinedParameters(properties);
 							send(msg);
 							   System.out.println("Pedestrian: Send REQUEST_WHEN to Station");
@@ -146,6 +146,7 @@ public class PedestrianAgent extends Agent {
 								Properties properties = new Properties();
 
 								properties.setProperty(MessageParameter.TYPE, MessageParameter.PEDESTRIAN);
+								properties.setProperty(MessageParameter.DESIRED_BUS, pedestrian.getPreferredBusLine());
 								response.setAllUserDefinedParameters(properties);
 								send(response);
 
@@ -158,6 +159,9 @@ public class PedestrianAgent extends Agent {
 								msg.setAllUserDefinedParameters(properties);
 								pedestrian.setState(DrivingState.IN_BUS);
 								send(msg);
+
+								while(!pedestrian.isAtStation()) pedestrian.Move();
+
 								break;
 						}
 					} else if(type == MessageParameter.BUS)

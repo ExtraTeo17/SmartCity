@@ -15,7 +15,6 @@ import OSMProxy.Elements.OSMWaypoint;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Iterator;
 import java.util.List;
 
 public final class Router {
@@ -59,7 +58,7 @@ public final class Router {
 		List<RouteNode> routeNodes = new ArrayList<>();
 		List<Long> crossingOsmIdsToTransform = new ArrayList<>();
 		for (int i = 0; i < routeInfo.getWayCount(); ++i) {
-			if (routeInfo.getWay(i).getRouteOrientation() == RouteOrientation.HETEROSEXUAL) {
+			if (routeInfo.getWay(i).getRouteOrientation() == RouteOrientation.FRONT) {
 				for (int j = 0; j < routeInfo.getWay(i).getWaypointCount(); ++j) {
 					addRouteNode(routeNodes, routeInfo.getWay(i).getWaypoint(j), routeInfo, crossingOsmIdsToTransform);
 				}
@@ -204,9 +203,9 @@ public final class Router {
 	}
 	
 	private static void addRouteNodesBasedOnOrientation(OSMWay el, List<RouteNode> routeNodes_list) {
-		if (el.getRelationOrientation() == RelationOrientation.HETEROSEXUAL) {
+		if (el.getRelationOrientation() == RelationOrientation.FRONT) {
 			addRouteNodesToList(el.getWaypoints(), routeNodes_list);
-		} else if (el.getRelationOrientation() == RelationOrientation.HOMOSEXUAL) {
+		} else if (el.getRelationOrientation() == RelationOrientation.BACK) {
 			addRouteNodesToList(reverse(el.getWaypoints()), routeNodes_list);
 		} else {
 			try {

@@ -17,13 +17,13 @@ public class OSMWay extends OSMElement {
 	}
 	
 	public enum RelationOrientation {
-		HOMOSEXUAL,
-		HETEROSEXUAL
+		BACK,
+		FRONT
 	}
 	
 	public enum RouteOrientation {
-		HOMOSEXUAL,
-		HETEROSEXUAL
+		BACK,
+		FRONT
 	}
 	
 	private static final String YES = "yes";
@@ -33,7 +33,7 @@ public class OSMWay extends OSMElement {
 	private final List<String> childNodeIds;
 	private LightOrientation lightOrientation = null;
 	private RelationOrientation relationOrientation = null;
-	private RouteOrientation routeOrientation = RouteOrientation.HETEROSEXUAL;
+	private RouteOrientation routeOrientation = RouteOrientation.FRONT;
 	private boolean isOneWay;
 	
 	public OSMWay(final String id) {
@@ -143,10 +143,10 @@ public class OSMWay extends OSMElement {
 		String firstWayFirstOsmNodeRef = getWaypoint(0).getOsmNodeRef();
 		String firstWayLastOsmNodeRef = getWaypoint(getWaypointCount() - 1).getOsmNodeRef();
 		if (firstWayFirstOsmNodeRef.equals(adjacentNodeRef)) {
-			relationOrientation = RelationOrientation.HETEROSEXUAL;
+			relationOrientation = RelationOrientation.FRONT;
 			return firstWayLastOsmNodeRef;
 		} else if (firstWayLastOsmNodeRef.equals(adjacentNodeRef)) {
-			relationOrientation = RelationOrientation.HOMOSEXUAL;
+			relationOrientation = RelationOrientation.BACK;
 			return firstWayFirstOsmNodeRef;
 		} else {
 			try {
@@ -165,11 +165,11 @@ public class OSMWay extends OSMElement {
 		String secondWayLastOsmNodeRef = nextWay.getWaypoint(nextWay.getWaypointCount() - 1).getOsmNodeRef();
 		if (firstWayFirstOsmNodeRef.equals(secondWayFirstOsmNodeRef) ||
 				firstWayFirstOsmNodeRef.equals(secondWayLastOsmNodeRef)) {
-			relationOrientation = RelationOrientation.HOMOSEXUAL;
+			relationOrientation = RelationOrientation.BACK;
 			return firstWayFirstOsmNodeRef;
 		} else if (firstWayLastOsmNodeRef.equals(secondWayFirstOsmNodeRef) ||
 				firstWayLastOsmNodeRef.equals(secondWayLastOsmNodeRef)) {
-			relationOrientation = RelationOrientation.HETEROSEXUAL;
+			relationOrientation = RelationOrientation.FRONT;
 			return firstWayLastOsmNodeRef;
 		} else {
 			try {
@@ -260,7 +260,7 @@ public class OSMWay extends OSMElement {
 			int tmp = startingNodeIndex;
 			startingNodeIndex = finishingNodeIndex;
 			finishingNodeIndex = tmp;
-			routeOrientation = RouteOrientation.HOMOSEXUAL;
+			routeOrientation = RouteOrientation.BACK;
 		}
 		final List<OSMWaypoint> newWaypoints = new ArrayList<>();
 		for (int i = startingNodeIndex; i <= finishingNodeIndex; ++i) {
