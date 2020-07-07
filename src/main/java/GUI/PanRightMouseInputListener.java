@@ -5,13 +5,13 @@
 
 package GUI;
 
-import java.awt.Cursor;
-import java.awt.Point;
+import org.jxmapviewer.JXMapViewer;
+
+import javax.swing.*;
+import javax.swing.event.MouseInputAdapter;
+import java.awt.*;
 import java.awt.event.MouseEvent;
 import java.awt.geom.Point2D.Double;
-import javax.swing.SwingUtilities;
-import javax.swing.event.MouseInputAdapter;
-import org.jxmapviewer.JXMapViewer;
 
 public class PanRightMouseInputListener extends MouseInputAdapter {
     private Point prev;
@@ -39,13 +39,13 @@ public class PanRightMouseInputListener extends MouseInputAdapter {
                 double x = this.viewer.getCenter().getX();
                 double y = this.viewer.getCenter().getY();
                 if (this.prev != null) {
-                    x += (double)(this.prev.x - current.x);
-                    y += (double)(this.prev.y - current.y);
+                    x += (double) (this.prev.x - current.x);
+                    y += (double) (this.prev.y - current.y);
                 }
 
-                int maxHeight = (int)(this.viewer.getTileFactory().getMapSize(this.viewer.getZoom()).getHeight() * (double)this.viewer.getTileFactory().getTileSize(this.viewer.getZoom()));
-                if (y > (double)maxHeight) {
-                    y = (double)maxHeight;
+                int maxHeight = (int) (this.viewer.getTileFactory().getMapSize(this.viewer.getZoom()).getHeight() * (double) this.viewer.getTileFactory().getTileSize(this.viewer.getZoom()));
+                if (y > (double) maxHeight) {
+                    y = (double) maxHeight;
                 }
 
                 this.prev = current;

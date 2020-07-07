@@ -1,23 +1,22 @@
 package SmartCity.Stations;
 
+import OSMProxy.Elements.OSMStation;
+import Routing.StationNode;
+import SmartCity.Lights.OptimizationResult;
+import SmartCity.SmartCityAgent;
+import org.javatuples.Pair;
+
 import java.time.Instant;
 import java.util.*;
 
-import org.javatuples.Pair;
-
-import OSMProxy.Elements.OSMStation;
-import Routing.StationNode;
-import SmartCity.SmartCityAgent;
-import SmartCity.Lights.OptimizationResult;
-
 public class StationStrategy {
+    final private static int WAIT_PERIOD = 60;
     //AgentName - Schedule Arrival Time / Arrival Time
     final private Map<String, Pair<Instant, Instant>> farAwayBusMap = new HashMap<>();
     final private Map<String, Pair<Instant, Instant>> busOnStationMap = new HashMap<>();
     final private Map<String, String> busAgentNameToBusNumberMap = new HashMap<>();
     final private Map<String, PedestrianArrivalInfo> farAwayPedestrianMap = new HashMap<>();
     final private Map<String, PedestrianArrivalInfo> pedestrianOnStationMap = new HashMap<>();
-    final private static int WAIT_PERIOD = 60;
 
     //private final OSMStation stationOSMNode;
     public StationStrategy(OSMStation stationOSMNode, long agentId) {
@@ -68,12 +67,9 @@ public class StationStrategy {
     }
 
     public void removePedestrianFromBusOnStationQueue(String agentName, String bus) {
-        try
-        {
+        try {
             pedestrianOnStationMap.get(bus).agentNamesAndArrivalTimes.removeIf(x -> x.getValue0().equals(agentName));
-        }
-        catch (Exception e)
-        {
+        } catch (Exception e) {
             removePedestrianFromFarAwayQueue(agentName, bus);
         }
     }
@@ -99,7 +95,8 @@ public class StationStrategy {
                 System.out.println("------------------BUS WAS LATE-----------------------");
                 List<String> passengersThatCanLeave = checkPassengersWhoAreReadyToGo(bus);
                 result.addBusAndPedestrianGrantedPassthrough(bus, passengersThatCanLeave);
-            } else if (scheduleAndArrivalTime.getValue1().isAfter((scheduleAndArrivalTime.getValue0().minusSeconds(WAIT_PERIOD))) &&
+            }
+            else if (scheduleAndArrivalTime.getValue1().isAfter((scheduleAndArrivalTime.getValue0().minusSeconds(WAIT_PERIOD))) &&
                     scheduleAndArrivalTime.getValue1().isBefore((scheduleAndArrivalTime.getValue0().plusSeconds(WAIT_PERIOD)))) {
                 System.out.println("------------------BUS WAS ON TIME-----------------------");
                 List<String> passengersThatCanLeave = checkPassengersWhoAreReadyToGo(bus);
@@ -107,10 +104,12 @@ public class StationStrategy {
                 passengersThatCanLeave.addAll(farPassengers);
                 result.addBusAndPedestrianGrantedPassthrough(bus, passengersThatCanLeave);
                 System.out.println("-----------------WAITING FOR: " + farPassengers.size() + " PASSENGERS------------------");
-            } else if (scheduleAndArrivalTime.getValue1().isBefore((scheduleAndArrivalTime.getValue0().minusSeconds(WAIT_PERIOD)))) {
+            }
+            else if (scheduleAndArrivalTime.getValue1().isBefore((scheduleAndArrivalTime.getValue0().minusSeconds(WAIT_PERIOD)))) {
                 System.out.println("------------------BUS TOO EARLY-----------------------");
                 continue;
-            } else {
+            }
+            else {
                 System.out.println("------------------SOMETHING HAPPENED-----------------------");
             }
         }

@@ -16,14 +16,12 @@ public class BasicLightStrategy {
             public void action() {
                 ACLMessage msg = agent.receive();
                 if (msg != null) {
-                    if(msg.getContent().equals("Pass"))
-                    {
-                        agent.Print(msg.getSender().getLocalName()+" passes light.");
+                    if (msg.getContent().equals("Pass")) {
+                        agent.Print(msg.getSender().getLocalName() + " passes light.");
                         agent.queue.remove(msg.getSender().getLocalName());
                     }
-                    else
-                    {
-                        agent.Print("Message from "+ msg.getSender().getLocalName() + ": " + msg.getContent());
+                    else {
+                        agent.Print("Message from " + msg.getSender().getLocalName() + ": " + msg.getContent());
                         agent.queue.add(msg.getSender().getLocalName());
                     }
 
@@ -36,9 +34,9 @@ public class BasicLightStrategy {
         Behaviour LightSwitch = new TickerBehaviour(agent, 15000) {
             @Override
             public void onTick() {
-                agent.lightColor = (agent.lightColor == LightColor.RED)? LightColor.GREEN: LightColor.RED;
+                agent.lightColor = (agent.lightColor == LightColor.RED) ? LightColor.GREEN : LightColor.RED;
                 if (agent.lightColor == LightColor.RED) {
-                    for(String name: agent.queue){
+                    for (String name : agent.queue) {
                         AID dest = new AID(name, AID.ISLOCALNAME);
                         ACLMessage msg = new ACLMessage(ACLMessage.INFORM);
                         msg.setContent("Red");
@@ -46,8 +44,9 @@ public class BasicLightStrategy {
                         agent.send(msg);
                     }
                     agent.Print("Red light.");
-                } else {
-                    for(String name: agent.queue){
+                }
+                else {
+                    for (String name : agent.queue) {
                         AID dest = new AID(name, AID.ISLOCALNAME);
                         ACLMessage msg = new ACLMessage(ACLMessage.INFORM);
                         msg.setContent("Green");

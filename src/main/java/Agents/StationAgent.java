@@ -1,23 +1,19 @@
 package Agents;
 
+import OSMProxy.Elements.OSMStation;
+import SmartCity.Lights.OptimizationResult;
+import SmartCity.Stations.StationStrategy;
 import jade.core.AID;
 import jade.core.Agent;
-
 import jade.core.behaviours.Behaviour;
 import jade.core.behaviours.CyclicBehaviour;
 import jade.core.behaviours.TickerBehaviour;
 import jade.lang.acl.ACLMessage;
 import jade.util.leap.Properties;
+import org.javatuples.Pair;
 
 import java.time.Instant;
 import java.util.List;
-
-import org.javatuples.Pair;
-import org.jxmapviewer.viewer.GeoPosition;
-
-import OSMProxy.Elements.OSMStation;
-import SmartCity.Lights.OptimizationResult;
-import SmartCity.Stations.StationStrategy;
 
 public class StationAgent extends Agent {
     private final StationStrategy stationStrategy;
@@ -39,7 +35,8 @@ public class StationAgent extends Agent {
                     if (type == MessageParameter.BUS) {
                         handleMessageFromBus(rcv);
 
-                    } else if (type == MessageParameter.PEDESTRIAN) {
+                    }
+                    else if (type == MessageParameter.PEDESTRIAN) {
                         handleMessageFromPedestrian(rcv);
 
                     }
@@ -68,7 +65,8 @@ public class StationAgent extends Agent {
                     stationStrategy.addMappingOfBusAndTheirAgent(agentBusName, busLine);
                     Print("Got INFORM from " + rcv.getSender().getLocalName());
                     // TO DO: SEND MESSAGE ABOUT PASSENGERS  
-                } else if (rcv.getPerformative() == ACLMessage.REQUEST_WHEN) {
+                }
+                else if (rcv.getPerformative() == ACLMessage.REQUEST_WHEN) {
 
 
                     stationStrategy.removeBusFromFarAwayQueue(rcv.getSender().getLocalName());
@@ -81,11 +79,13 @@ public class StationAgent extends Agent {
 
                     Print("Got REQUEST_WHEN from " + rcv.getSender().getLocalName());
                     send(msg);
-                } else if (rcv.getPerformative() == ACLMessage.AGREE) {
+                }
+                else if (rcv.getPerformative() == ACLMessage.AGREE) {
                     stationStrategy.removeBusFromBusOnStationQueue(rcv.getSender().getLocalName());
                     Print("Got AGREE from " + rcv.getSender().getLocalName());
 
-                } else {
+                }
+                else {
                     System.out.println("SMTH WRONG");
                 }
 
@@ -96,7 +96,8 @@ public class StationAgent extends Agent {
                     stationStrategy.addPedestrianToFarAwayQueue(rcv.getSender().getLocalName(),
                             rcv.getUserDefinedParameter(MessageParameter.DESIRED_BUS),
                             getInstantParameter(rcv, MessageParameter.ARRIVAL_TIME));
-                } else if (rcv.getPerformative() == ACLMessage.REQUEST_WHEN) {
+                }
+                else if (rcv.getPerformative() == ACLMessage.REQUEST_WHEN) {
                     System.out.println("GET MESSAGE FROM PEDESTIAN REQUEST_WHEN");
                     stationStrategy.removePedestrianFromFarAwayQueue(rcv.getSender().getLocalName(), rcv.getUserDefinedParameter(MessageParameter.DESIRED_BUS));
                     stationStrategy.addPedestrianToQueue(rcv.getSender().getLocalName(),
@@ -105,17 +106,18 @@ public class StationAgent extends Agent {
                     ACLMessage msg = new ACLMessage(ACLMessage.AGREE);
                     msg.addReceiver(rcv.getSender());
                     send(msg);
-                } else if (rcv.getPerformative() == ACLMessage.AGREE) {
+                }
+                else if (rcv.getPerformative() == ACLMessage.AGREE) {
                     System.out.println("-----GET AGREE from PEDESTRIAN------");
                     stationStrategy.removePedestrianFromBusOnStationQueue(rcv.getSender().getLocalName(), rcv.getUserDefinedParameter(MessageParameter.DESIRED_BUS));
-                } else {
+                }
+                else {
                     System.out.println("SMTH WRONG");
                 }
 
             }
         };
         Behaviour checkState = new TickerBehaviour(this, 100) {
-
 
 
             @Override
@@ -127,30 +129,27 @@ public class StationAgent extends Agent {
             }
 
 
-
             private void handleOptimizationResult(OptimizationResult result) {
-                List<Pair<String,List<String>>> elementsFreeToProceed = result.busesAndPedestriansFreeToProceed();
-                for (Pair<String,List<String>> busAndPedestrians : elementsFreeToProceed) {
+                List<Pair<String, List<String>>> elementsFreeToProceed = result.busesAndPedestriansFreeToProceed();
+                for (Pair<String, List<String>> busAndPedestrians : elementsFreeToProceed) {
                     answerBusCanProceed(busAndPedestrians.getValue0());
-                    answerPedestriansCanProceed(busAndPedestrians.getValue0(),busAndPedestrians.getValue1());
+                    answerPedestriansCanProceed(busAndPedestrians.getValue0(), busAndPedestrians.getValue1());
                 }
             }
 
 
-
-            private void answerPedestriansCanProceed(String busAgentName,List<String> pedestriansAgentsNames) {
-                for(String pedestrianAgentName : pedestriansAgentsNames) {
+            private void answerPedestriansCanProceed(String busAgentName, List<String> pedestriansAgentsNames) {
+                for (String pedestrianAgentName : pedestriansAgentsNames) {
                     ACLMessage msg = new ACLMessage(ACLMessage.REQUEST);
                     msg.addReceiver(new AID(pedestrianAgentName, AID.ISLOCALNAME));
                     Properties properties = new Properties();
                     properties.setProperty(MessageParameter.TYPE, MessageParameter.STATION);
-                    properties.setProperty(MessageParameter.BUS_ID,busAgentName);
+                    properties.setProperty(MessageParameter.BUS_ID, busAgentName);
                     msg.setAllUserDefinedParameters(properties);
                     send(msg);
                 }
 
             }
-
 
 
             private void answerBusCanProceed(String busAgentName) {
@@ -164,13 +163,7 @@ public class StationAgent extends Agent {
             }
 
 
-
-
-
-
-
         };
-
 
 
         addBehaviour(communication);
@@ -186,7 +179,6 @@ public class StationAgent extends Agent {
     public void takeDown() {
         super.takeDown();
     }
-
 
 
     void Print(String message) {

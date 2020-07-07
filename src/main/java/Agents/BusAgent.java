@@ -1,28 +1,25 @@
 package Agents;
 
-import java.time.Instant;
-import java.util.Date;
-import java.util.List;
-import java.util.Random;
-
 import Routing.LightManagerNode;
 import Routing.RouteNode;
 import Routing.StationNode;
-import SmartCity.SmartCityAgent;
 import SmartCity.Buses.Timetable;
+import SmartCity.SmartCityAgent;
 import Vehicles.Bus;
 import Vehicles.DrivingState;
 import jade.core.AID;
 import jade.core.Agent;
-import jade.core.AgentState;
 import jade.core.behaviours.Behaviour;
 import jade.core.behaviours.CyclicBehaviour;
 import jade.core.behaviours.TickerBehaviour;
 import jade.lang.acl.ACLMessage;
-import jade.tools.sniffer.Message;
 import jade.util.leap.Properties;
-
 import org.javatuples.Pair;
+
+import java.time.Instant;
+import java.util.Date;
+import java.util.List;
+import java.util.Random;
 
 @SuppressWarnings("serial")
 public class BusAgent extends Agent {
@@ -53,7 +50,7 @@ public class BusAgent extends Agent {
                             send(msg);
                             bus.setState(DrivingState.WAITING_AT_LIGHT);
                             Print("Asking LightManager" + light.getLightManagerId() + " for right to passage.");
-                       
+
                             break;
                         case WAITING_AT_LIGHT:
 
@@ -64,7 +61,8 @@ public class BusAgent extends Agent {
                             bus.setState(DrivingState.MOVING);
                             break;
                     }
-                } else if(bus.isAtDestination()) {
+                }
+                else if (bus.isAtDestination()) {
                     bus.setState(DrivingState.AT_DESTINATION);
                     Print("Reached destination.");
 
@@ -84,8 +82,7 @@ public class BusAgent extends Agent {
 
                             List<String> passengers = bus.getPassengersToLeave(station.getStationId());
 
-                            if(passengers.size() != 0)
-                            {
+                            if (passengers.size() != 0) {
                                 ACLMessage leave = new ACLMessage(ACLMessage.REQUEST);
 
                                 for (String name : passengers) {
@@ -98,8 +95,8 @@ public class BusAgent extends Agent {
                                 leave.setAllUserDefinedParameters(properties);
                                 send(leave);
                             }
-                            
-                            
+
+
                             ACLMessage msg = new ACLMessage(ACLMessage.REQUEST_WHEN);
                             msg.addReceiver(new AID("Station" + station.getStationId(), AID.ISLOCALNAME));
                             Properties properties = new Properties();
@@ -123,21 +120,23 @@ public class BusAgent extends Agent {
                             RouteNode node = bus.findNextStop();
                             if (node instanceof LightManagerNode) {
                                 GetNextLight();
-                            } 
+                            }
                             GetNextStation();
 
                             bus.setState(DrivingState.MOVING);
                             bus.Move();
                             break;
                     }
-                } else {
+                }
+                else {
                     bus.Move();
                 }
             }
-            private void sendAgreeMsg() {
-            	StationNode station = bus.getCurrentStationNode();
 
-            	ACLMessage msg = new ACLMessage(ACLMessage.REQUEST_WHEN);
+            private void sendAgreeMsg() {
+                StationNode station = bus.getCurrentStationNode();
+
+                ACLMessage msg = new ACLMessage(ACLMessage.REQUEST_WHEN);
                 msg.addReceiver(new AID("Station" + station.getStationId(), AID.ISLOCALNAME));
                 Properties properties = new Properties();
                 properties = new Properties();
@@ -145,7 +144,7 @@ public class BusAgent extends Agent {
             }
         };
 
-        
+
         Behaviour communication = new CyclicBehaviour() {
             @Override
             public void action() {
@@ -164,12 +163,15 @@ public class BusAgent extends Agent {
                                     properties.setProperty(MessageParameter.ADJACENT_OSM_WAY_ID, Long.toString(bus.getAdjacentOsmWayId()));
                                     response.setAllUserDefinedParameters(properties);
                                     send(response);
-                                    if (bus.findNextStop() instanceof LightManagerNode) GetNextLight();
+                                    if (bus.findNextStop() instanceof LightManagerNode) {
+                                        GetNextLight();
+                                    }
                                     bus.setState(DrivingState.PASSING_LIGHT);
                                 }
                                 break;
                         }
-                    } else if (type == MessageParameter.STATION) {
+                    }
+                    else if (type == MessageParameter.STATION) {
                         switch (rcv.getPerformative()) {
                             case ACLMessage.REQUEST:
                                 if (bus.getState() == DrivingState.WAITING_AT_STATION) {
@@ -186,7 +188,8 @@ public class BusAgent extends Agent {
                                 }
                                 break;
                         }
-                    } else if (type == MessageParameter.PEDESTRIAN) {
+                    }
+                    else if (type == MessageParameter.PEDESTRIAN) {
                         switch (rcv.getPerformative()) {
                             case ACLMessage.REQUEST_WHEN:
 
@@ -260,7 +263,7 @@ public class BusAgent extends Agent {
             msg.addReceiver(dest);
             Properties properties = new Properties();
             Instant currentTime = SmartCityAgent.getSimulationTime().toInstant();
-            Instant time =currentTime.plusMillis(bus.getMilisecondsToNextStation());
+            Instant time = currentTime.plusMillis(bus.getMilisecondsToNextStation());
             properties.setProperty(MessageParameter.TYPE, MessageParameter.BUS);
             properties.setProperty(MessageParameter.BUS_LINE, "" + bus.getLine());
             properties.setProperty(MessageParameter.SCHEDULE_ARRIVAL, "" + bus.getTimeOnStation(nextStation.getOsmStationId()).toInstant());
@@ -276,7 +279,7 @@ public class BusAgent extends Agent {
         return bus;
     }
 
-   
+
     public String getId() {
         return Long.toString(agentId);
     }
@@ -301,15 +304,17 @@ public class BusAgent extends Agent {
         System.out.println(getLocalName() + ": " + message);
     }
 
-	
-	public void runBasedOnTimetable(Date date) {
-		if(this.getAgentState().getValue() != jade.wrapper.AgentState.cAGENT_STATE_INITIATED)
-			return;
-		  readArgumentsAndCreateBus();
-		long hours = bus.getBoardingTime().getHours();
-		long minutes = bus.getBoardingTime().getMinutes();
-	    if(hours == date.getHours() && minutes == date.getMinutes()) {
-	    	SmartCityAgent.ActivateAgent(this);
-	    }
-	}
+
+    public void runBasedOnTimetable(Date date) {
+        if (this.getAgentState().getValue() != jade.wrapper.AgentState.cAGENT_STATE_INITIATED) {
+            return;
+        }
+        readArgumentsAndCreateBus();
+
+        long hours = bus.getBoardingTime().getHours();
+        long minutes = bus.getBoardingTime().getMinutes();
+        if (hours == date.getHours() && minutes == date.getMinutes()) {
+            SmartCityAgent.ActivateAgent(this);
+        }
+    }
 }

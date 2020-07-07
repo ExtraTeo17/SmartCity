@@ -4,25 +4,24 @@ import Agents.BusAgent;
 import Agents.LightManager;
 import Agents.PedestrianAgent;
 import Agents.VehicleAgent;
-import LightStrategies.LightManagerStrategy;
 import OSMProxy.Elements.OSMStation;
 import Routing.RouteNode;
 import Routing.Router;
 import Routing.StationNode;
+import SmartCity.Lights.Crossroad;
 import SmartCity.RoutePainter;
 import SmartCity.SmartCityAgent;
 import SmartCity.ZonePainter;
-import SmartCity.Lights.Crossroad;
 import Vehicles.Bus;
 import Vehicles.MovingObjectImpl;
 import Vehicles.Pedestrian;
 import Vehicles.TestCar;
 import jade.wrapper.StaleProxyException;
-
 import org.javatuples.Pair;
 import org.jxmapviewer.JXMapViewer;
 import org.jxmapviewer.OSMTileFactoryInfo;
-import org.jxmapviewer.input.*;
+import org.jxmapviewer.input.MapClickListener;
+import org.jxmapviewer.input.ZoomMouseWheelListenerCursor;
 import org.jxmapviewer.painter.CompoundPainter;
 import org.jxmapviewer.painter.Painter;
 import org.jxmapviewer.viewer.*;
@@ -40,9 +39,9 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.time.Duration;
 import java.time.Instant;
-import java.util.*;
 import java.util.List;
 import java.util.Timer;
+import java.util.*;
 
 public class MapWindow {
     private final static int REFRESH_MAP_INTERVAL_MILLISECONDS = 100;
@@ -51,13 +50,17 @@ public class MapWindow {
     private static final long CREATE_PEDESTRIAN_INTERVAL_MILLISECONDS = 100;
     private final static int PEDESTRIAN_STATION_RADIUS = 200;
     private final static int TIME_SCALE = 10;
-
-    public static int getTimeScale() {
-        return TIME_SCALE;
-    }
-
     public JPanel MainPanel;
     public JXMapViewer MapViewer;
+    public boolean renderPedestrians = true;
+    public boolean renderPedestrianRoutes = true;
+    public boolean renderCars = true;
+    public boolean renderCarRoutes = true;
+    public boolean renderBuses = true;
+    public boolean renderBusRoutes = true;
+    public boolean renderZone = true;
+    public boolean renderLights = true;
+    public boolean renderStations = true;
     private JPanel MapPanel;
     private JPanel SidePanel;
     private JButton StartRouteButton;
@@ -86,15 +89,6 @@ public class MapWindow {
     private Random testCarRandom = new Random(96);
     private GeoPosition zoneCenter;
     private Instant simulationStart;
-    public boolean renderPedestrians = true;
-    public boolean renderPedestrianRoutes = true;
-    public boolean renderCars = true;
-    public boolean renderCarRoutes = true;
-    public boolean renderBuses = true;
-    public boolean renderBusRoutes = true;
-    public boolean renderZone = true;
-    public boolean renderLights = true;
-    public boolean renderStations = true;
 
     public MapWindow() {
         MapViewer = new JXMapViewer();
@@ -253,6 +247,15 @@ public class MapWindow {
 
     }
 
+    public MapWindow(SmartCityAgent agent) {
+        this();
+        SmartCityAgent = agent;
+    }
+
+    public static int getTimeScale() {
+        return TIME_SCALE;
+    }
+
     public void setResultTime(String val) {
         ResultTimeLabel.setText(val);
     }
@@ -284,11 +287,6 @@ public class MapWindow {
         state = SimulationState.READY_TO_RUN;
 
         refreshTimer.scheduleAtFixedRate(new RefreshTask(), 0, REFRESH_MAP_INTERVAL_MILLISECONDS);
-    }
-
-    public MapWindow(SmartCityAgent agent) {
-        this();
-        SmartCityAgent = agent;
     }
 
     private int getZoneRadius() {
@@ -743,6 +741,16 @@ public class MapWindow {
      */
     public JComponent $$$getRootComponent$$$() { return MainPanel; }
 
+    private Pair<Double, Double> generateRandomGeoPosOffsetWithRadius(final int radius) {
+        double angle = random.nextDouble() * Math.PI * 2;
+        if (getTestCarId() == SmartCityAgent.carId) {
+            angle = testCarRandom.nextDouble() * Math.PI * 2;
+        }
+        double lat = Math.sin(angle) * radius * 0.0000089;
+        double lon = Math.cos(angle) * radius * 0.0000089 * Math.cos(lat);
+        return Pair.with(lat, lon);
+    }
+
     public class RefreshTask extends TimerTask { // OCB ?????? TOO OFTEN
         @Override
         public void run() {
@@ -808,7 +816,6 @@ public class MapWindow {
 
         }
     }
-
 
     public class CreateCarTask extends TimerTask {
 
@@ -894,15 +901,5 @@ public class MapWindow {
                 }
             }
         }
-    }
-
-    private Pair<Double, Double> generateRandomGeoPosOffsetWithRadius(final int radius) {
-        double angle = random.nextDouble() * Math.PI * 2;
-        if (getTestCarId() == SmartCityAgent.carId) {
-            angle = testCarRandom.nextDouble() * Math.PI * 2;
-        }
-        double lat = Math.sin(angle) * radius * 0.0000089;
-        double lon = Math.cos(angle) * radius * 0.0000089 * Math.cos(lat);
-        return Pair.with(lat, lon);
     }
 }

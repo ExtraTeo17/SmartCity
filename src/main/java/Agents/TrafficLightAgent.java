@@ -1,10 +1,7 @@
 package Agents;
 
 import LightStrategies.BasicLightStrategy;
-import LightStrategies.LightStrategy;
 import jade.core.Agent;
-import jade.core.behaviours.Behaviour;
-import jade.core.behaviours.CyclicBehaviour;
 import org.jxmapviewer.viewer.GeoPosition;
 
 import java.util.ArrayList;
@@ -13,8 +10,8 @@ import java.util.List;
 public class TrafficLightAgent extends Agent {
     public LightColor lightColor = LightColor.RED;
     public List<String> queue = new ArrayList<>();
-    private GeoPosition position;
     BasicLightStrategy strategy = new BasicLightStrategy();
+    private GeoPosition position;
 
     public TrafficLightAgent(GeoPosition pos) {
         position = pos;

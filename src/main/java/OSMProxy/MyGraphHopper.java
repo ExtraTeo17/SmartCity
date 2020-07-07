@@ -27,10 +27,10 @@ import com.graphhopper.storage.DataAccess;
 import com.graphhopper.storage.Directory;
 import com.graphhopper.storage.GraphHopperStorage;
 import com.graphhopper.util.BitUtil;
+
 import java.util.List;
 
 /**
- *
  * @author Peter Karich
  */
 public class MyGraphHopper extends GraphHopper {

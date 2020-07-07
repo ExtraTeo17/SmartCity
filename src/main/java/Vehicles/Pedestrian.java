@@ -1,19 +1,20 @@
 package Vehicles;
 
-import java.util.List;
-import java.util.ArrayList;
-
 import GUI.MapWindow;
-import Routing.StationNode;
-import org.jxmapviewer.viewer.GeoPosition;
-
 import Routing.LightManagerNode;
 import Routing.RouteNode;
 import Routing.Router;
+import Routing.StationNode;
+import org.jxmapviewer.viewer.GeoPosition;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @SuppressWarnings("restriction")
 public class Pedestrian extends MovingObject { // TODO: Remember to create a dedicated super-class for all moving types
 
+    private final String preferredBusLine;
+    public DrivingState state = DrivingState.STARTING;
     private List<RouteNode> displayRouteBeforeBus, displayRouteAfterBus;
     private List<RouteNode> routeBeforeBus, routeAfterBus;
     private StationNode stationStart;
@@ -22,10 +23,7 @@ public class Pedestrian extends MovingObject { // TODO: Remember to create a ded
     private int index = 0;
     private int speed = 10;
     private int closestLightIndex = 0;
- 
     private int stationIndex = 0;
-    public DrivingState state = DrivingState.STARTING;
-    private final String preferredBusLine;
 
     public Pedestrian(List<RouteNode> routeToStation, List<RouteNode> routeFromStation,
                       final long startingStationId, final String preferredBusLine, StationNode startStation, StationNode finishStation) {
@@ -34,7 +32,7 @@ public class Pedestrian extends MovingObject { // TODO: Remember to create a ded
         routeBeforeBus = Router.uniformRoute(displayRouteBeforeBus);
         routeBeforeBus.add(startStation);
         routeAfterBus = Router.uniformRoute(displayRouteAfterBus);
-        routeAfterBus.add(0,finishStation);
+        routeAfterBus.add(0, finishStation);
         route.addAll(routeBeforeBus);
         route.addAll(routeAfterBus);
         stationIndex = routeBeforeBus.size() - 1;
@@ -77,17 +75,17 @@ public class Pedestrian extends MovingObject { // TODO: Remember to create a ded
         return getCurrentTrafficLightNode();
     }
 
-	public RouteNode findNextStop() {
-		for (int i = index + 1; i < route.size(); i++) {
-			if (route.get(i) instanceof StationNode) {
-				return (StationNode) route.get(i);
-			}
-			if (route.get(i) instanceof LightManagerNode) {
-				return (LightManagerNode) route.get(i);
-			}
-		}
-		return null;
-	}
+    public RouteNode findNextStop() {
+        for (int i = index + 1; i < route.size(); i++) {
+            if (route.get(i) instanceof StationNode) {
+                return (StationNode) route.get(i);
+            }
+            if (route.get(i) instanceof LightManagerNode) {
+                return (LightManagerNode) route.get(i);
+            }
+        }
+        return null;
+    }
 
     @Override
     public String getPositionString() {
@@ -101,21 +99,24 @@ public class Pedestrian extends MovingObject { // TODO: Remember to create a ded
 
     @Override
     public LightManagerNode getCurrentTrafficLightNode() {
-        if (closestLightIndex == -1)
+        if (closestLightIndex == -1) {
             return null;
+        }
         return (LightManagerNode) (route.get(closestLightIndex));
     }
 
     @Override
     public boolean isAtTrafficLights() {
-        if (index == route.size())
+        if (index == route.size()) {
             return false;
+        }
         return route.get(index) instanceof LightManagerNode;
     }
 
     public boolean isAtStation() {
-        if (index == route.size())
+        if (index == route.size()) {
             return false;
+        }
         return route.get(index) instanceof StationNode;
     }
 
@@ -145,13 +146,13 @@ public class Pedestrian extends MovingObject { // TODO: Remember to create a ded
     }
 
     @Override
-    public void setState(DrivingState state) {
-        this.state = state;
+    public DrivingState getState() {
+        return state;
     }
 
     @Override
-    public DrivingState getState() {
-        return state;
+    public void setState(DrivingState state) {
+        this.state = state;
     }
 
     public List<RouteNode> getDisplayRouteBeforeBus() {
@@ -162,12 +163,12 @@ public class Pedestrian extends MovingObject { // TODO: Remember to create a ded
         return displayRouteAfterBus;
     }
 
-	public long getMilisecondsToNextStation() {
-		return ((routeBeforeBus.size()-1 - index) * 3600) / getSpeed();
-	
-	}
+    public long getMilisecondsToNextStation() {
+        return ((routeBeforeBus.size() - 1 - index) * 3600) / getSpeed();
 
-	public StationNode findNextStation() {
-		return stationStart;
-	}
+    }
+
+    public StationNode findNextStation() {
+        return stationStart;
+    }
 }

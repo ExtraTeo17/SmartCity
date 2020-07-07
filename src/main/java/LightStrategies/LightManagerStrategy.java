@@ -1,18 +1,9 @@
 package LightStrategies;
 
-import java.time.Instant;
-import java.util.List;
-
+import Agents.LightManager;
 import Agents.MessageParameter;
 import GUI.MapWindow;
 import OSMProxy.Elements.OSMNode;
-
-import jade.util.leap.Properties;
-import org.jxmapviewer.JXMapViewer;
-import org.jxmapviewer.painter.Painter;
-import org.w3c.dom.Node;
-
-import Agents.LightManager;
 import SmartCity.Lights.Crossroad;
 import SmartCity.Lights.OptimizationResult;
 import SmartCity.Lights.SimpleCrossroad;
@@ -22,6 +13,13 @@ import jade.core.behaviours.Behaviour;
 import jade.core.behaviours.CyclicBehaviour;
 import jade.core.behaviours.TickerBehaviour;
 import jade.lang.acl.ACLMessage;
+import jade.util.leap.Properties;
+import org.jxmapviewer.JXMapViewer;
+import org.jxmapviewer.painter.Painter;
+import org.w3c.dom.Node;
+
+import java.time.Instant;
+import java.util.List;
 
 public class LightManagerStrategy extends LightStrategy {
 
@@ -33,11 +31,11 @@ public class LightManagerStrategy extends LightStrategy {
         this.crossroad = new SimpleCrossroad(crossroad, managerId);
     }
 
-	public LightManagerStrategy(OSMNode centerCrossroadNode, long managerId) {
-		this.crossroad = new SimpleCrossroad(centerCrossroadNode, managerId);
-	}
+    public LightManagerStrategy(OSMNode centerCrossroadNode, long managerId) {
+        this.crossroad = new SimpleCrossroad(centerCrossroadNode, managerId);
+    }
 
-	@Override
+    @Override
     public void ApplyStrategy(final LightManager agent) {
         crossroad.startLifetime();
         this.agent = agent;
@@ -46,8 +44,10 @@ public class LightManagerStrategy extends LightStrategy {
                 ACLMessage rcv = agent.receive();
                 if (rcv != null) {
                     handleMessageFromRecipient(rcv);
-                } else
+                }
+                else {
                     block();
+                }
             }
 
             private void handleMessageFromRecipient(ACLMessage rcv) {
@@ -66,11 +66,11 @@ public class LightManagerStrategy extends LightStrategy {
                 switch (rcv.getPerformative()) {
                     case ACLMessage.INFORM:
                         Print(rcv.getSender().getLocalName() + " is approaching in " + getInstantParameter(rcv, MessageParameter.ARRIVAL_TIME) + "ms.");
-                    
+
                         crossroad.addCarToFarAwayQueue(getCarName(rcv),
                                 getIntParameter(rcv, MessageParameter.ADJACENT_OSM_WAY_ID),
                                 getInstantParameter(rcv, MessageParameter.ARRIVAL_TIME));
-                       
+
                         break;
                     case ACLMessage.REQUEST_WHEN:
                         Print(rcv.getSender().getLocalName() + " is waiting on way " + getIntParameter(rcv, MessageParameter.ADJACENT_OSM_WAY_ID) + ".");
@@ -173,6 +173,7 @@ public class LightManagerStrategy extends LightStrategy {
     private int getIntParameter(ACLMessage rcv, String param) {
         return Integer.parseInt(rcv.getUserDefinedParameter(param));
     }
+
     private Instant getInstantParameter(ACLMessage rcv, String param) {
         return Instant.parse(rcv.getUserDefinedParameter(param));
     }

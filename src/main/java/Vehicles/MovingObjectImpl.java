@@ -1,23 +1,21 @@
 package Vehicles;
 
-import Agents.LightManager;
 import GUI.MapWindow;
 import Routing.LightManagerNode;
 import Routing.RouteNode;
 import Routing.Router;
+import org.jxmapviewer.viewer.GeoPosition;
 
 import java.util.List;
 
-import org.jxmapviewer.viewer.GeoPosition;
-
 public class MovingObjectImpl extends MovingObject {
 
+    public DrivingState State = DrivingState.STARTING;
     private List<RouteNode> displayRoute;
     private List<RouteNode> route;
     private int index = 0;
     private int speed = 50;
     private int closestLightIndex = 0;
-    public DrivingState State = DrivingState.STARTING;
 
     public MovingObjectImpl(List<RouteNode> info) {
         displayRoute = info;
@@ -65,15 +63,17 @@ public class MovingObjectImpl extends MovingObject {
 
     @Override
     public LightManagerNode getCurrentTrafficLightNode() {
-        if (closestLightIndex == -1)
+        if (closestLightIndex == -1) {
             return null;
+        }
         return (LightManagerNode) (route.get(closestLightIndex));
     }
 
     @Override
     public boolean isAtTrafficLights() {
-        if (index == route.size())
+        if (index == route.size()) {
             return false;
+        }
         return route.get(index) instanceof LightManagerNode;
     }
 
@@ -103,12 +103,12 @@ public class MovingObjectImpl extends MovingObject {
     }
 
     @Override
-    public void setState(DrivingState state) {
-        State = state;
+    public DrivingState getState() {
+        return State;
     }
 
     @Override
-    public DrivingState getState() {
-        return State;
+    public void setState(DrivingState state) {
+        State = state;
     }
 }
