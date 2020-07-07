@@ -1,7 +1,5 @@
 package Agents;
 
-import java.time.Instant;
-
 import Routing.LightManagerNode;
 import SmartCity.SmartCityAgent;
 import Vehicles.DrivingState;
@@ -14,9 +12,11 @@ import jade.core.behaviours.TickerBehaviour;
 import jade.lang.acl.ACLMessage;
 import jade.util.leap.Properties;
 
+import java.time.Instant;
+
 @SuppressWarnings("serial")
 public class VehicleAgent extends Agent {
-	
+
     private MovingObject Vehicle;
 
     @Override
@@ -24,13 +24,12 @@ public class VehicleAgent extends Agent {
         GetNextStop();
         Vehicle.setState(DrivingState.MOVING);
 
-        Behaviour move = new TickerBehaviour(this, 3600 / Vehicle.getSpeed()) {
+        int speed = Vehicle.getSpeed();
+        Behaviour move = new TickerBehaviour(this, 3600 / speed) {
             @Override
             public void onTick() {
-                if (Vehicle.isAtTrafficLights())
-                {
-                    switch (Vehicle.getState())
-                    {
+                if (Vehicle.isAtTrafficLights()) {
+                    switch (Vehicle.getState()) {
                         case MOVING:
                             Vehicle.setState(DrivingState.WAITING_AT_LIGHT);
                             LightManagerNode light = Vehicle.getCurrentTrafficLightNode();
@@ -44,15 +43,16 @@ public class VehicleAgent extends Agent {
                             Print("Asking LightManager" + light.getLightManagerId() + " for right to passage.");
                             break;
                         case WAITING_AT_LIGHT:
-                        	
+
                             break;
                         case PASSING_LIGHT:
-                        	Print("Passing");
+                            Print("Passing");
                             Vehicle.Move();
                             Vehicle.setState(DrivingState.MOVING);
                             break;
                     }
-                } else if (Vehicle.isAtDestination()) {
+                }
+                else if (Vehicle.isAtDestination()) {
                     Vehicle.setState(DrivingState.AT_DESTINATION);
                     Print("Reached destination.");
 
@@ -64,7 +64,7 @@ public class VehicleAgent extends Agent {
                     msg.setAllUserDefinedParameters(prop);
                     send(msg);
                     doDelete();
-                } 
+                }
                 else {
                     Vehicle.Move();
                 }
@@ -104,18 +104,18 @@ public class VehicleAgent extends Agent {
     }
 
     void GetNextStop() {
-    	// finds next traffic light and announces his arrival
+        // finds next traffic light and announces his arrival
         LightManagerNode nextManager = Vehicle.findNextTrafficLight();
-        
+
         if (nextManager != null) {
 
             AID dest = new AID("LightManager" + nextManager.getLightManagerId(), AID.ISLOCALNAME);
             ACLMessage msg = new ACLMessage(ACLMessage.INFORM);
             msg.addReceiver(dest);
             Properties properties = new Properties();
-            Instant time= SmartCityAgent.getSimulationTime().toInstant().plusMillis( Vehicle.getMilisecondsToNextLight());
+            Instant time = SmartCityAgent.getSimulationTime().toInstant().plusMillis(Vehicle.getMilisecondsToNextLight());
             properties.setProperty(MessageParameter.TYPE, MessageParameter.VEHICLE);
-            properties.setProperty(MessageParameter.ARRIVAL_TIME, "" +time);
+            properties.setProperty(MessageParameter.ARRIVAL_TIME, "" + time);
             properties.setProperty(MessageParameter.ADJACENT_OSM_WAY_ID, "" + nextManager.getOsmWayId());
             msg.setAllUserDefinedParameters(properties);
 
@@ -123,9 +123,9 @@ public class VehicleAgent extends Agent {
             Print("Sending INFORM to LightManager" + nextManager.getLightManagerId() + ".");
         }
     }
-    
+
     public MovingObject getVehicle() {
-    	return Vehicle;
+        return Vehicle;
     }
 
     public void setVehicle(MovingObject v) {
@@ -138,6 +138,6 @@ public class VehicleAgent extends Agent {
     }
 
     void Print(String message) {
-         //System.out.println(getLocalName() + ": " + message);
+        //System.out.println(getLocalName() + ": " + message);
     }
 }

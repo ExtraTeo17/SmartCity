@@ -10,7 +10,6 @@ import org.jxmapviewer.viewer.GeoPosition;
 import Routing.LightManagerNode;
 import Routing.RouteNode;
 import Routing.Router;
-import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 @SuppressWarnings("restriction")
 public class Pedestrian extends MovingObject { // TODO: Remember to create a dedicated super-class for all moving types
@@ -132,7 +131,7 @@ public class Pedestrian extends MovingObject { // TODO: Remember to create a ded
 
     @Override
     public List<RouteNode> getDisplayRoute() {
-        throw new NotImplementedException();
+        throw new UnsupportedOperationException();
     }
 
     @Override
