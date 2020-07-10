@@ -42,3 +42,7 @@ MTPs-Main-Container.txt
 .idea/modules
 *.iml
 *.ipr
+
+# Eclipse
+*.eml
+.settings/
