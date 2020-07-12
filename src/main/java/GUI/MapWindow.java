@@ -12,10 +12,7 @@ import SmartCity.Lights.Crossroad;
 import SmartCity.RoutePainter;
 import SmartCity.SmartCityAgent;
 import SmartCity.ZonePainter;
-import Vehicles.Bus;
-import Vehicles.MovingObjectImpl;
-import Vehicles.Pedestrian;
-import Vehicles.TestCar;
+import Vehicles.*;
 import jade.wrapper.StaleProxyException;
 import org.javatuples.Pair;
 import org.jxmapviewer.JXMapViewer;
@@ -378,7 +375,18 @@ public class MapWindow {
             Set<Waypoint> set = new HashSet<>();
             for (PedestrianAgent a : smartCityAgent.pedestrians) {
                 if (!a.isInBus()) {
-                    set.add(new DefaultWaypoint(a.getPedestrian().getPosition()));
+                    if (a.getPedestrian() instanceof TestPedestrian) {
+                        Set<Waypoint> testPedestrianWaypoint = new HashSet<>();
+                        testPedestrianWaypoint.add(new DefaultWaypoint(a.getPedestrian().getPosition()));
+
+                        WaypointPainter<Waypoint> testPainter = new WaypointPainter<>();
+                        testPainter.setWaypoints(testPedestrianWaypoint);
+                        testPainter.setRenderer(new CustomWaypointRenderer("pedestrian_blue.png"));
+                        painters.add(testPainter);
+                    }
+                    else {
+                        set.add(new DefaultWaypoint(a.getPedestrian().getPosition()));
+                    }
                 }
             }
             WaypointPainter<Waypoint> waypointPainter = new WaypointPainter<>();
@@ -877,9 +885,17 @@ public class MapWindow {
                 GeoPosition pedestrianFinishPoint = new GeoPosition(finishStation.getLatitude() + geoPosInFirstStationCircle.getValue0(), finishStation.getLongitude() + geoPosInFirstStationCircle.getValue1());
                 List<RouteNode> routeToStation = Router.generateRouteInfoForPedestriansBeta(pedestrianStartPoint, pedestrianGetOnStation, null, startStation.getOsmStationId());
                 List<RouteNode> routeFromStation = Router.generateRouteInfoForPedestriansBeta(pedestrianDisembarkStation, pedestrianFinishPoint, finishStation.getOsmStationId(), null);
-                final Pedestrian pedestrian = new Pedestrian(routeToStation, routeFromStation, startStation.getStationId(), stationNodePairAndBusLine.getValue1(),
-                        stationNodePairAndBusLine.getValue0().getValue0(), stationNodePairAndBusLine.getValue0().getValue1());
-                smartCityAgent.ActivateAgent(SmartCityAgent.tryAddNewPedestrianAgent(pedestrian));
+                if (getTestCarId() == smartCityAgent.pedestrianId) {
+                    final TestPedestrian pedestrian = new TestPedestrian(routeToStation, routeFromStation, startStation.getStationId(), stationNodePairAndBusLine.getValue1(),
+                            stationNodePairAndBusLine.getValue0().getValue0(), stationNodePairAndBusLine.getValue0().getValue1());
+                    smartCityAgent.ActivateAgent(SmartCityAgent.tryAddNewPedestrianAgent(pedestrian));
+                }
+                else {
+                    final Pedestrian pedestrian = new Pedestrian(routeToStation, routeFromStation, startStation.getStationId(), stationNodePairAndBusLine.getValue1(),
+                            stationNodePairAndBusLine.getValue0().getValue0(), stationNodePairAndBusLine.getValue0().getValue1());
+                    smartCityAgent.ActivateAgent(SmartCityAgent.tryAddNewPedestrianAgent(pedestrian));
+                }
+                smartCityAgent.pedestrianId++;
             } catch (Exception e) {
             }
         }
@@ -890,12 +906,12 @@ public class MapWindow {
         }
 
         private BusAgent getRandomBusAgent() {
-            final List<BusAgent> busArray = new ArrayList<>(SmartCityAgent.buses); // TODO RETHINK!!!
+            final List<BusAgent> busArray = new ArrayList<>(smartCityAgent.buses); // TODO RETHINK!!!
             try {
                 return busArray.get(random.nextInt(busArray.size()));
             } catch (Exception e) {
                 try {
-                    throw new Exception("The 'shouldPrepareBuses' toggle in SmartCityAgent is probably switched off (pedestrians cannot exist without buses)");
+                    throw new Exception("The 'shouldPrepareBuses' toggle in smartCityAgent is probably switched off (pedestrians cannot exist without buses)");
                 } catch (Exception e2) {
                     e2.printStackTrace();
                     return null;

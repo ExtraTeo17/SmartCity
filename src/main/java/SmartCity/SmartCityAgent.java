@@ -15,6 +15,7 @@ import SmartCity.Buses.Timetable;
 import Vehicles.MovingObjectImpl;
 import Vehicles.Pedestrian;
 import Vehicles.TestCar;
+import Vehicles.TestPedestrian;
 import jade.core.Agent;
 import jade.core.behaviours.CyclicBehaviour;
 import jade.lang.acl.ACLMessage;
@@ -62,6 +63,7 @@ public class SmartCityAgent extends Agent {
     private static MapWindow window;
     public List<VehicleAgent> Vehicles = new ArrayList<>();
     public int carId = 0;
+    public int pedestrianId = 0;
     CyclicBehaviour receiveMessage = new CyclicBehaviour() {
         @Override
         public void action() {
@@ -90,7 +92,23 @@ public class SmartCityAgent extends Agent {
                         }
                         break;
                     case MessageParameter.PEDESTRIAN:
-                        pedestrians.removeIf(v -> v.getLocalName().equals(rcv.getSender().getLocalName()));
+                        for (int i = 0; i < pedestrians.size(); i++) {
+                            PedestrianAgent v = pedestrians.get(i);
+                            if (v.getLocalName().equals(rcv.getSender().getLocalName())) {
+                                if (v.getPedestrian() instanceof TestPedestrian) {
+                                    TestPedestrian pedestrian = (TestPedestrian) v.getPedestrian();
+                                    Long seconds = Duration.between(pedestrian.start, pedestrian.end).getSeconds();
+                                    String time = String.format(
+                                            "%d:%02d:%02d",
+                                            seconds / 3600,
+                                            (seconds % 3600) / 60,
+                                            seconds % 60);
+                                    window.setResultTime(time);
+                                }
+                                pedestrians.remove(i);
+                                break;
+                            }
+                        }
                         break;
                     case MessageParameter.BUS:
                         buses.removeIf(v -> v.getLocalName().equals(rcv.getSender().getLocalName()));
