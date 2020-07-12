@@ -10,6 +10,8 @@ import java.time.Instant;
 import java.util.*;
 
 public class StationStrategy {
+	final private static boolean SHOULD_USE_STRATEGY = true;
+	
     final private static int WAIT_PERIOD = 60;
     //AgentName - Schedule Arrival Time / Arrival Time
     final private Map<String, Pair<Instant, Instant>> farAwayBusMap = new HashMap<>();
@@ -96,11 +98,14 @@ public class StationStrategy {
                 List<String> passengersThatCanLeave = checkPassengersWhoAreReadyToGo(bus);
                 result.addBusAndPedestrianGrantedPassthrough(bus, passengersThatCanLeave);
             }
-            else if (scheduleAndArrivalTime.getValue1().isAfter((scheduleAndArrivalTime.getValue0().minusSeconds(WAIT_PERIOD))) &&
-                    scheduleAndArrivalTime.getValue1().isBefore((scheduleAndArrivalTime.getValue0().plusSeconds(WAIT_PERIOD)))) {
+            else if ((scheduleAndArrivalTime.getValue1().isAfter((scheduleAndArrivalTime.getValue0().minusSeconds(WAIT_PERIOD))) &&
+                    scheduleAndArrivalTime.getValue1().isBefore((scheduleAndArrivalTime.getValue0().plusSeconds(WAIT_PERIOD))))) {
                 System.out.println("------------------BUS WAS ON TIME-----------------------");
                 List<String> passengersThatCanLeave = checkPassengersWhoAreReadyToGo(bus);
-                List<String> farPassengers = checkPassengersWhoAreFar(bus, scheduleAndArrivalTime.getValue0().plusSeconds(WAIT_PERIOD));
+                List<String> farPassengers = new ArrayList<>();
+                if (SHOULD_USE_STRATEGY) {
+                	farPassengers = checkPassengersWhoAreFar(bus, scheduleAndArrivalTime.getValue0().plusSeconds(WAIT_PERIOD));
+                }
                 passengersThatCanLeave.addAll(farPassengers);
                 result.addBusAndPedestrianGrantedPassthrough(bus, passengersThatCanLeave);
                 System.out.println("-----------------WAITING FOR: " + farPassengers.size() + " PASSENGERS------------------");
