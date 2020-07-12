@@ -1,0 +1,68 @@
+<!doctype html>
+
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+
+    <title>Leaflet demo</title>
+    <meta name="description" content="Leaflet demo">
+    <meta name="author" content="SitePoint">
+
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.6.0/dist/leaflet.css"
+        integrity="sha512-xwE/Az9zrjBIphAcBb3F6JVqxf46+CDLwfLMHloNu6KEQCAWi6HcDUbeOfBIptF7tcCzusKFjFw2yuvEpDL9wQ=="
+        crossorigin="" />
+</head>
+
+
+<style>
+    #mapid {
+        margin: auto;
+        height: 768px;
+        width: 768px;
+    }
+</style>
+
+<body>
+    <div id="mapid"></div>
+</body>
+
+<script src="https://unpkg.com/leaflet@1.6.0/dist/leaflet.js"
+    integrity="sha512-gZwIG9x3wUXg2hdXF6+rVkLF/0Vi9U8D2Ntg4Ga5I5BZpVkVxlJWbSQtXPSiUTtC0TjtGOmxa1AJPuV0CPthew=="
+    crossorigin=""></script>
+<script type="text/javascript" src="animatedMarker.js"></script>
+
+<script>
+    let map = L.map('mapid').setView([52.217154, 21.005575], 15);
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        maxZoom: 19,
+        attribution: '&copy; <a href="https://openstreetmap.org/copyright">OpenStreetMap contributors</a>'
+    }).addTo(map);
+
+
+    var line = L.polyline([
+        [52.217116, 21.014223],
+        [52.217369, 21.006857],
+        [52.217264, 21.005254],
+        [52.220123, 21.005044],
+        [52.219946, 21.011481],
+        [52.219909, 21.011991],
+        [52.219857, 21.012318],
+        [52.218085, 21.015129],
+        [52.217099, 21.014872],
+    ]);
+    map.addLayer(line);
+
+    var carIcon = L.icon({
+        iconUrl: 'cabriolet.png',
+        iconSize: [32, 32], // size of the icon
+        iconAnchor: [16, 16], // point of the icon which will correspond to marker's location
+        popupAnchor: [-12, -12] // point from which the popup should open relative to the iconAnchor
+    });
+
+    var animatedMarker = L.animatedMarker(line.getLatLngs(), { icon: carIcon });
+    map.addLayer(animatedMarker);
+</script>
+
+
+</html>
