@@ -27,7 +27,7 @@ public abstract class MovingObject {
 
     public abstract long getAdjacentOsmWayId();
 
-    public abstract int getMilisecondsToNextLight();
+    public abstract int getMillisecondsToNextLight();
 
     public abstract int getSpeed();
 

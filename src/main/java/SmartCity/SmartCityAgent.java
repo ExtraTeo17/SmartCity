@@ -33,6 +33,7 @@ import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.time.Duration;
+import java.time.Instant;
 import java.util.*;
 
 public class SmartCityAgent extends Agent {
@@ -45,11 +46,9 @@ public class SmartCityAgent extends Agent {
     public static boolean SHOULD_GENERATE_PEDESTRIANS_AND_BUSES = false;
     public static boolean SHOULD_GENERATE_CARS = true;
     public static List<PedestrianAgent> pedestrians = new ArrayList<>();
-    //public Set<Pedestrian> pedestrians = new LinkedHashSet<>();
     public static Set<LightManager> lightManagers = new HashSet<>();
     public static Set<StationAgent> stationAgents = new HashSet<>();
     public static boolean lightManagersUnderConstruction = false;
-    //public static Map<Long, LightManagerNode> lightIdToLightManagerNode = new HashMap<>();
     public static Map<Pair<Long, Long>, LightManagerNode> wayIdLightIdToLightManagerNode = new HashMap<>();
     public static Map<Long, LightManagerNode> crossingOsmIdToLightManagerNode = new HashMap<>();
     public static Map<Long, StationNode> osmStationIdToStationNode = new HashMap<>();
@@ -64,6 +63,7 @@ public class SmartCityAgent extends Agent {
     public List<VehicleAgent> Vehicles = new ArrayList<>();
     public int carId = 0;
     public int pedestrianId = 0;
+    private JXMapViewer mapViewer;
     CyclicBehaviour receiveMessage = new CyclicBehaviour() {
         @Override
         public void action() {
@@ -73,42 +73,10 @@ public class SmartCityAgent extends Agent {
                 String type = rcv.getUserDefinedParameter(MessageParameter.TYPE);
                 switch (type) {
                     case MessageParameter.VEHICLE:
-                        for (int i = 0; i < Vehicles.size(); i++) {
-                            VehicleAgent v = Vehicles.get(i);
-                            if (v.getLocalName().equals(rcv.getSender().getLocalName())) {
-                                if (v.getVehicle() instanceof TestCar) {
-                                    TestCar car = (TestCar) v.getVehicle();
-                                    Long seconds = Duration.between(car.start, car.end).getSeconds();
-                                    String time = String.format(
-                                            "%d:%02d:%02d",
-                                            seconds / 3600,
-                                            (seconds % 3600) / 60,
-                                            seconds % 60);
-                                    window.setResultTime(time);
-                                }
-                                Vehicles.remove(i);
-                                break;
-                            }
-                        }
+                        onReceiveVehicle(rcv);
                         break;
                     case MessageParameter.PEDESTRIAN:
-                        for (int i = 0; i < pedestrians.size(); i++) {
-                            PedestrianAgent v = pedestrians.get(i);
-                            if (v.getLocalName().equals(rcv.getSender().getLocalName())) {
-                                if (v.getPedestrian() instanceof TestPedestrian) {
-                                    TestPedestrian pedestrian = (TestPedestrian) v.getPedestrian();
-                                    Long seconds = Duration.between(pedestrian.start, pedestrian.end).getSeconds();
-                                    String time = String.format(
-                                            "%d:%02d:%02d",
-                                            seconds / 3600,
-                                            (seconds % 3600) / 60,
-                                            seconds % 60);
-                                    window.setResultTime(time);
-                                }
-                                pedestrians.remove(i);
-                                break;
-                            }
-                        }
+                        onReceivePedestrian(rcv);
                         break;
                     case MessageParameter.BUS:
                         buses.removeIf(v -> v.getLocalName().equals(rcv.getSender().getLocalName()));
@@ -118,9 +86,48 @@ public class SmartCityAgent extends Agent {
             block(1000);
         }
     };
-    private JXMapViewer mapViewer;
 
-    public static final Date getSimulationTime() {
+    private void onReceivePedestrian(ACLMessage rcv) {
+        for (int i = 0; i < pedestrians.size(); i++) {
+            PedestrianAgent v = pedestrians.get(i);
+            if (v.getLocalName().equals(rcv.getSender().getLocalName())) {
+                if (v.getPedestrian() instanceof TestPedestrian) {
+                    TestPedestrian pedestrian = (TestPedestrian) v.getPedestrian();
+                    setResultTime(pedestrian.start, pedestrian.end);
+                }
+                pedestrians.remove(i);
+                break;
+            }
+        }
+    }
+
+    private void setResultTime(Instant start, Instant end) {
+        long seconds = Duration.between(start, end).getSeconds();
+        String time = String.format(
+                "%d:%02d:%02d",
+                seconds / 3600,
+                (seconds % 3600) / 60,
+                seconds % 60);
+        window.setResultTime(time);
+    }
+
+
+    private void onReceiveVehicle(ACLMessage rcv) {
+        for (int i = 0; i < Vehicles.size(); i++) {
+            VehicleAgent v = Vehicles.get(i);
+            if (v.getLocalName().equals(rcv.getSender().getLocalName())) {
+                if (v.getVehicle() instanceof TestCar) {
+                    TestCar car = (TestCar) v.getVehicle();
+                    setResultTime(car.start, car.end);
+                }
+                Vehicles.remove(i);
+                break;
+            }
+        }
+    }
+
+
+    public static Date getSimulationTime() {
         return window.getSimulationStartTime();
     }
 
@@ -385,6 +392,15 @@ public class SmartCityAgent extends Agent {
 
         menuBar.add(debug);
 
+        addGenerationMenu(menuBar);
+
+        frame.setJMenuBar(menuBar);
+        frame.setSize(1200, 600);
+        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        frame.setVisible(true);
+    }
+
+    private void addGenerationMenu(JMenuBar menuBar) {
         JMenu generation = new JMenu("Generation");
 
         final JCheckBoxMenuItem car_gen = new JCheckBoxMenuItem("Cars", SHOULD_GENERATE_CARS);
@@ -406,11 +422,6 @@ public class SmartCityAgent extends Agent {
         generation.add(pedestrians);
 
         menuBar.add(generation);
-
-        frame.setJMenuBar(menuBar);
-        frame.setSize(1200, 600);
-        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        frame.setVisible(true);
     }
 
     public void AddNewVehicleAgent(String name, VehicleAgent agent) throws StaleProxyException {
@@ -435,22 +446,6 @@ public class SmartCityAgent extends Agent {
         }
         lightManagersUnderConstruction = false;
     }
-    
-    /*private Set<BusAgent> prepareBusesV0() {
-    	Set<BusAgent> busSet = new LinkedHashSet<>();
-    	for (Station station : stations) {
-    		//busSet.addAll(getBusesIfNearby(station));
-    	}
-    	return busSet;
-    }*/
-
-//    private Set<BusAgent> getBusesIfNearby(Station station) {
-//    	Set<BusAgent> busesOnStation = new LinkedHashSet<>();
-//    	List<Integer> linesOnStation = getLinesOnStation(station.getWawId(), station.getWawNr());
-//    	BusAgent busAgent = new BusAgent(nextBusId(), busNumber, timetable);
-//    	tryAddAgent(busAgent);
-//    	return busAgent;
-//    }
 
     private void tryPrepareLightManagersInRadiusAndLightIdToLightManagerIdHashSetBeta(SmartCityAgent smartCityAgent,
                                                                                       GeoPosition middlePoint, int radius) {
@@ -478,7 +473,6 @@ public class SmartCityAgent extends Agent {
     }
 
     public void prepareStationsAndBuses(GeoPosition middlePoint, int radius) {
-        //stations = MapAccessManager.getStations(middlePoint, radius); NOT NEEDED ANYMORE, BECAUSE OF FILLING STATIONS DURING PARSING!
         resetStationAgentIdGenerator();
         System.out.println("STEP 1/" + SmartCityAgent.STEPS + ": Starting bus preparation");
         resetBusIdGen();

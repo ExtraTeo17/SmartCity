@@ -93,7 +93,7 @@ public class MovingObjectImpl extends MovingObject {
     }
 
     @Override
-    public int getMilisecondsToNextLight() {
+    public int getMillisecondsToNextLight() {
         return ((closestLightIndex - index) * 3600) / getSpeed();
     }
 

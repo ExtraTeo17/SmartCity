@@ -136,7 +136,7 @@ public class Pedestrian extends MovingObject { // TODO: Remember to create a ded
     }
 
     @Override
-    public int getMilisecondsToNextLight() {
+    public int getMillisecondsToNextLight() {
         return ((closestLightIndex - index) * 3600) / getSpeed();
     }
 

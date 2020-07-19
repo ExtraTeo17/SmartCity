@@ -192,12 +192,12 @@ public class MapWindow {
                             vehicle.setVehicle(car);
                             try {
                                 smartCityAgent.AddNewVehicleAgent(car.getVehicleType() + smartCityAgent.Vehicles.size(), vehicle);
-                                smartCityAgent.ActivateAgent(vehicle);
+                                SmartCityAgent.ActivateAgent(vehicle);
                             } catch (StaleProxyException e) {
                                 e.printStackTrace();
                             }
                             System.out.println("Vehicles: " + smartCityAgent.Vehicles.size());
-                            System.out.println("Lights: " + smartCityAgent.lightManagers.size());
+                            System.out.println("Lights: " + SmartCityAgent.lightManagers.size());
                             pointA = null;
                             pointB = null;
                         }
@@ -278,7 +278,7 @@ public class MapWindow {
 
         zoneCenter = new GeoPosition(lat, lon);
 
-        if (smartCityAgent.SHOULD_GENERATE_PEDESTRIANS_AND_BUSES) {
+        if (SmartCityAgent.SHOULD_GENERATE_PEDESTRIANS_AND_BUSES) {
             smartCityAgent.prepareStationsAndBuses(zoneCenter, getZoneRadius());
         }
         smartCityAgent.prepareLightManagers(zoneCenter, getZoneRadius());

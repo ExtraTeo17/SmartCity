@@ -242,7 +242,7 @@ public class BusAgent extends Agent {
             ACLMessage msg = new ACLMessage(ACLMessage.INFORM);
             msg.addReceiver(dest);
             Properties properties = new Properties();
-            Instant time = SmartCityAgent.getSimulationTime().toInstant().plusMillis(bus.getMilisecondsToNextLight());
+            Instant time = SmartCityAgent.getSimulationTime().toInstant().plusMillis(bus.getMillisecondsToNextLight());
             properties.setProperty(MessageParameter.TYPE, MessageParameter.VEHICLE);
             properties.setProperty(MessageParameter.ARRIVAL_TIME, "" + time);
             properties.setProperty(MessageParameter.ADJACENT_OSM_WAY_ID, "" + nextManager.getOsmWayId());
