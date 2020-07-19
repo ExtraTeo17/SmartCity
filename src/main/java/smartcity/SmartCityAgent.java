@@ -26,6 +26,7 @@ import vehicles.MovingObjectImpl;
 import vehicles.Pedestrian;
 import vehicles.TestCar;
 import vehicles.TestPedestrian;
+import web.WebServer;
 
 import java.time.Duration;
 import java.time.Instant;
@@ -33,6 +34,15 @@ import java.util.*;
 
 public class SmartCityAgent extends Agent {
     private static final Logger logger = LoggerFactory.getLogger(SmartCityAgent.class);
+    private static long nextLightManagerId;
+    private static long nextStationAgentId;
+    private static int nextBusId;
+    private static int nextPedestrianAgentId;
+    private static AgentContainer container;
+    private static MapWindow window;
+    private static WebServer webServer;
+
+    public final  static int SERVER_PORT = 9000;
     public final static String LIGHT_MANAGER = "LightManager";
     public final static String BUS = "Bus";
     public final static String STATION = "Station";
@@ -51,12 +61,6 @@ public class SmartCityAgent extends Agent {
     public static Map<Long, StationNode> osmStationIdToStationNode = new HashMap<>();
     public static Map<Long, OSMStation> osmIdToStationOSMNode = new HashMap<>();
     public static Set<BusAgent> buses = new LinkedHashSet<>();
-    private static long nextLightManagerId;
-    private static long nextStationAgentId;
-    private static int nextBusId;
-    private static int nextPedestrianAgentId;
-    private static AgentContainer container;
-    private static MapWindow window;
     public List<VehicleAgent> Vehicles = new ArrayList<>();
     public int carId = 0;
     public int pedestrianId = 0;
@@ -64,8 +68,11 @@ public class SmartCityAgent extends Agent {
     @Override
     protected void setup() {
         container = getContainerController();
-        window = WindowInitializer.generateWindow(this);
+        window = WindowInitializer.displayWindow(this);
         addBehaviour(getReceiveMessageBehaviour());
+        
+        webServer = new WebServer(SERVER_PORT);
+        webServer.start();
     }
 
     private CyclicBehaviour getReceiveMessageBehaviour() {

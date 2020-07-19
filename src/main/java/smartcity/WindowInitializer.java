@@ -18,7 +18,7 @@ import static smartcity.SmartCityAgent.SHOULD_GENERATE_PEDESTRIANS_AND_BUSES;
 
 public class WindowInitializer {
 
-    public static MapWindow generateWindow(SmartCityAgent smartCityAgent) {
+    public static MapWindow displayWindow(SmartCityAgent smartCityAgent) {
         var window = new MapWindow(smartCityAgent);
         var mapViewer = window.MapViewer;
         JFrame frame = new JFrame("Smart City by Katherine & Dominic & Robert");
