@@ -67,7 +67,7 @@ public class MapAccessManager {
     private static final String LAT = "lat";
     private static final String LON = "lon";
     private static final String ID = "id";
-    private static final String CROSSROADS = "crossroads.xml";
+    private static final String CROSSROADS = "config/crossroads.xml";
 
     public static OSMNode getNode(String nodeId) throws IOException, ParserConfigurationException, SAXException {
         String string = "http://www.openstreetmap.org/api/0.6/node/" + nodeId;

@@ -1,21 +1,22 @@
 package routing;
 
+import org.javatuples.Pair;
+import org.jxmapviewer.viewer.GeoPosition;
+import osmproxy.MapAccessManager;
 import osmproxy.elements.OSMLight;
 import osmproxy.elements.OSMNode;
 import osmproxy.elements.OSMWay;
 import osmproxy.elements.OSMWay.RelationOrientation;
 import osmproxy.elements.OSMWay.RouteOrientation;
 import osmproxy.elements.OSMWaypoint;
-import osmproxy.MapAccessManager;
 import smartcity.SmartCityAgent;
-import org.javatuples.Pair;
-import org.jxmapviewer.viewer.GeoPosition;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
 public final class Router {
+    private static final String CONFIG_PATH = "config/config.properties";
 
     public static List<RouteNode> generateRouteInfo(GeoPosition pointA, GeoPosition pointB) {
         Pair<List<Long>, List<RouteNode>> osmWayIdsAndPointList = findRoute(pointA, pointB, false);
@@ -85,7 +86,7 @@ public final class Router {
     /////////////////////////////////////////////////////////////
 
     private static Pair<List<Long>, List<RouteNode>> findRoute(GeoPosition pointA, GeoPosition pointB, boolean onFoot) {
-        Pair<List<Long>, List<RouteNode>> osmWayIdsAndPointList = osmproxy.HighwayAccessor.getOsmWayIdsAndPointList(new String[]{"config=config.properties", "datareader.file=mazowieckie-latest.osm.pbf"},
+        var osmWayIdsAndPointList = osmproxy.HighwayAccessor.getOsmWayIdsAndPointList(new String[]{"config=" + CONFIG_PATH, "datareader.file=mazowieckie-latest.osm.pbf"},
                 pointA.getLatitude(), pointA.getLongitude(), pointB.getLatitude(), pointB.getLongitude(), onFoot);
         return osmWayIdsAndPointList;
     }

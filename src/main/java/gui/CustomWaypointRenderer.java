@@ -21,8 +21,8 @@ public class CustomWaypointRenderer implements WaypointRenderer<Waypoint> {
     public CustomWaypointRenderer(String imageName) {
         try {
             this.img = ImageIO.read(getClass().getResource(imagesPath + imageName));
-        } catch (Exception var2) {
-            log.warn("couldn't read " + imageName, var2);
+        } catch (Exception ex) {
+            log.warn("couldn't read " + imageName, ex);
         }
     }
 
