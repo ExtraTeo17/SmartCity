@@ -2,6 +2,9 @@ package smartcity.lights;
 
 import agents.LightColor;
 import gui.MapWindow;
+import org.jxmapviewer.viewer.DefaultWaypointRenderer;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import osmproxy.elements.OSMNode;
 import osmproxy.MapAccessManager;
 import smartcity.SmartCityAgent;
@@ -16,8 +19,8 @@ import java.util.*;
 import java.util.Map.Entry;
 
 public class SimpleCrossroad extends Crossroad {
-
-    final public static int EXTEND_TIME = 30;
+    private static final Logger logger = LoggerFactory.getLogger(Crossroad.class);
+    public static final int EXTEND_TIME = 30;
     public boolean useStrategy = true;
     private Map<Long, Light> lights = new HashMap<>();
     private SimpleLightGroup lightGroup1;
@@ -60,7 +63,7 @@ public class SimpleCrossroad extends Crossroad {
             }
             timer = new Timer(true);
         } catch (IllegalStateException e) {
-            System.out.println("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAa");
+            logger.info("Illegal state detected", e);
             return;
         }
     }
@@ -90,7 +93,7 @@ public class SimpleCrossroad extends Crossroad {
             }
         }
         if (greenGroupCars > redGroupCars) {
-            System.out.println("LM:CROSSROAD HAS PROLONGED GREEN LIGHT FOR " + greenGroupCars + " CARS AS OPPOSED TO " + redGroupCars);
+            logger.info("LM:CROSSROAD HAS PROLONGED GREEN LIGHT FOR " + greenGroupCars + " CARS AS OPPOSED TO " + redGroupCars);
         }
         return greenGroupCars > redGroupCars; // should check if two base green intervals have passed (also temporary, because it also sucks)
     }
@@ -146,15 +149,23 @@ public class SimpleCrossroad extends Crossroad {
         try {
             lights.get(adjacentOsmWayId).addCarToFarAwayQueue(carName, journeyTime);
         } catch (Exception e) {
-            System.out.println("ADD");
-            System.out.println(adjacentOsmWayId);
-            for (Entry<Long, Light> l : lights.entrySet()) {
-                System.out.println("-------------");
-                System.out.println(l.getKey());
-                System.out.println(l.getValue().getAdjacentOSMWayId());
-            }
-            System.out.println(carName);
+            logAddException(carName, adjacentOsmWayId);
         }
+    }
+
+    private void logAddException(String name, long adjacentOsmWayId) {
+        logger.info("ADD");
+        logger.info(String.valueOf(adjacentOsmWayId));
+        for (Entry<Long, Light> l : lights.entrySet()) {
+            logger.info("-------------");
+            logger.info(String.valueOf(l.getKey()));
+            logger.info(String.valueOf(l.getValue().getAdjacentOSMWayId()));
+        }
+        logger.info(name);
+    }
+
+    private static void LogException(Exception e){
+
     }
 
     @Override
@@ -182,14 +193,7 @@ public class SimpleCrossroad extends Crossroad {
         try {
             lights.get(adjacentOsmWayId).addPedestrianToFarAwayQueue(pedestrianName, journeyTime);
         } catch (Exception e) {
-            System.out.println("ADD");
-            System.out.println(adjacentOsmWayId);
-            for (Entry<Long, Light> l : lights.entrySet()) {
-                System.out.println("-------------");
-                System.out.println(l.getKey());
-                System.out.println(l.getValue().getAdjacentOSMWayId());
-            }
-            System.out.println(pedestrianName);
+            logAddException(pedestrianName, adjacentOsmWayId);
         }
     }
 
@@ -210,13 +214,13 @@ public class SimpleCrossroad extends Crossroad {
             if (STRATEGY_ACTIVE) {
                 if (!alreadyExtendedGreen) {
                     if (shouldExtendGreenLightBecauseOfCarsOnLight()) {
-                        System.out.println("-------------------------------------shouldExtendGreenLightBecauseOfCarsOnLight--------------");
+                        logger.info("-------------------------------------shouldExtendGreenLightBecauseOfCarsOnLight--------------");
                         alreadyExtendedGreen = true;
                         return;
                     }
                     else if (shouldExtendBecauseOfFarAwayQueque()) {
                         prepareTimer();
-                        System.out.println("-------------------------------------shouldExtendBecauseOfFarAwayQueque--------------");
+                        logger.info("-------------------------------------shouldExtendBecauseOfFarAwayQueque--------------");
                         timer.schedule(new SwitchLightsTask(), EXTEND_TIME * 1000 / MapWindow.getTimeScale());
                         alreadyExtendedGreen = true;
                         return;
@@ -239,7 +243,7 @@ public class SimpleCrossroad extends Crossroad {
                     for (Instant time_of_car : light.farAwayCarMap.values()) {
                         // If current time + EXTEND_TIME > time_of_car
                         if (current_time.plusSeconds(EXTEND_TIME).isAfter(time_of_car)) {
-                            System.out.println("---------------------------------------------WHY WE should extend " + time_of_car + "----------Curent time" + current_time);
+                            logger.info("---------------------------------------------WHY WE should extend " + time_of_car + "----------Curent time" + current_time);
                             return true;
                         }
                     }
@@ -249,7 +253,7 @@ public class SimpleCrossroad extends Crossroad {
                     for (Instant time_of_pedestrian : light.farAwayPedestrianMap.values()) {
                         // If current time + EXTEND_TIME > time_of_car
                         if (current_time.plusSeconds(EXTEND_TIME).isAfter(time_of_pedestrian)) {
-                            System.out.println("---------------------------------------------WHY WE should extend " + time_of_pedestrian + "----------Curent time" + current_time);
+                            logger.info("---------------------------------------------WHY WE should extend " + time_of_pedestrian + "----------Curent time" + current_time);
                             return true;
                         }
                     }

@@ -1,5 +1,8 @@
 package agents;
 
+import org.jxmapviewer.viewer.DefaultWaypointRenderer;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import osmproxy.elements.OSMStation;
 import smartcity.lights.OptimizationResult;
 import smartcity.stations.StationStrategy;
@@ -16,9 +19,8 @@ import java.time.Instant;
 import java.util.List;
 
 public class StationAgent extends Agent {
+    private static final Logger logger = LoggerFactory.getLogger(StationAgent.class);
     private final StationStrategy stationStrategy;
-
-    //private final OSMStation stationOSMNode;
     private final long agentId;
 
     public StationAgent(OSMStation stationOSMNode, final long agentId) { // REMEMBER TO PRUNE BEYOND CIRCLE
@@ -86,7 +88,7 @@ public class StationAgent extends Agent {
 
                 }
                 else {
-                    System.out.println("SMTH WRONG");
+                    logger.info("SMTH WRONG");
                 }
 
             }
@@ -98,7 +100,7 @@ public class StationAgent extends Agent {
                             getInstantParameter(rcv, MessageParameter.ARRIVAL_TIME));
                 }
                 else if (rcv.getPerformative() == ACLMessage.REQUEST_WHEN) {
-                    System.out.println("GET MESSAGE FROM PEDESTIAN REQUEST_WHEN");
+                    logger.info("GET MESSAGE FROM PEDESTIAN REQUEST_WHEN");
                     stationStrategy.removePedestrianFromFarAwayQueue(rcv.getSender().getLocalName(), rcv.getUserDefinedParameter(MessageParameter.DESIRED_BUS));
                     stationStrategy.addPedestrianToQueue(rcv.getSender().getLocalName(),
                             rcv.getUserDefinedParameter(MessageParameter.DESIRED_BUS),
@@ -108,11 +110,11 @@ public class StationAgent extends Agent {
                     send(msg);
                 }
                 else if (rcv.getPerformative() == ACLMessage.AGREE) {
-                    System.out.println("-----GET AGREE from PEDESTRIAN------");
+                    logger.info("-----GET AGREE from PEDESTRIAN------");
                     stationStrategy.removePedestrianFromBusOnStationQueue(rcv.getSender().getLocalName(), rcv.getUserDefinedParameter(MessageParameter.DESIRED_BUS));
                 }
                 else {
-                    System.out.println("SMTH WRONG");
+                    logger.info("SMTH WRONG");
                 }
 
             }
@@ -182,6 +184,6 @@ public class StationAgent extends Agent {
 
 
     void Print(String message) {
-        System.out.println(getLocalName() + ": " + message);
+        logger.info(getLocalName() + ": " + message);
     }
 }

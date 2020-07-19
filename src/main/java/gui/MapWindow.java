@@ -4,6 +4,8 @@ import agents.BusAgent;
 import agents.LightManager;
 import agents.PedestrianAgent;
 import agents.VehicleAgent;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import osmproxy.elements.OSMStation;
 import routing.RouteNode;
 import routing.Router;
@@ -42,6 +44,7 @@ import java.util.Timer;
 import java.util.*;
 
 public class MapWindow {
+    private static final Logger logger = LoggerFactory.getLogger(MapWindow.class);
     private final static int REFRESH_MAP_INTERVAL_MILLISECONDS = 100;
     private final static int BUS_CONTROL_INTERVAL_MILLISECONDS = 2000; //60000
     private final static int CREATE_CAR_INTERVAL_MILLISECONDS = 500;
@@ -170,7 +173,7 @@ public class MapWindow {
         MapViewer.addMouseListener(new MapClickListener(MapViewer) {
             @Override
             public void mapClicked(GeoPosition geoPosition) {
-                System.out.println("Lat: " + geoPosition.getLatitude() + " Lon: " + geoPosition.getLongitude());
+                logger.info("Lat: " + geoPosition.getLatitude() + " Lon: " + geoPosition.getLongitude());
                 switch (state) {
                     case SETTING_ZONE:
                     case READY_TO_RUN:
@@ -196,8 +199,8 @@ public class MapWindow {
                             } catch (StaleProxyException e) {
                                 e.printStackTrace();
                             }
-                            System.out.println("Vehicles: " + smartCityAgent.Vehicles.size());
-                            System.out.println("Lights: " + SmartCityAgent.lightManagers.size());
+                            logger.info("Vehicles: " + smartCityAgent.Vehicles.size());
+                            logger.info("Lights: " + SmartCityAgent.lightManagers.size());
                             pointA = null;
                             pointB = null;
                         }

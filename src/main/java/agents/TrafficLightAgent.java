@@ -2,15 +2,19 @@ package agents;
 
 import lightstrategies.BasicLightStrategy;
 import jade.core.Agent;
+import org.jxmapviewer.viewer.DefaultWaypointRenderer;
 import org.jxmapviewer.viewer.GeoPosition;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class TrafficLightAgent extends Agent {
+    private static final Logger logger = LoggerFactory.getLogger(TrafficLightAgent.class);
     public LightColor lightColor = LightColor.RED;
     public List<String> queue = new ArrayList<>();
-    BasicLightStrategy strategy = new BasicLightStrategy();
+    private final BasicLightStrategy strategy = new BasicLightStrategy();
     private GeoPosition position;
 
     public TrafficLightAgent(GeoPosition pos) {
@@ -32,6 +36,6 @@ public class TrafficLightAgent extends Agent {
     }
 
     public void Print(String message) {
-        System.out.println(getLocalName() + ": " + message);
+        logger.info(getLocalName() + ": " + message);
     }
 }

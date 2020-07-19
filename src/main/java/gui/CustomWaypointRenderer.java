@@ -15,14 +15,13 @@ import java.awt.image.ImageObserver;
 
 public class CustomWaypointRenderer implements WaypointRenderer<Waypoint> {
     private static final Logger logger = LoggerFactory.getLogger(DefaultWaypointRenderer.class);
-    private static final String imagesPath = "../images/";
+    private static final String IMAGES_PATH = "../images/";
     private BufferedImage img = null;
 
     public CustomWaypointRenderer(String imageName) {
         try {
-            this.img = ImageIO.read(getClass().getResource(imagesPath + imageName));
+            this.img = ImageIO.read(getClass().getResource(IMAGES_PATH + imageName));
         } catch (Exception ex) {
-            // TODO: Does it work? Swap it to
             logger.warn("couldn't read " + imageName, ex);
         }
     }

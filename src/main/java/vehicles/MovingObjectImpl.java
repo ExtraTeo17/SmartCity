@@ -22,7 +22,7 @@ public class MovingObjectImpl extends MovingObject {
         route = Router.uniformRoute(displayRoute);
         /*for(RouteNode r : route) {
         	if(!r.getClass().getCanonicalName().equals("Routing.RouteNode"))
-        	System.out.println(r.getClass().getCanonicalName());
+        	logger.info(r.getClass().getCanonicalName());
         }*/
     }
 

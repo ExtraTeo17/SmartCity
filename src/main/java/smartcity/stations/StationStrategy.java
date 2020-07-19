@@ -1,5 +1,8 @@
 package smartcity.stations;
 
+import org.jxmapviewer.viewer.DefaultWaypointRenderer;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import osmproxy.elements.OSMStation;
 import routing.StationNode;
 import smartcity.lights.OptimizationResult;
@@ -10,10 +13,11 @@ import java.time.Instant;
 import java.util.*;
 
 public class StationStrategy {
+    private static final Logger logger = LoggerFactory.getLogger(StationStrategy.class);
 	final private static boolean SHOULD_USE_STRATEGY = true;
 	
     final private static int WAIT_PERIOD = 60;
-    //AgentName - Schedule Arrival Time / Arrival Time
+    // AgentName - Schedule Arrival Time / Arrival Time
     final private Map<String, Pair<Instant, Instant>> farAwayBusMap = new HashMap<>();
     final private Map<String, Pair<Instant, Instant>> busOnStationMap = new HashMap<>();
     final private Map<String, String> busAgentNameToBusNumberMap = new HashMap<>();
@@ -94,13 +98,13 @@ public class StationStrategy {
 
             if (scheduleAndArrivalTime.getValue1().isAfter(scheduleAndArrivalTime.getValue0().plusSeconds(WAIT_PERIOD))) {
 
-                System.out.println("------------------BUS WAS LATE-----------------------");
+                logger.info("------------------BUS WAS LATE-----------------------");
                 List<String> passengersThatCanLeave = checkPassengersWhoAreReadyToGo(bus);
                 result.addBusAndPedestrianGrantedPassthrough(bus, passengersThatCanLeave);
             }
             else if ((scheduleAndArrivalTime.getValue1().isAfter((scheduleAndArrivalTime.getValue0().minusSeconds(WAIT_PERIOD))) &&
                     scheduleAndArrivalTime.getValue1().isBefore((scheduleAndArrivalTime.getValue0().plusSeconds(WAIT_PERIOD))))) {
-                System.out.println("------------------BUS WAS ON TIME-----------------------");
+                logger.info("------------------BUS WAS ON TIME-----------------------");
                 List<String> passengersThatCanLeave = checkPassengersWhoAreReadyToGo(bus);
                 List<String> farPassengers = new ArrayList<>();
                 if (SHOULD_USE_STRATEGY) {
@@ -108,14 +112,14 @@ public class StationStrategy {
                 }
                 passengersThatCanLeave.addAll(farPassengers);
                 result.addBusAndPedestrianGrantedPassthrough(bus, passengersThatCanLeave);
-                System.out.println("-----------------WAITING FOR: " + farPassengers.size() + " PASSENGERS------------------");
+                logger.info("-----------------WAITING FOR: " + farPassengers.size() + " PASSENGERS------------------");
             }
             else if (scheduleAndArrivalTime.getValue1().isBefore((scheduleAndArrivalTime.getValue0().minusSeconds(WAIT_PERIOD)))) {
-                System.out.println("------------------BUS TOO EARLY-----------------------");
+                logger.info("------------------BUS TOO EARLY-----------------------");
                 continue;
             }
             else {
-                System.out.println("------------------SOMETHING HAPPENED-----------------------");
+                logger.info("------------------SOMETHING HAPPENED-----------------------");
             }
         }
         return result;
@@ -143,7 +147,7 @@ public class StationStrategy {
             PedestrianArrivalInfo arrivalTime = farAwayPedestrianMap.get(bus);
             for (Pair<String, Instant> pedestrian : arrivalTime.agentNamesAndArrivalTimes) {
                 if (pedestrian.getValue1().isBefore(deadline)) {
-                    System.out.println("--------Passenger too wait---------");
+                    logger.info("--------Passenger too wait---------");
                     passengersThatCanLeave.add(pedestrian.getValue0());
                 }
             }

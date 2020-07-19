@@ -1,5 +1,8 @@
 package agents;
 
+import org.jxmapviewer.viewer.DefaultWaypointRenderer;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import routing.LightManagerNode;
 import routing.RouteNode;
 import routing.StationNode;
@@ -23,7 +26,7 @@ import java.util.Random;
 
 @SuppressWarnings("serial")
 public class BusAgent extends Agent {
-
+    private static final Logger logger = LoggerFactory.getLogger(BusAgent.class);
     private long agentId;
     private Bus bus;
 
@@ -103,7 +106,7 @@ public class BusAgent extends Agent {
                             properties.setProperty(MessageParameter.TYPE, MessageParameter.BUS);
                             properties.setProperty(MessageParameter.SCHEDULE_ARRIVAL, "" + bus.getTimeOnStation(station.getOsmStationId()).toInstant());
                             properties.setProperty(MessageParameter.ARRIVAL_TIME, "" + SmartCityAgent.getSimulationTime().toInstant());
-                            System.out.println("BUS: send REQUEST_WHEN to station");
+                            logger.info("BUS: send REQUEST_WHEN to station");
                             msg.setAllUserDefinedParameters(properties);
                             send(msg);
 
@@ -182,7 +185,7 @@ public class BusAgent extends Agent {
                                     properties.setProperty(MessageParameter.TYPE, MessageParameter.BUS);
                                     response.setAllUserDefinedParameters(properties);
                                     send(response);
-                                    System.out.println("BUS: get REQUEST from station");
+                                    logger.info("BUS: get REQUEST from station");
                                     GetNextStation();
                                     bus.setState(DrivingState.PASSING_STATION);
                                 }
@@ -301,7 +304,7 @@ public class BusAgent extends Agent {
     }
 
     void Print(String message) {
-        System.out.println(getLocalName() + ": " + message);
+        logger.info(getLocalName() + ": " + message);
     }
 
 

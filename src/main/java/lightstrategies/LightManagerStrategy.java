@@ -3,6 +3,9 @@ package lightstrategies;
 import agents.LightManager;
 import agents.MessageParameter;
 import gui.MapWindow;
+import org.jxmapviewer.viewer.DefaultWaypointRenderer;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import osmproxy.elements.OSMNode;
 import smartcity.lights.Crossroad;
 import smartcity.lights.OptimizationResult;
@@ -22,9 +25,8 @@ import java.time.Instant;
 import java.util.List;
 
 public class LightManagerStrategy extends LightStrategy {
-
-    private Crossroad crossroad;
-
+    private static final Logger logger = LoggerFactory.getLogger(LightManagerStrategy.class);
+    private final Crossroad crossroad;
     private LightManager agent;
 
     public LightManagerStrategy(Node crossroad, Long managerId) {
@@ -93,7 +95,7 @@ public class LightManagerStrategy extends LightStrategy {
                         crossroad.removeCarFromQueue(getIntParameter(rcv, MessageParameter.ADJACENT_OSM_WAY_ID));
                         break;
                     default:
-                        System.out.println("Wait");
+                        logger.info("Wait");
                 }
             }
 
@@ -141,9 +143,9 @@ public class LightManagerStrategy extends LightStrategy {
                 // if queue is empty
                 // apply strategy
                 //for elemnts in queue (if there are elements in queue, make green)
-                //System.out.println("Optimization");
+                //logger.info("Optimization");
                 OptimizationResult result = crossroad.requestOptimizations();
-                //System.out.println("Len: " + result.carsFreeToProceed().size());
+                //logger.info("Len: " + result.carsFreeToProceed().size());
                 handleOptimizationResult(result);
             }
 
@@ -187,6 +189,6 @@ public class LightManagerStrategy extends LightStrategy {
     }
 
     public void Print(String message) {
-        System.out.println(agent.getLocalName() + ": " + message);
+        logger.info(agent.getLocalName() + ": " + message);
     }
 }

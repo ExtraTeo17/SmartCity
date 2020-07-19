@@ -1,5 +1,8 @@
 package agents;
 
+import org.jxmapviewer.viewer.DefaultWaypointRenderer;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import routing.LightManagerNode;
 import routing.StationNode;
 import smartcity.SmartCityAgent;
@@ -16,7 +19,7 @@ import jade.util.leap.Properties;
 import java.time.Instant;
 
 public class PedestrianAgent extends Agent {
-
+    private static final Logger logger = LoggerFactory.getLogger(PedestrianAgent.class);
     private final long agentId;
     private final Pedestrian pedestrian;
 
@@ -73,7 +76,7 @@ public class PedestrianAgent extends Agent {
                             properties.setProperty(MessageParameter.ARRIVAL_TIME, "" + SmartCityAgent.getSimulationTime().toInstant());
                             msg.setAllUserDefinedParameters(properties);
                             send(msg);
-                            System.out.println("Pedestrian: Send REQUEST_WHEN to Station");
+                            logger.info("Pedestrian: Send REQUEST_WHEN to Station");
 
                             pedestrian.setState(DrivingState.WAITING_AT_STATION);
                             break;
@@ -198,7 +201,7 @@ public class PedestrianAgent extends Agent {
         StationNode nextStation = pedestrian.findNextStation();
         pedestrian.setState(DrivingState.MOVING);
         if (nextStation != null) {
-            System.out.println("Pedestrian: send INFORM to station");
+            logger.info("Pedestrian: send INFORM to station");
             AID dest = new AID("Station" + nextStation.getStationId(), AID.ISLOCALNAME);
             ACLMessage msg = new ACLMessage(ACLMessage.INFORM);
             msg.addReceiver(dest);
@@ -211,7 +214,7 @@ public class PedestrianAgent extends Agent {
             msg.setAllUserDefinedParameters(properties);
 
             send(msg);
-            System.out.println("Pedestrian: Send Inform to Station");
+            logger.info("Pedestrian: Send Inform to Station");
         }
     }
 
@@ -245,6 +248,6 @@ public class PedestrianAgent extends Agent {
     }
 
     void Print(String message) {
-        System.out.println(getLocalName() + ": " + message);
+        logger.info(getLocalName() + ": " + message);
     }
 }

@@ -138,6 +138,6 @@ public class VehicleAgent extends Agent {
     }
 
     void Print(String message) {
-        //System.out.println(getLocalName() + ": " + message);
+        //logger.info(getLocalName() + ": " + message);
     }
 }

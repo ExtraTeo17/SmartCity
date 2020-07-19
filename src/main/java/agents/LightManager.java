@@ -2,6 +2,9 @@ package agents;
 
 import lightstrategies.LightManagerStrategy;
 import lightstrategies.LightStrategy;
+import org.jxmapviewer.viewer.DefaultWaypointRenderer;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import osmproxy.elements.OSMNode;
 import jade.core.Agent;
 import org.jxmapviewer.JXMapViewer;
@@ -11,7 +14,7 @@ import org.w3c.dom.Node;
 import java.util.List;
 
 public class LightManager extends Agent {
-
+    private static final Logger logger = LoggerFactory.getLogger(LightManager.class);
     private final LightStrategy strategy;
     private final long agentId;
 
@@ -35,7 +38,7 @@ public class LightManager extends Agent {
     }
 
     public void print(String message) {
-        System.out.println(getLocalName() + ": " + message);
+        logger.info(getLocalName() + ": " + message);
     }
 
     public void draw(List<Painter<JXMapViewer>> waypointPainter) {

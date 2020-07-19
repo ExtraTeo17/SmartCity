@@ -15,6 +15,9 @@
  */
 package osmproxy;
 
+import org.jxmapviewer.viewer.DefaultWaypointRenderer;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import osmproxy.elements.OSMLight;
 import osmproxy.elements.OSMNode;
 import osmproxy.elements.OSMStation;
@@ -56,11 +59,11 @@ import java.util.*;
  *
  */
 public class MapAccessManager {
-
+    private static final Logger logger = LoggerFactory.getLogger(MapAccessManager.class);
     protected static final String DELIMITER_RELATION = "3838046";
     protected static final String DELIMITER_WAY = "48439275";
 
-    //private static final String OVERPASS_API = "http://www.overpass-api.de/api/interpreter";
+    // OVERPASS_API = "http://www.overpass-api.de/api/interpreter";
     private static final String OVERPASS_API = "https://lz4.overpass-api.de/api/interpreter";
 
     private static final String OPENSTREETMAP_API_06 = "http://www.openstreetmap.org/api/0.6/";
@@ -518,9 +521,9 @@ public class MapAccessManager {
     public static List<OSMNode> traverseDatabase(double lat, double lon, double vicinityRange) throws IOException, SAXException, ParserConfigurationException {
         //Authenticator.setDefault(new java.net.CustomAuthenticator());
         List<OSMNode> osmNodesInVicinity = getOSMNodesInVicinity(lat, lon, vicinityRange);
-        System.out.println("Traffic lights:");
+        logger.info("Traffic lights:");
         for (OSMNode osmNode : osmNodesInVicinity) {
-            System.out.println(osmNode.getId() + ":" + osmNode.getLat() + ":" + osmNode.getLon());
+            logger.info(osmNode.getId() + ":" + osmNode.getLat() + ":" + osmNode.getLon());
         }
         return osmNodesInVicinity;
     }
@@ -808,12 +811,12 @@ public class MapAccessManager {
     }
 
     public static Set<BusInfo> getBusInfo(int radius, double middleLat, double middleLon) {
-        System.out.println("STEP 2/" + SmartCityAgent.STEPS + ": Sending bus overpass query");
+        logger.info("STEP 2/" + SmartCityAgent.STEPS + ": Sending bus overpass query");
         Set<BusInfo> infoSet = sendBusOverpassQuery(radius, middleLat, middleLon);
-        System.out.println("STEP 4/" + SmartCityAgent.STEPS + ": Starting warzawskie query and parsing");
+        logger.info("STEP 4/" + SmartCityAgent.STEPS + ": Starting warzawskie query and parsing");
         int i = 0;
         for (BusInfo info : infoSet) {
-            System.out.println("STEP 4/" + SmartCityAgent.STEPS + " (SUBSTEP " + (++i) + "/" + infoSet.size() + "): Warszawskie query sending & parsing substep");
+            logger.info("STEP 4/" + SmartCityAgent.STEPS + " (SUBSTEP " + (++i) + "/" + infoSet.size() + "): Warszawskie query sending & parsing substep");
             sendBusWarszawskieQuery(info);
         }
         return infoSet;
@@ -831,7 +834,7 @@ public class MapAccessManager {
     }
 
     private static Set<BusInfo> parseBusInfo(Document nodesViaOverpass, int radius, double middleLat, double middleLon) {
-        System.out.println("STEP 3/" + SmartCityAgent.STEPS + ": Starting overpass bus info parsing");
+        logger.info("STEP 3/" + SmartCityAgent.STEPS + ": Starting overpass bus info parsing");
         Set<BusInfo> infoSet = new LinkedHashSet<>();
         Node osmRoot = nodesViaOverpass.getFirstChild();
         NodeList osmXMLNodes = osmRoot.getChildNodes();

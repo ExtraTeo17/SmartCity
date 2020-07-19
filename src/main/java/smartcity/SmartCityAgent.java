@@ -2,6 +2,9 @@ package smartcity;
 
 import agents.*;
 import gui.MapWindow;
+import org.jxmapviewer.viewer.DefaultWaypointRenderer;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import osmproxy.elements.OSMNode;
 import osmproxy.elements.OSMStation;
 import osmproxy.LightAccessManager;
@@ -37,6 +40,7 @@ import java.time.Instant;
 import java.util.*;
 
 public class SmartCityAgent extends Agent {
+    private static final Logger logger = LoggerFactory.getLogger(SmartCityAgent.class);
     public final static String LIGHT_MANAGER = "LightManager";
     public final static String BUS = "Bus";
     public final static String STATION = "Station";
@@ -64,12 +68,12 @@ public class SmartCityAgent extends Agent {
     public int carId = 0;
     public int pedestrianId = 0;
     private JXMapViewer mapViewer;
-    CyclicBehaviour receiveMessage = new CyclicBehaviour() {
+    private CyclicBehaviour receiveMessage = new CyclicBehaviour() {
         @Override
         public void action() {
             ACLMessage rcv = receive();
             if (rcv != null) {
-                System.out.println("SmartCity: " + rcv.getSender().getLocalName() + " arrived at destination."); // TODO: Does it work?? (can't see it in the logs)
+                logger.info("SmartCity: " + rcv.getSender().getLocalName() + " arrived at destination."); // TODO: Does it work?? (can't see it in the logs)
                 String type = rcv.getUserDefinedParameter(MessageParameter.TYPE);
                 switch (type) {
                     case MessageParameter.VEHICLE:
@@ -474,17 +478,17 @@ public class SmartCityAgent extends Agent {
 
     public void prepareStationsAndBuses(GeoPosition middlePoint, int radius) {
         resetStationAgentIdGenerator();
-        System.out.println("STEP 1/" + SmartCityAgent.STEPS + ": Starting bus preparation");
+        logger.info("STEP 1/" + SmartCityAgent.STEPS + ": Starting bus preparation");
         resetBusIdGen();
         buses = new LinkedHashSet<>();
         Set<BusInfo> busInfoSet = MapAccessManager.getBusInfo(radius, middlePoint.getLatitude(), middlePoint.getLongitude());
-        System.out.println("STEP 5/" + SmartCityAgent.STEPS + ": Starting agent preparation based on queries");
+        logger.info("STEP 5/" + SmartCityAgent.STEPS + ": Starting agent preparation based on queries");
         int i = 0;
         for (BusInfo info : busInfoSet) {
-            System.out.println("STEP 5/" + SmartCityAgent.STEPS + " (SUBSTEP " + (++i) + "/" + busInfoSet.size() + "): Agent preparation substep");
+            logger.info("STEP 5/" + SmartCityAgent.STEPS + " (SUBSTEP " + (++i) + "/" + busInfoSet.size() + "): Agent preparation substep");
             info.prepareAgents(container);
         }
-        System.out.println("STEP 6/" + SmartCityAgent.STEPS + ": Buses are created!");
-        System.out.println("NUMBER OF BUS AGENTS: " + buses.size());
+        logger.info("STEP 6/" + SmartCityAgent.STEPS + ": Buses are created!");
+        logger.info("NUMBER OF BUS AGENTS: " + buses.size());
     }
 }
