@@ -44,5 +44,6 @@ MTPs-Main-Container.txt
 *.ipr
 
 # Eclipse
-*.eml
+smartCity.eml
 .settings/
+.classpath
