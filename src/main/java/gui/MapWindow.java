@@ -194,7 +194,7 @@ public class MapWindow {
                             MovingObjectImpl car = new MovingObjectImpl(info);
                             vehicle.setVehicle(car);
                             try {
-                                smartCityAgent.AddNewVehicleAgent(car.getVehicleType() + smartCityAgent.Vehicles.size(), vehicle);
+                                smartCityAgent.addNewVehicleAgent(car.getVehicleType() + smartCityAgent.Vehicles.size(), vehicle);
                                 SmartCityAgent.ActivateAgent(vehicle);
                             } catch (StaleProxyException e) {
                                 e.printStackTrace();
@@ -859,7 +859,7 @@ public class MapWindow {
             }
             vehicle.setVehicle(car);
             try {
-                smartCityAgent.AddNewVehicleAgent(car.getVehicleType() + smartCityAgent.carId, vehicle);
+                smartCityAgent.addNewVehicleAgent(car.getVehicleType() + smartCityAgent.carId, vehicle);
                 smartCityAgent.carId++;
                 smartCityAgent.ActivateAgent(vehicle);
             } catch (StaleProxyException e) {

@@ -2,23 +2,6 @@ package smartcity;
 
 import agents.*;
 import gui.MapWindow;
-import org.jxmapviewer.viewer.DefaultWaypointRenderer;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import osmproxy.elements.OSMNode;
-import osmproxy.elements.OSMStation;
-import osmproxy.LightAccessManager;
-import osmproxy.MapAccessManager;
-import routing.LightManagerNode;
-import routing.RouteNode;
-import routing.Router;
-import routing.StationNode;
-import smartcity.buses.BusInfo;
-import smartcity.buses.Timetable;
-import vehicles.MovingObjectImpl;
-import vehicles.Pedestrian;
-import vehicles.TestCar;
-import vehicles.TestPedestrian;
 import jade.core.Agent;
 import jade.core.behaviours.CyclicBehaviour;
 import jade.lang.acl.ACLMessage;
@@ -26,15 +9,24 @@ import jade.wrapper.AgentContainer;
 import jade.wrapper.ControllerException;
 import jade.wrapper.StaleProxyException;
 import org.javatuples.Pair;
-import org.jxmapviewer.JXMapViewer;
 import org.jxmapviewer.viewer.GeoPosition;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.w3c.dom.Node;
+import osmproxy.LightAccessManager;
+import osmproxy.MapAccessManager;
+import osmproxy.elements.OSMNode;
+import osmproxy.elements.OSMStation;
+import routing.LightManagerNode;
+import routing.RouteNode;
+import routing.StationNode;
+import smartcity.buses.BusInfo;
+import smartcity.buses.Timetable;
+import vehicles.MovingObjectImpl;
+import vehicles.Pedestrian;
+import vehicles.TestCar;
+import vehicles.TestPedestrian;
 
-import javax.swing.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.ItemEvent;
-import java.awt.event.ItemListener;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.*;
@@ -49,6 +41,7 @@ public class SmartCityAgent extends Agent {
     public static final String STEPS = "6";
     public static boolean SHOULD_GENERATE_PEDESTRIANS_AND_BUSES = false;
     public static boolean SHOULD_GENERATE_CARS = true;
+
     public static List<PedestrianAgent> pedestrians = new ArrayList<>();
     public static Set<LightManager> lightManagers = new HashSet<>();
     public static Set<StationAgent> stationAgents = new HashSet<>();
@@ -67,29 +60,32 @@ public class SmartCityAgent extends Agent {
     public List<VehicleAgent> Vehicles = new ArrayList<>();
     public int carId = 0;
     public int pedestrianId = 0;
-    private JXMapViewer mapViewer;
-    private CyclicBehaviour receiveMessage = new CyclicBehaviour() {
-        @Override
-        public void action() {
-            ACLMessage rcv = receive();
-            if (rcv != null) {
-                logger.info("SmartCity: " + rcv.getSender().getLocalName() + " arrived at destination."); // TODO: Does it work?? (can't see it in the logs)
-                String type = rcv.getUserDefinedParameter(MessageParameter.TYPE);
-                switch (type) {
-                    case MessageParameter.VEHICLE:
-                        onReceiveVehicle(rcv);
-                        break;
-                    case MessageParameter.PEDESTRIAN:
-                        onReceivePedestrian(rcv);
-                        break;
-                    case MessageParameter.BUS:
-                        buses.removeIf(v -> v.getLocalName().equals(rcv.getSender().getLocalName()));
-                        break;
+
+    @Override
+    protected void setup() {
+        container = getContainerController();
+        window = WindowInitializer.generateWindow(this);
+        addBehaviour(getReceiveMessageBehaviour());
+    }
+
+    private CyclicBehaviour getReceiveMessageBehaviour() {
+        return new CyclicBehaviour() {
+            @Override
+            public void action() {
+                ACLMessage rcv = receive();
+                if (rcv != null) {
+                    logger.info("SmartCity: " + rcv.getSender().getLocalName() + " arrived at destination."); // TODO: Does it work?? (can't see it in the logs)
+                    String type = rcv.getUserDefinedParameter(MessageParameter.TYPE);
+                    switch (type) {
+                        case MessageParameter.VEHICLE -> onReceiveVehicle(rcv);
+                        case MessageParameter.PEDESTRIAN -> onReceivePedestrian(rcv);
+                        case MessageParameter.BUS -> buses.removeIf(v -> v.getLocalName().equals(rcv.getSender().getLocalName()));
+                    }
                 }
+                block(1000);
             }
-            block(1000);
-        }
-    };
+        };
+    }
 
     private void onReceivePedestrian(ACLMessage rcv) {
         for (int i = 0; i < pedestrians.size(); i++) {
@@ -115,7 +111,6 @@ public class SmartCityAgent extends Agent {
         window.setResultTime(time);
     }
 
-
     private void onReceiveVehicle(ACLMessage rcv) {
         for (int i = 0; i < Vehicles.size(); i++) {
             VehicleAgent v = Vehicles.get(i);
@@ -129,7 +124,6 @@ public class SmartCityAgent extends Agent {
             }
         }
     }
-
 
     public static Date getSimulationTime() {
         return window.getSimulationStartTime();
@@ -202,233 +196,20 @@ public class SmartCityAgent extends Agent {
         return pedestrianAgent;
     }
 
-    protected void setup() {
-        container = getContainerController();
-        displayGUI();
-        addBehaviour(receiveMessage);
+
+    protected void addNewCarAgent(List<RouteNode> info) {
+        VehicleAgent vehicle = new VehicleAgent();
+        MovingObjectImpl car = new MovingObjectImpl(info);
+        vehicle.setVehicle(car);
+        try {
+            addNewVehicleAgent(car.getVehicleType() + carId, vehicle);
+            ++carId;
+        } catch (StaleProxyException ex) {
+            ex.printStackTrace();
+        }
     }
 
-    private void displayGUI() {
-        window = new MapWindow(this);
-        mapViewer = window.MapViewer;
-        JFrame frame = new JFrame("Smart City by Katherine & Dominic & Robert");
-        frame.getContentPane().add(window.MainPanel);
-        JMenuBar menuBar = new JMenuBar();
-        JMenu view = new JMenu("View");
-
-        final JCheckBoxMenuItem cars = new JCheckBoxMenuItem("Render cars", window.renderCars);
-        cars.addItemListener(new ItemListener() {
-            @Override
-            public void itemStateChanged(ItemEvent e) {
-                window.renderCars = cars.getState();
-            }
-        });
-        view.add(cars);
-
-        final JCheckBoxMenuItem routes = new JCheckBoxMenuItem("Render car routes", window.renderCarRoutes);
-        routes.addItemListener(new ItemListener() {
-            @Override
-            public void itemStateChanged(ItemEvent e) {
-                window.renderCarRoutes = routes.getState();
-            }
-        });
-        view.add(routes);
-
-        final JCheckBoxMenuItem buses = new JCheckBoxMenuItem("Render buses", window.renderBuses);
-        buses.addItemListener(new ItemListener() {
-            @Override
-            public void itemStateChanged(ItemEvent e) {
-                window.renderBuses = buses.getState();
-            }
-        });
-        view.add(buses);
-
-        final JCheckBoxMenuItem busRoutes = new JCheckBoxMenuItem("Render bus routes", window.renderBusRoutes);
-        busRoutes.addItemListener(new ItemListener() {
-            @Override
-            public void itemStateChanged(ItemEvent e) {
-                window.renderBusRoutes = busRoutes.getState();
-            }
-        });
-        view.add(busRoutes);
-
-        final JCheckBoxMenuItem pedestrian = new JCheckBoxMenuItem("Render pedestrians", window.renderPedestrians);
-        pedestrian.addItemListener(new ItemListener() {
-            @Override
-            public void itemStateChanged(ItemEvent e) {
-                window.renderPedestrians = pedestrian.getState();
-            }
-        });
-        view.add(pedestrian);
-
-        final JCheckBoxMenuItem pedestrianRoutes = new JCheckBoxMenuItem("Render pedestrian routes", window.renderPedestrianRoutes);
-        pedestrianRoutes.addItemListener(new ItemListener() {
-            @Override
-            public void itemStateChanged(ItemEvent e) {
-                window.renderPedestrianRoutes = pedestrianRoutes.getState();
-            }
-        });
-        view.add(pedestrianRoutes);
-
-        final JCheckBoxMenuItem lights = new JCheckBoxMenuItem("Render lights", window.renderLights);
-        lights.addItemListener(new ItemListener() {
-            @Override
-            public void itemStateChanged(ItemEvent e) {
-                window.renderLights = lights.getState();
-            }
-        });
-        view.add(lights);
-
-        final JCheckBoxMenuItem zone = new JCheckBoxMenuItem("Render zone", window.renderZone);
-        zone.addItemListener(new ItemListener() {
-            @Override
-            public void itemStateChanged(ItemEvent e) {
-                window.renderZone = zone.getState();
-            }
-        });
-        view.add(zone);
-
-        final JCheckBoxMenuItem stations = new JCheckBoxMenuItem("Render stations", window.renderStations);
-        stations.addItemListener(new ItemListener() {
-            @Override
-            public void itemStateChanged(ItemEvent e) {
-                window.renderStations = stations.getState();
-            }
-        });
-        view.add(stations);
-
-        menuBar.add(view);
-
-        JMenu debug = new JMenu("Debug");
-
-        JMenuItem runTest = new JMenuItem("Test crossroad");
-        runTest.addActionListener(new ActionListener() {
-            private void prepareCar(List<RouteNode> info) {
-                VehicleAgent vehicle = new VehicleAgent();
-                MovingObjectImpl car = new MovingObjectImpl(info);
-                vehicle.setVehicle(car);
-                try {
-                    AddNewVehicleAgent(car.getVehicleType() + carId, vehicle);
-                    carId++;
-
-
-                } catch (StaleProxyException ex) {
-                    ex.printStackTrace();
-                }
-            }
-
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                window.setInputEnabled(false);
-                double lat = 52.23702507833161;
-                double lon = 21.017934679985046;
-                mapViewer.setAddressLocation(new GeoPosition(lat, lon));
-                mapViewer.setZoom(1);
-                window.prepareAgentsAndSetZone(lat, lon, 100);
-                GeoPosition N = new GeoPosition(52.23758683540269, 21.017720103263855);
-                GeoPosition S = new GeoPosition(52.23627934304847, 21.018092930316925);
-                GeoPosition E = new GeoPosition(52.237225472020704, 21.019399166107178);
-                GeoPosition W = new GeoPosition(52.23678526174392, 21.016663312911987);
-
-                // N to S
-                List<RouteNode> NS;
-                try {
-                    NS = Router.generateRouteInfo(N, S);
-
-                    for (int i = 0; i < 5; i++) {
-                        prepareCar(NS);
-                    }
-                } catch (Exception ex) {
-                    ex.printStackTrace();
-                    return;
-                }
-
-                // S to N
-                List<RouteNode> SN;
-                try {
-                    SN = Router.generateRouteInfo(S, N);
-
-                    for (int i = 0; i < 5; i++) {
-                        prepareCar(SN);
-                    }
-                } catch (Exception ex) {
-                    ex.printStackTrace();
-                    return;
-                }
-
-                // E to W
-                List<RouteNode> EW;
-                try {
-                    EW = Router.generateRouteInfo(E, W);
-
-                    for (int i = 0; i < 5; i++) {
-                        prepareCar(EW);
-                    }
-                } catch (Exception ex) {
-                    ex.printStackTrace();
-                    return;
-                }
-
-                // W to E
-                List<RouteNode> WE;
-                try {
-                    WE = Router.generateRouteInfo(W, E);
-                    for (int i = 0; i < 5; i++) {
-                        prepareCar(WE);
-                    }
-                } catch (Exception ex) {
-                    ex.printStackTrace();
-                    return;
-                }
-
-
-                activateLightManagerAgents();
-
-                // start all
-                for (VehicleAgent agent : Vehicles) {
-                    ActivateAgent(agent);
-                }
-
-            }
-        });
-
-        debug.add(runTest);
-
-        menuBar.add(debug);
-
-        addGenerationMenu(menuBar);
-
-        frame.setJMenuBar(menuBar);
-        frame.setSize(1200, 600);
-        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        frame.setVisible(true);
-    }
-
-    private void addGenerationMenu(JMenuBar menuBar) {
-        JMenu generation = new JMenu("Generation");
-
-        final JCheckBoxMenuItem car_gen = new JCheckBoxMenuItem("Cars", SHOULD_GENERATE_CARS);
-        car_gen.addItemListener(new ItemListener() {
-            @Override
-            public void itemStateChanged(ItemEvent e) {
-                SHOULD_GENERATE_CARS = car_gen.getState();
-            }
-        });
-        generation.add(car_gen);
-
-        final JCheckBoxMenuItem pedestrians = new JCheckBoxMenuItem("Pedestrians", SHOULD_GENERATE_PEDESTRIANS_AND_BUSES);
-        pedestrians.addItemListener(new ItemListener() {
-            @Override
-            public void itemStateChanged(ItemEvent e) {
-                SHOULD_GENERATE_PEDESTRIANS_AND_BUSES = pedestrians.getState();
-            }
-        });
-        generation.add(pedestrians);
-
-        menuBar.add(generation);
-    }
-
-    public void AddNewVehicleAgent(String name, VehicleAgent agent) throws StaleProxyException {
+    public void addNewVehicleAgent(String name, VehicleAgent agent) throws StaleProxyException {
         container.acceptNewAgent(name, agent);
         Vehicles.add(agent);
     }
