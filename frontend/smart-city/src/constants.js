@@ -1,1 +1,1 @@
-export const SERVER_PORT = 9000;
+export const SERVER_ADDRESS = "wss://localhost:9000";

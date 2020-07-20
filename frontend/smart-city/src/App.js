@@ -1,7 +1,7 @@
 import React from "react";
 import * as Leaflet from "leaflet";
 import "./App.css";
-import { SERVER_PORT } from "./constants";
+import { SERVER_ADDRESS } from "./constants";
 
 class App extends React.Component {
   constructor(props) {
@@ -28,7 +28,7 @@ class App extends React.Component {
     ]);
     map.addLayer(line);
 
-    let socket = new WebSocket("wss://localhost:" + SERVER_PORT);
+    let socket = new WebSocket(SERVER_ADDRESS);
     socket.onopen = e => {
       console.log("Connected !!!");
     };
