@@ -27,6 +27,7 @@ import vehicles.Pedestrian;
 import vehicles.TestCar;
 import vehicles.TestPedestrian;
 import web.WebServer;
+import web.WebServerFactory;
 
 import java.time.Duration;
 import java.time.Instant;
@@ -71,7 +72,7 @@ public class SmartCityAgent extends Agent {
         window = WindowInitializer.displayWindow(this);
         addBehaviour(getReceiveMessageBehaviour());
         
-        webServer = new WebServer(SERVER_PORT);
+        webServer = WebServerFactory.Create(SERVER_PORT);
         webServer.start();
     }
 

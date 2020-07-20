@@ -1,1 +1,1 @@
-export const SERVER_ADDRESS = "wss://localhost:9000";
+export const SERVER_ADDRESS = "ws://localhost:9000";

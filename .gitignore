@@ -34,6 +34,7 @@ MTPs-Main-Container.txt
 # When using Gradle or Maven with auto-import, you should exclude module files,
 # since they will be recreated, and may cause churn.  Uncomment if using
 # auto-import.
+.idea/workspace.xml
 .idea/artifacts
 .idea/compiler.xml
 .idea/jarRepositories.xml
@@ -43,7 +44,13 @@ MTPs-Main-Container.txt
 *.iml
 *.ipr
 
+# Intellij settings
+.idea/.name
+.idea/saveactions_settings.xml
+
+
 # Eclipse
 smartCity.eml
 .settings/
 .classpath
+

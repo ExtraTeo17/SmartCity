@@ -12,11 +12,11 @@ import java.util.Set;
 
 public class WebServer extends WebSocketServer {
     private static final Logger logger = LoggerFactory.getLogger(WebServer.class);
-    private Set<WebSocket> conns;
+    private Set<WebSocket> sockets;
 
-    public WebServer(int port) {
+    WebServer(int port) {
         super(new InetSocketAddress(port));
-        conns = new HashSet<>();
+        sockets = new HashSet<>();
     }
 
     /**
@@ -27,20 +27,20 @@ public class WebServer extends WebSocketServer {
      */
     @Override
     public void onOpen(WebSocket conn, ClientHandshake handshake) {
-        conns.add(conn);
+        sockets.add(conn);
         logger.info("Connection established from: " + conn.getRemoteSocketAddress().getHostString());
     }
 
     /**
      * Called after the websocket connection has been closed.
      *
-     * @param conn   The <tt>WebSocket</tt> instance this event is occuring on.
+     * @param socket The <tt>WebSocket</tt> instance this event is occuring on.
      * @param code   The codes can be looked up here: {@link CloseFrame}
      * @param reason Additional information string
      * @param remote If remote
      **/
     @Override
-    public void onClose(WebSocket conn, int code, String reason, boolean remote) {
+    public void onClose(WebSocket socket, int code, String reason, boolean remote) {
 
     }
 
