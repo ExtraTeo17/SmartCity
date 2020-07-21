@@ -47,7 +47,8 @@ MTPs-Main-Container.txt
 # Intellij settings
 .idea/.name
 .idea/saveactions_settings.xml
-
+.idea/inspectionProfiles
+.idea/codeStyles
 
 # Eclipse
 smartCity.eml

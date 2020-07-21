@@ -15,7 +15,6 @@
  */
 package osmproxy;
 
-import org.jxmapviewer.viewer.DefaultWaypointRenderer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import osmproxy.elements.OSMLight;
@@ -60,6 +59,7 @@ import java.util.*;
  */
 public class MapAccessManager {
     private static final Logger logger = LoggerFactory.getLogger(MapAccessManager.class);
+    private static JSONParser jsonParser = new JSONParser();
     protected static final String DELIMITER_RELATION = "3838046";
     protected static final String DELIMITER_WAY = "48439275";
 
@@ -322,7 +322,6 @@ public class MapAccessManager {
         URL nieOsm;
         Scanner scanner;
         String json = "";
-        JSONParser parser = new JSONParser();
         JSONObject jObject = null;
         try {
             nieOsm = new URL(query);
@@ -330,7 +329,7 @@ public class MapAccessManager {
             while (scanner.hasNext()) {
                 json += scanner.nextLine();
             }
-            jObject = (JSONObject) parser.parse(json);
+            jObject = (JSONObject) jsonParser.parse(json);
         } catch (Exception e) {
             e.printStackTrace();
         }
