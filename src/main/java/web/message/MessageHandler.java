@@ -11,18 +11,18 @@ public class MessageHandler {
     private static final Logger logger = LoggerFactory.getLogger(MessageHandler.class);
 
     public static void Handle(String messageString) {
-        Message message = null;
+        MessageDto message = null;
         try {
-            message = MessageHandler.objectMapper.readValue(messageString, Message.class);
+            message = objectMapper.readValue(messageString, MessageDto.class);
         } catch (IOException e) {
-            MessageHandler.logger.error("Deserialization error", e);
+            logger.error("Deserialization error", e);
             return;
         }
 
-        MessageHandler.Handle(message);
+        Handle(message);
     }
 
-    private static void Handle(Message message) {
+    private static void Handle(MessageDto message) {
         // TODO: Class hierarchy for appropriate message types
         // TODO: Event-based interaction with backend
         switch (message.type) {

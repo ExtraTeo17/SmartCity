@@ -1,6 +1,6 @@
 package web.message;
 
-public class Message {
+public class MessageDto {
     public MessageType type;
     public String payload;
 }

@@ -33,6 +33,7 @@ import java.time.Duration;
 import java.time.Instant;
 import java.util.*;
 
+// TODO: This class should have no more than 10 fields.
 public class SmartCityAgent extends Agent {
     private static final Logger logger = LoggerFactory.getLogger(SmartCityAgent.class);
     private static long nextLightManagerId;
@@ -43,17 +44,18 @@ public class SmartCityAgent extends Agent {
     private static MapWindow window;
     private static WebServer webServer;
 
-    public final  static int SERVER_PORT = 9000;
+    public final static int SERVER_PORT = 9000;
     public final static String LIGHT_MANAGER = "LightManager";
     public final static String BUS = "Bus";
     public final static String STATION = "Station";
     public final static String PEDESTRIAN = "Pedestrian";
     public final static boolean USE_DEPRECATED_XML_FOR_LIGHT_MANAGERS = false;
-    public static final String STEPS = "6";
+    public final static String STEPS = "6";
     public static boolean SHOULD_GENERATE_PEDESTRIANS_AND_BUSES = false;
     public static boolean SHOULD_GENERATE_CARS = true;
 
-    public static List<PedestrianAgent> pedestrians = new ArrayList<>();
+    // TODO: Delete this abomination (or at least make it private)
+    public static final List<PedestrianAgent> pedestrians = new ArrayList<>();
     public static Set<LightManager> lightManagers = new HashSet<>();
     public static Set<StationAgent> stationAgents = new HashSet<>();
     public static boolean lightManagersUnderConstruction = false;
@@ -62,18 +64,18 @@ public class SmartCityAgent extends Agent {
     public static Map<Long, StationNode> osmStationIdToStationNode = new HashMap<>();
     public static Map<Long, OSMStation> osmIdToStationOSMNode = new HashMap<>();
     public static Set<BusAgent> buses = new LinkedHashSet<>();
-    public List<VehicleAgent> Vehicles = new ArrayList<>();
+    public static List<VehicleAgent> Vehicles = new ArrayList<>();
     public int carId = 0;
     public int pedestrianId = 0;
 
     @Override
     protected void setup() {
-        container = getContainerController();
-        window = WindowInitializer.displayWindow(this);
+        SmartCityAgent.container = getContainerController();
+        SmartCityAgent.window = WindowInitializer.displayWindow(this);
         addBehaviour(getReceiveMessageBehaviour());
-        
-        webServer = WebServerFactory.Create(SERVER_PORT);
-        webServer.start();
+
+        SmartCityAgent.webServer = WebServerFactory.Create(SmartCityAgent.SERVER_PORT);
+        SmartCityAgent.webServer.start();
     }
 
     private CyclicBehaviour getReceiveMessageBehaviour() {
@@ -82,12 +84,12 @@ public class SmartCityAgent extends Agent {
             public void action() {
                 ACLMessage rcv = receive();
                 if (rcv != null) {
-                    logger.info("SmartCity: " + rcv.getSender().getLocalName() + " arrived at destination."); // TODO: Does it work?? (can't see it in the logs)
+                    SmartCityAgent.logger.info("SmartCity: " + rcv.getSender().getLocalName() + " arrived at destination."); // TODO: Does it work?? (can't see it in the logs)
                     String type = rcv.getUserDefinedParameter(MessageParameter.TYPE);
                     switch (type) {
                         case MessageParameter.VEHICLE -> onReceiveVehicle(rcv);
                         case MessageParameter.PEDESTRIAN -> onReceivePedestrian(rcv);
-                        case MessageParameter.BUS -> buses.removeIf(v -> v.getLocalName().equals(rcv.getSender().getLocalName()));
+                        case MessageParameter.BUS -> SmartCityAgent.buses.removeIf(v -> v.getLocalName().equals(rcv.getSender().getLocalName()));
                     }
                 }
                 block(1000);
@@ -96,14 +98,14 @@ public class SmartCityAgent extends Agent {
     }
 
     private void onReceivePedestrian(ACLMessage rcv) {
-        for (int i = 0; i < pedestrians.size(); i++) {
-            PedestrianAgent v = pedestrians.get(i);
+        for (int i = 0; i < SmartCityAgent.pedestrians.size(); i++) {
+            PedestrianAgent v = SmartCityAgent.pedestrians.get(i);
             if (v.getLocalName().equals(rcv.getSender().getLocalName())) {
                 if (v.getPedestrian() instanceof TestPedestrian) {
                     TestPedestrian pedestrian = (TestPedestrian) v.getPedestrian();
                     setResultTime(pedestrian.start, pedestrian.end);
                 }
-                pedestrians.remove(i);
+                SmartCityAgent.pedestrians.remove(i);
                 break;
             }
         }
@@ -116,25 +118,25 @@ public class SmartCityAgent extends Agent {
                 seconds / 3600,
                 (seconds % 3600) / 60,
                 seconds % 60);
-        window.setResultTime(time);
+        SmartCityAgent.window.setResultTime(time);
     }
 
     private void onReceiveVehicle(ACLMessage rcv) {
-        for (int i = 0; i < Vehicles.size(); i++) {
-            VehicleAgent v = Vehicles.get(i);
+        for (int i = 0; i < SmartCityAgent.Vehicles.size(); i++) {
+            VehicleAgent v = SmartCityAgent.Vehicles.get(i);
             if (v.getLocalName().equals(rcv.getSender().getLocalName())) {
                 if (v.getVehicle() instanceof TestCar) {
                     TestCar car = (TestCar) v.getVehicle();
                     setResultTime(car.start, car.end);
                 }
-                Vehicles.remove(i);
+                SmartCityAgent.Vehicles.remove(i);
                 break;
             }
         }
     }
 
     public static Date getSimulationTime() {
-        return window.getSimulationStartTime();
+        return SmartCityAgent.window.getSimulationStartTime();
     }
 
     public static void ActivateAgent(Agent agent) {
@@ -146,24 +148,24 @@ public class SmartCityAgent extends Agent {
     }
 
     private static long nextLightManagerId() {
-        return nextLightManagerId++;
+        return SmartCityAgent.nextLightManagerId++;
     }
 
     private static long nextStationAgentId() {
-        return nextStationAgentId++;
+        return SmartCityAgent.nextStationAgentId++;
     }
 
     private static int nextBusId() {
-        return nextBusId++;
+        return SmartCityAgent.nextBusId++;
     }
 
     private static int nextPedestrianAgentId() {
-        return nextPedestrianAgentId++;
+        return SmartCityAgent.nextPedestrianAgentId++;
     }
 
     private static void tryAddAgent(Agent agent, String agentName) {
         try {
-            container.acceptNewAgent(agentName, agent);
+            SmartCityAgent.container.acceptNewAgent(agentName, agent);
         } catch (StaleProxyException e) {
             e.printStackTrace();
         }
@@ -172,35 +174,35 @@ public class SmartCityAgent extends Agent {
     public static void tryAddNewBusAgent(final Timetable timetable, List<RouteNode> route,
                                          final String busLine, final String brigadeNr) {
         BusAgent agent = new BusAgent();
-        final int busAgentId = nextBusId();
+        final int busAgentId = SmartCityAgent.nextBusId();
         agent.setArguments(new Object[]{route, timetable, busLine, brigadeNr, busAgentId});
-        smartcity.SmartCityAgent.buses.add(agent);
-        tryAddAgent(agent, BUS + busAgentId);
+        SmartCityAgent.buses.add(agent);
+        SmartCityAgent.tryAddAgent(agent, SmartCityAgent.BUS + busAgentId);
     }
 
     public static void tryAddNewLightManagerAgent(Node crossroad) {
-        LightManager manager = new LightManager(crossroad, nextLightManagerId());
-        smartcity.SmartCityAgent.lightManagers.add(manager);
-        tryAddAgent(manager, LIGHT_MANAGER + manager.getId());
+        LightManager manager = new LightManager(crossroad, SmartCityAgent.nextLightManagerId());
+        SmartCityAgent.lightManagers.add(manager);
+        SmartCityAgent.tryAddAgent(manager, SmartCityAgent.LIGHT_MANAGER + manager.getId());
     }
 
     public static void tryAddNewLightManagerAgent(final OSMNode centerCrossroadNode) {
-        LightManager manager = new LightManager(centerCrossroadNode, nextLightManagerId());
-        smartcity.SmartCityAgent.lightManagers.add(manager);
-        tryAddAgent(manager, LIGHT_MANAGER + manager.getId());
+        LightManager manager = new LightManager(centerCrossroadNode, SmartCityAgent.nextLightManagerId());
+        SmartCityAgent.lightManagers.add(manager);
+        SmartCityAgent.tryAddAgent(manager, SmartCityAgent.LIGHT_MANAGER + manager.getId());
     }
 
     public static Agent tryAddNewStationAgent(OSMStation stationOSMNode) {
-        StationAgent stationAgent = new StationAgent(stationOSMNode, nextStationAgentId());
-        smartcity.SmartCityAgent.osmIdToStationOSMNode.put(stationOSMNode.getId(), stationOSMNode);
-        tryAddAgent(stationAgent, STATION + stationAgent.getAgentId());
+        StationAgent stationAgent = new StationAgent(stationOSMNode, SmartCityAgent.nextStationAgentId());
+        SmartCityAgent.osmIdToStationOSMNode.put(stationOSMNode.getId(), stationOSMNode);
+        SmartCityAgent.tryAddAgent(stationAgent, SmartCityAgent.STATION + stationAgent.getAgentId());
         return stationAgent;
     }
 
     public static Agent tryAddNewPedestrianAgent(Pedestrian pedestrian) {
-        PedestrianAgent pedestrianAgent = new PedestrianAgent(pedestrian, nextPedestrianAgentId());
-        smartcity.SmartCityAgent.pedestrians.add(pedestrianAgent);
-        tryAddAgent(pedestrianAgent, PEDESTRIAN + pedestrianAgent.getAgentId());
+        PedestrianAgent pedestrianAgent = new PedestrianAgent(pedestrian, SmartCityAgent.nextPedestrianAgentId());
+        SmartCityAgent.pedestrians.add(pedestrianAgent);
+        SmartCityAgent.tryAddAgent(pedestrianAgent, SmartCityAgent.PEDESTRIAN + pedestrianAgent.getAgentId());
         return pedestrianAgent;
     }
 
@@ -218,26 +220,26 @@ public class SmartCityAgent extends Agent {
     }
 
     public void addNewVehicleAgent(String name, VehicleAgent agent) throws StaleProxyException {
-        container.acceptNewAgent(name, agent);
-        Vehicles.add(agent);
+        SmartCityAgent.container.acceptNewAgent(name, agent);
+        SmartCityAgent.Vehicles.add(agent);
     }
 
     public void activateLightManagerAgents() {
-        for (LightManager lightManager : lightManagers) {
-            ActivateAgent(lightManager);
+        for (LightManager lightManager : SmartCityAgent.lightManagers) {
+            SmartCityAgent.ActivateAgent(lightManager);
         }
     }
 
     public void prepareLightManagers(GeoPosition middlePoint, int radius) {
         resetIdGenerator();
-        lightManagersUnderConstruction = true;
-        if (USE_DEPRECATED_XML_FOR_LIGHT_MANAGERS) {
+        SmartCityAgent.lightManagersUnderConstruction = true;
+        if (SmartCityAgent.USE_DEPRECATED_XML_FOR_LIGHT_MANAGERS) {
             MapAccessManager.prepareLightManagersInRadiusAndLightIdToLightManagerIdHashSet(this, middlePoint, radius);
         }
         else {
             tryPrepareLightManagersInRadiusAndLightIdToLightManagerIdHashSetBeta(this, middlePoint, radius);
         }
-        lightManagersUnderConstruction = false;
+        SmartCityAgent.lightManagersUnderConstruction = false;
     }
 
     private void tryPrepareLightManagersInRadiusAndLightIdToLightManagerIdHashSetBeta(SmartCityAgent smartCityAgent,
@@ -250,34 +252,34 @@ public class SmartCityAgent extends Agent {
     }
 
     private void resetIdGenerator() {
-        nextLightManagerId = 1;
+        SmartCityAgent.nextLightManagerId = 1;
     }
 
     private void resetBusIdGen() {
-        nextBusId = 1;
+        SmartCityAgent.nextBusId = 1;
     }
 
     private void resetStationAgentIdGenerator() {
-        nextStationAgentId = 1;
+        SmartCityAgent.nextStationAgentId = 1;
     }
 
     private void resetPedestrianAgentIdGenerator() {
-        nextPedestrianAgentId = 1;
+        SmartCityAgent.nextPedestrianAgentId = 1;
     }
 
     public void prepareStationsAndBuses(GeoPosition middlePoint, int radius) {
         resetStationAgentIdGenerator();
-        logger.info("STEP 1/" + SmartCityAgent.STEPS + ": Starting bus preparation");
+        SmartCityAgent.logger.info("STEP 1/" + SmartCityAgent.STEPS + ": Starting bus preparation");
         resetBusIdGen();
-        buses = new LinkedHashSet<>();
+        SmartCityAgent.buses = new LinkedHashSet<>();
         Set<BusInfo> busInfoSet = MapAccessManager.getBusInfo(radius, middlePoint.getLatitude(), middlePoint.getLongitude());
-        logger.info("STEP 5/" + SmartCityAgent.STEPS + ": Starting agent preparation based on queries");
+        SmartCityAgent.logger.info("STEP 5/" + SmartCityAgent.STEPS + ": Starting agent preparation based on queries");
         int i = 0;
         for (BusInfo info : busInfoSet) {
-            logger.info("STEP 5/" + SmartCityAgent.STEPS + " (SUBSTEP " + (++i) + "/" + busInfoSet.size() + "): Agent preparation substep");
-            info.prepareAgents(container);
+            SmartCityAgent.logger.info("STEP 5/" + SmartCityAgent.STEPS + " (SUBSTEP " + (++i) + "/" + busInfoSet.size() + "): Agent preparation substep");
+            info.prepareAgents(SmartCityAgent.container);
         }
-        logger.info("STEP 6/" + SmartCityAgent.STEPS + ": Buses are created!");
-        logger.info("NUMBER OF BUS AGENTS: " + buses.size());
+        SmartCityAgent.logger.info("STEP 6/" + SmartCityAgent.STEPS + ": Buses are created!");
+        SmartCityAgent.logger.info("NUMBER OF BUS AGENTS: " + SmartCityAgent.buses.size());
     }
 }

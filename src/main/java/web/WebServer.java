@@ -6,7 +6,6 @@ import org.java_websocket.handshake.ClientHandshake;
 import org.java_websocket.server.WebSocketServer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import web.message.Message;
 import web.message.MessageHandler;
 
 import java.net.InetSocketAddress;
