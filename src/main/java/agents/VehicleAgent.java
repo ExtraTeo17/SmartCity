@@ -1,21 +1,21 @@
 package agents;
 
-import routing.LightManagerNode;
-import smartcity.SmartCityAgent;
-import vehicles.DrivingState;
-import vehicles.MovingObject;
+import agents.utils.MessageParameter;
 import jade.core.AID;
-import jade.core.Agent;
 import jade.core.behaviours.Behaviour;
 import jade.core.behaviours.CyclicBehaviour;
 import jade.core.behaviours.TickerBehaviour;
 import jade.lang.acl.ACLMessage;
 import jade.util.leap.Properties;
+import routing.LightManagerNode;
+import smartcity.MainContainerAgent;
+import vehicles.DrivingState;
+import vehicles.MovingObject;
 
 import java.time.Instant;
 
 @SuppressWarnings("serial")
-public class VehicleAgent extends Agent {
+public class VehicleAgent extends AbstractAgent {
 
     private MovingObject Vehicle;
 
@@ -113,7 +113,7 @@ public class VehicleAgent extends Agent {
             ACLMessage msg = new ACLMessage(ACLMessage.INFORM);
             msg.addReceiver(dest);
             Properties properties = new Properties();
-            Instant time = SmartCityAgent.getSimulationTime().toInstant().plusMillis(Vehicle.getMillisecondsToNextLight());
+            Instant time = MainContainerAgent.getSimulationTime().toInstant().plusMillis(Vehicle.getMillisecondsToNextLight());
             properties.setProperty(MessageParameter.TYPE, MessageParameter.VEHICLE);
             properties.setProperty(MessageParameter.ARRIVAL_TIME, "" + time);
             properties.setProperty(MessageParameter.ADJACENT_OSM_WAY_ID, "" + nextManager.getOsmWayId());

@@ -1,24 +1,23 @@
 package agents;
 
-import org.jxmapviewer.viewer.DefaultWaypointRenderer;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import routing.LightManagerNode;
-import routing.StationNode;
-import smartcity.SmartCityAgent;
-import vehicles.DrivingState;
-import vehicles.Pedestrian;
+import agents.utils.MessageParameter;
 import jade.core.AID;
-import jade.core.Agent;
 import jade.core.behaviours.Behaviour;
 import jade.core.behaviours.CyclicBehaviour;
 import jade.core.behaviours.TickerBehaviour;
 import jade.lang.acl.ACLMessage;
 import jade.util.leap.Properties;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import routing.LightManagerNode;
+import routing.StationNode;
+import smartcity.MainContainerAgent;
+import vehicles.DrivingState;
+import vehicles.Pedestrian;
 
 import java.time.Instant;
 
-public class PedestrianAgent extends Agent {
+public class PedestrianAgent extends AbstractAgent {
     private static final Logger logger = LoggerFactory.getLogger(PedestrianAgent.class);
     private final long agentId;
     private final Pedestrian pedestrian;
@@ -73,10 +72,10 @@ public class PedestrianAgent extends Agent {
                             Properties properties = new Properties();
                             properties.setProperty(MessageParameter.TYPE, MessageParameter.PEDESTRIAN);
                             properties.setProperty(MessageParameter.DESIRED_BUS, "" + pedestrian.getPreferredBusLine());
-                            properties.setProperty(MessageParameter.ARRIVAL_TIME, "" + SmartCityAgent.getSimulationTime().toInstant());
+                            properties.setProperty(MessageParameter.ARRIVAL_TIME, "" + MainContainerAgent.getSimulationTime().toInstant());
                             msg.setAllUserDefinedParameters(properties);
                             send(msg);
-                            logger.info("Pedestrian: Send REQUEST_WHEN to Station");
+                            PedestrianAgent.logger.info("Pedestrian: Send REQUEST_WHEN to Station");
 
                             pedestrian.setState(DrivingState.WAITING_AT_STATION);
                             break;
@@ -201,12 +200,12 @@ public class PedestrianAgent extends Agent {
         StationNode nextStation = pedestrian.findNextStation();
         pedestrian.setState(DrivingState.MOVING);
         if (nextStation != null) {
-            logger.info("Pedestrian: send INFORM to station");
+            PedestrianAgent.logger.info("Pedestrian: send INFORM to station");
             AID dest = new AID("Station" + nextStation.getStationId(), AID.ISLOCALNAME);
             ACLMessage msg = new ACLMessage(ACLMessage.INFORM);
             msg.addReceiver(dest);
             Properties properties = new Properties();
-            Instant currentTime = SmartCityAgent.getSimulationTime().toInstant();
+            Instant currentTime = MainContainerAgent.getSimulationTime().toInstant();
             Instant time = currentTime.plusMillis(pedestrian.getMilisecondsToNextStation());
             properties.setProperty(MessageParameter.TYPE, MessageParameter.PEDESTRIAN);
             properties.setProperty(MessageParameter.ARRIVAL_TIME, "" + time);
@@ -214,7 +213,7 @@ public class PedestrianAgent extends Agent {
             msg.setAllUserDefinedParameters(properties);
 
             send(msg);
-            logger.info("Pedestrian: Send Inform to Station");
+            PedestrianAgent.logger.info("Pedestrian: Send Inform to Station");
         }
     }
 
@@ -228,7 +227,7 @@ public class PedestrianAgent extends Agent {
             ACLMessage msg = new ACLMessage(ACLMessage.INFORM);
             msg.addReceiver(dest);
             Properties properties = new Properties();
-            Instant time = SmartCityAgent.getSimulationTime().toInstant().plusMillis(pedestrian.getMillisecondsToNextLight());
+            Instant time = MainContainerAgent.getSimulationTime().toInstant().plusMillis(pedestrian.getMillisecondsToNextLight());
             properties.setProperty(MessageParameter.TYPE, MessageParameter.PEDESTRIAN);
             properties.setProperty(MessageParameter.ARRIVAL_TIME, "" + time);
             properties.setProperty(MessageParameter.ADJACENT_OSM_WAY_ID, "" + nextManager.getOsmWayId());
@@ -248,6 +247,6 @@ public class PedestrianAgent extends Agent {
     }
 
     void Print(String message) {
-        logger.info(getLocalName() + ": " + message);
+        PedestrianAgent.logger.info(getLocalName() + ": " + message);
     }
 }

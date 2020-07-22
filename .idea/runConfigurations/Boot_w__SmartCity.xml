@@ -2,7 +2,7 @@
   <configuration default="false" name="Boot w/ SmartCity" type="Application" factoryName="Application">
     <option name="MAIN_CLASS_NAME" value="jade.Boot" />
     <module name="smartCity" />
-    <option name="PROGRAM_PARAMETERS" value="-gui -agents SmartCityAgent:smartcity.SmartCityAgent" />
+    <option name="PROGRAM_PARAMETERS" value="-gui -agents SmartCityAgent:smartcity.MainContainerAgent" />
     <method v="2">
       <option name="MakeProject" enabled="true" />
     </method>

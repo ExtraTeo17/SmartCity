@@ -13,12 +13,12 @@ import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.util.List;
 
-import static smartcity.SmartCityAgent.SHOULD_GENERATE_CARS;
-import static smartcity.SmartCityAgent.SHOULD_GENERATE_PEDESTRIANS_AND_BUSES;
+import static smartcity.MainContainerAgent.SHOULD_GENERATE_CARS;
+import static smartcity.MainContainerAgent.SHOULD_GENERATE_PEDESTRIANS_AND_BUSES;
 
 public class WindowInitializer {
 
-    public static MapWindow displayWindow(SmartCityAgent smartCityAgent) {
+    public static MapWindow displayWindow(MainContainerAgent smartCityAgent) {
         var window = new MapWindow(smartCityAgent);
         var mapViewer = window.MapViewer;
         JFrame frame = new JFrame("Smart City by Katherine & Dominic & Robert");
@@ -181,7 +181,7 @@ public class WindowInitializer {
 
                 // start all
                 for (VehicleAgent agent : smartCityAgent.Vehicles) {
-                    SmartCityAgent.ActivateAgent(agent);
+                    agent.start();
                 }
 
             }
@@ -190,7 +190,7 @@ public class WindowInitializer {
 
         menuBar.add(debug);
 
-        addGenerationMenu(menuBar);
+        WindowInitializer.addGenerationMenu(menuBar);
 
         frame.setJMenuBar(menuBar);
         frame.setSize(1200, 600);

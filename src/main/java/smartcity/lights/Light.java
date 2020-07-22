@@ -1,15 +1,15 @@
 package smartcity.lights;
 
-import agents.LightColor;
+import agents.utils.LightColor;
 import gui.CustomWaypointRenderer;
-import routing.LightManagerNode;
-import smartcity.SmartCityAgent;
 import org.javatuples.Pair;
 import org.jxmapviewer.viewer.DefaultWaypoint;
 import org.jxmapviewer.viewer.GeoPosition;
 import org.jxmapviewer.viewer.Waypoint;
 import org.jxmapviewer.viewer.WaypointPainter;
 import org.w3c.dom.Node;
+import routing.LightManagerNode;
+import smartcity.MainContainerAgent;
 
 import java.time.Instant;
 import java.util.*;
@@ -33,11 +33,11 @@ public class Light {
 
     public Light(Node node, LightColor color, Long managerId) {
         this.carLightColor = color;
-        osmId = Long.parseLong(node.getAttributes().getNamedItem(OSM_LIGHT_ID).getNodeValue());
-        double lat = Double.parseDouble((node.getAttributes().getNamedItem(LAT).getNodeValue()));
-        double lon = Double.parseDouble((node.getAttributes().getNamedItem(LON).getNodeValue()));
+        osmId = Long.parseLong(node.getAttributes().getNamedItem(Light.OSM_LIGHT_ID).getNodeValue());
+        double lat = Double.parseDouble((node.getAttributes().getNamedItem(Light.LAT).getNodeValue()));
+        double lon = Double.parseDouble((node.getAttributes().getNamedItem(Light.LON).getNodeValue()));
         position = new GeoPosition(lat, lon);
-        adjacentOsmWayId = Long.parseLong((node.getAttributes().getNamedItem(WAY_ID).getNodeValue())); // TODO: Retrieve crossings!
+        adjacentOsmWayId = Long.parseLong((node.getAttributes().getNamedItem(Light.WAY_ID).getNodeValue())); // TODO: Retrieve crossings!
         addHashMapsEntries(managerId);
     }
 
@@ -61,10 +61,10 @@ public class Light {
         final LightManagerNode lightManagerNode = new LightManagerNode(position.getLatitude(), position.getLongitude(),
                 adjacentOsmWayId, Long.parseLong(adjacentCrossingOsmId1), adjacentCrossingOsmId2 != null ?
                 Long.parseLong(adjacentCrossingOsmId2) : null, managerId);
-        SmartCityAgent.wayIdLightIdToLightManagerNode.put(Pair.with(adjacentOsmWayId, osmId), lightManagerNode);
-        SmartCityAgent.crossingOsmIdToLightManagerNode.put(Long.parseLong(adjacentCrossingOsmId1), lightManagerNode);
+        MainContainerAgent.wayIdLightIdToLightManagerNode.put(Pair.with(adjacentOsmWayId, osmId), lightManagerNode);
+        MainContainerAgent.crossingOsmIdToLightManagerNode.put(Long.parseLong(adjacentCrossingOsmId1), lightManagerNode);
         if (adjacentCrossingOsmId2 != null) {
-            SmartCityAgent.crossingOsmIdToLightManagerNode.put(Long.parseLong(adjacentCrossingOsmId2), lightManagerNode);
+            MainContainerAgent.crossingOsmIdToLightManagerNode.put(Long.parseLong(adjacentCrossingOsmId2), lightManagerNode);
         }
     }
 

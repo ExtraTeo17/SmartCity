@@ -1,4 +1,4 @@
-package agents;
+package agents.utils;
 
 public class MessageParameter {
     public static final String TYPE = "type";

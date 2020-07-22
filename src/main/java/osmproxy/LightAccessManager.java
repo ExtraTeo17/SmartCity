@@ -1,13 +1,13 @@
 package osmproxy;
 
-import osmproxy.elements.OSMNode;
-import osmproxy.elements.OSMWay;
-import smartcity.SmartCityAgent;
 import org.jxmapviewer.viewer.GeoPosition;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
+import osmproxy.elements.OSMNode;
+import osmproxy.elements.OSMWay;
+import smartcity.MainContainerAgent;
 
 import javax.xml.parsers.ParserConfigurationException;
 import java.io.IOException;
@@ -16,16 +16,16 @@ import java.util.List;
 
 public class LightAccessManager extends MapAccessManager {
 
-    public static void prepareLightManagersInRadiusAndLightIdToLightManagerIdHashSetBeta(SmartCityAgent smartCityAgent,
+    public static void prepareLightManagersInRadiusAndLightIdToLightManagerIdHashSetBeta(MainContainerAgent smartCityAgent,
                                                                                          GeoPosition middlePoint, int radius) throws IOException, ParserConfigurationException, SAXException {
-        List<OSMNode> lightsAround = sendLightsAroundOverpassQueryBeta(radius, middlePoint.getLatitude(), middlePoint.getLongitude());
-        List<OSMNode> lightNodeList = sendParentWaysOfLightOverpassQueryBeta(lightsAround);
-        List<OSMNode> lightsOfTypeA = filterByTypeA(lightNodeList);
-        prepareLightManagers(lightsOfTypeA);
+        List<OSMNode> lightsAround = LightAccessManager.sendLightsAroundOverpassQueryBeta(radius, middlePoint.getLatitude(), middlePoint.getLongitude());
+        List<OSMNode> lightNodeList = LightAccessManager.sendParentWaysOfLightOverpassQueryBeta(lightsAround);
+        List<OSMNode> lightsOfTypeA = LightAccessManager.filterByTypeA(lightNodeList);
+        LightAccessManager.prepareLightManagers(lightsOfTypeA);
     }
 
     private static List<OSMNode> sendLightsAroundOverpassQueryBeta(int radius, double middleLat, double middleLon) throws IOException, ParserConfigurationException, SAXException {
-        List<OSMNode> lightNodes = getNodes(getNodesViaOverpass(getLightsAroundOverpassQueryBeta(radius, middleLat, middleLon)));
+        List<OSMNode> lightNodes = MapAccessManager.getNodes(MapAccessManager.getNodesViaOverpass(LightAccessManager.getLightsAroundOverpassQueryBeta(radius, middleLat, middleLon)));
         return lightNodes;
     }
 
@@ -41,7 +41,7 @@ public class LightAccessManager extends MapAccessManager {
 
     private static List<OSMNode> sendParentWaysOfLightOverpassQueryBeta(final List<OSMNode> lightsAround)
             throws IOException, ParserConfigurationException, SAXException {
-        final List<OSMNode> lightInfoList = parseLightNodeList(getNodesViaOverpass(getParentWaysOfLightOverpassQueryBeta(lightsAround)));
+        final List<OSMNode> lightInfoList = LightAccessManager.parseLightNodeList(MapAccessManager.getNodesViaOverpass(LightAccessManager.getParentWaysOfLightOverpassQueryBeta(lightsAround)));
         return lightInfoList;
     }
 
@@ -49,7 +49,7 @@ public class LightAccessManager extends MapAccessManager {
         StringBuilder builder = new StringBuilder();
         builder.append("<osm-script>");
         for (final OSMNode light : lightsAround) {
-            builder.append(getSingleParentWaysOfLightOverpassQueryBeta(light.getId()));
+            builder.append(LightAccessManager.getSingleParentWaysOfLightOverpassQueryBeta(light.getId()));
         }
         builder.append("</osm-script>");
         return builder.toString();
@@ -69,7 +69,7 @@ public class LightAccessManager extends MapAccessManager {
         Node osmRoot = nodesViaOverpass.getFirstChild();
         NodeList osmXMLNodes = osmRoot.getChildNodes();
         for (int i = 1; i < osmXMLNodes.getLength(); i++) {
-            parseLightNode(lightNodeList, osmXMLNodes.item(i));
+            LightAccessManager.parseLightNode(lightNodeList, osmXMLNodes.item(i));
         }
         return lightNodeList;
     }
@@ -100,14 +100,14 @@ public class LightAccessManager extends MapAccessManager {
 
     private static void fillChildNodesOfWays(final List<OSMNode> lightsOfTypeA)
             throws IOException, ParserConfigurationException, SAXException {
-        parseChildNodesOfWays(getNodesViaOverpass(getChildNodesOfWaysOverpassQueryBeta(lightsOfTypeA)), lightsOfTypeA);
+        LightAccessManager.parseChildNodesOfWays(MapAccessManager.getNodesViaOverpass(LightAccessManager.getChildNodesOfWaysOverpassQueryBeta(lightsOfTypeA)), lightsOfTypeA);
     }
 
     private static String getChildNodesOfWaysOverpassQueryBeta(final List<OSMNode> lightsOfTypeA) {
         StringBuilder builder = new StringBuilder();
         builder.append("<osm-script>");
         for (int i = 0; i < lightsOfTypeA.size(); ++i) {
-            builder.append(getSingleChildNodesOfWaysOverpassQueryBeta(lightsOfTypeA.get(i).getParentWayIds()));
+            builder.append(LightAccessManager.getSingleChildNodesOfWaysOverpassQueryBeta(lightsOfTypeA.get(i).getParentWayIds()));
         }
         builder.append("</osm-script>");
         return builder.toString();
@@ -116,14 +116,14 @@ public class LightAccessManager extends MapAccessManager {
     private static String getSingleChildNodesOfWaysOverpassQueryBeta(final List<Long> parentWayIds) {
         StringBuilder builder = new StringBuilder();
         for (int i = 0; i < parentWayIds.size(); ++i) {
-            builder.append(getSingleChildNodesOfSingleWayOverpassQueryBeta(parentWayIds.get(i)));
+            builder.append(LightAccessManager.getSingleChildNodesOfSingleWayOverpassQueryBeta(parentWayIds.get(i)));
         }
-        builder.append(getSingleWayDelimiterOverpassQueryBeta());
+        builder.append(LightAccessManager.getSingleWayDelimiterOverpassQueryBeta());
         return builder.toString();
     }
 
     private static Object getSingleWayDelimiterOverpassQueryBeta() {
-        return "<id-query type=\"way\" ref=\"" + DELIMITER_WAY + "\"/>\r\n" +
+        return "<id-query type=\"way\" ref=\"" + MapAccessManager.DELIMITER_WAY + "\"/>\r\n" +
                 "  <print e=\"\" from=\"_\" geometry=\"skeleton\" ids=\"yes\" limit=\"\" mode=\"ids_only\" n=\"\" order=\"id\" s=\"\" w=\"\"/>\r\n";
     }
 
@@ -131,7 +131,7 @@ public class LightAccessManager extends MapAccessManager {
         return "<id-query type=\"way\" ref=\"" + osmWayId + "\" into=\"crossroadEntrance\"/>\r\n" +
                 "  <union into=\"_\">\r\n" +
                 "    <recurse from=\"crossroadEntrance\" type=\"way-node\"/>\r\n" +
-                "    <id-query type=\"relation\" ref=\"" + DELIMITER_RELATION + "\"/>\r\n" +
+                "    <id-query type=\"relation\" ref=\"" + MapAccessManager.DELIMITER_RELATION + "\"/>\r\n" +
                 "  </union>\r\n" +
                 "  <print e=\"\" from=\"_\" geometry=\"skeleton\" ids=\"yes\" limit=\"\" mode=\"ids_only\" n=\"\" order=\"id\" s=\"\" w=\"\"/>";
     }
@@ -159,7 +159,7 @@ public class LightAccessManager extends MapAccessManager {
     private static void prepareLightManagers(List<OSMNode> lightsOfTypeA) {
         for (final OSMNode centerCrossroadNode : lightsOfTypeA) {
             if (centerCrossroadNode.determineParentOrientationsTowardsCrossroad()) {
-                SmartCityAgent.tryAddNewLightManagerAgent(centerCrossroadNode);
+                MainContainerAgent.tryAddNewLightManagerAgent(centerCrossroadNode);
             }
         }
     }

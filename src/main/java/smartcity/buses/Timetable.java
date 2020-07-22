@@ -1,9 +1,9 @@
 package smartcity.buses;
 
-import routing.RouteNode;
-import smartcity.SmartCityAgent;
 import jade.wrapper.AgentContainer;
 import org.javatuples.Pair;
+import routing.RouteNode;
+import smartcity.MainContainerAgent;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -39,6 +39,6 @@ public class Timetable {
 
     public void createAgent(AgentContainer container, List<RouteNode> route, final String busLine,
                             final String brigadeNr) {
-        SmartCityAgent.tryAddNewBusAgent(this, route, busLine, brigadeNr);
+        MainContainerAgent.tryAddNewBusAgent(this, route, busLine, brigadeNr);
     }
 }

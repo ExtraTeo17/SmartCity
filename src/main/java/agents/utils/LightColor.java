@@ -1,4 +1,4 @@
-package agents;
+package agents.utils;
 
 public enum LightColor {
     GREEN,

@@ -2,18 +2,16 @@ package agents;
 
 import lightstrategies.LightManagerStrategy;
 import lightstrategies.LightStrategy;
-import org.jxmapviewer.viewer.DefaultWaypointRenderer;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import osmproxy.elements.OSMNode;
-import jade.core.Agent;
 import org.jxmapviewer.JXMapViewer;
 import org.jxmapviewer.painter.Painter;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.w3c.dom.Node;
+import osmproxy.elements.OSMNode;
 
 import java.util.List;
 
-public class LightManager extends Agent {
+public class LightManager extends AbstractAgent {
     private static final Logger logger = LoggerFactory.getLogger(LightManager.class);
     private final LightStrategy strategy;
     private final long agentId;
@@ -28,11 +26,13 @@ public class LightManager extends Agent {
         strategy = new LightManagerStrategy(centerCrossroadNode, id);
     }
 
+    @Override
     protected void setup() {
         print("I'm a traffic manager.");
         strategy.ApplyStrategy(this);
     }
 
+    @Override
     public void takeDown() {
         super.takeDown();
     }

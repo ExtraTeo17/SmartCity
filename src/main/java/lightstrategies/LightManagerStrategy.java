@@ -1,15 +1,8 @@
 package lightstrategies;
 
 import agents.LightManager;
-import agents.MessageParameter;
+import agents.utils.MessageParameter;
 import gui.MapWindow;
-import org.jxmapviewer.viewer.DefaultWaypointRenderer;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import osmproxy.elements.OSMNode;
-import smartcity.lights.Crossroad;
-import smartcity.lights.OptimizationResult;
-import smartcity.lights.SimpleCrossroad;
 import jade.core.AID;
 import jade.core.Agent;
 import jade.core.behaviours.Behaviour;
@@ -19,7 +12,13 @@ import jade.lang.acl.ACLMessage;
 import jade.util.leap.Properties;
 import org.jxmapviewer.JXMapViewer;
 import org.jxmapviewer.painter.Painter;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.w3c.dom.Node;
+import osmproxy.elements.OSMNode;
+import smartcity.lights.Crossroad;
+import smartcity.lights.OptimizationResult;
+import smartcity.lights.SimpleCrossroad;
 
 import java.time.Instant;
 import java.util.List;
@@ -42,6 +41,7 @@ public class LightManagerStrategy extends LightStrategy {
         crossroad.startLifetime();
         this.agent = agent;
         Behaviour communication = new CyclicBehaviour() {
+            @Override
             public void action() {
                 ACLMessage rcv = agent.receive();
                 if (rcv != null) {
@@ -184,6 +184,7 @@ public class LightManagerStrategy extends LightStrategy {
         return rcv.getSender().getLocalName();
     }
 
+    @Override
     public void drawCrossroad(List<Painter<JXMapViewer>> painter) {
         crossroad.draw(painter);
     }

@@ -1,23 +1,22 @@
 package agents;
 
-import org.jxmapviewer.viewer.DefaultWaypointRenderer;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import routing.LightManagerNode;
-import routing.RouteNode;
-import routing.StationNode;
-import smartcity.buses.Timetable;
-import smartcity.SmartCityAgent;
-import vehicles.Bus;
-import vehicles.DrivingState;
+import agents.utils.MessageParameter;
 import jade.core.AID;
-import jade.core.Agent;
 import jade.core.behaviours.Behaviour;
 import jade.core.behaviours.CyclicBehaviour;
 import jade.core.behaviours.TickerBehaviour;
 import jade.lang.acl.ACLMessage;
 import jade.util.leap.Properties;
 import org.javatuples.Pair;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import routing.LightManagerNode;
+import routing.RouteNode;
+import routing.StationNode;
+import smartcity.MainContainerAgent;
+import smartcity.buses.Timetable;
+import vehicles.Bus;
+import vehicles.DrivingState;
 
 import java.time.Instant;
 import java.util.Date;
@@ -25,7 +24,7 @@ import java.util.List;
 import java.util.Random;
 
 @SuppressWarnings("serial")
-public class BusAgent extends Agent {
+public class BusAgent extends AbstractAgent {
     private static final Logger logger = LoggerFactory.getLogger(BusAgent.class);
     private long agentId;
     private Bus bus;
@@ -105,8 +104,8 @@ public class BusAgent extends Agent {
                             Properties properties = new Properties();
                             properties.setProperty(MessageParameter.TYPE, MessageParameter.BUS);
                             properties.setProperty(MessageParameter.SCHEDULE_ARRIVAL, "" + bus.getTimeOnStation(station.getOsmStationId()).toInstant());
-                            properties.setProperty(MessageParameter.ARRIVAL_TIME, "" + SmartCityAgent.getSimulationTime().toInstant());
-                            logger.info("BUS: send REQUEST_WHEN to station");
+                            properties.setProperty(MessageParameter.ARRIVAL_TIME, "" + MainContainerAgent.getSimulationTime().toInstant());
+                            BusAgent.logger.info("BUS: send REQUEST_WHEN to station");
                             msg.setAllUserDefinedParameters(properties);
                             send(msg);
 
@@ -185,7 +184,7 @@ public class BusAgent extends Agent {
                                     properties.setProperty(MessageParameter.TYPE, MessageParameter.BUS);
                                     response.setAllUserDefinedParameters(properties);
                                     send(response);
-                                    logger.info("BUS: get REQUEST from station");
+                                    BusAgent.logger.info("BUS: get REQUEST from station");
                                     GetNextStation();
                                     bus.setState(DrivingState.PASSING_STATION);
                                 }
@@ -245,7 +244,7 @@ public class BusAgent extends Agent {
             ACLMessage msg = new ACLMessage(ACLMessage.INFORM);
             msg.addReceiver(dest);
             Properties properties = new Properties();
-            Instant time = SmartCityAgent.getSimulationTime().toInstant().plusMillis(bus.getMillisecondsToNextLight());
+            Instant time = MainContainerAgent.getSimulationTime().toInstant().plusMillis(bus.getMillisecondsToNextLight());
             properties.setProperty(MessageParameter.TYPE, MessageParameter.VEHICLE);
             properties.setProperty(MessageParameter.ARRIVAL_TIME, "" + time);
             properties.setProperty(MessageParameter.ADJACENT_OSM_WAY_ID, "" + nextManager.getOsmWayId());
@@ -265,7 +264,7 @@ public class BusAgent extends Agent {
             ACLMessage msg = new ACLMessage(ACLMessage.INFORM);
             msg.addReceiver(dest);
             Properties properties = new Properties();
-            Instant currentTime = SmartCityAgent.getSimulationTime().toInstant();
+            Instant currentTime = MainContainerAgent.getSimulationTime().toInstant();
             Instant time = currentTime.plusMillis(bus.getMilisecondsToNextStation());
             properties.setProperty(MessageParameter.TYPE, MessageParameter.BUS);
             properties.setProperty(MessageParameter.BUS_LINE, "" + bus.getLine());
@@ -304,7 +303,7 @@ public class BusAgent extends Agent {
     }
 
     void Print(String message) {
-        logger.info(getLocalName() + ": " + message);
+        BusAgent.logger.info(getLocalName() + ": " + message);
     }
 
 
@@ -317,7 +316,7 @@ public class BusAgent extends Agent {
         long hours = bus.getBoardingTime().getHours();
         long minutes = bus.getBoardingTime().getMinutes();
         if (hours == date.getHours() && minutes == date.getMinutes()) {
-            SmartCityAgent.ActivateAgent(this);
+           start();
         }
     }
 }

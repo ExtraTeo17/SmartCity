@@ -1,24 +1,23 @@
 package agents;
 
-import org.jxmapviewer.viewer.DefaultWaypointRenderer;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import osmproxy.elements.OSMStation;
-import smartcity.lights.OptimizationResult;
-import smartcity.stations.StationStrategy;
+import agents.utils.MessageParameter;
 import jade.core.AID;
-import jade.core.Agent;
 import jade.core.behaviours.Behaviour;
 import jade.core.behaviours.CyclicBehaviour;
 import jade.core.behaviours.TickerBehaviour;
 import jade.lang.acl.ACLMessage;
 import jade.util.leap.Properties;
 import org.javatuples.Pair;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import osmproxy.elements.OSMStation;
+import smartcity.lights.OptimizationResult;
+import smartcity.stations.StationStrategy;
 
 import java.time.Instant;
 import java.util.List;
 
-public class StationAgent extends Agent {
+public class StationAgent extends AbstractAgent {
     private static final Logger logger = LoggerFactory.getLogger(StationAgent.class);
     private final StationStrategy stationStrategy;
     private final long agentId;
@@ -178,6 +177,7 @@ public class StationAgent extends Agent {
         return agentId;
     }
 
+    @Override
     public void takeDown() {
         super.takeDown();
     }
