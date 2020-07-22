@@ -7,6 +7,8 @@ import jade.core.behaviours.CyclicBehaviour;
 import jade.core.behaviours.TickerBehaviour;
 import jade.lang.acl.ACLMessage;
 import jade.util.leap.Properties;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import routing.LightManagerNode;
 import smartcity.MainContainerAgent;
 import vehicles.DrivingState;
@@ -16,8 +18,16 @@ import java.time.Instant;
 
 @SuppressWarnings("serial")
 public class VehicleAgent extends AbstractAgent {
-
     private MovingObject Vehicle;
+
+    public VehicleAgent(int id){
+        super(id);
+    }
+
+    @Override
+    public String getNamePrefix() {
+        return Vehicle.getVehicleType();
+    }
 
     @Override
     protected void setup() {
@@ -40,13 +50,13 @@ public class VehicleAgent extends AbstractAgent {
                             properties.setProperty(MessageParameter.ADJACENT_OSM_WAY_ID, Long.toString(Vehicle.getAdjacentOsmWayId()));
                             msg.setAllUserDefinedParameters(properties);
                             send(msg);
-                            Print("Asking LightManager" + light.getLightManagerId() + " for right to passage.");
+                            print("Asking LightManager" + light.getLightManagerId() + " for right to passage.");
                             break;
                         case WAITING_AT_LIGHT:
 
                             break;
                         case PASSING_LIGHT:
-                            Print("Passing");
+                            print("Passing");
                             Vehicle.Move();
                             Vehicle.setState(DrivingState.MOVING);
                             break;
@@ -54,7 +64,7 @@ public class VehicleAgent extends AbstractAgent {
                 }
                 else if (Vehicle.isAtDestination()) {
                     Vehicle.setState(DrivingState.AT_DESTINATION);
-                    Print("Reached destination.");
+                    print("Reached destination.");
 
                     ACLMessage msg = new ACLMessage(ACLMessage.INFORM);
                     msg.addReceiver(new AID("SmartCityAgent", AID.ISLOCALNAME));
@@ -120,7 +130,7 @@ public class VehicleAgent extends AbstractAgent {
             msg.setAllUserDefinedParameters(properties);
 
             send(msg);
-            Print("Sending INFORM to LightManager" + nextManager.getLightManagerId() + ".");
+            print("Sending INFORM to LightManager" + nextManager.getLightManagerId() + ".");
         }
     }
 
@@ -135,9 +145,5 @@ public class VehicleAgent extends AbstractAgent {
     @Override
     public void takeDown() {
         super.takeDown();
-    }
-
-    void Print(String message) {
-        //logger.info(getLocalName() + ": " + message);
     }
 }

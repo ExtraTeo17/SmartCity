@@ -27,13 +27,13 @@ public class SimpleCrossroad extends Crossroad {
     private Timer timer;
     private boolean alreadyExtendedGreen = false;
 
-    public SimpleCrossroad(Node crossroad, Long managerId) {
+    public SimpleCrossroad(Node crossroad, int managerId) {
         prepareLightGroups(crossroad, managerId);
         prepareTimer();
         prepareLightMap();
     }
 
-    public SimpleCrossroad(OSMNode centerCrossroadNode, long managerId) {
+    public SimpleCrossroad(OSMNode centerCrossroadNode, int managerId) {
         prepareLightGroups(centerCrossroadNode, managerId);
         prepareTimer();
         prepareLightMap();
@@ -44,12 +44,12 @@ public class SimpleCrossroad extends Crossroad {
         lights.putAll(lightGroup2.prepareMap());
     }
 
-    private void prepareLightGroups(Node crossroad, Long managerId) {
+    private void prepareLightGroups(Node crossroad, int managerId) {
         lightGroup1 = new SimpleLightGroup(MapAccessManager.getCrossroadGroup(crossroad, 1), LightColor.RED, managerId);
         lightGroup2 = new SimpleLightGroup(MapAccessManager.getCrossroadGroup(crossroad, 3), LightColor.GREEN, managerId);
     }
 
-    private void prepareLightGroups(OSMNode centerCrossroadNode, long managerId) {
+    private void prepareLightGroups(OSMNode centerCrossroadNode, int managerId) {
         CrossroadInfo info = new CrossroadInfo(centerCrossroadNode);
         lightGroup1 = new SimpleLightGroup(info.getFirstLightGroupInfo(), LightColor.RED, managerId);
         lightGroup2 = new SimpleLightGroup(info.getSecondLightGroupInfo(), LightColor.GREEN, managerId);

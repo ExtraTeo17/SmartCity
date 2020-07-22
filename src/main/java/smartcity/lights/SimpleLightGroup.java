@@ -12,7 +12,7 @@ public class SimpleLightGroup {
 
     private Set<Light> lights;
 
-    public SimpleLightGroup(Node crossroadGroup, LightColor color, Long managerId) {
+    public SimpleLightGroup(Node crossroadGroup, LightColor color, int managerId) {
         lights = new HashSet<>();
         NodeList lightsInGroup = crossroadGroup.getChildNodes();
         for (int i = 0; i < lightsInGroup.getLength(); ++i) {
@@ -22,7 +22,7 @@ public class SimpleLightGroup {
         }
     }
 
-    public SimpleLightGroup(List<LightInfo> infoList, LightColor color, Long managerId) {
+    public SimpleLightGroup(List<LightInfo> infoList, LightColor color, int managerId) {
         lights = new HashSet<>();
         for (LightInfo info : infoList) {
             lights.add(new Light(info, color, managerId));

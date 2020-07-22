@@ -7,7 +7,6 @@ import jade.core.Agent;
 import jade.core.behaviours.CyclicBehaviour;
 import jade.lang.acl.ACLMessage;
 import jade.wrapper.AgentContainer;
-import jade.wrapper.ControllerException;
 import jade.wrapper.StaleProxyException;
 import org.javatuples.Pair;
 import org.jxmapviewer.viewer.GeoPosition;
@@ -37,19 +36,12 @@ import java.util.*;
 // TODO: This class should have no more than 10 fields.
 public class MainContainerAgent extends Agent {
     private static final Logger logger = LoggerFactory.getLogger(MainContainerAgent.class);
-    private static long nextLightManagerId;
-    private static long nextStationAgentId;
-    private static int nextBusId;
-    private static int nextPedestrianAgentId;
+
     private static AgentContainer container;
     private static MapWindow window;
     private static WebServer webServer;
 
     public final static int SERVER_PORT = 9000;
-    public final static String LIGHT_MANAGER = "LightManager";
-    public final static String BUS = "Bus";
-    public final static String STATION = "Station";
-    public final static String PEDESTRIAN = "Pedestrian";
     public final static boolean USE_DEPRECATED_XML_FOR_LIGHT_MANAGERS = false;
     public final static String STEPS = "6";
     public static boolean SHOULD_GENERATE_PEDESTRIANS_AND_BUSES = false;
@@ -140,25 +132,9 @@ public class MainContainerAgent extends Agent {
         return window.getSimulationStartTime();
     }
 
-    private static long nextLightManagerId() {
-        return nextLightManagerId++;
-    }
-
-    private static long nextStationAgentId() {
-        return nextStationAgentId++;
-    }
-
-    private static int nextBusId() {
-        return nextBusId++;
-    }
-
-    private static int nextPedestrianAgentId() {
-        return nextPedestrianAgentId++;
-    }
-
-    private static void tryAddAgent(Agent agent, String agentName) {
+    private static void tryAddAgent(AbstractAgent agent) {
         try {
-            container.acceptNewAgent(agentName, agent);
+            container.acceptNewAgent(agent.getPredictedName(), agent);
         } catch (StaleProxyException e) {
             e.printStackTrace();
         }
@@ -166,54 +142,59 @@ public class MainContainerAgent extends Agent {
 
     public static void tryAddNewBusAgent(final Timetable timetable, List<RouteNode> route,
                                          final String busLine, final String brigadeNr) {
-        BusAgent agent = new BusAgent();
-        final int busAgentId = nextBusId();
-        agent.setArguments(new Object[]{route, timetable, busLine, brigadeNr, busAgentId});
+        BusAgent agent = new BusAgent(IdGenerator.getBusId(), route, timetable, busLine, brigadeNr);
         buses.add(agent);
-        tryAddAgent(agent, BUS + busAgentId);
+        tryAddAgent(agent);
     }
 
     public static void tryAddNewLightManagerAgent(Node crossroad) {
-        LightManager manager = new LightManager(crossroad, nextLightManagerId());
+        LightManager manager = new LightManager(crossroad, IdGenerator.getLightManagerId());
         lightManagers.add(manager);
-        tryAddAgent(manager, LIGHT_MANAGER + manager.getId());
+        tryAddAgent(manager);
     }
 
     public static void tryAddNewLightManagerAgent(final OSMNode centerCrossroadNode) {
-        LightManager manager = new LightManager(centerCrossroadNode, nextLightManagerId());
+        LightManager manager = new LightManager(centerCrossroadNode, IdGenerator.getLightManagerId());
         lightManagers.add(manager);
-        tryAddAgent(manager, LIGHT_MANAGER + manager.getId());
+        tryAddAgent(manager);
     }
 
     public static AbstractAgent tryAddNewStationAgent(OSMStation stationOSMNode) {
-        StationAgent stationAgent = new StationAgent(stationOSMNode, nextStationAgentId());
+        StationAgent stationAgent = new StationAgent(stationOSMNode, IdGenerator.getStationAgentId());
         osmIdToStationOSMNode.put(stationOSMNode.getId(), stationOSMNode);
-        tryAddAgent(stationAgent, STATION + stationAgent.getAgentId());
+        tryAddAgent(stationAgent);
         return stationAgent;
     }
 
     public static AbstractAgent tryAddNewPedestrianAgent(Pedestrian pedestrian) {
-        PedestrianAgent pedestrianAgent = new PedestrianAgent(pedestrian, nextPedestrianAgentId());
+        PedestrianAgent pedestrianAgent = new PedestrianAgent(pedestrian, IdGenerator.getPedestrianId());
         pedestrians.add(pedestrianAgent);
-        tryAddAgent(pedestrianAgent, PEDESTRIAN + pedestrianAgent.getAgentId());
+        tryAddAgent(pedestrianAgent);
         return pedestrianAgent;
     }
 
-    protected void addNewCarAgent(List<RouteNode> info) {
-        VehicleAgent vehicle = new VehicleAgent();
+    public VehicleAgent addNewVehicleAgent(List<RouteNode> info) {
+        VehicleAgent vehicle = new VehicleAgent(carId);
         MovingObjectImpl car = new MovingObjectImpl(info);
         vehicle.setVehicle(car);
-        try {
-            addNewVehicleAgent(car.getVehicleType() + carId, vehicle);
-            ++carId;
-        } catch (StaleProxyException ex) {
-            ex.printStackTrace();
-        }
+        addNewVehicleAgent(vehicle);
+
+        return vehicle;
     }
 
-    public void addNewVehicleAgent(String name, VehicleAgent agent) throws StaleProxyException {
-        container.acceptNewAgent(name, agent);
+    public VehicleAgent addNewTestVehicleAgent(List<RouteNode> info) {
+        VehicleAgent vehicle = new VehicleAgent(carId);
+        MovingObjectImpl car = new MovingObjectImpl(info);
+        vehicle.setVehicle(car);
+        addNewVehicleAgent(vehicle);
+
+        return vehicle;
+    }
+
+    private void addNewVehicleAgent(VehicleAgent agent){
+        tryAddAgent(agent);
         Vehicles.add(agent);
+        ++carId;
     }
 
     public void activateLightManagerAgents() {
@@ -223,7 +204,7 @@ public class MainContainerAgent extends Agent {
     }
 
     public void prepareLightManagers(GeoPosition middlePoint, int radius) {
-        resetIdGenerator();
+        IdGenerator.resetLightManagerId();
         lightManagersUnderConstruction = true;
         if (USE_DEPRECATED_XML_FOR_LIGHT_MANAGERS) {
             MapAccessManager.prepareLightManagersInRadiusAndLightIdToLightManagerIdHashSet(this, middlePoint, radius);
@@ -243,26 +224,10 @@ public class MainContainerAgent extends Agent {
         }
     }
 
-    private void resetIdGenerator() {
-        nextLightManagerId = 1;
-    }
-
-    private void resetBusIdGen() {
-        nextBusId = 1;
-    }
-
-    private void resetStationAgentIdGenerator() {
-        nextStationAgentId = 1;
-    }
-
-    private void resetPedestrianAgentIdGenerator() {
-        nextPedestrianAgentId = 1;
-    }
-
     public void prepareStationsAndBuses(GeoPosition middlePoint, int radius) {
-        resetStationAgentIdGenerator();
+        IdGenerator.resetStationAgentId();
         logger.info("STEP 1/" + STEPS + ": Starting bus preparation");
-        resetBusIdGen();
+        IdGenerator.resetBusId();
         buses = new LinkedHashSet<>();
         Set<BusInfo> busInfoSet = MapAccessManager.getBusInfo(radius, middlePoint.getLatitude(), middlePoint.getLongitude());
         logger.info("STEP 5/" + STEPS + ": Starting agent preparation based on queries");

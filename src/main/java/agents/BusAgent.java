@@ -26,8 +26,24 @@ import java.util.Random;
 @SuppressWarnings("serial")
 public class BusAgent extends AbstractAgent {
     private static final Logger logger = LoggerFactory.getLogger(BusAgent.class);
-    private long agentId;
+    private final List<RouteNode> route;
+    private final Timetable timetable;
+    private final String busLine;
+    private final String brigadeNr;
     private Bus bus;
+
+    public BusAgent(int busId, List<RouteNode> route, Timetable timetable, String busLine, String brigadeNr) {
+        super(busId);
+        this.route = route;
+        this.timetable = timetable;
+        this.busLine = busLine;
+        this.brigadeNr = brigadeNr;
+    }
+
+    @Override
+    public String getNamePrefix() {
+        return "Bus";
+    }
 
     @Override
     protected void setup() {
@@ -226,14 +242,6 @@ public class BusAgent extends AbstractAgent {
         addBehaviour(communication);
     }
 
-    @SuppressWarnings("unchecked")
-    private void readArgumentsAndCreateBus() {
-        final Object[] args = getArguments();
-        bus = new Bus((List<RouteNode>) args[0], (Timetable) args[1],
-                (String) args[2], (String) args[3]);
-        agentId = (int) args[4];
-    }
-
     void GetNextLight() {
         // finds next traffic light and announces his arrival
         LightManagerNode nextManager = bus.findNextTrafficLight();
@@ -265,7 +273,7 @@ public class BusAgent extends AbstractAgent {
             msg.addReceiver(dest);
             Properties properties = new Properties();
             Instant currentTime = MainContainerAgent.getSimulationTime().toInstant();
-            Instant time = currentTime.plusMillis(bus.getMilisecondsToNextStation());
+            Instant time = currentTime.plusMillis(bus.getMillisecondsToNextStation());
             properties.setProperty(MessageParameter.TYPE, MessageParameter.BUS);
             properties.setProperty(MessageParameter.BUS_LINE, "" + bus.getLine());
             properties.setProperty(MessageParameter.SCHEDULE_ARRIVAL, "" + bus.getTimeOnStation(nextStation.getOsmStationId()).toInstant());
@@ -279,11 +287,6 @@ public class BusAgent extends AbstractAgent {
 
     public Bus getBus() {
         return bus;
-    }
-
-
-    public String getId() {
-        return Long.toString(agentId);
     }
 
     public final String getLine() {
@@ -306,17 +309,18 @@ public class BusAgent extends AbstractAgent {
         BusAgent.logger.info(getLocalName() + ": " + message);
     }
 
-
     public void runBasedOnTimetable(Date date) {
         if (this.getAgentState().getValue() != jade.wrapper.AgentState.cAGENT_STATE_INITIATED) {
             return;
         }
-        readArgumentsAndCreateBus();
+
+        // TODO: New bus is created each time - is it needed?
+        this.bus = new Bus(route, timetable, busLine, brigadeNr);
 
         long hours = bus.getBoardingTime().getHours();
         long minutes = bus.getBoardingTime().getMinutes();
         if (hours == date.getHours() && minutes == date.getMinutes()) {
-           start();
+            start();
         }
     }
 }

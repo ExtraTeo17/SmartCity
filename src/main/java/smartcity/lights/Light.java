@@ -31,7 +31,7 @@ public class Light {
     private String adjacentCrossingOsmId2;
     private long osmId;
 
-    public Light(Node node, LightColor color, Long managerId) {
+    public Light(Node node, LightColor color, int managerId) {
         this.carLightColor = color;
         osmId = Long.parseLong(node.getAttributes().getNamedItem(Light.OSM_LIGHT_ID).getNodeValue());
         double lat = Double.parseDouble((node.getAttributes().getNamedItem(Light.LAT).getNodeValue()));
@@ -41,7 +41,7 @@ public class Light {
         addHashMapsEntries(managerId);
     }
 
-    public Light(LightInfo info, LightColor color, Long managerId) {
+    public Light(LightInfo info, LightColor color, int managerId) {
         this.carLightColor = color;
         osmId = Long.parseLong(info.getOsmLightId());
         double lat = Double.parseDouble(info.getLat());

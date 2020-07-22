@@ -19,12 +19,16 @@ import java.time.Instant;
 
 public class PedestrianAgent extends AbstractAgent {
     private static final Logger logger = LoggerFactory.getLogger(PedestrianAgent.class);
-    private final long agentId;
     private final Pedestrian pedestrian;
 
+    @Override
+    public String getNamePrefix() {
+        return "Pedestrian";
+    }
+
     public PedestrianAgent(final Pedestrian pedestrian, final int agentId) {
+        super(agentId);
         this.pedestrian = pedestrian;
-        this.agentId = agentId;
     }
 
     public boolean isInBus() { return DrivingState.IN_BUS == pedestrian.getState();}
@@ -240,10 +244,6 @@ public class PedestrianAgent extends AbstractAgent {
 
     public Pedestrian getPedestrian() {
         return pedestrian;
-    }
-
-    public String getAgentId() {
-        return Long.toString(agentId);
     }
 
     void Print(String message) {

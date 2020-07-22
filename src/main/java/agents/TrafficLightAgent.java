@@ -14,9 +14,15 @@ public class TrafficLightAgent extends AbstractAgent {
     public LightColor lightColor = LightColor.RED;
     public List<String> queue = new ArrayList<>();
     private final BasicLightStrategy strategy = new BasicLightStrategy();
-    private GeoPosition position;
+    private final GeoPosition position;
 
-    public TrafficLightAgent(GeoPosition pos) {
+    @Override
+    public String getNamePrefix() {
+        return "TrafficLight";
+    }
+
+    public TrafficLightAgent(int id, GeoPosition pos) {
+        super(id);
         position = pos;
     }
 
@@ -26,17 +32,13 @@ public class TrafficLightAgent extends AbstractAgent {
 
     @Override
     protected void setup() {
-        Print("I'm a traffic light.");
-        Print("Red light.");
+        print("I'm a traffic light.");
+        print("Red light.");
         strategy.ApplyStrategy(this);
     }
 
     @Override
     public void takeDown() {
         super.takeDown();
-    }
-
-    public void Print(String message) {
-        logger.info(getLocalName() + ": " + message);
     }
 }

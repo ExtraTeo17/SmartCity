@@ -28,11 +28,11 @@ public class LightManagerStrategy extends LightStrategy {
     private final Crossroad crossroad;
     private LightManager agent;
 
-    public LightManagerStrategy(Node crossroad, Long managerId) {
+    public LightManagerStrategy(Node crossroad, int managerId) {
         this.crossroad = new SimpleCrossroad(crossroad, managerId);
     }
 
-    public LightManagerStrategy(OSMNode centerCrossroadNode, long managerId) {
+    public LightManagerStrategy(OSMNode centerCrossroadNode, int managerId) {
         this.crossroad = new SimpleCrossroad(centerCrossroadNode, managerId);
     }
 

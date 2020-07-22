@@ -1,12 +1,12 @@
 package vehicles;
 
 import gui.MapWindow;
+import org.jxmapviewer.viewer.GeoPosition;
 import routing.LightManagerNode;
 import routing.RouteNode;
 import routing.Router;
 import routing.StationNode;
 import smartcity.buses.Timetable;
-import org.jxmapviewer.viewer.GeoPosition;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -74,9 +74,9 @@ public class Bus extends MovingObject {
     private List<StationNode> extractStationsFromRoute() {
         List<StationNode> stationsOnRoute = new ArrayList<>();
         for (final RouteNode node : route) {
-			if (node instanceof StationNode) {
-				stationsOnRoute.add((StationNode) node);
-			}
+            if (node instanceof StationNode) {
+                stationsOnRoute.add((StationNode) node);
+            }
         }
         return stationsOnRoute;
     }
@@ -153,9 +153,9 @@ public class Bus extends MovingObject {
 
     @Override
     public LightManagerNode getCurrentTrafficLightNode() {
-		if (closestLightIndex == -1) {
-			return null;
-		}
+        if (closestLightIndex == -1) {
+            return null;
+        }
         return (LightManagerNode) (route.get(closestLightIndex));
     }
 
@@ -175,9 +175,9 @@ public class Bus extends MovingObject {
     }
 
     public StationNode getCurrentStationNode() {
-		if (closestStationIndex == -1) {
-			return null;
-		}
+        if (closestStationIndex == -1) {
+            return null;
+        }
         return (StationNode) (route.get(closestStationIndex));
     }
 
@@ -188,12 +188,12 @@ public class Bus extends MovingObject {
 
     @Override
     public void Move() {
-		if (isAtDestination()) {
-			index = 0;
-		}
-		else {
-			index++;
-		}
+        if (isAtDestination()) {
+            index = 0;
+        }
+        else {
+            index++;
+        }
     }
 
     @Override
@@ -206,7 +206,7 @@ public class Bus extends MovingObject {
         return ((closestLightIndex - index) * 3600) / getSpeed();
     }
 
-    public int getMilisecondsToNextStation() {
+    public int getMillisecondsToNextStation() {
         return ((closestStationIndex - index) * 3600) / getSpeed();
     }
 

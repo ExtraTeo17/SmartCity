@@ -17,11 +17,11 @@ public class BasicLightStrategy {
                 ACLMessage msg = agent.receive();
                 if (msg != null) {
                     if (msg.getContent().equals("Pass")) {
-                        agent.Print(msg.getSender().getLocalName() + " passes light.");
+                        agent.print(msg.getSender().getLocalName() + " passes light.");
                         agent.queue.remove(msg.getSender().getLocalName());
                     }
                     else {
-                        agent.Print("Message from " + msg.getSender().getLocalName() + ": " + msg.getContent());
+                        agent.print("Message from " + msg.getSender().getLocalName() + ": " + msg.getContent());
                         agent.queue.add(msg.getSender().getLocalName());
                     }
 
@@ -43,7 +43,7 @@ public class BasicLightStrategy {
                         msg.addReceiver(dest);
                         agent.send(msg);
                     }
-                    agent.Print("Red light.");
+                    agent.print("Red light.");
                 }
                 else {
                     for (String name : agent.queue) {
@@ -53,7 +53,7 @@ public class BasicLightStrategy {
                         msg.addReceiver(dest);
                         agent.send(msg);
                     }
-                    agent.Print("Green light.");
+                    agent.print("Green light.");
                 }
             }
         };

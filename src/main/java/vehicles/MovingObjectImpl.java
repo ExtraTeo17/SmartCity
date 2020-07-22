@@ -1,15 +1,14 @@
 package vehicles;
 
 import gui.MapWindow;
+import org.jxmapviewer.viewer.GeoPosition;
 import routing.LightManagerNode;
 import routing.RouteNode;
 import routing.Router;
-import org.jxmapviewer.viewer.GeoPosition;
 
 import java.util.List;
 
 public class MovingObjectImpl extends MovingObject {
-
     public DrivingState State = DrivingState.STARTING;
     private List<RouteNode> displayRoute;
     private List<RouteNode> route;
@@ -20,10 +19,6 @@ public class MovingObjectImpl extends MovingObject {
     public MovingObjectImpl(List<RouteNode> info) {
         displayRoute = info;
         route = Router.uniformRoute(displayRoute);
-        /*for(RouteNode r : route) {
-        	if(!r.getClass().getCanonicalName().equals("Routing.RouteNode"))
-        	logger.info(r.getClass().getCanonicalName());
-        }*/
     }
 
     @Override

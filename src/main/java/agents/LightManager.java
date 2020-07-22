@@ -14,15 +14,19 @@ import java.util.List;
 public class LightManager extends AbstractAgent {
     private static final Logger logger = LoggerFactory.getLogger(LightManager.class);
     private final LightStrategy strategy;
-    private final long agentId;
 
-    public LightManager(Node crossroad, Long id) {
-        agentId = id;
+    @Override
+    public String getNamePrefix() {
+        return "LightManager";
+    }
+
+    public LightManager(Node crossroad, int id) {
+        super(id);
         strategy = new LightManagerStrategy(crossroad, id);
     }
 
-    public LightManager(OSMNode centerCrossroadNode, long id) {
-        agentId = id;
+    public LightManager(OSMNode centerCrossroadNode, int id) {
+        super(id);
         strategy = new LightManagerStrategy(centerCrossroadNode, id);
     }
 
@@ -43,9 +47,5 @@ public class LightManager extends AbstractAgent {
 
     public void draw(List<Painter<JXMapViewer>> waypointPainter) {
         strategy.drawCrossroad(waypointPainter);
-    }
-
-    public String getId() {
-        return Long.toString(agentId);
     }
 }
