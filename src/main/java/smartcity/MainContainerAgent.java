@@ -173,21 +173,21 @@ public class MainContainerAgent extends Agent {
         return pedestrianAgent;
     }
 
-    public VehicleAgent addNewVehicleAgent(List<RouteNode> info, boolean testCar) {
+    public VehicleAgent tryAddNewVehicleAgent(List<RouteNode> info, boolean testCar) {
         VehicleAgent vehicle = new VehicleAgent(carId);
         MovingObjectImpl car = testCar ? new TestCar(info) : new MovingObjectImpl(info);
         vehicle.setVehicle(car);
 
-        addNewVehicleAgent(vehicle);
+        tryAddNewVehicleAgent(vehicle);
 
         return vehicle;
     }
 
-    public VehicleAgent addNewVehicleAgent(List<RouteNode> info) {
-        return addNewVehicleAgent(info, false);
+    public VehicleAgent tryAddNewVehicleAgent(List<RouteNode> info) {
+        return tryAddNewVehicleAgent(info, false);
     }
 
-    private void addNewVehicleAgent(VehicleAgent agent) {
+    private void tryAddNewVehicleAgent(VehicleAgent agent) {
         tryAddAgent(agent);
         Vehicles.add(agent);
         ++carId;

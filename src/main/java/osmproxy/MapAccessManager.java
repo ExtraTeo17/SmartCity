@@ -17,7 +17,6 @@ package osmproxy;
 
 import com.graphhopper.util.PointList;
 import com.graphhopper.util.shapes.GHPoint;
-import jade.core.Agent;
 import org.javatuples.Pair;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
@@ -47,6 +46,7 @@ import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 import java.util.*;
@@ -59,7 +59,7 @@ import java.util.*;
  */
 public class MapAccessManager {
     private static final Logger logger = LoggerFactory.getLogger(MapAccessManager.class);
-    private static JSONParser jsonParser = new JSONParser();
+    private static final JSONParser jsonParser = new JSONParser();
     protected static final String DELIMITER_RELATION = "3838046";
     protected static final String DELIMITER_WAY = "48439275";
 
@@ -80,7 +80,7 @@ public class MapAccessManager {
         DocumentBuilderFactory dbfac = DocumentBuilderFactory.newInstance();
         DocumentBuilder docBuilder = dbfac.newDocumentBuilder();
         Document document = docBuilder.parse(connection.getInputStream());
-        List<OSMNode> nodes = MapAccessManager.getNodes(document);
+        List<OSMNode> nodes = getNodes(document);
         if (!nodes.isEmpty()) {
             return nodes.iterator().next();
         }
@@ -106,7 +106,7 @@ public class MapAccessManager {
         String right = format.format(lat + vicinityRange);
         String top = format.format(lon + vicinityRange);
 
-        String string = MapAccessManager.OPENSTREETMAP_API_06 + "map?bbox=" + left + "," + bottom + "," + right + ","
+        String string = OPENSTREETMAP_API_06 + "map?bbox=" + left + "," + bottom + "," + right + ","
                 + top;
         URL osm = new URL(string);
         HttpURLConnection connection = (HttpURLConnection) osm.openConnection();
@@ -155,7 +155,7 @@ public class MapAccessManager {
         NodeList osmXMLNodes = osmRoot.getChildNodes();
         List<OSMNode> nodesOfOneWay = new ArrayList<>();
         for (int i = 1; i < osmXMLNodes.getLength(); i++) {
-            MapAccessManager.parseLightNode(osmXMLNodes.item(i), osmLights, nodesOfOneWay);
+            parseLightNode(osmXMLNodes.item(i), osmLights, nodesOfOneWay);
         }
         return osmLights;
     }
@@ -176,7 +176,7 @@ public class MapAccessManager {
             NamedNodeMap attributes = item.getAttributes();
             Node namedItemID = attributes.getNamedItem("id");
             adherentWayId = namedItemID.getNodeValue();
-            MapAccessManager.addLightNodeSeries(osmLights, nodesOfOneWay, adherentWayId);
+            addLightNodeSeries(osmLights, nodesOfOneWay, adherentWayId);
             nodesOfOneWay = new ArrayList<>();
         }
     }
@@ -279,7 +279,7 @@ public class MapAccessManager {
 
     public static List<OSMNode> getOSMNodesInVicinity(double lat, double lon, double vicinityRange) throws IOException,
             SAXException, ParserConfigurationException {
-        return MapAccessManager.getNodes(MapAccessManager.getNodesViaOverpass("<osm-script>\r\n" +
+        return getNodes(getNodesViaOverpass("<osm-script>\r\n" +
                 "  <query into=\"_\" type=\"node\">\r\n" +
                 "    <has-kv k=\"highway\" modv=\"\" v=\"traffic_signals\"/>\r\n" +
                 "    <bbox-query s=\"" + (lon - vicinityRange) + "\" w=\"" + (lat - vicinityRange) + "\" n=\"" + (lon + vicinityRange) + "\" e=\"" + (lat + vicinityRange) + "\"/>\r\n" +
@@ -296,7 +296,7 @@ public class MapAccessManager {
      * @throws SAXException
      */
     public static Document getNodesViaOverpass(String query) throws IOException, ParserConfigurationException, SAXException {
-        String hostname = MapAccessManager.OVERPASS_API;
+        String hostname = OVERPASS_API;
         String queryString = query;//readFileAsString(query);
 
         URL osm = new URL(hostname);
@@ -306,7 +306,7 @@ public class MapAccessManager {
         connection.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");
 
         DataOutputStream printout = new DataOutputStream(connection.getOutputStream());
-        printout.writeBytes("data=" + URLEncoder.encode(queryString, "utf-8"));
+        printout.writeBytes("data=" + URLEncoder.encode(queryString, StandardCharsets.UTF_8));
         printout.flush();
         printout.close();
 
@@ -318,17 +318,17 @@ public class MapAccessManager {
     public static JSONObject getNodesViaWarszawskie(String query) {
         URL nieOsm;
         Scanner scanner;
-        String json = "";
+        StringBuilder json = new StringBuilder();
         JSONObject jObject = null;
         try {
             nieOsm = new URL(query);
             scanner = new Scanner(nieOsm.openStream());
             while (scanner.hasNext()) {
-                json += scanner.nextLine();
+                json.append(scanner.nextLine());
             }
-            jObject = (JSONObject) MapAccessManager.jsonParser.parse(json);
+            jObject = (JSONObject) jsonParser.parse(json.toString());
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.warn("Error trying to get 'Warszawskie busy'", e);
         }
         return jObject;
     }
@@ -336,10 +336,10 @@ public class MapAccessManager {
     public static List<OSMNode> sendHighwayOverpassQuery(PointList points) {
         List<OSMNode> nodes = new ArrayList<>();
         try {
-            nodes = MapAccessManager.getNodes(MapAccessManager.getNodesViaOverpass("<osm-script>\r\n" + MapAccessManager.getHighwayQueries(points) + "</osm-script>"));
+            var overpassNodes = getNodesViaOverpass("<osm-script>\r\n" + getHighwayQueries(points) + "</osm-script>");
+            nodes = getNodes(overpassNodes);
         } catch (Exception e) {
-            e.printStackTrace();
-        } finally {
+            logger.warn("Error trying to get highway info", e);
         }
         return nodes;
     }
@@ -347,10 +347,10 @@ public class MapAccessManager {
     private static List<OSMNode> sendLightAroundOverpassQuery(String lightAroundOverpassQuery) {
         List<OSMNode> nodes = new ArrayList<>();
         try {
-            nodes = MapAccessManager.getNodes(MapAccessManager.getNodesViaOverpass(lightAroundOverpassQuery));
+            var overpassNodes = getNodesViaOverpass(lightAroundOverpassQuery);
+            nodes = getNodes(overpassNodes);
         } catch (Exception e) {
-            e.printStackTrace();
-        } finally {
+            logger.warn("Error trying to get lights info", e);
         }
         return nodes;
     }
@@ -358,30 +358,32 @@ public class MapAccessManager {
     public static List<RouteNode> sendFullWayAndItsTrafficSignalsQuery(List<Long> osmWayIds) {
         List<RouteNode> nodes = new ArrayList<>();
         try {
-            nodes = MapAccessManager.getRouteNodes(MapAccessManager.getNodesViaOverpass(MapAccessManager.getFullWayAndItsTrafficSignalsQuery(osmWayIds)));
+            var overpassNodes = getNodesViaOverpass(getFullWayAndItsTrafficSignalsQuery(osmWayIds));
+            nodes = getRouteNodes(overpassNodes);
         } catch (Exception e) {
-            e.printStackTrace();
-        } finally {
+            logger.warn("Error trying to get full way and it's traffic signals info", e);
         }
         return nodes;
     }
 
     public static List<OSMLight> sendFullTrafficSignalQuery(List<Long> osmWayIds) {
-        List<OSMLight> nodes = new ArrayList<>();
+        List<OSMLight> LightNodes = new ArrayList<>();
         try {
-            nodes = MapAccessManager.getLights(MapAccessManager.getNodesViaOverpass(MapAccessManager.getFullTrafficSignalQuery(osmWayIds)));
+            var overpassNodes = getNodesViaOverpass(getFullTrafficSignalQuery(osmWayIds));
+            LightNodes = getLights(overpassNodes);
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.warn("Error trying to get light nodes", e);
         }
-        return nodes;
+        return LightNodes;
     }
 
     public static RouteInfo sendMultipleWayAndItsNodesQuery(List<Long> osmWayIds) {
         RouteInfo info = null;
         try {
-            info = MapAccessManager.parseWayAndNodes(MapAccessManager.getNodesViaOverpass(MapAccessManager.getMultipleWayAndItsNodesQuery(osmWayIds)));
+            var overpassNodes = getNodesViaOverpass(getMultipleWayAndItsNodesQuery(osmWayIds));
+            info = parseWayAndNodes(overpassNodes);
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.warn("Error trying to get route info", e);
         }
         return info;
     }
@@ -389,9 +391,9 @@ public class MapAccessManager {
     public static List<OSMStation> sendStationOverpassQuery(String query) {
         List<OSMStation> nodes = new ArrayList<>();
         try {
-            nodes = MapAccessManager.getStationNodes(MapAccessManager.getNodesViaOverpass(query));
+            nodes = getStationNodes(getNodesViaOverpass(query));
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.warn("Error trying to get osm stations", e);
         }
         return nodes;
     }
@@ -399,7 +401,7 @@ public class MapAccessManager {
     private static String getHighwayQueries(PointList points) {
         StringBuilder builder = new StringBuilder();
         for (GHPoint point : points) {
-            builder.append(MapAccessManager.getHighwayQuery(point));
+            builder.append(getHighwayQuery(point));
         }
         return builder.toString();
     }
@@ -420,7 +422,7 @@ public class MapAccessManager {
         StringBuilder builder = new StringBuilder();
         builder.append("<osm-script>");
         for (long id : osmWayIds) {
-            builder.append(MapAccessManager.getSingleWayAndItsTrafficSignalsQuery(id));
+            builder.append(getSingleWayAndItsTrafficSignalsQuery(id));
         }
         builder.append("</osm-script>");
         return builder.toString();
@@ -430,7 +432,7 @@ public class MapAccessManager {
         StringBuilder builder = new StringBuilder();
         builder.append("<osm-script>");
         for (long id : osmWayIds) {
-            builder.append(MapAccessManager.getSingleTrafficSignalQuery(id));
+            builder.append(getSingleTrafficSignalQuery(id));
         }
         builder.append("</osm-script>");
         return builder.toString();
@@ -440,7 +442,7 @@ public class MapAccessManager {
         StringBuilder builder = new StringBuilder();
         builder.append("<osm-script>");
         for (long id : osmWayIds) {
-            builder.append(MapAccessManager.getSingleWayAndItsNodesQuery(id));
+            builder.append(getSingleWayAndItsNodesQuery(id));
         }
         builder.append("</osm-script>");
         return builder.toString();
@@ -515,10 +517,10 @@ public class MapAccessManager {
      */
     public static List<OSMNode> traverseDatabase(double lat, double lon, double vicinityRange) throws IOException, SAXException, ParserConfigurationException {
         //Authenticator.setDefault(new java.net.CustomAuthenticator());
-        List<OSMNode> osmNodesInVicinity = MapAccessManager.getOSMNodesInVicinity(lat, lon, vicinityRange);
-        MapAccessManager.logger.info("Traffic lights:");
+        List<OSMNode> osmNodesInVicinity = getOSMNodesInVicinity(lat, lon, vicinityRange);
+        logger.info("Traffic lights:");
         for (OSMNode osmNode : osmNodesInVicinity) {
-            MapAccessManager.logger.info(osmNode.getId() + ":" + osmNode.getLat() + ":" + osmNode.getLon());
+            logger.info(osmNode.getId() + ":" + osmNode.getLat() + ":" + osmNode.getLon());
         }
         return osmNodesInVicinity;
     }
@@ -535,31 +537,31 @@ public class MapAccessManager {
         double midLat = (p1.lat - p2.lat) / 2.0;
         double midLon = (p1.lon - p2.lon) / 2.0;
         double vicinityRange = Math.max(p1.lat - p2.lat, p1.lon - p2.lon);
-        return MapAccessManager.traverseDatabase(midLat, midLon, vicinityRange);
+        return traverseDatabase(midLat, midLon, vicinityRange);
     }
 
     public static void prepareLightManagersInRadiusAndLightIdToLightManagerIdHashSet(MainContainerAgent smartCityAgent, GeoPosition middlePoint, int radius) {
-        Document xmlDocument = MapAccessManager.getXmlDocument(MapAccessManager.CROSSROADS);
+        Document xmlDocument = getXmlDocument(CROSSROADS);
         Node osmRoot = xmlDocument.getFirstChild();
         NodeList districtXMLNodes = osmRoot.getChildNodes();
         for (int i = 0; i < districtXMLNodes.getLength(); i++) {
             if (districtXMLNodes.item(i).getNodeName().equals("district")) {
-                MapAccessManager.addAllDesiredIdsInDistrict(smartCityAgent, districtXMLNodes.item(i), middlePoint, radius);
+                addAllDesiredIdsInDistrict(smartCityAgent, districtXMLNodes.item(i), middlePoint, radius);
             }
         }
     }
 
     public static void prepareLightManagersInRadiusAndLightIdToLightManagerIdHashSetBeta(MainContainerAgent smartCityAgent,
                                                                                          GeoPosition middlePoint, int radius) throws IOException, ParserConfigurationException, SAXException {
-        List<OSMNode> lightsAround = MapAccessManager.sendLightsAroundOverpassQueryBeta(radius, middlePoint.getLatitude(), middlePoint.getLongitude());
-        List<OSMNode> lightNodeList = MapAccessManager.sendParentWaysOfLightOverpassQueryBeta(lightsAround);
-        List<OSMNode> lightsOfTypeA = MapAccessManager.filterByTypeA(lightNodeList);
+        List<OSMNode> lightsAround = sendLightsAroundOverpassQueryBeta(radius, middlePoint.getLatitude(), middlePoint.getLongitude());
+        List<OSMNode> lightNodeList = sendParentWaysOfLightOverpassQueryBeta(lightsAround);
+        List<OSMNode> lightsOfTypeA = filterByTypeA(lightNodeList);
         //fillChildNodesOfWays(lightsOfTypeA);
-        MapAccessManager.prepareLightManagers(lightsOfTypeA);
+        prepareLightManagers(lightsOfTypeA);
     }
 
     private static List<OSMNode> sendLightsAroundOverpassQueryBeta(int radius, double middleLat, double middleLon) throws IOException, ParserConfigurationException, SAXException {
-        List<OSMNode> lightNodes = MapAccessManager.getNodes(MapAccessManager.getNodesViaOverpass(MapAccessManager.getLightsAroundOverpassQueryBeta(radius, middleLat, middleLon)));
+        List<OSMNode> lightNodes = getNodes(getNodesViaOverpass(getLightsAroundOverpassQueryBeta(radius, middleLat, middleLon)));
         return lightNodes;
     }
 
@@ -575,7 +577,7 @@ public class MapAccessManager {
 
     private static List<OSMNode> sendParentWaysOfLightOverpassQueryBeta(final List<OSMNode> lightsAround)
             throws IOException, ParserConfigurationException, SAXException {
-        final List<OSMNode> lightInfoList = MapAccessManager.parseLightNodeList(MapAccessManager.getNodesViaOverpass(MapAccessManager.getParentWaysOfLightOverpassQueryBeta(lightsAround)));
+        final List<OSMNode> lightInfoList = parseLightNodeList(getNodesViaOverpass(getParentWaysOfLightOverpassQueryBeta(lightsAround)));
         return lightInfoList;
     }
 
@@ -583,7 +585,7 @@ public class MapAccessManager {
         StringBuilder builder = new StringBuilder();
         builder.append("<osm-script>");
         for (final OSMNode light : lightsAround) {
-            builder.append(MapAccessManager.getSingleParentWaysOfLightOverpassQueryBeta(light.getId()));
+            builder.append(getSingleParentWaysOfLightOverpassQueryBeta(light.getId()));
         }
         builder.append("</osm-script>");
         return builder.toString();
@@ -603,7 +605,7 @@ public class MapAccessManager {
         Node osmRoot = nodesViaOverpass.getFirstChild();
         NodeList osmXMLNodes = osmRoot.getChildNodes();
         for (int i = 1; i < osmXMLNodes.getLength(); i++) {
-            MapAccessManager.parseLightNode(lightNodeList, osmXMLNodes.item(i));
+            parseLightNode(lightNodeList, osmXMLNodes.item(i));
         }
         return lightNodeList;
     }
@@ -631,14 +633,14 @@ public class MapAccessManager {
 
     private static void fillChildNodesOfWays(final List<OSMNode> lightsOfTypeA)
             throws IOException, ParserConfigurationException, SAXException {
-        MapAccessManager.parseChildNodesOfWays(MapAccessManager.getNodesViaOverpass(MapAccessManager.getChildNodesOfWaysOverpassQueryBeta(lightsOfTypeA)), lightsOfTypeA);
+        parseChildNodesOfWays(getNodesViaOverpass(getChildNodesOfWaysOverpassQueryBeta(lightsOfTypeA)), lightsOfTypeA);
     }
 
     private static String getChildNodesOfWaysOverpassQueryBeta(final List<OSMNode> lightsOfTypeA) {
         StringBuilder builder = new StringBuilder();
         builder.append("<osm-script>");
         for (int i = 0; i < lightsOfTypeA.size(); ++i) {
-            builder.append(MapAccessManager.getSingleChildNodesOfWaysOverpassQueryBeta(lightsOfTypeA.get(i).getParentWayIds()));
+            builder.append(getSingleChildNodesOfWaysOverpassQueryBeta(lightsOfTypeA.get(i).getParentWayIds()));
         }
         builder.append("</osm-script>");
         return builder.toString();
@@ -647,14 +649,14 @@ public class MapAccessManager {
     private static String getSingleChildNodesOfWaysOverpassQueryBeta(final List<Long> parentWayIds) {
         StringBuilder builder = new StringBuilder();
         for (int i = 0; i < parentWayIds.size(); ++i) {
-            builder.append(MapAccessManager.getSingleChildNodesOfSingleWayOverpassQueryBeta(parentWayIds.get(i)));
+            builder.append(getSingleChildNodesOfSingleWayOverpassQueryBeta(parentWayIds.get(i)));
         }
-        builder.append(MapAccessManager.getSingleWayDelimiterOverpassQueryBeta());
+        builder.append(getSingleWayDelimiterOverpassQueryBeta());
         return builder.toString();
     }
 
     private static Object getSingleWayDelimiterOverpassQueryBeta() {
-        return "<id-query type=\"way\" ref=\"" + MapAccessManager.DELIMITER_WAY + "\"/>\r\n" +
+        return "<id-query type=\"way\" ref=\"" + DELIMITER_WAY + "\"/>\r\n" +
                 "  <print e=\"\" from=\"_\" geometry=\"skeleton\" ids=\"yes\" limit=\"\" mode=\"ids_only\" n=\"\" order=\"id\" s=\"\" w=\"\"/>\r\n";
     }
 
@@ -662,7 +664,7 @@ public class MapAccessManager {
         return "<id-query type=\"way\" ref=\"" + osmWayId + "\" into=\"crossroadEntrance\"/>\r\n" +
                 "  <union into=\"_\">\r\n" +
                 "    <recurse from=\"crossroadEntrance\" type=\"way-node\"/>\r\n" +
-                "    <id-query type=\"relation\" ref=\"" + MapAccessManager.DELIMITER_RELATION + "\"/>\r\n" +
+                "    <id-query type=\"relation\" ref=\"" + DELIMITER_RELATION + "\"/>\r\n" +
                 "  </union>\r\n" +
                 "  <print e=\"\" from=\"_\" geometry=\"skeleton\" ids=\"yes\" limit=\"\" mode=\"ids_only\" n=\"\" order=\"id\" s=\"\" w=\"\"/>";
     }
@@ -700,33 +702,33 @@ public class MapAccessManager {
         NodeList crossroadXMLNodes = crossroadsRoot.getChildNodes();
         for (int i = 0; i < crossroadXMLNodes.getLength(); ++i) {
             if (crossroadXMLNodes.item(i).getNodeName().equals("crossroad")) {
-                MapAccessManager.addCrossroadIdIfDesired(smartCityAgent, crossroadXMLNodes.item(i), middlePoint, radius);
+                addCrossroadIdIfDesired(smartCityAgent, crossroadXMLNodes.item(i), middlePoint, radius);
             }
         }
     }
 
     private static void addCrossroadIdIfDesired(MainContainerAgent smartCityAgent, Node crossroad, GeoPosition middlePoint, int radius) {
-        Pair<Double, Double> crossroadLatLon = MapAccessManager.calculateLatLonBasedOnInternalLights(crossroad);
+        Pair<Double, Double> crossroadLatLon = calculateLatLonBasedOnInternalLights(crossroad);
 
-        if (MapAccessManager.belongsToCircle(crossroadLatLon.getValue0(), crossroadLatLon.getValue1(), middlePoint, radius)) {
+        if (belongsToCircle(crossroadLatLon.getValue0(), crossroadLatLon.getValue1(), middlePoint, radius)) {
             MainContainerAgent.tryAddNewLightManagerAgent(crossroad);
         }
     }
 
     private static Pair<Double, Double> calculateLatLonBasedOnInternalLights(Node crossroad) {
-        List<Double> latList = MapAccessManager.getParametersFromGroup(MapAccessManager.getCrossroadGroup(crossroad, 1),
-                MapAccessManager.getCrossroadGroup(crossroad, 3), MapAccessManager.LAT);
-        List<Double> lonList = MapAccessManager.getParametersFromGroup(MapAccessManager.getCrossroadGroup(crossroad, 1),
-                MapAccessManager.getCrossroadGroup(crossroad, 3), MapAccessManager.LON);
-        double latAverage = MapAccessManager.calculateAverage(latList);
-        double lonAverage = MapAccessManager.calculateAverage(lonList);
+        List<Double> latList = getParametersFromGroup(getCrossroadGroup(crossroad, 1),
+                getCrossroadGroup(crossroad, 3), LAT);
+        List<Double> lonList = getParametersFromGroup(getCrossroadGroup(crossroad, 1),
+                getCrossroadGroup(crossroad, 3), LON);
+        double latAverage = calculateAverage(latList);
+        double lonAverage = calculateAverage(lonList);
         return Pair.with(latAverage, lonAverage);
     }
 
     private static List<Double> getParametersFromGroup(Node group1, Node group2, String parameterName) {
         List<Double> parameterList = new ArrayList<>();
-        MapAccessManager.addLightParametersFromGroup(parameterList, group1, parameterName);
-        MapAccessManager.addLightParametersFromGroup(parameterList, group2, parameterName);
+        addLightParametersFromGroup(parameterList, group1, parameterName);
+        addLightParametersFromGroup(parameterList, group2, parameterName);
         return parameterList;
     }
 
@@ -764,18 +766,18 @@ public class MapAccessManager {
             DocumentBuilder docBuilder = dbfac.newDocumentBuilder();
             document = docBuilder.parse(new File(filepath));
         } catch (SAXException e) {
-            e.printStackTrace();
+            logger.warn("Error parsing xml.", e);
         } catch (IOException e) {
-            e.printStackTrace();
+            logger.warn("Error accessing file.", e);
         } catch (ParserConfigurationException e) {
-            e.printStackTrace();
-        } finally {
+            logger.warn("Wrong parser configuration.", e);
         }
+
         return document;
     }
 
     public static Set<OSMStation> getStations(GeoPosition middlePoint, int radius) {
-        List<OSMStation> stationNodes = MapAccessManager.sendStationOverpassQuery(MapAccessManager.getStationsInRadiusQuery(middlePoint, radius));
+        List<OSMStation> stationNodes = sendStationOverpassQuery(getStationsInRadiusQuery(middlePoint, radius));
         return new LinkedHashSet<>(stationNodes);
     }
 
@@ -806,13 +808,13 @@ public class MapAccessManager {
     }
 
     public static Set<BusInfo> getBusInfo(int radius, double middleLat, double middleLon) {
-        MapAccessManager.logger.info("STEP 2/" + MainContainerAgent.STEPS + ": Sending bus overpass query");
-        Set<BusInfo> infoSet = MapAccessManager.sendBusOverpassQuery(radius, middleLat, middleLon);
-        MapAccessManager.logger.info("STEP 4/" + MainContainerAgent.STEPS + ": Starting warzawskie query and parsing");
+        logger.info("STEP 2/" + MainContainerAgent.STEPS + ": Sending bus overpass query");
+        Set<BusInfo> infoSet = sendBusOverpassQuery(radius, middleLat, middleLon);
+        logger.info("STEP 4/" + MainContainerAgent.STEPS + ": Starting warszawskie query and parsing");
         int i = 0;
         for (BusInfo info : infoSet) {
-            MapAccessManager.logger.info("STEP 4/" + MainContainerAgent.STEPS + " (SUBSTEP " + (++i) + "/" + infoSet.size() + "): Warszawskie query sending & parsing substep");
-            MapAccessManager.sendBusWarszawskieQuery(info);
+            logger.info("STEP 4/" + MainContainerAgent.STEPS + " (SUBSTEP " + (++i) + "/" + infoSet.size() + "): Warszawskie query sending & parsing substep");
+            sendBusWarszawskieQuery(info);
         }
         return infoSet;
     }
@@ -820,16 +822,18 @@ public class MapAccessManager {
     private static Set<BusInfo> sendBusOverpassQuery(int radius, double middleLat, double middleLon) {
         Set<BusInfo> infoSet = null;
         try {
-            infoSet = MapAccessManager.parseBusInfo(MapAccessManager.getNodesViaOverpass(MapAccessManager.getBusOverpassQuery(radius, middleLat, middleLon)), radius, middleLat, middleLon);
+            var overpassQuery = getBusOverpassQuery(radius, middleLat, middleLon);
+            var overpassInfo = getNodesViaOverpass(overpassQuery);
+            infoSet = parseBusInfo(overpassInfo, radius, middleLat, middleLon);
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.warn("Error getting bus info.", e);
         }
 
         return infoSet;
     }
 
     private static Set<BusInfo> parseBusInfo(Document nodesViaOverpass, int radius, double middleLat, double middleLon) {
-        MapAccessManager.logger.info("STEP 3/" + MainContainerAgent.STEPS + ": Starting overpass bus info parsing");
+        logger.info("STEP 3/" + MainContainerAgent.STEPS + ": Starting overpass bus info parsing");
         Set<BusInfo> infoSet = new LinkedHashSet<>();
         Node osmRoot = nodesViaOverpass.getFirstChild();
         NodeList osmXMLNodes = osmRoot.getChildNodes();
@@ -849,7 +853,7 @@ public class MapAccessManager {
                             info.addStation(namedItemID.getNodeValue());
                         }
                         else if (attributes.getNamedItem("role").getNodeValue().length() == 0 && attributes.getNamedItem("type").getNodeValue().equals("way")) {
-                            MapAccessManager.appendSingleBusWayOverpassQuery(builder, Long.parseLong(namedItemID.getNodeValue()));
+                            appendSingleBusWayOverpassQuery(builder, Long.parseLong(namedItemID.getNodeValue()));
                         }
                     }
                     else if (member.getNodeName().equals("tag")) {
@@ -862,9 +866,11 @@ public class MapAccessManager {
                     }
                 }
                 try {
-                    info.setRoute(MapAccessManager.parseOsmWay(MapAccessManager.getNodesViaOverpass(MapAccessManager.getBusWayOverpassQueryWithPayload(builder)), radius, middleLat, middleLon));
+                    var overpassNodes = getNodesViaOverpass(getBusWayOverpassQueryWithPayload(builder));
+                    var osmWay = parseOsmWay(overpassNodes, radius, middleLat, middleLon);
+                    info.setRoute(osmWay);
                 } catch (Exception e) {
-                    e.printStackTrace();
+                    logger.warn("Error setting osm way", e);
                 }
             }
             if (item.getNodeName().equals("node")) {
@@ -874,7 +880,7 @@ public class MapAccessManager {
                 String lat = attributes.getNamedItem("lat").getNodeValue();
                 String lon = attributes.getNamedItem("lon").getNodeValue();
 
-                if (MapAccessManager.belongsToCircle(Double.parseDouble(lat), Double.parseDouble(lon), new GeoPosition(middleLat, middleLon), radius) &&
+                if (belongsToCircle(Double.parseDouble(lat), Double.parseDouble(lon), new GeoPosition(middleLat, middleLon), radius) &&
                         !MainContainerAgent.osmIdToStationOSMNode.containsKey(Long.parseLong(osmId))) {
                     NodeList list_tags = item.getChildNodes();
                     for (int z = 0; z < list_tags.getLength(); z++) {
@@ -911,7 +917,7 @@ public class MapAccessManager {
         List<OSMWay> route = new ArrayList<>();
         Node osmRoot = nodesViaOverpass.getFirstChild();
         NodeList osmXMLNodes = osmRoot.getChildNodes();
-        Pair<OSMWay, String> wayAdjacentNodeRef = MapAccessManager.determineInitialWayRelOrientation(osmXMLNodes);
+        Pair<OSMWay, String> wayAdjacentNodeRef = determineInitialWayRelOrientation(osmXMLNodes);
         String adjacentNodeRef = wayAdjacentNodeRef.getValue1();
         boolean isFirst = true;
         for (int i = 1; i < osmXMLNodes.getLength(); i++) {
@@ -977,9 +983,9 @@ public class MapAccessManager {
         Map<String, BrigadeInfo> brigadeNrToBrigadeInfo = new HashMap<>();
         for (OSMStation station : info.getStations()) {
             try {
-                MapAccessManager.parseBusInfo(brigadeNrToBrigadeInfo, station, MapAccessManager.getNodesViaWarszawskie(MapAccessManager.getBusWarszawskieQuery(station.getBusStopId(), station.getBusStopNr(), info.getBusLine())));
-            } catch (NullPointerException gowno) {
-                gowno.printStackTrace();
+                parseBusInfo(brigadeNrToBrigadeInfo, station, getNodesViaWarszawskie(getBusWarszawskieQuery(station.getBusStopId(), station.getBusStopNr(), info.getBusLine())));
+            } catch (NullPointerException e) {
+                logger.warn("You shall not pass! (Null.", e);
             }
         }
         info.setBrigadeList(brigadeNrToBrigadeInfo.values());

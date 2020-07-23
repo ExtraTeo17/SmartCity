@@ -132,7 +132,7 @@ public class WindowInitializer {
                     NS = Router.generateRouteInfo(N, S);
 
                     for (int i = 0; i < 5; i++) {
-                        smartCityAgent.addNewVehicleAgent(NS);
+                        smartCityAgent.tryAddNewVehicleAgent(NS);
                     }
                 } catch (Exception ex) {
                     ex.printStackTrace();
@@ -145,7 +145,7 @@ public class WindowInitializer {
                     SN = Router.generateRouteInfo(S, N);
 
                     for (int i = 0; i < 5; i++) {
-                        smartCityAgent.addNewVehicleAgent(SN);
+                        smartCityAgent.tryAddNewVehicleAgent(SN);
                     }
                 } catch (Exception ex) {
                     ex.printStackTrace();
@@ -158,7 +158,7 @@ public class WindowInitializer {
                     EW = Router.generateRouteInfo(E, W);
 
                     for (int i = 0; i < 5; i++) {
-                        smartCityAgent.addNewVehicleAgent(EW);
+                        smartCityAgent.tryAddNewVehicleAgent(EW);
                     }
                 } catch (Exception ex) {
                     ex.printStackTrace();
@@ -170,7 +170,7 @@ public class WindowInitializer {
                 try {
                     WE = Router.generateRouteInfo(W, E);
                     for (int i = 0; i < 5; i++) {
-                        smartCityAgent.addNewVehicleAgent(WE);
+                        smartCityAgent.tryAddNewVehicleAgent(WE);
                     }
                 } catch (Exception ex) {
                     ex.printStackTrace();

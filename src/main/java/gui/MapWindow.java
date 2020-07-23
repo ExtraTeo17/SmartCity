@@ -4,7 +4,6 @@ import agents.BusAgent;
 import agents.LightManager;
 import agents.PedestrianAgent;
 import agents.VehicleAgent;
-import jade.wrapper.StaleProxyException;
 import org.javatuples.Pair;
 import org.jxmapviewer.JXMapViewer;
 import org.jxmapviewer.OSMTileFactoryInfo;
@@ -23,7 +22,10 @@ import smartcity.MainContainerAgent;
 import smartcity.RoutePainter;
 import smartcity.ZonePainter;
 import smartcity.lights.Crossroad;
-import vehicles.*;
+import vehicles.Bus;
+import vehicles.Pedestrian;
+import vehicles.TestCar;
+import vehicles.TestPedestrian;
 
 import javax.swing.*;
 import javax.swing.border.TitledBorder;
@@ -188,7 +190,7 @@ public class MapWindow {
                         }
                         else {
                             pointB = geoPosition;
-                            var vehicle = smartCityAgent.addNewVehicleAgent(Router.generateRouteInfo(pointA, pointB));
+                            var vehicle = smartCityAgent.tryAddNewVehicleAgent(Router.generateRouteInfo(pointA, pointB));
                             vehicle.start();
 
                             logger.info("Vehicles: " + MainContainerAgent.Vehicles.size());
@@ -841,10 +843,10 @@ public class MapWindow {
 
             VehicleAgent vehicle;
             if (getTestCarId() == smartCityAgent.carId) {
-                vehicle = smartCityAgent.addNewVehicleAgent(info, true);
+                vehicle = smartCityAgent.tryAddNewVehicleAgent(info, true);
             }
             else {
-                vehicle = smartCityAgent.addNewVehicleAgent(info);
+                vehicle = smartCityAgent.tryAddNewVehicleAgent(info);
             }
 
             vehicle.start();
@@ -895,8 +897,9 @@ public class MapWindow {
 
         private BusAgent getRandomBusAgent() {
             final List<BusAgent> busArray = new ArrayList<>(MainContainerAgent.buses); // TODO RETHINK!!!
+            BusAgent bus;
             try {
-                return busArray.get(random.nextInt(busArray.size()));
+                bus = busArray.get(random.nextInt(busArray.size()));
             } catch (Exception e) {
                 try {
                     throw new Exception("The 'shouldPrepareBuses' toggle in smartCityAgent is probably switched off (pedestrians cannot exist without buses)");
@@ -905,6 +908,8 @@ public class MapWindow {
                     return null;
                 }
             }
+
+            return bus;
         }
     }
 }
