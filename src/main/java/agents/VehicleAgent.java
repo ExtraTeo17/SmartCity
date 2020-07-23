@@ -7,47 +7,42 @@ import jade.core.behaviours.CyclicBehaviour;
 import jade.core.behaviours.TickerBehaviour;
 import jade.lang.acl.ACLMessage;
 import jade.util.leap.Properties;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import routing.LightManagerNode;
-import smartcity.MainContainerAgent;
 import vehicles.DrivingState;
 import vehicles.MovingObject;
 
-import java.time.Instant;
-
 @SuppressWarnings("serial")
 public class VehicleAgent extends AbstractAgent {
-    private MovingObject Vehicle;
+    private MovingObject vehicle;
 
-    public VehicleAgent(int id){
+    public VehicleAgent(int id) {
         super(id);
     }
 
     @Override
     public String getNamePrefix() {
-        return Vehicle.getVehicleType();
+        return vehicle.getVehicleType();
     }
 
     @Override
     protected void setup() {
-        GetNextStop();
-        Vehicle.setState(DrivingState.MOVING);
+        findNextStop(vehicle);
+        vehicle.setState(DrivingState.MOVING);
 
-        int speed = Vehicle.getSpeed();
+        int speed = vehicle.getSpeed();
         Behaviour move = new TickerBehaviour(this, 3600 / speed) {
             @Override
             public void onTick() {
-                if (Vehicle.isAtTrafficLights()) {
-                    switch (Vehicle.getState()) {
+                if (vehicle.isAtTrafficLights()) {
+                    switch (vehicle.getState()) {
                         case MOVING:
-                            Vehicle.setState(DrivingState.WAITING_AT_LIGHT);
-                            LightManagerNode light = Vehicle.getCurrentTrafficLightNode();
+                            vehicle.setState(DrivingState.WAITING_AT_LIGHT);
+                            LightManagerNode light = vehicle.getCurrentTrafficLightNode();
                             ACLMessage msg = new ACLMessage(ACLMessage.REQUEST_WHEN);
                             msg.addReceiver(new AID("LightManager" + light.getLightManagerId(), AID.ISLOCALNAME));
                             Properties properties = new Properties();
                             properties.setProperty(MessageParameter.TYPE, MessageParameter.VEHICLE);
-                            properties.setProperty(MessageParameter.ADJACENT_OSM_WAY_ID, Long.toString(Vehicle.getAdjacentOsmWayId()));
+                            properties.setProperty(MessageParameter.ADJACENT_OSM_WAY_ID, Long.toString(vehicle.getAdjacentOsmWayId()));
                             msg.setAllUserDefinedParameters(properties);
                             send(msg);
                             print("Asking LightManager" + light.getLightManagerId() + " for right to passage.");
@@ -57,13 +52,13 @@ public class VehicleAgent extends AbstractAgent {
                             break;
                         case PASSING_LIGHT:
                             print("Passing");
-                            Vehicle.Move();
-                            Vehicle.setState(DrivingState.MOVING);
+                            vehicle.Move();
+                            vehicle.setState(DrivingState.MOVING);
                             break;
                     }
                 }
-                else if (Vehicle.isAtDestination()) {
-                    Vehicle.setState(DrivingState.AT_DESTINATION);
+                else if (vehicle.isAtDestination()) {
+                    vehicle.setState(DrivingState.AT_DESTINATION);
                     print("Reached destination.");
 
                     ACLMessage msg = new ACLMessage(ACLMessage.INFORM);
@@ -76,7 +71,7 @@ public class VehicleAgent extends AbstractAgent {
                     doDelete();
                 }
                 else {
-                    Vehicle.Move();
+                    vehicle.Move();
                 }
             }
         };
@@ -87,22 +82,18 @@ public class VehicleAgent extends AbstractAgent {
                 ACLMessage rcv = receive();
                 if (rcv != null) {
                     switch (rcv.getPerformative()) {
-                        case ACLMessage.REQUEST:
+                        case ACLMessage.REQUEST -> {
                             ACLMessage response = new ACLMessage(ACLMessage.AGREE);
                             response.addReceiver(rcv.getSender());
                             Properties properties = new Properties();
-
                             properties.setProperty(MessageParameter.TYPE, MessageParameter.VEHICLE);
-                            properties.setProperty(MessageParameter.ADJACENT_OSM_WAY_ID, Long.toString(Vehicle.getAdjacentOsmWayId()));
+                            properties.setProperty(MessageParameter.ADJACENT_OSM_WAY_ID, Long.toString(vehicle.getAdjacentOsmWayId()));
                             response.setAllUserDefinedParameters(properties);
                             send(response);
-
-                            GetNextStop();
-                            Vehicle.setState(DrivingState.PASSING_LIGHT);
-                            break;
-                        case ACLMessage.AGREE:
-                            Vehicle.setState(DrivingState.WAITING_AT_LIGHT);
-                            break;
+                            findNextStop(vehicle);
+                            vehicle.setState(DrivingState.PASSING_LIGHT);
+                        }
+                        case ACLMessage.AGREE -> vehicle.setState(DrivingState.WAITING_AT_LIGHT);
                     }
                 }
                 block(100);
@@ -113,33 +104,12 @@ public class VehicleAgent extends AbstractAgent {
         addBehaviour(communication);
     }
 
-    void GetNextStop() {
-        // finds next traffic light and announces his arrival
-        LightManagerNode nextManager = Vehicle.findNextTrafficLight();
-
-        if (nextManager != null) {
-
-            AID dest = new AID("LightManager" + nextManager.getLightManagerId(), AID.ISLOCALNAME);
-            ACLMessage msg = new ACLMessage(ACLMessage.INFORM);
-            msg.addReceiver(dest);
-            Properties properties = new Properties();
-            Instant time = MainContainerAgent.getSimulationTime().toInstant().plusMillis(Vehicle.getMillisecondsToNextLight());
-            properties.setProperty(MessageParameter.TYPE, MessageParameter.VEHICLE);
-            properties.setProperty(MessageParameter.ARRIVAL_TIME, "" + time);
-            properties.setProperty(MessageParameter.ADJACENT_OSM_WAY_ID, "" + nextManager.getOsmWayId());
-            msg.setAllUserDefinedParameters(properties);
-
-            send(msg);
-            print("Sending INFORM to LightManager" + nextManager.getLightManagerId() + ".");
-        }
-    }
-
     public MovingObject getVehicle() {
-        return Vehicle;
+        return vehicle;
     }
 
     public void setVehicle(MovingObject v) {
-        Vehicle = v;
+        vehicle = v;
     }
 
     @Override

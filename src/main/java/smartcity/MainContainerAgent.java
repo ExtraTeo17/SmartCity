@@ -77,7 +77,8 @@ public class MainContainerAgent extends Agent {
             public void action() {
                 ACLMessage rcv = receive();
                 if (rcv != null) {
-                    logger.info("SmartCity: " + rcv.getSender().getLocalName() + " arrived at destination."); // TODO: Does it work?? (can't see it in the logs)
+                    // TODO: Does it work?? (can't see it in the logs)
+                    logger.info("SmartCity: " + rcv.getSender().getLocalName() + " arrived at destination.");
                     String type = rcv.getUserDefinedParameter(MessageParameter.TYPE);
                     switch (type) {
                         case MessageParameter.VEHICLE -> onReceiveVehicle(rcv);

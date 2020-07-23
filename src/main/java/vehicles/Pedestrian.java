@@ -60,7 +60,7 @@ public class Pedestrian extends MovingObject { // TODO: Remember to create a ded
 
     @Override
     public String getVehicleType() {
-        return "Pedestrian";
+        return VehicleType.PEDESTRIAN.toString();
     }
 
     @Override

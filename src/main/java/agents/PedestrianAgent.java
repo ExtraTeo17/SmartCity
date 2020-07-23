@@ -79,7 +79,7 @@ public class PedestrianAgent extends AbstractAgent {
                             properties.setProperty(MessageParameter.ARRIVAL_TIME, "" + MainContainerAgent.getSimulationTime().toInstant());
                             msg.setAllUserDefinedParameters(properties);
                             send(msg);
-                            PedestrianAgent.logger.info("Pedestrian: Send REQUEST_WHEN to Station");
+                            logger.info("Pedestrian: Send REQUEST_WHEN to Station");
 
                             pedestrian.setState(DrivingState.WAITING_AT_STATION);
                             break;
@@ -136,7 +136,7 @@ public class PedestrianAgent extends AbstractAgent {
                                     response.setAllUserDefinedParameters(properties);
                                     send(response);
                                     if (pedestrian.findNextStop() instanceof LightManagerNode) {
-                                        GetNextLight();
+                                        findNextStop(pedestrian);
                                     }
                                     pedestrian.setState(DrivingState.PASSING_LIGHT);
                                 }
@@ -186,7 +186,7 @@ public class PedestrianAgent extends AbstractAgent {
                                 pedestrian.Move();
                                 pedestrian.setState(DrivingState.PASSING_STATION);
 
-                                GetNextLight();
+                                findNextStop(pedestrian);
 
                                 break;
                         }
@@ -204,7 +204,7 @@ public class PedestrianAgent extends AbstractAgent {
         StationNode nextStation = pedestrian.findNextStation();
         pedestrian.setState(DrivingState.MOVING);
         if (nextStation != null) {
-            PedestrianAgent.logger.info("Pedestrian: send INFORM to station");
+            logger.info("Pedestrian: send INFORM to station");
             AID dest = new AID("Station" + nextStation.getStationId(), AID.ISLOCALNAME);
             ACLMessage msg = new ACLMessage(ACLMessage.INFORM);
             msg.addReceiver(dest);
@@ -217,28 +217,7 @@ public class PedestrianAgent extends AbstractAgent {
             msg.setAllUserDefinedParameters(properties);
 
             send(msg);
-            PedestrianAgent.logger.info("Pedestrian: Send Inform to Station");
-        }
-    }
-
-    void GetNextLight() {
-        // finds next traffic light and announces his arrival
-        LightManagerNode nextManager = pedestrian.findNextTrafficLight();
-
-        if (nextManager != null) {
-
-            AID dest = new AID("LightManager" + nextManager.getLightManagerId(), AID.ISLOCALNAME);
-            ACLMessage msg = new ACLMessage(ACLMessage.INFORM);
-            msg.addReceiver(dest);
-            Properties properties = new Properties();
-            Instant time = MainContainerAgent.getSimulationTime().toInstant().plusMillis(pedestrian.getMillisecondsToNextLight());
-            properties.setProperty(MessageParameter.TYPE, MessageParameter.PEDESTRIAN);
-            properties.setProperty(MessageParameter.ARRIVAL_TIME, "" + time);
-            properties.setProperty(MessageParameter.ADJACENT_OSM_WAY_ID, "" + nextManager.getOsmWayId());
-            msg.setAllUserDefinedParameters(properties);
-
-            send(msg);
-            Print("Sending INFORM to LightManager" + nextManager.getLightManagerId() + ".");
+            logger.info("Pedestrian: Send Inform to Station");
         }
     }
 
@@ -247,6 +226,6 @@ public class PedestrianAgent extends AbstractAgent {
     }
 
     void Print(String message) {
-        PedestrianAgent.logger.info(getLocalName() + ": " + message);
+        logger.info(getLocalName() + ": " + message);
     }
 }

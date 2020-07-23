@@ -49,7 +49,7 @@ public class BusAgent extends AbstractAgent {
     protected void setup() {
         GetNextStation();
         StationNode station = bus.getCurrentStationNode();
-        Print("Started at station " + station.getStationId() + ".");
+        print("Started at station " + station.getStationId() + ".");
         bus.setState(DrivingState.MOVING);
 
         Behaviour move = new TickerBehaviour(this, 3600 / bus.getSpeed()) {
@@ -67,14 +67,14 @@ public class BusAgent extends AbstractAgent {
                             msg.setAllUserDefinedParameters(properties);
                             send(msg);
                             bus.setState(DrivingState.WAITING_AT_LIGHT);
-                            Print("Asking LightManager" + light.getLightManagerId() + " for right to passage.");
+                            print("Asking LightManager" + light.getLightManagerId() + " for right to passage.");
 
                             break;
                         case WAITING_AT_LIGHT:
 
                             break;
                         case PASSING_LIGHT:
-                            Print("Passing the light.");
+                            print("Passing the light.");
                             bus.Move();
                             bus.setState(DrivingState.MOVING);
                             break;
@@ -82,7 +82,7 @@ public class BusAgent extends AbstractAgent {
                 }
                 else if (bus.isAtDestination()) {
                     bus.setState(DrivingState.AT_DESTINATION);
-                    Print("Reached destination.");
+                    print("Reached destination.");
 
                     ACLMessage msg = new ACLMessage(ACLMessage.INFORM);
                     msg.addReceiver(new AID("SmartCityAgent", AID.ISLOCALNAME));
@@ -121,11 +121,11 @@ public class BusAgent extends AbstractAgent {
                             properties.setProperty(MessageParameter.TYPE, MessageParameter.BUS);
                             properties.setProperty(MessageParameter.SCHEDULE_ARRIVAL, "" + bus.getTimeOnStation(station.getOsmStationId()).toInstant());
                             properties.setProperty(MessageParameter.ARRIVAL_TIME, "" + MainContainerAgent.getSimulationTime().toInstant());
-                            BusAgent.logger.info("BUS: send REQUEST_WHEN to station");
+                            logger.info("BUS: send REQUEST_WHEN to station");
                             msg.setAllUserDefinedParameters(properties);
                             send(msg);
 
-                            Print("Arrived at station " + station.getStationId() + ".");
+                            print("Arrived at station " + station.getStationId() + ".");
                             bus.setState(DrivingState.WAITING_AT_STATION);
                             break;
                         case WAITING_AT_STATION:
@@ -137,7 +137,7 @@ public class BusAgent extends AbstractAgent {
                         case PASSING_STATION:
                             RouteNode node = bus.findNextStop();
                             if (node instanceof LightManagerNode) {
-                                GetNextLight();
+                                findNextStop(bus);
                             }
                             GetNextStation();
 
@@ -169,9 +169,9 @@ public class BusAgent extends AbstractAgent {
                 ACLMessage rcv = receive();
                 if (rcv != null) {
                     String type = rcv.getUserDefinedParameter(MessageParameter.TYPE);
-                    if (type == MessageParameter.LIGHT) {
-                        switch (rcv.getPerformative()) {
-                            case ACLMessage.REQUEST:
+                    switch (type) {
+                        case MessageParameter.LIGHT:
+                            if (rcv.getPerformative() == ACLMessage.REQUEST) {
                                 if (bus.getState() == DrivingState.WAITING_AT_LIGHT) {
                                     ACLMessage response = new ACLMessage(ACLMessage.AGREE);
                                     response.addReceiver(rcv.getSender());
@@ -182,16 +182,14 @@ public class BusAgent extends AbstractAgent {
                                     response.setAllUserDefinedParameters(properties);
                                     send(response);
                                     if (bus.findNextStop() instanceof LightManagerNode) {
-                                        GetNextLight();
+                                        findNextStop(bus);
                                     }
                                     bus.setState(DrivingState.PASSING_LIGHT);
                                 }
-                                break;
-                        }
-                    }
-                    else if (type == MessageParameter.STATION) {
-                        switch (rcv.getPerformative()) {
-                            case ACLMessage.REQUEST:
+                            }
+                            break;
+                        case MessageParameter.STATION:
+                            if (rcv.getPerformative() == ACLMessage.REQUEST) {
                                 if (bus.getState() == DrivingState.WAITING_AT_STATION) {
                                     ACLMessage response = new ACLMessage(ACLMessage.AGREE);
                                     response.addReceiver(rcv.getSender());
@@ -200,39 +198,38 @@ public class BusAgent extends AbstractAgent {
                                     properties.setProperty(MessageParameter.TYPE, MessageParameter.BUS);
                                     response.setAllUserDefinedParameters(properties);
                                     send(response);
-                                    BusAgent.logger.info("BUS: get REQUEST from station");
+                                    logger.info("BUS: get REQUEST from station");
                                     GetNextStation();
                                     bus.setState(DrivingState.PASSING_STATION);
                                 }
-                                break;
-                        }
-                    }
-                    else if (type == MessageParameter.PEDESTRIAN) {
-                        switch (rcv.getPerformative()) {
-                            case ACLMessage.REQUEST_WHEN:
+                            }
+                            break;
+                        case MessageParameter.PEDESTRIAN:
+                            switch (rcv.getPerformative()) {
+                                case ACLMessage.REQUEST_WHEN:
+                                    int stationId =
+                                            Integer.parseInt(rcv.getUserDefinedParameter(MessageParameter.STATION_ID));
+                                    print("Passenger " + rcv.getSender().getLocalName() + " entered the bus.");
+                                    bus.addPassengerToStation(stationId, rcv.getSender().getLocalName());
 
-                                int stationId =
-                                        Integer.parseInt(rcv.getUserDefinedParameter(MessageParameter.STATION_ID));
-                                Print("Passenger " + rcv.getSender().getLocalName() + " entered the bus.");
-                                bus.addPassengerToStation(stationId, rcv.getSender().getLocalName());
+                                    ACLMessage response = new ACLMessage(ACLMessage.AGREE);
+                                    response.addReceiver(rcv.getSender());
 
-                                ACLMessage response = new ACLMessage(ACLMessage.AGREE);
-                                response.addReceiver(rcv.getSender());
+                                    Properties properties = new Properties();
+                                    properties.setProperty(MessageParameter.TYPE, MessageParameter.BUS);
+                                    response.setAllUserDefinedParameters(properties);
+                                    send(response);
+                                    print("Passengers: " + bus.getPassengersCount());
+                                    break;
+                                case ACLMessage.AGREE:
+                                    stationId = Integer.parseInt(rcv.getUserDefinedParameter(MessageParameter.STATION_ID));
+                                    print("Passenger " + rcv.getSender().getLocalName() + " left the bus.");
+                                    bus.removePassengerFromStation(stationId, rcv.getSender().getLocalName());
+                                    print("Passengers: " + bus.getPassengersCount());
+                                    break;
+                            }
 
-                                Properties properties = new Properties();
-                                properties.setProperty(MessageParameter.TYPE, MessageParameter.BUS);
-                                response.setAllUserDefinedParameters(properties);
-                                send(response);
-                                Print("Passengers: " + bus.getPassengersCount());
-                                break;
-                            case ACLMessage.AGREE:
-                                stationId = Integer.parseInt(rcv.getUserDefinedParameter(MessageParameter.STATION_ID));
-                                Print("Passenger " + rcv.getSender().getLocalName() + " left the bus.");
-                                bus.removePassengerFromStation(stationId, rcv.getSender().getLocalName());
-                                Print("Passengers: " + bus.getPassengersCount());
-                                break;
-                        }
-
+                            break;
                     }
                 }
                 block(100);
@@ -241,27 +238,6 @@ public class BusAgent extends AbstractAgent {
 
         addBehaviour(move);
         addBehaviour(communication);
-    }
-
-    void GetNextLight() {
-        // finds next traffic light and announces his arrival
-        LightManagerNode nextManager = bus.findNextTrafficLight();
-
-        if (nextManager != null) {
-
-            AID dest = new AID("LightManager" + nextManager.getLightManagerId(), AID.ISLOCALNAME);
-            ACLMessage msg = new ACLMessage(ACLMessage.INFORM);
-            msg.addReceiver(dest);
-            Properties properties = new Properties();
-            Instant time = MainContainerAgent.getSimulationTime().toInstant().plusMillis(bus.getMillisecondsToNextLight());
-            properties.setProperty(MessageParameter.TYPE, MessageParameter.VEHICLE);
-            properties.setProperty(MessageParameter.ARRIVAL_TIME, "" + time);
-            properties.setProperty(MessageParameter.ADJACENT_OSM_WAY_ID, "" + nextManager.getOsmWayId());
-            msg.setAllUserDefinedParameters(properties);
-
-            send(msg);
-            Print("Sending INFORM to LightManager" + nextManager.getLightManagerId() + ".");
-        }
     }
 
     void GetNextStation() {
@@ -282,7 +258,7 @@ public class BusAgent extends AbstractAgent {
             msg.setAllUserDefinedParameters(properties);
 
             send(msg);
-            Print("Sending INFORM to Station" + nextStation.getStationId() + ".");
+            print("Sending INFORM to Station" + nextStation.getStationId() + ".");
         }
     }
 
@@ -304,10 +280,6 @@ public class BusAgent extends AbstractAgent {
     @Override
     protected void takeDown() {
         super.takeDown();
-    }
-
-    void Print(String message) {
-        BusAgent.logger.info(getLocalName() + ": " + message);
     }
 
     public void runBasedOnTimetable(Date date) {

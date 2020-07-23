@@ -1,5 +1,8 @@
 package agents.utils;
 
+import vehicles.MovingObject;
+import vehicles.VehicleType;
+
 public class MessageParameter {
     public static final String TYPE = "type";
     public static final String VEHICLE = "vehicle";
@@ -15,4 +18,13 @@ public class MessageParameter {
     public static final String SCHEDULE_ARRIVAL = "schedule_arrival";
     public static final String DESIRED_BUS = "desired_bus";
     public static final String BUS_LINE = "bus_line";
+
+    public static String GetTypeByMovingObject(MovingObject movingObject) {
+        var value = VehicleType.valueOf(movingObject.getVehicleType());
+        return switch (value) {
+            case BUS -> BUS;
+            case PEDESTRIAN -> PEDESTRIAN;
+            case REGULAR_CAR -> VEHICLE;
+        };
+    }
 }

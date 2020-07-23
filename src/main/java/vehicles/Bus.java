@@ -97,7 +97,7 @@ public class Bus extends MovingObject {
 
     @Override
     public String getVehicleType() {
-        return "Bus";
+        return VehicleType.BUS.toString();
     }
 
     @Override

@@ -901,12 +901,9 @@ public class MapWindow {
             try {
                 bus = busArray.get(random.nextInt(busArray.size()));
             } catch (Exception e) {
-                try {
-                    throw new Exception("The 'shouldPrepareBuses' toggle in smartCityAgent is probably switched off (pedestrians cannot exist without buses)");
-                } catch (Exception e2) {
-                    e2.printStackTrace();
-                    return null;
-                }
+                logger.warn("The 'shouldPrepareBuses' toggle in smartCityAgent is probably switched off (pedestrians " +
+                    "cannot exist without buses)", e);
+                throw e;
             }
 
             return bus;

@@ -31,7 +31,7 @@ public class MovingObjectImpl extends MovingObject {
 
     @Override
     public String getVehicleType() {
-        return "RegularCar";
+        return VehicleType.REGULAR_CAR.toString();
     }
 
     @Override
