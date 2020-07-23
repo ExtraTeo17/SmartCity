@@ -19,7 +19,7 @@ public class Bus extends MovingObject {
     public static int CAPACITY_HIGH = 25;
 
     private final Timetable timetable;
-    private final HashMap<Long, List<String>> stationsForPassengers = new HashMap<>();
+    private final HashMap<Integer, List<String>> stationsForPassengers = new HashMap<>();
     private final List<StationNode> stationNodesOnRoute;
     private final String busLine;
     private final String brigadeNr;
@@ -54,12 +54,12 @@ public class Bus extends MovingObject {
         return passengersCount;
     }
 
-    public void addPassengerToStation(Long id, String passenger) {
+    public void addPassengerToStation(int id, String passenger) {
         stationsForPassengers.get(id).add(passenger);
         passengersCount++;
     }
 
-    public boolean removePassengerFromStation(Long id, String passenger) {
+    public boolean removePassengerFromStation(int id, String passenger) {
         if (stationsForPassengers.get(id).remove(passenger)) {
             passengersCount--;
             return true;
@@ -67,7 +67,7 @@ public class Bus extends MovingObject {
         return false;
     }
 
-    public List<String> getPassengersToLeave(Long id) {
+    public List<String> getPassengersToLeave(int id) {
         return stationsForPassengers.get(id);
     }
 

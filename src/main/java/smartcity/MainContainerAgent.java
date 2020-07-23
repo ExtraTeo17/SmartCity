@@ -136,7 +136,7 @@ public class MainContainerAgent extends Agent {
         try {
             container.acceptNewAgent(agent.getPredictedName(), agent);
         } catch (StaleProxyException e) {
-            e.printStackTrace();
+            logger.warn("Error adding agent", e);
         }
     }
 
@@ -173,25 +173,21 @@ public class MainContainerAgent extends Agent {
         return pedestrianAgent;
     }
 
+    public VehicleAgent addNewVehicleAgent(List<RouteNode> info, boolean testCar) {
+        VehicleAgent vehicle = new VehicleAgent(carId);
+        MovingObjectImpl car = testCar ? new TestCar(info) : new MovingObjectImpl(info);
+        vehicle.setVehicle(car);
+
+        addNewVehicleAgent(vehicle);
+
+        return vehicle;
+    }
+
     public VehicleAgent addNewVehicleAgent(List<RouteNode> info) {
-        VehicleAgent vehicle = new VehicleAgent(carId);
-        MovingObjectImpl car = new MovingObjectImpl(info);
-        vehicle.setVehicle(car);
-        addNewVehicleAgent(vehicle);
-
-        return vehicle;
+        return addNewVehicleAgent(info, false);
     }
 
-    public VehicleAgent addNewTestVehicleAgent(List<RouteNode> info) {
-        VehicleAgent vehicle = new VehicleAgent(carId);
-        MovingObjectImpl car = new MovingObjectImpl(info);
-        vehicle.setVehicle(car);
-        addNewVehicleAgent(vehicle);
-
-        return vehicle;
-    }
-
-    private void addNewVehicleAgent(VehicleAgent agent){
+    private void addNewVehicleAgent(VehicleAgent agent) {
         tryAddAgent(agent);
         Vehicles.add(agent);
         ++carId;

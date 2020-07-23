@@ -25,8 +25,9 @@ public class StationStrategy {
 
     //private final OSMStation stationOSMNode;
     public StationStrategy(OSMStation stationOSMNode, int agentId) {
-        MainContainerAgent.osmStationIdToStationNode.put(stationOSMNode.getId(), new StationNode(stationOSMNode.getLat(),
-                stationOSMNode.getLon(), Long.toString(stationOSMNode.getId()), agentId));
+        MainContainerAgent.osmStationIdToStationNode.put(stationOSMNode.getId(),
+                new StationNode(stationOSMNode.getLat(), stationOSMNode.getLon(),
+                        Long.toString(stationOSMNode.getId()), agentId));
     }
 
     public void addBusToFarAwayQueue(String agentBusName, Instant arrivalTime, Instant scheduleArrivalTime) {

@@ -211,7 +211,8 @@ public class BusAgent extends AbstractAgent {
                         switch (rcv.getPerformative()) {
                             case ACLMessage.REQUEST_WHEN:
 
-                                Long stationId = Long.parseLong(rcv.getUserDefinedParameter(MessageParameter.STATION_ID));
+                                int stationId =
+                                        Integer.parseInt(rcv.getUserDefinedParameter(MessageParameter.STATION_ID));
                                 Print("Passenger " + rcv.getSender().getLocalName() + " entered the bus.");
                                 bus.addPassengerToStation(stationId, rcv.getSender().getLocalName());
 
@@ -225,7 +226,7 @@ public class BusAgent extends AbstractAgent {
                                 Print("Passengers: " + bus.getPassengersCount());
                                 break;
                             case ACLMessage.AGREE:
-                                stationId = Long.parseLong(rcv.getUserDefinedParameter(MessageParameter.STATION_ID));
+                                stationId = Integer.parseInt(rcv.getUserDefinedParameter(MessageParameter.STATION_ID));
                                 Print("Passenger " + rcv.getSender().getLocalName() + " left the bus.");
                                 bus.removePassengerFromStation(stationId, rcv.getSender().getLocalName());
                                 Print("Passengers: " + bus.getPassengersCount());

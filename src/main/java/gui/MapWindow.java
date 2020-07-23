@@ -841,7 +841,7 @@ public class MapWindow {
 
             VehicleAgent vehicle;
             if (getTestCarId() == smartCityAgent.carId) {
-                vehicle = smartCityAgent.addNewTestVehicleAgent(info);
+                vehicle = smartCityAgent.addNewVehicleAgent(info, true);
             }
             else {
                 vehicle = smartCityAgent.addNewVehicleAgent(info);
