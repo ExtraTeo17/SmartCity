@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { Map, Marker, Popup, TileLayer } from "react-leaflet";
 
-const SmartCityMap = props => {
+const CityMap = props => {
   const [position, setPosition] = useState([52.217154, 21.005575]);
   const [zoom, setZoom] = useState(15);
 
@@ -20,4 +20,4 @@ const SmartCityMap = props => {
   );
 };
 
-export default SmartCityMap;
+export default CityMap;
