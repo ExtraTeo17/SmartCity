@@ -372,7 +372,7 @@ public class MapAccessManager {
             var overpassNodes = getNodesViaOverpass(getFullTrafficSignalQuery(osmWayIds));
             LightNodes = getLights(overpassNodes);
         } catch (Exception e) {
-            logger.warn("Error trying to get light nodes", e);
+            logger.error("Error trying to get light nodes", e);
         }
         return LightNodes;
     }
@@ -864,6 +864,8 @@ public class MapAccessManager {
                             info.setBusLine(number_of_line.getNodeValue());
                         }
                     }
+                    logger.info("STEP 3/" + MainContainerAgent.STEPS + " (SUBSTEP " + (i) + "/" + infoSet.size() +
+                            "): Bus info parsing");
                 }
                 try {
                     var overpassNodes = getNodesViaOverpass(getBusWayOverpassQueryWithPayload(builder));

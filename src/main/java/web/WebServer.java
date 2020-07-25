@@ -29,7 +29,7 @@ public class WebServer extends WebSocketServer {
     @Override
     public void onOpen(WebSocket socket, ClientHandshake handshake) {
         sockets.add(socket);
-        WebServer.logger.info("Connection established from: " + WebServer.getSocketAddress(socket));
+        logger.info("Connection established from: " + getSocketAddress(socket));
     }
 
     /**
@@ -43,12 +43,12 @@ public class WebServer extends WebSocketServer {
     @Override
     public void onClose(WebSocket socket, int code, String reason, boolean remote) {
         if (code == CloseFrame.NORMAL || code == CloseFrame.GOING_AWAY) {
-            WebServer.logger.info("Gracefully closed connection.\n"
-                    + "Address: " + WebServer.getSocketAddress(socket));
+            logger.info("Gracefully closed connection.\n"
+                    + "Address: " + getSocketAddress(socket));
         }
         else {
-            WebServer.logger.warn("Connection closed unexpectedly.\n"
-                    + "Address: " + WebServer.getSocketAddress(socket) + "\n"
+            logger.warn("Connection closed unexpectedly.\n"
+                    + "Address: " + getSocketAddress(socket) + "\n"
                     + "Error code: " + code
                     + "Reason: " + reason);
         }
@@ -83,7 +83,7 @@ public class WebServer extends WebSocketServer {
      **/
     @Override
     public void onError(WebSocket socket, Exception ex) {
-        WebServer.logger.error("Error in connection to " + WebServer.getSocketAddress(socket), ex);
+        logger.error("Error in connection to " + getSocketAddress(socket), ex);
         sockets.remove(socket);
     }
 
@@ -94,7 +94,7 @@ public class WebServer extends WebSocketServer {
      */
     @Override
     public void onStart() {
-        WebServer.logger.info("Successfully started.");
+        logger.info("Successfully started.");
     }
 
     private static String getSocketAddress(WebSocket socket) {

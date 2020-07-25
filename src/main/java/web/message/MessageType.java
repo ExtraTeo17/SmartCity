@@ -1,7 +1,7 @@
 package web.message;
 
 public enum MessageType {
-    SPAWN_CAR(1),
+    SET_ZONE(1),
     ;
 
     private int code;
@@ -9,7 +9,7 @@ public enum MessageType {
     MessageType(int code) {
         this.code = code;
     }
-    
+
     public int getCode() {
         return code;
     }

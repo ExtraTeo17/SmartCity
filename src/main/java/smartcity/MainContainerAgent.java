@@ -2,6 +2,7 @@ package smartcity;
 
 import agents.*;
 import agents.utils.MessageParameter;
+import com.google.inject.Inject;
 import gui.MapWindow;
 import jade.core.Agent;
 import jade.core.behaviours.CyclicBehaviour;
@@ -39,7 +40,7 @@ public class MainContainerAgent extends Agent {
 
     private static AgentContainer container;
     private static MapWindow window;
-    private static WebServer webServer;
+    private WebServer webServer;
 
     public final static int SERVER_PORT = 9000;
     public final static boolean USE_DEPRECATED_XML_FOR_LIGHT_MANAGERS = false;
@@ -61,13 +62,19 @@ public class MainContainerAgent extends Agent {
     public int carId = 0;
     public int pedestrianId = 0;
 
+    @Inject
+    public MainContainerAgent(WebServer webServer) {
+        this.webServer = webServer;
+    }
+
+
     @Override
     protected void setup() {
         container = getContainerController();
         window = WindowInitializer.displayWindow(this);
         addBehaviour(getReceiveMessageBehaviour());
 
-        webServer = WebServerFactory.Create(SERVER_PORT);
+        webServer = WebServerFactory.create(SERVER_PORT);
         webServer.start();
     }
 
@@ -137,7 +144,7 @@ public class MainContainerAgent extends Agent {
         try {
             container.acceptNewAgent(agent.getPredictedName(), agent);
         } catch (StaleProxyException e) {
-            logger.warn("Error adding agent", e);
+            logger.warn("Error adding agent");
         }
     }
 

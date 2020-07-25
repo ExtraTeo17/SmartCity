@@ -26,6 +26,9 @@ public class MessageHandler {
         // TODO: Class hierarchy for appropriate message types
         // TODO: Event-based interaction with backend
         switch (message.type) {
+            case SET_ZONE:
+                
+                break;
         }
     }
 }
