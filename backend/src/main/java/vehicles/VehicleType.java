@@ -11,8 +11,18 @@ public enum VehicleType {
         this.name = name;
     }
 
+    public static VehicleType getValue(String name) {
+        for (var vehicleType : VehicleType.values()) {
+            if (vehicleType.name.equals(name)) {
+                return vehicleType;
+            }
+        }
+
+        throw new IllegalArgumentException("No such value exists: " + name);
+    }
+
     @Override
-    public String toString(){
+    public String toString() {
         return name;
     }
 }

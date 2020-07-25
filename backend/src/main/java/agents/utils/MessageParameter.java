@@ -20,7 +20,8 @@ public class MessageParameter {
     public static final String BUS_LINE = "bus_line";
 
     public static String GetTypeByMovingObject(MovingObject movingObject) {
-        var value = VehicleType.valueOf(movingObject.getVehicleType());
+        var type = movingObject.getVehicleType();
+        var value = VehicleType.getValue(type);
         return switch (value) {
             case BUS -> BUS;
             case PEDESTRIAN -> PEDESTRIAN;
