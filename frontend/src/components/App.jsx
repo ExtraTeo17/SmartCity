@@ -22,6 +22,7 @@ class App extends React.Component {
             <Pane>
               <CityMap />
             </Pane>
+            {/* TODO: Reload part of map on pane move */}
             <Pane>
               <div className="row justify-content-center">
                 <form>
@@ -46,8 +47,7 @@ class App extends React.Component {
                     />
                   </div>
                   <button className="btn btn-primary" type="button">
-                    {" "}
-                    Set zone{" "}
+                    Set zone
                   </button>
                 </form>
               </div>
