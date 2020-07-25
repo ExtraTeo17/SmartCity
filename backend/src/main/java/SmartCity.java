@@ -1,8 +1,5 @@
-import com.google.inject.Module;
-import com.google.inject.*;
+import com.google.inject.Guice;
 import genesis.MainModule;
-import jade.core.ProfileImpl;
-import jade.core.Runtime;
 import jade.wrapper.ContainerController;
 import jade.wrapper.StaleProxyException;
 import org.slf4j.Logger;
@@ -19,7 +16,9 @@ public class SmartCity {
         var controller = injector.getInstance(ContainerController.class);
         var mainAgent = injector.getInstance(MainContainerAgent.class);
         try {
-            controller.acceptNewAgent("Master", mainAgent).start();
+            var agentController = controller.acceptNewAgent("Master", mainAgent);
+            agentController.activate();
+            agentController.start();
         } catch (StaleProxyException e) {
             logger.error("Error accepting main agent", e);
             System.exit(-1);

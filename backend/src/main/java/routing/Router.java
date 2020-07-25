@@ -86,8 +86,10 @@ public final class Router {
     /////////////////////////////////////////////////////////////
 
     private static Pair<List<Long>, List<RouteNode>> findRoute(GeoPosition pointA, GeoPosition pointB, boolean onFoot) {
-        var osmWayIdsAndPointList = osmproxy.HighwayAccessor.getOsmWayIdsAndPointList(new String[]{"config=" + Router.CONFIG_PATH, "datareader.file=mazowieckie-latest.osm.pbf"},
-                pointA.getLatitude(), pointA.getLongitude(), pointB.getLatitude(), pointB.getLongitude(), onFoot);
+        var osmWayIdsAndPointList =
+                osmproxy.HighwayAccessor.getOsmWayIdsAndPointList(new String[]{"config=" + Router.CONFIG_PATH,
+                                "datareader.file=mazowieckie-latest.osm.pbf"},
+                        pointA.getLatitude(), pointA.getLongitude(), pointB.getLatitude(), pointB.getLongitude(), onFoot);
         return osmWayIdsAndPointList;
     }
 

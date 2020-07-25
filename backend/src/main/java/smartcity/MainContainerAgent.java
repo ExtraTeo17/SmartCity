@@ -223,8 +223,8 @@ public class MainContainerAgent extends Agent {
                                                                                       GeoPosition middlePoint, int radius) {
         try {
             LightAccessManager.prepareLightManagersInRadiusAndLightIdToLightManagerIdHashSetBeta(this, middlePoint, radius);
-        } catch (Exception exception) {
-            exception.printStackTrace();
+        } catch (Exception e) {
+            logger.error("Error preparing light managers", e);
         }
     }
 
