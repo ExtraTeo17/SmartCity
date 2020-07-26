@@ -94,7 +94,7 @@ public class WebServer extends WebSocketServer {
      */
     @Override
     public void onStart() {
-        logger.info("Successfully started.");
+        logger.info("Successfully started on port: " + getPort());
     }
 
     private static String getSocketAddress(WebSocket socket) {

@@ -7,7 +7,7 @@ import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 import osmproxy.elements.OSMNode;
 import osmproxy.elements.OSMWay;
-import smartcity.MainContainerAgent;
+import smartcity.MasterAgent;
 
 import javax.xml.parsers.ParserConfigurationException;
 import java.io.IOException;
@@ -16,7 +16,7 @@ import java.util.List;
 
 public class LightAccessManager extends MapAccessManager {
 
-    public static void prepareLightManagersInRadiusAndLightIdToLightManagerIdHashSetBeta(MainContainerAgent smartCityAgent,
+    public static void prepareLightManagersInRadiusAndLightIdToLightManagerIdHashSetBeta(MasterAgent smartCityAgent,
                                                                                          GeoPosition middlePoint, int radius) throws IOException, ParserConfigurationException, SAXException {
         List<OSMNode> lightsAround = sendLightsAroundOverpassQueryBeta(radius, middlePoint.getLatitude(), middlePoint.getLongitude());
         List<OSMNode> lightNodeList = sendParentWaysOfLightOverpassQueryBeta(lightsAround);
@@ -161,7 +161,7 @@ public class LightAccessManager extends MapAccessManager {
     private static void prepareLightManagers(List<OSMNode> lightsOfTypeA) {
         for (final OSMNode centerCrossroadNode : lightsOfTypeA) {
             if (centerCrossroadNode.determineParentOrientationsTowardsCrossroad()) {
-                MainContainerAgent.tryAddNewLightManagerAgent(centerCrossroadNode);
+                MasterAgent.tryAddNewLightManagerAgent(centerCrossroadNode);
             }
         }
     }

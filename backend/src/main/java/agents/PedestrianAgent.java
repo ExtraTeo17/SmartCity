@@ -11,7 +11,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import routing.LightManagerNode;
 import routing.StationNode;
-import smartcity.MainContainerAgent;
+import smartcity.MasterAgent;
 import vehicles.DrivingState;
 import vehicles.Pedestrian;
 
@@ -76,7 +76,7 @@ public class PedestrianAgent extends AbstractAgent {
                             Properties properties = new Properties();
                             properties.setProperty(MessageParameter.TYPE, MessageParameter.PEDESTRIAN);
                             properties.setProperty(MessageParameter.DESIRED_BUS, "" + pedestrian.getPreferredBusLine());
-                            properties.setProperty(MessageParameter.ARRIVAL_TIME, "" + MainContainerAgent.getSimulationTime().toInstant());
+                            properties.setProperty(MessageParameter.ARRIVAL_TIME, "" + MasterAgent.getSimulationTime().toInstant());
                             msg.setAllUserDefinedParameters(properties);
                             send(msg);
                             logger.info("Pedestrian: Send REQUEST_WHEN to Station");
@@ -209,7 +209,7 @@ public class PedestrianAgent extends AbstractAgent {
             ACLMessage msg = new ACLMessage(ACLMessage.INFORM);
             msg.addReceiver(dest);
             Properties properties = new Properties();
-            Instant currentTime = MainContainerAgent.getSimulationTime().toInstant();
+            Instant currentTime = MasterAgent.getSimulationTime().toInstant();
             Instant time = currentTime.plusMillis(pedestrian.getMilisecondsToNextStation());
             properties.setProperty(MessageParameter.TYPE, MessageParameter.PEDESTRIAN);
             properties.setProperty(MessageParameter.ARRIVAL_TIME, "" + time);

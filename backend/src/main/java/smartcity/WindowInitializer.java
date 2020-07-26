@@ -13,12 +13,12 @@ import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.util.List;
 
-import static smartcity.MainContainerAgent.SHOULD_GENERATE_CARS;
-import static smartcity.MainContainerAgent.SHOULD_GENERATE_PEDESTRIANS_AND_BUSES;
+import static smartcity.MasterAgent.SHOULD_GENERATE_CARS;
+import static smartcity.MasterAgent.SHOULD_GENERATE_PEDESTRIANS_AND_BUSES;
 
 public class WindowInitializer {
 
-    public static MapWindow displayWindow(MainContainerAgent smartCityAgent) {
+    public static MapWindow displayWindow(MasterAgent smartCityAgent) {
         var window = new MapWindow(smartCityAgent);
         var mapViewer = window.MapViewer;
         JFrame frame = new JFrame("Smart City by Katherine & Dominic & Robert");

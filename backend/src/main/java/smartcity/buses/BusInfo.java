@@ -7,7 +7,7 @@ import osmproxy.elements.OSMStation;
 import osmproxy.elements.OSMWay;
 import routing.RouteNode;
 import routing.Router;
-import smartcity.MainContainerAgent;
+import smartcity.MasterAgent;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -36,7 +36,7 @@ public class BusInfo {
     public List<OSMStation> getStations() {
         List<OSMStation> stations = new ArrayList<>();
         for (long osmId : stationsOnRouteOsmIds) {
-            stations.add(MainContainerAgent.osmIdToStationOSMNode.get(osmId));
+            stations.add(MasterAgent.osmIdToStationOSMNode.get(osmId));
         }
         return stations;
     }
@@ -66,7 +66,7 @@ public class BusInfo {
     public void filterStationsByCircle(double middleLat, double middleLon, int radius) {
         List<Long> filteredStationOsmIds = new ArrayList<>();
         for (Long osmStationId : stationsOnRouteOsmIds) {
-            OSMStation station = MainContainerAgent.osmIdToStationOSMNode.get(osmStationId);
+            OSMStation station = MasterAgent.osmIdToStationOSMNode.get(osmStationId);
             if (station != null && MapAccessManager.belongsToCircle(station.getLat(), station.getLon(),
                     new GeoPosition(middleLat, middleLon), radius)) {
                 filteredStationOsmIds.add(osmStationId);

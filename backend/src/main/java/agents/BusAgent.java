@@ -13,7 +13,7 @@ import org.slf4j.LoggerFactory;
 import routing.LightManagerNode;
 import routing.RouteNode;
 import routing.StationNode;
-import smartcity.MainContainerAgent;
+import smartcity.MasterAgent;
 import smartcity.buses.Timetable;
 import vehicles.Bus;
 import vehicles.DrivingState;
@@ -120,7 +120,7 @@ public class BusAgent extends AbstractAgent {
                             Properties properties = new Properties();
                             properties.setProperty(MessageParameter.TYPE, MessageParameter.BUS);
                             properties.setProperty(MessageParameter.SCHEDULE_ARRIVAL, "" + bus.getTimeOnStation(station.getOsmStationId()).toInstant());
-                            properties.setProperty(MessageParameter.ARRIVAL_TIME, "" + MainContainerAgent.getSimulationTime().toInstant());
+                            properties.setProperty(MessageParameter.ARRIVAL_TIME, "" + MasterAgent.getSimulationTime().toInstant());
                             logger.info("BUS: send REQUEST_WHEN to station");
                             msg.setAllUserDefinedParameters(properties);
                             send(msg);
@@ -249,7 +249,7 @@ public class BusAgent extends AbstractAgent {
             ACLMessage msg = new ACLMessage(ACLMessage.INFORM);
             msg.addReceiver(dest);
             Properties properties = new Properties();
-            Instant currentTime = MainContainerAgent.getSimulationTime().toInstant();
+            Instant currentTime = MasterAgent.getSimulationTime().toInstant();
             Instant time = currentTime.plusMillis(bus.getMillisecondsToNextStation());
             properties.setProperty(MessageParameter.TYPE, MessageParameter.BUS);
             properties.setProperty(MessageParameter.BUS_LINE, "" + bus.getLine());

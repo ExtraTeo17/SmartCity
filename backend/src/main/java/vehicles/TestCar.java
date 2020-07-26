@@ -1,7 +1,7 @@
 package vehicles;
 
 import routing.RouteNode;
-import smartcity.MainContainerAgent;
+import smartcity.MasterAgent;
 
 import java.time.Instant;
 import java.util.List;
@@ -17,11 +17,11 @@ public class TestCar extends MovingObjectImpl {
     @Override
     public void setState(DrivingState state) {
         if (getState() == DrivingState.STARTING) {
-            start = MainContainerAgent.getSimulationTime().toInstant();
+            start = MasterAgent.getSimulationTime().toInstant();
         }
         super.setState(state);
         if (state == DrivingState.AT_DESTINATION) {
-            end = MainContainerAgent.getSimulationTime().toInstant();
+            end = MasterAgent.getSimulationTime().toInstant();
         }
     }
 }

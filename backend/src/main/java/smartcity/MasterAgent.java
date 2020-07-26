@@ -35,8 +35,8 @@ import java.time.Instant;
 import java.util.*;
 
 // TODO: This class should have no more than 10 fields.
-public class MainContainerAgent extends Agent {
-    private static final Logger logger = LoggerFactory.getLogger(MainContainerAgent.class);
+public class MasterAgent extends Agent {
+    private static final Logger logger = LoggerFactory.getLogger(MasterAgent.class);
 
     private static AgentContainer container;
     private static MapWindow window;
@@ -63,7 +63,7 @@ public class MainContainerAgent extends Agent {
     public int pedestrianId = 0;
 
     @Inject
-    public MainContainerAgent(WebServer webServer) {
+    public MasterAgent(WebServer webServer) {
         this.webServer = webServer;
     }
 
@@ -73,8 +73,6 @@ public class MainContainerAgent extends Agent {
         container = getContainerController();
         window = WindowInitializer.displayWindow(this);
         addBehaviour(getReceiveMessageBehaviour());
-
-        webServer = WebServerFactory.create(SERVER_PORT);
         webServer.start();
     }
 
@@ -219,7 +217,7 @@ public class MainContainerAgent extends Agent {
         lightManagersUnderConstruction = false;
     }
 
-    private void tryPrepareLightManagersInRadiusAndLightIdToLightManagerIdHashSetBeta(MainContainerAgent smartCityAgent,
+    private void tryPrepareLightManagersInRadiusAndLightIdToLightManagerIdHashSetBeta(MasterAgent smartCityAgent,
                                                                                       GeoPosition middlePoint, int radius) {
         try {
             LightAccessManager.prepareLightManagersInRadiusAndLightIdToLightManagerIdHashSetBeta(this, middlePoint, radius);

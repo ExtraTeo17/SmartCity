@@ -5,7 +5,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import osmproxy.elements.OSMStation;
 import routing.StationNode;
-import smartcity.MainContainerAgent;
+import smartcity.MasterAgent;
 import smartcity.lights.OptimizationResult;
 
 import java.time.Instant;
@@ -25,7 +25,7 @@ public class StationStrategy {
 
     //private final OSMStation stationOSMNode;
     public StationStrategy(OSMStation stationOSMNode, int agentId) {
-        MainContainerAgent.osmStationIdToStationNode.put(stationOSMNode.getId(),
+        MasterAgent.osmStationIdToStationNode.put(stationOSMNode.getId(),
                 new StationNode(stationOSMNode.getLat(), stationOSMNode.getLon(),
                         Long.toString(stationOSMNode.getId()), agentId));
     }

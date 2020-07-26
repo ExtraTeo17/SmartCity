@@ -15,16 +15,12 @@ import org.slf4j.LoggerFactory;
 import web.WebServer;
 import web.WebServerFactory;
 
-public class MainModule implements Module {
+public class MainModule extends AbstractModule {
     private final static Logger logger = LoggerFactory.getLogger(MainModule.class);
     private final String[] args;
 
     public MainModule(String... args) {
         this.args = args;
-    }
-
-    @Override
-    public void configure(Binder binder) {
     }
 
     @Provides
@@ -58,8 +54,5 @@ public class MainModule implements Module {
         return new ProfileImpl();
     }
 
-    @Provides
-    public static WebServer createWebServer() {
-        return WebServerFactory.create(9000);
-    }
+
 }

@@ -9,15 +9,13 @@ import osmproxy.elements.OSMWay;
 import osmproxy.elements.OSMWay.RelationOrientation;
 import osmproxy.elements.OSMWay.RouteOrientation;
 import osmproxy.elements.OSMWaypoint;
-import smartcity.MainContainerAgent;
+import smartcity.MasterAgent;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
 public final class Router {
-    private static final String CONFIG_PATH = "config/config.properties";
-
     public static List<RouteNode> generateRouteInfo(GeoPosition pointA, GeoPosition pointB) {
         Pair<List<Long>, List<RouteNode>> osmWayIdsAndPointList = Router.findRoute(pointA, pointB, false);
         final List<OSMLight> lightInfo = MapAccessManager.sendFullTrafficSignalQuery(osmWayIdsAndPointList.getValue0());
@@ -74,7 +72,7 @@ public final class Router {
     private static void addRouteNode(List<RouteNode> routeNodes, OSMWaypoint waypoint, RouteInfo routeInfo,
                                      List<Long> crossingOsmIdsToTransform) {
         if (routeInfo.removeIfContains(waypoint.getOsmNodeRef())) {
-            routeNodes.add(MainContainerAgent.crossingOsmIdToLightManagerNode.get(Long.parseLong(waypoint.getOsmNodeRef())));
+            routeNodes.add(MasterAgent.crossingOsmIdToLightManagerNode.get(Long.parseLong(waypoint.getOsmNodeRef())));
         }
         else {
             routeNodes.add(new RouteNode(waypoint.getPosition()));
@@ -87,9 +85,8 @@ public final class Router {
 
     private static Pair<List<Long>, List<RouteNode>> findRoute(GeoPosition pointA, GeoPosition pointB, boolean onFoot) {
         var osmWayIdsAndPointList =
-                osmproxy.HighwayAccessor.getOsmWayIdsAndPointList(new String[]{"config=" + Router.CONFIG_PATH,
-                                "datareader.file=mazowieckie-latest.osm.pbf"},
-                        pointA.getLatitude(), pointA.getLongitude(), pointB.getLatitude(), pointB.getLongitude(), onFoot);
+                osmproxy.HighwayAccessor.getOsmWayIdsAndPointList(pointA.getLatitude(), pointA.getLongitude(), pointB.getLatitude(),
+                        pointB.getLongitude(), onFoot);
         return osmWayIdsAndPointList;
     }
 
@@ -103,7 +100,7 @@ public final class Router {
 
     private static void addLightManagerNodeToManagersList(List<RouteNode> managers, OSMLight light, List<RouteNode> route) {
         Pair<Long, Long> osmWayIdOsmLightId = Pair.with(light.getAdherentOsmWayId(), light.getId());
-        RouteNode nodeToAdd = MainContainerAgent.wayIdLightIdToLightManagerNode.get(osmWayIdOsmLightId);
+        RouteNode nodeToAdd = MasterAgent.wayIdLightIdToLightManagerNode.get(osmWayIdOsmLightId);
 
         if (nodeToAdd != null && !Router.lastManagerIdEqualTo(managers, nodeToAdd)) {
             managers.add(nodeToAdd);
@@ -194,7 +191,7 @@ public final class Router {
     private static List<OSMNode> getOSMNodesForStations(List<Long> stationsIDs) {
         List<OSMNode> listOsmNodes = new ArrayList<>();
         for (long station : stationsIDs) {
-            listOsmNodes.add(MainContainerAgent.osmIdToStationOSMNode.get(station));
+            listOsmNodes.add(MasterAgent.osmIdToStationOSMNode.get(station));
         }
         return listOsmNodes;
     }
@@ -247,7 +244,7 @@ public final class Router {
 
     private static void addStationNodeToList(List<RouteNode> stations, OSMNode station, List<RouteNode> route) {
 
-        RouteNode nodeToAdd = MainContainerAgent.osmStationIdToStationNode.get(station.getId());
+        RouteNode nodeToAdd = MasterAgent.osmStationIdToStationNode.get(station.getId());
         stations.add(nodeToAdd);
     }
 }

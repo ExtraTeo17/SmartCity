@@ -35,7 +35,7 @@ import osmproxy.elements.OSMStation;
 import osmproxy.elements.OSMWay;
 import routing.RouteInfo;
 import routing.RouteNode;
-import smartcity.MainContainerAgent;
+import smartcity.MasterAgent;
 import smartcity.buses.BrigadeInfo;
 import smartcity.buses.BusInfo;
 
@@ -540,7 +540,7 @@ public class MapAccessManager {
         return traverseDatabase(midLat, midLon, vicinityRange);
     }
 
-    public static void prepareLightManagersInRadiusAndLightIdToLightManagerIdHashSet(MainContainerAgent smartCityAgent, GeoPosition middlePoint, int radius) {
+    public static void prepareLightManagersInRadiusAndLightIdToLightManagerIdHashSet(MasterAgent smartCityAgent, GeoPosition middlePoint, int radius) {
         Document xmlDocument = getXmlDocument(CROSSROADS);
         Node osmRoot = xmlDocument.getFirstChild();
         NodeList districtXMLNodes = osmRoot.getChildNodes();
@@ -551,7 +551,7 @@ public class MapAccessManager {
         }
     }
 
-    public static void prepareLightManagersInRadiusAndLightIdToLightManagerIdHashSetBeta(MainContainerAgent smartCityAgent,
+    public static void prepareLightManagersInRadiusAndLightIdToLightManagerIdHashSetBeta(MasterAgent smartCityAgent,
                                                                                          GeoPosition middlePoint, int radius) throws IOException, ParserConfigurationException, SAXException {
         List<OSMNode> lightsAround = sendLightsAroundOverpassQueryBeta(radius, middlePoint.getLatitude(), middlePoint.getLongitude());
         List<OSMNode> lightNodeList = sendParentWaysOfLightOverpassQueryBeta(lightsAround);
@@ -692,12 +692,12 @@ public class MapAccessManager {
     private static void prepareLightManagers(List<OSMNode> lightsOfTypeA) {
         for (final OSMNode centerCrossroadNode : lightsOfTypeA) {
             if (centerCrossroadNode.determineParentOrientationsTowardsCrossroad()) {
-                MainContainerAgent.tryAddNewLightManagerAgent(centerCrossroadNode);
+                MasterAgent.tryAddNewLightManagerAgent(centerCrossroadNode);
             }
         }
     }
 
-    private static void addAllDesiredIdsInDistrict(MainContainerAgent smartCityAgent, Node districtRoot, GeoPosition middlePoint, int radius) {
+    private static void addAllDesiredIdsInDistrict(MasterAgent smartCityAgent, Node districtRoot, GeoPosition middlePoint, int radius) {
         Node crossroadsRoot = districtRoot.getChildNodes().item(1);
         NodeList crossroadXMLNodes = crossroadsRoot.getChildNodes();
         for (int i = 0; i < crossroadXMLNodes.getLength(); ++i) {
@@ -707,11 +707,11 @@ public class MapAccessManager {
         }
     }
 
-    private static void addCrossroadIdIfDesired(MainContainerAgent smartCityAgent, Node crossroad, GeoPosition middlePoint, int radius) {
+    private static void addCrossroadIdIfDesired(MasterAgent smartCityAgent, Node crossroad, GeoPosition middlePoint, int radius) {
         Pair<Double, Double> crossroadLatLon = calculateLatLonBasedOnInternalLights(crossroad);
 
         if (belongsToCircle(crossroadLatLon.getValue0(), crossroadLatLon.getValue1(), middlePoint, radius)) {
-            MainContainerAgent.tryAddNewLightManagerAgent(crossroad);
+            MasterAgent.tryAddNewLightManagerAgent(crossroad);
         }
     }
 
@@ -808,12 +808,12 @@ public class MapAccessManager {
     }
 
     public static Set<BusInfo> getBusInfo(int radius, double middleLat, double middleLon) {
-        logger.info("STEP 2/" + MainContainerAgent.STEPS + ": Sending bus overpass query");
+        logger.info("STEP 2/" + MasterAgent.STEPS + ": Sending bus overpass query");
         Set<BusInfo> infoSet = sendBusOverpassQuery(radius, middleLat, middleLon);
-        logger.info("STEP 4/" + MainContainerAgent.STEPS + ": Starting warszawskie query and parsing");
+        logger.info("STEP 4/" + MasterAgent.STEPS + ": Starting warszawskie query and parsing");
         int i = 0;
         for (BusInfo info : infoSet) {
-            logger.info("STEP 4/" + MainContainerAgent.STEPS + " (SUBSTEP " + (++i) + "/" + infoSet.size() + "): Warszawskie query sending & parsing substep");
+            logger.info("STEP 4/" + MasterAgent.STEPS + " (SUBSTEP " + (++i) + "/" + infoSet.size() + "): Warszawskie query sending & parsing substep");
             sendBusWarszawskieQuery(info);
         }
         return infoSet;
@@ -833,7 +833,7 @@ public class MapAccessManager {
     }
 
     private static Set<BusInfo> parseBusInfo(Document nodesViaOverpass, int radius, double middleLat, double middleLon) {
-        logger.info("STEP 3/" + MainContainerAgent.STEPS + ": Starting overpass bus info parsing");
+        logger.info("STEP 3/" + MasterAgent.STEPS + ": Starting overpass bus info parsing");
         Set<BusInfo> infoSet = new LinkedHashSet<>();
         Node osmRoot = nodesViaOverpass.getFirstChild();
         NodeList osmXMLNodes = osmRoot.getChildNodes();
@@ -864,7 +864,7 @@ public class MapAccessManager {
                             info.setBusLine(number_of_line.getNodeValue());
                         }
                     }
-                    logger.info("STEP 3/" + MainContainerAgent.STEPS + " (SUBSTEP " + (i) + "/" + infoSet.size() +
+                    logger.info("STEP 3/" + MasterAgent.STEPS + " (SUBSTEP " + (i) + "/" + infoSet.size() +
                             "): Bus info parsing");
                 }
                 try {
@@ -883,7 +883,7 @@ public class MapAccessManager {
                 String lon = attributes.getNamedItem("lon").getNodeValue();
 
                 if (belongsToCircle(Double.parseDouble(lat), Double.parseDouble(lon), new GeoPosition(middleLat, middleLon), radius) &&
-                        !MainContainerAgent.osmIdToStationOSMNode.containsKey(Long.parseLong(osmId))) {
+                        !MasterAgent.osmIdToStationOSMNode.containsKey(Long.parseLong(osmId))) {
                     NodeList list_tags = item.getChildNodes();
                     for (int z = 0; z < list_tags.getLength(); z++) {
                         Node tag = list_tags.item(z);
@@ -899,7 +899,7 @@ public class MapAccessManager {
                             else if (kAttr.getNodeValue().equals("ref")) {
                                 Node number_of_station = attr.getNamedItem("v");
                                 OSMStation stationOSMNode = new OSMStation(osmId, lat, lon, number_of_station.getNodeValue());
-                                var agent = MainContainerAgent.tryAddNewStationAgent(stationOSMNode);
+                                var agent = MasterAgent.tryAddNewStationAgent(stationOSMNode);
                                 agent.start();
                             }
                         }

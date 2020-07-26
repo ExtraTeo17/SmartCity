@@ -17,7 +17,6 @@
  */
 package osmproxy;
 
-import routing.RouteNode;
 import com.graphhopper.GHRequest;
 import com.graphhopper.GHResponse;
 import com.graphhopper.routing.Path;
@@ -26,6 +25,7 @@ import com.graphhopper.util.CmdArgs;
 import com.graphhopper.util.EdgeIteratorState;
 import com.graphhopper.util.PointList;
 import org.javatuples.Pair;
+import routing.RouteNode;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -38,8 +38,11 @@ import java.util.List;
  * @author Peter Karich
  */
 public class HighwayAccessor {
+    private static final String CONFIG_PATH = "config/graphHopper.properties";
+    private static final String[] args = new String[]{"config=" + CONFIG_PATH, "datareader.file=mazowieckie-latest.osm.pbf"};
 
-    public static Pair<List<Long>, List<RouteNode>> getOsmWayIdsAndPointList(String[] args, double fromLat, double fromLon, double toLat, double toLon, boolean onFoot) {
+
+    public static Pair<List<Long>, List<RouteNode>> getOsmWayIdsAndPointList(double fromLat, double fromLon, double toLat, double toLon, boolean onFoot) {
         List<Long> osmWayIds = new ArrayList<>();
         List<RouteNode> pointList = new ArrayList<>();
 

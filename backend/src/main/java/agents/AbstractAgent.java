@@ -9,7 +9,7 @@ import jade.wrapper.ControllerException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import routing.LightManagerNode;
-import smartcity.MainContainerAgent;
+import smartcity.MasterAgent;
 import vehicles.MovingObject;
 
 import java.time.Instant;
@@ -67,7 +67,7 @@ public abstract class AbstractAgent extends Agent {
         Properties properties = new Properties();
         var agentType = MessageParameter.GetTypeByMovingObject(movingObject);
         properties.setProperty(MessageParameter.TYPE, agentType);
-        Instant time = MainContainerAgent.getSimulationTime().toInstant().plusMillis(movingObject.getMillisecondsToNextLight());
+        Instant time = MasterAgent.getSimulationTime().toInstant().plusMillis(movingObject.getMillisecondsToNextLight());
         properties.setProperty(MessageParameter.ARRIVAL_TIME, "" + time);
         properties.setProperty(MessageParameter.ADJACENT_OSM_WAY_ID, "" + nextManager.getOsmWayId());
         msg.setAllUserDefinedParameters(properties);

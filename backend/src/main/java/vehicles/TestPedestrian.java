@@ -2,7 +2,7 @@ package vehicles;
 
 import routing.RouteNode;
 import routing.StationNode;
-import smartcity.MainContainerAgent;
+import smartcity.MasterAgent;
 
 import java.time.Instant;
 import java.util.List;
@@ -18,11 +18,11 @@ public class TestPedestrian extends Pedestrian {
     @Override
     public void setState(DrivingState state) {
         if (getState() == DrivingState.STARTING) {
-            start = MainContainerAgent.getSimulationTime().toInstant();
+            start = MasterAgent.getSimulationTime().toInstant();
         }
         super.setState(state);
         if (state == DrivingState.AT_DESTINATION) {
-            end = MainContainerAgent.getSimulationTime().toInstant();
+            end = MasterAgent.getSimulationTime().toInstant();
         }
     }
 }

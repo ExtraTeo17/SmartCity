@@ -11,7 +11,7 @@ import org.slf4j.LoggerFactory;
 import org.w3c.dom.Node;
 import osmproxy.MapAccessManager;
 import osmproxy.elements.OSMNode;
-import smartcity.MainContainerAgent;
+import smartcity.MasterAgent;
 
 import java.time.Instant;
 import java.util.*;
@@ -238,7 +238,7 @@ public class SimpleCrossroad extends Crossroad {
         private boolean shouldExtendBecauseOfFarAwayQueque() {
             for (Light light : lights.values()) {
                 if (light.isGreen()) {
-                    Instant current_time = MainContainerAgent.getSimulationTime().toInstant();
+                    Instant current_time = MasterAgent.getSimulationTime().toInstant();
                     for (Instant time_of_car : light.farAwayCarMap.values()) {
                         // If current time + EXTEND_TIME > time_of_car
                         if (current_time.plusSeconds(SimpleCrossroad.EXTEND_TIME).isAfter(time_of_car)) {
@@ -248,7 +248,7 @@ public class SimpleCrossroad extends Crossroad {
                     }
                 }
                 else {
-                    Instant current_time = MainContainerAgent.getSimulationTime().toInstant();
+                    Instant current_time = MasterAgent.getSimulationTime().toInstant();
                     for (Instant time_of_pedestrian : light.farAwayPedestrianMap.values()) {
                         // If current time + EXTEND_TIME > time_of_car
                         if (current_time.plusSeconds(SimpleCrossroad.EXTEND_TIME).isAfter(time_of_pedestrian)) {

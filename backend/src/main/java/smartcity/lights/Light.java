@@ -9,7 +9,7 @@ import org.jxmapviewer.viewer.Waypoint;
 import org.jxmapviewer.viewer.WaypointPainter;
 import org.w3c.dom.Node;
 import routing.LightManagerNode;
-import smartcity.MainContainerAgent;
+import smartcity.MasterAgent;
 
 import java.time.Instant;
 import java.util.*;
@@ -61,10 +61,10 @@ public class Light {
         final LightManagerNode lightManagerNode = new LightManagerNode(position.getLatitude(), position.getLongitude(),
                 adjacentOsmWayId, Long.parseLong(adjacentCrossingOsmId1), adjacentCrossingOsmId2 != null ?
                 Long.parseLong(adjacentCrossingOsmId2) : null, managerId);
-        MainContainerAgent.wayIdLightIdToLightManagerNode.put(Pair.with(adjacentOsmWayId, osmId), lightManagerNode);
-        MainContainerAgent.crossingOsmIdToLightManagerNode.put(Long.parseLong(adjacentCrossingOsmId1), lightManagerNode);
+        MasterAgent.wayIdLightIdToLightManagerNode.put(Pair.with(adjacentOsmWayId, osmId), lightManagerNode);
+        MasterAgent.crossingOsmIdToLightManagerNode.put(Long.parseLong(adjacentCrossingOsmId1), lightManagerNode);
         if (adjacentCrossingOsmId2 != null) {
-            MainContainerAgent.crossingOsmIdToLightManagerNode.put(Long.parseLong(adjacentCrossingOsmId2), lightManagerNode);
+            MasterAgent.crossingOsmIdToLightManagerNode.put(Long.parseLong(adjacentCrossingOsmId2), lightManagerNode);
         }
     }
 
