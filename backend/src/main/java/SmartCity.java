@@ -10,7 +10,7 @@ public class SmartCity {
     private static Logger logger = LoggerFactory.getLogger(SmartCity.class);
 
     public static void main(String[] args) {
-        var injector = Guice.createInjector(new MainModule());
+        var injector = Guice.createInjector(new MainModule(args));
 
         // TODO: Inject configuration - port/main name, etc.
         var controller = injector.getInstance(ContainerController.class);
