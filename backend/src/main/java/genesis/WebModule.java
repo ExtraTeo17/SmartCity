@@ -1,20 +1,17 @@
 package genesis;
 
-import com.google.inject.Provides;
-import com.google.inject.Singleton;
+import com.google.inject.Binder;
+import org.java_websocket.server.WebSocketServer;
 import web.WebServer;
-import web.WebServerFactory;
+
 
 public class WebModule extends AbstractModule {
-    private final int port;
-
-    public WebModule(int port) {
-        this.port = port;
+    public WebModule() {
     }
 
-    @Provides
-    @Singleton
-    public WebServer createWebServer() {
-        return WebServerFactory.create(port);
+    @Override
+    public void configure(Binder binder) {
+        super.configure(binder);
+        binder.bind(WebSocketServer.class).to(WebServer.class);
     }
 }

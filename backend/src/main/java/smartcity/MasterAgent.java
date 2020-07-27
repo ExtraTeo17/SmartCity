@@ -28,7 +28,6 @@ import vehicles.Pedestrian;
 import vehicles.TestCar;
 import vehicles.TestPedestrian;
 import web.WebServer;
-import web.WebServerFactory;
 
 import java.time.Duration;
 import java.time.Instant;
@@ -63,15 +62,16 @@ public class MasterAgent extends Agent {
     public int pedestrianId = 0;
 
     @Inject
-    public MasterAgent(WebServer webServer) {
+    public MasterAgent(WebServer webServer, MapWindow window) {
         this.webServer = webServer;
+        MasterAgent.window = window;
     }
-
 
     @Override
     protected void setup() {
         container = getContainerController();
-        window = WindowInitializer.displayWindow(this);
+        window.setSmartCityAgent(this);
+        window.display();
         addBehaviour(getReceiveMessageBehaviour());
         webServer.start();
     }

@@ -1,7 +1,5 @@
 package genesis;
 
-import com.google.inject.Binder;
-import com.google.inject.Module;
 import com.google.inject.Provides;
 import com.google.inject.Singleton;
 import jade.Boot;
@@ -12,8 +10,10 @@ import jade.util.leap.Properties;
 import jade.wrapper.ContainerController;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import web.WebServer;
-import web.WebServerFactory;
+import utilities.ExtendedProperties;
+
+import java.io.InputStream;
+import java.net.URL;
 
 public class MainModule extends AbstractModule {
     private final static Logger logger = LoggerFactory.getLogger(MainModule.class);
@@ -25,7 +25,7 @@ public class MainModule extends AbstractModule {
 
     @Provides
     @Singleton
-    public ContainerController boot() {
+    private ContainerController boot() {
         ProfileImpl profile = createProfile();
         Runtime.instance().setCloseVM(true);
         return Runtime.instance().createMainContainer(profile);
@@ -54,5 +54,21 @@ public class MainModule extends AbstractModule {
         return new ProfileImpl();
     }
 
+    @Provides
+    @Singleton
+    private ExtendedProperties readProperties() {
+        URL configFile = MainModule.class.getClassLoader().getResource("config.properties");
+        var prop = new ExtendedProperties();
+        if (configFile != null) {
+            try {
+                InputStream configFileStream = configFile.openStream();
+                prop.load(configFileStream);
+                configFileStream.close();
+            } catch (Exception e) {
+                logger.warn("Unable to read properties", e);
+            }
+        }
 
+        return prop;
+    }
 }

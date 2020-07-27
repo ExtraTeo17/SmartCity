@@ -2,6 +2,7 @@ package smartcity;
 
 import java.util.concurrent.atomic.AtomicInteger;
 
+// TODO: Instance class via DI + Id based on string/enum/class in dictionary
 class IdGenerator {
     private static final int resetValue = 1;
     private static final AtomicInteger lightManagerId = new AtomicInteger();

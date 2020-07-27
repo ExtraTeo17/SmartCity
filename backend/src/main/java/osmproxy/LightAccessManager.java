@@ -43,8 +43,7 @@ public class LightAccessManager extends MapAccessManager {
 
     private static List<OSMNode> sendParentWaysOfLightOverpassQueryBeta(final List<OSMNode> lightsAround)
             throws IOException, ParserConfigurationException, SAXException {
-        final List<OSMNode> lightInfoList = parseLightNodeList(MapAccessManager.getNodesViaOverpass(getParentWaysOfLightOverpassQueryBeta(lightsAround)));
-        return lightInfoList;
+        return parseLightNodeList(MapAccessManager.getNodesViaOverpass(getParentWaysOfLightOverpassQueryBeta(lightsAround)));
     }
 
     private static String getParentWaysOfLightOverpassQueryBeta(final List<OSMNode> lightsAround) {

@@ -4,6 +4,8 @@ import agents.BusAgent;
 import agents.LightManager;
 import agents.PedestrianAgent;
 import agents.VehicleAgent;
+import com.google.common.eventbus.Subscribe;
+import events.SetZoneEvent;
 import org.javatuples.Pair;
 import org.jxmapviewer.JXMapViewer;
 import org.jxmapviewer.OSMTileFactoryInfo;
@@ -44,6 +46,8 @@ import java.time.Instant;
 import java.util.List;
 import java.util.Timer;
 import java.util.*;
+
+import static smartcity.MasterAgent.SHOULD_GENERATE_PEDESTRIANS_AND_BUSES;
 
 public class MapWindow {
     private static final Logger logger = LoggerFactory.getLogger(MapWindow.class);
@@ -239,12 +243,224 @@ public class MapWindow {
             }
         });
         refreshTimer.scheduleAtFixedRate(new RefreshTask(), 0, REFRESH_MAP_INTERVAL_MILLISECONDS);
-
     }
 
-    public MapWindow(MasterAgent agent) {
-        this();
-        smartCityAgent = agent;
+    public void setSmartCityAgent(MasterAgent smartCityAgent) {
+        this.smartCityAgent = smartCityAgent;
+    }
+
+    public MasterAgent getSmartCityAgent() {
+        return smartCityAgent;
+    }
+
+    public void display() {
+        var mapViewer = this.MapViewer;
+        JFrame frame = new JFrame("Smart City by Katherine & Dominic & Robert");
+        frame.getContentPane().add(this.MainPanel);
+        JMenuBar menuBar = new JMenuBar();
+        JMenu view = new JMenu("View");
+
+        final JCheckBoxMenuItem cars = new JCheckBoxMenuItem("Render cars", this.renderCars);
+        var window = this;
+        cars.addItemListener(new ItemListener() {
+            @Override
+            public void itemStateChanged(ItemEvent e) {
+                window.renderCars = cars.getState();
+            }
+        });
+        view.add(cars);
+
+        final JCheckBoxMenuItem routes = new JCheckBoxMenuItem("Render car routes", this.renderCarRoutes);
+        routes.addItemListener(new ItemListener() {
+            @Override
+            public void itemStateChanged(ItemEvent e) {
+                window.renderCarRoutes = routes.getState();
+            }
+        });
+        view.add(routes);
+
+        final JCheckBoxMenuItem buses = new JCheckBoxMenuItem("Render buses", this.renderBuses);
+        buses.addItemListener(new ItemListener() {
+            @Override
+            public void itemStateChanged(ItemEvent e) {
+                window.renderBuses = buses.getState();
+            }
+        });
+        view.add(buses);
+
+        final JCheckBoxMenuItem busRoutes = new JCheckBoxMenuItem("Render bus routes", this.renderBusRoutes);
+        busRoutes.addItemListener(new ItemListener() {
+            @Override
+            public void itemStateChanged(ItemEvent e) {
+                window.renderBusRoutes = busRoutes.getState();
+            }
+        });
+        view.add(busRoutes);
+
+        final JCheckBoxMenuItem pedestrian = new JCheckBoxMenuItem("Render pedestrians", this.renderPedestrians);
+        pedestrian.addItemListener(new ItemListener() {
+            @Override
+            public void itemStateChanged(ItemEvent e) {
+                window.renderPedestrians = pedestrian.getState();
+            }
+        });
+        view.add(pedestrian);
+
+        final JCheckBoxMenuItem pedestrianRoutes = new JCheckBoxMenuItem("Render pedestrian routes", this.renderPedestrianRoutes);
+        pedestrianRoutes.addItemListener(new ItemListener() {
+            @Override
+            public void itemStateChanged(ItemEvent e) {
+                window.renderPedestrianRoutes = pedestrianRoutes.getState();
+            }
+        });
+        view.add(pedestrianRoutes);
+
+        final JCheckBoxMenuItem lights = new JCheckBoxMenuItem("Render lights", this.renderLights);
+        lights.addItemListener(new ItemListener() {
+            @Override
+            public void itemStateChanged(ItemEvent e) {
+                window.renderLights = lights.getState();
+            }
+        });
+        view.add(lights);
+
+        final JCheckBoxMenuItem zone = new JCheckBoxMenuItem("Render zone", this.renderZone);
+        zone.addItemListener(new ItemListener() {
+            @Override
+            public void itemStateChanged(ItemEvent e) {
+                window.renderZone = zone.getState();
+            }
+        });
+        view.add(zone);
+
+        final JCheckBoxMenuItem stations = new JCheckBoxMenuItem("Render stations", this.renderStations);
+        stations.addItemListener(new ItemListener() {
+            @Override
+            public void itemStateChanged(ItemEvent e) {
+                window.renderStations = stations.getState();
+            }
+        });
+        view.add(stations);
+
+        menuBar.add(view);
+
+        JMenu debug = new JMenu("Debug");
+
+        JMenuItem runTest = new JMenuItem("Test crossroad");
+        var smartCityAgent = this.getSmartCityAgent();
+        runTest.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                window.setInputEnabled(false);
+                double lat = 52.23702507833161;
+                double lon = 21.017934679985046;
+                mapViewer.setAddressLocation(new GeoPosition(lat, lon));
+                mapViewer.setZoom(1);
+                window.prepareAgentsAndSetZone(lat, lon, 100);
+                GeoPosition N = new GeoPosition(52.23758683540269, 21.017720103263855);
+                GeoPosition S = new GeoPosition(52.23627934304847, 21.018092930316925);
+                GeoPosition E = new GeoPosition(52.237225472020704, 21.019399166107178);
+                GeoPosition W = new GeoPosition(52.23678526174392, 21.016663312911987);
+
+                // N to S
+                List<RouteNode> NS;
+                try {
+                    NS = Router.generateRouteInfo(N, S);
+
+                    for (int i = 0; i < 5; i++) {
+                        smartCityAgent.tryAddNewVehicleAgent(NS);
+                    }
+                } catch (Exception ex) {
+                    ex.printStackTrace();
+                    return;
+                }
+
+                // S to N
+                List<RouteNode> SN;
+                try {
+                    SN = Router.generateRouteInfo(S, N);
+
+                    for (int i = 0; i < 5; i++) {
+                        smartCityAgent.tryAddNewVehicleAgent(SN);
+                    }
+                } catch (Exception ex) {
+                    ex.printStackTrace();
+                    return;
+                }
+
+                // E to W
+                List<RouteNode> EW;
+                try {
+                    EW = Router.generateRouteInfo(E, W);
+
+                    for (int i = 0; i < 5; i++) {
+                        smartCityAgent.tryAddNewVehicleAgent(EW);
+                    }
+                } catch (Exception ex) {
+                    ex.printStackTrace();
+                    return;
+                }
+
+                // W to E
+                List<RouteNode> WE;
+                try {
+                    WE = Router.generateRouteInfo(W, E);
+                    for (int i = 0; i < 5; i++) {
+                        smartCityAgent.tryAddNewVehicleAgent(WE);
+                    }
+                } catch (Exception ex) {
+                    ex.printStackTrace();
+                    return;
+                }
+
+                smartCityAgent.activateLightManagerAgents();
+
+                // start all
+                for (VehicleAgent agent : MasterAgent.Vehicles) {
+                    agent.start();
+                }
+
+            }
+        });
+        debug.add(runTest);
+
+        menuBar.add(debug);
+
+        addGenerationMenu(menuBar);
+
+        frame.setJMenuBar(menuBar);
+        frame.setSize(1200, 600);
+        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        frame.setVisible(true);
+    }
+
+    private static void addGenerationMenu(JMenuBar menuBar) {
+        JMenu generation = new JMenu("Generation");
+
+        final JCheckBoxMenuItem car_gen = new JCheckBoxMenuItem("Cars", MasterAgent.SHOULD_GENERATE_CARS);
+        car_gen.addItemListener(new ItemListener() {
+            @Override
+            public void itemStateChanged(ItemEvent e) {
+                MasterAgent.SHOULD_GENERATE_CARS = car_gen.getState();
+            }
+        });
+        generation.add(car_gen);
+
+        final JCheckBoxMenuItem pedestrians = new JCheckBoxMenuItem("Pedestrians", SHOULD_GENERATE_PEDESTRIANS_AND_BUSES);
+        pedestrians.addItemListener(new ItemListener() {
+            @Override
+            public void itemStateChanged(ItemEvent e) {
+                SHOULD_GENERATE_PEDESTRIANS_AND_BUSES = pedestrians.getState();
+            }
+        });
+        generation.add(pedestrians);
+
+        menuBar.add(generation);
+    }
+
+    @Subscribe
+    public void HandleSetZone(SetZoneEvent event) {
+        logger.info("Set zone event occurred");
     }
 
     public static int getTimeScale() {
@@ -276,9 +492,9 @@ public class MapWindow {
         zoneCenter = new GeoPosition(lat, lon);
 
         if (MasterAgent.SHOULD_GENERATE_PEDESTRIANS_AND_BUSES) {
-            smartCityAgent.prepareStationsAndBuses(zoneCenter, getZoneRadius());
+            smartCityAgent.prepareStationsAndBuses(zoneCenter, radius);
         }
-        smartCityAgent.prepareLightManagers(zoneCenter, getZoneRadius());
+        smartCityAgent.prepareLightManagers(zoneCenter, radius);
         state = SimulationState.READY_TO_RUN;
 
         refreshTimer.scheduleAtFixedRate(new RefreshTask(), 0, REFRESH_MAP_INTERVAL_MILLISECONDS);
@@ -902,7 +1118,7 @@ public class MapWindow {
                 bus = busArray.get(random.nextInt(busArray.size()));
             } catch (Exception e) {
                 logger.warn("The 'shouldPrepareBuses' toggle in smartCityAgent is probably switched off (pedestrians " +
-                    "cannot exist without buses)", e);
+                        "cannot exist without buses)", e);
                 throw e;
             }
 
