@@ -15,6 +15,8 @@ class App extends React.Component {
   componentDidMount() {}
 
   render() {
+    const { apiManager } = this.state;
+
     return (
       <div className="App">
         <header className="App-header">
@@ -46,7 +48,7 @@ class App extends React.Component {
                       placeholder="Enter longitude"
                     />
                   </div>
-                  <button className="btn btn-primary" type="button">
+                  <button className="btn btn-primary" type="button" onClick={e => apiManager.setZone()}>
                     Set zone
                   </button>
                 </form>
