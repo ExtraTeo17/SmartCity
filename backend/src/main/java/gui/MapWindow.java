@@ -459,8 +459,10 @@ public class MapWindow {
     }
 
     @Subscribe
-    public void HandleSetZone(SetZoneEvent event) {
-        logger.info("Set zone event occurred");
+    public void HandleSetZone(SetZoneEvent e) {
+        logger.info("Set zone event occurred: " + e.toString());
+        prepareAgentsAndSetZone(e.latitude, e.longitude, (int) e.radius);
+        state = SimulationState.READY_TO_RUN;
     }
 
     public static int getTimeScale() {

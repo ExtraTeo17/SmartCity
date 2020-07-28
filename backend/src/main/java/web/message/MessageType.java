@@ -15,15 +15,13 @@ public enum MessageType {
 
     @JsonCreator
     public static MessageType create(int code) {
-        // TODO: improve
-        var values = MessageType.values();
-        for (var value : values) {
+        for (var value : MessageType.values()) {
             if (value.code == code) {
                 return value;
             }
         }
 
-        return null;
+        throw new IllegalArgumentException("Message type with code: " + code + "was not found");
     }
 
     @JsonValue

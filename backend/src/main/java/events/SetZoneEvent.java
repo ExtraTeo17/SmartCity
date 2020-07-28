@@ -10,4 +10,13 @@ public class SetZoneEvent {
         this.longitude = longitude;
         this.radius = radius;
     }
+
+    @Override
+    public String toString() {
+        return '(' +
+                "latitude: " + latitude +
+                ", longitude: " + longitude +
+                ", radius: " + radius +
+                ')';
+    }
 }
