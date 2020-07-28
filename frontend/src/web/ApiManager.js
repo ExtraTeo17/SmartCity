@@ -5,18 +5,32 @@ import { SET_ZONE } from "./MessageType";
 class ApiManager {
   constructor() {
     this.socket = new WebSocket(SERVER_ADDRESS);
+    // TODO: Why connected twice?
     this.socket.onopen = e => {
       console.log("Connected !!!");
     };
   }
 
-  setZone() {
-    // TODO: payload
-    var msg = JSON.stringify({
+  setZone({ latitude, longitude, radius } = {}) {
+    var msg = {
       type: SET_ZONE,
-      payload: "",
-    });
-    this.socket.send(msg);
+      payload: {
+        latitude,
+        longitude,
+        radius,
+      },
+    };
+    this._send(msg);
+  }
+
+  _send(msgObj) {
+    var msg = {
+      type: msgObj.type,
+      payload: JSON.stringify(msgObj.payload),
+    };
+
+    console.log(msg.payload);
+    this.socket.send(JSON.stringify(msg));
   }
 }
 
