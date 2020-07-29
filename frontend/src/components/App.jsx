@@ -10,7 +10,6 @@ class App extends React.Component {
     super(props);
     // TODO: connect to Map
     this.state = {
-      apiManager: new ApiManager(),
       latitude: 52.23682,
       longitude: 21.01681,
       radius: 200,
@@ -36,7 +35,7 @@ class App extends React.Component {
   componentDidMount() {}
 
   render() {
-    const { apiManager, latitude, longitude, radius } = this.state;
+    const { latitude, longitude, radius } = this.state;
 
     return (
       <div className="App">
@@ -86,7 +85,7 @@ class App extends React.Component {
                   <button
                     className="btn btn-primary"
                     type="button"
-                    onClick={() => apiManager.setZone({ latitude, longitude, radius })}
+                    onClick={() => ApiManager.setZone({ latitude, longitude, radius })}
                   >
                     Set zone
                   </button>

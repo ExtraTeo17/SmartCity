@@ -1,17 +1,14 @@
 import { SERVER_ADDRESS } from "../utils/constants";
 import { SET_ZONE } from "./MessageType";
 
-// TODO: static?
-class ApiManager {
-  constructor() {
-    this.socket = new WebSocket(SERVER_ADDRESS);
-    // TODO: Why connected twice?
-    this.socket.onopen = e => {
-      console.log("Connected !!!");
-    };
-  }
+var socket = new WebSocket(SERVER_ADDRESS);
+socket.onopen = () => {
+  console.log("Connected !!!");
+};
 
-  setZone({ latitude, longitude, radius } = {}) {
+// TODO: static?
+export default {
+  setZone({ latitude, longitude, radius } = { latitude: 0, longitude: 0, radius: 0 }) {
     var msg = {
       type: SET_ZONE,
       payload: {
@@ -21,8 +18,11 @@ class ApiManager {
       },
     };
     this._send(msg);
-  }
+  },
 
+  /**
+   * @param {{ type: any; payload: any; }} msgObj
+   */
   _send(msgObj) {
     var msg = {
       type: msgObj.type,
@@ -30,8 +30,6 @@ class ApiManager {
     };
 
     console.log(msg.payload);
-    this.socket.send(JSON.stringify(msg));
-  }
-}
-
-export default ApiManager;
+    socket.send(JSON.stringify(msg));
+  },
+};
