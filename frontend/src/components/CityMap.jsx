@@ -1,8 +1,9 @@
 import React, { useState } from "react";
 import { Map, Marker, Popup, TileLayer } from "react-leaflet";
+import "../styles/CityMap.css";
 
 const CityMap = props => {
-  const [position, setPosition] = useState([52.217154, 21.005575]);
+  const [position, setPosition] = useState({ lat: 52.217154, lng: 21.005575 });
   const [zoom, setZoom] = useState(15);
 
   return (

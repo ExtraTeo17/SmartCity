@@ -6,7 +6,6 @@ socket.onopen = () => {
   console.log("Connected !!!");
 };
 
-// TODO: static?
 export default {
   setZone({ latitude, longitude, radius } = { latitude: 0, longitude: 0, radius: 0 }) {
     var msg = {
