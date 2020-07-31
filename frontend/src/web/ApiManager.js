@@ -7,13 +7,13 @@ socket.onopen = () => {
 };
 
 export default {
-  setZone({ latitude, longitude, radius } = { latitude: 0, longitude: 0, radius: 0 }) {
+  setZone({ lat, lng, rad } = { lat: 0, lng: 0, rad: 0 }) {
     var msg = {
       type: SET_ZONE,
       payload: {
-        latitude,
-        longitude,
-        radius,
+        latitude: lat,
+        longitude: lng,
+        radius: rad,
       },
     };
     this._send(msg);

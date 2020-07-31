@@ -3,36 +3,28 @@ import CityMap from "./CityMap";
 import "../styles/App.css";
 import Menu from "./Menu";
 
-/*TODO: Functional component? */
-class App extends React.Component {
-  constructor(props) {
-    super(props);
-    // TODO: connect to Map
-    this.state = {
-      latitude: 52.23682,
-      longitude: 21.01681,
-      radius: 200,
-    };
-  }
+import appReducer from "../redux/reducers";
+import { createStore } from "redux";
+import { composeWithDevTools } from "redux-devtools-extension";
+import { Provider } from "react-redux";
 
-  componentDidMount() {}
+const store = createStore(appReducer, composeWithDevTools());
 
-  render() {
-    return (
-      <div className="App">
-        <header className="App-header">
-          <div className="row w-100 main-container">
-            <div className="col-9">
-              <CityMap />
-            </div>
-            <div className="col-3">
-              <Menu />
-            </div>
+const App = () => (
+  <Provider store={store}>
+    <div className="App">
+      <header className="App-header">
+        <div className="row w-100 main-container">
+          <div className="col-9">
+            <CityMap />
           </div>
-        </header>
-      </div>
-    );
-  }
-}
+          <div className="col-3">
+            <Menu />
+          </div>
+        </div>
+      </header>
+    </div>
+  </Provider>
+);
 
 export default App;

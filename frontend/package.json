@@ -3,14 +3,17 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
+    "leaflet": "1.6.0",
     "react": "^16.13.1",
     "react-dom": "^16.13.1",
-    "react-scripts": "3.4.1",
-    "leaflet": "1.6.0",
     "react-leaflet": "2.7.0",
-    "react-notify-toast": "0.5.1"
+    "react-notify-toast": "0.5.1",
+    "react-redux": "^7.2.1",
+    "react-scripts": "3.4.1",
+    "redux": "^4.0.5"
   },
   "devDependencies": {
+    "redux-devtools-extension": "2.13.8",
     "eslint": "^6.8.0",
     "eslint-plugin-import": "^2.18.2",
     "eslint-plugin-jest": "^22.17.0",

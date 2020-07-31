@@ -1,10 +1,41 @@
+/* eslint-disable react/prop-types */
 import React, { useState } from "react";
 import ApiManager from "../web/ApiManager";
+import { connect } from "react-redux";
+import { centerUpdated } from "../redux/actions";
 
 const Menu = props => {
-  const [latitude, setLatitude] = useState(52.217154);
-  const [longitude, setLongtitude] = useState(21.01681);
-  const [radius, setRadius] = useState(200);
+  const { lat, lng, rad } = props.center;
+
+  /**
+   * @param {number} val
+   */
+  const setLat = val => {
+    if (!isNaN(val)) {
+      let center = { ...props.center, lat: val };
+      props.dispatch(centerUpdated(center));
+    }
+  };
+
+  /**
+   * @param {number} val
+   */
+  const setLng = val => {
+    if (!isNaN(val)) {
+      let center = { ...props.center, lng: val };
+      props.dispatch(centerUpdated(center));
+    }
+  };
+
+  /**
+   * @param {number} val
+   */
+  const setRad = val => {
+    if (!isNaN(val)) {
+      let center = { ...props.center, rad: val };
+      props.dispatch(centerUpdated(center));
+    }
+  };
 
   return (
     <div className="row justify-content-center">
@@ -13,40 +44,39 @@ const Menu = props => {
           <label htmlFor="lat">Latitude</label>
           <input
             type="number"
-            defaultValue={latitude}
+            defaultValue={lat}
             className="form-control"
             id="lat"
+            step="0.00001"
             placeholder="Enter latitude"
-            onChange={e => setLatitude(parseFloat(e.target.value))}
+            onChange={e => setLat(parseFloat(e.target.value))}
           />
         </div>
         <div className="form-group">
           <label htmlFor="long">Longitude</label>
           <input
             type="number"
-            defaultValue={longitude}
+            defaultValue={lng}
             className="form-control"
             id="long"
+            step="0.00001"
             placeholder="Enter longitude"
-            onChange={e => setLongtitude(parseFloat(e.target.value))}
+            onChange={e => setLng(parseFloat(e.target.value))}
           />
         </div>
         <div className="form-group">
           <label htmlFor="rad">Radius</label>
           <input
             type="number"
-            defaultValue={radius}
+            defaultValue={rad}
             className="form-control"
             id="rad"
+            step="10"
             placeholder="Enter radius"
-            onChange={e => setRadius(parseFloat(e.target.value))}
+            onChange={e => setRad(parseFloat(e.target.value))}
           />
         </div>
-        <button
-          className="btn btn-primary"
-          type="button"
-          onClick={() => ApiManager.setZone({ latitude, longitude, radius })}
-        >
+        <button className="btn btn-primary" type="button" onClick={() => ApiManager.setZone({ lat, lng, rad })}>
           Set zone
         </button>
       </form>
@@ -54,4 +84,10 @@ const Menu = props => {
   );
 };
 
-export default Menu;
+const mapStateToProps = (state /* , ownProps */) => {
+  return {
+    center: state.center,
+  };
+};
+
+export default connect(mapStateToProps)(Menu);
