@@ -209,16 +209,15 @@ public class MasterAgent extends Agent {
         IdGenerator.resetLightManagerId();
         lightManagersUnderConstruction = true;
         if (USE_DEPRECATED_XML_FOR_LIGHT_MANAGERS) {
-            MapAccessManager.prepareLightManagersInRadiusAndLightIdToLightManagerIdHashSet(this, middlePoint, radius);
+            MapAccessManager.prepareLightManagersInRadiusAndLightIdToLightManagerIdHashSet(middlePoint, radius);
         }
         else {
-            tryPrepareLightManagersInRadiusAndLightIdToLightManagerIdHashSetBeta(this, middlePoint, radius);
+            tryPrepareLightManagersInRadiusAndLightIdToLightManagerIdHashSetBeta(middlePoint, radius);
         }
         lightManagersUnderConstruction = false;
     }
 
-    private void tryPrepareLightManagersInRadiusAndLightIdToLightManagerIdHashSetBeta(MasterAgent smartCityAgent,
-                                                                                      GeoPosition middlePoint, int radius) {
+    private void tryPrepareLightManagersInRadiusAndLightIdToLightManagerIdHashSetBeta(GeoPosition middlePoint, int radius) {
         try {
             LightAccessManager.constructLightManagers(middlePoint, radius);
         } catch (Exception e) {
