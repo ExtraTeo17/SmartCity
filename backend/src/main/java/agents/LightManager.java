@@ -33,12 +33,9 @@ public class LightManager extends AbstractAgent {
     @Override
     protected void setup() {
         print("I'm a traffic manager.");
-        strategy.ApplyStrategy(this);
-    }
-
-    @Override
-    public void takeDown() {
-        super.takeDown();
+        // TODO: Remove strategy initialization from this class
+        //  Inject it as dependency or better add factory for lightManager with parameter
+        strategy.applyStrategy(this);
     }
 
     public void print(String message) {

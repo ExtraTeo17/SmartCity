@@ -600,7 +600,7 @@ public class MapAccessManager {
                 "  <print e=\"\" from=\"_\" geometry=\"full\" ids=\"yes\" limit=\"\" mode=\"body\" n=\"\" order=\"id\" s=\"\" w=\"\"/>";
     }
 
-    private static List<OSMNode> parseLightNodeList(Document nodesViaOverpass) {
+    public static List<OSMNode> parseLightNodeList(Document nodesViaOverpass) {
         List<OSMNode> lightNodeList = new ArrayList<>();
         Node osmRoot = nodesViaOverpass.getFirstChild();
         NodeList osmXMLNodes = osmRoot.getChildNodes();
@@ -669,7 +669,7 @@ public class MapAccessManager {
                 "  <print e=\"\" from=\"_\" geometry=\"skeleton\" ids=\"yes\" limit=\"\" mode=\"ids_only\" n=\"\" order=\"id\" s=\"\" w=\"\"/>";
     }
 
-    private static void parseChildNodesOfWays(Document childNodesOfWays, List<OSMNode> lightsOfTypeA) {
+    public static void parseChildNodesOfWays(Document childNodesOfWays, List<OSMNode> lightsOfTypeA) {
         Node osmRoot = childNodesOfWays.getFirstChild();
         NodeList osmXMLNodes = osmRoot.getChildNodes();
         int lightIndex = 0, parentWayIndex = 0;
@@ -864,8 +864,6 @@ public class MapAccessManager {
                             info.setBusLine(number_of_line.getNodeValue());
                         }
                     }
-                    logger.info("STEP 3/" + MasterAgent.STEPS + " (SUBSTEP " + (i) + "/" + infoSet.size() +
-                            "): Bus info parsing");
                 }
                 try {
                     var overpassNodes = getNodesViaOverpass(getBusWayOverpassQueryWithPayload(builder));

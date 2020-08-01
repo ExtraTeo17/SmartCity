@@ -34,6 +34,7 @@ public class MovingObjectImpl extends MovingObject {
         return VehicleType.REGULAR_CAR.toString();
     }
 
+
     @Override
     public LightManagerNode findNextTrafficLight() {
         for (int i = index + 1; i < route.size(); i++) {

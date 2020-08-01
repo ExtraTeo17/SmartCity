@@ -461,7 +461,7 @@ public class MapWindow {
     @Subscribe
     public void HandleSetZone(SetZoneEvent e) {
         logger.info("Set zone event occurred: " + e.toString());
-        prepareAgentsAndSetZone(e.latitude, e.longitude, (int) e.radius);
+       // prepareAgentsAndSetZone(e.latitude, e.longitude, (int) e.radius);
         state = SimulationState.READY_TO_RUN;
     }
 
@@ -669,7 +669,7 @@ public class MapWindow {
             painter_high.setRenderer(new CustomWaypointRenderer("bus_high.png"));
             painters.add(painter_high);
         } catch (Exception e) {
-
+            logger.warn("Error drawing buses", e);
         }
     }
 
@@ -1028,7 +1028,7 @@ public class MapWindow {
                     RunBusBasedOnTimeTable();
                 }
             } catch (Exception e) {
-                e.printStackTrace();
+                logger.warn("Error in bus control task", e);
             }
         }
 
@@ -1055,7 +1055,7 @@ public class MapWindow {
             try {
                 info = Router.generateRouteInfo(A, B);
             } catch (Exception e) {
-                e.printStackTrace();
+                logger.warn("Error generating route info");
                 return;
             }
 
@@ -1079,7 +1079,7 @@ public class MapWindow {
                 if (!MasterAgent.SHOULD_GENERATE_PEDESTRIANS_AND_BUSES) {
                     return;
                 }
-                // add people limit
+                // TODO: add people limit
                 final Pair<Pair<StationNode, StationNode>, String> stationNodePairAndBusLine = getStationPairAndLineFromRandomBus();
                 final StationNode startStation = stationNodePairAndBusLine.getValue0().getValue0();
                 final StationNode finishStation = stationNodePairAndBusLine.getValue0().getValue1();

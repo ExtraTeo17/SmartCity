@@ -1,9 +1,9 @@
 package events;
 
 public class SetZoneEvent {
-    public final double latitude;
-    public final double longitude;
-    public final double radius;
+    private final double latitude;
+    private final double longitude;
+    private final double radius;
 
     public SetZoneEvent(double latitude, double longitude, double radius) {
         this.latitude = latitude;
@@ -18,5 +18,17 @@ public class SetZoneEvent {
                 ", longitude: " + longitude +
                 ", radius: " + radius +
                 ')';
+    }
+
+    public double getLatitude() {
+        return latitude;
+    }
+
+    public double getLongitude() {
+        return longitude;
+    }
+
+    public double getRadius() {
+        return radius;
     }
 }

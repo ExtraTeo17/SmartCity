@@ -6,7 +6,7 @@ import com.google.inject.Inject;
 import events.SetZoneEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import web.message.payloads.SetZonePayload;
+import web.message.payloads.requests.SetZoneRequest;
 
 import java.io.IOException;
 import java.util.Optional;
@@ -33,14 +33,13 @@ public class MessageHandler {
     }
 
     private void Handle(MessageDto message) {
-        // TODO: Class hierarchy for appropriate message types
         switch (message.type) {
-            case SET_ZONE:
-                var payload = tryDeserialize(message.payload, SetZonePayload.class);
+            case SET_ZONE_REQUEST:
+                var payload = tryDeserialize(message.payload, SetZoneRequest.class);
                 if (payload.isPresent()) {
                     var pVal = payload.get();
                     // TODO: Mapper?
-                    eventBus.post(new SetZoneEvent(pVal.getLatitude(), pVal.getLongitude(), pVal.getRadius()));
+                    eventBus.post(new SetZoneEvent(pVal.latitude, pVal.longitude, pVal.radius));
                 }
                 break;
         }

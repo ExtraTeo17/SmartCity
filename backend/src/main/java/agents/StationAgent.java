@@ -166,8 +166,6 @@ public class StationAgent extends AbstractAgent {
                 send(msg);
 
             }
-
-
         };
 
         addBehaviour(communication);

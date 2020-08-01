@@ -37,8 +37,9 @@ public class LightManagerStrategy extends LightStrategy {
     }
 
     @Override
-    public void ApplyStrategy(final LightManager agent) {
+    public void applyStrategy(final LightManager agent) {
         crossroad.startLifetime();
+        // TODO: Move to constructor
         this.agent = agent;
         Behaviour communication = new CyclicBehaviour() {
             @Override

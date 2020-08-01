@@ -33,9 +33,9 @@ public class SimpleLightGroup {
         HashSet<Waypoint> set = new HashSet<>();
 
         for (Light light : lights) {
-
             light.draw(set, painter);
         }
+
         painter.setWaypoints(set);
     }
 

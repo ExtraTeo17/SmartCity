@@ -44,8 +44,8 @@ public class MasterAgent extends Agent {
     public final static int SERVER_PORT = 9000;
     public final static boolean USE_DEPRECATED_XML_FOR_LIGHT_MANAGERS = false;
     public final static String STEPS = "6";
-    public static boolean SHOULD_GENERATE_PEDESTRIANS_AND_BUSES = false;
-    public static boolean SHOULD_GENERATE_CARS = true;
+    public static boolean SHOULD_GENERATE_PEDESTRIANS_AND_BUSES = true;
+    public static boolean SHOULD_GENERATE_CARS = false;
 
     // TODO: Delete this abomination (or at least make it private)
     public static final List<PedestrianAgent> pedestrians = new ArrayList<>();
@@ -220,7 +220,7 @@ public class MasterAgent extends Agent {
     private void tryPrepareLightManagersInRadiusAndLightIdToLightManagerIdHashSetBeta(MasterAgent smartCityAgent,
                                                                                       GeoPosition middlePoint, int radius) {
         try {
-            LightAccessManager.prepareLightManagersInRadiusAndLightIdToLightManagerIdHashSetBeta(this, middlePoint, radius);
+            LightAccessManager.constructLightManagers(middlePoint, radius);
         } catch (Exception e) {
             logger.error("Error preparing light managers", e);
         }

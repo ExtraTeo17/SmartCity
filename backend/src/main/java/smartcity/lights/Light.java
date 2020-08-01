@@ -24,12 +24,11 @@ public class Light {
     public Queue<String> carQueue = new LinkedList<>();
     public Queue<String> pedestrianQueue = new LinkedList<>();
     private LightColor carLightColor;
-    private LightColor pedestrianLightColor;
-    private GeoPosition position;
-    private long adjacentOsmWayId;
+    private final GeoPosition position;
+    private final long adjacentOsmWayId;
     private String adjacentCrossingOsmId1;
     private String adjacentCrossingOsmId2;
-    private long osmId;
+    private final long osmId;
 
     public Light(Node node, LightColor color, int managerId) {
         this.carLightColor = color;
@@ -72,22 +71,17 @@ public class Light {
         return carLightColor == LightColor.GREEN;
     }
 
-    public void draw(HashSet lightSet, WaypointPainter<Waypoint> painter) {
+    public void draw(HashSet<Waypoint> lightSet, WaypointPainter<Waypoint> painter) {
         lightSet.add(new DefaultWaypoint(position));
         switch (carLightColor) {
-            case RED:
-                painter.setRenderer(new CustomWaypointRenderer("light_red.png"));
-                break;
-            case YELLOW:
-                painter.setRenderer(new CustomWaypointRenderer("light_yellow.png"));
-                break;
-            case GREEN:
-                painter.setRenderer(new CustomWaypointRenderer("light_green.png"));
-                break;
+            case RED -> painter.setRenderer(new CustomWaypointRenderer("light_red.png"));
+            case YELLOW -> painter.setRenderer(new CustomWaypointRenderer("light_yellow.png"));
+            case GREEN -> painter.setRenderer(new CustomWaypointRenderer("light_green.png"));
         }
     }
 
     public void switchLight() {
+        LightColor pedestrianLightColor;
         if (carLightColor == LightColor.RED) {
             pedestrianLightColor = LightColor.RED;
             carLightColor = LightColor.GREEN;
