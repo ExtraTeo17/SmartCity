@@ -4,6 +4,7 @@ import agents.utils.LightColor;
 import gui.MapWindow;
 import org.jxmapviewer.JXMapViewer;
 import org.jxmapviewer.painter.Painter;
+import org.jxmapviewer.viewer.GeoPosition;
 import org.jxmapviewer.viewer.Waypoint;
 import org.jxmapviewer.viewer.WaypointPainter;
 import org.slf4j.Logger;
@@ -16,12 +17,14 @@ import smartcity.MasterAgent;
 import java.time.Instant;
 import java.util.*;
 import java.util.Map.Entry;
+import java.util.stream.Collectors;
 
-public class SimpleCrossroad extends Crossroad {
-    private static final Logger logger = LoggerFactory.getLogger(Crossroad.class);
+public class SimpleCrossroad implements ICrossroad {
     public static final int EXTEND_TIME = 30;
-    public boolean useStrategy = true;
-    private Map<Long, Light> lights = new HashMap<>();
+    public static boolean STRATEGY_ACTIVE = true;
+    private static final Logger logger = LoggerFactory.getLogger(ICrossroad.class);
+
+    private final Map<Long, Light> lights = new HashMap<>();
     private SimpleLightGroup lightGroup1;
     private SimpleLightGroup lightGroup2;
     private Timer timer;
@@ -62,15 +65,14 @@ public class SimpleCrossroad extends Crossroad {
             }
             timer = new Timer(true);
         } catch (IllegalStateException e) {
-            SimpleCrossroad.logger.info("Illegal state detected", e);
-            return;
+            logger.info("Illegal state detected", e);
         }
     }
 
     private void startTimer() {
         int delayBeforeStart = 0;
-        int repeatIntervalInMillisecs = SimpleCrossroad.EXTEND_TIME * 1000 / MapWindow.getTimeScale();
-        timer.scheduleAtFixedRate(new SwitchLightsTask(), delayBeforeStart, repeatIntervalInMillisecs);
+        int repeatIntervalInMilliseconds = SimpleCrossroad.EXTEND_TIME * 1000 / MapWindow.getTimeScale();
+        timer.scheduleAtFixedRate(new SwitchLightsTask(), delayBeforeStart, repeatIntervalInMilliseconds);
     }
 
     @Override
@@ -97,15 +99,6 @@ public class SimpleCrossroad extends Crossroad {
         return greenGroupCars > redGroupCars; // should check if two base green intervals have passed (also temporary, because it also sucks)
     }
 
-    private SimpleLightGroup currentGreenGroup() {
-        if (lightGroup1.areLightsGreen()) {
-            return lightGroup1;
-        }
-        else {
-            return lightGroup2;
-        }
-    }
-
     private OptimizationResult allCarsOnGreen() {
         OptimizationResult result = new OptimizationResult();
         for (Light light : lights.values()) {
@@ -124,14 +117,9 @@ public class SimpleCrossroad extends Crossroad {
     }
 
     @Override
-    public boolean isLightGreen(long adjacentOsmWayId) {
-        return lights.get(adjacentOsmWayId).isGreen();
-    }
-
-    @Override
     public void draw(List<Painter<JXMapViewer>> painter) {
-        WaypointPainter<Waypoint> painter1 = new WaypointPainter<Waypoint>();
-        WaypointPainter<Waypoint> painter2 = new WaypointPainter<Waypoint>();
+        WaypointPainter<Waypoint> painter1 = new WaypointPainter<>();
+        WaypointPainter<Waypoint> painter2 = new WaypointPainter<>();
         lightGroup1.drawLights(painter1);
         lightGroup2.drawLights(painter2);
         painter.add(painter1);
@@ -153,18 +141,19 @@ public class SimpleCrossroad extends Crossroad {
     }
 
     private void logAddException(String name, long adjacentOsmWayId) {
-        SimpleCrossroad.logger.info("ADD");
-        SimpleCrossroad.logger.info(String.valueOf(adjacentOsmWayId));
+        logger.info("ADD");
+        logger.info(String.valueOf(adjacentOsmWayId));
         for (Entry<Long, Light> l : lights.entrySet()) {
-            SimpleCrossroad.logger.info("-------------");
-            SimpleCrossroad.logger.info(String.valueOf(l.getKey()));
-            SimpleCrossroad.logger.info(String.valueOf(l.getValue().getAdjacentOSMWayId()));
+            logger.info("-------------");
+            logger.info(String.valueOf(l.getKey()));
+            logger.info(String.valueOf(l.getValue().getAdjacentOSMWayId()));
         }
-        SimpleCrossroad.logger.info(name);
+        logger.info(name);
     }
 
-    private static void LogException(Exception e) {
-
+    @Override
+    public List<GeoPosition> getLightsPositions() {
+        return lights.values().stream().map(Light::getPosition).collect(Collectors.toList());
     }
 
     @Override
@@ -210,16 +199,16 @@ public class SimpleCrossroad extends Crossroad {
 
         @Override
         public void run() {
-            if (Crossroad.STRATEGY_ACTIVE) {
+            if (SimpleCrossroad.STRATEGY_ACTIVE) {
                 if (!alreadyExtendedGreen) {
                     if (shouldExtendGreenLightBecauseOfCarsOnLight()) {
-                        SimpleCrossroad.logger.info("-------------------------------------shouldExtendGreenLightBecauseOfCarsOnLight--------------");
+                        logger.info("-------------------------------------shouldExtendGreenLightBecauseOfCarsOnLight--------------");
                         alreadyExtendedGreen = true;
                         return;
                     }
-                    else if (shouldExtendBecauseOfFarAwayQueque()) {
+                    else if (shouldExtendBecauseOfFarAwayQueue()) {
                         prepareTimer();
-                        SimpleCrossroad.logger.info("-------------------------------------shouldExtendBecauseOfFarAwayQueque--------------");
+                        logger.info("-------------------------------------shouldExtendBecauseOfFarAwayQueue--------------");
                         timer.schedule(new SwitchLightsTask(), SimpleCrossroad.EXTEND_TIME * 1000 / MapWindow.getTimeScale());
                         alreadyExtendedGreen = true;
                         return;
@@ -235,14 +224,15 @@ public class SimpleCrossroad extends Crossroad {
             lightGroup2.switchLights();
         }
 
-        private boolean shouldExtendBecauseOfFarAwayQueque() {
+        private boolean shouldExtendBecauseOfFarAwayQueue() {
             for (Light light : lights.values()) {
                 if (light.isGreen()) {
                     Instant current_time = MasterAgent.getSimulationTime().toInstant();
                     for (Instant time_of_car : light.farAwayCarMap.values()) {
                         // If current time + EXTEND_TIME > time_of_car
                         if (current_time.plusSeconds(SimpleCrossroad.EXTEND_TIME).isAfter(time_of_car)) {
-                            SimpleCrossroad.logger.info("---------------------------------------------WHY WE should extend " + time_of_car + "----------Curent time" + current_time);
+                            logger.info("---------------------------------------------WHY WE should extend " +
+                                    time_of_car + "----------Current time" + current_time);
                             return true;
                         }
                     }
@@ -252,7 +242,8 @@ public class SimpleCrossroad extends Crossroad {
                     for (Instant time_of_pedestrian : light.farAwayPedestrianMap.values()) {
                         // If current time + EXTEND_TIME > time_of_car
                         if (current_time.plusSeconds(SimpleCrossroad.EXTEND_TIME).isAfter(time_of_pedestrian)) {
-                            SimpleCrossroad.logger.info("---------------------------------------------WHY WE should extend " + time_of_pedestrian + "----------Curent time" + current_time);
+                            logger.info("---------------------------------------------WHY WE should extend " +
+                                    time_of_pedestrian + "----------Current time" + current_time);
                             return true;
                         }
                     }

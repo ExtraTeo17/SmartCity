@@ -3,9 +3,8 @@ package routing;
 import org.jxmapviewer.viewer.GeoPosition;
 
 public class RouteNode {
-
-    private double lat;
-    private double lon;
+    private final double lat;
+    private final double lon;
 
     public RouteNode(double lat, double lon) {
         this.lat = lat;
@@ -31,6 +30,6 @@ public class RouteNode {
 
     @Override
     public String toString() {
-        return "(" + Double.toString(lat) + ", " + Double.toString(lon) + ")\n";
+        return "(" + lat + ", " + lon + ")\n";
     }
 }

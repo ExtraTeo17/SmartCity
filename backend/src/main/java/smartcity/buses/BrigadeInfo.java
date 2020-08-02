@@ -1,7 +1,6 @@
 package smartcity.buses;
 
 import routing.RouteNode;
-import jade.wrapper.AgentContainer;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -9,7 +8,7 @@ import java.util.List;
 public class BrigadeInfo {
 
     private final String brigadeNr;
-    private List<Timetable> timetables = new ArrayList<>();
+    private final List<Timetable> timetables = new ArrayList<>();
     private int timetablesCounter;
     private long currentlyConsideredStation = -1;
 
@@ -47,9 +46,9 @@ public class BrigadeInfo {
         timetables.get(timetablesCounter).addEntryToTimetable(stationOsmId, time);
     }
 
-    public void prepareAgents(AgentContainer container, List<RouteNode> route, final String busLine) {
+    public void prepareAgents(List<RouteNode> route, final String busLine) {
         for (Timetable timetable : timetables) {
-            timetable.createAgent(container, route, busLine, brigadeNr);
+            timetable.createAgent(route, busLine, brigadeNr);
         }
     }
 }

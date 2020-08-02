@@ -2,7 +2,9 @@ package smartcity;
 
 import agents.*;
 import agents.utils.MessageParameter;
+import com.google.common.eventbus.Subscribe;
 import com.google.inject.Inject;
+import events.SimulationReadyEvent;
 import gui.MapWindow;
 import jade.core.Agent;
 import jade.core.behaviours.CyclicBehaviour;
@@ -27,7 +29,9 @@ import vehicles.MovingObjectImpl;
 import vehicles.Pedestrian;
 import vehicles.TestCar;
 import vehicles.TestPedestrian;
-import web.WebServer;
+import web.IWebManager;
+import web.message.MessageType;
+import web.message.payloads.responses.SetZoneResponse;
 
 import java.time.Duration;
 import java.time.Instant;
@@ -39,18 +43,16 @@ public class MasterAgent extends Agent {
 
     private static AgentContainer container;
     private static MapWindow window;
-    private WebServer webServer;
+    private final IWebManager webManager;
 
-    public final static int SERVER_PORT = 9000;
     public final static boolean USE_DEPRECATED_XML_FOR_LIGHT_MANAGERS = false;
     public final static String STEPS = "6";
-    public static boolean SHOULD_GENERATE_PEDESTRIANS_AND_BUSES = true;
-    public static boolean SHOULD_GENERATE_CARS = false;
+    public static boolean SHOULD_GENERATE_PEDESTRIANS_AND_BUSES = false;
+    public static boolean SHOULD_GENERATE_CARS = true;
 
     // TODO: Delete this abomination (or at least make it private)
     public static final List<PedestrianAgent> pedestrians = new ArrayList<>();
     public static Set<LightManager> lightManagers = new HashSet<>();
-    public static final Set<StationAgent> stationAgents = new HashSet<>();
     public static boolean lightManagersUnderConstruction = false;
     public static Map<Pair<Long, Long>, LightManagerNode> wayIdLightIdToLightManagerNode = new HashMap<>();
     public static Map<Long, LightManagerNode> crossingOsmIdToLightManagerNode = new HashMap<>();
@@ -62,8 +64,10 @@ public class MasterAgent extends Agent {
     public int pedestrianId = 0;
 
     @Inject
-    public MasterAgent(WebServer webServer, MapWindow window) {
-        this.webServer = webServer;
+    public MasterAgent(IWebManager webManager, MapWindow window) {
+        this.webManager = webManager;
+
+        // TODO: Delete this abomination
         MasterAgent.window = window;
     }
 
@@ -73,7 +77,7 @@ public class MasterAgent extends Agent {
         window.setSmartCityAgent(this);
         window.display();
         addBehaviour(getReceiveMessageBehaviour());
-        webServer.start();
+        webManager.start();
     }
 
     private CyclicBehaviour getReceiveMessageBehaviour() {
@@ -138,12 +142,31 @@ public class MasterAgent extends Agent {
         return window.getSimulationStartTime();
     }
 
-    private static void tryAddAgent(AbstractAgent agent) {
+    @Subscribe
+    public void handleSimulationReady(SimulationReadyEvent e) {
+        logger.info("Handling SimulationReadyEvent");
+        GeoPosition[] positions = lightManagers.stream().flatMap(man -> man.getLightsPositions().stream()).toArray(GeoPosition[]::new);
+        var payload = new SetZoneResponse(positions);
+        webManager.broadcastMessage(MessageType.SET_ZONE_RESPONSE, payload);
+    }
+
+    public void prepareAgents(double lat, double lon, int radius) {
+        var zoneCenter = new GeoPosition(lat, lon);
+        if (SHOULD_GENERATE_PEDESTRIANS_AND_BUSES) {
+            prepareStationsAndBuses(zoneCenter, radius);
+        }
+        prepareLightManagers(zoneCenter, radius);
+    }
+
+    private static boolean tryAddAgent(AbstractAgent agent) {
         try {
             container.acceptNewAgent(agent.getPredictedName(), agent);
         } catch (StaleProxyException e) {
             logger.warn("Error adding agent");
+            return false;
         }
+
+        return true;
     }
 
     public static void tryAddNewBusAgent(final Timetable timetable, List<RouteNode> route,
@@ -153,13 +176,15 @@ public class MasterAgent extends Agent {
         tryAddAgent(agent);
     }
 
-    public static void tryAddNewLightManagerAgent(Node crossroad) {
+    public static void tryCreateLightManager(Node crossroad) {
         LightManager manager = new LightManager(crossroad, IdGenerator.getLightManagerId());
         lightManagers.add(manager);
-        tryAddAgent(manager);
+        if (!tryAddAgent(manager)) {
+            logger.warn("Failed to add LightManager.");
+        }
     }
 
-    public static void tryAddNewLightManagerAgent(final OSMNode centerCrossroadNode) {
+    public static void tryCreateLightManager(final OSMNode centerCrossroadNode) {
         LightManager manager = new LightManager(centerCrossroadNode, IdGenerator.getLightManagerId());
         lightManagers.add(manager);
         tryAddAgent(manager);
@@ -212,17 +237,19 @@ public class MasterAgent extends Agent {
             MapAccessManager.prepareLightManagersInRadiusAndLightIdToLightManagerIdHashSet(middlePoint, radius);
         }
         else {
-            tryPrepareLightManagersInRadiusAndLightIdToLightManagerIdHashSetBeta(middlePoint, radius);
+            tryConstructLightManagers(middlePoint, radius);
         }
         lightManagersUnderConstruction = false;
+
     }
 
-    private void tryPrepareLightManagersInRadiusAndLightIdToLightManagerIdHashSetBeta(GeoPosition middlePoint, int radius) {
+    private void tryConstructLightManagers(GeoPosition middlePoint, int radius) {
         try {
             LightAccessManager.constructLightManagers(middlePoint, radius);
         } catch (Exception e) {
             logger.error("Error preparing light managers", e);
         }
+
     }
 
     public void prepareStationsAndBuses(GeoPosition middlePoint, int radius) {
@@ -235,7 +262,7 @@ public class MasterAgent extends Agent {
         int i = 0;
         for (BusInfo info : busInfoSet) {
             logger.info("STEP 5/" + STEPS + " (SUBSTEP " + (++i) + "/" + busInfoSet.size() + "): Agent preparation substep");
-            info.prepareAgents(container);
+            info.prepareAgents();
         }
         logger.info("STEP 6/" + STEPS + ": Buses are created!");
         logger.info("NUMBER OF BUS AGENTS: " + buses.size());

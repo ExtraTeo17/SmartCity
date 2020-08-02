@@ -33,8 +33,7 @@ import java.util.List;
 /**
  * @author Peter Karich
  */
-public class MyGraphHopper extends GraphHopper {
-
+public class ExtendedGraphHopper extends GraphHopper {
     // mapping of internal edge ID to OSM way ID
     private DataAccess edgeMapping;
     private BitUtil bitUtil;

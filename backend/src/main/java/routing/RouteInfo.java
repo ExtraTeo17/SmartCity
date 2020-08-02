@@ -8,9 +8,8 @@ import java.util.List;
 import java.util.Set;
 
 public class RouteInfo {
-
-    private List<OSMWay> ways = new ArrayList<>();
-    private Set<Long> lightOsmIds = new HashSet<>();
+    private final List<OSMWay> ways = new ArrayList<>();
+    private final Set<Long> lightOsmIds = new HashSet<>();
 
     public final OSMWay getWay(final int i) {
         return ways.get(i);

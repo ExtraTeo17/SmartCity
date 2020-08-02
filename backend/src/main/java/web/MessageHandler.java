@@ -1,4 +1,4 @@
-package web.message;
+package web;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.eventbus.EventBus;
@@ -6,6 +6,7 @@ import com.google.inject.Inject;
 import events.SetZoneEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import web.message.MessageDto;
 import web.message.payloads.requests.SetZoneRequest;
 
 import java.io.IOException;

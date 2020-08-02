@@ -6,8 +6,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class OptimizationResult {
-    private List<String> carsFreeToProceedNames = new ArrayList<>();
-    private List<Pair<String, List<String>>> busesAndPedestriansFreeToProceedNames = new ArrayList<>();
+    private final List<String> carsFreeToProceedNames = new ArrayList<>();
+    private final List<Pair<String, List<String>>> busesAndPedestriansFreeToProceedNames = new ArrayList<>();
 
     public static OptimizationResult empty() {
         return new OptimizationResult();

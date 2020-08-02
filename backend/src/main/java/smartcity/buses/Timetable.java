@@ -1,6 +1,5 @@
 package smartcity.buses;
 
-import jade.wrapper.AgentContainer;
 import org.javatuples.Pair;
 import routing.RouteNode;
 import smartcity.MasterAgent;
@@ -10,9 +9,8 @@ import java.text.SimpleDateFormat;
 import java.util.*;
 
 public class Timetable {
-
-    private Map<Long, Date> stationOsmIdToTime = new HashMap<>();
-    private List<Pair<Date, Long>> timeOnStationChronological = new ArrayList<>();
+    private final Map<Long, Date> stationOsmIdToTime = new HashMap<>();
+    private final List<Pair<Date, Long>> timeOnStationChronological = new ArrayList<>();
 
     public Date getTimeOnStation(final long stationOsmId) {
         return stationOsmIdToTime.get(stationOsmId);
@@ -37,7 +35,7 @@ public class Timetable {
         }
     }
 
-    public void createAgent(AgentContainer container, List<RouteNode> route, final String busLine,
+    public void createAgent(List<RouteNode> route, final String busLine,
                             final String brigadeNr) {
         MasterAgent.tryAddNewBusAgent(this, route, busLine, brigadeNr);
     }

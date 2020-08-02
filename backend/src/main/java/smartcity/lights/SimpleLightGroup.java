@@ -9,8 +9,7 @@ import org.w3c.dom.NodeList;
 import java.util.*;
 
 public class SimpleLightGroup {
-
-    private Set<Light> lights;
+    private final Set<Light> lights;
 
     public SimpleLightGroup(Node crossroadGroup, LightColor color, int managerId) {
         lights = new HashSet<>();
@@ -43,13 +42,6 @@ public class SimpleLightGroup {
         for (Light light : lights) {
             light.switchLight();
         }
-    }
-
-    public boolean areLightsGreen() {
-        for (Light light : lights) {
-            return light.isGreen();
-        }
-        throw new RuntimeException("Something is not properly initialized.");
     }
 
     public Map<? extends Long, ? extends Light> prepareMap() {

@@ -14,8 +14,8 @@ import java.awt.event.MouseEvent;
 import java.awt.geom.Point2D.Double;
 
 public class PanRightMouseInputListener extends MouseInputAdapter {
+    private final JXMapViewer viewer;
     private Point prev;
-    private JXMapViewer viewer;
     private Cursor priorCursor;
 
     public PanRightMouseInputListener(JXMapViewer viewer) {
@@ -27,7 +27,7 @@ public class PanRightMouseInputListener extends MouseInputAdapter {
             if (this.viewer.isPanningEnabled()) {
                 this.prev = evt.getPoint();
                 this.priorCursor = this.viewer.getCursor();
-                this.viewer.setCursor(Cursor.getPredefinedCursor(13));
+                this.viewer.setCursor(Cursor.getPredefinedCursor(Cursor.MOVE_CURSOR));
             }
         }
     }
@@ -39,13 +39,13 @@ public class PanRightMouseInputListener extends MouseInputAdapter {
                 double x = this.viewer.getCenter().getX();
                 double y = this.viewer.getCenter().getY();
                 if (this.prev != null) {
-                    x += (double) (this.prev.x - current.x);
-                    y += (double) (this.prev.y - current.y);
+                    x += this.prev.x - current.x;
+                    y += this.prev.y - current.y;
                 }
 
                 int maxHeight = (int) (this.viewer.getTileFactory().getMapSize(this.viewer.getZoom()).getHeight() * (double) this.viewer.getTileFactory().getTileSize(this.viewer.getZoom()));
                 if (y > (double) maxHeight) {
-                    y = (double) maxHeight;
+                    y = maxHeight;
                 }
 
                 this.prev = current;

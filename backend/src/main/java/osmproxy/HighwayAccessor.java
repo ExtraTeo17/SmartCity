@@ -46,7 +46,7 @@ public class HighwayAccessor {
         List<Long> osmWayIds = new ArrayList<>();
         List<RouteNode> pointList = new ArrayList<>();
 
-        MyGraphHopper graphHopper = new MyGraphHopper();
+        ExtendedGraphHopper graphHopper = new ExtendedGraphHopper();
         graphHopper.init(CmdArgs.read(args));
         graphHopper.importOrLoad();
 
@@ -58,12 +58,10 @@ public class HighwayAccessor {
         long previousWayId = 0;
         for (EdgeIteratorState edge : path0.calcEdges()) {
             int edgeId = edge.getEdge();
-            String vInfo = "";
             if (edge instanceof VirtualEdgeIteratorState) {
                 // first, via and last edges can be virtual
                 VirtualEdgeIteratorState vEdge = (VirtualEdgeIteratorState) edge;
                 edgeId = vEdge.getOriginalTraversalKey() / 2;
-                vInfo = "v";
             }
 
             long osmWayIdToAdd = graphHopper.getOSMWay(edgeId);
@@ -73,14 +71,14 @@ public class HighwayAccessor {
                 previousWayId = osmWayIdToAdd;
             }
 
-            pointList.addAll(getRouteNodeList(edge.fetchWayGeometry(2), osmWayIdToAdd));
+            pointList.addAll(getRouteNodeList(edge.fetchWayGeometry(2)));
 
         }
 
-        return new Pair<List<Long>, List<RouteNode>>(osmWayIds, pointList);
+        return new Pair<>(osmWayIds, pointList);
     }
 
-    private static List<RouteNode> getRouteNodeList(PointList pointList, long osmWayId) {
+    private static List<RouteNode> getRouteNodeList(PointList pointList) {
         List<RouteNode> nodeList = new ArrayList<>();
         for (int i = 0; i < pointList.size(); ++i) {
             nodeList.add(new RouteNode(pointList.toGHPoint(i).lat, pointList.toGHPoint(i).lon));

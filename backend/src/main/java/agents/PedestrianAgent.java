@@ -35,7 +35,7 @@ public class PedestrianAgent extends AbstractAgent {
 
     @Override
     protected void setup() {
-        GetNextStation();
+        getNextStation();
 
         pedestrian.setState(DrivingState.MOVING);
         Behaviour move = new TickerBehaviour(this, 3600 / pedestrian.getSpeed()) {
@@ -123,7 +123,7 @@ public class PedestrianAgent extends AbstractAgent {
                 ACLMessage rcv = receive();
                 if (rcv != null) {
                     String type = rcv.getUserDefinedParameter(MessageParameter.TYPE);
-                    if (type == MessageParameter.LIGHT) {
+                    if (type.equals(MessageParameter.LIGHT)) {
                         switch (rcv.getPerformative()) {
                             case ACLMessage.REQUEST:
                                 if (pedestrian.getState() == DrivingState.WAITING_AT_LIGHT) {
@@ -143,7 +143,7 @@ public class PedestrianAgent extends AbstractAgent {
                                 break;
                         }
                     }
-                    else if (type == MessageParameter.STATION) {
+                    else if (type.equals(MessageParameter.STATION)) {
                         switch (rcv.getPerformative()) {
                             case ACLMessage.REQUEST:
                                 ACLMessage response = new ACLMessage(ACLMessage.AGREE);
@@ -172,7 +172,7 @@ public class PedestrianAgent extends AbstractAgent {
                                 break;
                         }
                     }
-                    else if (type == MessageParameter.BUS) {
+                    else if (type.equals(MessageParameter.BUS)) {
                         switch (rcv.getPerformative()) {
                             case ACLMessage.REQUEST:
                                 ACLMessage response = new ACLMessage(ACLMessage.AGREE);
@@ -199,7 +199,7 @@ public class PedestrianAgent extends AbstractAgent {
         addBehaviour(communication);
     }
 
-    void GetNextStation() {
+    void getNextStation() {
         // finds next station and announces his arrival
         StationNode nextStation = pedestrian.findNextStation();
         pedestrian.setState(DrivingState.MOVING);

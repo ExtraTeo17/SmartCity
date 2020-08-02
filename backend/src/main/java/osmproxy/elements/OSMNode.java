@@ -31,15 +31,15 @@ public class OSMNode extends OSMElement {
         parentWays = new ArrayList<>();
     }
 
-    private final void fillLatLon(final Node latItem, final Node lonItem) {
+    private void fillLatLon(final Node latItem, final Node lonItem) {
         fillLatLon(latItem.getNodeValue(), lonItem.getNodeValue());
     }
 
-    private final void fillLatLon(final String lat, final String lon) {
+    private void fillLatLon(final String lat, final String lon) {
         fillLatLon(Double.parseDouble(lat), Double.parseDouble(lon));
     }
 
-    private final void fillLatLon(final double lat, final double lon) {
+    private void fillLatLon(final double lat, final double lon) {
         this.lat = lat;
         this.lon = lon;
     }
@@ -54,14 +54,6 @@ public class OSMNode extends OSMElement {
 
     public final void addParentWay(final OSMWay osmWay) {
         parentWays.add(osmWay);
-    }
-
-    public final List<Long> getParentWayIds() {
-        final List<Long> parentWayIds = new ArrayList<>();
-        for (final OSMWay way : parentWays) {
-            parentWayIds.add(way.getId());
-        }
-        return parentWayIds;
     }
 
     public final int getParentWayCount() {

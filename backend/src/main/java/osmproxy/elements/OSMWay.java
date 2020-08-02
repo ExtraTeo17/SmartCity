@@ -18,12 +18,7 @@ public class OSMWay extends OSMElement {
     private LightOrientation lightOrientation = null;
     private RelationOrientation relationOrientation = null;
     private RouteOrientation routeOrientation = RouteOrientation.FRONT;
-    private boolean isOneWay;
-    public OSMWay(final String id) {
-        super(id);
-        waypoints = new ArrayList<>();
-        childNodeIds = new ArrayList<>();
-    }
+
     public OSMWay(Node item) {
         super(item.getAttributes().getNamedItem("id").getNodeValue());
         waypoints = new ArrayList<>();
@@ -46,11 +41,9 @@ public class OSMWay extends OSMElement {
         childNodeIds = new ArrayList<>();
     }
 
-    public boolean isOneWayAndLightContiguous(final long osmLightId) {
-        return !(isOneWay && Long.parseLong(waypoints.get(0).getOsmNodeRef()) == osmLightId);
-    }
-
+    // TODO: Where is the logic here?
     private void fillOneWay(final String nodeValue) {
+        boolean isOneWay;
         if (nodeValue.equals(YES)) {
             isOneWay = true;
         }
@@ -75,24 +68,12 @@ public class OSMWay extends OSMElement {
         return waypoints.get(i);
     }
 
-    public final OSMWaypoint getFirstWaypoint() {
-        return getWaypoint(0);
-    }
-
-    public final OSMWaypoint getLastWaypoint() {
-        return getWaypoint(getWaypointCount() - 1);
-    }
-
     public final int getWaypointCount() {
         return waypoints.size();
     }
 
     public final boolean isLightOriented() {
         return lightOrientation != null;
-    }
-
-    public final boolean isRelationOriented() {
-        return relationOrientation != null;
     }
 
     public final LightOrientation getLightOrientation() {
@@ -174,13 +155,10 @@ public class OSMWay extends OSMElement {
     }
 
     public GeoPosition getLightNeighborPos() {
-        switch (lightOrientation) {
-            case LIGHT_AT_ENTRY:
-                return waypoints.get(0 + 1).getPosition();
-            case LIGHT_AT_EXIT:
-                return waypoints.get(waypoints.size() - 1 - 1).getPosition();
-        }
-        return null;
+        return switch (lightOrientation) {
+            case LIGHT_AT_ENTRY -> waypoints.get(1).getPosition();
+            case LIGHT_AT_EXIT -> waypoints.get(waypoints.size() - 1 - 1).getPosition();
+        };
     }
 
     public boolean startsInCircle(int radius, double middleLat, double middleLon) {
@@ -190,8 +168,7 @@ public class OSMWay extends OSMElement {
     public Integer determineRouteOrientationAndFilterRelevantNodes(OSMWay osmWay, Integer startingNodeIndex, Integer finishingNodeIndex) {
         Pair<Pair<Integer, Integer>, Pair<Integer, Integer>> tangentialNodes = determineTangentialNodes(osmWay);
         if (startingNodeIndex == null) {
-            //return determineStartingNodeRefAndFilterRelevantNodes(tangentialNodes);
-            return filterRelevantNodes(startingNodeIndex == null ? getWaypointCount() - 1 : startingNodeIndex, tangentialNodes);
+            return filterRelevantNodes(getWaypointCount() - 1, tangentialNodes);
         }
         else if (tangentialNodes == null) {
             return filterRelevantNodes(startingNodeIndex, finishingNodeIndex == null ? 0 : finishingNodeIndex);
@@ -222,20 +199,6 @@ public class OSMWay extends OSMElement {
             }
         }
         return tangentialNodesOursAndNext;
-    }
-
-    private Integer determineStartingNodeRefAndFilterRelevantNodes(Pair<Pair<Integer, Integer>, Pair<Integer, Integer>> tangentialNodes) {
-        final int startFirstCount = wayCountBetween(0, tangentialNodes.getValue0().getValue0());
-        final int endFirstCount = wayCountBetween(getWaypointCount() - 1, tangentialNodes.getValue0().getValue0());
-        final int startSecondCount = tangentialNodes.getValue1() != null ? wayCountBetween(0, tangentialNodes.getValue1().getValue0()) : Integer.MAX_VALUE;
-        final int endSecondCount = tangentialNodes.getValue1() != null ? wayCountBetween(getWaypointCount() - 1, tangentialNodes.getValue1().getValue0()) : Integer.MAX_VALUE;
-        if ((startFirstCount < endFirstCount && startFirstCount < endSecondCount) ||
-                startSecondCount < endFirstCount && startSecondCount < endSecondCount) {
-            return filterRelevantNodes(0, tangentialNodes);
-        }
-        else {
-            return filterRelevantNodes(getWaypointCount() - 1, tangentialNodes);
-        }
     }
 
     private Integer filterRelevantNodes(Integer startingNodeIndex, Pair<Pair<Integer, Integer>, Pair<Integer, Integer>> tangentialNodes) {

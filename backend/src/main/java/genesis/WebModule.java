@@ -1,8 +1,12 @@
 package genesis;
 
 import com.google.inject.Binder;
-import org.java_websocket.server.WebSocketServer;
+import com.google.inject.Singleton;
+import web.IWebManager;
+import web.WebManager;
 import web.WebServer;
+import web.serialization.IMessageObjectMapper;
+import web.serialization.MessageObjectMapper;
 
 
 public class WebModule extends AbstractModule {
@@ -12,6 +16,8 @@ public class WebModule extends AbstractModule {
     @Override
     public void configure(Binder binder) {
         super.configure(binder);
-        binder.bind(WebSocketServer.class).to(WebServer.class);
+        binder.bind(WebServer.class).in(Singleton.class);
+        binder.bind(IWebManager.class).to(WebManager.class).in(Singleton.class);
+        binder.bind(IMessageObjectMapper.class).to(MessageObjectMapper.class).in(Singleton.class);
     }
 }

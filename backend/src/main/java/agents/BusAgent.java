@@ -150,16 +150,6 @@ public class BusAgent extends AbstractAgent {
                     bus.Move();
                 }
             }
-
-            private void sendAgreeMsg() {
-                StationNode station = bus.getCurrentStationNode();
-
-                ACLMessage msg = new ACLMessage(ACLMessage.REQUEST_WHEN);
-                msg.addReceiver(new AID("Station" + station.getStationId(), AID.ISLOCALNAME));
-                Properties properties = new Properties();
-                properties = new Properties();
-                properties.setProperty(MessageParameter.TYPE, MessageParameter.BUS);
-            }
         };
 
 

@@ -1,47 +1,27 @@
-package lightstrategies;
+package behaviourfactories;
 
 import agents.LightManager;
 import agents.utils.MessageParameter;
 import gui.MapWindow;
 import jade.core.AID;
 import jade.core.Agent;
-import jade.core.behaviours.Behaviour;
 import jade.core.behaviours.CyclicBehaviour;
 import jade.core.behaviours.TickerBehaviour;
 import jade.lang.acl.ACLMessage;
 import jade.util.leap.Properties;
-import org.jxmapviewer.JXMapViewer;
-import org.jxmapviewer.painter.Painter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.w3c.dom.Node;
-import osmproxy.elements.OSMNode;
-import smartcity.lights.Crossroad;
 import smartcity.lights.OptimizationResult;
-import smartcity.lights.SimpleCrossroad;
 
 import java.time.Instant;
 import java.util.List;
 
-public class LightManagerStrategy extends LightStrategy {
-    private static final Logger logger = LoggerFactory.getLogger(LightManagerStrategy.class);
-    private final Crossroad crossroad;
-    private LightManager agent;
-
-    public LightManagerStrategy(Node crossroad, int managerId) {
-        this.crossroad = new SimpleCrossroad(crossroad, managerId);
-    }
-
-    public LightManagerStrategy(OSMNode centerCrossroadNode, int managerId) {
-        this.crossroad = new SimpleCrossroad(centerCrossroadNode, managerId);
-    }
+public class LightManagerBehaviourFactory implements IBehaviourFactory<LightManager> {
+    private static final Logger logger = LoggerFactory.getLogger(LightManagerBehaviourFactory.class);
 
     @Override
-    public void applyStrategy(final LightManager agent) {
-        crossroad.startLifetime();
-        // TODO: Move to constructor
-        this.agent = agent;
-        Behaviour communication = new CyclicBehaviour() {
+    public CyclicBehaviour createCyclicBehaviour(final LightManager agent) {
+        return new CyclicBehaviour() {
             @Override
             public void action() {
                 ACLMessage rcv = agent.receive();
@@ -56,61 +36,59 @@ public class LightManagerStrategy extends LightStrategy {
             private void handleMessageFromRecipient(ACLMessage rcv) {
                 String recipientType = rcv.getUserDefinedParameter(MessageParameter.TYPE);
                 switch (recipientType) {
-                    case MessageParameter.VEHICLE:
-                        handleMessageFromVehicle(rcv);
-                        break;
-                    case MessageParameter.PEDESTRIAN:
-                        handleMessageFromPedestrian(rcv);
-                        break;
+                    case MessageParameter.VEHICLE -> handleMessageFromVehicle(rcv);
+                    case MessageParameter.PEDESTRIAN -> handleMessageFromPedestrian(rcv);
                 }
             }
 
             private void handleMessageFromVehicle(ACLMessage rcv) {
+                // TODO: Should be refactored - too much usage of crossroad methods.
+                var crossroad = agent.getCrossroad();
                 switch (rcv.getPerformative()) {
-                    case ACLMessage.INFORM:
-                        Print(rcv.getSender().getLocalName() + " is approaching in " + getInstantParameter(rcv, MessageParameter.ARRIVAL_TIME) + "ms.");
-
+                    case ACLMessage.INFORM -> {
+                        print(agent, rcv.getSender().getLocalName() + " is approaching in " + getInstantParameter(rcv,
+                                MessageParameter.ARRIVAL_TIME) + "ms.");
                         crossroad.addCarToFarAwayQueue(getCarName(rcv),
                                 getIntParameter(rcv, MessageParameter.ADJACENT_OSM_WAY_ID),
                                 getInstantParameter(rcv, MessageParameter.ARRIVAL_TIME));
-
-                        break;
-                    case ACLMessage.REQUEST_WHEN:
-                        Print(rcv.getSender().getLocalName() + " is waiting on way " + getIntParameter(rcv, MessageParameter.ADJACENT_OSM_WAY_ID) + ".");
-                        crossroad.removeCarFromFarAwayQueue(getCarName(rcv),
-                                getIntParameter(rcv, MessageParameter.ADJACENT_OSM_WAY_ID));
+                    }
+                    case ACLMessage.REQUEST_WHEN -> {
+                        print(agent, rcv.getSender().getLocalName() + " is waiting on way " + getIntParameter(rcv,
+                                MessageParameter.ADJACENT_OSM_WAY_ID) + ".");
+                        crossroad.removeCarFromFarAwayQueue(getCarName(rcv), getIntParameter(rcv,
+                                MessageParameter.ADJACENT_OSM_WAY_ID));
                         ACLMessage agree = new ACLMessage(ACLMessage.AGREE);
                         agree.addReceiver(rcv.getSender());
                         Properties properties = new Properties();
                         properties.setProperty(MessageParameter.TYPE, MessageParameter.LIGHT);
                         agree.setAllUserDefinedParameters(properties);
                         agent.send(agree);
-                        // if (crossroad.isLightGreen(getIntParameter(rcv, ADJACENT_OSM_WAY_ID)))
-                        //	answerCanProceed(getCarName(rcv),agent);
-                        // else
                         crossroad.addCarToQueue(getCarName(rcv),
                                 getIntParameter(rcv, MessageParameter.ADJACENT_OSM_WAY_ID));
-                        break;
-                    case ACLMessage.AGREE:
-                        Print(rcv.getSender().getLocalName() + " passed the light.");
+                    }
+                    case ACLMessage.AGREE -> {
+                        print(agent, rcv.getSender().getLocalName() + " passed the light.");
                         crossroad.removeCarFromQueue(getIntParameter(rcv, MessageParameter.ADJACENT_OSM_WAY_ID));
-                        break;
-                    default:
-                        logger.info("Wait");
+                    }
+                    default -> logger.info("Wait");
                 }
             }
 
             private void handleMessageFromPedestrian(ACLMessage rcv) {
+                // TODO: Should be refactored - too much usage of crossroad methods.
+                var crossroad = agent.getCrossroad();
                 switch (rcv.getPerformative()) {
                     case ACLMessage.INFORM:
-                        Print(rcv.getSender().getLocalName() + " is approaching in " + getInstantParameter(rcv, MessageParameter.ARRIVAL_TIME) + "ms.");
+                        print(agent, rcv.getSender().getLocalName() + " is approaching in " + getInstantParameter(rcv,
+                                MessageParameter.ARRIVAL_TIME) + "ms.");
 
                         crossroad.addPedestrianToFarAwayQueue(rcv.getSender().getLocalName(),
                                 getIntParameter(rcv, MessageParameter.ADJACENT_OSM_WAY_ID),
                                 getInstantParameter(rcv, MessageParameter.ARRIVAL_TIME));
 
                     case ACLMessage.REQUEST_WHEN:
-                        Print(rcv.getSender().getLocalName() + " is waiting on way " + getIntParameter(rcv, MessageParameter.ADJACENT_OSM_WAY_ID) + ".");
+                        print(agent, rcv.getSender().getLocalName() + " is waiting on way " + getIntParameter(rcv,
+                                MessageParameter.ADJACENT_OSM_WAY_ID) + ".");
                         crossroad.removePedestrianFromFarAwayQueue(rcv.getSender().getLocalName(),
                                 getIntParameter(rcv, MessageParameter.ADJACENT_OSM_WAY_ID));
                         ACLMessage agree = new ACLMessage(ACLMessage.AGREE);
@@ -124,29 +102,32 @@ public class LightManagerStrategy extends LightStrategy {
                                 getIntParameter(rcv, MessageParameter.ADJACENT_OSM_WAY_ID));
                         break;
                     case ACLMessage.AGREE:
-                        Print(rcv.getSender().getLocalName() + " passed the light.");
+                        print(agent, rcv.getSender().getLocalName() + " passed the light.");
                         crossroad.removePedestrianFromQueue(getIntParameter(rcv, MessageParameter.ADJACENT_OSM_WAY_ID));
                     default:
-                        Print("Wait");
+                        print(agent, "Wait");
                 }
             }
         };
 
-        Behaviour checkState = new TickerBehaviour(agent, 100 / MapWindow.getTimeScale()) {
+    }
 
+
+    @Override
+    public TickerBehaviour createTickerBehaviour(final LightManager agent) {
+        return new TickerBehaviour(agent, 100 / MapWindow.getTimeScale()) {
             @Override
             protected void onTick() {
                 //for all Light check
                 //check if time from last green > written time
                 // if so, put in the queue
                 //if not
-                // check count of people (rememeber about 2 person on pedestrian light= 1 car)
+                // check count of people (remember about 2 person on pedestrian light= 1 car)
                 // if queue is empty
                 // apply strategy
-                //for elemnts in queue (if there are elements in queue, make green)
-                //logger.info("Optimization");
+                //for elements in queue (if there are elements in queue, make green)
+                var crossroad = agent.getCrossroad();
                 OptimizationResult result = crossroad.requestOptimizations();
-                //logger.info("Len: " + result.carsFreeToProceed().size());
                 handleOptimizationResult(result);
             }
 
@@ -158,13 +139,10 @@ public class LightManagerStrategy extends LightStrategy {
             }
 
         };
-
-        agent.addBehaviour(communication);
-        agent.addBehaviour(checkState);
     }
 
     private void answerCanProceed(String carName, Agent agent) {
-        Print(carName + " can proceed.");
+        print(agent, carName + " can proceed.");
         ACLMessage msg = new ACLMessage(ACLMessage.REQUEST);
         msg.addReceiver(new AID(carName, AID.ISLOCALNAME));
         Properties properties = new Properties();
@@ -185,12 +163,7 @@ public class LightManagerStrategy extends LightStrategy {
         return rcv.getSender().getLocalName();
     }
 
-    @Override
-    public void drawCrossroad(List<Painter<JXMapViewer>> painter) {
-        crossroad.draw(painter);
-    }
-
-    public void Print(String message) {
+    public void print(Agent agent, String message) {
         logger.info(agent.getLocalName() + ": " + message);
     }
 }

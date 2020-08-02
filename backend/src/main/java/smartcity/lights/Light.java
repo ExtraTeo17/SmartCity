@@ -67,11 +67,15 @@ public class Light {
         }
     }
 
+    public GeoPosition getPosition() {
+        return position;
+    }
+
     public boolean isGreen() {
         return carLightColor == LightColor.GREEN;
     }
 
-    public void draw(HashSet<Waypoint> lightSet, WaypointPainter<Waypoint> painter) {
+    public void draw(Collection<Waypoint> lightSet, WaypointPainter<Waypoint> painter) {
         lightSet.add(new DefaultWaypoint(position));
         switch (carLightColor) {
             case RED -> painter.setRenderer(new CustomWaypointRenderer("light_red.png"));
@@ -81,14 +85,11 @@ public class Light {
     }
 
     public void switchLight() {
-        LightColor pedestrianLightColor;
         if (carLightColor == LightColor.RED) {
-            pedestrianLightColor = LightColor.RED;
             carLightColor = LightColor.GREEN;
         }
         else if (carLightColor == LightColor.GREEN) {
             carLightColor = LightColor.RED;
-            pedestrianLightColor = LightColor.GREEN;
         }
     }
 

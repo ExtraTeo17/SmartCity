@@ -19,6 +19,7 @@ public class LightAccessManager extends MapAccessManager {
         List<OSMNode> lightsAround = getLightNodesAround(radius, middlePoint.getLatitude(), middlePoint.getLongitude());
         List<OSMNode> lightNodeList = sendParentWaysOfLightOverpassQuery(lightsAround);
         List<OSMNode> lightsOfTypeA = lightNodeList.stream().filter(OSMNode::isTypeA).collect(Collectors.toList());
+
         createLightManagers(lightsOfTypeA);
     }
 
@@ -72,8 +73,9 @@ public class LightAccessManager extends MapAccessManager {
         for (final OSMNode centerCrossroadNode : lightsOfTypeA) {
             if (centerCrossroadNode.determineParentOrientationsTowardsCrossroad()) {
                 // TODO: MasterAgent as instance or separate service for adding new agents to container
-                MasterAgent.tryAddNewLightManagerAgent(centerCrossroadNode);
+                MasterAgent.tryCreateLightManager(centerCrossroadNode);
             }
         }
+
     }
 }

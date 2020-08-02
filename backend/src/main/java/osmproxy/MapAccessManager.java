@@ -290,6 +290,7 @@ public class MapAccessManager {
                 addAllDesiredIdsInDistrict(districtXMLNodes.item(i), middlePoint, radius);
             }
         }
+
     }
 
     public static List<OSMNode> parseLightNodeList(Document nodesViaOverpass) {
@@ -341,14 +342,16 @@ public class MapAccessManager {
                 addCrossroadIdIfDesired(crossroadXMLNodes.item(i), middlePoint, radius);
             }
         }
+
     }
 
     private static void addCrossroadIdIfDesired(Node crossroad, GeoPosition middlePoint, int radius) {
         Pair<Double, Double> crossroadLatLon = calculateLatLonBasedOnInternalLights(crossroad);
 
         if (belongsToCircle(crossroadLatLon.getValue0(), crossroadLatLon.getValue1(), middlePoint, radius)) {
-            MasterAgent.tryAddNewLightManagerAgent(crossroad);
+            MasterAgent.tryCreateLightManager(crossroad);
         }
+
     }
 
     private static Pair<Double, Double> calculateLatLonBasedOnInternalLights(Node crossroad) {
@@ -537,8 +540,9 @@ public class MapAccessManager {
                     way = new OSMWay(item);
                     adjacentNodeRef = way.determineRelationOrientation(adjacentNodeRef);
                 }
-                if (way.startsInCircle(radius, middleLat, middleLon)) // TODO CORRECT POTENTIAL BUGS CAUSING ROUTE TO BE CUT INTO PIECES BECAUSE OF RZĄŻEWSKI CASE
-                {
+
+                // TODO: CORRECT POTENTIAL BUGS CAUSING ROUTE TO BE CUT INTO PIECES BECAUSE OF RZĄŻEWSKI CASE
+                if (way.startsInCircle(radius, middleLat, middleLon)) {
                     route.add(way);
                 }
             }

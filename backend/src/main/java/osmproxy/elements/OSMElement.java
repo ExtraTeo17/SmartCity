@@ -18,8 +18,12 @@ public class OSMElement {
 
     @Override
     public boolean equals(Object arg) {
-        OSMElement obj = (OSMElement) arg;
-        return this.getId().equals(obj.getId());
+        if (arg instanceof OSMElement){
+            OSMElement obj = (OSMElement) arg;
+            return this.getId().equals(obj.getId());
+        }
+
+        return false;
     }
 
     @Override

@@ -1,19 +1,18 @@
 package routing;
 
 public class LightManagerNode extends RouteNode {
-
-    private long lightManagerId;
+    private final long lightManagerId;
+    private final long crossingOsmId1;
+    private final long crossingOsmId2;
     private long osmWayId;
-    private long crossingOsmId1;
-    private long crossingOsmId2;
 
     public LightManagerNode(double lat, double lon, Long osmWayId, Long adjacentCrossingOsmId1,
                             Long adjacentCrossingOsmId2, long lightManagerId) {
         super(lat, lon);
         this.lightManagerId = lightManagerId;
         this.osmWayId = osmWayId;
-        this.crossingOsmId1 = crossingOsmId1;
-        this.crossingOsmId2 = crossingOsmId2;
+        this.crossingOsmId1 = adjacentCrossingOsmId1;
+        this.crossingOsmId2 = adjacentCrossingOsmId2;
     }
 
     public long getLightManagerId() {
@@ -38,7 +37,11 @@ public class LightManagerNode extends RouteNode {
 
     @Override
     public boolean equals(Object obj) {
-        LightManagerNode node = (LightManagerNode) obj;
-        return node.getLightManagerId() == getLightManagerId() && node.getOsmWayId() == getOsmWayId();
+        if (obj instanceof LightManagerNode) {
+            LightManagerNode node = (LightManagerNode) obj;
+            return node.getLightManagerId() == getLightManagerId() && node.getOsmWayId() == getOsmWayId();
+        }
+
+        return false;
     }
 }

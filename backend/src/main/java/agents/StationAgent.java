@@ -37,11 +37,11 @@ public class StationAgent extends AbstractAgent {
                 ACLMessage rcv = receive();
                 if (rcv != null) {
                     String type = rcv.getUserDefinedParameter(MessageParameter.TYPE);
-                    if (type == MessageParameter.BUS) {
+                    if (type.equals(MessageParameter.BUS)) {
                         handleMessageFromBus(rcv);
 
                     }
-                    else if (type == MessageParameter.PEDESTRIAN) {
+                    else if (type.equals(MessageParameter.PEDESTRIAN)) {
                         handleMessageFromPedestrian(rcv);
 
                     }
@@ -50,10 +50,6 @@ public class StationAgent extends AbstractAgent {
             }
 
 
-            private int getIntParameter(ACLMessage rcv, String param) {
-                return Integer.parseInt(rcv.getUserDefinedParameter(param));
-            }
-
             private Instant getInstantParameter(ACLMessage rcv, String param) {
                 return Instant.parse(rcv.getUserDefinedParameter(param));
             }
@@ -61,15 +57,14 @@ public class StationAgent extends AbstractAgent {
 
             private void handleMessageFromBus(ACLMessage rcv) {
                 if (rcv.getPerformative() == ACLMessage.INFORM) {
-
                     String agentBusName = rcv.getSender().getLocalName();
                     String busLine = rcv.getUserDefinedParameter(MessageParameter.BUS_LINE);
                     stationStrategy.addBusToFarAwayQueue(agentBusName,
                             getInstantParameter(rcv, MessageParameter.ARRIVAL_TIME),
                             getInstantParameter(rcv, MessageParameter.SCHEDULE_ARRIVAL));
                     stationStrategy.addMappingOfBusAndTheirAgent(agentBusName, busLine);
-                    Print("Got INFORM from " + rcv.getSender().getLocalName());
-                    // TO DO: SEND MESSAGE ABOUT PASSENGERS  
+                    print("Got INFORM from " + rcv.getSender().getLocalName());
+                    // TODO: SEND MESSAGE ABOUT PASSENGERS
                 }
                 else if (rcv.getPerformative() == ACLMessage.REQUEST_WHEN) {
 
@@ -82,16 +77,16 @@ public class StationAgent extends AbstractAgent {
                     msg.addReceiver(rcv.getSender());
 
 
-                    Print("Got REQUEST_WHEN from " + rcv.getSender().getLocalName());
+                    print("Got REQUEST_WHEN from " + rcv.getSender().getLocalName());
                     send(msg);
                 }
                 else if (rcv.getPerformative() == ACLMessage.AGREE) {
                     stationStrategy.removeBusFromBusOnStationQueue(rcv.getSender().getLocalName());
-                    Print("Got AGREE from " + rcv.getSender().getLocalName());
+                    print("Got AGREE from " + rcv.getSender().getLocalName());
 
                 }
                 else {
-                    logger.info("SMTH WRONG");
+                    logger.info("Smth WRONG");
                 }
 
             }
@@ -170,15 +165,5 @@ public class StationAgent extends AbstractAgent {
 
         addBehaviour(communication);
         addBehaviour(checkState);
-    }
-
-    @Override
-    public void takeDown() {
-        super.takeDown();
-    }
-
-
-    void Print(String message) {
-        logger.info(getLocalName() + ": " + message);
     }
 }

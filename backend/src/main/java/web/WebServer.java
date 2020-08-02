@@ -1,7 +1,6 @@
 package web;
 
 import com.google.inject.Inject;
-import com.google.inject.assistedinject.Assisted;
 import org.java_websocket.WebSocket;
 import org.java_websocket.framing.CloseFrame;
 import org.java_websocket.handshake.ClientHandshake;
@@ -9,15 +8,17 @@ import org.java_websocket.server.WebSocketServer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import utilities.ExtendedProperties;
-import web.message.MessageHandler;
 
 import java.net.InetSocketAddress;
 import java.util.HashSet;
+import java.util.List;
+import java.util.function.Consumer;
+import java.util.stream.Collectors;
 
 public class WebServer extends WebSocketServer {
     private static final Logger logger = LoggerFactory.getLogger(WebServer.class);
-    private final HashSet<WebSocket> sockets;
     private final MessageHandler messageHandler;
+    private final HashSet<WebSocket> sockets;
 
     @Inject
     WebServer(MessageHandler messageHandler, ExtendedProperties properties) {
@@ -26,18 +27,25 @@ public class WebServer extends WebSocketServer {
         sockets = new HashSet<>();
     }
 
-    private static InetSocketAddress getSocketAddress(ExtendedProperties properties){
+    private static InetSocketAddress getSocketAddress(ExtendedProperties properties) {
         var port = properties.getOrDefault("port", 8000);
         return new InetSocketAddress(port);
+    }
+
+    List<Consumer<String>> getMessageBuses() {
+        return sockets.stream()
+                .map(s -> (Consumer<String>) s::send)
+                .collect(Collectors.toList());
     }
 
     /**
      * Called after an opening handshake has been performed and the given websocket is ready to be written on.
      *
-     * @param socket    The <tt>WebSocket</tt> instance this event is occuring on.
+     * @param socket    The <tt>WebSocket</tt> instance this event is occurring on.
      * @param handshake The handshake of the websocket instance
      */
     @Override
+
     public void onOpen(WebSocket socket, ClientHandshake handshake) {
         sockets.add(socket);
         logger.info("Connection established from: " + getSocketAddress(socket));
@@ -75,12 +83,6 @@ public class WebServer extends WebSocketServer {
     @Override
     public void onMessage(WebSocket socket, String message) {
         messageHandler.Handle(message);
-    }
-
-    public void broadcastMessage(String message) {
-        for (var socket : sockets) {
-            socket.send(message);
-        }
     }
 
     /**

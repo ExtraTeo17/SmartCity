@@ -14,7 +14,6 @@ import java.util.HashMap;
 import java.util.List;
 
 public class Bus extends MovingObject {
-
     public static int CAPACITY_MID = 10;
     public static int CAPACITY_HIGH = 25;
 

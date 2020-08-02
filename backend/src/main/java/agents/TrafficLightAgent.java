@@ -1,7 +1,8 @@
 package agents;
 
 import agents.utils.LightColor;
-import lightstrategies.BasicLightStrategy;
+import behaviourfactories.BasicLightsBehaviourFactory;
+import behaviourfactories.IBehaviourFactory;
 import org.jxmapviewer.viewer.GeoPosition;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -11,34 +12,55 @@ import java.util.List;
 
 public class TrafficLightAgent extends AbstractAgent {
     private static final Logger logger = LoggerFactory.getLogger(TrafficLightAgent.class);
-    public LightColor lightColor = LightColor.RED;
-    public List<String> queue = new ArrayList<>();
-    private final BasicLightStrategy strategy = new BasicLightStrategy();
+    // TODO: Inject as dependency
+    private final IBehaviourFactory<TrafficLightAgent> behaviourFactory;
     private final GeoPosition position;
+    private LightColor lightColor;
+    private final List<String> agentsQueue;
+
+    public TrafficLightAgent(int id, GeoPosition position) {
+        super(id);
+        this.position = position;
+        this.behaviourFactory = new BasicLightsBehaviourFactory();
+        this.lightColor = LightColor.RED;
+        this.agentsQueue = new ArrayList<>();
+    }
 
     @Override
     public String getNamePrefix() {
         return "TrafficLight";
     }
 
-    public TrafficLightAgent(int id, GeoPosition pos) {
-        super(id);
-        position = pos;
+    @Override
+    protected void setup() {
+        print("I'm a traffic light.");
+        print("Red light.");
+        addBehaviour(behaviourFactory.createCyclicBehaviour(this));
+        addBehaviour(behaviourFactory.createTickerBehaviour(this));
     }
 
     public GeoPosition getPosition() {
         return position;
     }
 
-    @Override
-    protected void setup() {
-        print("I'm a traffic light.");
-        print("Red light.");
-        strategy.ApplyStrategy(this);
+    public LightColor getLightColor() {
+        return lightColor;
     }
 
-    @Override
-    public void takeDown() {
-        super.takeDown();
+    public void setLightColor(LightColor lightColor) {
+        this.lightColor = lightColor;
+    }
+
+    // TODO: Is the name of method correct??
+    public Iterable<String> getWaitingAgents() {
+        return agentsQueue;
+    }
+
+    public void addAgentToQueue(String name) {
+        agentsQueue.add(name);
+    }
+
+    public void removeAgentFromQueue(String name) {
+        agentsQueue.remove(name);
     }
 }

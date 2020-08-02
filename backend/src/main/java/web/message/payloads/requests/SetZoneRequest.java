@@ -2,8 +2,9 @@ package web.message.payloads.requests;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import web.message.payloads.AbstractPayload;
 
-public class SetZoneRequest {
+public class SetZoneRequest extends AbstractPayload {
     public final double latitude;
     public final double longitude;
     public final double radius;

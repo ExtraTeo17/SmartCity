@@ -19,58 +19,53 @@ public final class Router {
     public static List<RouteNode> generateRouteInfo(GeoPosition pointA, GeoPosition pointB) {
         Pair<List<Long>, List<RouteNode>> osmWayIdsAndPointList = Router.findRoute(pointA, pointB, false);
         final List<OSMLight> lightInfo = MapAccessManager.sendFullTrafficSignalQuery(osmWayIdsAndPointList.getValue0());
-        List<RouteNode> managers = Router.getManagersForLights(lightInfo, osmWayIdsAndPointList.getValue1());
-        List<RouteNode> routeWithManagers = Router.getRouteWithAdditionalNodes(osmWayIdsAndPointList.getValue1(), managers);
-        return routeWithManagers;
+        List<RouteNode> managers = Router.getManagersForLights(lightInfo);
+        return Router.getRouteWithAdditionalNodes(osmWayIdsAndPointList.getValue1(), managers);
     }
 
     @Deprecated
     public static List<RouteNode> generateRouteInfoForPedestrians(GeoPosition pointA, GeoPosition pointB) { // TODO: Merge with function for cars if testing proves they are identical
         Pair<List<Long>, List<RouteNode>> osmWayIdsAndPointList = Router.findRoute(pointA, pointB, true);
         final List<OSMLight> lightInfo = MapAccessManager.sendFullTrafficSignalQuery(osmWayIdsAndPointList.getValue0());
-        List<RouteNode> managers = Router.getManagersForLights(lightInfo, osmWayIdsAndPointList.getValue1());
-        List<RouteNode> routeWithMgrs = Router.getRouteWithAdditionalNodes(osmWayIdsAndPointList.getValue1(), managers);
-        return routeWithMgrs;
+        List<RouteNode> managers = Router.getManagersForLights(lightInfo);
+        return getRouteWithAdditionalNodes(osmWayIdsAndPointList.getValue1(), managers);
     }
 
     public static List<RouteNode> generateRouteInfoForPedestriansBeta(GeoPosition pointA, GeoPosition pointB, // TODO: Improve routing to consider random OSM nodes as start/end points instead of random lat/lons
                                                                       String startingOsmNodeRef, String finishingOsmNodeRef) {
         Pair<List<Long>, List<RouteNode>> osmWayIdsAndPointList = Router.findRoute(pointA, pointB, true);
         final RouteInfo routeInfo = MapAccessManager.sendMultipleWayAndItsNodesQuery(osmWayIdsAndPointList.getValue0());
-        return Router.createRouteNodeList(routeInfo, startingOsmNodeRef, finishingOsmNodeRef);
+        return createRouteNodeList(routeInfo, startingOsmNodeRef, finishingOsmNodeRef);
     }
 
     public static List<RouteNode> generateRouteInfoForBuses(List<OSMWay> router, List<Long> osmStationIds) {
-        Pair<List<Long>, List<RouteNode>> osmWayIdsAndPointList = Router.findBusRoute(router);
+        Pair<List<Long>, List<RouteNode>> osmWayIdsAndPointList = findBusRoute(router);
         List<OSMLight> lightsOnRoute = MapAccessManager.sendFullTrafficSignalQuery(osmWayIdsAndPointList.getValue0());
-        List<RouteNode> managers = Router.getManagersForLights(lightsOnRoute, osmWayIdsAndPointList.getValue1());
-        List<RouteNode> stationNodes = Router.getAgentStationsForRoute(Router.getOSMNodesForStations(osmStationIds), osmWayIdsAndPointList.getValue1());
+        List<RouteNode> managers = getManagersForLights(lightsOnRoute);
+        List<RouteNode> stationNodes = getAgentStationsForRoute(getOSMNodesForStations(osmStationIds));
         managers.addAll(stationNodes);
-        List<RouteNode> routeWithManagers = Router.getRouteWithAdditionalNodes(osmWayIdsAndPointList.getValue1(), managers);
-        return routeWithManagers;
+        return getRouteWithAdditionalNodes(osmWayIdsAndPointList.getValue1(), managers);
     }
 
     private static List<RouteNode> createRouteNodeList(RouteInfo routeInfo, String startingOsmNodeRef, String finishingOsmNodeRef) {
         routeInfo.determineRouteOrientationsAndFilterRelevantNodes(startingOsmNodeRef, finishingOsmNodeRef);
         List<RouteNode> routeNodes = new ArrayList<>();
-        List<Long> crossingOsmIdsToTransform = new ArrayList<>();
         for (int i = 0; i < routeInfo.getWayCount(); ++i) {
             if (routeInfo.getWay(i).getRouteOrientation() == RouteOrientation.FRONT) {
                 for (int j = 0; j < routeInfo.getWay(i).getWaypointCount(); ++j) {
-                    Router.addRouteNode(routeNodes, routeInfo.getWay(i).getWaypoint(j), routeInfo, crossingOsmIdsToTransform);
+                    addRouteNode(routeNodes, routeInfo.getWay(i).getWaypoint(j), routeInfo);
                 }
             }
             else {
                 for (int j = routeInfo.getWay(i).getWaypointCount() - 1; j >= 0; --j) {
-                    Router.addRouteNode(routeNodes, routeInfo.getWay(i).getWaypoint(j), routeInfo, crossingOsmIdsToTransform);
+                    addRouteNode(routeNodes, routeInfo.getWay(i).getWaypoint(j), routeInfo);
                 }
             }
         }
         return routeNodes;
     }
 
-    private static void addRouteNode(List<RouteNode> routeNodes, OSMWaypoint waypoint, RouteInfo routeInfo,
-                                     List<Long> crossingOsmIdsToTransform) {
+    private static void addRouteNode(List<RouteNode> routeNodes, OSMWaypoint waypoint, RouteInfo routeInfo) {
         if (routeInfo.removeIfContains(waypoint.getOsmNodeRef())) {
             routeNodes.add(MasterAgent.crossingOsmIdToLightManagerNode.get(Long.parseLong(waypoint.getOsmNodeRef())));
         }
@@ -84,25 +79,23 @@ public final class Router {
     /////////////////////////////////////////////////////////////
 
     private static Pair<List<Long>, List<RouteNode>> findRoute(GeoPosition pointA, GeoPosition pointB, boolean onFoot) {
-        var osmWayIdsAndPointList =
-                osmproxy.HighwayAccessor.getOsmWayIdsAndPointList(pointA.getLatitude(), pointA.getLongitude(), pointB.getLatitude(),
-                        pointB.getLongitude(), onFoot);
-        return osmWayIdsAndPointList;
+        return osmproxy.HighwayAccessor.getOsmWayIdsAndPointList(pointA.getLatitude(), pointA.getLongitude(), pointB.getLatitude(),
+                pointB.getLongitude(), onFoot);
     }
 
-    private static List<RouteNode> getManagersForLights(List<OSMLight> lights, List<RouteNode> route) {
+    private static List<RouteNode> getManagersForLights(List<OSMLight> lights) {
         List<RouteNode> managers = new ArrayList<>();
         for (OSMLight light : lights) {
-            Router.addLightManagerNodeToManagersList(managers, light, route);
+            addLightManagerNodeToManagersList(managers, light);
         }
         return managers;
     }
 
-    private static void addLightManagerNodeToManagersList(List<RouteNode> managers, OSMLight light, List<RouteNode> route) {
+    private static void addLightManagerNodeToManagersList(List<RouteNode> managers, OSMLight light) {
         Pair<Long, Long> osmWayIdOsmLightId = Pair.with(light.getAdherentOsmWayId(), light.getId());
         RouteNode nodeToAdd = MasterAgent.wayIdLightIdToLightManagerNode.get(osmWayIdOsmLightId);
 
-        if (nodeToAdd != null && !Router.lastManagerIdEqualTo(managers, nodeToAdd)) {
+        if (nodeToAdd != null && !lastManagerIdEqualTo(managers, nodeToAdd)) {
             managers.add(nodeToAdd);
         }
     }
@@ -118,7 +111,7 @@ public final class Router {
 
     private static List<RouteNode> getRouteWithAdditionalNodes(List<RouteNode> route, List<RouteNode> more_nodes) {
         for (RouteNode node : more_nodes) {
-            Router.findPositionOfElementOnRoute(route, node);
+            findPositionOfElementOnRoute(route, node);
         }
         return route;
     }
@@ -128,7 +121,7 @@ public final class Router {
         int minIndex = -1;
         double minDistance = Double.MAX_VALUE;
         for (int i = 0; i < route.size(); ++i) {
-            double distance = Router.calculateDistance(route.get(i), manager);
+            double distance = calculateDistance(route.get(i), manager);
             if (distance < minDistance) {
                 minDistance = distance;
                 minIndex = i;
@@ -138,8 +131,8 @@ public final class Router {
             route.add(minIndex + 1, manager);
             return;
         }
-        double distMgrToMinPrev = Router.calculateDistance(route.get(minIndex - 1), manager);
-        double distMinToMinPrev = Router.calculateDistance(route.get(minIndex - 1), route.get(minIndex));
+        double distMgrToMinPrev = calculateDistance(route.get(minIndex - 1), manager);
+        double distMinToMinPrev = calculateDistance(route.get(minIndex - 1), route.get(minIndex));
         if (distMgrToMinPrev < distMinToMinPrev) {
             route.add(minIndex, manager);
         }
@@ -201,17 +194,17 @@ public final class Router {
         List<RouteNode> RouteNodes_list = new ArrayList<>();
         for (OSMWay el : router) {
             osmWayIds_list.add(el.getId());
-            Router.addRouteNodesBasedOnOrientation(el, RouteNodes_list);
+            addRouteNodesBasedOnOrientation(el, RouteNodes_list);
         }
-        return new Pair<List<Long>, List<RouteNode>>(osmWayIds_list, RouteNodes_list);
+        return new Pair<>(osmWayIds_list, RouteNodes_list);
     }
 
     private static void addRouteNodesBasedOnOrientation(OSMWay el, List<RouteNode> routeNodes_list) {
         if (el.getRelationOrientation() == RelationOrientation.FRONT) {
-            Router.addRouteNodesToList(el.getWaypoints(), routeNodes_list);
+            addRouteNodesToList(el.getWaypoints(), routeNodes_list);
         }
         else if (el.getRelationOrientation() == RelationOrientation.BACK) {
-            Router.addRouteNodesToList(Router.reverse(el.getWaypoints()), routeNodes_list);
+            addRouteNodesToList(reverse(el.getWaypoints()), routeNodes_list);
         }
         else {
             try {
@@ -234,16 +227,15 @@ public final class Router {
         }
     }
 
-    private static List<RouteNode> getAgentStationsForRoute(List<OSMNode> stations, List<RouteNode> route) {
+    private static List<RouteNode> getAgentStationsForRoute(List<OSMNode> stations) {
         List<RouteNode> managers = new ArrayList<>();
         for (OSMNode station : stations) {
-            Router.addStationNodeToList(managers, station, route);
+            addStationNodeToList(managers, station);
         }
         return managers;
     }
 
-    private static void addStationNodeToList(List<RouteNode> stations, OSMNode station, List<RouteNode> route) {
-
+    private static void addStationNodeToList(List<RouteNode> stations, OSMNode station) {
         RouteNode nodeToAdd = MasterAgent.osmStationIdToStationNode.get(station.getId());
         stations.add(nodeToAdd);
     }

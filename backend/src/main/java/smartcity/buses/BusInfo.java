@@ -1,6 +1,5 @@
 package smartcity.buses;
 
-import jade.wrapper.AgentContainer;
 import org.jxmapviewer.viewer.GeoPosition;
 import osmproxy.MapAccessManager;
 import osmproxy.elements.OSMStation;
@@ -15,7 +14,6 @@ import java.util.List;
 
 // Bus Lines
 public class BusInfo {
-
     private String busLine;
     private List<OSMWay> route = new ArrayList<>();
     private List<BrigadeInfo> brigadeList = new ArrayList<>();
@@ -49,18 +47,11 @@ public class BusInfo {
         brigadeList = new ArrayList<>(values);
     }
 
-    public void prepareAgents(AgentContainer container) {
+    public void prepareAgents() {
         List<RouteNode> routeWithNodes = Router.generateRouteInfoForBuses(route, stationsOnRouteOsmIds);
         for (BrigadeInfo brigade : brigadeList) {
-            brigade.prepareAgents(container, routeWithNodes, busLine);
+            brigade.prepareAgents(routeWithNodes, busLine);
         }
-    }
-
-    public Long getLastStation() {
-        if (stationsOnRouteOsmIds.size() == 0) {
-            return (long) 0;
-        }
-        return stationsOnRouteOsmIds.get(stationsOnRouteOsmIds.size() - 1);
     }
 
     public void filterStationsByCircle(double middleLat, double middleLon, int radius) {

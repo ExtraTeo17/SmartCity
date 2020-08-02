@@ -8,11 +8,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class CrossroadInfo {
-
-    private static double cosineOf135degrees = -0.7071;
-
-    private List<LightInfo> firstLightGroupInfo;
-    private List<LightInfo> secondLightGroupInfo;
+    private static final double cosineOf135degrees = -0.7071;
+    private final List<LightInfo> firstLightGroupInfo;
+    private final List<LightInfo> secondLightGroupInfo;
 
     public CrossroadInfo(OSMNode centerCrossroadNode) {
         firstLightGroupInfo = new ArrayList<>();
@@ -45,11 +43,11 @@ public class CrossroadInfo {
         return secondLightGroupInfo;
     }
 
-    private final double cosineFromLawOfCosinesInTriangle(double a, double b, double c) {
+    private double cosineFromLawOfCosinesInTriangle(double a, double b, double c) {
         return ((a * a) + (b * b) - (c * c)) / (2 * a * b);
     }
 
-    private final double calculateDistance(GeoPosition pos1, GeoPosition pos2) {
+    private double calculateDistance(GeoPosition pos1, GeoPosition pos2) {
         return Math.sqrt(((pos2.getLatitude() - pos1.getLatitude()) * (pos2.getLatitude() - pos1.getLatitude()))
                 + ((pos2.getLongitude() - pos1.getLongitude()) * (pos2.getLongitude() - pos1.getLongitude())));
     }

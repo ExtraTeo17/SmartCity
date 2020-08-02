@@ -1,41 +1,56 @@
 package agents;
 
-import lightstrategies.LightManagerStrategy;
-import lightstrategies.LightStrategy;
+import behaviourfactories.IBehaviourFactory;
+import behaviourfactories.LightManagerBehaviourFactory;
 import org.jxmapviewer.JXMapViewer;
 import org.jxmapviewer.painter.Painter;
+import org.jxmapviewer.viewer.GeoPosition;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Node;
 import osmproxy.elements.OSMNode;
+import smartcity.lights.ICrossroad;
+import smartcity.lights.SimpleCrossroad;
 
 import java.util.List;
 
 public class LightManager extends AbstractAgent {
     private static final Logger logger = LoggerFactory.getLogger(LightManager.class);
-    private final LightStrategy strategy;
+    // TODO: Inject it as dependency
+    private final IBehaviourFactory<LightManager> behaviourFactory;
+    private final ICrossroad crossroad;
+
+    public LightManager(Node node, int id) {
+        super(id);
+        behaviourFactory = new LightManagerBehaviourFactory();
+        crossroad = new SimpleCrossroad(node, id);
+    }
+
+    public LightManager(OSMNode centerCrossroadNode, int id) {
+        super(id);
+        behaviourFactory = new LightManagerBehaviourFactory();
+        crossroad = new SimpleCrossroad(centerCrossroadNode, id);
+    }
 
     @Override
     public String getNamePrefix() {
         return "LightManager";
     }
 
-    public LightManager(Node crossroad, int id) {
-        super(id);
-        strategy = new LightManagerStrategy(crossroad, id);
-    }
-
-    public LightManager(OSMNode centerCrossroadNode, int id) {
-        super(id);
-        strategy = new LightManagerStrategy(centerCrossroadNode, id);
-    }
-
     @Override
     protected void setup() {
         print("I'm a traffic manager.");
-        // TODO: Remove strategy initialization from this class
-        //  Inject it as dependency or better add factory for lightManager with parameter
-        strategy.applyStrategy(this);
+        crossroad.startLifetime();
+        addBehaviour(behaviourFactory.createCyclicBehaviour(this));
+        addBehaviour(behaviourFactory.createTickerBehaviour(this));
+    }
+
+    public ICrossroad getCrossroad() {
+        return crossroad;
+    }
+
+    public List<GeoPosition> getLightsPositions() {
+        return crossroad.getLightsPositions();
     }
 
     public void print(String message) {
@@ -43,6 +58,6 @@ public class LightManager extends AbstractAgent {
     }
 
     public void draw(List<Painter<JXMapViewer>> waypointPainter) {
-        strategy.drawCrossroad(waypointPainter);
+        crossroad.draw(waypointPainter);
     }
 }

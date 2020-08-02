@@ -21,12 +21,7 @@ public abstract class AbstractAgent extends Agent {
     public AbstractAgent(int id) {
         this.id = id;
     }
-
-    public AbstractAgent(int id, String args[]) {
-        this(id);
-        setArguments(args);
-    }
-
+    
     public String getPredictedName() {
         return getNamePrefix() + id;
     }
