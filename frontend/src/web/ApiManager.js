@@ -2,8 +2,12 @@ import { SERVER_ADDRESS } from "../utils/constants";
 import { SET_ZONE } from "./MessageType";
 
 var socket = new WebSocket(SERVER_ADDRESS);
+var subscribers = [];
 socket.onopen = () => {
   console.log("Connected !!!");
+};
+socket.onmessage = e => {
+  console.log("Message received:" + e.data);
 };
 
 export default {
@@ -30,5 +34,9 @@ export default {
 
     console.log(msg.payload);
     socket.send(JSON.stringify(msg));
+  },
+
+  subscribe(listener) {
+    subscribers.push(listener);
   },
 };

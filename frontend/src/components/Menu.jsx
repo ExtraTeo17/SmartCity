@@ -47,7 +47,9 @@ const Menu = props => {
             defaultValue={lat}
             className="form-control"
             id="lat"
-            step="0.00001"
+            step="0.0001"
+            min="-90"
+            max="90"
             placeholder="Enter latitude"
             onChange={e => setLat(parseFloat(e.target.value))}
           />
@@ -59,7 +61,9 @@ const Menu = props => {
             defaultValue={lng}
             className="form-control"
             id="long"
-            step="0.00001"
+            step="0.0001"
+            min="-180"
+            max="180"
             placeholder="Enter longitude"
             onChange={e => setLng(parseFloat(e.target.value))}
           />
@@ -72,6 +76,7 @@ const Menu = props => {
             className="form-control"
             id="rad"
             step="10"
+            max="10000"
             placeholder="Enter radius"
             onChange={e => setRad(parseFloat(e.target.value))}
           />
