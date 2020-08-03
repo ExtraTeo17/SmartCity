@@ -69,4 +69,8 @@ public abstract class AbstractAgent extends Agent {
 
         return msg;
     }
+
+    public void takeDown() {
+        super.takeDown();
+    }
 }

@@ -8,13 +8,13 @@ import web.message.payloads.AbstractPayload;
 import web.serialization.MessageObjectMapper;
 
 
-public class WebManager implements IWebManager {
-    private static final Logger logger = LoggerFactory.getLogger(WebManager.class);
-    private final WebServer webServer;
+class WebConnector implements IWebConnector {
+    private static final Logger logger = LoggerFactory.getLogger(WebConnector.class);
+    private final SocketServer webServer;
     private final MessageObjectMapper objectMapper;
 
     @Inject
-    public WebManager(WebServer webServer, MessageObjectMapper objectMapper) {
+    public WebConnector(SocketServer webServer, MessageObjectMapper objectMapper) {
         this.webServer = webServer;
         this.objectMapper = objectMapper;
     }

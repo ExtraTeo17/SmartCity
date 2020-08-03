@@ -267,11 +267,6 @@ public class BusAgent extends AbstractAgent {
                 stationsOnRoute.get(halfIndex + random.nextInt(halfIndex)));
     }
 
-    @Override
-    protected void takeDown() {
-        super.takeDown();
-    }
-
     public void runBasedOnTimetable(Date date) {
         if (this.getAgentState().getValue() != jade.wrapper.AgentState.cAGENT_STATE_INITIATED) {
             return;

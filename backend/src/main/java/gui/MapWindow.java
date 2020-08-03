@@ -214,7 +214,7 @@ public class MapWindow {
                             var vehicle = smartCityAgent.tryAddNewVehicleAgent(Router.generateRouteInfo(pointA, pointB));
                             vehicle.start();
 
-                            logger.info("Vehicles: " + MasterAgent.Vehicles.size());
+                            logger.info("Vehicles: " + MasterAgent.vehicles.size());
                             logger.info("Lights: " + MasterAgent.lightManagers.size());
                             pointA = null;
                             pointB = null;
@@ -433,7 +433,7 @@ public class MapWindow {
                 smartCityAgent.activateLightManagerAgents();
 
                 // start all
-                for (VehicleAgent agent : MasterAgent.Vehicles) {
+                for (VehicleAgent agent : MasterAgent.vehicles) {
                     agent.start();
                 }
 
@@ -479,6 +479,10 @@ public class MapWindow {
     @Subscribe
     public void HandleSetZone(SetZoneEvent e) {
         logger.info("Set zone event occurred: " + e.toString());
+        if (state == SimulationState.READY_TO_RUN) {
+            MasterAgent.reset();
+            state = SimulationState.SETTING_ZONE;
+        }
         prepareAgentsAndSetZone(e.getLatitude(), e.getLongitude(), (int) e.getRadius());
         setState(SimulationState.READY_TO_RUN);
     }
@@ -560,7 +564,7 @@ public class MapWindow {
     public void DrawVehicles(List<Painter<JXMapViewer>> painters) {
         try {
             Set<Waypoint> set = new HashSet<>();
-            for (VehicleAgent a : MasterAgent.Vehicles) {
+            for (VehicleAgent a : MasterAgent.vehicles) {
                 if (a.getVehicle() instanceof TestCar) {
                     Set<Waypoint> testCarWaypoint = new HashSet<>();
                     testCarWaypoint.add(new DefaultWaypoint(a.getVehicle().getPosition()));
@@ -585,7 +589,7 @@ public class MapWindow {
 
     public void DrawRoutes(List<Painter<JXMapViewer>> painters) {
         try {
-            for (VehicleAgent a : MasterAgent.Vehicles) {
+            for (VehicleAgent a : MasterAgent.vehicles) {
                 List<GeoPosition> track = new ArrayList<GeoPosition>();
                 for (RouteNode point : a.getVehicle().getDisplayRoute()) {
                     track.add(new GeoPosition(point.getLatitude(), point.getLongitude()));
@@ -1058,7 +1062,7 @@ public class MapWindow {
 
         @Override
         public void run() {
-            if (!MasterAgent.SHOULD_GENERATE_CARS || MasterAgent.Vehicles.size() >= getCarLimit()) {
+            if (!MasterAgent.SHOULD_GENERATE_CARS || MasterAgent.vehicles.size() >= getCarLimit()) {
                 return;
             }
             final Pair<Double, Double> geoPosInZoneCircle = generateRandomGeoPosOffsetWithRadius(getZoneRadius());

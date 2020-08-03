@@ -1,11 +1,11 @@
 import com.google.inject.Guice;
 import genesis.MainModule;
-import genesis.WebModule;
 import jade.wrapper.ContainerController;
 import jade.wrapper.StaleProxyException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import smartcity.MasterAgent;
+import web.WebModule;
 
 public class SmartCity {
     private static final Logger logger = LoggerFactory.getLogger(SmartCity.class);

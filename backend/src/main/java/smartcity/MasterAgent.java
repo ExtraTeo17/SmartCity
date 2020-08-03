@@ -29,13 +29,16 @@ import vehicles.MovingObjectImpl;
 import vehicles.Pedestrian;
 import vehicles.TestCar;
 import vehicles.TestPedestrian;
-import web.IWebManager;
+import web.IWebService;
 import web.message.MessageType;
+import web.message.payloads.responses.Location;
 import web.message.payloads.responses.SetZoneResponse;
+import web.serialization.Converter;
 
 import java.time.Duration;
 import java.time.Instant;
 import java.util.*;
+import java.util.stream.Collectors;
 
 // TODO: This class should have no more than 10 fields.
 public class MasterAgent extends Agent {
@@ -43,7 +46,7 @@ public class MasterAgent extends Agent {
 
     private static AgentContainer container;
     private static MapWindow window;
-    private final IWebManager webManager;
+    private final IWebService webService;
 
     public final static boolean USE_DEPRECATED_XML_FOR_LIGHT_MANAGERS = false;
     public final static String STEPS = "6";
@@ -51,21 +54,23 @@ public class MasterAgent extends Agent {
     public static boolean SHOULD_GENERATE_CARS = true;
 
     // TODO: Delete this abomination (or at least make it private)
-    public static final List<PedestrianAgent> pedestrians = new ArrayList<>();
-    public static Set<LightManager> lightManagers = new HashSet<>();
     public static boolean lightManagersUnderConstruction = false;
+    public static final Set<LightManager> lightManagers = new HashSet<>();
+    public static final List<PedestrianAgent> pedestrians = new ArrayList<>();
+    public static final Set<BusAgent> buses = new LinkedHashSet<>();
+    public static final List<VehicleAgent> vehicles = new ArrayList<>();
+
     public static Map<Pair<Long, Long>, LightManagerNode> wayIdLightIdToLightManagerNode = new HashMap<>();
     public static Map<Long, LightManagerNode> crossingOsmIdToLightManagerNode = new HashMap<>();
     public static Map<Long, StationNode> osmStationIdToStationNode = new HashMap<>();
     public static Map<Long, OSMStation> osmIdToStationOSMNode = new HashMap<>();
-    public static Set<BusAgent> buses = new LinkedHashSet<>();
-    public static List<VehicleAgent> Vehicles = new ArrayList<>();
+
     public int carId = 0;
     public int pedestrianId = 0;
 
     @Inject
-    public MasterAgent(IWebManager webManager, MapWindow window) {
-        this.webManager = webManager;
+    public MasterAgent(IWebService webService, MapWindow window) {
+        this.webService = webService;
 
         // TODO: Delete this abomination
         MasterAgent.window = window;
@@ -77,7 +82,7 @@ public class MasterAgent extends Agent {
         window.setSmartCityAgent(this);
         window.display();
         addBehaviour(getReceiveMessageBehaviour());
-        webManager.start();
+        webService.start();
     }
 
     private CyclicBehaviour getReceiveMessageBehaviour() {
@@ -125,14 +130,14 @@ public class MasterAgent extends Agent {
     }
 
     private void onReceiveVehicle(ACLMessage rcv) {
-        for (int i = 0; i < Vehicles.size(); i++) {
-            VehicleAgent v = Vehicles.get(i);
+        for (int i = 0; i < vehicles.size(); i++) {
+            VehicleAgent v = vehicles.get(i);
             if (v.getLocalName().equals(rcv.getSender().getLocalName())) {
                 if (v.getVehicle() instanceof TestCar) {
                     TestCar car = (TestCar) v.getVehicle();
                     setResultTime(car.start, car.end);
                 }
-                Vehicles.remove(i);
+                vehicles.remove(i);
                 break;
             }
         }
@@ -145,9 +150,10 @@ public class MasterAgent extends Agent {
     @Subscribe
     public void handleSimulationReady(SimulationReadyEvent e) {
         logger.info("Handling SimulationReadyEvent");
-        GeoPosition[] positions = lightManagers.stream().flatMap(man -> man.getLightsPositions().stream()).toArray(GeoPosition[]::new);
-        var payload = new SetZoneResponse(positions);
-        webManager.broadcastMessage(MessageType.SET_ZONE_RESPONSE, payload);
+        var positions = lightManagers.stream()
+                .flatMap(man -> man.getLightsPositions().stream())
+                .collect(Collectors.toList());
+        webService.setZone(positions);
     }
 
     public void prepareAgents(double lat, double lon, int radius) {
@@ -220,7 +226,7 @@ public class MasterAgent extends Agent {
 
     private void tryAddNewVehicleAgent(VehicleAgent agent) {
         tryAddAgent(agent);
-        Vehicles.add(agent);
+        vehicles.add(agent);
         ++carId;
     }
 
@@ -256,7 +262,8 @@ public class MasterAgent extends Agent {
         IdGenerator.resetStationAgentId();
         logger.info("STEP 1/" + STEPS + ": Starting bus preparation");
         IdGenerator.resetBusId();
-        buses = new LinkedHashSet<>();
+        buses.clear();
+        ;
         Set<BusInfo> busInfoSet = MapAccessManager.getBusInfo(radius, middlePoint.getLatitude(), middlePoint.getLongitude());
         logger.info("STEP 5/" + STEPS + ": Starting agent preparation based on queries");
         int i = 0;
@@ -267,4 +274,31 @@ public class MasterAgent extends Agent {
         logger.info("STEP 6/" + STEPS + ": Buses are created!");
         logger.info("NUMBER OF BUS AGENTS: " + buses.size());
     }
+
+    public static void reset() {
+        for (var manager : lightManagers) {
+            manager.takeDown();
+        }
+        lightManagers.clear();
+
+        for (var vehicle : vehicles) {
+            vehicle.takeDown();
+        }
+        vehicles.clear();
+
+        for (var bus : buses) {
+            bus.takeDown();
+        }
+        buses.clear();
+
+        // People die last
+        for (var pedestrian : pedestrians) {
+            pedestrian.takeDown();
+        }
+        pedestrians.clear();
+
+        // TODO: Still not removed from container - how to do that?
+    }
+
+
 }

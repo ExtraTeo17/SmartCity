@@ -15,13 +15,13 @@ import java.util.List;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
-public class WebServer extends WebSocketServer {
-    private static final Logger logger = LoggerFactory.getLogger(WebServer.class);
+public class SocketServer extends WebSocketServer {
+    private static final Logger logger = LoggerFactory.getLogger(SocketServer.class);
     private final MessageHandler messageHandler;
     private final HashSet<WebSocket> sockets;
 
     @Inject
-    WebServer(MessageHandler messageHandler, ExtendedProperties properties) {
+    SocketServer(MessageHandler messageHandler, ExtendedProperties properties) {
         super(getSocketAddress(properties));
         this.messageHandler = messageHandler;
         sockets = new HashSet<>();
