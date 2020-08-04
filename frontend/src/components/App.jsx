@@ -3,12 +3,8 @@ import CityMap from "./CityMap";
 import "../styles/App.css";
 import Menu from "./Menu";
 
-import appReducer from "../redux/reducers";
-import { createStore } from "redux";
-import { composeWithDevTools } from "redux-devtools-extension";
 import { Provider } from "react-redux";
-
-const store = createStore(appReducer, composeWithDevTools());
+import store from "../redux/store";
 
 const App = () => (
   <Provider store={store}>
