@@ -58,8 +58,10 @@ public class Light {
 
     private void addHashMapsEntries(long managerId) {
         final LightManagerNode lightManagerNode = new LightManagerNode(position.getLatitude(), position.getLongitude(),
-                adjacentOsmWayId, Long.parseLong(adjacentCrossingOsmId1), adjacentCrossingOsmId2 != null ?
-                Long.parseLong(adjacentCrossingOsmId2) : null, managerId);
+                adjacentOsmWayId,
+                adjacentCrossingOsmId1 != null ? Long.parseLong(adjacentCrossingOsmId1) : 0,
+                adjacentCrossingOsmId2 != null ? Long.parseLong(adjacentCrossingOsmId2) : 0,
+                managerId);
         MasterAgent.wayIdLightIdToLightManagerNode.put(Pair.with(adjacentOsmWayId, osmId), lightManagerNode);
         MasterAgent.crossingOsmIdToLightManagerNode.put(Long.parseLong(adjacentCrossingOsmId1), lightManagerNode);
         if (adjacentCrossingOsmId2 != null) {

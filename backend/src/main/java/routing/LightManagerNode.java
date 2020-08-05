@@ -6,8 +6,8 @@ public class LightManagerNode extends RouteNode {
     private final long crossingOsmId2;
     private long osmWayId;
 
-    public LightManagerNode(double lat, double lon, Long osmWayId, Long adjacentCrossingOsmId1,
-                            Long adjacentCrossingOsmId2, long lightManagerId) {
+    public LightManagerNode(double lat, double lon, long osmWayId, long adjacentCrossingOsmId1,
+                            long adjacentCrossingOsmId2, long lightManagerId) {
         super(lat, lon);
         this.lightManagerId = lightManagerId;
         this.osmWayId = osmWayId;

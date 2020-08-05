@@ -15,7 +15,7 @@ import java.util.List;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
-public class SocketServer extends WebSocketServer {
+class SocketServer extends WebSocketServer {
     private static final Logger logger = LoggerFactory.getLogger(SocketServer.class);
     private final MessageHandler messageHandler;
     private final HashSet<WebSocket> sockets;
