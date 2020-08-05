@@ -8,13 +8,11 @@ export default {
     switch (msg.type) {
       case SET_ZONE_RESPONSE:
         const locations = payload.locations;
-        console.log("Locations");
-        console.log(locations);
         dispatch(lightLocationsUpdated(locations));
         break;
 
       default:
-        console.log("Unrecognized message type");
+        console.warn("Unrecognized message type");
     }
   },
 };

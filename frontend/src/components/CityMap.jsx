@@ -1,5 +1,4 @@
-/* eslint-disable react/prop-types */
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Map, Marker, Popup, TileLayer, Circle, CircleMarker } from "react-leaflet";
 import "../styles/CityMap.css";
 import { connect } from "react-redux";
@@ -7,13 +6,10 @@ import { connect } from "react-redux";
 const CityMap = props => {
   const [zoom, setZoom] = useState(15);
   const { lat, lng, rad } = props.center;
-  const lights = props.lights;
+  const { lights } = props;
 
-  const lightMarkers = lights.forEach(light => (
-    <CircleMarker center={light}>
-      <Popup>I am a light!</Popup>
-    </CircleMarker>
-  ));
+  // Similar to componentDidMount and componentDidUpdate:
+  useEffect(() => {});
 
   return (
     <Map
@@ -21,10 +17,6 @@ const CityMap = props => {
       zoom={zoom}
       onzoomanim={e => {
         setZoom(e.zoom);
-      }}
-      onclick={e => {
-        console.log(lights);
-        console.log(lights[0]);
       }}
     >
       <TileLayer
@@ -37,7 +29,11 @@ const CityMap = props => {
             A pretty CSS3 popup. <br /> Easily customizable.
           </Popup>
         </Marker>
-        {lightMarkers}
+        {lights.map((light, ind) => (
+          <Marker key={ind} position={light} opacity={0.5}>
+            <Popup>I am a light!</Popup>
+          </Marker>
+        ))}
       </Circle>
     </Map>
   );

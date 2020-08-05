@@ -8,7 +8,7 @@ const message = (state = initialState, action) => {
   switch (action.type) {
     case LIGHT_LOCATIONS_UPDATED: {
       const { lightLocations } = action.payload;
-      return { ...state, lightLocations: lightLocations.slice() };
+      return { ...state, lightLocations: lightLocations };
     }
 
     default:
