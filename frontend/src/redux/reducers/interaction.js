@@ -1,9 +1,12 @@
 import { CENTER_UPDATED } from "../constants";
 
 const initialState = {
-  center: { lat: 52.23682, lng: 21.01681, rad: 200 },
+  center: { lat: 0, lng: 0, rad: 0 },
 };
 
+/**
+ * @param {{ type: any; payload: { center: { lat: number; lng: number; rad: number}; }; }} action
+ */
 const interaction = (state = initialState, action) => {
   switch (action.type) {
     case CENTER_UPDATED: {
