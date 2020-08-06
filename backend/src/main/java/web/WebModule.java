@@ -14,6 +14,7 @@ public class WebModule extends AbstractModule {
     @Override
     public void configure(Binder binder) {
         super.configure(binder);
+
         binder.bind(SocketServer.class).in(Singleton.class);
         binder.bind(IWebConnector.class).to(WebConnector.class).in(Singleton.class);
         binder.bind(IMessageObjectMapper.class).to(MessageObjectMapper.class).in(Singleton.class);

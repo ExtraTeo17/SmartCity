@@ -38,6 +38,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
 // TODO: This class should have no more than 10 fields.
+// TODO: This class should be package private
 public class MasterAgent extends Agent {
     private static final Logger logger = LoggerFactory.getLogger(MasterAgent.class);
 

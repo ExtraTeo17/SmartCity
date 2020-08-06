@@ -52,6 +52,7 @@ import java.util.*;
 
 import static smartcity.MasterAgent.SHOULD_GENERATE_PEDESTRIANS_AND_BUSES;
 
+@Deprecated
 public class MapWindow {
     private static final Logger logger = LoggerFactory.getLogger(MapWindow.class);
     private final static int REFRESH_MAP_INTERVAL_MILLISECONDS = 100;
