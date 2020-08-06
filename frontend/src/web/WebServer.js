@@ -8,14 +8,14 @@ var socketContainer = {
 const createSocket = () => {
   const socket = new WebSocket(SERVER_ADDRESS);
   socket.onopen = () => {
-    console.log("Connected !!!");
+    console.info("Connected !!!");
   };
 
   /**
    * @param {{ data: object; }} e
    */
   socket.onmessage = e => {
-    console.group("OnMessage");
+    console.groupCollapsed("OnMessage");
 
     console.log("Message received:" + e.data);
     let msgDto = JSON.parse(e.data);
