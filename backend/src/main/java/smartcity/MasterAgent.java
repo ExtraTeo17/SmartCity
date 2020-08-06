@@ -30,14 +30,11 @@ import vehicles.Pedestrian;
 import vehicles.TestCar;
 import vehicles.TestPedestrian;
 import web.IWebService;
-import web.message.MessageType;
-import web.message.payloads.responses.Location;
-import web.message.payloads.responses.SetZoneResponse;
-import web.serialization.Converter;
 
 import java.time.Duration;
 import java.time.Instant;
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
 // TODO: This class should have no more than 10 fields.
@@ -55,7 +52,7 @@ public class MasterAgent extends Agent {
 
     // TODO: Delete this abomination (or at least make it private)
     public static boolean lightManagersUnderConstruction = false;
-    public static final Set<LightManager> lightManagers = new HashSet<>();
+    public static final Set<LightManager> lightManagers = ConcurrentHashMap.newKeySet();
     public static final List<PedestrianAgent> pedestrians = new ArrayList<>();
     public static final Set<BusAgent> buses = new LinkedHashSet<>();
     public static final List<VehicleAgent> vehicles = new ArrayList<>();
@@ -263,7 +260,7 @@ public class MasterAgent extends Agent {
         logger.info("STEP 1/" + STEPS + ": Starting bus preparation");
         IdGenerator.resetBusId();
         buses.clear();
-        ;
+
         Set<BusInfo> busInfoSet = MapAccessManager.getBusInfo(radius, middlePoint.getLatitude(), middlePoint.getLongitude());
         logger.info("STEP 5/" + STEPS + ": Starting agent preparation based on queries");
         int i = 0;
@@ -276,6 +273,7 @@ public class MasterAgent extends Agent {
     }
 
     public static void reset() {
+        IdGenerator.resetLightManagerId();
         for (var manager : lightManagers) {
             manager.takeDown();
         }
