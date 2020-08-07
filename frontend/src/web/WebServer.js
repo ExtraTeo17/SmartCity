@@ -1,5 +1,6 @@
-import { SERVER_ADDRESS, RECONNECT_INTERVAL_SEC } from "../utils/constants";
+import { SERVER_ADDRESS, RECONNECT_INTERVAL_SEC, NOTIFY_SHOW_SEC } from "../utils/constants";
 import MessageHandler from "./MessageHandler";
+import { notify } from "react-notify-toast";
 
 var socketContainer = {
   socket: {},
@@ -9,6 +10,7 @@ const createSocket = () => {
   const socket = new WebSocket(SERVER_ADDRESS);
   socket.onopen = () => {
     console.info("Connected !!!");
+    notify.show("Sucessfully connected", "success", NOTIFY_SHOW_SEC * 1000);
   };
 
   /**
@@ -32,6 +34,7 @@ const createSocket = () => {
 
   socket.onclose = e => {
     console.warn(`Socket is closed. Reconnect will be attempted in ${RECONNECT_INTERVAL_SEC} seconds`, e.reason);
+    notify.show("Error encountered, trying to reconnect...", "error", RECONNECT_INTERVAL_SEC * 1000);
     setTimeout(() => {
       socketContainer.socket = createSocket();
     }, RECONNECT_INTERVAL_SEC * 1000);
