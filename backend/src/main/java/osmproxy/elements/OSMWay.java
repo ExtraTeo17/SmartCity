@@ -2,6 +2,8 @@ package osmproxy.elements;
 
 import org.javatuples.Pair;
 import org.jxmapviewer.viewer.GeoPosition;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -10,7 +12,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class OSMWay extends OSMElement {
-
+    private final static Logger logger = LoggerFactory.getLogger(OSMWay.class);
     private static final String YES = "yes";
     private static final String NO = "no";
     private final List<String> childNodeIds;
@@ -108,27 +110,23 @@ public class OSMWay extends OSMElement {
         }
     }
 
+    // TODO: Describe this function - what it is returning?
     public String determineRelationOrientation(final String adjacentNodeRef) {
-        String firstWayFirstOsmNodeRef = getWaypoint(0).getOsmNodeRef();
-        String firstWayLastOsmNodeRef = getWaypoint(getWaypointCount() - 1).getOsmNodeRef();
-        if (firstWayFirstOsmNodeRef.equals(adjacentNodeRef)) {
+        String firstOsmNodeRef = getWaypoint(0).getOsmNodeRef();
+        String lastOsmNodeRef = getWaypoint(getWaypointCount() - 1).getOsmNodeRef();
+        if (firstOsmNodeRef.equals(adjacentNodeRef)) {
             relationOrientation = RelationOrientation.FRONT;
-            return firstWayLastOsmNodeRef;
+            return lastOsmNodeRef;
         }
-        else if (firstWayLastOsmNodeRef.equals(adjacentNodeRef)) {
+        else if (lastOsmNodeRef.equals(adjacentNodeRef)) {
             relationOrientation = RelationOrientation.BACK;
-            return firstWayFirstOsmNodeRef;
+            return firstOsmNodeRef;
         }
-        else {
-            try {
-                throw new Exception("This orientation is not yet known :(");
-            } catch (Exception e) {
-                e.printStackTrace();
-                return null;
-            }
-        }
+
+        throw new UnsupportedOperationException("This orientation is not yet known :(");
     }
 
+    // TODO: Describe this function - what it is returning?
     public String determineRelationOrientation(final OSMWay nextWay) {
         String firstWayFirstOsmNodeRef = getWaypoint(0).getOsmNodeRef();
         String firstWayLastOsmNodeRef = getWaypoint(getWaypointCount() - 1).getOsmNodeRef();
@@ -144,14 +142,8 @@ public class OSMWay extends OSMElement {
             relationOrientation = RelationOrientation.FRONT;
             return firstWayLastOsmNodeRef;
         }
-        else {
-            try {
-                throw new Exception("This orientation is not yet known :(");
-            } catch (Exception e) {
-                e.printStackTrace();
-                return null;
-            }
-        }
+
+        throw new UnsupportedOperationException("This orientation is not yet known :(");
     }
 
     public GeoPosition getLightNeighborPos() {

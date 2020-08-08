@@ -6,16 +6,10 @@ public enum LightColor {
     RED;
 
     public LightColor next() {
-        if (this == GREEN) {
-            return LightColor.RED;
-        }
-        else if (this == RED) {
-            return LightColor.GREEN;
-        }
-        else if (this == YELLOW) {
-            return LightColor.YELLOW;
-        }
-
-        throw new IllegalArgumentException("Method was not updated after new field was added.");
+        return switch (this) {
+            case GREEN -> LightColor.RED;
+            case YELLOW -> LightColor.YELLOW;
+            case RED -> LightColor.GREEN;
+        };
     }
 }

@@ -15,6 +15,7 @@
  */
 package osmproxy;
 
+import jade.core.NotFoundException;
 import org.javatuples.Pair;
 import org.javatuples.Triplet;
 import org.json.simple.JSONArray;
@@ -181,17 +182,14 @@ public class MapAccessManager {
      * @return the nodes in the formulated query
      */
     public static Document getNodesViaOverpass(String query) throws IOException, ParserConfigurationException, SAXException {
-        String hostname = OVERPASS_API;
-        String queryString = query; // readFileAsString(query);
-
-        URL osm = new URL(hostname);
+        URL osm = new URL(OVERPASS_API);
         HttpURLConnection connection = (HttpURLConnection) osm.openConnection();
         connection.setDoInput(true);
         connection.setDoOutput(true);
         connection.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");
 
         DataOutputStream printout = new DataOutputStream(connection.getOutputStream());
-        printout.writeBytes("data=" + URLEncoder.encode(queryString, StandardCharsets.UTF_8));
+        printout.writeBytes("data=" + URLEncoder.encode(query, StandardCharsets.UTF_8));
         printout.flush();
         printout.close();
 
@@ -473,15 +471,18 @@ public class MapAccessManager {
                         }
                     }
                 }
+
                 try {
                     var overpassNodes = getNodesViaOverpass(getBusWayOverpassQueryWithPayload(builder));
                     var osmWay = parseOsmWay(overpassNodes, radius, middleLat, middleLon);
                     info.setRoute(osmWay);
+                } catch (NotFoundException e) {
+                    logger.warn("Please change the zone, this one is not supported yet.", e);
                 } catch (Exception e) {
-                    logger.warn("Error setting osm way", e);
+                    logger.error("Error setting osm way", e);
                 }
             }
-            if (item.getNodeName().equals("node")) {
+            else if (item.getNodeName().equals("node")) {
                 NamedNodeMap attributes = item.getAttributes();
 
                 String osmId = attributes.getNamedItem("id").getNodeValue();
@@ -521,7 +522,8 @@ public class MapAccessManager {
         return infoSet;
     }
 
-    private static List<OSMWay> parseOsmWay(Document nodesViaOverpass, int radius, double middleLat, double middleLon) {
+    private static List<OSMWay> parseOsmWay(Document nodesViaOverpass, int radius, double middleLat, double middleLon)
+            throws NotFoundException {
         List<OSMWay> route = new ArrayList<>();
         Node osmRoot = nodesViaOverpass.getFirstChild();
         NodeList osmXMLNodes = osmRoot.getChildNodes();
@@ -538,7 +540,11 @@ public class MapAccessManager {
                 }
                 else {
                     way = new OSMWay(item);
-                    adjacentNodeRef = way.determineRelationOrientation(adjacentNodeRef);
+                    try {
+                        adjacentNodeRef = way.determineRelationOrientation(adjacentNodeRef);
+                    } catch (UnsupportedOperationException e) {
+                        logger.warn("Failed to determine orientation", e);
+                    }
                 }
 
                 // TODO: CORRECT POTENTIAL BUGS CAUSING ROUTE TO BE CUT INTO PIECES BECAUSE OF RZĄŻEWSKI CASE
@@ -550,18 +556,31 @@ public class MapAccessManager {
         return route;
     }
 
-    private static Pair<OSMWay, String> determineInitialWayRelOrientation(final NodeList osmXMLNodes) {
+    // TODO: Is it returning orientation of next way or current way?
+    private static Pair<OSMWay, String> determineInitialWayRelOrientation(final NodeList osmXMLNodes)
+            throws NotFoundException {
         List<OSMWay> twoFirstWays = new ArrayList<>();
-        OSMWay way = null;
-        int i = 0;
-        while (twoFirstWays.size() < 2) {
-            Node item = osmXMLNodes.item(++i);
-            if (item.getNodeName().equals("way")) {
-                way = new OSMWay(item);
-                twoFirstWays.add(way);
+        OSMWay firstWay = null;
+        OSMWay lastWay = null;
+        for (int it = 1; it < osmXMLNodes.getLength(); ++it) {
+            Node node = osmXMLNodes.item(it);
+            if (node.getNodeName().equals("way")) {
+                var way = new OSMWay(node);
+                if (firstWay == null) {
+                    firstWay = way;
+                }
+                else {
+                    lastWay = way;
+                }
             }
         }
-        return Pair.with(way, twoFirstWays.get(0).determineRelationOrientation(twoFirstWays.get(1)));
+
+        if (firstWay != null && lastWay != null) {
+            var orientation = firstWay.determineRelationOrientation(lastWay);
+            return Pair.with(lastWay, orientation);
+        }
+
+        throw new NotFoundException("Did not find two 'way'-type nodes in provided list.");
     }
 
     private static void appendSingleBusWayOverpassQuery(StringBuilder query, long osmWayId) {
