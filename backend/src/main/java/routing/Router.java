@@ -1,5 +1,6 @@
 package routing;
 
+import com.google.common.annotations.Beta;
 import org.javatuples.Pair;
 import org.jxmapviewer.viewer.GeoPosition;
 import osmproxy.MapAccessManager;
@@ -15,6 +16,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+// TODO: Add fields to this class and make it some kind of service (not static)
 public final class Router {
     public static List<RouteNode> generateRouteInfo(GeoPosition pointA, GeoPosition pointB) {
         Pair<List<Long>, List<RouteNode>> osmWayIdsAndPointList = Router.findRoute(pointA, pointB, false);
@@ -23,19 +25,24 @@ public final class Router {
         return Router.getRouteWithAdditionalNodes(osmWayIdsAndPointList.getValue1(), managers);
     }
 
+    // TODO: Merge with function for cars if testing proves they are identical
     @Deprecated
-    public static List<RouteNode> generateRouteInfoForPedestrians(GeoPosition pointA, GeoPosition pointB) { // TODO: Merge with function for cars if testing proves they are identical
+    public static List<RouteNode> generateRouteInfoForPedestrians(GeoPosition pointA, GeoPosition pointB) {
         Pair<List<Long>, List<RouteNode>> osmWayIdsAndPointList = Router.findRoute(pointA, pointB, true);
         final List<OSMLight> lightInfo = MapAccessManager.sendFullTrafficSignalQuery(osmWayIdsAndPointList.getValue0());
         List<RouteNode> managers = Router.getManagersForLights(lightInfo);
         return getRouteWithAdditionalNodes(osmWayIdsAndPointList.getValue1(), managers);
     }
 
-    public static List<RouteNode> generateRouteInfoForPedestriansBeta(GeoPosition pointA, GeoPosition pointB, // TODO: Improve routing to consider random OSM nodes as start/end points instead of random lat/lons
-                                                                      String startingOsmNodeRef, String finishingOsmNodeRef) {
+    // TODO: Improve routing to consider random OSM nodes as start/end points instead of random lat/lng
+    @Beta
+    public static List<RouteNode> generateRouteInfoForPedestrians(GeoPosition pointA, GeoPosition pointB,
+                                                                  String startingOsmNodeRef, String finishingOsmNodeRef) {
         Pair<List<Long>, List<RouteNode>> osmWayIdsAndPointList = Router.findRoute(pointA, pointB, true);
         final RouteInfo routeInfo = MapAccessManager.sendMultipleWayAndItsNodesQuery(osmWayIdsAndPointList.getValue0());
-        return createRouteNodeList(routeInfo, startingOsmNodeRef, finishingOsmNodeRef);
+        routeInfo.determineRouteOrientationsAndFilterRelevantNodes(startingOsmNodeRef, finishingOsmNodeRef);
+
+        return createRouteNodeList(routeInfo);
     }
 
     public static List<RouteNode> generateRouteInfoForBuses(List<OSMWay> router, List<Long> osmStationIds) {
@@ -47,31 +54,33 @@ public final class Router {
         return getRouteWithAdditionalNodes(osmWayIdsAndPointList.getValue1(), managers);
     }
 
-    private static List<RouteNode> createRouteNodeList(RouteInfo routeInfo, String startingOsmNodeRef, String finishingOsmNodeRef) {
-        routeInfo.determineRouteOrientationsAndFilterRelevantNodes(startingOsmNodeRef, finishingOsmNodeRef);
+    // TODO: Always: either starting == null or finishing == null
+    private static List<RouteNode> createRouteNodeList(RouteInfo routeInfo) {
         List<RouteNode> routeNodes = new ArrayList<>();
-        for (int i = 0; i < routeInfo.getWayCount(); ++i) {
-            if (routeInfo.getWay(i).getRouteOrientation() == RouteOrientation.FRONT) {
-                for (int j = 0; j < routeInfo.getWay(i).getWaypointCount(); ++j) {
-                    addRouteNode(routeNodes, routeInfo.getWay(i).getWaypoint(j), routeInfo);
+        for (var route : routeInfo) {
+            int waypointCount = route.getWaypointCount();
+            if (route.getRouteOrientation() == RouteOrientation.FRONT) {
+                for (int j = 0; j < waypointCount; ++j) {
+                    routeNodes.add(getRoute(route.getWaypoint(j), routeInfo));
                 }
             }
             else {
-                for (int j = routeInfo.getWay(i).getWaypointCount() - 1; j >= 0; --j) {
-                    addRouteNode(routeNodes, routeInfo.getWay(i).getWaypoint(j), routeInfo);
+                for (int j = waypointCount - 1; j >= 0; --j) {
+                    routeNodes.add(getRoute(route.getWaypoint(j), routeInfo));
                 }
             }
         }
+
         return routeNodes;
     }
 
-    private static void addRouteNode(List<RouteNode> routeNodes, OSMWaypoint waypoint, RouteInfo routeInfo) {
-        if (routeInfo.removeIfContains(waypoint.getOsmNodeRef())) {
-            routeNodes.add(MasterAgent.crossingOsmIdToLightManagerNode.get(Long.parseLong(waypoint.getOsmNodeRef())));
+    private static RouteNode getRoute(OSMWaypoint waypoint, RouteInfo routeInfo) {
+        String nodeRef = waypoint.getOsmNodeRef();
+        if (routeInfo.remove(nodeRef)) {
+            return MasterAgent.crossingOsmIdToLightManagerNode.get(Long.parseLong(nodeRef));
         }
-        else {
-            routeNodes.add(new RouteNode(waypoint.getPosition()));
-        }
+
+        return new RouteNode(waypoint.getPosition());
     }
 
     /////////////////////////////////////////////////////////////
@@ -208,6 +217,7 @@ public final class Router {
         }
         else {
             try {
+                // TODO: AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
                 throw new Exception("Orientation was not known :(");
             } catch (Exception e) {
                 e.printStackTrace();

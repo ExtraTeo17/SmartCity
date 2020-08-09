@@ -123,73 +123,75 @@ public class PedestrianAgent extends AbstractAgent {
                 ACLMessage rcv = receive();
                 if (rcv != null) {
                     String type = rcv.getUserDefinedParameter(MessageParameter.TYPE);
-                    if (type.equals(MessageParameter.LIGHT)) {
-                        switch (rcv.getPerformative()) {
-                            case ACLMessage.REQUEST:
-                                if (pedestrian.getState() == DrivingState.WAITING_AT_LIGHT) {
+                    switch (type) {
+                        case MessageParameter.LIGHT:
+                            switch (rcv.getPerformative()) {
+                                case ACLMessage.REQUEST:
+                                    if (pedestrian.getState() == DrivingState.WAITING_AT_LIGHT) {
+                                        ACLMessage response = new ACLMessage(ACLMessage.AGREE);
+                                        response.addReceiver(rcv.getSender());
+                                        Properties properties = new Properties();
+
+                                        properties.setProperty(MessageParameter.TYPE, MessageParameter.PEDESTRIAN);
+                                        properties.setProperty(MessageParameter.ADJACENT_OSM_WAY_ID, Long.toString(pedestrian.getAdjacentOsmWayId()));
+                                        response.setAllUserDefinedParameters(properties);
+                                        send(response);
+                                        if (pedestrian.findNextStop() instanceof LightManagerNode) {
+                                            findNextStop(pedestrian);
+                                        }
+                                        pedestrian.setState(DrivingState.PASSING_LIGHT);
+                                    }
+                                    break;
+                            }
+                            break;
+                        case MessageParameter.STATION:
+                            switch (rcv.getPerformative()) {
+                                case ACLMessage.REQUEST:
                                     ACLMessage response = new ACLMessage(ACLMessage.AGREE);
                                     response.addReceiver(rcv.getSender());
                                     Properties properties = new Properties();
 
                                     properties.setProperty(MessageParameter.TYPE, MessageParameter.PEDESTRIAN);
-                                    properties.setProperty(MessageParameter.ADJACENT_OSM_WAY_ID, Long.toString(pedestrian.getAdjacentOsmWayId()));
+                                    properties.setProperty(MessageParameter.DESIRED_BUS, pedestrian.getPreferredBusLine());
                                     response.setAllUserDefinedParameters(properties);
                                     send(response);
-                                    if (pedestrian.findNextStop() instanceof LightManagerNode) {
-                                        findNextStop(pedestrian);
+
+                                    ACLMessage msg = new ACLMessage(ACLMessage.REQUEST_WHEN);
+                                    String busAgentId = rcv.getUserDefinedParameter(MessageParameter.BUS_ID);
+                                    msg.addReceiver(new AID(busAgentId, AID.ISLOCALNAME));
+                                    properties = new Properties();
+                                    properties.setProperty(MessageParameter.TYPE, MessageParameter.PEDESTRIAN);
+                                    properties.setProperty(MessageParameter.STATION_ID, "" + pedestrian.getTargetStation().getStationId());
+                                    msg.setAllUserDefinedParameters(properties);
+                                    pedestrian.setState(DrivingState.IN_BUS);
+                                    send(msg);
+
+                                    while (!pedestrian.isAtStation()) {
+                                        pedestrian.Move();
                                     }
-                                    pedestrian.setState(DrivingState.PASSING_LIGHT);
-                                }
-                                break;
-                        }
-                    }
-                    else if (type.equals(MessageParameter.STATION)) {
-                        switch (rcv.getPerformative()) {
-                            case ACLMessage.REQUEST:
-                                ACLMessage response = new ACLMessage(ACLMessage.AGREE);
-                                response.addReceiver(rcv.getSender());
-                                Properties properties = new Properties();
 
-                                properties.setProperty(MessageParameter.TYPE, MessageParameter.PEDESTRIAN);
-                                properties.setProperty(MessageParameter.DESIRED_BUS, pedestrian.getPreferredBusLine());
-                                response.setAllUserDefinedParameters(properties);
-                                send(response);
+                                    break;
+                            }
+                            break;
+                        case MessageParameter.BUS:
+                            switch (rcv.getPerformative()) {
+                                case ACLMessage.REQUEST:
+                                    ACLMessage response = new ACLMessage(ACLMessage.AGREE);
+                                    response.addReceiver(rcv.getSender());
+                                    Properties properties = new Properties();
 
-                                ACLMessage msg = new ACLMessage(ACLMessage.REQUEST_WHEN);
-                                String busAgentId = rcv.getUserDefinedParameter(MessageParameter.BUS_ID);
-                                msg.addReceiver(new AID(busAgentId, AID.ISLOCALNAME));
-                                properties = new Properties();
-                                properties.setProperty(MessageParameter.TYPE, MessageParameter.PEDESTRIAN);
-                                properties.setProperty(MessageParameter.STATION_ID, "" + pedestrian.getTargetStation().getStationId());
-                                msg.setAllUserDefinedParameters(properties);
-                                pedestrian.setState(DrivingState.IN_BUS);
-                                send(msg);
-
-                                while (!pedestrian.isAtStation()) {
+                                    properties.setProperty(MessageParameter.TYPE, MessageParameter.PEDESTRIAN);
+                                    properties.setProperty(MessageParameter.STATION_ID, "" + pedestrian.getTargetStation().getStationId());
+                                    response.setAllUserDefinedParameters(properties);
+                                    send(response);
                                     pedestrian.Move();
-                                }
+                                    pedestrian.setState(DrivingState.PASSING_STATION);
 
-                                break;
-                        }
-                    }
-                    else if (type.equals(MessageParameter.BUS)) {
-                        switch (rcv.getPerformative()) {
-                            case ACLMessage.REQUEST:
-                                ACLMessage response = new ACLMessage(ACLMessage.AGREE);
-                                response.addReceiver(rcv.getSender());
-                                Properties properties = new Properties();
+                                    findNextStop(pedestrian);
 
-                                properties.setProperty(MessageParameter.TYPE, MessageParameter.PEDESTRIAN);
-                                properties.setProperty(MessageParameter.STATION_ID, "" + pedestrian.getTargetStation().getStationId());
-                                response.setAllUserDefinedParameters(properties);
-                                send(response);
-                                pedestrian.Move();
-                                pedestrian.setState(DrivingState.PASSING_STATION);
-
-                                findNextStop(pedestrian);
-
-                                break;
-                        }
+                                    break;
+                            }
+                            break;
                     }
                 }
             }

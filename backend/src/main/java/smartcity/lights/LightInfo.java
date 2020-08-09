@@ -1,9 +1,9 @@
 package smartcity.lights;
 
+import org.jxmapviewer.viewer.GeoPosition;
 import osmproxy.elements.OSMNode;
 import osmproxy.elements.OSMWay;
 import osmproxy.elements.OSMWaypoint;
-import org.jxmapviewer.viewer.GeoPosition;
 
 public class LightInfo {
     private static final double DISTANCE_THRESHOLD = 0.00008;
@@ -72,7 +72,7 @@ public class LightInfo {
         return adjacentOsmWayId;
     }
 
-    public String getAdjacentCrossingOsmId1() {
+    String getAdjacentCrossingOsmId1() {
         return adjacentCrossingOsmId1;
     }
 

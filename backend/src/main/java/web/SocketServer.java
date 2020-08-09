@@ -68,7 +68,7 @@ class SocketServer extends WebSocketServer {
         else {
             logger.warn("Connection closed unexpectedly.\n"
                     + "Address: " + getSocketAddress(socket) + "\n"
-                    + "Error code: " + code
+                    + "Error code: " + code + "\n"
                     + "Reason: " + reason);
         }
         sockets.remove(socket);

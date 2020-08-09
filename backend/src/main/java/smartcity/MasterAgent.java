@@ -16,6 +16,7 @@ import org.jxmapviewer.viewer.GeoPosition;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Node;
+import osmproxy.BusLinesManager;
 import osmproxy.LightAccessManager;
 import osmproxy.MapAccessManager;
 import osmproxy.elements.OSMNode;
@@ -48,8 +49,8 @@ public class MasterAgent extends Agent {
 
     public final static boolean USE_DEPRECATED_XML_FOR_LIGHT_MANAGERS = false;
     public final static String STEPS = "6";
-    public static boolean SHOULD_GENERATE_PEDESTRIANS_AND_BUSES = false;
-    public static boolean SHOULD_GENERATE_CARS = true;
+    public static boolean SHOULD_GENERATE_PEDESTRIANS_AND_BUSES = true;
+    public static boolean SHOULD_GENERATE_CARS = false;
 
     // TODO: Delete this abomination (or at least make it private)
     public static boolean lightManagersUnderConstruction = false;
@@ -154,12 +155,14 @@ public class MasterAgent extends Agent {
         webService.setZone(positions);
     }
 
-    public void prepareAgents(double lat, double lon, int radius) {
+    public boolean prepareAgents(double lat, double lon, int radius) {
         var zoneCenter = new GeoPosition(lat, lon);
         if (SHOULD_GENERATE_PEDESTRIANS_AND_BUSES) {
-            prepareStationsAndBuses(zoneCenter, radius);
+            if (!prepareStationsAndBuses(zoneCenter, radius)) {
+                return false;
+            }
         }
-        prepareLightManagers(zoneCenter, radius);
+        return prepareLightManagers(zoneCenter, radius);
     }
 
     private static boolean tryAddAgent(AbstractAgent agent) {
@@ -234,35 +237,46 @@ public class MasterAgent extends Agent {
         }
     }
 
-    public void prepareLightManagers(GeoPosition middlePoint, int radius) {
+    public boolean prepareLightManagers(GeoPosition middlePoint, int radius) {
         IdGenerator.resetLightManagerId();
         lightManagersUnderConstruction = true;
+        boolean result;
         if (USE_DEPRECATED_XML_FOR_LIGHT_MANAGERS) {
-            MapAccessManager.prepareLightManagersInRadiusAndLightIdToLightManagerIdHashSet(middlePoint, radius);
+            result = MapAccessManager.prepareLightManagersInRadiusAndLightIdToLightManagerIdHashSet(middlePoint, radius);
         }
         else {
-            tryConstructLightManagers(middlePoint, radius);
+            result = tryConstructLightManagers(middlePoint, radius);
         }
         lightManagersUnderConstruction = false;
 
+        return result;
     }
 
-    private void tryConstructLightManagers(GeoPosition middlePoint, int radius) {
+    private boolean tryConstructLightManagers(GeoPosition middlePoint, int radius) {
         try {
             LightAccessManager.constructLightManagers(middlePoint, radius);
         } catch (Exception e) {
             logger.error("Error preparing light managers", e);
+            return false;
         }
 
+        return true;
     }
 
-    public void prepareStationsAndBuses(GeoPosition middlePoint, int radius) {
+    public boolean prepareStationsAndBuses(GeoPosition middlePoint, int radius) {
         IdGenerator.resetStationAgentId();
         logger.info("STEP 1/" + STEPS + ": Starting bus preparation");
         IdGenerator.resetBusId();
         buses.clear();
 
-        Set<BusInfo> busInfoSet = MapAccessManager.getBusInfo(radius, middlePoint.getLatitude(), middlePoint.getLongitude());
+        Set<BusInfo> busInfoSet = null;
+        try {
+            busInfoSet = BusLinesManager.getBusInfo(radius, middlePoint.getLatitude(),
+                    middlePoint.getLongitude());
+        } catch (Exception e) {
+            return false;
+        }
+
         logger.info("STEP 5/" + STEPS + ": Starting agent preparation based on queries");
         int i = 0;
         for (BusInfo info : busInfoSet) {
@@ -271,6 +285,8 @@ public class MasterAgent extends Agent {
         }
         logger.info("STEP 6/" + STEPS + ": Buses are created!");
         logger.info("NUMBER OF BUS AGENTS: " + buses.size());
+
+        return true;
     }
 
     public static void reset() {

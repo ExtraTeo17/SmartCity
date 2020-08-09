@@ -69,7 +69,7 @@ public class MapWindow {
     public boolean renderPedestrianRoutes = true;
     public boolean renderCars = true;
     public boolean renderCarRoutes = true;
-    public boolean renderBuses = false;
+    public boolean renderBuses = true;
     public boolean renderBusRoutes = true;
     public boolean renderZone = true;
     public boolean renderLights = true;
@@ -184,6 +184,9 @@ public class MapWindow {
                 latSpinner.setValue(52.203342);
                 lonSpinner.setValue(20.861213);
                 radiusSpinner.setValue(300);
+                if (!MasterAgent.SHOULD_GENERATE_PEDESTRIANS_AND_BUSES) {
+                    logger.warn("Pedestrians won't be generated");
+                }
                 prepareAgentsAndSetZone(52.203342, 20.861213, getZoneRadius());
             }
         });
@@ -515,10 +518,10 @@ public class MapWindow {
         refreshTimer = new Timer();
         zoneCenter = new GeoPosition(lat, lon);
 
-        smartCityAgent.prepareAgents(lat, lon, radius);
-        setState(SimulationState.READY_TO_RUN);
-
-        refreshTimer.scheduleAtFixedRate(new RefreshTask(), 0, REFRESH_MAP_INTERVAL_MILLISECONDS);
+        if (smartCityAgent.prepareAgents(lat, lon, radius)) {
+            setState(SimulationState.READY_TO_RUN);
+            refreshTimer.scheduleAtFixedRate(new RefreshTask(), 0, REFRESH_MAP_INTERVAL_MILLISECONDS);
+        }
     }
 
     private int getZoneRadius() {
@@ -694,17 +697,17 @@ public class MapWindow {
 
     public void DrawBusRoutes(List<Painter<JXMapViewer>> painters) {
         try {
-            for (BusAgent a : MasterAgent.buses) {
+            for (BusAgent busAgent : MasterAgent.buses) {
                 List<GeoPosition> track = new ArrayList<>();
-                for (RouteNode point : a.getBus().getDisplayRoute()) {
+                var bus = busAgent.getBus();
+                for (RouteNode point : bus.getDisplayRoute()) {
                     track.add(new GeoPosition(point.getLatitude(), point.getLongitude()));
                 }
-                Random r = new Random(a.hashCode());
+                Random r = new Random(busAgent.hashCode());
                 RoutePainter routePainter = new RoutePainter(track, new Color(r.nextInt(255), r.nextInt(255), r.nextInt(255)));
                 painters.add(routePainter);
 
             }
-
         } catch (Exception e) {
             logger.error("Error drawing bus routes", e);
             renderBusRoutes = false;
@@ -999,7 +1002,6 @@ public class MapWindow {
         @Override
         public void run() {
             try {
-
                 List<Painter<JXMapViewer>> painters = new ArrayList<>();
                 if (renderBusRoutes) {
                     DrawBusRoutes(painters);
@@ -1035,7 +1037,7 @@ public class MapWindow {
                     RefreshTime();
                 }
             } catch (Exception e) {
-                e.printStackTrace();
+                logger.error("Error refreshing simulation", e);
             }
         }
     }
@@ -1108,8 +1110,13 @@ public class MapWindow {
                 GeoPosition pedestrianGetOnStation = new GeoPosition(startStation.getLatitude(), startStation.getLongitude());
                 GeoPosition pedestrianDisembarkStation = new GeoPosition(finishStation.getLatitude(), finishStation.getLongitude());
                 GeoPosition pedestrianFinishPoint = new GeoPosition(finishStation.getLatitude() + geoPosInFirstStationCircle.getValue0(), finishStation.getLongitude() + geoPosInFirstStationCircle.getValue1());
-                List<RouteNode> routeToStation = Router.generateRouteInfoForPedestriansBeta(pedestrianStartPoint, pedestrianGetOnStation, null, startStation.getOsmStationId());
-                List<RouteNode> routeFromStation = Router.generateRouteInfoForPedestriansBeta(pedestrianDisembarkStation, pedestrianFinishPoint, finishStation.getOsmStationId(), null);
+
+                List<RouteNode> routeToStation = Router.generateRouteInfoForPedestrians(pedestrianStartPoint, pedestrianGetOnStation,
+                        null, startStation.getOsmStationId());
+                List<RouteNode> routeFromStation = Router.generateRouteInfoForPedestrians(pedestrianDisembarkStation, pedestrianFinishPoint,
+                        finishStation.getOsmStationId(), null);
+
+
                 if (getTestCarId() == smartCityAgent.pedestrianId) {
                     final TestPedestrian pedestrian = new TestPedestrian(routeToStation, routeFromStation, startStation.getStationId(), stationNodePairAndBusLine.getValue1(),
                             stationNodePairAndBusLine.getValue0().getValue0(), stationNodePairAndBusLine.getValue0().getValue1());

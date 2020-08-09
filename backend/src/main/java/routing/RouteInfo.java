@@ -1,29 +1,23 @@
 package routing;
 
+import org.jetbrains.annotations.NotNull;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import osmproxy.elements.OSMWay;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
+import java.util.function.Consumer;
 
-public class RouteInfo {
+public class RouteInfo implements Iterable<OSMWay> {
+    private final static Logger logger = LoggerFactory.getLogger(RouteInfo.class);
     private final List<OSMWay> ways = new ArrayList<>();
     private final Set<Long> lightOsmIds = new HashSet<>();
-
-    public final OSMWay getWay(final int i) {
-        return ways.get(i);
-    }
-
-    public final int getWayCount() {
-        return ways.size();
-    }
 
     public final void addWay(final OSMWay way) {
         ways.add(way);
     }
 
-    public boolean removeIfContains(final String lightOsmIdString) {
+    boolean remove(final String lightOsmIdString) {
         final long lightOsmId = Long.parseLong(lightOsmIdString);
         if (lightOsmIds.contains(lightOsmId)) {
             lightOsmIds.remove(lightOsmId);
@@ -32,15 +26,39 @@ public class RouteInfo {
         return false;
     }
 
-    public final void addLightOsmId(final String lightOsmId) {
+    public final void add(final String lightOsmId) {
         lightOsmIds.add(Long.parseLong(lightOsmId));
     }
 
-    public void determineRouteOrientationsAndFilterRelevantNodes(String startingOsmNodeRef, String finishingOsmNodeRef) {
-        Integer startingNodeIndex = ways.get(0).determineRouteOrientationAndFilterRelevantNodes(ways.size() > 1 ? ways.get(1) : null, ways.get(0).indexOf(startingOsmNodeRef), null);
-        for (int i = 1; i < ways.size() - 1; ++i) {
-            startingNodeIndex = ways.get(i).determineRouteOrientationAndFilterRelevantNodes(ways.get(i + 1), startingNodeIndex, null);
+    void determineRouteOrientationsAndFilterRelevantNodes(String startingOsmNodeRef, String finishingOsmNodeRef) {
+        if (ways.size() == 0 || ways.size() == 1) {
+            logger.warn("No ways to determine");
+            return;
         }
-        ways.get(ways.size() - 1).determineRouteOrientationAndFilterRelevantNodes(null, startingNodeIndex, ways.get(ways.size() - 1).indexOf(finishingOsmNodeRef));
+
+        int startingNodeIndex = ways.get(0).
+                determineRouteOrientationAndFilterRelevantNodes(ways.get(1), startingOsmNodeRef);
+        var lastInd = ways.size() - 1;
+        for (int i = 1; i < lastInd; ++i) {
+            startingNodeIndex = ways.get(i).determineRouteOrientationAndFilterRelevantNodes(ways.get(i + 1), startingNodeIndex);
+        }
+
+        ways.get(lastInd).determineRouteOrientationAndFilterRelevantNodes(startingNodeIndex, finishingOsmNodeRef);
+    }
+
+    @Override
+    @NotNull
+    public Iterator<OSMWay> iterator() {
+        return ways.iterator();
+    }
+
+    @Override
+    public void forEach(Consumer<? super OSMWay> action) {
+        ways.forEach(action);
+    }
+
+    @Override
+    public Spliterator<OSMWay> spliterator() {
+        return ways.spliterator();
     }
 }

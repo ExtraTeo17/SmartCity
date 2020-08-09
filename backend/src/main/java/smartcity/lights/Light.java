@@ -63,7 +63,9 @@ public class Light {
                 adjacentCrossingOsmId2 != null ? Long.parseLong(adjacentCrossingOsmId2) : 0,
                 managerId);
         MasterAgent.wayIdLightIdToLightManagerNode.put(Pair.with(adjacentOsmWayId, osmId), lightManagerNode);
-        MasterAgent.crossingOsmIdToLightManagerNode.put(Long.parseLong(adjacentCrossingOsmId1), lightManagerNode);
+        if(adjacentCrossingOsmId1 != null) {
+            MasterAgent.crossingOsmIdToLightManagerNode.put(Long.parseLong(adjacentCrossingOsmId1), lightManagerNode);
+        }
         if (adjacentCrossingOsmId2 != null) {
             MasterAgent.crossingOsmIdToLightManagerNode.put(Long.parseLong(adjacentCrossingOsmId2), lightManagerNode);
         }

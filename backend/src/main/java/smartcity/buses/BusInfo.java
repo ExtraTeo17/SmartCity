@@ -12,7 +12,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-// Bus Lines
 public class BusInfo {
     private String busLine;
     private List<OSMWay> route = new ArrayList<>();
@@ -47,6 +46,12 @@ public class BusInfo {
         brigadeList = new ArrayList<>(values);
     }
 
+    public void generateBrigadeList() {
+        for (OSMStation station : getStations()) {
+
+        }
+    }
+
     public void prepareAgents() {
         List<RouteNode> routeWithNodes = Router.generateRouteInfoForBuses(route, stationsOnRouteOsmIds);
         for (BrigadeInfo brigade : brigadeList) {
@@ -65,4 +70,5 @@ public class BusInfo {
         }
         stationsOnRouteOsmIds = filteredStationOsmIds;
     }
+
 }

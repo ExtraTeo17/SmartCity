@@ -4,7 +4,6 @@ import osmproxy.MapAccessManager;
 import org.jxmapviewer.viewer.GeoPosition;
 
 public class OSMWaypoint {
-
     private final String osmNodeRef;
     private final GeoPosition geoPos;
 
@@ -29,7 +28,7 @@ public class OSMWaypoint {
         return geoPos;
     }
 
-    public boolean containedInCircle(int radius, double middleLat, double middleLon) {
+    boolean containedInCircle(int radius, double middleLat, double middleLon) {
         return MapAccessManager.belongsToCircle(geoPos.getLatitude(), geoPos.getLongitude(), new GeoPosition(middleLat, middleLon), radius);
     }
 }

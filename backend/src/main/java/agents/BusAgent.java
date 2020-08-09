@@ -38,6 +38,7 @@ public class BusAgent extends AbstractAgent {
         this.timetable = timetable;
         this.busLine = busLine;
         this.brigadeNr = brigadeNr;
+        this.bus = new Bus(route, timetable, busLine, brigadeNr);
     }
 
     @Override

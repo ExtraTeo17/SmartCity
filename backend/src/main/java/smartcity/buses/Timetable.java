@@ -1,6 +1,8 @@
 package smartcity.buses;
 
 import org.javatuples.Pair;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import routing.RouteNode;
 import smartcity.MasterAgent;
 
@@ -9,6 +11,7 @@ import java.text.SimpleDateFormat;
 import java.util.*;
 
 public class Timetable {
+    private final static Logger logger = LoggerFactory.getLogger(Timetable.class);
     private final Map<Long, Date> stationOsmIdToTime = new HashMap<>();
     private final List<Pair<Date, Long>> timeOnStationChronological = new ArrayList<>();
 
@@ -25,7 +28,7 @@ public class Timetable {
         try {
             timeOnStation = new SimpleDateFormat("HH:mm:ss").parse(time);
         } catch (ParseException e) {
-            e.printStackTrace();
+            logger.warn("Error parsing new entry", e);
         }
         if (timeOnStationChronological.size() == 0 ||
                 (timeOnStation != null && timeOnStation.after(timeOnStationChronological

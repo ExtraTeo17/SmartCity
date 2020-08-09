@@ -3,7 +3,7 @@ package web.message.payloads;
 import org.junit.Assert;
 import org.junit.Test;
 
-public class AbstractPayloadTest {
+class AbstractPayloadTest {
 
     @Test
     public void toString_fourFields_correctResult() {
