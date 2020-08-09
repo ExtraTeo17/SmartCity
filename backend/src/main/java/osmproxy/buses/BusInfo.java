@@ -1,4 +1,4 @@
-package smartcity.buses;
+package osmproxy.buses;
 
 import org.jxmapviewer.viewer.GeoPosition;
 import osmproxy.MapAccessManager;
@@ -7,10 +7,9 @@ import osmproxy.elements.OSMWay;
 import routing.RouteNode;
 import routing.Router;
 import smartcity.MasterAgent;
+import smartcity.buses.BrigadeInfo;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
+import java.util.*;
 
 public class BusInfo {
     private String busLine;
@@ -42,14 +41,8 @@ public class BusInfo {
         route = parseOsmWay;
     }
 
-    public void setBrigadeList(Collection<BrigadeInfo> values) {
+    void setBrigadeList(Collection<BrigadeInfo> values) {
         brigadeList = new ArrayList<>(values);
-    }
-
-    public void generateBrigadeList() {
-        for (OSMStation station : getStations()) {
-
-        }
     }
 
     public void prepareAgents() {

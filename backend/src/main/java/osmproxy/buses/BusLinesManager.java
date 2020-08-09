@@ -1,14 +1,14 @@
-package osmproxy;
+package osmproxy.buses;
 
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import osmproxy.MapAccessManager;
 import osmproxy.elements.OSMStation;
 import smartcity.MasterAgent;
 import smartcity.buses.BrigadeInfo;
-import smartcity.buses.BusInfo;
 
 import java.net.URL;
 import java.util.*;
@@ -24,12 +24,13 @@ public class BusLinesManager {
         int i = 0;
         for (BusInfo info : infoSet) {
             logger.info("STEP 4/" + MasterAgent.STEPS + " (SUBSTEP " + (++i) + "/" + infoSet.size() + "): Warszawskie query sending & parsing substep");
-            sendBusWarszawskieQuery(info);
+            var brigadeInfos = generateBrigadeInfos(info);
+            info.setBrigadeList(brigadeInfos);
         }
         return infoSet;
     }
 
-    private static void sendBusWarszawskieQuery(BusInfo info) {
+    private static Collection<BrigadeInfo> generateBrigadeInfos(BusInfo info) {
         Map<String, BrigadeInfo> brigadeNrToBrigadeInfo = new HashMap<>();
         var busLine = info.getBusLine();
         for (OSMStation station : info.getStations()) {
@@ -37,7 +38,8 @@ public class BusLinesManager {
             var nodesOptional = getNodesViaWarszawskie(query);
             nodesOptional.ifPresent(jsonObject -> parseBusInfo(brigadeNrToBrigadeInfo, station, jsonObject));
         }
-        info.setBrigadeList(brigadeNrToBrigadeInfo.values());
+
+        return brigadeNrToBrigadeInfo.values();
     }
 
     private static Optional<JSONObject> getNodesViaWarszawskie(String query) {

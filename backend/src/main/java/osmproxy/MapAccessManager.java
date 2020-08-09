@@ -33,7 +33,7 @@ import osmproxy.elements.OSMStation;
 import osmproxy.elements.OSMWay;
 import routing.RouteInfo;
 import smartcity.MasterAgent;
-import smartcity.buses.BusInfo;
+import osmproxy.buses.BusInfo;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -173,7 +173,7 @@ public class MapAccessManager {
         }
         return info;
     }
-    static Set<BusInfo> sendBusOverpassQuery(int radius, double middleLat, double middleLon) {
+    public static Set<BusInfo> sendBusOverpassQuery(int radius, double middleLat, double middleLon) {
         Set<BusInfo> infoSet = null;
         var overpassQuery = OsmQueryManager.getBusOverpassQuery(radius, middleLat, middleLon);
         try {
