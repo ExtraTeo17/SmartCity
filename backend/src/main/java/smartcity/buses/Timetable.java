@@ -37,9 +37,4 @@ public class Timetable {
             timeOnStationChronological.add(Pair.with(timeOnStation, stationOsmId));
         }
     }
-
-    public void createAgent(List<RouteNode> route, final String busLine,
-                            final String brigadeNr) {
-        MasterAgent.tryAddNewBusAgent(this, route, busLine, brigadeNr);
-    }
 }

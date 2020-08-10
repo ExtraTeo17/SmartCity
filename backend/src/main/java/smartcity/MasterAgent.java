@@ -47,6 +47,7 @@ public class MasterAgent extends Agent {
     private static MapWindow window;
     private final IWebService webService;
     private final BusLinesManager busLinesManager;
+    private final IdGenerator idGenerator;
 
     public final static boolean USE_DEPRECATED_XML_FOR_LIGHT_MANAGERS = false;
     public final static String STEPS = "6";
@@ -71,9 +72,11 @@ public class MasterAgent extends Agent {
     @Inject
     public MasterAgent(IWebService webService,
                        BusLinesManager busLinesManager,
+                       IdGenerator idGenerator,
                        MapWindow window) {
         this.webService = webService;
         this.busLinesManager = busLinesManager;
+        this.idGenerator = idGenerator;
 
         // TODO: Delete this abomination
         MasterAgent.window = window;
@@ -84,9 +87,19 @@ public class MasterAgent extends Agent {
         container = getContainerController();
         window.setSmartCityAgent(this);
         window.display();
+        registerAgentsForId();
         addBehaviour(getReceiveMessageBehaviour());
         webService.start();
     }
+
+    private void registerAgentsForId() {
+        idGenerator.register(VehicleAgent.class,
+                BusAgent.class,
+                LightManager.class,
+                StationAgent.class,
+                Pedestrian.class);
+    }
+
 
     private CyclicBehaviour getReceiveMessageBehaviour() {
         return new CyclicBehaviour() {
@@ -180,9 +193,9 @@ public class MasterAgent extends Agent {
         return true;
     }
 
-    public static void tryAddNewBusAgent(final Timetable timetable, List<RouteNode> route,
-                                         final String busLine, final String brigadeNr) {
-        BusAgent agent = new BusAgent(IdGenerator.getBusId(), route, timetable, busLine, brigadeNr);
+    public void tryAddNewBusAgent(final Timetable timetable, List<RouteNode> route,
+                                  final String busLine, final String brigadeNr) {
+        BusAgent agent = new BusAgent(idGenerator.getId(BusAgent.class), route, timetable, busLine, brigadeNr);
         buses.add(agent);
         tryAddAgent(agent);
     }
@@ -270,7 +283,7 @@ public class MasterAgent extends Agent {
     public boolean prepareStationsAndBuses(GeoPosition middlePoint, int radius) {
         IdGenerator.resetStationAgentId();
         logger.info("STEP 1/" + STEPS + ": Starting bus preparation");
-        IdGenerator.resetBusId();
+        idGenerator.resetId(BusAgent.class);
         buses.clear();
 
         Set<BusInfo> busInfoSet = null;
@@ -283,9 +296,19 @@ public class MasterAgent extends Agent {
 
         logger.info("STEP 5/" + STEPS + ": Starting agent preparation based on queries");
         int i = 0;
-        for (BusInfo info : busInfoSet) {
+        for (var busInfo : busInfoSet) {
             logger.info("STEP 5/" + STEPS + " (SUBSTEP " + (++i) + "/" + busInfoSet.size() + "): Agent preparation substep");
-            info.prepareAgents();
+
+            // TODO: Improve - accessing busInfo/bridgeInfo too much
+            List<RouteNode> routeWithNodes = busInfo.getRouteInfo();
+            var busLine = busInfo.getBusLine();
+            for (var brigade : busInfo) {
+                var brigadeNr = brigade.getBrigadeNr();
+                for (Timetable timetable : brigade) {
+                    tryAddNewBusAgent(timetable, routeWithNodes, busLine, brigadeNr);
+                }
+            }
+
         }
         logger.info("STEP 6/" + STEPS + ": Buses are created!");
         logger.info("NUMBER OF BUS AGENTS: " + buses.size());
