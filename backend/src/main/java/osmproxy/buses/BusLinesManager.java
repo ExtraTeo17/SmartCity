@@ -17,7 +17,7 @@ public class BusLinesManager {
     private static final Logger logger = LoggerFactory.getLogger(BusLinesManager.class);
     private static final JSONParser jsonParser = new JSONParser();
 
-    public static Set<BusInfo> getBusInfo(int radius, double middleLat, double middleLon) {
+    public Set<BusInfo> getBusInfo(int radius, double middleLat, double middleLon) {
         logger.info("STEP 2/" + MasterAgent.STEPS + ": Sending bus overpass query");
         Set<BusInfo> infoSet = MapAccessManager.sendBusOverpassQuery(radius, middleLat, middleLon);
         logger.info("STEP 4/" + MasterAgent.STEPS + ": Starting warszawskie query and parsing");
@@ -30,7 +30,7 @@ public class BusLinesManager {
         return infoSet;
     }
 
-    private static Collection<BrigadeInfo> generateBrigadeInfos(BusInfo info) {
+    private Collection<BrigadeInfo> generateBrigadeInfos(BusInfo info) {
         Map<String, BrigadeInfo> brigadeNrToBrigadeInfo = new HashMap<>();
         var busLine = info.getBusLine();
         for (OSMStation station : info.getStations()) {
@@ -42,7 +42,7 @@ public class BusLinesManager {
         return brigadeNrToBrigadeInfo.values();
     }
 
-    private static Optional<JSONObject> getNodesViaWarszawskie(String query) {
+    private Optional<JSONObject> getNodesViaWarszawskie(String query) {
         URL url;
         Scanner scanner;
         StringBuilder json = new StringBuilder();
@@ -62,7 +62,7 @@ public class BusLinesManager {
         return Optional.of(jObject);
     }
 
-    private static void parseBusInfo(Map<String, BrigadeInfo> brigadeNrToBrigadeInfo, OSMStation station, JSONObject jsonObject) {
+    private void parseBusInfo(Map<String, BrigadeInfo> brigadeNrToBrigadeInfo, OSMStation station, JSONObject jsonObject) {
         JSONArray msg = (JSONArray) jsonObject.get("result");
         String currentBrigadeNr = "";
         for (Object o : msg) {

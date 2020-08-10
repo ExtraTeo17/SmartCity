@@ -27,13 +27,13 @@ import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
+import osmproxy.buses.BusInfo;
 import osmproxy.elements.OSMLight;
 import osmproxy.elements.OSMNode;
 import osmproxy.elements.OSMStation;
 import osmproxy.elements.OSMWay;
 import routing.RouteInfo;
 import smartcity.MasterAgent;
-import osmproxy.buses.BusInfo;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -97,7 +97,7 @@ public class MapAccessManager {
         return Triplet.with(id, latitude, longitude);
     }
 
-    public static List<OSMLight> getLights(Document xmlDocument) {
+    private static List<OSMLight> getLights(Document xmlDocument) {
         List<OSMLight> osmLights = new ArrayList<>();
         Node osmRoot = xmlDocument.getFirstChild();
         NodeList osmXMLNodes = osmRoot.getChildNodes();
@@ -173,6 +173,7 @@ public class MapAccessManager {
         }
         return info;
     }
+
     public static Set<BusInfo> sendBusOverpassQuery(int radius, double middleLat, double middleLon) {
         Set<BusInfo> infoSet = null;
         var overpassQuery = OsmQueryManager.getBusOverpassQuery(radius, middleLat, middleLon);
@@ -460,6 +461,7 @@ public class MapAccessManager {
                         adjacentNodeRef = way.determineRelationOrientation(adjacentNodeRef);
                     } catch (UnsupportedOperationException e) {
                         logger.warn("Failed to determine orientation", e);
+                        break;
                     }
                 }
 

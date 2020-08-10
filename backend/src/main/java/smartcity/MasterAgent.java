@@ -46,6 +46,7 @@ public class MasterAgent extends Agent {
     private static AgentContainer container;
     private static MapWindow window;
     private final IWebService webService;
+    private final BusLinesManager busLinesManager;
 
     public final static boolean USE_DEPRECATED_XML_FOR_LIGHT_MANAGERS = false;
     public final static String STEPS = "6";
@@ -68,8 +69,11 @@ public class MasterAgent extends Agent {
     public int pedestrianId = 0;
 
     @Inject
-    public MasterAgent(IWebService webService, MapWindow window) {
+    public MasterAgent(IWebService webService,
+                       BusLinesManager busLinesManager,
+                       MapWindow window) {
         this.webService = webService;
+        this.busLinesManager = busLinesManager;
 
         // TODO: Delete this abomination
         MasterAgent.window = window;
@@ -271,7 +275,7 @@ public class MasterAgent extends Agent {
 
         Set<BusInfo> busInfoSet = null;
         try {
-            busInfoSet = BusLinesManager.getBusInfo(radius, middlePoint.getLatitude(),
+            busInfoSet = busLinesManager.getBusInfo(radius, middlePoint.getLatitude(),
                     middlePoint.getLongitude());
         } catch (Exception e) {
             return false;
