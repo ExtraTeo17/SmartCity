@@ -138,7 +138,7 @@ public class OSMWay extends OSMElement {
      */
     private String getNodeReference(int index) {
         if (index < 0) {
-            index = waypoints.size() - index;
+            index = waypoints.size() + index;
         }
         return waypoints.get(index).getOsmNodeRef();
     }
