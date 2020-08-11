@@ -8,15 +8,17 @@ import jade.core.behaviours.TickerBehaviour;
 import jade.lang.acl.ACLMessage;
 import jade.util.leap.Properties;
 import routing.LightManagerNode;
+import smartcity.MasterAgent;
 import vehicles.DrivingState;
 import vehicles.MovingObject;
 
 @SuppressWarnings("serial")
 public class VehicleAgent extends AbstractAgent {
-    private MovingObject vehicle;
+    private final MovingObject vehicle;
 
-    public VehicleAgent(int id) {
+    public VehicleAgent(int id, MovingObject vehicle) {
         super(id);
+        this.vehicle = vehicle;
     }
 
     @Override
@@ -26,7 +28,7 @@ public class VehicleAgent extends AbstractAgent {
 
     @Override
     protected void setup() {
-        findNextStop(vehicle);
+        vehicle.getNextTrafficLight();
         vehicle.setState(DrivingState.MOVING);
 
         int speed = vehicle.getSpeed();
@@ -37,7 +39,7 @@ public class VehicleAgent extends AbstractAgent {
                     switch (vehicle.getState()) {
                         case MOVING:
                             vehicle.setState(DrivingState.WAITING_AT_LIGHT);
-                            LightManagerNode light = vehicle.getCurrentTrafficLightNode();
+                            LightManagerNode light = vehicle.getNextTrafficLight();
                             ACLMessage msg = new ACLMessage(ACLMessage.REQUEST_WHEN);
                             msg.addReceiver(new AID("LightManager" + light.getLightManagerId(), AID.ISLOCALNAME));
                             Properties properties = new Properties();
@@ -52,7 +54,7 @@ public class VehicleAgent extends AbstractAgent {
                             break;
                         case PASSING_LIGHT:
                             print("Passing");
-                            vehicle.Move();
+                            vehicle.move();
                             vehicle.setState(DrivingState.MOVING);
                             break;
                     }
@@ -62,7 +64,7 @@ public class VehicleAgent extends AbstractAgent {
                     print("Reached destination.");
 
                     ACLMessage msg = new ACLMessage(ACLMessage.INFORM);
-                    msg.addReceiver(new AID("SmartCityAgent", AID.ISLOCALNAME));
+                    msg.addReceiver(new AID(MasterAgent.class.getName(), AID.ISLOCALNAME));
                     Properties prop = new Properties();
                     prop.setProperty(MessageParameter.TYPE, MessageParameter.VEHICLE);
                     prop.setProperty(MessageParameter.AT_DESTINATION, String.valueOf(Boolean.TRUE));
@@ -71,7 +73,7 @@ public class VehicleAgent extends AbstractAgent {
                     doDelete();
                 }
                 else {
-                    vehicle.Move();
+                    vehicle.move();
                 }
             }
         };
@@ -90,7 +92,7 @@ public class VehicleAgent extends AbstractAgent {
                             properties.setProperty(MessageParameter.ADJACENT_OSM_WAY_ID, Long.toString(vehicle.getAdjacentOsmWayId()));
                             response.setAllUserDefinedParameters(properties);
                             send(response);
-                            findNextStop(vehicle);
+                            vehicle.getNextTrafficLight();
                             vehicle.setState(DrivingState.PASSING_LIGHT);
                         }
                         case ACLMessage.AGREE -> vehicle.setState(DrivingState.WAITING_AT_LIGHT);
@@ -106,10 +108,6 @@ public class VehicleAgent extends AbstractAgent {
 
     public MovingObject getVehicle() {
         return vehicle;
-    }
-
-    public void setVehicle(MovingObject v) {
-        vehicle = v;
     }
 
     @Override

@@ -76,7 +76,7 @@ public class BusAgent extends AbstractAgent {
                             break;
                         case PASSING_LIGHT:
                             print("Passing the light.");
-                            bus.Move();
+                            bus.move();
                             bus.setState(DrivingState.MOVING);
                             break;
                     }
@@ -138,17 +138,17 @@ public class BusAgent extends AbstractAgent {
                         case PASSING_STATION:
                             RouteNode node = bus.findNextStop();
                             if (node instanceof LightManagerNode) {
-                                findNextStop(bus);
+                                informLightManager(bus);
                             }
                             GetNextStation();
 
                             bus.setState(DrivingState.MOVING);
-                            bus.Move();
+                            bus.move();
                             break;
                     }
                 }
                 else {
-                    bus.Move();
+                    bus.move();
                 }
             }
         };
@@ -173,7 +173,7 @@ public class BusAgent extends AbstractAgent {
                                     response.setAllUserDefinedParameters(properties);
                                     send(response);
                                     if (bus.findNextStop() instanceof LightManagerNode) {
-                                        findNextStop(bus);
+                                        informLightManager(bus);
                                     }
                                     bus.setState(DrivingState.PASSING_LIGHT);
                                 }

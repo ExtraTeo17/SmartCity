@@ -35,6 +35,7 @@ public final class Router {
     }
 
     // TODO: Improve routing to consider random OSM nodes as start/end points instead of random lat/lng
+    // TODO: Always: either starting == null or finishing == null
     @Beta
     public static List<RouteNode> generateRouteInfoForPedestrians(GeoPosition pointA, GeoPosition pointB,
                                                                   String startingOsmNodeRef, String finishingOsmNodeRef) {
@@ -54,7 +55,6 @@ public final class Router {
         return getRouteWithAdditionalNodes(osmWayIdsAndPointList.getValue1(), managers);
     }
 
-    // TODO: Always: either starting == null or finishing == null
     private static List<RouteNode> createRouteNodeList(RouteInfo routeInfo) {
         List<RouteNode> routeNodes = new ArrayList<>();
         for (var route : routeInfo) {
@@ -154,11 +154,12 @@ public final class Router {
         List<RouteNode> newRoute = new ArrayList<>();
 
         for (int i = 0; i < route.size() - 1; i++) {
-            RouteNode A = route.get(i);
-            RouteNode B = route.get(i + 1);
-            double x = B.getLongitude() - A.getLongitude();
-            double y = B.getLatitude() - A.getLatitude();
+            RouteNode routeA = route.get(i);
+            RouteNode routeB = route.get(i + 1);
+            double x = routeB.getLongitude() - routeA.getLongitude();
+            double y = routeB.getLatitude() - routeA.getLatitude();
 
+            // TODO: What?
             double xInMeters = x * 111111;
             double yInMeters = y * 111111;
 
@@ -167,15 +168,15 @@ public final class Router {
             double dx = x / distance;
             double dy = y / distance;
 
-            newRoute.add(A);
+            newRoute.add(routeA);
 
-            double lon = A.getLongitude();
-            double lat = A.getLatitude();
+            double lon = routeA.getLongitude();
+            double lat = routeA.getLatitude();
 
             for (int p = 1; p < distance; p++) {
                 lon = lon + dx;
                 lat = lat + dy;
-                RouteNode node = new RouteNode(lat, lon/*, A.getOsmWayId()*/);
+                RouteNode node = new RouteNode(lat, lon);
                 newRoute.add(node);
             }
         }
@@ -209,20 +210,16 @@ public final class Router {
     }
 
     private static void addRouteNodesBasedOnOrientation(OSMWay el, List<RouteNode> routeNodes_list) {
-        if (el.getRelationOrientation() == RelationOrientation.FRONT) {
-            addRouteNodesToList(el.getWaypoints(), routeNodes_list);
+        var orientation = el.getRelationOrientation();
+        var waypoints = el.getWaypoints();
+        if (orientation == RelationOrientation.FRONT) {
+            addRouteNodesToList(waypoints, routeNodes_list);
         }
-        else if (el.getRelationOrientation() == RelationOrientation.BACK) {
-            addRouteNodesToList(reverse(el.getWaypoints()), routeNodes_list);
+        else if (orientation == RelationOrientation.BACK) {
+            addRouteNodesToList(reverse(waypoints), routeNodes_list);
         }
-        else {
-            try {
-                // TODO: AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
-                throw new Exception("Orientation was not known :(");
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        }
+
+        throw new UnsupportedOperationException("Orientation " + orientation.toString() + " is not supported");
     }
 
     private static List<OSMWaypoint> reverse(List<OSMWaypoint> waypoints) {

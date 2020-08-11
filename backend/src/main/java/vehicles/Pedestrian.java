@@ -1,11 +1,11 @@
 package vehicles;
 
 import gui.MapWindow;
+import org.jxmapviewer.viewer.GeoPosition;
 import routing.LightManagerNode;
 import routing.RouteNode;
 import routing.Router;
 import routing.StationNode;
-import org.jxmapviewer.viewer.GeoPosition;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -64,7 +64,7 @@ public class Pedestrian extends MovingObject { // TODO: Remember to create a ded
     }
 
     @Override
-    public LightManagerNode findNextTrafficLight() {
+    public LightManagerNode getNextTrafficLight() {
         for (int i = index + 1; i < route.size(); i++) {
             if (route.get(i) instanceof LightManagerNode) {
                 closestLightIndex = i;
@@ -126,7 +126,7 @@ public class Pedestrian extends MovingObject { // TODO: Remember to create a ded
     }
 
     @Override
-    public void Move() {
+    public void move() {
         index++;
     }
 

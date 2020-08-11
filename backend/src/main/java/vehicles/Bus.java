@@ -100,7 +100,7 @@ public class Bus extends MovingObject {
     }
 
     @Override
-    public LightManagerNode findNextTrafficLight() {
+    public LightManagerNode getNextTrafficLight() {
         for (int i = index + 1; i < route.size(); i++) {
             if (route.get(i) instanceof LightManagerNode) {
                 closestLightIndex = i;
@@ -186,7 +186,7 @@ public class Bus extends MovingObject {
     }
 
     @Override
-    public void Move() {
+    public void move() {
         if (isAtDestination()) {
             index = 0;
         }

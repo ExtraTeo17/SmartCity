@@ -41,6 +41,7 @@ import java.util.stream.Collectors;
 // TODO: This class should have no more than 10 fields.
 // TODO: This class should be package private
 public class MasterAgent extends Agent {
+    public static final String name = MasterAgent.class.getName().replace("Agent", "");
     private static final Logger logger = LoggerFactory.getLogger(MasterAgent.class);
 
     private static AgentContainer container;
@@ -51,8 +52,8 @@ public class MasterAgent extends Agent {
 
     public final static boolean USE_DEPRECATED_XML_FOR_LIGHT_MANAGERS = false;
     public final static String STEPS = "6";
-    public static boolean SHOULD_GENERATE_PEDESTRIANS_AND_BUSES = true;
-    public static boolean SHOULD_GENERATE_CARS = false;
+    public static boolean SHOULD_GENERATE_PEDESTRIANS_AND_BUSES = false;
+    public static boolean SHOULD_GENERATE_CARS = true;
 
     // TODO: Delete this abomination (or at least make it private)
     public static boolean lightManagersUnderConstruction = false;
@@ -229,10 +230,8 @@ public class MasterAgent extends Agent {
     }
 
     public VehicleAgent tryAddNewVehicleAgent(List<RouteNode> info, boolean testCar) {
-        VehicleAgent vehicle = new VehicleAgent(carId);
         MovingObjectImpl car = testCar ? new TestCar(info) : new MovingObjectImpl(info);
-        vehicle.setVehicle(car);
-
+        VehicleAgent vehicle = new VehicleAgent(carId, car);
         tryAddNewVehicleAgent(vehicle);
 
         return vehicle;

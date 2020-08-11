@@ -21,7 +21,7 @@ public abstract class AbstractAgent extends Agent {
     public AbstractAgent(int id) {
         this.id = id;
     }
-    
+
     public String getPredictedName() {
         return getNamePrefix() + id;
     }
@@ -44,9 +44,10 @@ public abstract class AbstractAgent extends Agent {
         logger.info(getLocalName() + ": " + message);
     }
 
-    protected void findNextStop(MovingObject movingObject) {
+    // TODO: Pass only LightManager here, remove movingObject and pass additional parameters
+    void informLightManager(MovingObject movingObject) {
         // finds next traffic light and announces his arrival
-        LightManagerNode nextManager = movingObject.findNextTrafficLight();
+        LightManagerNode nextManager = movingObject.getNextTrafficLight();
         if (nextManager != null) {
             ACLMessage msg = prepareMessage(nextManager, movingObject);
             send(msg);
@@ -54,7 +55,7 @@ public abstract class AbstractAgent extends Agent {
         }
     }
 
-    protected ACLMessage prepareMessage(LightManagerNode nextManager, MovingObject movingObject) {
+    private ACLMessage prepareMessage(LightManagerNode nextManager, MovingObject movingObject) {
         ACLMessage msg = new ACLMessage(ACLMessage.INFORM);
         AID dest = new AID("LightManager" + nextManager.getLightManagerId(), AID.ISLOCALNAME);
         msg.addReceiver(dest);

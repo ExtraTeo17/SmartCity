@@ -4,7 +4,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.atomic.AtomicInteger;
 
-// TODO: Instance class via DI + Id based on string/enum/class in dictionary
+// TODO: Move all static methods to getId/resetId
 class IdGenerator {
     public static final int resetValue = 1;
     private final ConcurrentMap<Class<?>, AtomicInteger> idMap;
@@ -36,34 +36,42 @@ class IdGenerator {
         idMap.get(type).set(resetValue);
     }
 
+    @Deprecated
     public static int getLightManagerId() {
         return lightManagerId.getAndIncrement();
     }
 
+    @Deprecated
     public static void resetLightManagerId() {
         lightManagerId.set(resetValue);
     }
 
+    @Deprecated
     public static int getStationAgentId() {
         return stationAgentId.getAndIncrement();
     }
 
+    @Deprecated
     public static void resetStationAgentId() {
         stationAgentId.set(resetValue);
     }
 
+    @Deprecated
     public static int getPedestrianId() {
         return pedestrianId.getAndIncrement();
     }
 
+    @Deprecated
     public static void resetPedestrianId() {
         pedestrianId.set(resetValue);
     }
 
+    @Deprecated
     public static int getVehicleId() {
         return vehicleId.getAndIncrement();
     }
 
+    @Deprecated
     public static void resetVehicleId() {
         vehicleId.set(resetValue);
     }

@@ -71,7 +71,7 @@ public class MapAccessManager {
      * @return a list of openseamap nodes extracted from xml
      */
     @SuppressWarnings("nls")
-    public static List<OSMNode> getNodes(Document xmlDocument) {
+    static List<OSMNode> getNodes(Document xmlDocument) {
         List<OSMNode> osmNodes = new ArrayList<>();
         Node osmRoot = xmlDocument.getFirstChild();
         NodeList osmXMLNodes = osmRoot.getChildNodes();

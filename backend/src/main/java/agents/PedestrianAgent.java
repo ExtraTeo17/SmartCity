@@ -61,7 +61,7 @@ public class PedestrianAgent extends AbstractAgent {
                             break;
                         case PASSING_LIGHT:
                             Print("Passing the light.");
-                            pedestrian.Move();
+                            pedestrian.move();
                             pedestrian.setState(DrivingState.MOVING);
                             break;
                     }
@@ -93,7 +93,7 @@ public class PedestrianAgent extends AbstractAgent {
                             break;
                         case PASSING_STATION:
 
-                            pedestrian.Move();
+                            pedestrian.move();
                             pedestrian.setState(DrivingState.MOVING);
                             break;
                     }
@@ -112,7 +112,7 @@ public class PedestrianAgent extends AbstractAgent {
                     doDelete();
                 }
                 else {
-                    pedestrian.Move();
+                    pedestrian.move();
                 }
             }
         };
@@ -137,7 +137,7 @@ public class PedestrianAgent extends AbstractAgent {
                                         response.setAllUserDefinedParameters(properties);
                                         send(response);
                                         if (pedestrian.findNextStop() instanceof LightManagerNode) {
-                                            findNextStop(pedestrian);
+                                            informLightManager(pedestrian);
                                         }
                                         pedestrian.setState(DrivingState.PASSING_LIGHT);
                                     }
@@ -167,7 +167,7 @@ public class PedestrianAgent extends AbstractAgent {
                                     send(msg);
 
                                     while (!pedestrian.isAtStation()) {
-                                        pedestrian.Move();
+                                        pedestrian.move();
                                     }
 
                                     break;
@@ -184,10 +184,10 @@ public class PedestrianAgent extends AbstractAgent {
                                     properties.setProperty(MessageParameter.STATION_ID, "" + pedestrian.getTargetStation().getStationId());
                                     response.setAllUserDefinedParameters(properties);
                                     send(response);
-                                    pedestrian.Move();
+                                    pedestrian.move();
                                     pedestrian.setState(DrivingState.PASSING_STATION);
 
-                                    findNextStop(pedestrian);
+                                    informLightManager(pedestrian);
 
                                     break;
                             }

@@ -1,15 +1,15 @@
 package vehicles;
 
+import org.jxmapviewer.viewer.GeoPosition;
 import routing.LightManagerNode;
 import routing.RouteNode;
-import org.jxmapviewer.viewer.GeoPosition;
 
 import java.util.List;
 
 public abstract class MovingObject {
     public abstract String getVehicleType();
 
-    public abstract LightManagerNode findNextTrafficLight();
+    public abstract LightManagerNode getNextTrafficLight();
 
     public abstract String getPositionString();
 
@@ -21,7 +21,7 @@ public abstract class MovingObject {
 
     public abstract boolean isAtDestination();
 
-    public abstract void Move();
+    public abstract void move();
 
     public abstract List<RouteNode> getDisplayRoute();
 
