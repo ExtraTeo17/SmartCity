@@ -24,8 +24,6 @@ import routing.RouteNode;
 import routing.Router;
 import routing.StationNode;
 import smartcity.MasterAgent;
-import smartcity.RoutePainter;
-import smartcity.ZonePainter;
 import smartcity.lights.SimpleCrossroad;
 import vehicles.Bus;
 import vehicles.Pedestrian;

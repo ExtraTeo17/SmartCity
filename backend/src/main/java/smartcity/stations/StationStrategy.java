@@ -56,7 +56,7 @@ public class StationStrategy {
 
             farAwayPedestrianMap.put(desiredBus, new PedestrianArrivalInfo());
         }
-        farAwayPedestrianMap.get(desiredBus).putPedestrianOnList(new Pair<String, Instant>(agentName, arrivalTime));
+        farAwayPedestrianMap.get(desiredBus).putPedestrianOnList(new Pair<>(agentName, arrivalTime));
     }
 
     public void addPedestrianToQueue(String agentName, String desiredBus, Instant arrivalTime) {
@@ -64,7 +64,7 @@ public class StationStrategy {
 
             pedestrianOnStationMap.put(desiredBus, new PedestrianArrivalInfo());
         }
-        pedestrianOnStationMap.get(desiredBus).putPedestrianOnList(new Pair<String, Instant>(agentName, arrivalTime));
+        pedestrianOnStationMap.get(desiredBus).putPedestrianOnList(new Pair<>(agentName, arrivalTime));
 
     }
 
@@ -94,7 +94,7 @@ public class StationStrategy {
             Calendar scheduleCalendar = Calendar.getInstance();
             scheduleCalendar.set(arrivalCalendar.get(Calendar.YEAR), arrivalCalendar.get(Calendar.MONTH), arrivalCalendar.get(Calendar.DAY_OF_MONTH), scheduleTime.getHours(), scheduleTime.getMinutes());
 
-            scheduleAndArrivalTime = new Pair<Instant, Instant>(scheduleCalendar.toInstant(), arrivalTime.toInstant());
+            scheduleAndArrivalTime = new Pair<>(scheduleCalendar.toInstant(), arrivalTime.toInstant());
 
             if (scheduleAndArrivalTime.getValue1().isAfter(scheduleAndArrivalTime.getValue0().plusSeconds(StationStrategy.WAIT_PERIOD))) {
 
@@ -116,7 +116,6 @@ public class StationStrategy {
             }
             else if (scheduleAndArrivalTime.getValue1().isBefore((scheduleAndArrivalTime.getValue0().minusSeconds(StationStrategy.WAIT_PERIOD)))) {
                 StationStrategy.logger.info("------------------BUS TOO EARLY-----------------------");
-                continue;
             }
             else {
                 StationStrategy.logger.info("------------------SOMETHING HAPPENED-----------------------");
@@ -127,7 +126,7 @@ public class StationStrategy {
 
     private List<String> checkPassengersWhoAreReadyToGo(String busAgentName) {
         String bus = busAgentNameToBusNumberMap.get(busAgentName);
-        List<String> passengersThatCanLeave = new ArrayList();
+        List<String> passengersThatCanLeave = new ArrayList<>();
         if (pedestrianOnStationMap.containsKey(bus)) {
             PedestrianArrivalInfo arrivalTime = pedestrianOnStationMap.get(bus);
             for (Pair<String, Instant> pedestrian : arrivalTime.agentNamesAndArrivalTimes) {
@@ -136,13 +135,13 @@ public class StationStrategy {
 
             return passengersThatCanLeave;
         }
-        return new ArrayList<String>();
+        return new ArrayList<>();
     }
 
     private List<String> checkPassengersWhoAreFar(String busAgentName, Instant deadline) {
 
         String bus = busAgentNameToBusNumberMap.get(busAgentName);
-        List<String> passengersThatCanLeave = new ArrayList();
+        List<String> passengersThatCanLeave = new ArrayList<>();
         if (farAwayPedestrianMap.containsKey(bus)) {
             PedestrianArrivalInfo arrivalTime = farAwayPedestrianMap.get(bus);
             for (Pair<String, Instant> pedestrian : arrivalTime.agentNamesAndArrivalTimes) {
@@ -153,7 +152,7 @@ public class StationStrategy {
             }
             return passengersThatCanLeave;
         }
-        return new ArrayList<String>();
+        return new ArrayList<>();
 
     }
 }

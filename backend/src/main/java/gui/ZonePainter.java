@@ -1,4 +1,4 @@
-package smartcity;
+package gui;
 
 import org.jxmapviewer.JXMapViewer;
 import org.jxmapviewer.painter.Painter;
@@ -11,10 +11,9 @@ public class ZonePainter implements Painter<JXMapViewer> {
     private Color color = Color.YELLOW;
     private boolean antiAlias = true;
     private int radius = 500;
+    private final GeoPosition center;
 
-    private GeoPosition center;
-
-    public ZonePainter(GeoPosition center, int radius, Color color) {
+    ZonePainter(GeoPosition center, int radius, Color color) {
         this.color = color;
         this.radius = radius;
         this.center = center;
