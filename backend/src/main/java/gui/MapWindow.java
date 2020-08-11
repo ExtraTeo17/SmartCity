@@ -544,7 +544,7 @@ public class MapWindow {
         return (Date) setTimeSpinner.getValue();
     }
 
-    private void RefreshTime() {
+    private void refreshTime() {
         Date date = getSimulationStartTime();
         Duration timeDiff = Duration.ofSeconds((TIME_SCALE * REFRESH_MAP_INTERVAL_MILLISECONDS) / 1000);
         Instant inst = date.toInstant();
@@ -555,7 +555,7 @@ public class MapWindow {
         setTimeSpinner.setValue(Date.from(inst));
     }
 
-    public void DrawLights(List<Painter<JXMapViewer>> painters) {
+    public void drawLights(List<Painter<JXMapViewer>> painters) {
         if (MasterAgent.lightManagersUnderConstruction) {
             return;
         }
@@ -565,7 +565,7 @@ public class MapWindow {
         }
     }
 
-    public void DrawVehicles(List<Painter<JXMapViewer>> painters) {
+    public void drawVehicles(List<Painter<JXMapViewer>> painters) {
         try {
             Set<Waypoint> set = new HashSet<>();
             for (VehicleAgent a : MasterAgent.vehicles) {
@@ -591,7 +591,7 @@ public class MapWindow {
         }
     }
 
-    public void DrawRoutes(List<Painter<JXMapViewer>> painters) {
+    public void drawRoutes(List<Painter<JXMapViewer>> painters) {
         try {
             for (VehicleAgent a : MasterAgent.vehicles) {
                 List<GeoPosition> track = new ArrayList<GeoPosition>();
@@ -607,7 +607,7 @@ public class MapWindow {
         }
     }
 
-    public void DrawPedestrians(List<Painter<JXMapViewer>> painters) {
+    public void drawPedestrians(List<Painter<JXMapViewer>> painters) {
         try {
             Set<Waypoint> set = new HashSet<>();
             for (PedestrianAgent a : MasterAgent.pedestrians) {
@@ -658,7 +658,7 @@ public class MapWindow {
         }
     }
 
-    public void DrawBuses(List<Painter<JXMapViewer>> painters) {
+    public void drawBuses(List<Painter<JXMapViewer>> painters) {
         try {
             Set<Waypoint> set_low = new HashSet<>();
             Set<Waypoint> set_mid = new HashSet<>();
@@ -695,7 +695,7 @@ public class MapWindow {
         }
     }
 
-    public void DrawBusRoutes(List<Painter<JXMapViewer>> painters) {
+    public void drawBusRoutes(List<Painter<JXMapViewer>> painters) {
         try {
             for (BusAgent busAgent : MasterAgent.buses) {
                 List<GeoPosition> track = new ArrayList<>();
@@ -714,7 +714,7 @@ public class MapWindow {
         }
     }
 
-    public void DrawZones(Collection<Painter<JXMapViewer>> painters) {
+    public void drawZones(Collection<Painter<JXMapViewer>> painters) {
         if (zoneCenter != null) {
             Set<Waypoint> set = new HashSet<>();
             set.add(new DefaultWaypoint(zoneCenter));
@@ -727,7 +727,7 @@ public class MapWindow {
         }
     }
 
-    private void DrawStations(List<Painter<JXMapViewer>> painters) {
+    private void drawStations(List<Painter<JXMapViewer>> painters) {
         Set<Waypoint> set = new HashSet<>();
         for (OSMStation stationOSMNode : MasterAgent.osmIdToStationOSMNode.values()) {
             set.add(new DefaultWaypoint(stationOSMNode.getPosition()));
@@ -1004,37 +1004,37 @@ public class MapWindow {
             try {
                 List<Painter<JXMapViewer>> painters = new ArrayList<>();
                 if (renderBusRoutes) {
-                    DrawBusRoutes(painters);
+                    drawBusRoutes(painters);
                 }
                 if (renderCarRoutes) {
-                    DrawRoutes(painters);
+                    drawRoutes(painters);
                 }
                 if (renderPedestrianRoutes) {
                     drawPedestrianRoutes(painters);
                 }
                 if (renderZone) {
-                    DrawZones(painters);
+                    drawZones(painters);
                 }
                 if (renderStations) {
-                    DrawStations(painters);
+                    drawStations(painters);
                 }
                 if (renderLights) {
-                    DrawLights(painters);
+                    drawLights(painters);
                 }
                 if (renderCars) {
-                    DrawVehicles(painters);
+                    drawVehicles(painters);
                 }
                 if (renderBuses) {
-                    DrawBuses(painters);
+                    drawBuses(painters);
                 }
                 if (renderPedestrians) {
-                    DrawPedestrians(painters);
+                    drawPedestrians(painters);
                 }
 
                 CompoundPainter<JXMapViewer> painter = new CompoundPainter<>(painters);
                 MapViewer.setOverlayPainter(painter);
                 if (state == SimulationState.RUNNING) {
-                    RefreshTime();
+                    refreshTime();
                 }
             } catch (Exception e) {
                 logger.error("Error refreshing simulation", e);
@@ -1066,16 +1066,17 @@ public class MapWindow {
         @Override
         public void run() {
             if (!MasterAgent.SHOULD_GENERATE_CARS || MasterAgent.vehicles.size() >= getCarLimit()) {
-                return;
+                this.cancel();
             }
             final Pair<Double, Double> geoPosInZoneCircle = generateRandomGeoPosOffsetWithRadius(getZoneRadius());
-            GeoPosition A = new GeoPosition(zoneCenter.getLatitude() + geoPosInZoneCircle.getValue0(),
+            GeoPosition posA = new GeoPosition(zoneCenter.getLatitude() + geoPosInZoneCircle.getValue0(),
                     zoneCenter.getLongitude() + geoPosInZoneCircle.getValue1());
-            GeoPosition B = new GeoPosition(zoneCenter.getLatitude() - geoPosInZoneCircle.getValue0(),
+            GeoPosition posB = new GeoPosition(zoneCenter.getLatitude() - geoPosInZoneCircle.getValue0(),
                     zoneCenter.getLongitude() - geoPosInZoneCircle.getValue1());
+
             List<RouteNode> info;
             try {
-                info = Router.generateRouteInfo(A, B);
+                info = Router.generateRouteInfo(posA, posB);
             } catch (Exception e) {
                 logger.warn("Error generating route info");
                 return;

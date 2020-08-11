@@ -11,10 +11,13 @@ import osmproxy.elements.OSMWay.RelationOrientation;
 import osmproxy.elements.OSMWay.RouteOrientation;
 import osmproxy.elements.OSMWaypoint;
 import smartcity.MasterAgent;
+import utilities.CalculationHelper;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+
+import static utilities.CalculationHelper.getEuclideanDistance;
 
 // TODO: Add fields to this class and make it some kind of service (not static)
 public final class Router {
@@ -130,7 +133,7 @@ public final class Router {
         int minIndex = -1;
         double minDistance = Double.MAX_VALUE;
         for (int i = 0; i < route.size(); ++i) {
-            double distance = calculateDistance(route.get(i), manager);
+            double distance = getEuclideanDistance(route.get(i), manager);
             if (distance < minDistance) {
                 minDistance = distance;
                 minIndex = i;
@@ -140,8 +143,8 @@ public final class Router {
             route.add(minIndex + 1, manager);
             return;
         }
-        double distMgrToMinPrev = calculateDistance(route.get(minIndex - 1), manager);
-        double distMinToMinPrev = calculateDistance(route.get(minIndex - 1), route.get(minIndex));
+        double distMgrToMinPrev = getEuclideanDistance(route.get(minIndex - 1), manager);
+        double distMinToMinPrev = getEuclideanDistance(route.get(minIndex - 1), route.get(minIndex));
         if (distMgrToMinPrev < distMinToMinPrev) {
             route.add(minIndex, manager);
         }
@@ -184,11 +187,6 @@ public final class Router {
         newRoute.add(route.get(route.size() - 1));
 
         return newRoute;
-    }
-
-    private static double calculateDistance(RouteNode node1, RouteNode node2) {
-        return Math.sqrt(((node2.getLatitude() - node1.getLatitude()) * (node2.getLatitude() - node1.getLatitude()))
-                + ((node2.getLongitude() - node1.getLongitude()) * (node2.getLongitude() - node1.getLongitude())));
     }
 
     private static List<OSMNode> getOSMNodesForStations(List<Long> stationsIDs) {
