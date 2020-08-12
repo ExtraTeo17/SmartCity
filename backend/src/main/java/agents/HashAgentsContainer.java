@@ -30,26 +30,26 @@ public class HashAgentsContainer<TAgent extends AbstractAgent>
     public boolean tryAdd(@NotNull TAgent agent) {
         var type = agent.getClass();
         var set = container.get(type);
-        if (set != null) {
-            if (tryAddAgent(agent)) {
-                return set.add(agent);
-            }
-
-            return false;
+        if (set == null) {
+            throw new NotRegisteredException(type);
         }
 
-        throw new NotRegisteredException(type);
+        if (tryAddAgent(agent)) {
+            return set.add(agent);
+        }
+
+        return false;
     }
 
     @Override
     @SuppressWarnings("unchecked")
     public <TSpec extends TAgent> Iterator<TSpec> iterator(Class<TSpec> type) {
         var set = container.get(type);
-        if (set != null) {
-            return (Iterator<TSpec>) set.iterator();
+        if (set == null) {
+            throw new NotRegisteredException(type);
         }
 
-        throw new NotRegisteredException(type);
+        return (Iterator<TSpec>) set.iterator();
     }
 
 
@@ -68,57 +68,55 @@ public class HashAgentsContainer<TAgent extends AbstractAgent>
     public boolean contains(TAgent agent) {
         var type = agent.getClass();
         var set = container.get(type);
-        if (set != null) {
-            return set.contains(agent);
+        if (set == null) {
+            throw new NotRegisteredException(type);
         }
 
-        throw new NotRegisteredException(type);
+        return set.contains(agent);
     }
 
     @Override
     @SuppressWarnings("unchecked")
     public <TSpec extends TAgent> void removeIf(Class<TSpec> type, Predicate<TSpec> predicate) {
         var set = container.get(type);
-        if (set != null) {
-            set.removeIf(tAgent -> predicate.test((TSpec) tAgent));
-            return;
+        if (set == null) {
+            throw new NotRegisteredException(type);
         }
 
-        throw new NotRegisteredException(type);
+        set.removeIf(tAgent -> predicate.test((TSpec) tAgent));
     }
 
     @Override
     @SuppressWarnings("unchecked")
     public <TSpec extends TAgent> void forEach(Class<TSpec> type, Consumer<TSpec> consumer) {
         var set = container.get(type);
-        if (set != null) {
-            set.forEach(tAgent -> consumer.accept((TSpec) tAgent));
-            return;
+        if (set == null) {
+            throw new NotRegisteredException(type);
         }
 
-        throw new NotRegisteredException(type);
+
+        set.forEach(tAgent -> consumer.accept((TSpec) tAgent));
     }
 
 
     @Override
     public int size(Class<?> type) {
         var set = container.get(type);
-        if (set != null) {
-            return set.size();
+        if (set == null) {
+            throw new NotRegisteredException(type);
         }
 
-        throw new NotRegisteredException(type);
+        return set.size();
     }
 
     @Override
     public void clear(Class<?> type) {
         var set = container.get(type);
-        if (set != null) {
-            set.clear();
-            return;
+        if (set == null) {
+            throw new NotRegisteredException(type);
         }
 
-        throw new NotRegisteredException(type);
+        set.clear();
     }
 
     @Override
