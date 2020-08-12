@@ -14,7 +14,7 @@ public class MovingObjectImpl extends MovingObject {
     private final List<RouteNode> route;
     private int index = 0;
     private final int speed = 50;
-    private int closestLightIndex = 0;
+    private int closestLightIndex = Integer.MAX_VALUE;
 
     public MovingObjectImpl(List<RouteNode> displayRoute) {
         this.displayRoute = displayRoute;

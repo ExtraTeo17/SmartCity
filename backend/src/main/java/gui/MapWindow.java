@@ -1,9 +1,7 @@
 package gui;
 
-import agents.BusAgent;
-import agents.LightManager;
-import agents.PedestrianAgent;
-import agents.VehicleAgent;
+import agents.*;
+import com.google.common.collect.ImmutableList;
 import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
 import com.google.inject.Inject;
@@ -60,6 +58,7 @@ public class MapWindow {
     private final static int PEDESTRIAN_STATION_RADIUS = 200;
     private final static int TIME_SCALE = 10;
     private final EventBus eventBus;
+    private final IAgentsContainer<AbstractAgent> agentsContainer;
 
     public JPanel MainPanel;
     public JXMapViewer MapViewer;
@@ -90,7 +89,7 @@ public class MapWindow {
     private JLabel ResultTimeTitle;
     private JButton testBusZoneButton;
     private JButton testCarZoneButton;
-    private MasterAgent smartCityAgent;
+    private MasterAgent masterAgent;
     private Timer refreshTimer = new Timer(true);
     private final Timer spawnTimer = new Timer(true);
     private GeoPosition pointA;
@@ -112,8 +111,10 @@ public class MapWindow {
     private Instant simulationStart;
 
     @Inject
-    public MapWindow(EventBus eventBus) {
+    public MapWindow(EventBus eventBus, IAgentsContainer<AbstractAgent> agentsContainer) {
         this.eventBus = eventBus;
+        this.agentsContainer = agentsContainer;
+
         MapViewer = new JXMapViewer();
         currentTimeLabel.setVisible(false);
         currentTimeTitle.setVisible(false);
@@ -213,7 +214,7 @@ public class MapWindow {
                         }
                         else {
                             pointB = geoPosition;
-                            var vehicle = smartCityAgent.tryAddNewVehicleAgent(Router.generateRouteInfo(pointA, pointB));
+                            var vehicle = masterAgent.tryAddNewVehicleAgent(Router.generateRouteInfo(pointA, pointB));
                             vehicle.start();
 
                             logger.info("Vehicles: " + MasterAgent.vehicles.size());
@@ -247,7 +248,7 @@ public class MapWindow {
                 currentTimeLabel.setVisible(true);
                 ResultTimeLabel.setVisible(true);
                 ResultTimeTitle.setVisible(true);
-                smartCityAgent.activateLightManagerAgents();
+                masterAgent.activateLightManagerAgents();
                 random.setSeed(getSeed());
 
                 if (MasterAgent.SHOULD_GENERATE_CARS) {
@@ -265,11 +266,11 @@ public class MapWindow {
     }
 
     public void setSmartCityAgent(MasterAgent smartCityAgent) {
-        this.smartCityAgent = smartCityAgent;
+        this.masterAgent = smartCityAgent;
     }
 
     public MasterAgent getSmartCityAgent() {
-        return smartCityAgent;
+        return masterAgent;
     }
 
     public void display() {
@@ -482,7 +483,7 @@ public class MapWindow {
     public void HandleSetZone(SetZoneEvent e) {
         logger.info("Set zone event occurred: " + e.toString());
         if (state == SimulationState.READY_TO_RUN) {
-            MasterAgent.reset();
+            masterAgent.reset();
             state = SimulationState.SETTING_ZONE;
         }
         prepareAgentsAndSetZone(e.getLatitude(), e.getLongitude(), (int) e.getRadius());
@@ -516,7 +517,7 @@ public class MapWindow {
         refreshTimer = new Timer();
         zoneCenter = new GeoPosition(lat, lon);
 
-        if (smartCityAgent.prepareAgents(lat, lon, radius)) {
+        if (masterAgent.prepareAgents(lat, lon, radius)) {
             setState(SimulationState.READY_TO_RUN);
             refreshTimer.scheduleAtFixedRate(new RefreshTask(), 0, REFRESH_MAP_INTERVAL_MILLISECONDS);
         }
@@ -661,18 +662,19 @@ public class MapWindow {
             Set<Waypoint> set_low = new HashSet<>();
             Set<Waypoint> set_mid = new HashSet<>();
             Set<Waypoint> set_high = new HashSet<>();
-            for (BusAgent a : MasterAgent.buses) {
-                int count = a.getBus().getPassengersCount();
+            agentsContainer.forEach(BusAgent.class, busAgent -> {
+                var bus = busAgent.getBus();
+                int count = bus.getPassengersCount();
                 if (count > Bus.CAPACITY_HIGH) {
-                    set_high.add(new DefaultWaypoint(a.getBus().getPosition()));
+                    set_high.add(new DefaultWaypoint(bus.getPosition()));
                 }
                 else if (count > Bus.CAPACITY_MID) {
-                    set_mid.add(new DefaultWaypoint(a.getBus().getPosition()));
+                    set_mid.add(new DefaultWaypoint(bus.getPosition()));
                 }
                 else {
-                    set_low.add(new DefaultWaypoint(a.getBus().getPosition()));
+                    set_low.add(new DefaultWaypoint(bus.getPosition()));
                 }
-            }
+            });
 
             WaypointPainter<Waypoint> painter_low = new WaypointPainter<>();
             painter_low.setWaypoints(set_low);
@@ -695,7 +697,7 @@ public class MapWindow {
 
     public void drawBusRoutes(List<Painter<JXMapViewer>> painters) {
         try {
-            for (BusAgent busAgent : MasterAgent.buses) {
+            agentsContainer.forEach(BusAgent.class, busAgent -> {
                 List<GeoPosition> track = new ArrayList<>();
                 var bus = busAgent.getBus();
                 for (RouteNode point : bus.getDisplayRoute()) {
@@ -705,7 +707,7 @@ public class MapWindow {
                 RoutePainter routePainter = new RoutePainter(track, new Color(r.nextInt(255), r.nextInt(255), r.nextInt(255)));
                 painters.add(routePainter);
 
-            }
+            });
         } catch (Exception e) {
             logger.error("Error drawing bus routes", e);
             renderBusRoutes = false;
@@ -988,7 +990,7 @@ public class MapWindow {
 
     private Pair<Double, Double> generateRandomGeoPosOffsetWithRadius(final int radius) {
         double angle = random.nextDouble() * Math.PI * 2;
-        if (getTestCarId() == smartCityAgent.carId) {
+        if (getTestCarId() == masterAgent.carId) {
             angle = testCarRandom.nextDouble() * Math.PI * 2;
         }
         double lat = Math.sin(angle) * radius * 0.0000089;
@@ -1053,9 +1055,9 @@ public class MapWindow {
         }
 
         private void RunBusBasedOnTimeTable() {
-            for (BusAgent busAgent : MasterAgent.buses) {
+            agentsContainer.forEach(BusAgent.class, busAgent -> {
                 busAgent.runBasedOnTimetable(getSimulationStartTime());
-            }
+            });
         }
     }
 
@@ -1081,11 +1083,11 @@ public class MapWindow {
             }
 
             VehicleAgent vehicle;
-            if (getTestCarId() == smartCityAgent.carId) {
-                vehicle = smartCityAgent.tryAddNewVehicleAgent(info, true);
+            if (getTestCarId() == masterAgent.carId) {
+                vehicle = masterAgent.tryAddNewVehicleAgent(info, true);
             }
             else {
-                vehicle = smartCityAgent.tryAddNewVehicleAgent(info);
+                vehicle = masterAgent.tryAddNewVehicleAgent(info);
             }
 
             vehicle.start();
@@ -1098,7 +1100,7 @@ public class MapWindow {
         public void run() {
             try {
                 if (!MasterAgent.SHOULD_GENERATE_PEDESTRIANS_AND_BUSES) {
-                    return;
+                    this.cancel();
                 }
                 // TODO: add people limit
                 final Pair<Pair<StationNode, StationNode>, String> stationNodePairAndBusLine = getStationPairAndLineFromRandomBus();
@@ -1116,7 +1118,7 @@ public class MapWindow {
                         finishStation.getOsmStationId(), null);
 
 
-                if (getTestCarId() == smartCityAgent.pedestrianId) {
+                if (getTestCarId() == masterAgent.pedestrianId) {
                     final TestPedestrian pedestrian = new TestPedestrian(routeToStation, routeFromStation, startStation.getStationId(), stationNodePairAndBusLine.getValue1(),
                             stationNodePairAndBusLine.getValue0().getValue0(), stationNodePairAndBusLine.getValue0().getValue1());
                     var agent = MasterAgent.tryAddNewPedestrianAgent(pedestrian);
@@ -1128,7 +1130,7 @@ public class MapWindow {
                     var agent = MasterAgent.tryAddNewPedestrianAgent(pedestrian);
                     agent.start();
                 }
-                smartCityAgent.pedestrianId++;
+                masterAgent.pedestrianId++;
             } catch (Exception e) {
                 logger.warn("Unknown error.", e);
             }
@@ -1140,12 +1142,12 @@ public class MapWindow {
         }
 
         private BusAgent getRandomBusAgent() {
-            final List<BusAgent> busArray = new ArrayList<>(MasterAgent.buses); // TODO RETHINK!!!
+            final List<BusAgent> busArray = ImmutableList.copyOf(agentsContainer.iterator(BusAgent.class)); // TODO RETHINK!!!
             BusAgent bus;
             try {
                 bus = busArray.get(random.nextInt(busArray.size()));
             } catch (Exception e) {
-                logger.warn("The 'shouldPrepareBuses' toggle in smartCityAgent is probably switched off (pedestrians " +
+                logger.error("The 'shouldPrepareBuses' toggle in smartCityAgent is probably switched off (pedestrians " +
                         "cannot exist without buses)", e);
                 throw e;
             }

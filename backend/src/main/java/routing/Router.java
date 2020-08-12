@@ -11,7 +11,6 @@ import osmproxy.elements.OSMWay.RelationOrientation;
 import osmproxy.elements.OSMWay.RouteOrientation;
 import osmproxy.elements.OSMWaypoint;
 import smartcity.MasterAgent;
-import utilities.CalculationHelper;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -212,9 +211,11 @@ public final class Router {
         var waypoints = el.getWaypoints();
         if (orientation == RelationOrientation.FRONT) {
             addRouteNodesToList(waypoints, routeNodes_list);
+            return;
         }
         else if (orientation == RelationOrientation.BACK) {
             addRouteNodesToList(reverse(waypoints), routeNodes_list);
+            return;
         }
 
         throw new UnsupportedOperationException("Orientation " + orientation.toString() + " is not supported");

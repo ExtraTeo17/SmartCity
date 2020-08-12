@@ -22,7 +22,7 @@ public class MessageHandler {
         this.eventBus = eventBus;
     }
 
-    public void Handle(String messageString) {
+    public void handle(String messageString) {
         logger.info("Handling message: " + messageString);
 
         var message = tryDeserialize(messageString, MessageDto.class);
@@ -30,10 +30,10 @@ public class MessageHandler {
             return;
         }
 
-        Handle(message.get());
+        handle(message.get());
     }
 
-    private void Handle(MessageDto message) {
+    private void handle(MessageDto message) {
         switch (message.type) {
             case SET_ZONE_REQUEST:
                 var payload = tryDeserialize(message.payload, SetZoneRequest.class);

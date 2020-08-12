@@ -82,7 +82,7 @@ class SocketServer extends WebSocketServer {
      **/
     @Override
     public void onMessage(WebSocket socket, String message) {
-        messageHandler.Handle(message);
+        messageHandler.handle(message);
     }
 
     /**

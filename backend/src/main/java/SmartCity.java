@@ -1,3 +1,4 @@
+import agents.AgentsModule;
 import com.google.inject.Guice;
 import genesis.GuiModule;
 import genesis.MainModule;
@@ -16,6 +17,7 @@ public class SmartCity {
     public static void main(String[] args) {
         var injector = Guice.createInjector(
                 new MainModule(args),
+                new AgentsModule(),
                 new GuiModule(),
                 new WebModule(),
                 new SmartCityModule(),

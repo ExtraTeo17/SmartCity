@@ -1,11 +1,11 @@
-package smartcity;
+package agents;
 
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.atomic.AtomicInteger;
 
 // TODO: Move all static methods to getId/resetId
-class IdGenerator {
+public class IdGenerator<TAgent extends AbstractAgent> implements IRegistrable<TAgent> {
     public static final int resetValue = 1;
     private final ConcurrentMap<Class<?>, AtomicInteger> idMap;
 
@@ -18,21 +18,29 @@ class IdGenerator {
         this.idMap = new ConcurrentHashMap<>();
     }
 
-    void register(Class<?> type) {
+    private void register(Class<?> type) {
         idMap.putIfAbsent(type, new AtomicInteger());
     }
 
-    void register(Class<?>... types) {
+    @Override
+    public final void register(Class<?>... types) {
         for (var type : types) {
             register(type);
         }
     }
 
-    int getId(Class<?> type) {
+    @Override
+    public void registerAll(Class<?>[] types) {
+        for (var type : types) {
+            register(type);
+        }
+    }
+
+    public int get(Class<?> type) {
         return idMap.get(type).getAndIncrement();
     }
 
-    void resetId(Class<?> type) {
+    public void reset(Class<?> type) {
         idMap.get(type).set(resetValue);
     }
 

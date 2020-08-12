@@ -11,6 +11,5 @@ public class SmartCityModule extends AbstractModule {
         super.configure(binder);
 
         binder.bind(MasterAgent.class).in(Singleton.class);
-        binder.bind(IdGenerator.class).in(Singleton.class);
     }
 }
