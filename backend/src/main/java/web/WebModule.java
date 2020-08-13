@@ -3,6 +3,7 @@ package web;
 import com.google.inject.Binder;
 import com.google.inject.Singleton;
 import genesis.AbstractModule;
+import web.abstractions.IWebService;
 import web.serialization.IMessageObjectMapper;
 import web.serialization.MessageObjectMapper;
 

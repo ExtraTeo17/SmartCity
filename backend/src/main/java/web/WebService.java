@@ -2,6 +2,7 @@ package web;
 
 import com.google.inject.Inject;
 import org.jxmapviewer.viewer.GeoPosition;
+import web.abstractions.IWebService;
 import web.message.MessageType;
 import web.message.payloads.responses.Location;
 import web.message.payloads.responses.SetZoneResponse;

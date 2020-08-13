@@ -1,5 +1,6 @@
 package agents;
 
+import agents.abstractions.IAgentsContainer;
 import com.google.inject.Binder;
 import com.google.inject.Inject;
 import com.google.inject.Provides;

@@ -1,6 +1,7 @@
 package gui;
 
 import agents.*;
+import agents.abstractions.IAgentsContainer;
 import com.google.common.collect.ImmutableList;
 import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;

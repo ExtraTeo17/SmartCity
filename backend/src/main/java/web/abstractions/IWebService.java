@@ -1,4 +1,4 @@
-package web;
+package web.abstractions;
 
 import org.jxmapviewer.viewer.GeoPosition;
 

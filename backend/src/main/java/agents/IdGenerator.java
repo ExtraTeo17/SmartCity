@@ -1,11 +1,13 @@
 package agents;
 
+import agents.abstractions.IRegistrable;
+
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.atomic.AtomicInteger;
 
 // TODO: Move all static methods to getId/resetId
-public class IdGenerator<TAgent extends AbstractAgent> implements IRegistrable<TAgent> {
+public class IdGenerator<TAgent extends AbstractAgent> implements IRegistrable {
     public static final int resetValue = 1;
     private final ConcurrentMap<Class<?>, AtomicInteger> idMap;
 

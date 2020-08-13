@@ -1,5 +1,6 @@
 package agents;
 
+import agents.abstractions.IAgentsContainer;
 import com.google.inject.Inject;
 import jade.wrapper.ContainerController;
 import jade.wrapper.StaleProxyException;
@@ -14,14 +15,14 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 
-public class HashAgentsContainer<TAgent extends AbstractAgent>
+class HashAgentsContainer<TAgent extends AbstractAgent>
         implements IAgentsContainer<TAgent> {
     private final static Logger logger = LoggerFactory.getLogger(HashAgentsContainer.class);
     private final ContainerController controller;
     private final Map<Class<?>, HashSet<TAgent>> container;
 
     @Inject
-    public HashAgentsContainer(ContainerController controller) {
+    HashAgentsContainer(ContainerController controller) {
         this.controller = controller;
         this.container = new ConcurrentHashMap<>();
     }

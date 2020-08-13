@@ -1,6 +1,6 @@
-package agents;
+package agents.abstractions;
 
-public interface IRegistrable<T> {
+public interface IRegistrable {
     void register(Class<?>... types);
 
     void registerAll(Class<?>[] types);

@@ -1,4 +1,4 @@
-package agents;
+package agents.abstractions;
 
 import jade.core.Agent;
 
@@ -8,7 +8,7 @@ import java.util.function.Predicate;
 
 
 // I hate Java generics.
-public interface IAgentsContainer<T extends Agent> extends IRegistrable<T> {
+public interface IAgentsContainer<T extends Agent> extends IRegistrable {
     boolean tryAdd(T agent);
 
     <TSpec extends T> Iterator<TSpec> iterator(Class<TSpec> type);

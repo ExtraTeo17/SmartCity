@@ -1,6 +1,7 @@
 package smartcity;
 
 import agents.*;
+import agents.abstractions.IAgentsContainer;
 import agents.utils.MessageParameter;
 import com.google.common.eventbus.Subscribe;
 import com.google.inject.Inject;
@@ -30,7 +31,7 @@ import vehicles.MovingObjectImpl;
 import vehicles.Pedestrian;
 import vehicles.TestCar;
 import vehicles.TestPedestrian;
-import web.IWebService;
+import web.abstractions.IWebService;
 
 import java.time.Duration;
 import java.time.Instant;
