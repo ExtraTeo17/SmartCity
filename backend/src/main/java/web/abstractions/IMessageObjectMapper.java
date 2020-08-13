@@ -1,4 +1,4 @@
-package web.serialization;
+package web.abstractions;
 
 import web.message.MessageType;
 import web.message.payloads.AbstractPayload;

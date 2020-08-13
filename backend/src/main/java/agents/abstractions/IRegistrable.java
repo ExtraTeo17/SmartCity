@@ -6,7 +6,7 @@ public interface IRegistrable {
     void registerAll(Class<?>[] types);
 
     class NotRegisteredException extends RuntimeException {
-        NotRegisteredException(Class<?> type) {
+        public NotRegisteredException(Class<?> type) {
             super("Type '" + type.getName() + "' was not registered");
         }
     }

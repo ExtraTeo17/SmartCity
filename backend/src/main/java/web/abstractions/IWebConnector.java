@@ -1,9 +1,8 @@
-package web;
+package web.abstractions;
 
-import web.abstractions.IStartable;
 import web.message.MessageType;
 import web.message.payloads.AbstractPayload;
 
-interface IWebConnector extends IStartable {
+public interface IWebConnector extends IStartable {
     void broadcastMessage(MessageType type, AbstractPayload payload);
 }

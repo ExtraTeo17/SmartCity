@@ -12,17 +12,17 @@ import web.message.payloads.requests.SetZoneRequest;
 import java.io.IOException;
 import java.util.Optional;
 
-public class MessageHandler {
+class MessageHandler {
     private static final ObjectMapper objectMapper = new ObjectMapper();
     private static final Logger logger = LoggerFactory.getLogger(MessageHandler.class);
     private final EventBus eventBus;
 
     @Inject
-    public MessageHandler(EventBus eventBus) {
+    MessageHandler(EventBus eventBus) {
         this.eventBus = eventBus;
     }
 
-    public void handle(String messageString) {
+    void handle(String messageString) {
         logger.info("Handling message: " + messageString);
 
         var message = tryDeserialize(messageString, MessageDto.class);

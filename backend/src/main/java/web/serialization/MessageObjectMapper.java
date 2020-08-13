@@ -2,19 +2,19 @@ package web.serialization;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.checkerframework.checker.nullness.Opt;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import web.abstractions.IMessageObjectMapper;
 import web.message.MessageDto;
 import web.message.MessageType;
 import web.message.payloads.AbstractPayload;
 
 import java.util.Optional;
 
-public class MessageObjectMapper implements IMessageObjectMapper {
+class MessageObjectMapper implements IMessageObjectMapper {
     private static final Logger logger = LoggerFactory.getLogger(MessageObjectMapper.class);
     private final static ObjectMapper objectMapper = new ObjectMapper();
-    
+
     @Override
     public Optional<String> serialize(MessageType type, AbstractPayload payload) {
         String serializedPayload;
@@ -31,7 +31,7 @@ public class MessageObjectMapper implements IMessageObjectMapper {
             serializedMessage = objectMapper.writeValueAsString(message);
         } catch (JsonProcessingException e) {
             logger.warn("Error serializing message", e);
-            return  Optional.empty();
+            return Optional.empty();
         }
 
         return Optional.of(serializedMessage);

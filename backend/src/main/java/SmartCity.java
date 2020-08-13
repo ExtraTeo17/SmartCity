@@ -10,6 +10,7 @@ import osmproxy.OsmModule;
 import smartcity.MasterAgent;
 import smartcity.SmartCityModule;
 import web.WebModule;
+import web.serialization.SerializationModule;
 
 public class SmartCity {
     private static final Logger logger = LoggerFactory.getLogger(SmartCity.class);
@@ -19,6 +20,7 @@ public class SmartCity {
                 new MainModule(args),
                 new AgentsModule(),
                 new GuiModule(),
+                new SerializationModule(),
                 new WebModule(),
                 new SmartCityModule(),
                 new OsmModule()
