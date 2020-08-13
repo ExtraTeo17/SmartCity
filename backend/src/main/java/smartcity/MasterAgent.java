@@ -55,7 +55,7 @@ public class MasterAgent extends Agent {
 
     public final static boolean USE_DEPRECATED_XML_FOR_LIGHT_MANAGERS = false;
     public final static String STEPS = "6";
-    public static boolean SHOULD_GENERATE_PEDESTRIANS_AND_BUSES = true;
+    public static boolean SHOULD_GENERATE_PEDESTRIANS_AND_BUSES = false;
     public static boolean SHOULD_GENERATE_CARS = true;
 
     // TODO: Delete this abomination (or at least make it private)
@@ -311,29 +311,31 @@ public class MasterAgent extends Agent {
         return true;
     }
 
+    // TODO: Still not removed from container - how to do that?
     public void reset() {
-        IdGenerator.resetLightManagerId();
-        for (var manager : lightManagers) {
-            manager.doDelete();
-        }
+        logger.info("Resetting started");
+
+        delete(lightManagers.iterator());
         lightManagers.clear();
 
-        for (var vehicle : vehicles) {
-            vehicle.doDelete();
-        }
+        delete(vehicles.iterator());
         vehicles.clear();
 
-        agentsContainer.forEach(BusAgent.class, Agent::doDelete);
+        delete(agentsContainer.iterator(BusAgent.class));
         agentsContainer.clear(BusAgent.class);
 
         // People die last
-        for (var pedestrian : pedestrians) {
-            pedestrian.doDelete();
-        }
+        delete(pedestrians.iterator());
         pedestrians.clear();
 
-        // TODO: Still not removed from container - how to do that?
+        logger.info("Resetting finished");
     }
 
-
+    private void delete(Iterator<? extends AbstractAgent> it) {
+        try {
+            it.forEachRemaining(AbstractAgent::takeDown);
+        } catch (Exception e) {
+            logger.warn("Failed to delete agent", e);
+        }
+    }
 }

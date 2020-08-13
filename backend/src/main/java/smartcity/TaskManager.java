@@ -1,4 +1,8 @@
 package smartcity;
 
-public class TaskManager {
+class TaskManager {
+    void schedule() {
+        
+    }
+
 }
