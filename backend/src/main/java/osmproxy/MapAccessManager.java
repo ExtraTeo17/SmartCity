@@ -27,13 +27,13 @@ import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
-import osmproxy.buses.BusInfo;
 import osmproxy.elements.OSMLight;
 import osmproxy.elements.OSMNode;
-import osmproxy.elements.OSMStation;
 import osmproxy.elements.OSMWay;
 import routing.RouteInfo;
 import smartcity.MasterAgent;
+import utilities.NumericHelper;
+import utilities.Point;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -51,9 +51,7 @@ import java.net.URL;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
-import java.util.LinkedHashSet;
 import java.util.List;
-import java.util.Set;
 
 //import org.osm.lights.diff.OSMNode;
 //import org.osm.lights.upload.BasicAuthenticator;
@@ -65,12 +63,16 @@ public class MapAccessManager {
     private static final Logger logger = LoggerFactory.getLogger(MapAccessManager.class);
     private static final JSONParser jsonParser = new JSONParser();
     private static final String OVERPASS_API = "https://lz4.overpass-api.de/api/interpreter";
-    private static final String CROSSROADS = "config/crossroads.xml";
+    private static final String CROSSROADS_LOCATIONS_PATH = "config/crossroads.xml";
+
+    public static final double EARTH_RADIUS = 6364.917;
+    public static final double METERS_PER_DEGREE = EARTH_RADIUS * 2 * Math.PI / 360.0 * 1000;
 
     /**
      * @return a list of openseamap nodes extracted from xml
      */
     @SuppressWarnings("nls")
+
     static List<OSMNode> getNodes(Document xmlDocument) {
         List<OSMNode> osmNodes = new ArrayList<>();
         Node osmRoot = xmlDocument.getFirstChild();
@@ -174,21 +176,6 @@ public class MapAccessManager {
         return info;
     }
 
-    public static Set<BusInfo> sendBusOverpassQuery(int radius, double middleLat, double middleLon) {
-        Set<BusInfo> infoSet = null;
-        var overpassQuery = OsmQueryManager.getBusOverpassQuery(radius, middleLat, middleLon);
-        try {
-            var overpassInfo = getNodesViaOverpass(overpassQuery);
-            infoSet = parseBusInfo(overpassInfo, radius, middleLat, middleLon);
-        } catch (Exception e) {
-            logger.warn("Error getting bus info.", e);
-            throw new RuntimeException(e);
-        }
-
-        return infoSet;
-    }
-
-
     /**
      * @param query the overpass query
      * @return the nodes in the formulated query
@@ -211,92 +198,6 @@ public class MapAccessManager {
         return docBuilder.parse(connection.getInputStream());
     }
 
-    private static Set<BusInfo> parseBusInfo(Document nodesViaOverpass, int radius, double middleLat, double middleLon) {
-        logger.info("STEP 3/" + MasterAgent.STEPS + ": Starting overpass bus info parsing");
-        Set<BusInfo> infoSet = new LinkedHashSet<>();
-        Node osmRoot = nodesViaOverpass.getFirstChild();
-        NodeList osmXMLNodes = osmRoot.getChildNodes();
-        for (int i = 1; i < osmXMLNodes.getLength(); i++) {
-            Node item = osmXMLNodes.item(i);
-            if (item.getNodeName().equals("relation")) {
-                BusInfo info = new BusInfo();
-                infoSet.add(info);
-                NodeList member_list = item.getChildNodes();
-                StringBuilder builder = new StringBuilder();
-                for (int j = 0; j < member_list.getLength(); j++) {
-                    Node member = member_list.item(j);
-                    if (member.getNodeName().equals("member")) {
-                        NamedNodeMap attributes = member.getAttributes();
-                        Node namedItemID = attributes.getNamedItem("ref");
-                        if (attributes.getNamedItem("role").getNodeValue().contains("stop") && attributes.getNamedItem("type").getNodeValue().equals("node")) {
-                            info.addStation(namedItemID.getNodeValue());
-                        }
-                        else if (attributes.getNamedItem("role").getNodeValue().length() == 0 && attributes.getNamedItem("type").getNodeValue().equals("way")) {
-                            long id = Long.parseLong(namedItemID.getNodeValue());
-                            builder.append(OsmQueryManager.getSingleBusWayOverpassQuery(id));
-                        }
-                    }
-                    else if (member.getNodeName().equals("tag")) {
-                        NamedNodeMap attributes = member.getAttributes();
-                        Node namedItemID = attributes.getNamedItem("k");
-                        if (namedItemID.getNodeValue().equals("ref")) {
-                            Node number_of_line = attributes.getNamedItem("v");
-                            info.setBusLine(number_of_line.getNodeValue());
-                        }
-                    }
-                }
-
-                try {
-                    var overpassNodes = getNodesViaOverpass(OsmQueryManager.getQueryWithPayload(builder.toString()));
-                    var osmWays = parseOsmWay(overpassNodes, radius, middleLat, middleLon);
-                    info.setRoute(osmWays);
-                } catch (NotFoundException | UnsupportedOperationException e) {
-                    logger.warn("Please change the zone, this one is not supported yet.", e);
-                    throw new IllegalArgumentException(e);
-                } catch (Exception e) {
-                    logger.error("Error setting osm way", e);
-                    throw new IllegalArgumentException(e);
-                }
-            }
-            else if (item.getNodeName().equals("node")) {
-                NamedNodeMap attributes = item.getAttributes();
-
-                String osmId = attributes.getNamedItem("id").getNodeValue();
-                String lat = attributes.getNamedItem("lat").getNodeValue();
-                String lon = attributes.getNamedItem("lon").getNodeValue();
-
-                if (belongsToCircle(Double.parseDouble(lat), Double.parseDouble(lon), new GeoPosition(middleLat, middleLon), radius) &&
-                        !MasterAgent.osmIdToStationOSMNode.containsKey(Long.parseLong(osmId))) {
-                    NodeList list_tags = item.getChildNodes();
-                    for (int z = 0; z < list_tags.getLength(); z++) {
-                        Node tag = list_tags.item(z);
-                        if (tag.getNodeName().equals("tag")) {
-                            NamedNodeMap attr = tag.getAttributes();
-                            Node kAttr = attr.getNamedItem("k");
-                            if (kAttr.getNodeValue().equals("public_transport")) {
-                                Node vAttr = attr.getNamedItem("v");
-                                if (!vAttr.getNodeValue().contains("stop")) {
-                                    break;
-                                }
-                            }
-                            else if (kAttr.getNodeValue().equals("ref")) {
-                                Node number_of_station = attr.getNamedItem("v");
-                                OSMStation stationOSMNode = new OSMStation(osmId, lat, lon, number_of_station.getNodeValue());
-                                var agent = MasterAgent.tryAddNewStationAgent(stationOSMNode);
-                                agent.start();
-                            }
-                        }
-                    }
-                }
-            }
-        }
-
-        for (BusInfo info : infoSet) {
-            info.filterStationsByCircle(middleLat, middleLon, radius);
-        }
-
-        return infoSet;
-    }
 
     public static List<OSMLight> sendFullTrafficSignalQuery(List<Long> osmWayIds) {
         List<OSMLight> lightNodes = new ArrayList<>();
@@ -322,7 +223,7 @@ public class MapAccessManager {
 
     public static boolean prepareLightManagersInRadiusAndLightIdToLightManagerIdHashSet(GeoPosition middlePoint, int radius) {
         try {
-            Document xmlDocument = getXmlDocument(CROSSROADS);
+            Document xmlDocument = getXmlDocument(CROSSROADS_LOCATIONS_PATH);
             Node osmRoot = xmlDocument.getFirstChild();
             NodeList districtXMLNodes = osmRoot.getChildNodes();
             for (int i = 0; i < districtXMLNodes.getLength(); i++) {
@@ -370,22 +271,21 @@ public class MapAccessManager {
     }
 
     private static void addCrossroadIdIfDesired(Node crossroad, GeoPosition middlePoint, int radius) {
-        Pair<Double, Double> crossroadLatLon = calculateLatLonBasedOnInternalLights(crossroad);
-
-        if (belongsToCircle(crossroadLatLon.getValue0(), crossroadLatLon.getValue1(), middlePoint, radius)) {
+        Point crossroadPoint = calculateLatLonBasedOnInternalLights(crossroad);
+        if (NumericHelper.belongsToCircle(crossroadPoint, Point.of(middlePoint),
+                radius / METERS_PER_DEGREE)) {
             MasterAgent.tryCreateLightManager(crossroad);
         }
-
     }
 
-    private static Pair<Double, Double> calculateLatLonBasedOnInternalLights(Node crossroad) {
-        List<Double> latList = getParametersFromGroup(getCrossroadGroup(crossroad, 1),
-                getCrossroadGroup(crossroad, 3), "lat");
-        List<Double> lonList = getParametersFromGroup(getCrossroadGroup(crossroad, 1),
-                getCrossroadGroup(crossroad, 3), "lon");
-        double latAverage = calculateAverage(latList);
-        double lonAverage = calculateAverage(lonList);
-        return Pair.with(latAverage, lonAverage);
+    private static Point calculateLatLonBasedOnInternalLights(Node crossroad) {
+        var crossroadA = getCrossroadGroup(crossroad, 1);
+        var crossroadB = getCrossroadGroup(crossroad, 3);
+        List<Double> latList = getParametersFromGroup(crossroadA, crossroadB, "lat");
+        List<Double> lonList = getParametersFromGroup(crossroadA, crossroadB, "lon");
+        double latAverage = NumericHelper.calculateAverage(latList);
+        double lonAverage = NumericHelper.calculateAverage(lonList);
+        return Point.of(latAverage, lonAverage);
     }
 
     private static List<Double> getParametersFromGroup(Node group1, Node group2, String parameterName) {
@@ -404,22 +304,8 @@ public class MapAccessManager {
         }
     }
 
-    private static double calculateAverage(List<Double> doubleList) {
-        double sum = 0;
-        for (double value : doubleList) {
-            sum += value;
-        }
-        return sum / (double) (doubleList.size());
-    }
-
     public static Node getCrossroadGroup(Node crossroad, int index) {
         return crossroad.getChildNodes().item(index);
-    }
-
-    public static boolean belongsToCircle(double latToBelong, double lonToBelong, GeoPosition middlePoint, int radius) {
-        return (((latToBelong - middlePoint.getLatitude()) * (latToBelong - middlePoint.getLatitude()))
-                + ((lonToBelong - middlePoint.getLongitude()) * (lonToBelong - middlePoint.getLongitude())))
-                < (radius * radius) * 0.0000089 * 0.0000089;
     }
 
     private static Document getXmlDocument(String filepath) {
@@ -439,7 +325,7 @@ public class MapAccessManager {
         return document;
     }
 
-    private static List<OSMWay> parseOsmWay(Document nodesViaOverpass, int radius, double middleLat, double middleLon)
+    public static List<OSMWay> parseOsmWay(Document nodesViaOverpass, int radius, double middleLat, double middleLon)
             throws NotFoundException {
         List<OSMWay> route = new ArrayList<>();
         Node osmRoot = nodesViaOverpass.getFirstChild();

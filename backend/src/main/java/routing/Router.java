@@ -16,7 +16,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import static utilities.CalculationHelper.getEuclideanDistance;
+import static utilities.NumericHelper.getEuclideanDistance;
 
 // TODO: Add fields to this class and make it some kind of service (not static)
 public final class Router {

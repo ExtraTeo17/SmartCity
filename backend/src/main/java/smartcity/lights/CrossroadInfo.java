@@ -6,8 +6,8 @@ import osmproxy.elements.OSMWay;
 import java.util.ArrayList;
 import java.util.List;
 
-import static utilities.CalculationHelper.getCosineInTriangle;
-import static utilities.CalculationHelper.getEuclideanDistance;
+import static utilities.NumericHelper.getCosineInTriangle;
+import static utilities.NumericHelper.getEuclideanDistance;
 
 class CrossroadInfo {
     private static final double COSINE_OF_135_DEGREES = -0.7071;

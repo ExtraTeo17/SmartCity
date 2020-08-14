@@ -481,7 +481,7 @@ public class MapWindow {
 
     // TODO: To be moved into MasterAgent
     @Subscribe
-    public void HandleSetZone(SetZoneEvent e) {
+    public void handleSetZone(SetZoneEvent e) {
         logger.info("Set zone event occurred: " + e.toString());
         if (state == SimulationState.READY_TO_RUN) {
             masterAgent.reset();
@@ -513,7 +513,7 @@ public class MapWindow {
         testBusZoneButton.setEnabled(check);
     }
 
-    public void prepareAgentsAndSetZone(double lat, double lon, int radius) {
+    private void prepareAgentsAndSetZone(double lat, double lon, int radius) {
         refreshTimer.cancel();
         refreshTimer = new Timer();
         zoneCenter = new GeoPosition(lat, lon);
@@ -658,7 +658,7 @@ public class MapWindow {
         }
     }
 
-    public void drawBuses(List<Painter<JXMapViewer>> painters) {
+    private void drawBuses(List<Painter<JXMapViewer>> painters) {
         try {
             Set<Waypoint> set_low = new HashSet<>();
             Set<Waypoint> set_mid = new HashSet<>();
@@ -696,7 +696,7 @@ public class MapWindow {
         }
     }
 
-    public void drawBusRoutes(List<Painter<JXMapViewer>> painters) {
+    private void drawBusRoutes(List<Painter<JXMapViewer>> painters) {
         try {
             agentsContainer.forEach(BusAgent.class, busAgent -> {
                 List<GeoPosition> track = new ArrayList<>();

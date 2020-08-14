@@ -3,7 +3,7 @@ package osmproxy;
 import java.util.List;
 
 // TODO: Not static, injected
-class OsmQueryManager {
+public class OsmQueryManager {
     static String getFullTrafficSignalQuery(List<Long> osmWayIds) {
         StringBuilder builder = new StringBuilder();
         builder.append("<osm-script>");
@@ -46,18 +46,18 @@ class OsmQueryManager {
     }
 
 
-    static String getSingleBusWayOverpassQuery(long osmWayId) {
+    public static String getSingleBusWayOverpassQuery(long osmWayId) {
         return "<id-query type=\"way\" ref=\"" + osmWayId + "\"/>\r\n" +
                 "  <print e=\"\" from=\"_\" geometry=\"full\" ids=\"yes\" limit=\"\" mode=\"skeleton\" n=\"\" order=\"id\" s=\"\" w=\"\"/>";
     }
 
-    static String getQueryWithPayload(String query) {
+    public static String getQueryWithPayload(String query) {
         return "<osm-script>\r\n" +
                 query +
                 "</osm-script>";
     }
 
-    static String getBusOverpassQuery(int radius, double middleLat, double middleLon) {
+    public static String getBusOverpassQuery(int radius, double middleLat, double middleLon) {
         return "<osm-script>\r\n" +
                 "  <query into=\"_\" type=\"relation\">\r\n" +
                 "    <has-kv k=\"route\" modv=\"\" v=\"bus\"/>\r\n" +

@@ -19,14 +19,14 @@ import org.slf4j.LoggerFactory;
 import org.w3c.dom.Node;
 import osmproxy.LightAccessManager;
 import osmproxy.MapAccessManager;
-import osmproxy.buses.BusInfo;
-import osmproxy.buses.BusLinesManager;
+import osmproxy.buses.IBusLinesManager;
 import osmproxy.elements.OSMNode;
 import osmproxy.elements.OSMStation;
 import routing.LightManagerNode;
 import routing.RouteNode;
 import routing.StationNode;
 import smartcity.buses.Timetable;
+import smartcity.task.TaskManager;
 import vehicles.MovingObjectImpl;
 import vehicles.Pedestrian;
 import vehicles.TestCar;
@@ -49,12 +49,12 @@ public class MasterAgent extends Agent {
     private static AgentContainer container;
     private static MapWindow window;
     private final IWebService webService;
-    private final BusLinesManager busLinesManager;
+    private final IBusLinesManager busLinesManager;
     private final IdGenerator<AbstractAgent> idGenerator;
     private final IAgentsContainer<AbstractAgent> agentsContainer;
+    private final TaskManager taskManager;
 
     public final static boolean USE_DEPRECATED_XML_FOR_LIGHT_MANAGERS = false;
-    public final static String STEPS = "6";
     public static boolean SHOULD_GENERATE_PEDESTRIANS_AND_BUSES = false;
     public static boolean SHOULD_GENERATE_CARS = true;
 
@@ -74,14 +74,16 @@ public class MasterAgent extends Agent {
 
     @Inject
     public MasterAgent(IWebService webService,
-                       BusLinesManager busLinesManager,
+                       IBusLinesManager busLinesManager,
                        IdGenerator<AbstractAgent> idGenerator,
                        IAgentsContainer<AbstractAgent> agentsContainer,
+                       TaskManager taskManager,
                        MapWindow window) {
         this.webService = webService;
         this.busLinesManager = busLinesManager;
         this.idGenerator = idGenerator;
         this.agentsContainer = agentsContainer;
+        this.taskManager = taskManager;
 
         // TODO: Delete this abomination
         MasterAgent.window = window;
@@ -172,7 +174,7 @@ public class MasterAgent extends Agent {
     public boolean prepareAgents(double lat, double lon, int radius) {
         var zoneCenter = new GeoPosition(lat, lon);
         if (SHOULD_GENERATE_PEDESTRIANS_AND_BUSES) {
-            if (!prepareStationsAndBuses(zoneCenter, radius)) {
+            if (!busLinesManager.prepareStationsAndBuses(zoneCenter, radius, this::tryAddNewBusAgent)) {
                 return false;
             }
         }
@@ -247,7 +249,7 @@ public class MasterAgent extends Agent {
         }
     }
 
-    public boolean prepareLightManagers(GeoPosition middlePoint, int radius) {
+    private boolean prepareLightManagers(GeoPosition middlePoint, int radius) {
         IdGenerator.resetLightManagerId();
         lightManagersUnderConstruction = true;
         boolean result;
@@ -269,44 +271,6 @@ public class MasterAgent extends Agent {
             logger.error("Error preparing light managers", e);
             return false;
         }
-
-        return true;
-    }
-
-    public boolean prepareStationsAndBuses(GeoPosition middlePoint, int radius) {
-        IdGenerator.resetStationAgentId();
-        logger.info("STEP 1/" + STEPS + ": Starting bus preparation");
-        idGenerator.reset(BusAgent.class);
-        agentsContainer.clear(BusAgent.class);
-
-        Set<BusInfo> busInfoSet;
-        try {
-            busInfoSet = busLinesManager.getBusInfo(radius, middlePoint.getLatitude(),
-                    middlePoint.getLongitude());
-        } catch (Exception e) {
-            return false;
-        }
-
-        logger.info("STEP 5/" + STEPS + ": Starting agent preparation based on queries");
-        int i = 0;
-        for (var busInfo : busInfoSet) {
-            logger.info("STEP 5/" + STEPS + " (SUBSTEP " + (++i) + "/" + busInfoSet.size() + "): Agent preparation substep");
-
-            // TODO: Improve - accessing busInfo/bridgeInfo too much
-            List<RouteNode> routeWithNodes = busInfo.getRouteInfo();
-            var busLine = busInfo.getBusLine();
-            for (var brigade : busInfo) {
-                var brigadeNr = brigade.getBrigadeNr();
-                for (Timetable timetable : brigade) {
-                    if (!tryAddNewBusAgent(timetable, routeWithNodes, busLine, brigadeNr)) {
-                        logger.warn("Bus agent could not be added");
-                    }
-                }
-            }
-
-        }
-        logger.info("STEP 6/" + STEPS + ": Buses are created!");
-        logger.info("NUMBER OF BUS AGENTS: " + agentsContainer.size(BusAgent.class));
 
         return true;
     }

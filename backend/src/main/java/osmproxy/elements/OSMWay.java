@@ -6,6 +6,7 @@ import org.slf4j.LoggerFactory;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
+import utilities.Siblings;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -255,24 +256,6 @@ public class OSMWay extends OSMElement {
         }
 
         return Optional.empty();
-    }
-
-    private static class Siblings<T> {
-        public final T first;
-        public final T second;
-
-        private Siblings(T first, T second) {
-            this.first = first;
-            this.second = second;
-        }
-
-        private Siblings(T first) {
-            this(first, null);
-        }
-
-        private boolean isSecondPresent() {
-            return second != null;
-        }
     }
 
     private static class Range {

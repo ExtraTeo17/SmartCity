@@ -6,12 +6,15 @@ import com.google.inject.Singleton;
 import genesis.AbstractModule;
 import web.abstractions.IWebConnector;
 import web.abstractions.IWebService;
+import web.serialization.SerializationModule;
 
 
 public class WebModule extends AbstractModule {
     @Override
     public void configure(Binder binder) {
         super.configure(binder);
+
+        binder.install(new SerializationModule());
 
         binder.install(new PrivateModule() {
             @Override

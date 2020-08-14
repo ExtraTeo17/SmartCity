@@ -1,7 +1,9 @@
 package osmproxy.elements;
 
-import osmproxy.MapAccessManager;
 import org.jxmapviewer.viewer.GeoPosition;
+import osmproxy.MapAccessManager;
+import utilities.NumericHelper;
+import utilities.Point;
 
 public class OSMWaypoint {
     private final String osmNodeRef;
@@ -28,7 +30,9 @@ public class OSMWaypoint {
         return geoPos;
     }
 
+    // TODO: Delete
     boolean containedInCircle(int radius, double middleLat, double middleLon) {
-        return MapAccessManager.belongsToCircle(geoPos.getLatitude(), geoPos.getLongitude(), new GeoPosition(middleLat, middleLon), radius);
+        return NumericHelper.belongsToCircle(Point.of(geoPos), Point.of(middleLat, middleLon),
+                radius / MapAccessManager.METERS_PER_DEGREE);
     }
 }

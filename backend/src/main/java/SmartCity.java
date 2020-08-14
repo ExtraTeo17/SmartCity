@@ -20,10 +20,9 @@ public class SmartCity {
                 new MainModule(args),
                 new AgentsModule(),
                 new GuiModule(),
-                new SerializationModule(),
                 new WebModule(),
-                new SmartCityModule(),
-                new OsmModule()
+                new OsmModule(),
+                new SmartCityModule()
         );
 
         var controller = injector.getInstance(ContainerController.class);
