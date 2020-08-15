@@ -1,26 +1,27 @@
 package osmproxy.elements;
 
-public class OSMElement {
+import utilities.NumericHelper;
 
+public class OSMElement {
     protected final long id;
 
-    public OSMElement(final String id) {
-        this.id = Long.parseLong(id);
+    OSMElement(final String id) {
+        this.id = NumericHelper.parseLong(id);
     }
 
-    public OSMElement(final long id) {
+    OSMElement(final long id) {
         this.id = id;
     }
 
-    public final Long getId() {
+    public final long getId() {
         return id;
     }
 
     @Override
     public boolean equals(Object arg) {
-        if (arg instanceof OSMElement){
+        if (arg instanceof OSMElement) {
             OSMElement obj = (OSMElement) arg;
-            return this.getId().equals(obj.getId());
+            return this.id == obj.id;
         }
 
         return false;

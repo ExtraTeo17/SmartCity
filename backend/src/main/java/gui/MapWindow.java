@@ -18,6 +18,7 @@ import org.jxmapviewer.painter.Painter;
 import org.jxmapviewer.viewer.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import osmproxy.elements.OSMNode;
 import osmproxy.elements.OSMStation;
 import routing.RouteNode;
 import routing.Router;
@@ -731,7 +732,7 @@ public class MapWindow {
     private void drawStations(List<Painter<JXMapViewer>> painters) {
         Set<Waypoint> set = new HashSet<>();
         for (OSMStation stationOSMNode : MasterAgent.osmIdToStationOSMNode.values()) {
-            set.add(new DefaultWaypoint(stationOSMNode.getPosition()));
+            set.add(new DefaultWaypoint(OSMNode.convertToPosition(stationOSMNode)));
         }
         WaypointPainter<Waypoint> waypointPainter = new WaypointPainter<>();
         waypointPainter.setWaypoints(set);

@@ -32,6 +32,7 @@ import osmproxy.elements.OSMNode;
 import osmproxy.elements.OSMWay;
 import routing.RouteInfo;
 import smartcity.MasterAgent;
+import utilities.IterableNodeList;
 import utilities.NumericHelper;
 import utilities.Point;
 
@@ -98,41 +99,28 @@ public class MapAccessManager {
     }
 
     private static List<OSMLight> getLights(Document xmlDocument) {
-        List<OSMLight> osmLights = new ArrayList<>();
         Node osmRoot = xmlDocument.getFirstChild();
-        NodeList osmXMLNodes = osmRoot.getChildNodes();
-        List<OSMNode> nodesOfOneWay = new ArrayList<>();
-        for (int i = 1; i < osmXMLNodes.getLength(); i++) {
-            parseLightNode(osmXMLNodes.item(i), osmLights, nodesOfOneWay);
+        IterableNodeList osmXMLNodes = IterableNodeList.of(osmRoot.getChildNodes());
+        List<OSMLight> osmLights = new ArrayList<>();
+        int firstNodeIndex = 0;
+        for (var xmlNode : osmXMLNodes) {
+            NamedNodeMap attributes = xmlNode.getAttributes();
+            if (xmlNode.getNodeName().equals("node")) {
+                String id = attributes.getNamedItem("id").getNodeValue();
+                String lat = attributes.getNamedItem("lat").getNodeValue();
+                String lon = attributes.getNamedItem("lon").getNodeValue();
+                osmLights.add(new OSMLight(id, lat, lon));
+            }
+            else if (xmlNode.getNodeName().equals("way")) {
+                String adherentWayId = attributes.getNamedItem("id").getNodeValue();
+                for (int i = firstNodeIndex; i < osmLights.size(); ++i) {
+                    osmLights.get(i).setAdherentWayId(adherentWayId);
+                }
+                firstNodeIndex = osmLights.size();
+            }
         }
+
         return osmLights;
-    }
-
-    private static void parseLightNode(Node item, List<OSMLight> osmLights, List<OSMNode> nodesOfOneWay) {
-        String id, latitude, longitude, adherentWayId;
-        if (item.getNodeName().equals("node")) {
-            NamedNodeMap attributes = item.getAttributes();
-            Node namedItemID = attributes.getNamedItem("id");
-            Node namedItemLat = attributes.getNamedItem("lat");
-            Node namedItemLon = attributes.getNamedItem("lon");
-            id = namedItemID.getNodeValue();
-            latitude = namedItemLat.getNodeValue();
-            longitude = namedItemLon.getNodeValue();
-            nodesOfOneWay.add(new OSMNode(id, latitude, longitude));
-        }
-        else if (item.getNodeName().equals("way")) {
-            NamedNodeMap attributes = item.getAttributes();
-            Node namedItemID = attributes.getNamedItem("id");
-            adherentWayId = namedItemID.getNodeValue();
-            addLightNodeSeries(osmLights, nodesOfOneWay, adherentWayId);
-        }
-    }
-
-    private static void addLightNodeSeries(List<OSMLight> osmLights, List<OSMNode> nodesOfOneWay,
-                                           String adherentWayId) {
-        for (OSMNode osmNode : nodesOfOneWay) {
-            osmLights.add(new OSMLight(osmNode, adherentWayId));
-        }
     }
 
     private static RouteInfo parseWayAndNodes(Document nodesViaOverpass) {

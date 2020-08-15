@@ -46,7 +46,7 @@ class OSMWayTest {
         setupDocument("OSMTwoWays.xml");
         var mainNode = document.getFirstChild();
         var children = mainNode.getChildNodes();
-        var nodes = IterableNodeList.create(children).stream()
+        var nodes = IterableNodeList.of(children).stream()
                 .filter(node -> node.getNodeName().equals("way"))
                 .collect(Collectors.toList());
         if (nodes.size() < 2) {
@@ -70,7 +70,7 @@ class OSMWayTest {
         setupDocument("OSMTwoWays.xml");
         var mainNode = document.getFirstChild();
         var children = mainNode.getChildNodes();
-        var nodes = IterableNodeList.create(children).stream()
+        var nodes = IterableNodeList.of(children).stream()
                 .filter(node -> node.getNodeName().equals("way"))
                 .collect(Collectors.toList());
         if (nodes.size() < 2) {

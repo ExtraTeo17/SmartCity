@@ -43,8 +43,8 @@ public class Light {
     public Light(LightInfo info, LightColor color, int managerId) {
         this.carLightColor = color;
         osmId = Long.parseLong(info.getOsmLightId());
-        double lat = Double.parseDouble(info.getLat());
-        double lon = Double.parseDouble(info.getLon());
+        double lat = info.getLatitude();
+        double lon = info.getLongitude();
         position = new GeoPosition(lat, lon);
         adjacentOsmWayId = Long.parseLong(info.getAdjacentOsmWayId());
         adjacentCrossingOsmId1 = info.getAdjacentCrossingOsmId1();
@@ -63,7 +63,7 @@ public class Light {
                 adjacentCrossingOsmId2 != null ? Long.parseLong(adjacentCrossingOsmId2) : 0,
                 managerId);
         MasterAgent.wayIdLightIdToLightManagerNode.put(Pair.with(adjacentOsmWayId, osmId), lightManagerNode);
-        if(adjacentCrossingOsmId1 != null) {
+        if (adjacentCrossingOsmId1 != null) {
             MasterAgent.crossingOsmIdToLightManagerNode.put(Long.parseLong(adjacentCrossingOsmId1), lightManagerNode);
         }
         if (adjacentCrossingOsmId2 != null) {

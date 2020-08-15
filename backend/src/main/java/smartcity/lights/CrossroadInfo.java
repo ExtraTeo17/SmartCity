@@ -14,26 +14,25 @@ class CrossroadInfo {
     private final List<LightInfo> firstLightGroupInfo;
     private final List<LightInfo> secondLightGroupInfo;
 
-    CrossroadInfo(OSMNode centerCrossroadNode) {
-        firstLightGroupInfo = new ArrayList<>();
-        secondLightGroupInfo = new ArrayList<>();
-        final OSMWay firstParentWay = centerCrossroadNode.getParentWay(0);
-        firstLightGroupInfo.add(new LightInfo(firstParentWay, centerCrossroadNode,
-                getEuclideanDistance(firstParentWay.getLightNeighborPos(), centerCrossroadNode.getPosition())));
-        for (int i = 1; i < centerCrossroadNode.getParentWayCount(); ++i) {
-            determineLightGroup(firstParentWay, centerCrossroadNode.getParentWay(i), centerCrossroadNode);
-        }
-    }
+    CrossroadInfo(OSMNode centerNode) {
+        this.firstLightGroupInfo = new ArrayList<>();
+        this.secondLightGroupInfo = new ArrayList<>();
 
-    private void determineLightGroup(OSMWay wayFromFirstGroup, OSMWay anotherWay, OSMNode centerNode) {
-        double a = getEuclideanDistance(wayFromFirstGroup.getLightNeighborPos(), centerNode.getPosition());
-        double b = getEuclideanDistance(anotherWay.getLightNeighborPos(), centerNode.getPosition());
-        double c = getEuclideanDistance(wayFromFirstGroup.getLightNeighborPos(), anotherWay.getLightNeighborPos());
-        if (getCosineInTriangle(a, b, c) < COSINE_OF_135_DEGREES) {
-            firstLightGroupInfo.add(new LightInfo(anotherWay, centerNode, b));
-        }
-        else {
-            secondLightGroupInfo.add(new LightInfo(anotherWay, centerNode, b));
+        final OSMWay firstWay = centerNode.getParentWay(0);
+        firstLightGroupInfo.add(new LightInfo(firstWay, centerNode,
+                getEuclideanDistance(firstWay.getLightNeighborPos(), OSMNode.convertToPosition(centerNode))));
+        for (int i = 1; i < centerNode.getParentWayCount(); ++i) {
+            var nextParentWay = centerNode.getParentWay(i);
+            var pos = OSMNode.convertToPosition(centerNode);
+            double a = getEuclideanDistance(firstWay.getLightNeighborPos(), pos);
+            double b = getEuclideanDistance(nextParentWay.getLightNeighborPos(), pos);
+            double c = getEuclideanDistance(firstWay.getLightNeighborPos(), nextParentWay.getLightNeighborPos());
+            if (getCosineInTriangle(a, b, c) < COSINE_OF_135_DEGREES) {
+                firstLightGroupInfo.add(new LightInfo(nextParentWay, centerNode, b));
+            }
+            else {
+                secondLightGroupInfo.add(new LightInfo(nextParentWay, centerNode, b));
+            }
         }
     }
 

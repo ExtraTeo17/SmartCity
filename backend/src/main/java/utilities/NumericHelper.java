@@ -5,7 +5,7 @@ import org.jxmapviewer.viewer.GeoPosition;
 
 import java.util.List;
 
-public class NumericHelper {
+public final class NumericHelper {
     public static final double EARTH_RADIUS = 6364.917;
     public static final double METERS_PER_DEGREE = EARTH_RADIUS * 2 * Math.PI / 360.0 * 1000;
 
@@ -36,18 +36,6 @@ public class NumericHelper {
     }
 
     /**
-     * @param radius DEGREE based radius
-     */
-    @Contract(pure = true)
-    public static boolean isInCircle(double xPoint, double yPoint,
-                                     double xCenter, double yCenter,
-                                     double radius) {
-        return (xPoint - xCenter) * (xPoint - xCenter) +
-                (yPoint - yCenter) * (yPoint - yCenter)
-                < (radius * radius);
-    }
-
-    /**
      * @param radius METER based radius
      */
     @Contract(pure = true)
@@ -65,6 +53,24 @@ public class NumericHelper {
         return isInCircle(xPoint, yPoint, xCenter, yCenter, radius / METERS_PER_DEGREE);
     }
 
+    /**
+     * @param radius DEGREE based radius
+     */
+    @Contract(pure = true)
+    public static boolean isInCircle(double xPoint, double yPoint,
+                                     double xCenter, double yCenter,
+                                     double radius) {
+        return (xPoint - xCenter) * (xPoint - xCenter) +
+                (yPoint - yCenter) * (yPoint - yCenter)
+                < (radius * radius);
+    }
+
+    @Contract(pure = true)
+    public static GeoPosition getMiddlePosition(GeoPosition posA, GeoPosition posB) {
+        return new GeoPosition((posA.getLatitude() + posB.getLatitude()) / 2,
+                (posA.getLongitude() + posB.getLongitude()) / 2);
+    }
+
     @Contract(pure = true)
     public static double calculateAverage(List<Double> doubles) {
         return doubles.stream().mapToDouble(NumericHelper::unbox).average().orElse(0);
@@ -78,5 +84,10 @@ public class NumericHelper {
     @Contract(pure = true)
     public static double parseDouble(String val) {
         return val == null || val.isEmpty() ? 0.0 : Double.parseDouble(val);
+    }
+
+    @Contract(pure = true)
+    public static long parseLong(String val) {
+        return val == null || val.isEmpty() ? 0 : Long.parseLong(val);
     }
 }

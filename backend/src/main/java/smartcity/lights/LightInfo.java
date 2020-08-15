@@ -4,10 +4,10 @@ import org.jxmapviewer.viewer.GeoPosition;
 import osmproxy.elements.OSMNode;
 import osmproxy.elements.OSMWay;
 import osmproxy.elements.OSMWaypoint;
+import utilities.NumericHelper;
 
 public class LightInfo {
     private static final double DISTANCE_THRESHOLD = 0.00008;
-
     private final String osmLightId;
     private final String adjacentOsmWayId;
     private GeoPosition position;
@@ -16,10 +16,13 @@ public class LightInfo {
 
     public LightInfo(OSMWay adjacentOsmWay, OSMNode centerCrossroadNode,
                      double distToCrossroad) {
-        adjacentOsmWayId = Long.toString(adjacentOsmWay.getId());
+        this.adjacentOsmWayId = Long.toString(adjacentOsmWay.getId());
         this.osmLightId = Long.toString(centerCrossroadNode.getId());
         fillLightPositionAndCrossings(adjacentOsmWay);
-        shiftTowardsCrossroad(centerCrossroadNode.getPosition(), distToCrossroad);
+        if (distToCrossroad > DISTANCE_THRESHOLD) {
+            position = NumericHelper.getMiddlePosition(OSMNode.convertToPosition(centerCrossroadNode), position);
+            position = NumericHelper.getMiddlePosition(OSMNode.convertToPosition(centerCrossroadNode), position);
+        }
     }
 
     private void fillLightPositionAndCrossings(OSMWay adjacentOsmWay) {
@@ -30,9 +33,9 @@ public class LightInfo {
                 thirdWaypoint = adjacentOsmWay.getWaypointCount() > 2 ? adjacentOsmWay.getWaypoint(2) : null;
             }
             case LIGHT_AT_EXIT -> {
-                secondWaypoint = adjacentOsmWay.getWaypoint(adjacentOsmWay.getWaypointCount() - 1 - 1);
+                secondWaypoint = adjacentOsmWay.getWaypoint(adjacentOsmWay.getWaypointCount() - 2);
                 thirdWaypoint = adjacentOsmWay.getWaypointCount() > 2 ?
-                        adjacentOsmWay.getWaypoint(adjacentOsmWay.getWaypointCount() - 1 - 2) : null;
+                        adjacentOsmWay.getWaypoint(adjacentOsmWay.getWaypointCount() - 3) : null;
             }
         }
         position = new GeoPosition(secondWaypoint.getLatitude(), secondWaypoint.getLongitude());
@@ -40,32 +43,16 @@ public class LightInfo {
         adjacentCrossingOsmId2 = thirdWaypoint != null ? thirdWaypoint.getOsmNodeRef() : null;
     }
 
-    private void shiftTowardsCrossroad(final GeoPosition crossroadPos, final double distToCrossroad) {
-        if (distToCrossroad > DISTANCE_THRESHOLD) {
-            shiftTowardsCrossroad(crossroadPos);
-            shiftTowardsCrossroad(crossroadPos);
-        }
-    }
-
-    private void shiftTowardsCrossroad(GeoPosition crossroadPos) {
-        position = getMiddlePoint(crossroadPos, position);
-    }
-
-    private GeoPosition getMiddlePoint(GeoPosition point1, GeoPosition point2) {
-        return new GeoPosition((point1.getLatitude() + point2.getLatitude()) / 2,
-                (point1.getLongitude() + point2.getLongitude()) / 2);
-    }
-
     public String getOsmLightId() {
         return osmLightId;
     }
 
-    public String getLat() {
-        return Double.toString(position.getLatitude());
+    public double getLatitude() {
+        return position.getLatitude();
     }
 
-    public String getLon() {
-        return Double.toString(position.getLongitude());
+    public double getLongitude() {
+        return position.getLongitude();
     }
 
     public String getAdjacentOsmWayId() {

@@ -1,7 +1,6 @@
 package osmproxy.buses;
 
 import org.jetbrains.annotations.NotNull;
-import osmproxy.MapAccessManager;
 import osmproxy.elements.OSMStation;
 import osmproxy.elements.OSMWay;
 import routing.RouteNode;
@@ -9,7 +8,6 @@ import routing.Router;
 import smartcity.MasterAgent;
 import smartcity.buses.BrigadeInfo;
 import utilities.NumericHelper;
-import utilities.Point;
 
 import java.util.*;
 import java.util.function.Consumer;
@@ -56,7 +54,7 @@ public class BusInfo implements Iterable<BrigadeInfo> {
         List<Long> filteredStationOsmIds = new ArrayList<>();
         for (Long osmStationId : stationsOnRouteOsmIds) {
             OSMStation station = MasterAgent.osmIdToStationOSMNode.get(osmStationId);
-            if (station != null && NumericHelper.isInCircle(station.getLat(), station.getLon(),
+            if (station != null && NumericHelper.isInCircle(station.getLatitude(), station.getLongitude(),
                     middleLat, middleLon, radius)) {
                 filteredStationOsmIds.add(osmStationId);
             }

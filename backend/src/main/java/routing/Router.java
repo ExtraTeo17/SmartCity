@@ -11,6 +11,7 @@ import osmproxy.elements.OSMWay.RelationOrientation;
 import osmproxy.elements.OSMWay.RouteOrientation;
 import osmproxy.elements.OSMWaypoint;
 import smartcity.MasterAgent;
+import utilities.NumericHelper;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -103,7 +104,7 @@ public final class Router {
     }
 
     private static void addLightManagerNodeToManagersList(List<RouteNode> managers, OSMLight light) {
-        Pair<Long, Long> osmWayIdOsmLightId = Pair.with(light.getAdherentOsmWayId(), light.getId());
+        Pair<Long, Long> osmWayIdOsmLightId = Pair.with(light.getAdherentWayId(), light.getId());
         RouteNode nodeToAdd = MasterAgent.wayIdLightIdToLightManagerNode.get(osmWayIdOsmLightId);
 
         if (nodeToAdd != null && !lastManagerIdEqualTo(managers, nodeToAdd)) {
@@ -162,8 +163,8 @@ public final class Router {
             double y = routeB.getLatitude() - routeA.getLatitude();
 
             // TODO: What?
-            double xInMeters = x * 111111;
-            double yInMeters = y * 111111;
+            double xInMeters = x * NumericHelper.METERS_PER_DEGREE;
+            double yInMeters = y * NumericHelper.METERS_PER_DEGREE;
 
             double distance = Math.sqrt(xInMeters * xInMeters + yInMeters * yInMeters);
 

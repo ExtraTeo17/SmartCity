@@ -18,7 +18,7 @@ import java.util.Optional;
 public class OSMWay extends OSMElement {
     private final static Logger logger = LoggerFactory.getLogger(OSMWay.class);
     private final List<String> childNodeIds;
-    private boolean isOneWay;
+    private final boolean isOneWay;
     private List<OSMWaypoint> waypoints;
     private LightOrientation lightOrientation = null;
     private RelationOrientation relationOrientation = null;
@@ -26,8 +26,11 @@ public class OSMWay extends OSMElement {
 
     public OSMWay(Node item) {
         super(item.getAttributes().getNamedItem("id").getNodeValue());
-        waypoints = new ArrayList<>();
+        this.waypoints = new ArrayList<>();
+        this.childNodeIds = new ArrayList<>();
+
         NodeList childNodes = item.getChildNodes();
+        Boolean oneWayValue = null;
         for (int k = 0; k < childNodes.getLength(); ++k) {
             Node el = childNodes.item(k);
             if (el.getNodeName().equals("nd")) {
@@ -35,29 +38,22 @@ public class OSMWay extends OSMElement {
                 String nodeRef = attributes.getNamedItem("ref").getNodeValue();
                 double lat = Double.parseDouble(attributes.getNamedItem("lat").getNodeValue());
                 double lng = Double.parseDouble(attributes.getNamedItem("lon").getNodeValue());
-                addPoint(new OSMWaypoint(nodeRef, lat, lng));
+                waypoints.add(new OSMWaypoint(nodeRef, lat, lng));
             }
             else if (el.getNodeName().equals("tag") &&
-                    el.getAttributes().getNamedItem("k").getNodeValue().equals("oneway")) {
-                fillOneWay(el.getAttributes().getNamedItem("v").getNodeValue());
+                    el.getAttributes().getNamedItem("k").getNodeValue().equals("oneway")
+                    && oneWayValue == null) {
+                String value = el.getAttributes().getNamedItem("v").getNodeValue();
+                if (value.equals("yes")) {
+                    oneWayValue = true;
+                }
+                else if (value.equals("no")) {
+                    oneWayValue = false;
+                }
             }
             // TODO: consider adding other tags
         }
-        childNodeIds = new ArrayList<>();
-    }
-
-    // TODO: Where is the logic here?
-    private void fillOneWay(final String nodeValue) {
-        if (nodeValue.equals("yes")) {
-            isOneWay = true;
-        }
-        else if (nodeValue.equals("no")) {
-            isOneWay = false;
-        }
-    }
-
-    private void addPoint(final OSMWaypoint waypoint) {
-        waypoints.add(waypoint);
+        this.isOneWay = oneWayValue != null ? oneWayValue : false;
     }
 
     // TODO: Result is not queried anywhere, why are we adding it?
