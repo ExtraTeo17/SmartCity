@@ -82,7 +82,7 @@ public final class Router {
             return MasterAgent.crossingOsmIdToLightManagerNode.get(Long.parseLong(nodeRef));
         }
 
-        return new RouteNode(waypoint.getPosition());
+        return new RouteNode(waypoint);
     }
 
     /////////////////////////////////////////////////////////////
@@ -229,7 +229,7 @@ public final class Router {
 
     private static void addRouteNodesToList(List<OSMWaypoint> waypoints, List<RouteNode> routeNodes_list) {
         for (OSMWaypoint point : waypoints) {
-            routeNodes_list.add(new RouteNode(point.getLat(), point.getLon()));
+            routeNodes_list.add(new RouteNode(point.getLatitude(), point.getLongitude()));
         }
     }
 

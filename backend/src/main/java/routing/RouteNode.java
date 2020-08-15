@@ -3,7 +3,6 @@ package routing;
 import org.jxmapviewer.viewer.GeoPosition;
 
 public class RouteNode extends GeoPosition {
-
     public RouteNode(double lat, double lng) {
         super(lat, lng);
     }

@@ -35,7 +35,7 @@ public class LightInfo {
                         adjacentOsmWay.getWaypoint(adjacentOsmWay.getWaypointCount() - 1 - 2) : null;
             }
         }
-        position = new GeoPosition(secondWaypoint.getLat(), secondWaypoint.getLon());
+        position = new GeoPosition(secondWaypoint.getLatitude(), secondWaypoint.getLongitude());
         adjacentCrossingOsmId1 = secondWaypoint.getOsmNodeRef();
         adjacentCrossingOsmId2 = thirdWaypoint != null ? thirdWaypoint.getOsmNodeRef() : null;
     }

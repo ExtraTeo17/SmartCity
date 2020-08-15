@@ -65,8 +65,6 @@ public class MapAccessManager {
     private static final String OVERPASS_API = "https://lz4.overpass-api.de/api/interpreter";
     private static final String CROSSROADS_LOCATIONS_PATH = "config/crossroads.xml";
 
-    public static final double EARTH_RADIUS = 6364.917;
-    public static final double METERS_PER_DEGREE = EARTH_RADIUS * 2 * Math.PI / 360.0 * 1000;
 
     /**
      * @return a list of openseamap nodes extracted from xml
@@ -272,8 +270,7 @@ public class MapAccessManager {
 
     private static void addCrossroadIdIfDesired(Node crossroad, GeoPosition middlePoint, int radius) {
         Point crossroadPoint = calculateLatLonBasedOnInternalLights(crossroad);
-        if (NumericHelper.belongsToCircle(crossroadPoint, Point.of(middlePoint),
-                radius / METERS_PER_DEGREE)) {
+        if (NumericHelper.isInCircle(crossroadPoint, Point.of(middlePoint), radius)) {
             MasterAgent.tryCreateLightManager(crossroad);
         }
     }
@@ -352,7 +349,7 @@ public class MapAccessManager {
                 }
 
                 // TODO: CORRECT POTENTIAL BUGS CAUSING ROUTE TO BE CUT INTO PIECES BECAUSE OF RZĄŻEWSKI CASE
-                if (way.startsInCircle(radius, middleLat, middleLon)) {
+                if (way.startsInCircle(middleLat, middleLon, radius)) {
                     route.add(way);
                 }
             }

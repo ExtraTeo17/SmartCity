@@ -35,7 +35,7 @@ public class BusLinesManager implements IBusLinesManager {
     // TODO: CreateBusFunc - Temporary
     @Override
     public boolean prepareStationsAndBuses(GeoPosition middlePoint, int radius,
-                                           CreateBusFunc<Boolean,Timetable, List<RouteNode>, String,String> createBusFunc) {
+                                           CreateBusFunc<Boolean, Timetable, List<RouteNode>, String, String> createBusFunc) {
         logger.info("STEP 1/" + BUS_PREPARATION_STEPS + ": Starting bus preparation");
         Set<BusInfo> busInfoSet;
         try {
@@ -152,8 +152,7 @@ public class BusLinesManager implements IBusLinesManager {
                 String lat = attributes.getNamedItem("lat").getNodeValue();
                 String lon = attributes.getNamedItem("lon").getNodeValue();
 
-                if (NumericHelper.belongsToCircle(Point.of(lat, lon), Point.of(middleLat, middleLon),
-                        radius / MapAccessManager.METERS_PER_DEGREE) &&
+                if (NumericHelper.isInCircle(Point.of(lat, lon), Point.of(middleLat, middleLon), radius) &&
                         !MasterAgent.osmIdToStationOSMNode.containsKey(Long.parseLong(osmId))) {
                     NodeList list_tags = item.getChildNodes();
                     for (int z = 0; z < list_tags.getLength(); z++) {

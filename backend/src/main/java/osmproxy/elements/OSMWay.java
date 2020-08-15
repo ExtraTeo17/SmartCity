@@ -6,6 +6,8 @@ import org.slf4j.LoggerFactory;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
+import utilities.NumericHelper;
+import utilities.Point;
 import utilities.Siblings;
 
 import java.util.ArrayList;
@@ -102,7 +104,7 @@ public class OSMWay extends OSMElement {
                 .append(super.toString())
                 .append("waypoints:" + "\n");
         for (final OSMWaypoint waypoint : waypoints) {
-            builder.append(waypoint.getPosition());
+            builder.append(waypoint);
         }
         return builder.append("\n").toString();
     }
@@ -166,13 +168,13 @@ public class OSMWay extends OSMElement {
 
     public GeoPosition getLightNeighborPos() {
         return switch (lightOrientation) {
-            case LIGHT_AT_ENTRY -> waypoints.get(1).getPosition();
-            case LIGHT_AT_EXIT -> waypoints.get(waypoints.size() - 1 - 1).getPosition();
+            case LIGHT_AT_ENTRY -> waypoints.get(1);
+            case LIGHT_AT_EXIT -> waypoints.get(waypoints.size() - 2);
         };
     }
 
-    public boolean startsInCircle(int radius, double middleLat, double middleLon) {
-        return waypoints.get(0).containedInCircle(radius, middleLat, middleLon);
+    public boolean startsInCircle(double middleLat, double middleLon, int radius) {
+        return NumericHelper.isInCircle(Point.of(waypoints.get(0)), Point.of(middleLat, middleLon), radius);
     }
 
     // TODO: What is returned here?

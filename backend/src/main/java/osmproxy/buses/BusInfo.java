@@ -56,8 +56,8 @@ public class BusInfo implements Iterable<BrigadeInfo> {
         List<Long> filteredStationOsmIds = new ArrayList<>();
         for (Long osmStationId : stationsOnRouteOsmIds) {
             OSMStation station = MasterAgent.osmIdToStationOSMNode.get(osmStationId);
-            if (station != null && NumericHelper.belongsToCircle(Point.of(station.getLat(), station.getLon()),
-                    Point.of(middleLat, middleLon), radius / MapAccessManager.METERS_PER_DEGREE)) {
+            if (station != null && NumericHelper.isInCircle(station.getLat(), station.getLon(),
+                    middleLat, middleLon, radius)) {
                 filteredStationOsmIds.add(osmStationId);
             }
         }

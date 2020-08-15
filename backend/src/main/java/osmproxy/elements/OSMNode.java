@@ -8,7 +8,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class OSMNode extends OSMElement {
-
     protected final List<OSMWay> parentWays;
     protected double lat;
     protected double lon;
