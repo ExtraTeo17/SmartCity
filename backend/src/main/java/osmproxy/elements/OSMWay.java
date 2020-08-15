@@ -1,13 +1,13 @@
 package osmproxy.elements;
 
-import org.jxmapviewer.viewer.GeoPosition;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
-import utilities.NumericHelper;
-import utilities.Point;
+import routing.IZone;
+import routing.Position;
 import utilities.Siblings;
 
 import java.util.ArrayList;
@@ -162,15 +162,15 @@ public class OSMWay extends OSMElement {
         throw new UnsupportedOperationException("This orientation is not yet known :(");
     }
 
-    public GeoPosition getLightNeighborPos() {
+    public Position getLightNeighborPos() {
         return switch (lightOrientation) {
             case LIGHT_AT_ENTRY -> waypoints.get(1);
             case LIGHT_AT_EXIT -> waypoints.get(waypoints.size() - 2);
         };
     }
 
-    public boolean startsInCircle(double middleLat, double middleLon, int radius) {
-        return NumericHelper.isInCircle(Point.of(waypoints.get(0)), Point.of(middleLat, middleLon), radius);
+    public boolean startsInZone(IZone zone) {
+        return zone.isInZone(waypoints.get(0));
     }
 
     // TODO: What is returned here?

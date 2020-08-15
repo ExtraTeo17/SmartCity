@@ -52,14 +52,4 @@ public class RouteInfo implements Iterable<OSMWay> {
     public Iterator<OSMWay> iterator() {
         return ways.iterator();
     }
-
-    @Override
-    public void forEach(Consumer<? super OSMWay> action) {
-        ways.forEach(action);
-    }
-
-    @Override
-    public Spliterator<OSMWay> spliterator() {
-        return ways.spliterator();
-    }
 }

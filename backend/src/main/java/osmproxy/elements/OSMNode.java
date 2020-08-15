@@ -1,29 +1,32 @@
 package osmproxy.elements;
 
-import org.jxmapviewer.viewer.GeoPosition;
+
+import org.jetbrains.annotations.NotNull;
 import org.w3c.dom.NamedNodeMap;
-import utilities.NumericHelper;
+import routing.IGeoPosition;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
-public class OSMNode extends OSMElement {
+public class OSMNode extends OSMElement
+        implements IGeoPosition, Iterable<OSMWay> {
+
     protected final List<OSMWay> parentWays;
     protected double lat;
     protected double lon;
 
-    OSMNode(long id, long lat, long lon) {
+    OSMNode(long id, double lat, double lon) {
         super(id);
         this.lat = lat;
         this.lon = lon;
         this.parentWays = new ArrayList<>();
     }
 
-    @SuppressWarnings("FeatureEnvy")
     public OSMNode(final String id, final String lat, final String lon) {
-        this(NumericHelper.parseLong(id),
-                NumericHelper.parseLong(lat),
-                NumericHelper.parseLong(lon));
+        this(Long.parseLong(id),
+                Double.parseDouble(lat),
+                Double.parseDouble(lon));
     }
 
     public OSMNode(final NamedNodeMap attributes) {
@@ -32,11 +35,13 @@ public class OSMNode extends OSMElement {
                 attributes.getNamedItem("lon").getNodeValue());
     }
 
-    public final double getLatitude() {
+    @Override
+    public final double getLat() {
         return lat;
     }
 
-    public final double getLongitude() {
+    @Override
+    public final double getLng() {
         return lon;
     }
 
@@ -44,20 +49,8 @@ public class OSMNode extends OSMElement {
         parentWays.add(osmWay);
     }
 
-    public final int getParentWayCount() {
-        return parentWays.size();
-    }
-
-    public OSMWay getParentWay(int i) {
-        return parentWays.get(i);
-    }
-
     public final boolean isTypeA() {
-        return getParentWayCount() > 1;
-    }
-
-    public static GeoPosition convertToPosition(OSMNode node) {
-        return new GeoPosition(node.lat, node.lon);
+        return parentWays.size() > 1;
     }
 
     @Override
@@ -84,5 +77,11 @@ public class OSMNode extends OSMElement {
             }
         }
         return true;
+    }
+
+    @NotNull
+    @Override
+    public Iterator<OSMWay> iterator() {
+        return parentWays.iterator();
     }
 }

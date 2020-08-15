@@ -1,8 +1,8 @@
 package vehicles;
 
 import gui.MapWindow;
-import org.jxmapviewer.viewer.GeoPosition;
 import routing.LightManagerNode;
+import routing.Position;
 import routing.RouteNode;
 import routing.Router;
 
@@ -58,13 +58,12 @@ public class MovingObjectImpl extends MovingObject {
     @Override
     public String getPositionString() {
         var node = route.get(index);
-        return "Lat: " + node.getLatitude() + " Lon: " + node.getLongitude();
+        return "Lat: " + node.getLat() + " Lon: " + node.getLng();
     }
 
     @Override
-    public GeoPosition getPosition() {
-        var node = route.get(index);
-        return new GeoPosition(node.getLatitude(), node.getLongitude());
+    public Position getPosition() {
+        return route.get(index);
     }
 
     // TODO: Delete this function - replaced with getNextTrafficLight

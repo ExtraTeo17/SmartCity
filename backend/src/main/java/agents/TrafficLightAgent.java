@@ -3,9 +3,9 @@ package agents;
 import agents.utils.LightColor;
 import behaviourfactories.BasicLightsBehaviourFactory;
 import behaviourfactories.IBehaviourFactory;
-import org.jxmapviewer.viewer.GeoPosition;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import routing.IGeoPosition;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -14,11 +14,11 @@ public class TrafficLightAgent extends AbstractAgent {
     private static final Logger logger = LoggerFactory.getLogger(TrafficLightAgent.class);
     // TODO: Inject as dependency
     private final IBehaviourFactory<TrafficLightAgent> behaviourFactory;
-    private final GeoPosition position;
+    private final IGeoPosition position;
     private LightColor lightColor;
     private final List<String> agentsQueue;
 
-    public TrafficLightAgent(int id, GeoPosition position) {
+    public TrafficLightAgent(int id, IGeoPosition position) {
         super(id);
         this.position = position;
         this.behaviourFactory = new BasicLightsBehaviourFactory();
@@ -39,7 +39,7 @@ public class TrafficLightAgent extends AbstractAgent {
         addBehaviour(behaviourFactory.createTickerBehaviour(this));
     }
 
-    public GeoPosition getPosition() {
+    public IGeoPosition getPosition() {
         return position;
     }
 

@@ -2,14 +2,14 @@ package smartcity.lights;
 
 import org.jxmapviewer.JXMapViewer;
 import org.jxmapviewer.painter.Painter;
-import org.jxmapviewer.viewer.GeoPosition;
+import routing.IGeoPosition;
 
 import java.time.Instant;
 import java.util.List;
 
 // TODO: Interface is too big and too specific, make it more general and move some methods to different interface
 public interface ICrossroad {
-    List<GeoPosition> getLightsPositions();
+    List<IGeoPosition> getLightsPositions();
 
     void addCarToQueue(String carName, long adjacentOsmWayId);
 

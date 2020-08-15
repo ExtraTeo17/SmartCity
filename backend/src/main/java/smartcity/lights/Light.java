@@ -4,52 +4,62 @@ import agents.utils.LightColor;
 import gui.CustomWaypointRenderer;
 import org.javatuples.Pair;
 import org.jxmapviewer.viewer.DefaultWaypoint;
-import org.jxmapviewer.viewer.GeoPosition;
 import org.jxmapviewer.viewer.Waypoint;
 import org.jxmapviewer.viewer.WaypointPainter;
 import org.w3c.dom.Node;
+import routing.IGeoPosition;
 import routing.LightManagerNode;
 import smartcity.MasterAgent;
 
 import java.time.Instant;
 import java.util.*;
 
-public class Light {
+public class Light implements IGeoPosition {
     private static final String OSM_LIGHT_ID = "light";
     private static final String WAY_ID = "way";
     private static final String LAT = "lat";
     private static final String LON = "lon";
-    public Map<String, Instant> farAwayCarMap = new HashMap<>();
-    public Map<String, Instant> farAwayPedestrianMap = new HashMap<>();
-    public Queue<String> carQueue = new LinkedList<>();
-    public Queue<String> pedestrianQueue = new LinkedList<>();
+
+    private final double lat;
+    private final double lng;
+    Map<String, Instant> farAwayCarMap = new HashMap<>();
+    Map<String, Instant> farAwayPedestrianMap = new HashMap<>();
+    Queue<String> carQueue = new LinkedList<>();
+    Queue<String> pedestrianQueue = new LinkedList<>();
     private LightColor carLightColor;
-    private final GeoPosition position;
     private final long adjacentOsmWayId;
     private String adjacentCrossingOsmId1;
     private String adjacentCrossingOsmId2;
     private final long osmId;
 
-    public Light(Node node, LightColor color, int managerId) {
+    Light(Node node, LightColor color, int managerId) {
         this.carLightColor = color;
         osmId = Long.parseLong(node.getAttributes().getNamedItem(Light.OSM_LIGHT_ID).getNodeValue());
-        double lat = Double.parseDouble((node.getAttributes().getNamedItem(Light.LAT).getNodeValue()));
-        double lon = Double.parseDouble((node.getAttributes().getNamedItem(Light.LON).getNodeValue()));
-        position = new GeoPosition(lat, lon);
+        lat = Double.parseDouble((node.getAttributes().getNamedItem(Light.LAT).getNodeValue()));
+        lng = Double.parseDouble((node.getAttributes().getNamedItem(Light.LON).getNodeValue()));
         adjacentOsmWayId = Long.parseLong((node.getAttributes().getNamedItem(Light.WAY_ID).getNodeValue())); // TODO: Retrieve crossings!
         addHashMapsEntries(managerId);
     }
 
-    public Light(LightInfo info, LightColor color, int managerId) {
+    Light(LightInfo info, LightColor color, int managerId) {
         this.carLightColor = color;
-        osmId = Long.parseLong(info.getOsmLightId());
-        double lat = info.getLatitude();
-        double lon = info.getLongitude();
-        position = new GeoPosition(lat, lon);
+        this.osmId = Long.parseLong(info.getOsmLightId());
+        this.lat = info.getLat();
+        this.lng = info.getLng();
         adjacentOsmWayId = Long.parseLong(info.getAdjacentOsmWayId());
         adjacentCrossingOsmId1 = info.getAdjacentCrossingOsmId1();
         adjacentCrossingOsmId2 = info.getAdjacentCrossingOsmId2();
         addHashMapsEntries(managerId);
+    }
+
+    @Override
+    public double getLat() {
+        return lat;
+    }
+
+    @Override
+    public double getLng() {
+        return lng;
     }
 
     public long getAdjacentOSMWayId() {
@@ -57,7 +67,7 @@ public class Light {
     }
 
     private void addHashMapsEntries(long managerId) {
-        final LightManagerNode lightManagerNode = new LightManagerNode(position.getLatitude(), position.getLongitude(),
+        final LightManagerNode lightManagerNode = new LightManagerNode(lat, lng,
                 adjacentOsmWayId,
                 adjacentCrossingOsmId1 != null ? Long.parseLong(adjacentCrossingOsmId1) : 0,
                 adjacentCrossingOsmId2 != null ? Long.parseLong(adjacentCrossingOsmId2) : 0,
@@ -71,16 +81,13 @@ public class Light {
         }
     }
 
-    public GeoPosition getPosition() {
-        return position;
-    }
 
-    public boolean isGreen() {
+    boolean isGreen() {
         return carLightColor == LightColor.GREEN;
     }
 
-    public void draw(Collection<Waypoint> lightSet, WaypointPainter<Waypoint> painter) {
-        lightSet.add(new DefaultWaypoint(position));
+    void draw(Collection<Waypoint> lightSet, WaypointPainter<Waypoint> painter) {
+        lightSet.add(new DefaultWaypoint(lat, lng));
         switch (carLightColor) {
             case RED -> painter.setRenderer(new CustomWaypointRenderer("light_red.png"));
             case YELLOW -> painter.setRenderer(new CustomWaypointRenderer("light_yellow.png"));
@@ -97,37 +104,37 @@ public class Light {
         }
     }
 
-    public void addCarToFarAwayQueue(String carName, Instant journeyTime) {
+    void addCarToFarAwayQueue(String carName, Instant journeyTime) {
         farAwayCarMap.put(carName, journeyTime);
     }
 
-    public void addCarToQueue(String carName) {
+    void addCarToQueue(String carName) {
         carQueue.add(carName);
     }
 
-    public void removeCarFromFarAwayQueue(String carName) {
+    void removeCarFromFarAwayQueue(String carName) {
         farAwayCarMap.remove(carName);
     }
 
-    public void removeCarFromQueue() {
+    void removeCarFromQueue() {
         if (carQueue.size() != 0) {
             carQueue.remove();
         }
     }
 
-    public void addPedestrianToFarAwayQueue(String pedestrianName, Instant journeyTime) {
+    void addPedestrianToFarAwayQueue(String pedestrianName, Instant journeyTime) {
         farAwayPedestrianMap.put(pedestrianName, journeyTime);
     }
 
-    public void addPedestrianToQueue(String pedestrianName) {
+    void addPedestrianToQueue(String pedestrianName) {
         pedestrianQueue.add(pedestrianName);
     }
 
-    public void removePedestrianFromFarAwayQueue(String pedestrianName) {
+    void removePedestrianFromFarAwayQueue(String pedestrianName) {
         farAwayPedestrianMap.remove(pedestrianName);
     }
 
-    public void removePedestrianFromQueue() {
+    void removePedestrianFromQueue() {
         if (pedestrianQueue.size() != 0) {
             pedestrianQueue.remove();
         }

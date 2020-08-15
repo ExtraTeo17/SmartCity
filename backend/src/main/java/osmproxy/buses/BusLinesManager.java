@@ -1,10 +1,10 @@
 package osmproxy.buses;
 
+import com.google.inject.Inject;
 import jade.core.NotFoundException;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
-import org.jxmapviewer.viewer.GeoPosition;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
@@ -14,12 +14,13 @@ import org.w3c.dom.NodeList;
 import osmproxy.MapAccessManager;
 import osmproxy.OsmQueryManager;
 import osmproxy.elements.OSMStation;
+import routing.IZone;
+import routing.Position;
 import routing.RouteNode;
 import smartcity.MasterAgent;
 import smartcity.buses.BrigadeInfo;
 import smartcity.buses.Timetable;
 import utilities.NumericHelper;
-import utilities.Point;
 
 import java.net.URL;
 import java.util.*;
@@ -27,22 +28,24 @@ import java.util.*;
 public class BusLinesManager implements IBusLinesManager {
     private static final Logger logger = LoggerFactory.getLogger(BusLinesManager.class);
     private static final JSONParser jsonParser = new JSONParser();
-    private final static int BUS_PREPARATION_STEPS = 5;
+    private static final int BUS_PREPARATION_STEPS = 5;
+    private final IZone zone;
 
-    BusLinesManager() {
+    @Inject
+    BusLinesManager(IZone zone) {
+        this.zone = zone;
     }
 
     // TODO: CreateBusFunc - Temporary
     @Override
-    public boolean prepareStationsAndBuses(GeoPosition middlePoint, int radius,
-                                           CreateBusFunc<Boolean, Timetable, List<RouteNode>, String, String> createBusFunc) {
+    public boolean prepareStationsAndBuses(CreateBusFunc<Boolean, Timetable, List<RouteNode>, String, String> createBusFunc) {
         logger.info("STEP 1/" + BUS_PREPARATION_STEPS + ": Starting bus preparation");
         Set<BusInfo> busInfoSet;
         try {
             logger.info("STEP 2/" + BUS_PREPARATION_STEPS + ": Sending bus overpass query");
             // TODO: Move part of the logic from MapAccess manager here
             logger.info("STEP 3/" + BUS_PREPARATION_STEPS + ": Starting overpass bus info parsing");
-            busInfoSet = sendBusOverpassQuery(radius, middlePoint.getLatitude(), middlePoint.getLongitude());
+            busInfoSet = sendBusOverpassQuery();
         } catch (Exception e) {
             return false;
         }
@@ -85,12 +88,12 @@ public class BusLinesManager implements IBusLinesManager {
         return true;
     }
 
-    public Set<BusInfo> sendBusOverpassQuery(int radius, double middleLat, double middleLon) {
-        Set<BusInfo> infoSet = null;
-        var overpassQuery = OsmQueryManager.getBusOverpassQuery(radius, middleLat, middleLon);
+    public Set<BusInfo> sendBusOverpassQuery() {
+        Set<BusInfo> infoSet;
+        var overpassQuery = OsmQueryManager.getBusOverpassQuery(zone.getCenter(), zone.getRadius());
         try {
             var overpassInfo = MapAccessManager.getNodesViaOverpass(overpassQuery);
-            infoSet = parseBusInfo(overpassInfo, radius, middleLat, middleLon);
+            infoSet = parseBusInfo(overpassInfo);
         } catch (Exception e) {
             logger.warn("Error getting bus info.", e);
             throw new RuntimeException(e);
@@ -99,7 +102,7 @@ public class BusLinesManager implements IBusLinesManager {
         return infoSet;
     }
 
-    private static Set<BusInfo> parseBusInfo(Document nodesViaOverpass, int radius, double middleLat, double middleLon) {
+    private Set<BusInfo> parseBusInfo(Document nodesViaOverpass) {
         Set<BusInfo> infoSet = new LinkedHashSet<>();
         Node osmRoot = nodesViaOverpass.getFirstChild();
         NodeList osmXMLNodes = osmRoot.getChildNodes();
@@ -115,10 +118,12 @@ public class BusLinesManager implements IBusLinesManager {
                     if (member.getNodeName().equals("member")) {
                         NamedNodeMap attributes = member.getAttributes();
                         Node namedItemID = attributes.getNamedItem("ref");
-                        if (attributes.getNamedItem("role").getNodeValue().contains("stop") && attributes.getNamedItem("type").getNodeValue().equals("node")) {
+                        if (attributes.getNamedItem("role").getNodeValue().contains("stop") &&
+                                attributes.getNamedItem("type").getNodeValue().equals("node")) {
                             info.addStation(namedItemID.getNodeValue());
                         }
-                        else if (attributes.getNamedItem("role").getNodeValue().length() == 0 && attributes.getNamedItem("type").getNodeValue().equals("way")) {
+                        else if (attributes.getNamedItem("role").getNodeValue().length() == 0 &&
+                                attributes.getNamedItem("type").getNodeValue().equals("way")) {
                             long id = Long.parseLong(namedItemID.getNodeValue());
                             builder.append(OsmQueryManager.getSingleBusWayOverpassQuery(id));
                         }
@@ -136,7 +141,7 @@ public class BusLinesManager implements IBusLinesManager {
                 try {
                     var overpassNodes =
                             MapAccessManager.getNodesViaOverpass(OsmQueryManager.getQueryWithPayload(builder.toString()));
-                    var osmWays = MapAccessManager.parseOsmWay(overpassNodes, radius, middleLat, middleLon);
+                    var osmWays = MapAccessManager.parseOsmWay(overpassNodes, zone);
                     info.setRoute(osmWays);
                 } catch (NotFoundException | UnsupportedOperationException e) {
                     logger.warn("Please change the zone, this one is not supported yet.", e);
@@ -152,7 +157,7 @@ public class BusLinesManager implements IBusLinesManager {
                 String lat = attributes.getNamedItem("lat").getNodeValue();
                 String lon = attributes.getNamedItem("lon").getNodeValue();
 
-                if (NumericHelper.isInCircle(Point.of(lat, lon), Point.of(middleLat, middleLon), radius) &&
+                if (zone.isInZone(Position.of(lat, lon)) &&
                         !MasterAgent.osmIdToStationOSMNode.containsKey(Long.parseLong(osmId))) {
                     NodeList list_tags = item.getChildNodes();
                     for (int z = 0; z < list_tags.getLength(); z++) {
@@ -179,7 +184,7 @@ public class BusLinesManager implements IBusLinesManager {
         }
 
         for (BusInfo info : infoSet) {
-            info.filterStationsByCircle(middleLat, middleLon, radius);
+            info.filterStationsByCircle(zone);
         }
 
         return infoSet;

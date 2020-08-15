@@ -13,7 +13,6 @@ import jade.lang.acl.ACLMessage;
 import jade.wrapper.AgentContainer;
 import jade.wrapper.StaleProxyException;
 import org.javatuples.Pair;
-import org.jxmapviewer.viewer.GeoPosition;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Node;
@@ -53,6 +52,8 @@ public class MasterAgent extends Agent {
     private final IdGenerator<AbstractAgent> idGenerator;
     private final IAgentsContainer<AbstractAgent> agentsContainer;
     private final TaskManager taskManager;
+    private final LightAccessManager lightAccessManager;
+    private final ConfigContainer configContainer;
 
     public final static boolean USE_DEPRECATED_XML_FOR_LIGHT_MANAGERS = false;
     public static boolean SHOULD_GENERATE_PEDESTRIANS_AND_BUSES = false;
@@ -78,12 +79,16 @@ public class MasterAgent extends Agent {
                        IdGenerator<AbstractAgent> idGenerator,
                        IAgentsContainer<AbstractAgent> agentsContainer,
                        TaskManager taskManager,
+                       LightAccessManager lightAccessManager,
+                       ConfigContainer configContainer,
                        MapWindow window) {
         this.webService = webService;
         this.busLinesManager = busLinesManager;
         this.idGenerator = idGenerator;
         this.agentsContainer = agentsContainer;
         this.taskManager = taskManager;
+        this.lightAccessManager = lightAccessManager;
+        this.configContainer = configContainer;
 
         // TODO: Delete this abomination
         MasterAgent.window = window;
@@ -171,14 +176,13 @@ public class MasterAgent extends Agent {
         webService.setZone(positions);
     }
 
-    public boolean prepareAgents(double lat, double lon, int radius) {
-        var zoneCenter = new GeoPosition(lat, lon);
+    public boolean prepareAgents() {
         if (SHOULD_GENERATE_PEDESTRIANS_AND_BUSES) {
-            if (!busLinesManager.prepareStationsAndBuses(zoneCenter, radius, this::tryAddNewBusAgent)) {
+            if (!busLinesManager.prepareStationsAndBuses(this::tryAddNewBusAgent)) {
                 return false;
             }
         }
-        return prepareLightManagers(zoneCenter, radius);
+        return prepareLightManagers();
     }
 
     private static boolean tryAddAgent(AbstractAgent agent) {
@@ -239,7 +243,9 @@ public class MasterAgent extends Agent {
     }
 
     private void tryAddNewVehicleAgent(VehicleAgent agent) {
-        agentsContainer.tryAdd(agent);
+        // TODO: Move to container
+        vehicles.add(agent);
+        MasterAgent.tryAddAgent(agent);
         ++carId;
     }
 
@@ -249,24 +255,24 @@ public class MasterAgent extends Agent {
         }
     }
 
-    private boolean prepareLightManagers(GeoPosition middlePoint, int radius) {
+    private boolean prepareLightManagers() {
         IdGenerator.resetLightManagerId();
         lightManagersUnderConstruction = true;
         boolean result;
         if (USE_DEPRECATED_XML_FOR_LIGHT_MANAGERS) {
-            result = MapAccessManager.prepareLightManagersInRadiusAndLightIdToLightManagerIdHashSet(middlePoint, radius);
+            result = MapAccessManager.prepareLightManagersInRadiusAndLightIdToLightManagerIdHashSet(configContainer.getZone());
         }
         else {
-            result = tryConstructLightManagers(middlePoint, radius);
+            result = tryConstructLightManagers();
         }
         lightManagersUnderConstruction = false;
 
         return result;
     }
 
-    private boolean tryConstructLightManagers(GeoPosition middlePoint, int radius) {
+    private boolean tryConstructLightManagers() {
         try {
-            LightAccessManager.constructLightManagers(middlePoint, radius);
+            lightAccessManager.constructLightManagers();
         } catch (Exception e) {
             logger.error("Error preparing light managers", e);
             return false;

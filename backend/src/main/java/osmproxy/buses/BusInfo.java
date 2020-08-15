@@ -3,6 +3,7 @@ package osmproxy.buses;
 import org.jetbrains.annotations.NotNull;
 import osmproxy.elements.OSMStation;
 import osmproxy.elements.OSMWay;
+import routing.IZone;
 import routing.RouteNode;
 import routing.Router;
 import smartcity.MasterAgent;
@@ -50,12 +51,12 @@ public class BusInfo implements Iterable<BrigadeInfo> {
         return Router.generateRouteInfoForBuses(route, stationsOnRouteOsmIds);
     }
 
-    public void filterStationsByCircle(double middleLat, double middleLon, int radius) {
+    // TODO: Zone injected when creating busInfo
+    public void filterStationsByCircle(IZone zone) {
         List<Long> filteredStationOsmIds = new ArrayList<>();
         for (Long osmStationId : stationsOnRouteOsmIds) {
             OSMStation station = MasterAgent.osmIdToStationOSMNode.get(osmStationId);
-            if (station != null && NumericHelper.isInCircle(station.getLatitude(), station.getLongitude(),
-                    middleLat, middleLon, radius)) {
+            if (station != null && zone.isInZone(station)) {
                 filteredStationOsmIds.add(osmStationId);
             }
         }

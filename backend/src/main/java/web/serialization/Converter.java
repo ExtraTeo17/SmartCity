@@ -1,10 +1,11 @@
 package web.serialization;
 
-import org.jxmapviewer.viewer.GeoPosition;
+
+import routing.IGeoPosition;
 import web.message.payloads.responses.Location;
 
 public class Converter {
-    public static Location convert(GeoPosition geoPosition) {
-        return new Location(geoPosition.getLatitude(), geoPosition.getLongitude());
+    public static Location convert(IGeoPosition geoPosition) {
+        return new Location(geoPosition.getLat(), geoPosition.getLng());
     }
 }

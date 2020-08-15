@@ -1,5 +1,7 @@
 package osmproxy;
 
+import routing.IGeoPosition;
+
 import java.util.List;
 
 // TODO: Not static, injected
@@ -57,7 +59,11 @@ public class OsmQueryManager {
                 "</osm-script>";
     }
 
-    public static String getBusOverpassQuery(int radius, double middleLat, double middleLon) {
+    public static String getBusOverpassQuery(IGeoPosition pos, int radius) {
+        return getBusOverpassQuery(pos.getLat(), pos.getLng(), radius);
+    }
+
+    public static String getBusOverpassQuery(double middleLat, double middleLon, int radius) {
         return "<osm-script>\r\n" +
                 "  <query into=\"_\" type=\"relation\">\r\n" +
                 "    <has-kv k=\"route\" modv=\"\" v=\"bus\"/>\r\n" +
@@ -69,7 +75,11 @@ public class OsmQueryManager {
                 "</osm-script>";
     }
 
-    static String getLightsAroundOverpassQuery(int radius, double lat, double lon) {
+    static String getLightsAroundOverpassQuery(IGeoPosition pos, int radius){
+        return getLightsAroundOverpassQuery(pos.getLat(), pos.getLng(), radius);
+    }
+
+    static String getLightsAroundOverpassQuery(double lat, double lon, int radius) {
         return "<osm-script>\r\n" +
                 "  <query into=\"_\" type=\"node\">\r\n" +
                 "    <has-kv k=\"highway\" modv=\"\" v=\"traffic_signals\"/>\r\n" +

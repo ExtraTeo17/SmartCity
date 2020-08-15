@@ -158,12 +158,14 @@ public class BusAgent extends AbstractAgent {
             @Override
             public void action() {
                 ACLMessage rcv = receive();
-                if (rcv == null)
+                if (rcv == null) {
                     return;
+                }
 
                 String type = rcv.getUserDefinedParameter(MessageParameter.TYPE);
-                if(type == null)
+                if (type == null) {
                     return;
+                }
 
                 switch (type) {
                     case MessageParameter.LIGHT:

@@ -1,18 +1,13 @@
 package utilities;
 
 import org.jetbrains.annotations.Contract;
-import org.jxmapviewer.viewer.GeoPosition;
+import routing.IGeoPosition;
 
 import java.util.List;
 
 public final class NumericHelper {
     public static final double EARTH_RADIUS = 6364.917;
     public static final double METERS_PER_DEGREE = EARTH_RADIUS * 2 * Math.PI / 360.0 * 1000;
-
-    public static double getEuclideanDistance(GeoPosition posA, GeoPosition posB) {
-        return getEuclideanDistance(posA.getLatitude(), posB.getLatitude(),
-                posA.getLongitude(), posB.getLongitude());
-    }
 
     @Contract(pure = true)
     public static double getEuclideanDistance(double x1, double x2, double y1, double y2) {
@@ -28,19 +23,11 @@ public final class NumericHelper {
     }
 
     /**
-     * @param radius DEGREE based radius
-     */
-    @Contract(pure = true)
-    public static boolean isInCircle(Point point, Point center, double radius) {
-        return isInCircle(point.x, point.y, center.x, center.y, radius);
-    }
-
-    /**
      * @param radius METER based radius
      */
     @Contract(pure = true)
-    public static boolean isInCircle(Point point, Point center, int radius) {
-        return isInCircle(point.x, point.y, center.x, center.y, radius / METERS_PER_DEGREE);
+    public static boolean isInCircle(IGeoPosition point, IGeoPosition center, int radius) {
+        return isInCircle(point.getLat(), point.getLng(), center.getLat(), center.getLng(), radius / METERS_PER_DEGREE);
     }
 
     /**
@@ -66,12 +53,6 @@ public final class NumericHelper {
     }
 
     @Contract(pure = true)
-    public static GeoPosition getMiddlePosition(GeoPosition posA, GeoPosition posB) {
-        return new GeoPosition((posA.getLatitude() + posB.getLatitude()) / 2,
-                (posA.getLongitude() + posB.getLongitude()) / 2);
-    }
-
-    @Contract(pure = true)
     public static double calculateAverage(List<Double> doubles) {
         return doubles.stream().mapToDouble(NumericHelper::unbox).average().orElse(0);
     }
@@ -79,15 +60,5 @@ public final class NumericHelper {
     @Contract(value = "!null -> param1", pure = true)
     public static double unbox(Double d) {
         return d == null ? 0 : d;
-    }
-
-    @Contract(pure = true)
-    public static double parseDouble(String val) {
-        return val == null || val.isEmpty() ? 0.0 : Double.parseDouble(val);
-    }
-
-    @Contract(pure = true)
-    public static long parseLong(String val) {
-        return val == null || val.isEmpty() ? 0 : Long.parseLong(val);
     }
 }

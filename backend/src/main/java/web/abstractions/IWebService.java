@@ -1,9 +1,10 @@
 package web.abstractions;
 
-import org.jxmapviewer.viewer.GeoPosition;
+
+import routing.IGeoPosition;
 
 import java.util.List;
 
 public interface IWebService extends IStartable {
-    void setZone(List<GeoPosition> positions);
+    void setZone(List<IGeoPosition> positions);
 }

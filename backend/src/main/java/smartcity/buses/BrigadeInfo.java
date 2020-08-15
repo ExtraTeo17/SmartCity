@@ -58,14 +58,4 @@ public class BrigadeInfo implements Iterable<Timetable> {
     public Iterator<Timetable> iterator() {
         return timetables.iterator();
     }
-
-    @Override
-    public void forEach(Consumer<? super Timetable> action) {
-        timetables.forEach(action);
-    }
-
-    @Override
-    public Spliterator<Timetable> spliterator() {
-        return timetables.spliterator();
-    }
 }

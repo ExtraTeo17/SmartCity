@@ -1,11 +1,13 @@
 package vehicles;
 
-import org.jxmapviewer.viewer.GeoPosition;
+
+import routing.IGeoPosition;
 import routing.LightManagerNode;
 import routing.RouteNode;
 
 import java.util.List;
 
+// TODO: Interface or move some functionality here
 public abstract class MovingObject {
     public abstract String getVehicleType();
 
@@ -13,7 +15,7 @@ public abstract class MovingObject {
 
     public abstract String getPositionString();
 
-    public abstract GeoPosition getPosition();
+    public abstract IGeoPosition getPosition();
 
     public abstract LightManagerNode getCurrentTrafficLightNode();
 

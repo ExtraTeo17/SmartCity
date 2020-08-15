@@ -1,16 +1,16 @@
 package smartcity.lights;
 
-import org.jxmapviewer.viewer.GeoPosition;
+
 import osmproxy.elements.OSMNode;
 import osmproxy.elements.OSMWay;
 import osmproxy.elements.OSMWaypoint;
-import utilities.NumericHelper;
+import routing.IGeoPosition;
 
-public class LightInfo {
+public class LightInfo implements IGeoPosition {
     private static final double DISTANCE_THRESHOLD = 0.00008;
     private final String osmLightId;
     private final String adjacentOsmWayId;
-    private GeoPosition position;
+    private IGeoPosition position;
     private String adjacentCrossingOsmId1;
     private String adjacentCrossingOsmId2;
 
@@ -20,13 +20,14 @@ public class LightInfo {
         this.osmLightId = Long.toString(centerCrossroadNode.getId());
         fillLightPositionAndCrossings(adjacentOsmWay);
         if (distToCrossroad > DISTANCE_THRESHOLD) {
-            position = NumericHelper.getMiddlePosition(OSMNode.convertToPosition(centerCrossroadNode), position);
-            position = NumericHelper.getMiddlePosition(OSMNode.convertToPosition(centerCrossroadNode), position);
+            position = position.midpoint(centerCrossroadNode);
+            position = position.midpoint(centerCrossroadNode);
         }
     }
 
     private void fillLightPositionAndCrossings(OSMWay adjacentOsmWay) {
-        OSMWaypoint secondWaypoint = null, thirdWaypoint = null;
+        OSMWaypoint secondWaypoint = null;
+        OSMWaypoint thirdWaypoint = null;
         switch (adjacentOsmWay.getLightOrientation()) {
             case LIGHT_AT_ENTRY -> {
                 secondWaypoint = adjacentOsmWay.getWaypoint(1);
@@ -38,7 +39,7 @@ public class LightInfo {
                         adjacentOsmWay.getWaypoint(adjacentOsmWay.getWaypointCount() - 3) : null;
             }
         }
-        position = new GeoPosition(secondWaypoint.getLatitude(), secondWaypoint.getLongitude());
+        position = secondWaypoint;
         adjacentCrossingOsmId1 = secondWaypoint.getOsmNodeRef();
         adjacentCrossingOsmId2 = thirdWaypoint != null ? thirdWaypoint.getOsmNodeRef() : null;
     }
@@ -47,12 +48,14 @@ public class LightInfo {
         return osmLightId;
     }
 
-    public double getLatitude() {
-        return position.getLatitude();
+    @Override
+    public double getLat() {
+        return position.getLat();
     }
 
-    public double getLongitude() {
-        return position.getLongitude();
+    @Override
+    public double getLng() {
+        return position.getLng();
     }
 
     public String getAdjacentOsmWayId() {

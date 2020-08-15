@@ -1,6 +1,5 @@
 package utilities;
 
-import org.jxmapviewer.viewer.GeoPosition;
 
 public class Siblings<T> {
     public final T first;
@@ -17,9 +16,5 @@ public class Siblings<T> {
 
     public boolean isSecondPresent() {
         return second != null;
-    }
-
-    public static Siblings<Double> of(GeoPosition pos) {
-        return new Siblings<>(pos.getLatitude(), pos.getLongitude());
     }
 }

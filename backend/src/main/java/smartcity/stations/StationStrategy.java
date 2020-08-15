@@ -26,7 +26,7 @@ public class StationStrategy {
     //private final OSMStation stationOSMNode;
     public StationStrategy(OSMStation stationOSMNode, int agentId) {
         MasterAgent.osmStationIdToStationNode.put(stationOSMNode.getId(),
-                new StationNode(stationOSMNode.getLatitude(), stationOSMNode.getLongitude(),
+                new StationNode(stationOSMNode.getLat(), stationOSMNode.getLng(),
                         Long.toString(stationOSMNode.getId()), agentId));
     }
 

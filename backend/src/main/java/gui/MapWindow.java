@@ -18,11 +18,9 @@ import org.jxmapviewer.painter.Painter;
 import org.jxmapviewer.viewer.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import osmproxy.elements.OSMNode;
 import osmproxy.elements.OSMStation;
-import routing.RouteNode;
-import routing.Router;
-import routing.StationNode;
+import routing.*;
+import smartcity.ConfigContainer;
 import smartcity.MasterAgent;
 import smartcity.lights.SimpleCrossroad;
 import vehicles.Bus;
@@ -61,6 +59,7 @@ public class MapWindow {
     private final static int TIME_SCALE = 10;
     private final EventBus eventBus;
     private final IAgentsContainer<AbstractAgent> agentsContainer;
+    private final ConfigContainer configContainer;
 
     public JPanel MainPanel;
     public JXMapViewer MapViewer;
@@ -94,8 +93,8 @@ public class MapWindow {
     private MasterAgent masterAgent;
     private Timer refreshTimer = new Timer(true);
     private final Timer spawnTimer = new Timer(true);
-    private GeoPosition pointA;
-    private GeoPosition pointB;
+    private IGeoPosition pointA;
+    private IGeoPosition pointB;
 
     public void setState(SimulationState state) {
         if (this.state != state) {
@@ -109,13 +108,17 @@ public class MapWindow {
     private SimulationState state = SimulationState.SETTING_ZONE;
     private final Random random = new Random();
     private final Random testCarRandom = new Random(96);
-    private GeoPosition zoneCenter;
+    private final IZone zone;
     private Instant simulationStart;
 
     @Inject
-    public MapWindow(EventBus eventBus, IAgentsContainer<AbstractAgent> agentsContainer) {
+    public MapWindow(EventBus eventBus,
+                     IAgentsContainer<AbstractAgent> agentsContainer,
+                     ConfigContainer configContainer) {
         this.eventBus = eventBus;
         this.agentsContainer = agentsContainer;
+        this.configContainer = configContainer;
+        this.zone = configContainer.getZone();
 
         MapViewer = new JXMapViewer();
         currentTimeLabel.setVisible(false);
@@ -201,21 +204,23 @@ public class MapWindow {
         MapViewer.addMouseListener(new MapClickListener(MapViewer) {
             @Override
             public void mapClicked(GeoPosition geoPosition) {
-                logger.info("Lat: " + geoPosition.getLatitude() + " Lon: " + geoPosition.getLongitude());
+                var lat = geoPosition.getLatitude();
+                var lng = geoPosition.getLongitude();
+                logger.info("Lat: " + lat + " Lon: " + lng);
                 switch (state) {
                     case SETTING_ZONE:
                     case READY_TO_RUN:
-                        latSpinner.setValue(geoPosition.getLatitude());
-                        lonSpinner.setValue(geoPosition.getLongitude());
-                        prepareAgentsAndSetZone(geoPosition.getLatitude(), geoPosition.getLongitude(), getZoneRadius());
+                        latSpinner.setValue(lat);
+                        lonSpinner.setValue(lng);
+                        prepareAgentsAndSetZone(lat, lng, getZoneRadius());
                         state = SimulationState.READY_TO_RUN;
                         break;
                     case RUNNING:
                         if (pointA == null) {
-                            pointA = geoPosition;
+                            pointA = Position.of(lat, lng);
                         }
                         else {
-                            pointB = geoPosition;
+                            pointB = Position.of(lat, lng);
                             var vehicle = masterAgent.tryAddNewVehicleAgent(Router.generateRouteInfo(pointA, pointB));
                             vehicle.start();
 
@@ -253,10 +258,10 @@ public class MapWindow {
                 masterAgent.activateLightManagerAgents();
                 random.setSeed(getSeed());
 
-                if (MasterAgent.SHOULD_GENERATE_CARS) {
+                if (configContainer.shouldGenerateCars()) {
                     spawnTimer.scheduleAtFixedRate(new CreateCarTask(), 0, CREATE_CAR_INTERVAL_MILLISECONDS);
                 }
-                if (MasterAgent.SHOULD_GENERATE_PEDESTRIANS_AND_BUSES) {
+                if (configContainer.shouldGeneratePedestriansAndBuses()) {
                     spawnTimer.scheduleAtFixedRate(new CreatePedestrianTask(), 0, CREATE_PEDESTRIAN_INTERVAL_MILLISECONDS);
                 }
                 simulationStart = getSimulationStartTime().toInstant();
@@ -267,12 +272,12 @@ public class MapWindow {
         refreshTimer.scheduleAtFixedRate(new RefreshTask(), 0, REFRESH_MAP_INTERVAL_MILLISECONDS);
     }
 
-    public void setSmartCityAgent(MasterAgent smartCityAgent) {
-        this.masterAgent = smartCityAgent;
+    private int getZoneRadius() {
+        return zone.getRadius();
     }
 
-    public MasterAgent getSmartCityAgent() {
-        return masterAgent;
+    public void setSmartCityAgent(MasterAgent smartCityAgent) {
+        this.masterAgent = smartCityAgent;
     }
 
     public void display() {
@@ -369,7 +374,6 @@ public class MapWindow {
         JMenu debug = new JMenu("Debug");
 
         JMenuItem runTest = new JMenuItem("Test crossroad");
-        var smartCityAgent = this.getSmartCityAgent();
         runTest.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -379,10 +383,10 @@ public class MapWindow {
                 mapViewer.setAddressLocation(new GeoPosition(lat, lon));
                 mapViewer.setZoom(1);
                 window.prepareAgentsAndSetZone(lat, lon, 100);
-                GeoPosition N = new GeoPosition(52.23758683540269, 21.017720103263855);
-                GeoPosition S = new GeoPosition(52.23627934304847, 21.018092930316925);
-                GeoPosition E = new GeoPosition(52.237225472020704, 21.019399166107178);
-                GeoPosition W = new GeoPosition(52.23678526174392, 21.016663312911987);
+                IGeoPosition N = new Position(52.23758683540269, 21.017720103263855);
+                IGeoPosition S = new Position(52.23627934304847, 21.018092930316925);
+                IGeoPosition E = new Position(52.237225472020704, 21.019399166107178);
+                IGeoPosition W = new Position(52.23678526174392, 21.016663312911987);
 
                 // N to S
                 List<RouteNode> NS;
@@ -390,7 +394,7 @@ public class MapWindow {
                     NS = Router.generateRouteInfo(N, S);
 
                     for (int i = 0; i < 5; i++) {
-                        smartCityAgent.tryAddNewVehicleAgent(NS);
+                        masterAgent.tryAddNewVehicleAgent(NS);
                     }
                 } catch (Exception ex) {
                     ex.printStackTrace();
@@ -403,7 +407,7 @@ public class MapWindow {
                     SN = Router.generateRouteInfo(S, N);
 
                     for (int i = 0; i < 5; i++) {
-                        smartCityAgent.tryAddNewVehicleAgent(SN);
+                        masterAgent.tryAddNewVehicleAgent(SN);
                     }
                 } catch (Exception ex) {
                     ex.printStackTrace();
@@ -416,7 +420,7 @@ public class MapWindow {
                     EW = Router.generateRouteInfo(E, W);
 
                     for (int i = 0; i < 5; i++) {
-                        smartCityAgent.tryAddNewVehicleAgent(EW);
+                        masterAgent.tryAddNewVehicleAgent(EW);
                     }
                 } catch (Exception ex) {
                     ex.printStackTrace();
@@ -428,14 +432,14 @@ public class MapWindow {
                 try {
                     WE = Router.generateRouteInfo(W, E);
                     for (int i = 0; i < 5; i++) {
-                        smartCityAgent.tryAddNewVehicleAgent(WE);
+                        masterAgent.tryAddNewVehicleAgent(WE);
                     }
                 } catch (Exception ex) {
                     ex.printStackTrace();
                     return;
                 }
 
-                smartCityAgent.activateLightManagerAgents();
+                masterAgent.activateLightManagerAgents();
 
                 // start all
                 for (VehicleAgent agent : MasterAgent.vehicles) {
@@ -448,7 +452,7 @@ public class MapWindow {
 
         menuBar.add(debug);
 
-        addGenerationMenu(menuBar);
+        MapWindow.addGenerationMenu(menuBar);
 
         frame.setJMenuBar(menuBar);
         frame.setSize(1200, 600);
@@ -488,7 +492,7 @@ public class MapWindow {
             masterAgent.reset();
             state = SimulationState.SETTING_ZONE;
         }
-        prepareAgentsAndSetZone(e.getLatitude(), e.getLongitude(), (int) e.getRadius());
+        prepareAgentsAndSetZone(e.getLat(), e.getLng(), (int) e.getRadius());
         setState(SimulationState.READY_TO_RUN);
     }
 
@@ -517,16 +521,12 @@ public class MapWindow {
     private void prepareAgentsAndSetZone(double lat, double lon, int radius) {
         refreshTimer.cancel();
         refreshTimer = new Timer();
-        zoneCenter = new GeoPosition(lat, lon);
+        configContainer.setZone(lat, lon, radius);
 
-        if (masterAgent.prepareAgents(lat, lon, radius)) {
+        if (masterAgent.prepareAgents()) {
             setState(SimulationState.READY_TO_RUN);
             refreshTimer.scheduleAtFixedRate(new RefreshTask(), 0, REFRESH_MAP_INTERVAL_MILLISECONDS);
         }
-    }
-
-    private int getZoneRadius() {
-        return (int) radiusSpinner.getValue();
     }
 
     private int getCarLimit() {
@@ -570,9 +570,10 @@ public class MapWindow {
         try {
             Set<Waypoint> set = new HashSet<>();
             for (VehicleAgent a : MasterAgent.vehicles) {
+                var waypoint = new DefaultWaypoint(a.getVehicle().getPosition().toMapGeoPosition());
                 if (a.getVehicle() instanceof TestCar) {
                     Set<Waypoint> testCarWaypoint = new HashSet<>();
-                    testCarWaypoint.add(new DefaultWaypoint(a.getVehicle().getPosition()));
+                    testCarWaypoint.add(waypoint);
 
                     WaypointPainter<Waypoint> testPainter = new WaypointPainter<>();
                     testPainter.setWaypoints(testCarWaypoint);
@@ -580,7 +581,7 @@ public class MapWindow {
                     painters.add(testPainter);
                 }
                 else {
-                    set.add(new DefaultWaypoint(a.getVehicle().getPosition()));
+                    set.add(waypoint);
                 }
             }
             WaypointPainter<Waypoint> waypointPainter = new WaypointPainter<>();
@@ -595,10 +596,9 @@ public class MapWindow {
     public void drawRoutes(List<Painter<JXMapViewer>> painters) {
         try {
             for (VehicleAgent a : MasterAgent.vehicles) {
-                List<GeoPosition> track = new ArrayList<GeoPosition>();
-                for (RouteNode point : a.getVehicle().getDisplayRoute()) {
-                    track.add(new GeoPosition(point.getLatitude(), point.getLongitude()));
-                }
+                List<IGeoPosition> track = new ArrayList<>();
+                track.addAll(a.getVehicle().getDisplayRoute());
+
                 Random r = new Random(a.hashCode());
                 RoutePainter routePainter = new RoutePainter(track, new Color(r.nextInt(255), r.nextInt(255), r.nextInt(255)));
                 painters.add(routePainter);
@@ -613,9 +613,10 @@ public class MapWindow {
             Set<Waypoint> set = new HashSet<>();
             for (PedestrianAgent a : MasterAgent.pedestrians) {
                 if (!a.isInBus()) {
+                    var waypoint = new DefaultWaypoint(a.getPedestrian().getPosition().toMapGeoPosition());
                     if (a.getPedestrian() instanceof TestPedestrian) {
                         Set<Waypoint> testPedestrianWaypoint = new HashSet<>();
-                        testPedestrianWaypoint.add(new DefaultWaypoint(a.getPedestrian().getPosition()));
+                        testPedestrianWaypoint.add(waypoint);
 
                         WaypointPainter<Waypoint> testPainter = new WaypointPainter<>();
                         testPainter.setWaypoints(testPedestrianWaypoint);
@@ -623,7 +624,7 @@ public class MapWindow {
                         painters.add(testPainter);
                     }
                     else {
-                        set.add(new DefaultWaypoint(a.getPedestrian().getPosition()));
+                        set.add(waypoint);
                     }
                 }
             }
@@ -639,14 +640,11 @@ public class MapWindow {
     public void drawPedestrianRoutes(List<Painter<JXMapViewer>> painters) {
         try {
             for (PedestrianAgent a : MasterAgent.pedestrians) {
-                List<GeoPosition> trackBefore = new ArrayList<GeoPosition>();
-                List<GeoPosition> trackAfter = new ArrayList<>();
-                for (RouteNode point : a.getPedestrian().getDisplayRouteBeforeBus()) {
-                    trackBefore.add(new GeoPosition(point.getLatitude(), point.getLongitude()));
-                }
-                for (RouteNode point : a.getPedestrian().getDisplayRouteAfterBus()) {
-                    trackAfter.add(new GeoPosition(point.getLatitude(), point.getLongitude()));
-                }
+                List<IGeoPosition> trackBefore = new ArrayList<>();
+                List<IGeoPosition> trackAfter = new ArrayList<>();
+                trackBefore.addAll(a.getPedestrian().getDisplayRouteBeforeBus());
+                trackAfter.addAll(a.getPedestrian().getDisplayRouteAfterBus());
+
                 Random r = new Random(a.hashCode());
                 Color c = new Color(r.nextInt(255), r.nextInt(255), r.nextInt(255));
                 RoutePainter routePainterBefore = new RoutePainter(trackBefore, c);
@@ -667,14 +665,15 @@ public class MapWindow {
             agentsContainer.forEach(BusAgent.class, busAgent -> {
                 var bus = busAgent.getBus();
                 int count = bus.getPassengersCount();
+                var pos = bus.getPosition().toMapGeoPosition();
                 if (count > Bus.CAPACITY_HIGH) {
-                    set_high.add(new DefaultWaypoint(bus.getPosition()));
+                    set_high.add(new DefaultWaypoint(pos));
                 }
                 else if (count > Bus.CAPACITY_MID) {
-                    set_mid.add(new DefaultWaypoint(bus.getPosition()));
+                    set_mid.add(new DefaultWaypoint(pos));
                 }
                 else {
-                    set_low.add(new DefaultWaypoint(bus.getPosition()));
+                    set_low.add(new DefaultWaypoint(pos));
                 }
             });
 
@@ -700,11 +699,10 @@ public class MapWindow {
     private void drawBusRoutes(List<Painter<JXMapViewer>> painters) {
         try {
             agentsContainer.forEach(BusAgent.class, busAgent -> {
-                List<GeoPosition> track = new ArrayList<>();
+                List<IGeoPosition> track = new ArrayList<>();
                 var bus = busAgent.getBus();
-                for (RouteNode point : bus.getDisplayRoute()) {
-                    track.add(new GeoPosition(point.getLatitude(), point.getLongitude()));
-                }
+                track.addAll(bus.getDisplayRoute());
+
                 Random r = new Random(busAgent.hashCode());
                 RoutePainter routePainter = new RoutePainter(track, new Color(r.nextInt(255), r.nextInt(255), r.nextInt(255)));
                 painters.add(routePainter);
@@ -717,22 +715,22 @@ public class MapWindow {
     }
 
     public void drawZones(Collection<Painter<JXMapViewer>> painters) {
-        if (zoneCenter != null) {
+        if (zone != null) {
             Set<Waypoint> set = new HashSet<>();
-            set.add(new DefaultWaypoint(zoneCenter));
+            set.add(new DefaultWaypoint(zone.getCenter().toMapGeoPosition()));
             WaypointPainter<Waypoint> waypointPainter = new WaypointPainter<>();
             waypointPainter.setWaypoints(set);
             waypointPainter.setRenderer(new CustomWaypointRenderer("blue_waypoint.png"));
             painters.add(waypointPainter);
 
-            painters.add(new ZonePainter(zoneCenter, getZoneRadius(), Color.BLUE));
+            painters.add(new ZonePainter(zone.getCenter(), getZoneRadius(), Color.BLUE));
         }
     }
 
     private void drawStations(List<Painter<JXMapViewer>> painters) {
         Set<Waypoint> set = new HashSet<>();
         for (OSMStation stationOSMNode : MasterAgent.osmIdToStationOSMNode.values()) {
-            set.add(new DefaultWaypoint(OSMNode.convertToPosition(stationOSMNode)));
+            set.add(new DefaultWaypoint(stationOSMNode.toMapGeoPosition()));
         }
         WaypointPainter<Waypoint> waypointPainter = new WaypointPainter<>();
         waypointPainter.setWaypoints(set);
@@ -990,14 +988,14 @@ public class MapWindow {
      */
     public JComponent $$$getRootComponent$$$() { return MainPanel; }
 
-    private Pair<Double, Double> generateRandomGeoPosOffsetWithRadius(final int radius) {
+    private IGeoPosition generateRandomGeoPosOffsetWithRadius(final int radius) {
         double angle = random.nextDouble() * Math.PI * 2;
         if (getTestCarId() == masterAgent.carId) {
             angle = testCarRandom.nextDouble() * Math.PI * 2;
         }
         double lat = Math.sin(angle) * radius * 0.0000089;
-        double lon = Math.cos(angle) * radius * 0.0000089 * Math.cos(lat);
-        return Pair.with(lat, lon);
+        double lng = Math.cos(angle) * radius * 0.0000089 * Math.cos(lat);
+        return new Position(lat, lng);
     }
 
     public class RefreshTask extends TimerTask { // OCB ?????? TOO OFTEN
@@ -1067,20 +1065,21 @@ public class MapWindow {
 
         @Override
         public void run() {
-            if (!MasterAgent.SHOULD_GENERATE_CARS || MasterAgent.vehicles.size() >= getCarLimit()) {
+            if (!configContainer.shouldGenerateCars() || MasterAgent.vehicles.size() >= getCarLimit()) {
                 this.cancel();
             }
-            final Pair<Double, Double> geoPosInZoneCircle = generateRandomGeoPosOffsetWithRadius(getZoneRadius());
-            GeoPosition posA = new GeoPosition(zoneCenter.getLatitude() + geoPosInZoneCircle.getValue0(),
-                    zoneCenter.getLongitude() + geoPosInZoneCircle.getValue1());
-            GeoPosition posB = new GeoPosition(zoneCenter.getLatitude() - geoPosInZoneCircle.getValue0(),
-                    zoneCenter.getLongitude() - geoPosInZoneCircle.getValue1());
+
+            var zoneCenter = zone.getCenter();
+            var geoPosInZoneCircle = generateRandomGeoPosOffsetWithRadius(zone.getRadius());
+            IGeoPosition posA = zoneCenter.sum(geoPosInZoneCircle);
+            IGeoPosition posB = zoneCenter.difference(geoPosInZoneCircle);
 
             List<RouteNode> info;
             try {
                 info = Router.generateRouteInfo(posA, posB);
             } catch (Exception e) {
-                logger.warn("Error generating route info");
+                logger.warn("Error generating route info", e);
+                this.cancel();
                 return;
             }
 
@@ -1108,15 +1107,14 @@ public class MapWindow {
                 final Pair<Pair<StationNode, StationNode>, String> stationNodePairAndBusLine = getStationPairAndLineFromRandomBus();
                 final StationNode startStation = stationNodePairAndBusLine.getValue0().getValue0();
                 final StationNode finishStation = stationNodePairAndBusLine.getValue0().getValue1();
-                final Pair<Double, Double> geoPosInFirstStationCircle = generateRandomGeoPosOffsetWithRadius(PEDESTRIAN_STATION_RADIUS); // TODO: Generating this offset doesn't work!
-                GeoPosition pedestrianStartPoint = new GeoPosition(startStation.getLatitude() + geoPosInFirstStationCircle.getValue0(), startStation.getLongitude() + geoPosInFirstStationCircle.getValue1());
-                GeoPosition pedestrianGetOnStation = new GeoPosition(startStation.getLatitude(), startStation.getLongitude());
-                GeoPosition pedestrianDisembarkStation = new GeoPosition(finishStation.getLatitude(), finishStation.getLongitude());
-                GeoPosition pedestrianFinishPoint = new GeoPosition(finishStation.getLatitude() + geoPosInFirstStationCircle.getValue0(), finishStation.getLongitude() + geoPosInFirstStationCircle.getValue1());
+                // TODO: Generating this offset doesn't work!
+                var geoPosInFirstStationCircle = generateRandomGeoPosOffsetWithRadius(PEDESTRIAN_STATION_RADIUS);
+                IGeoPosition pedestrianStartPoint = startStation.sum(geoPosInFirstStationCircle);
+                IGeoPosition pedestrianFinishPoint = finishStation.sum(geoPosInFirstStationCircle);
 
-                List<RouteNode> routeToStation = Router.generateRouteInfoForPedestrians(pedestrianStartPoint, pedestrianGetOnStation,
+                List<RouteNode> routeToStation = Router.generateRouteInfoForPedestrians(pedestrianStartPoint, startStation,
                         null, startStation.getOsmStationId());
-                List<RouteNode> routeFromStation = Router.generateRouteInfoForPedestrians(pedestrianDisembarkStation, pedestrianFinishPoint,
+                List<RouteNode> routeFromStation = Router.generateRouteInfoForPedestrians(finishStation, pedestrianFinishPoint,
                         finishStation.getOsmStationId(), null);
 
 

@@ -1,11 +1,7 @@
 package vehicles;
 
 import gui.MapWindow;
-import org.jxmapviewer.viewer.GeoPosition;
-import routing.LightManagerNode;
-import routing.RouteNode;
-import routing.Router;
-import routing.StationNode;
+import routing.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -89,12 +85,12 @@ public class Pedestrian extends MovingObject { // TODO: Remember to create a ded
 
     @Override
     public String getPositionString() {
-        return "Lat: " + route.get(index).getLatitude() + " Lon: " + route.get(index).getLongitude();
+        return "Lat: " + route.get(index).getLat() + " Lon: " + route.get(index).getLng();
     }
 
     @Override
-    public GeoPosition getPosition() {
-        return new GeoPosition(route.get(index).getLatitude(), route.get(index).getLongitude());
+    public IGeoPosition getPosition() {
+        return route.get(index);
     }
 
     @Override

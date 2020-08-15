@@ -6,7 +6,7 @@ public class OSMElement {
     protected final long id;
 
     OSMElement(final String id) {
-        this.id = NumericHelper.parseLong(id);
+        this.id = Long.parseLong(id);
     }
 
     OSMElement(final long id) {

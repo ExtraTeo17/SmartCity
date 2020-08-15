@@ -1,7 +1,7 @@
 package web;
 
 import com.google.inject.Inject;
-import org.jxmapviewer.viewer.GeoPosition;
+import routing.IGeoPosition;
 import web.abstractions.IWebService;
 import web.message.MessageType;
 import web.message.payloads.responses.Location;
@@ -23,7 +23,7 @@ public class WebService implements IWebService {
         webConnector.start();
     }
 
-    public void setZone(List<GeoPosition> positions) {
+    public void setZone(List<IGeoPosition> positions) {
         var locations = positions.stream().map(Converter::convert)
                 .toArray(Location[]::new);
         var payload = new SetZoneResponse(locations);

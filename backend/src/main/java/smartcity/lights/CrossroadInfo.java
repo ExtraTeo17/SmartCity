@@ -1,13 +1,12 @@
 package smartcity.lights;
 
+import com.google.common.collect.Iterables;
 import osmproxy.elements.OSMNode;
 import osmproxy.elements.OSMWay;
+import utilities.NumericHelper;
 
 import java.util.ArrayList;
 import java.util.List;
-
-import static utilities.NumericHelper.getCosineInTriangle;
-import static utilities.NumericHelper.getEuclideanDistance;
 
 class CrossroadInfo {
     private static final double COSINE_OF_135_DEGREES = -0.7071;
@@ -18,20 +17,19 @@ class CrossroadInfo {
         this.firstLightGroupInfo = new ArrayList<>();
         this.secondLightGroupInfo = new ArrayList<>();
 
-        final OSMWay firstWay = centerNode.getParentWay(0);
-        firstLightGroupInfo.add(new LightInfo(firstWay, centerNode,
-                getEuclideanDistance(firstWay.getLightNeighborPos(), OSMNode.convertToPosition(centerNode))));
-        for (int i = 1; i < centerNode.getParentWayCount(); ++i) {
-            var nextParentWay = centerNode.getParentWay(i);
-            var pos = OSMNode.convertToPosition(centerNode);
-            double a = getEuclideanDistance(firstWay.getLightNeighborPos(), pos);
-            double b = getEuclideanDistance(nextParentWay.getLightNeighborPos(), pos);
-            double c = getEuclideanDistance(firstWay.getLightNeighborPos(), nextParentWay.getLightNeighborPos());
-            if (getCosineInTriangle(a, b, c) < COSINE_OF_135_DEGREES) {
-                firstLightGroupInfo.add(new LightInfo(nextParentWay, centerNode, b));
+        OSMWay firstWay = centerNode.iterator().next();
+        var firstWayNeighborPos = firstWay.getLightNeighborPos();
+        var firstWayDistance = firstWayNeighborPos.distance(centerNode);
+        firstLightGroupInfo.add(new LightInfo(firstWay, centerNode, firstWayDistance));
+        for (OSMWay parentWay : Iterables.skip(centerNode, 1)) {
+            var nextWayLightNeighborPos = parentWay.getLightNeighborPos();
+            double b = nextWayLightNeighborPos.distance(centerNode);
+            double c = firstWayNeighborPos.distance(nextWayLightNeighborPos);
+            if (NumericHelper.getCosineInTriangle(firstWayDistance, b, c) < COSINE_OF_135_DEGREES) {
+                firstLightGroupInfo.add(new LightInfo(parentWay, centerNode, b));
             }
             else {
-                secondLightGroupInfo.add(new LightInfo(nextParentWay, centerNode, b));
+                secondLightGroupInfo.add(new LightInfo(parentWay, centerNode, b));
             }
         }
     }

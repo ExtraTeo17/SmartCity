@@ -18,6 +18,7 @@ public class TaskManager {
         new FixedExecutionRunnable(runCountConsumer, maxRunCount).runNTimes(interval, TimeUnit.MILLISECONDS);
     }
 
+    // TODO: Add reference to source
     class FixedExecutionRunnable implements Runnable {
         private final AtomicInteger runCount = new AtomicInteger();
         private final Consumer<Integer> action;

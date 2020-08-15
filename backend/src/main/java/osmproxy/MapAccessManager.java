@@ -19,7 +19,6 @@ import jade.core.NotFoundException;
 import org.javatuples.Pair;
 import org.javatuples.Triplet;
 import org.json.simple.parser.JSONParser;
-import org.jxmapviewer.viewer.GeoPosition;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
@@ -30,11 +29,12 @@ import org.xml.sax.SAXException;
 import osmproxy.elements.OSMLight;
 import osmproxy.elements.OSMNode;
 import osmproxy.elements.OSMWay;
+import routing.IZone;
+import routing.Position;
 import routing.RouteInfo;
 import smartcity.MasterAgent;
 import utilities.IterableNodeList;
 import utilities.NumericHelper;
-import utilities.Point;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -207,14 +207,14 @@ public class MapAccessManager {
         return info;
     }
 
-    public static boolean prepareLightManagersInRadiusAndLightIdToLightManagerIdHashSet(GeoPosition middlePoint, int radius) {
+    public static boolean prepareLightManagersInRadiusAndLightIdToLightManagerIdHashSet(IZone zone) {
         try {
             Document xmlDocument = getXmlDocument(CROSSROADS_LOCATIONS_PATH);
             Node osmRoot = xmlDocument.getFirstChild();
             NodeList districtXMLNodes = osmRoot.getChildNodes();
             for (int i = 0; i < districtXMLNodes.getLength(); i++) {
                 if (districtXMLNodes.item(i).getNodeName().equals("district")) {
-                    addAllDesiredIdsInDistrict(districtXMLNodes.item(i), middlePoint, radius);
+                    addAllDesiredIdsInDistrict(districtXMLNodes.item(i), zone);
                 }
             }
         } catch (Exception e) {
@@ -245,32 +245,32 @@ public class MapAccessManager {
         }
     }
 
-    private static void addAllDesiredIdsInDistrict(Node districtRoot, GeoPosition middlePoint, int radius) {
+    private static void addAllDesiredIdsInDistrict(Node districtRoot, IZone zone) {
         Node crossroadsRoot = districtRoot.getChildNodes().item(1);
         NodeList crossroadXMLNodes = crossroadsRoot.getChildNodes();
         for (int i = 0; i < crossroadXMLNodes.getLength(); ++i) {
             if (crossroadXMLNodes.item(i).getNodeName().equals("crossroad")) {
-                addCrossroadIdIfDesired(crossroadXMLNodes.item(i), middlePoint, radius);
+                addCrossroadIdIfDesired(crossroadXMLNodes.item(i), zone);
             }
         }
 
     }
 
-    private static void addCrossroadIdIfDesired(Node crossroad, GeoPosition middlePoint, int radius) {
-        Point crossroadPoint = calculateLatLonBasedOnInternalLights(crossroad);
-        if (NumericHelper.isInCircle(crossroadPoint, Point.of(middlePoint), radius)) {
+    private static void addCrossroadIdIfDesired(Node crossroad, IZone zone) {
+        var crossroadPos = calculateLatLonBasedOnInternalLights(crossroad);
+        if (zone.isInZone(crossroadPos)) {
             MasterAgent.tryCreateLightManager(crossroad);
         }
     }
 
-    private static Point calculateLatLonBasedOnInternalLights(Node crossroad) {
+    private static Position calculateLatLonBasedOnInternalLights(Node crossroad) {
         var crossroadA = getCrossroadGroup(crossroad, 1);
         var crossroadB = getCrossroadGroup(crossroad, 3);
         List<Double> latList = getParametersFromGroup(crossroadA, crossroadB, "lat");
         List<Double> lonList = getParametersFromGroup(crossroadA, crossroadB, "lon");
         double latAverage = NumericHelper.calculateAverage(latList);
         double lonAverage = NumericHelper.calculateAverage(lonList);
-        return Point.of(latAverage, lonAverage);
+        return Position.of(latAverage, lonAverage);
     }
 
     private static List<Double> getParametersFromGroup(Node group1, Node group2, String parameterName) {
@@ -310,7 +310,7 @@ public class MapAccessManager {
         return document;
     }
 
-    public static List<OSMWay> parseOsmWay(Document nodesViaOverpass, int radius, double middleLat, double middleLon)
+    public static List<OSMWay> parseOsmWay(Document nodesViaOverpass, IZone zone)
             throws NotFoundException {
         List<OSMWay> route = new ArrayList<>();
         Node osmRoot = nodesViaOverpass.getFirstChild();
@@ -337,7 +337,7 @@ public class MapAccessManager {
                 }
 
                 // TODO: CORRECT POTENTIAL BUGS CAUSING ROUTE TO BE CUT INTO PIECES BECAUSE OF RZĄŻEWSKI CASE
-                if (way.startsInCircle(middleLat, middleLon, radius)) {
+                if (way.startsInZone(zone)) {
                     route.add(way);
                 }
             }

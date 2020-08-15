@@ -14,7 +14,7 @@ public class OSMLight extends OSMNode {
     }
 
     public final void setAdherentWayId(String value) {
-        setAdherentWayId(NumericHelper.parseLong(value));
+        setAdherentWayId(Long.parseLong(value));
     }
 
     public final long getAdherentWayId() {

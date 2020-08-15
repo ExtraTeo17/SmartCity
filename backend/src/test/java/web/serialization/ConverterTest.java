@@ -2,7 +2,8 @@ package web.serialization;
 
 import org.junit.Assert;
 import org.junit.jupiter.api.Test;
-import org.jxmapviewer.viewer.GeoPosition;
+import routing.IGeoPosition;
+import routing.Position;
 import web.message.payloads.responses.Location;
 
 class ConverterTest {
@@ -11,7 +12,7 @@ class ConverterTest {
     void convert_correctData_correctResult() {
         double lat = 52.00222;
         double lng = 21.001;
-        GeoPosition geoPosition = new GeoPosition(lat, lng);
+        IGeoPosition geoPosition = new Position(lat, lng);
 
         Location result = Converter.convert(geoPosition);
 
