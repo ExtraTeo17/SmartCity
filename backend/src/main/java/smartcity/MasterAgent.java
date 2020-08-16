@@ -55,12 +55,7 @@ public class MasterAgent extends Agent {
     private final LightAccessManager lightAccessManager;
     private final ConfigContainer configContainer;
 
-    public final static boolean USE_DEPRECATED_XML_FOR_LIGHT_MANAGERS = false;
-    public static boolean SHOULD_GENERATE_PEDESTRIANS_AND_BUSES = false;
-    public static boolean SHOULD_GENERATE_CARS = true;
-
     // TODO: Delete this abomination (or at least make it private)
-    public static boolean lightManagersUnderConstruction = false;
     public static final Set<LightManager> lightManagers = ConcurrentHashMap.newKeySet();
     public static final List<PedestrianAgent> pedestrians = new CopyOnWriteArrayList<>();
     public static final List<VehicleAgent> vehicles = new ArrayList<>();
@@ -177,7 +172,7 @@ public class MasterAgent extends Agent {
     }
 
     public boolean prepareAgents() {
-        if (SHOULD_GENERATE_PEDESTRIANS_AND_BUSES) {
+        if (configContainer.shouldGeneratePedestriansAndBuses()) {
             if (!busLinesManager.prepareStationsAndBuses(this::tryAddNewBusAgent)) {
                 return false;
             }
@@ -257,15 +252,19 @@ public class MasterAgent extends Agent {
 
     private boolean prepareLightManagers() {
         IdGenerator.resetLightManagerId();
-        lightManagersUnderConstruction = true;
+        if (!configContainer.tryLockLightManagers()) {
+            logger.error("Light managers are locked, cannot prepare.");
+            return false;
+        }
+
         boolean result;
-        if (USE_DEPRECATED_XML_FOR_LIGHT_MANAGERS) {
+        if (configContainer.USE_DEPRECATED_XML_FOR_LIGHT_MANAGERS) {
             result = MapAccessManager.prepareLightManagersInRadiusAndLightIdToLightManagerIdHashSet(configContainer.getZone());
         }
         else {
             result = tryConstructLightManagers();
         }
-        lightManagersUnderConstruction = false;
+        configContainer.unlockLightManagers();
 
         return result;
     }

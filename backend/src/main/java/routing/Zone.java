@@ -2,6 +2,8 @@ package routing;
 
 import utilities.NumericHelper;
 
+import java.util.Objects;
+
 public class Zone implements IZone {
     private IGeoPosition center;
     private int radius;
@@ -28,6 +30,7 @@ public class Zone implements IZone {
 
     @Override
     public void setZone(ZoneMutator.Mutation mutation, IGeoPosition pos, int radius) {
+        Objects.requireNonNull(mutation);
         this.center = pos;
         this.radius = radius;
     }

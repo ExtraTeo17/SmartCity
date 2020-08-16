@@ -9,6 +9,7 @@ public final class ConfigContainer extends ZoneMutator {
 
     private boolean shouldGeneratePedestriansAndBuses = false;
     private boolean shouldGenerateCars = true;
+    private boolean lightManagersLock = false;
     private final IZone zone;
 
     public ConfigContainer() {
@@ -30,6 +31,20 @@ public final class ConfigContainer extends ZoneMutator {
     public void setGeneratePedestriansAndBuses(boolean value) {
         this.shouldGeneratePedestriansAndBuses = value;
     }
+
+    public boolean tryLockLightManagers() {
+        if (lightManagersLock) {
+            return false;
+        }
+        
+        lightManagersLock = true;
+        return true;
+    }
+
+    public void unlockLightManagers() {
+        lightManagersLock = false;
+    }
+
 
     public IZone getZone() {
         return zone;

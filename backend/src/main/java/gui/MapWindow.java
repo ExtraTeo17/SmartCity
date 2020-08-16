@@ -30,14 +30,8 @@ import vehicles.TestPedestrian;
 
 import javax.swing.*;
 import javax.swing.border.TitledBorder;
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
 import javax.swing.event.MouseInputListener;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.ItemEvent;
-import java.awt.event.ItemListener;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.time.Duration;
@@ -45,8 +39,6 @@ import java.time.Instant;
 import java.util.List;
 import java.util.Timer;
 import java.util.*;
-
-import static smartcity.MasterAgent.SHOULD_GENERATE_PEDESTRIANS_AND_BUSES;
 
 @Deprecated
 public class MapWindow {
@@ -62,7 +54,7 @@ public class MapWindow {
     private final ConfigContainer configContainer;
 
     public JPanel MainPanel;
-    private JXMapViewer MapViewer;
+    private final JXMapViewer MapViewer;
     private boolean renderPedestrians = true;
     public boolean renderPedestrianRoutes = true;
     private boolean renderCars = true;
@@ -134,65 +126,45 @@ public class MapWindow {
         MapViewer.setAddressLocation(warsaw);
         radiusSpinner.setModel(new SpinnerNumberModel(200, 100, 50000, 100));
         carLimitSpinner.setModel(new SpinnerNumberModel(1, 1, 1000, 1));
-        carLimitSpinner.addChangeListener(new ChangeListener() {
-            @Override
-            public void stateChanged(ChangeEvent e) {
-                if (getCarLimit() - 1 < getTestCarId()) {
-                    testCarIdSpinner.setValue(getCarLimit() - 1);
-                }
+        carLimitSpinner.addChangeListener(e -> {
+            if (getCarLimit() - 1 < getTestCarId()) {
+                testCarIdSpinner.setValue(getCarLimit() - 1);
             }
         });
 
-        UseStrategyCheckBox.addItemListener(new ItemListener() {
-            @Override
-            public void itemStateChanged(ItemEvent e) {
-                SimpleCrossroad.STRATEGY_ACTIVE = UseStrategyCheckBox.isSelected();
-            }
-        });
+        UseStrategyCheckBox.addItemListener(e -> SimpleCrossroad.STRATEGY_ACTIVE = UseStrategyCheckBox.isSelected());
 
         seedSpinner.setModel(new SpinnerNumberModel(69, 0, 999999, 1));
         latSpinner.setModel(new SpinnerNumberModel(52.203342, -90, 90, 1));
         lonSpinner.setModel(new SpinnerNumberModel(20.861213, -180, 180, 0.001));
 
         testCarIdSpinner.setModel(new SpinnerNumberModel(40, 0, 100, 1));
-        testCarIdSpinner.addChangeListener(new ChangeListener() {
-            @Override
-            public void stateChanged(ChangeEvent e) {
-                if (getTestCarId() >= getCarLimit()) {
-                    testCarIdSpinner.setValue(testCarIdSpinner.getPreviousValue());
-                }
+        testCarIdSpinner.addChangeListener(e -> {
+            if (getTestCarId() >= getCarLimit()) {
+                testCarIdSpinner.setValue(testCarIdSpinner.getPreviousValue());
             }
         });
-        setZoneButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                prepareAgentsAndSetZone((double) latSpinner.getValue(), (double) lonSpinner.getValue(), getZoneRadius());
-                setState(SimulationState.READY_TO_RUN);
-            }
+        setZoneButton.addActionListener(e -> {
+            prepareAgentsAndSetZone((double) latSpinner.getValue(), (double) lonSpinner.getValue(), getZoneRadius());
+            setState(SimulationState.READY_TO_RUN);
         });
 
-        testCarZoneButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                latSpinner.setValue(52.23682);
-                lonSpinner.setValue(21.01681);
-                seedSpinner.setValue(34);
-                radiusSpinner.setValue(600);
-                prepareAgentsAndSetZone(52.23682, 21.01681, getZoneRadius());
-            }
+        testCarZoneButton.addActionListener(e -> {
+            latSpinner.setValue(52.23682);
+            lonSpinner.setValue(21.01681);
+            seedSpinner.setValue(34);
+            radiusSpinner.setValue(600);
+            prepareAgentsAndSetZone(52.23682, 21.01681, getZoneRadius());
         });
 
-        testBusZoneButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                latSpinner.setValue(52.203342);
-                lonSpinner.setValue(20.861213);
-                radiusSpinner.setValue(300);
-                if (!MasterAgent.SHOULD_GENERATE_PEDESTRIANS_AND_BUSES) {
-                    logger.warn("Pedestrians won't be generated");
-                }
-                prepareAgentsAndSetZone(52.203342, 20.861213, getZoneRadius());
+        testBusZoneButton.addActionListener(e -> {
+            latSpinner.setValue(52.203342);
+            lonSpinner.setValue(20.861213);
+            radiusSpinner.setValue(300);
+            if (!configContainer.shouldGeneratePedestriansAndBuses()) {
+                logger.warn("Pedestrians won't be generated");
             }
+            prepareAgentsAndSetZone(52.203342, 20.861213, getZoneRadius());
         });
 
         setTimeSpinner.setModel(new SpinnerDateModel());
@@ -244,30 +216,27 @@ public class MapWindow {
 
         MapPanel.add(MapViewer);
         MapPanel.revalidate();
-        StartRouteButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                if (state != SimulationState.READY_TO_RUN) {
-                    return;
-                }
-                setInputEnabled(false);
-                currentTimeTitle.setVisible(true);
-                currentTimeLabel.setVisible(true);
-                ResultTimeLabel.setVisible(true);
-                ResultTimeTitle.setVisible(true);
-                masterAgent.activateLightManagerAgents();
-                random.setSeed(getSeed());
-
-                if (configContainer.shouldGenerateCars()) {
-                    spawnTimer.scheduleAtFixedRate(new CreateCarTask(), 0, CREATE_CAR_INTERVAL_MILLISECONDS);
-                }
-                if (configContainer.shouldGeneratePedestriansAndBuses()) {
-                    spawnTimer.scheduleAtFixedRate(new CreatePedestrianTask(), 0, CREATE_PEDESTRIAN_INTERVAL_MILLISECONDS);
-                }
-                simulationStart = getSimulationStartTime().toInstant();
-                refreshTimer.scheduleAtFixedRate(new BusControlTask(), 0, BUS_CONTROL_INTERVAL_MILLISECONDS);
-                setState(SimulationState.RUNNING);
+        StartRouteButton.addActionListener(e -> {
+            if (state != SimulationState.READY_TO_RUN) {
+                return;
             }
+            setInputEnabled(false);
+            currentTimeTitle.setVisible(true);
+            currentTimeLabel.setVisible(true);
+            ResultTimeLabel.setVisible(true);
+            ResultTimeTitle.setVisible(true);
+            masterAgent.activateLightManagerAgents();
+            random.setSeed(getSeed());
+
+            if (configContainer.shouldGenerateCars()) {
+                spawnTimer.scheduleAtFixedRate(new CreateCarTask(), 0, CREATE_CAR_INTERVAL_MILLISECONDS);
+            }
+            if (configContainer.shouldGeneratePedestriansAndBuses()) {
+                spawnTimer.scheduleAtFixedRate(new CreatePedestrianTask(), 0, CREATE_PEDESTRIAN_INTERVAL_MILLISECONDS);
+            }
+            simulationStart = getSimulationStartTime().toInstant();
+            refreshTimer.scheduleAtFixedRate(new BusControlTask(), 0, BUS_CONTROL_INTERVAL_MILLISECONDS);
+            setState(SimulationState.RUNNING);
         });
         refreshTimer.scheduleAtFixedRate(new RefreshTask(), 0, REFRESH_MAP_INTERVAL_MILLISECONDS);
     }
@@ -289,84 +258,39 @@ public class MapWindow {
 
         final JCheckBoxMenuItem cars = new JCheckBoxMenuItem("Render cars", this.renderCars);
         var window = this;
-        cars.addItemListener(new ItemListener() {
-            @Override
-            public void itemStateChanged(ItemEvent e) {
-                window.renderCars = cars.getState();
-            }
-        });
+        cars.addItemListener(e -> window.renderCars = cars.getState());
         view.add(cars);
 
         final JCheckBoxMenuItem routes = new JCheckBoxMenuItem("Render car routes", this.renderCarRoutes);
-        routes.addItemListener(new ItemListener() {
-            @Override
-            public void itemStateChanged(ItemEvent e) {
-                window.renderCarRoutes = routes.getState();
-            }
-        });
+        routes.addItemListener(e -> window.renderCarRoutes = routes.getState());
         view.add(routes);
 
         final JCheckBoxMenuItem buses = new JCheckBoxMenuItem("Render buses", this.renderBuses);
-        buses.addItemListener(new ItemListener() {
-            @Override
-            public void itemStateChanged(ItemEvent e) {
-                window.renderBuses = buses.getState();
-            }
-        });
+        buses.addItemListener(e -> window.renderBuses = buses.getState());
         view.add(buses);
 
         final JCheckBoxMenuItem busRoutes = new JCheckBoxMenuItem("Render bus routes", this.renderBusRoutes);
-        busRoutes.addItemListener(new ItemListener() {
-            @Override
-            public void itemStateChanged(ItemEvent e) {
-                window.renderBusRoutes = busRoutes.getState();
-            }
-        });
+        busRoutes.addItemListener(e -> window.renderBusRoutes = busRoutes.getState());
         view.add(busRoutes);
 
         final JCheckBoxMenuItem pedestrian = new JCheckBoxMenuItem("Render pedestrians", this.renderPedestrians);
-        pedestrian.addItemListener(new ItemListener() {
-            @Override
-            public void itemStateChanged(ItemEvent e) {
-                window.renderPedestrians = pedestrian.getState();
-            }
-        });
+        pedestrian.addItemListener(e -> window.renderPedestrians = pedestrian.getState());
         view.add(pedestrian);
 
         final JCheckBoxMenuItem pedestrianRoutes = new JCheckBoxMenuItem("Render pedestrian routes", this.renderPedestrianRoutes);
-        pedestrianRoutes.addItemListener(new ItemListener() {
-            @Override
-            public void itemStateChanged(ItemEvent e) {
-                window.renderPedestrianRoutes = pedestrianRoutes.getState();
-            }
-        });
+        pedestrianRoutes.addItemListener(e -> window.renderPedestrianRoutes = pedestrianRoutes.getState());
         view.add(pedestrianRoutes);
 
         final JCheckBoxMenuItem lights = new JCheckBoxMenuItem("Render lights", this.renderLights);
-        lights.addItemListener(new ItemListener() {
-            @Override
-            public void itemStateChanged(ItemEvent e) {
-                window.renderLights = lights.getState();
-            }
-        });
+        lights.addItemListener(e -> window.renderLights = lights.getState());
         view.add(lights);
 
         final JCheckBoxMenuItem zone = new JCheckBoxMenuItem("Render zone", this.renderZone);
-        zone.addItemListener(new ItemListener() {
-            @Override
-            public void itemStateChanged(ItemEvent e) {
-                window.renderZone = zone.getState();
-            }
-        });
+        zone.addItemListener(e -> window.renderZone = zone.getState());
         view.add(zone);
 
         final JCheckBoxMenuItem stations = new JCheckBoxMenuItem("Render stations", this.renderStations);
-        stations.addItemListener(new ItemListener() {
-            @Override
-            public void itemStateChanged(ItemEvent e) {
-                window.renderStations = stations.getState();
-            }
-        });
+        stations.addItemListener(e -> window.renderStations = stations.getState());
         view.add(stations);
 
         menuBar.add(view);
@@ -374,85 +298,82 @@ public class MapWindow {
         JMenu debug = new JMenu("Debug");
 
         JMenuItem runTest = new JMenuItem("Test crossroad");
-        runTest.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                window.setInputEnabled(false);
-                double lat = 52.23702507833161;
-                double lon = 21.017934679985046;
-                mapViewer.setAddressLocation(new GeoPosition(lat, lon));
-                mapViewer.setZoom(1);
-                window.prepareAgentsAndSetZone(lat, lon, 100);
-                IGeoPosition N = new Position(52.23758683540269, 21.017720103263855);
-                IGeoPosition S = new Position(52.23627934304847, 21.018092930316925);
-                IGeoPosition E = new Position(52.237225472020704, 21.019399166107178);
-                IGeoPosition W = new Position(52.23678526174392, 21.016663312911987);
+        runTest.addActionListener(e -> {
+            window.setInputEnabled(false);
+            double lat = 52.23702507833161;
+            double lon = 21.017934679985046;
+            mapViewer.setAddressLocation(new GeoPosition(lat, lon));
+            mapViewer.setZoom(1);
+            window.prepareAgentsAndSetZone(lat, lon, 100);
+            IGeoPosition N = new Position(52.23758683540269, 21.017720103263855);
+            IGeoPosition S = new Position(52.23627934304847, 21.018092930316925);
+            IGeoPosition E = new Position(52.237225472020704, 21.019399166107178);
+            IGeoPosition W = new Position(52.23678526174392, 21.016663312911987);
 
-                // N to S
-                List<RouteNode> NS;
-                try {
-                    NS = Router.generateRouteInfo(N, S);
+            // N to S
+            List<RouteNode> NS;
+            try {
+                NS = Router.generateRouteInfo(N, S);
 
-                    for (int i = 0; i < 5; i++) {
-                        masterAgent.tryAddNewVehicleAgent(NS);
-                    }
-                } catch (Exception ex) {
-                    ex.printStackTrace();
-                    return;
+                for (int i = 0; i < 5; i++) {
+                    masterAgent.tryAddNewVehicleAgent(NS);
                 }
-
-                // S to N
-                List<RouteNode> SN;
-                try {
-                    SN = Router.generateRouteInfo(S, N);
-
-                    for (int i = 0; i < 5; i++) {
-                        masterAgent.tryAddNewVehicleAgent(SN);
-                    }
-                } catch (Exception ex) {
-                    ex.printStackTrace();
-                    return;
-                }
-
-                // E to W
-                List<RouteNode> EW;
-                try {
-                    EW = Router.generateRouteInfo(E, W);
-
-                    for (int i = 0; i < 5; i++) {
-                        masterAgent.tryAddNewVehicleAgent(EW);
-                    }
-                } catch (Exception ex) {
-                    ex.printStackTrace();
-                    return;
-                }
-
-                // W to E
-                List<RouteNode> WE;
-                try {
-                    WE = Router.generateRouteInfo(W, E);
-                    for (int i = 0; i < 5; i++) {
-                        masterAgent.tryAddNewVehicleAgent(WE);
-                    }
-                } catch (Exception ex) {
-                    ex.printStackTrace();
-                    return;
-                }
-
-                masterAgent.activateLightManagerAgents();
-
-                // start all
-                for (VehicleAgent agent : MasterAgent.vehicles) {
-                    agent.start();
-                }
-
+            } catch (Exception ex) {
+                logger.warn("Error adding vehicle", ex);
+                return;
             }
+
+            // S to N
+            List<RouteNode> SN;
+            try {
+                SN = Router.generateRouteInfo(S, N);
+
+                for (int i = 0; i < 5; i++) {
+                    masterAgent.tryAddNewVehicleAgent(SN);
+                }
+            } catch (Exception ex) {
+                logger.warn("Error adding vehicle", ex);
+                return;
+            }
+
+            // E to W
+            List<RouteNode> EW;
+            try {
+                EW = Router.generateRouteInfo(E, W);
+
+                for (int i = 0; i < 5; i++) {
+                    masterAgent.tryAddNewVehicleAgent(EW);
+                }
+            } catch (Exception ex) {
+                logger.warn("Error adding vehicle", ex);
+                return;
+            }
+
+            // W to E
+            List<RouteNode> WE;
+            try {
+                WE = Router.generateRouteInfo(W, E);
+                for (int i = 0; i < 5; i++) {
+                    masterAgent.tryAddNewVehicleAgent(WE);
+                }
+            } catch (Exception ex) {
+                logger.warn("Error adding vehicle", ex);
+                return;
+            }
+
+            masterAgent.activateLightManagerAgents();
+
+            // start all
+            for (VehicleAgent agent : MasterAgent.vehicles) {
+                agent.start();
+            }
+
         });
         debug.add(runTest);
 
         menuBar.add(debug);
 
-        MapWindow.addGenerationMenu(menuBar);
+        this.addGenerationMenu(menuBar);
 
         frame.setJMenuBar(menuBar);
         frame.setSize(1200, 600);
@@ -460,25 +381,16 @@ public class MapWindow {
         frame.setVisible(true);
     }
 
-    private static void addGenerationMenu(JMenuBar menuBar) {
+    private void addGenerationMenu(JMenuBar menuBar) {
         JMenu generation = new JMenu("Generation");
 
-        final JCheckBoxMenuItem car_gen = new JCheckBoxMenuItem("Cars", MasterAgent.SHOULD_GENERATE_CARS);
-        car_gen.addItemListener(new ItemListener() {
-            @Override
-            public void itemStateChanged(ItemEvent e) {
-                MasterAgent.SHOULD_GENERATE_CARS = car_gen.getState();
-            }
-        });
+        final JCheckBoxMenuItem car_gen = new JCheckBoxMenuItem("Cars", configContainer.shouldGenerateCars());
+        car_gen.addItemListener(e -> configContainer.setGenerateCars(car_gen.getState()));
         generation.add(car_gen);
 
-        final JCheckBoxMenuItem pedestrians = new JCheckBoxMenuItem("Pedestrians", SHOULD_GENERATE_PEDESTRIANS_AND_BUSES);
-        pedestrians.addItemListener(new ItemListener() {
-            @Override
-            public void itemStateChanged(ItemEvent e) {
-                SHOULD_GENERATE_PEDESTRIANS_AND_BUSES = pedestrians.getState();
-            }
-        });
+        final JCheckBoxMenuItem pedestrians = new JCheckBoxMenuItem("Pedestrians and buses",
+                configContainer.shouldGeneratePedestriansAndBuses());
+        pedestrians.addItemListener(e -> configContainer.setGeneratePedestriansAndBuses(pedestrians.getState()));
         generation.add(pedestrians);
 
         menuBar.add(generation);
@@ -557,13 +469,15 @@ public class MapWindow {
     }
 
     private void drawLights(List<Painter<JXMapViewer>> painters) {
-        if (MasterAgent.lightManagersUnderConstruction) {
+        if (!configContainer.tryLockLightManagers()) {
             return;
         }
 
         for (LightManager mgr : MasterAgent.lightManagers) {
             mgr.draw(painters);
         }
+
+        configContainer.unlockLightManagers();
     }
 
     private void drawVehicles(List<Painter<JXMapViewer>> painters) {
@@ -596,8 +510,7 @@ public class MapWindow {
     private void drawRoutes(List<Painter<JXMapViewer>> painters) {
         try {
             for (VehicleAgent a : MasterAgent.vehicles) {
-                List<IGeoPosition> track = new ArrayList<>();
-                track.addAll(a.getVehicle().getDisplayRoute());
+                List<IGeoPosition> track = new ArrayList<>(a.getVehicle().getDisplayRoute());
 
                 Random r = new Random(a.hashCode());
                 RoutePainter routePainter = new RoutePainter(track, new Color(r.nextInt(255), r.nextInt(255), r.nextInt(255)));
@@ -640,10 +553,8 @@ public class MapWindow {
     private void drawPedestrianRoutes(List<Painter<JXMapViewer>> painters) {
         try {
             for (PedestrianAgent a : MasterAgent.pedestrians) {
-                List<IGeoPosition> trackBefore = new ArrayList<>();
-                List<IGeoPosition> trackAfter = new ArrayList<>();
-                trackBefore.addAll(a.getPedestrian().getDisplayRouteBeforeBus());
-                trackAfter.addAll(a.getPedestrian().getDisplayRouteAfterBus());
+                List<IGeoPosition> trackBefore = new ArrayList<>(a.getPedestrian().getDisplayRouteBeforeBus());
+                List<IGeoPosition> trackAfter = new ArrayList<>(a.getPedestrian().getDisplayRouteAfterBus());
 
                 Random r = new Random(a.hashCode());
                 Color c = new Color(r.nextInt(255), r.nextInt(255), r.nextInt(255));
@@ -699,9 +610,8 @@ public class MapWindow {
     private void drawBusRoutes(List<Painter<JXMapViewer>> painters) {
         try {
             agentsContainer.forEach(BusAgent.class, busAgent -> {
-                List<IGeoPosition> track = new ArrayList<>();
                 var bus = busAgent.getBus();
-                track.addAll(bus.getDisplayRoute());
+                List<IGeoPosition> track = new ArrayList<>(bus.getDisplayRoute());
 
                 Random r = new Random(busAgent.hashCode());
                 RoutePainter routePainter = new RoutePainter(track, new Color(r.nextInt(255), r.nextInt(255), r.nextInt(255)));
@@ -1055,9 +965,7 @@ public class MapWindow {
         }
 
         private void RunBusBasedOnTimeTable() {
-            agentsContainer.forEach(BusAgent.class, busAgent -> {
-                busAgent.runBasedOnTimetable(getSimulationStartTime());
-            });
+            agentsContainer.forEach(BusAgent.class, busAgent -> busAgent.runBasedOnTimetable(getSimulationStartTime()));
         }
     }
 
@@ -1099,10 +1007,12 @@ public class MapWindow {
 
         @Override
         public void run() {
+            if (!configContainer.shouldGeneratePedestriansAndBuses()) {
+                this.cancel();
+                return;
+            }
+
             try {
-                if (!MasterAgent.SHOULD_GENERATE_PEDESTRIANS_AND_BUSES) {
-                    this.cancel();
-                }
                 // TODO: add people limit
                 final Pair<Pair<StationNode, StationNode>, String> stationNodePairAndBusLine = getStationPairAndLineFromRandomBus();
                 final StationNode startStation = stationNodePairAndBusLine.getValue0().getValue0();
@@ -1133,6 +1043,7 @@ public class MapWindow {
                 masterAgent.pedestrianId++;
             } catch (Exception e) {
                 logger.warn("Unknown error.", e);
+                this.cancel();
             }
         }
 
