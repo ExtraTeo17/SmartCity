@@ -123,21 +123,6 @@ public class MapAccessManager {
     }
 
     private static RouteInfo parseWayAndNodes(Document nodesViaOverpass) {
-        try {
-            DOMSource source = new DOMSource(nodesViaOverpass);
-            File file = new File("output.xml");
-            if (file.createNewFile()) {
-                FileWriter writer = new FileWriter(file);
-                StreamResult result = new StreamResult(writer);
-
-                TransformerFactory transformerFactory = TransformerFactory.newInstance();
-                Transformer transformer = transformerFactory.newTransformer();
-                transformer.transform(source, result);
-            }
-        } catch (Exception e) {
-            logger.warn("Could not write to file");
-        }
-
         final RouteInfo info = new RouteInfo();
         Node osmRoot = nodesViaOverpass.getFirstChild();
         NodeList osmXMLNodes = osmRoot.getChildNodes();
