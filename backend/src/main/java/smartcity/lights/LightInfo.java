@@ -14,11 +14,12 @@ public class LightInfo implements IGeoPosition {
     private String adjacentCrossingOsmId1;
     private String adjacentCrossingOsmId2;
 
-    public LightInfo(OSMWay adjacentOsmWay, OSMNode centerCrossroadNode,
-                     double distToCrossroad) {
+    public LightInfo(OSMWay adjacentOsmWay, OSMNode centerCrossroadNode) {
         this.adjacentOsmWayId = Long.toString(adjacentOsmWay.getId());
         this.osmLightId = Long.toString(centerCrossroadNode.getId());
         fillLightPositionAndCrossings(adjacentOsmWay);
+
+        var distToCrossroad = adjacentOsmWay.getLightNeighborPos().distance(centerCrossroadNode);
         if (distToCrossroad > DISTANCE_THRESHOLD) {
             position = position.midpoint(centerCrossroadNode);
             position = position.midpoint(centerCrossroadNode);

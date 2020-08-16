@@ -3,7 +3,6 @@ package smartcity.lights;
 import com.google.common.collect.Iterables;
 import osmproxy.elements.OSMNode;
 import osmproxy.elements.OSMWay;
-import utilities.NumericHelper;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -19,17 +18,15 @@ class CrossroadInfo {
 
         OSMWay firstWay = centerNode.iterator().next();
         var firstWayNeighborPos = firstWay.getLightNeighborPos();
-        var firstWayDistance = firstWayNeighborPos.distance(centerNode);
-        firstLightGroupInfo.add(new LightInfo(firstWay, centerNode, firstWayDistance));
+        firstLightGroupInfo.add(new LightInfo(firstWay, centerNode));
         for (OSMWay parentWay : Iterables.skip(centerNode, 1)) {
             var nextWayLightNeighborPos = parentWay.getLightNeighborPos();
-            double b = nextWayLightNeighborPos.distance(centerNode);
-            double c = firstWayNeighborPos.distance(nextWayLightNeighborPos);
-            if (NumericHelper.getCosineInTriangle(firstWayDistance, b, c) < COSINE_OF_135_DEGREES) {
-                firstLightGroupInfo.add(new LightInfo(parentWay, centerNode, b));
+            double cosineCenterNodeNextWay = firstWayNeighborPos.cosineAngle(centerNode, nextWayLightNeighborPos);
+            if (cosineCenterNodeNextWay < COSINE_OF_135_DEGREES) {
+                firstLightGroupInfo.add(new LightInfo(parentWay, centerNode));
             }
             else {
-                secondLightGroupInfo.add(new LightInfo(parentWay, centerNode, b));
+                secondLightGroupInfo.add(new LightInfo(parentWay, centerNode));
             }
         }
     }

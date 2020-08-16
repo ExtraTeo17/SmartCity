@@ -18,7 +18,6 @@ package osmproxy;
 import jade.core.NotFoundException;
 import org.javatuples.Pair;
 import org.javatuples.Triplet;
-import org.json.simple.parser.JSONParser;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
@@ -53,6 +52,7 @@ import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.NoSuchElementException;
 
 //import org.osm.lights.diff.OSMNode;
 //import org.osm.lights.upload.BasicAuthenticator;
@@ -62,7 +62,6 @@ import java.util.List;
  */
 public class MapAccessManager {
     private static final Logger logger = LoggerFactory.getLogger(MapAccessManager.class);
-    private static final JSONParser jsonParser = new JSONParser();
     private static final String OVERPASS_API = "https://lz4.overpass-api.de/api/interpreter";
     private static final String CROSSROADS_LOCATIONS_PATH = "config/crossroads.xml";
 
@@ -162,6 +161,7 @@ public class MapAccessManager {
         return info;
     }
 
+    // TODO: Remove checked exceptions from here
     /**
      * @param query the overpass query
      * @return the nodes in the formulated query
@@ -310,8 +310,7 @@ public class MapAccessManager {
         return document;
     }
 
-    public static List<OSMWay> parseOsmWay(Document nodesViaOverpass, IZone zone)
-            throws NotFoundException {
+    public static List<OSMWay> parseOsmWay(Document nodesViaOverpass, IZone zone) {
         List<OSMWay> route = new ArrayList<>();
         Node osmRoot = nodesViaOverpass.getFirstChild();
         NodeList osmXMLNodes = osmRoot.getChildNodes();
@@ -346,8 +345,7 @@ public class MapAccessManager {
     }
 
     // TODO: Is it returning orientation of next way or current way?
-    private static Pair<OSMWay, String> determineInitialWayRelOrientation(final NodeList osmXMLNodes)
-            throws NotFoundException {
+    private static Pair<OSMWay, String> determineInitialWayRelOrientation(final NodeList osmXMLNodes) {
         OSMWay firstWay = null;
         OSMWay lastWay = null;
         for (int it = 1; it < osmXMLNodes.getLength(); ++it) {
@@ -369,6 +367,6 @@ public class MapAccessManager {
             return Pair.with(lastWay, orientation);
         }
 
-        throw new NotFoundException("Did not find two 'way'-type nodes in provided list.");
+        throw new NoSuchElementException("Did not find two 'way'-type nodes in provided list.");
     }
 }

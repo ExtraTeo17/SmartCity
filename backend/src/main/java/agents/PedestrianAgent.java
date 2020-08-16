@@ -121,12 +121,14 @@ public class PedestrianAgent extends AbstractAgent {
             @Override
             public void action() {
                 ACLMessage rcv = receive();
-                if (rcv == null)
+                if (rcv == null) {
                     return;
-                
+                }
+
                 String type = rcv.getUserDefinedParameter(MessageParameter.TYPE);
-                if(type == null)
+                if (type == null) {
                     return;
+                }
 
                 switch (type) {
                     case MessageParameter.LIGHT:
@@ -216,7 +218,7 @@ public class PedestrianAgent extends AbstractAgent {
             msg.addReceiver(dest);
             Properties properties = new Properties();
             Instant currentTime = MasterAgent.getSimulationTime().toInstant();
-            Instant time = currentTime.plusMillis(pedestrian.getMilisecondsToNextStation());
+            Instant time = currentTime.plusMillis(pedestrian.getMillisecondsToNextStation());
             properties.setProperty(MessageParameter.TYPE, MessageParameter.PEDESTRIAN);
             properties.setProperty(MessageParameter.ARRIVAL_TIME, "" + time);
             properties.setProperty(MessageParameter.DESIRED_BUS, "" + pedestrian.getPreferredBusLine());

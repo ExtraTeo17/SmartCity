@@ -7,7 +7,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 @SuppressWarnings("restriction")
-public class Pedestrian extends MovingObject { // TODO: Remember to create a dedicated super-class for all moving types
+// TODO: Create a dedicated super-class for all moving types
+public class Pedestrian extends MovingObject {
 
     private final String preferredBusLine;
     public DrivingState state = DrivingState.STARTING;
@@ -159,7 +160,7 @@ public class Pedestrian extends MovingObject { // TODO: Remember to create a ded
         return displayRouteAfterBus;
     }
 
-    public long getMilisecondsToNextStation() {
+    public long getMillisecondsToNextStation() {
         return ((routeBeforeBus.size() - 1 - index) * 3600) / getSpeed();
 
     }

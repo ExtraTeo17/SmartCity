@@ -56,7 +56,7 @@ public class MapWindow {
     public JPanel MainPanel;
     private final JXMapViewer MapViewer;
     private boolean renderPedestrians = true;
-    public boolean renderPedestrianRoutes = true;
+    private boolean renderPedestrianRoutes = true;
     private boolean renderCars = true;
     private boolean renderCarRoutes = true;
     private boolean renderBuses = true;
@@ -980,7 +980,7 @@ public class MapWindow {
             var zoneCenter = zone.getCenter();
             var geoPosInZoneCircle = generateRandomGeoPosOffsetWithRadius(zone.getRadius());
             IGeoPosition posA = zoneCenter.sum(geoPosInZoneCircle);
-            IGeoPosition posB = zoneCenter.difference(geoPosInZoneCircle);
+            IGeoPosition posB = zoneCenter.diff(geoPosInZoneCircle);
 
             List<RouteNode> info;
             try {

@@ -35,7 +35,6 @@ public class Zone implements IZone {
         this.radius = radius;
     }
 
-    // TODO: Move computation here or add some utilities for difference in pos
     @Override
     public boolean isInZone(IGeoPosition pos) {
         return NumericHelper.isInCircle(pos, center, radius);

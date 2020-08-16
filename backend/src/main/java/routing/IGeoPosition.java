@@ -26,7 +26,7 @@ public interface IGeoPosition {
     }
 
     default double distance(IGeoPosition other) {
-        return NumericHelper.getEuclideanDistance(getLat(), other.getLat(), getLng(), other.getLng());
+        return Math.sqrt(this.diff(other).squaredSum());
     }
 
     default IGeoPosition sum(IGeoPosition other) {
@@ -46,7 +46,7 @@ public interface IGeoPosition {
         };
     }
 
-    default IGeoPosition difference(IGeoPosition other) {
+    default IGeoPosition diff(IGeoPosition other) {
         return new IGeoPosition() {
             private final double lat = IGeoPosition.this.getLat() - other.getLat();
             private final double lng = IGeoPosition.this.getLng() - other.getLng();
@@ -62,6 +62,18 @@ public interface IGeoPosition {
             }
         };
     }
+
+    default double squaredSum() {
+        return getLat() * getLat() + getLng() * getLng();
+    }
+
+    default double cosineAngle(IGeoPosition posA, IGeoPosition posB) {
+        var a = posA.distance(posB);
+        var b = posB.distance(this);
+        var c = this.distance(posA);
+        return NumericHelper.getCosineInTriangle(a, b, c);
+    }
+
 
     @Deprecated
     default GeoPosition toMapGeoPosition() {

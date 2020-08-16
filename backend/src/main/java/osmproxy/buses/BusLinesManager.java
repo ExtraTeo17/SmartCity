@@ -1,7 +1,6 @@
 package osmproxy.buses;
 
 import com.google.inject.Inject;
-import jade.core.NotFoundException;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
@@ -20,7 +19,6 @@ import routing.RouteNode;
 import smartcity.MasterAgent;
 import smartcity.buses.BrigadeInfo;
 import smartcity.buses.Timetable;
-import utilities.NumericHelper;
 
 import java.net.URL;
 import java.util.*;
@@ -143,7 +141,7 @@ public class BusLinesManager implements IBusLinesManager {
                             MapAccessManager.getNodesViaOverpass(OsmQueryManager.getQueryWithPayload(builder.toString()));
                     var osmWays = MapAccessManager.parseOsmWay(overpassNodes, zone);
                     info.setRoute(osmWays);
-                } catch (NotFoundException | UnsupportedOperationException e) {
+                } catch (NoSuchElementException | UnsupportedOperationException e) {
                     logger.warn("Please change the zone, this one is not supported yet.", e);
                     throw new IllegalArgumentException(e);
                 } catch (Exception e) {

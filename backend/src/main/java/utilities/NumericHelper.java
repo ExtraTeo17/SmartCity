@@ -9,13 +9,8 @@ public final class NumericHelper {
     public static final double EARTH_RADIUS = 6364.917;
     public static final double METERS_PER_DEGREE = EARTH_RADIUS * 2 * Math.PI / 360.0 * 1000;
 
-    @Contract(pure = true)
-    public static double getEuclideanDistance(double x1, double x2, double y1, double y2) {
-        return Math.sqrt((x2 - x1) * (x2 - x1) + (y2 - y1) * (y2 - y1));
-    }
-
     /**
-     * @return cosine calculated from the Law of Cosines in triangle
+     * @return cosine in radians, calculated from the Law of Cosines in triangle
      */
     @Contract(pure = true)
     public static double getCosineInTriangle(double a, double b, double c) {
@@ -27,29 +22,8 @@ public final class NumericHelper {
      */
     @Contract(pure = true)
     public static boolean isInCircle(IGeoPosition point, IGeoPosition center, int radius) {
-        return isInCircle(point.getLat(), point.getLng(), center.getLat(), center.getLng(), radius / METERS_PER_DEGREE);
-    }
-
-    /**
-     * @param radius METER based radius
-     */
-    @Contract(pure = true)
-    public static boolean isInCircle(double xPoint, double yPoint,
-                                     double xCenter, double yCenter,
-                                     int radius) {
-        return isInCircle(xPoint, yPoint, xCenter, yCenter, radius / METERS_PER_DEGREE);
-    }
-
-    /**
-     * @param radius DEGREE based radius
-     */
-    @Contract(pure = true)
-    public static boolean isInCircle(double xPoint, double yPoint,
-                                     double xCenter, double yCenter,
-                                     double radius) {
-        return (xPoint - xCenter) * (xPoint - xCenter) +
-                (yPoint - yCenter) * (yPoint - yCenter)
-                < (radius * radius);
+        var degreeRadius = radius / METERS_PER_DEGREE;
+        return center.diff(point).squaredSum() < degreeRadius * degreeRadius;
     }
 
     @Contract(pure = true)
