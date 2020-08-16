@@ -64,7 +64,7 @@ public class VehicleAgent extends AbstractAgent {
                     print("Reached destination.");
 
                     ACLMessage msg = new ACLMessage(ACLMessage.INFORM);
-                    msg.addReceiver(new AID(MasterAgent.class.getName(), AID.ISLOCALNAME));
+                    msg.addReceiver(new AID(MasterAgent.name, AID.ISLOCALNAME));
                     Properties prop = new Properties();
                     prop.setProperty(MessageParameter.TYPE, MessageParameter.VEHICLE);
                     prop.setProperty(MessageParameter.AT_DESTINATION, String.valueOf(Boolean.TRUE));

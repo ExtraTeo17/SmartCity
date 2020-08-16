@@ -62,16 +62,16 @@ public class MapWindow {
     private final ConfigContainer configContainer;
 
     public JPanel MainPanel;
-    public JXMapViewer MapViewer;
-    public boolean renderPedestrians = true;
+    private JXMapViewer MapViewer;
+    private boolean renderPedestrians = true;
     public boolean renderPedestrianRoutes = true;
-    public boolean renderCars = true;
-    public boolean renderCarRoutes = true;
-    public boolean renderBuses = true;
-    public boolean renderBusRoutes = true;
-    public boolean renderZone = true;
-    public boolean renderLights = true;
-    public boolean renderStations = true;
+    private boolean renderCars = true;
+    private boolean renderCarRoutes = true;
+    private boolean renderBuses = true;
+    private boolean renderBusRoutes = true;
+    private boolean renderZone = true;
+    private boolean renderLights = true;
+    private boolean renderStations = true;
     private JPanel MapPanel;
     private JPanel SidePanel;
     private JButton StartRouteButton;
@@ -504,7 +504,7 @@ public class MapWindow {
         ResultTimeLabel.setText(val);
     }
 
-    public void setInputEnabled(boolean check) {
+    private void setInputEnabled(boolean check) {
         carLimitSpinner.setEnabled(check);
         seedSpinner.setEnabled(check);
         radiusSpinner.setEnabled(check);
@@ -556,7 +556,7 @@ public class MapWindow {
         setTimeSpinner.setValue(Date.from(inst));
     }
 
-    public void drawLights(List<Painter<JXMapViewer>> painters) {
+    private void drawLights(List<Painter<JXMapViewer>> painters) {
         if (MasterAgent.lightManagersUnderConstruction) {
             return;
         }
@@ -566,7 +566,7 @@ public class MapWindow {
         }
     }
 
-    public void drawVehicles(List<Painter<JXMapViewer>> painters) {
+    private void drawVehicles(List<Painter<JXMapViewer>> painters) {
         try {
             Set<Waypoint> set = new HashSet<>();
             for (VehicleAgent a : MasterAgent.vehicles) {
@@ -593,7 +593,7 @@ public class MapWindow {
         }
     }
 
-    public void drawRoutes(List<Painter<JXMapViewer>> painters) {
+    private void drawRoutes(List<Painter<JXMapViewer>> painters) {
         try {
             for (VehicleAgent a : MasterAgent.vehicles) {
                 List<IGeoPosition> track = new ArrayList<>();
@@ -608,7 +608,7 @@ public class MapWindow {
         }
     }
 
-    public void drawPedestrians(List<Painter<JXMapViewer>> painters) {
+    private void drawPedestrians(List<Painter<JXMapViewer>> painters) {
         try {
             Set<Waypoint> set = new HashSet<>();
             for (PedestrianAgent a : MasterAgent.pedestrians) {
@@ -637,7 +637,7 @@ public class MapWindow {
         }
     }
 
-    public void drawPedestrianRoutes(List<Painter<JXMapViewer>> painters) {
+    private void drawPedestrianRoutes(List<Painter<JXMapViewer>> painters) {
         try {
             for (PedestrianAgent a : MasterAgent.pedestrians) {
                 List<IGeoPosition> trackBefore = new ArrayList<>();
@@ -714,7 +714,7 @@ public class MapWindow {
         }
     }
 
-    public void drawZones(Collection<Painter<JXMapViewer>> painters) {
+    private void drawZones(Collection<Painter<JXMapViewer>> painters) {
         if (zone != null) {
             Set<Waypoint> set = new HashSet<>();
             set.add(new DefaultWaypoint(zone.getCenter().toMapGeoPosition()));

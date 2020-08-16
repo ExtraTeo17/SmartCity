@@ -23,6 +23,14 @@ public final class ConfigContainer extends ZoneMutator {
         return shouldGenerateCars;
     }
 
+    public void setGenerateCars(boolean value) {
+        this.shouldGenerateCars = value;
+    }
+
+    public void setGeneratePedestriansAndBuses(boolean value) {
+        this.shouldGeneratePedestriansAndBuses = value;
+    }
+
     public IZone getZone() {
         return zone;
     }

@@ -1,6 +1,7 @@
 package vehicles;
 
 import gui.MapWindow;
+import org.jetbrains.annotations.Contract;
 import routing.LightManagerNode;
 import routing.Position;
 import routing.RouteNode;
@@ -94,6 +95,9 @@ public class MovingObjectImpl extends MovingObject {
     @Override
     public void move() {
         ++index;
+        if (index > route.size()) {
+            throw new ArrayIndexOutOfBoundsException("MovingObject exceeded its route: " + index + "/" + route.size());
+        }
     }
 
     @Override

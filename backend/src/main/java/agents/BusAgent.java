@@ -86,7 +86,7 @@ public class BusAgent extends AbstractAgent {
                     print("Reached destination.");
 
                     ACLMessage msg = new ACLMessage(ACLMessage.INFORM);
-                    msg.addReceiver(new AID("SmartCityAgent", AID.ISLOCALNAME));
+                    msg.addReceiver(new AID(MasterAgent.name, AID.ISLOCALNAME));
                     Properties prop = new Properties();
                     prop.setProperty(MessageParameter.TYPE, MessageParameter.BUS);
                     prop.setProperty(MessageParameter.AT_DESTINATION, String.valueOf(Boolean.TRUE));
