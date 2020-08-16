@@ -9,10 +9,10 @@ import web.message.payloads.responses.Location;
 class ConverterTest {
 
     @Test
-    void convert_correctData_correctResult() {
+    void convert_happyPath() {
         double lat = 52.00222;
         double lng = 21.001;
-        IGeoPosition geoPosition = new Position(lat, lng);
+        IGeoPosition geoPosition = Position.of(lat, lng);
 
         Location result = Converter.convert(geoPosition);
 

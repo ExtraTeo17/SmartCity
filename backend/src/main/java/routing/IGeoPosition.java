@@ -68,9 +68,9 @@ public interface IGeoPosition {
     }
 
     default double cosineAngle(IGeoPosition posA, IGeoPosition posB) {
-        var a = posA.distance(posB);
-        var b = posB.distance(this);
-        var c = this.distance(posA);
+        var a = this.distance(posA);
+        var b = this.distance(posB);
+        var c = posA.distance(posB);
         return NumericHelper.getCosineInTriangle(a, b, c);
     }
 

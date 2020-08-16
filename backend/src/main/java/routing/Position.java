@@ -8,12 +8,12 @@ public class Position implements IGeoPosition {
     private final double lat;
     private final double lng;
 
-    public Position(double lat, double lng) {
+    protected Position(double lat, double lng) {
         this.lat = lat;
         this.lng = lng;
     }
 
-    public Position(IGeoPosition pos) {
+    protected Position(IGeoPosition pos) {
         this.lat = pos.getLat();
         this.lng = pos.getLng();
     }

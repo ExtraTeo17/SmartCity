@@ -305,10 +305,10 @@ public class MapWindow {
             mapViewer.setAddressLocation(new GeoPosition(lat, lon));
             mapViewer.setZoom(1);
             window.prepareAgentsAndSetZone(lat, lon, 100);
-            IGeoPosition N = new Position(52.23758683540269, 21.017720103263855);
-            IGeoPosition S = new Position(52.23627934304847, 21.018092930316925);
-            IGeoPosition E = new Position(52.237225472020704, 21.019399166107178);
-            IGeoPosition W = new Position(52.23678526174392, 21.016663312911987);
+            IGeoPosition N = Position.of(52.23758683540269, 21.017720103263855);
+            IGeoPosition S = Position.of(52.23627934304847, 21.018092930316925);
+            IGeoPosition E = Position.of(52.237225472020704, 21.019399166107178);
+            IGeoPosition W = Position.of(52.23678526174392, 21.016663312911987);
 
             // N to S
             List<RouteNode> NS;
@@ -905,7 +905,7 @@ public class MapWindow {
         }
         double lat = Math.sin(angle) * radius * 0.0000089;
         double lng = Math.cos(angle) * radius * 0.0000089 * Math.cos(lat);
-        return new Position(lat, lng);
+        return Position.of(lat, lng);
     }
 
     public class RefreshTask extends TimerTask { // OCB ?????? TOO OFTEN

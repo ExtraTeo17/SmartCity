@@ -4,7 +4,7 @@ import routing.*;
 
 public final class ConfigContainer extends ZoneMutator {
     public final boolean USE_DEPRECATED_XML_FOR_LIGHT_MANAGERS = false;
-    public final IGeoPosition warsawPos = new Position(52.23682, 21.01681);
+    public final IGeoPosition warsawPos = Position.of(52.23682, 21.01681);
     public final int defaultRadius = 600;
 
     private boolean shouldGeneratePedestriansAndBuses = false;
@@ -36,7 +36,7 @@ public final class ConfigContainer extends ZoneMutator {
         if (lightManagersLock) {
             return false;
         }
-        
+
         lightManagersLock = true;
         return true;
     }
