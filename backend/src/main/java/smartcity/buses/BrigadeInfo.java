@@ -1,12 +1,15 @@
 package smartcity.buses;
 
+import org.jetbrains.annotations.NotNull;
 import routing.RouteNode;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Spliterator;
+import java.util.function.Consumer;
 
-public class BrigadeInfo {
-
+public class BrigadeInfo implements Iterable<Timetable> {
     private final String brigadeNr;
     private final List<Timetable> timetables = new ArrayList<>();
     private int timetablesCounter;
@@ -14,6 +17,10 @@ public class BrigadeInfo {
 
     public BrigadeInfo(final String brigadeNr) {
         this.brigadeNr = brigadeNr;
+    }
+
+    public String getBrigadeNr() {
+        return brigadeNr;
     }
 
     private void stampCounterAndUpdateTimetableList(final long stationOsmId) {
@@ -46,9 +53,9 @@ public class BrigadeInfo {
         timetables.get(timetablesCounter).addEntryToTimetable(stationOsmId, time);
     }
 
-    public void prepareAgents(List<RouteNode> route, final String busLine) {
-        for (Timetable timetable : timetables) {
-            timetable.createAgent(route, busLine, brigadeNr);
-        }
+    @NotNull
+    @Override
+    public Iterator<Timetable> iterator() {
+        return timetables.iterator();
     }
 }

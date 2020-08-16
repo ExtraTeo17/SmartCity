@@ -1,30 +1,32 @@
 package vehicles;
 
 import gui.MapWindow;
-import org.jxmapviewer.viewer.GeoPosition;
+import org.jetbrains.annotations.Contract;
 import routing.LightManagerNode;
+import routing.Position;
 import routing.RouteNode;
 import routing.Router;
 
 import java.util.List;
 
 public class MovingObjectImpl extends MovingObject {
-    public DrivingState State = DrivingState.STARTING;
-    private List<RouteNode> displayRoute;
-    private List<RouteNode> route;
+    public DrivingState state = DrivingState.STARTING;
+    private final List<RouteNode> displayRoute;
+    private final List<RouteNode> route;
     private int index = 0;
-    private int speed = 50;
-    private int closestLightIndex = 0;
+    private final int speed = 50;
+    private int closestLightIndex = Integer.MAX_VALUE;
 
-    public MovingObjectImpl(List<RouteNode> info) {
-        displayRoute = info;
-        route = Router.uniformRoute(displayRoute);
+    public MovingObjectImpl(List<RouteNode> displayRoute) {
+        this.displayRoute = displayRoute;
+        route = Router.uniformRoute(this.displayRoute);
     }
 
+    // TODO: Why car is moving backwards here? Change name of the function to describe behaviour
     @Override
     public long getAdjacentOsmWayId() {
         while (!(route.get(index) instanceof LightManagerNode)) {
-            index--;
+            --index;
         }
         return ((LightManagerNode) route.get(index)).getOsmWayId();
     }
@@ -35,28 +37,38 @@ public class MovingObjectImpl extends MovingObject {
     }
 
 
+    // TODO: Check if behaviour is correct and add test
     @Override
-    public LightManagerNode findNextTrafficLight() {
-        for (int i = index + 1; i < route.size(); i++) {
-            if (route.get(i) instanceof LightManagerNode) {
+    public LightManagerNode getNextTrafficLight() {
+        if (closestLightIndex < route.size() && index <= closestLightIndex) {
+            return (LightManagerNode) route.get(closestLightIndex);
+        }
+
+        for (int i = index + 1; i < route.size(); ++i) {
+            var node = route.get(i);
+            if (node instanceof LightManagerNode) {
                 closestLightIndex = i;
-                return getCurrentTrafficLightNode();
+                return (LightManagerNode) node;
             }
         }
-        closestLightIndex = -1;
-        return getCurrentTrafficLightNode();
+
+        closestLightIndex = Integer.MAX_VALUE;
+        return null;
     }
 
     @Override
     public String getPositionString() {
-        return "Lat: " + route.get(index).getLatitude() + " Lon: " + route.get(index).getLongitude();
+        var node = route.get(index);
+        return "Lat: " + node.getLat() + " Lon: " + node.getLng();
     }
 
     @Override
-    public GeoPosition getPosition() {
-        return new GeoPosition(route.get(index).getLatitude(), route.get(index).getLongitude());
+    public Position getPosition() {
+        return route.get(index);
     }
 
+    // TODO: Delete this function - replaced with getNextTrafficLight
+    @Deprecated
     @Override
     public LightManagerNode getCurrentTrafficLightNode() {
         if (closestLightIndex == -1) {
@@ -65,12 +77,14 @@ public class MovingObjectImpl extends MovingObject {
         return (LightManagerNode) (route.get(closestLightIndex));
     }
 
+    // TODO: Behaviour was changed, confirm that is correct and add test.
     @Override
     public boolean isAtTrafficLights() {
-        if (index == route.size()) {
+        if (isAtDestination()) {
             return false;
         }
-        return route.get(index) instanceof LightManagerNode;
+
+        return closestLightIndex == index;
     }
 
     @Override
@@ -79,8 +93,11 @@ public class MovingObjectImpl extends MovingObject {
     }
 
     @Override
-    public void Move() {
-        index++;
+    public void move() {
+        ++index;
+        if (index > route.size()) {
+            throw new ArrayIndexOutOfBoundsException("MovingObject exceeded its route: " + index + "/" + route.size());
+        }
     }
 
     @Override
@@ -100,11 +117,11 @@ public class MovingObjectImpl extends MovingObject {
 
     @Override
     public DrivingState getState() {
-        return State;
+        return state;
     }
 
     @Override
     public void setState(DrivingState state) {
-        State = state;
+        this.state = state;
     }
 }

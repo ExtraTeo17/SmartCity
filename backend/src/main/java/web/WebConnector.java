@@ -3,18 +3,19 @@ package web;
 import com.google.inject.Inject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import web.abstractions.IMessageObjectMapper;
+import web.abstractions.IWebConnector;
 import web.message.MessageType;
 import web.message.payloads.AbstractPayload;
-import web.serialization.MessageObjectMapper;
 
 
-public class WebManager implements IWebManager {
-    private static final Logger logger = LoggerFactory.getLogger(WebManager.class);
-    private final WebServer webServer;
-    private final MessageObjectMapper objectMapper;
+class WebConnector implements IWebConnector {
+    private static final Logger logger = LoggerFactory.getLogger(WebConnector.class);
+    private final SocketServer webServer;
+    private final IMessageObjectMapper objectMapper;
 
     @Inject
-    public WebManager(WebServer webServer, MessageObjectMapper objectMapper) {
+    public WebConnector(SocketServer webServer, IMessageObjectMapper objectMapper) {
         this.webServer = webServer;
         this.objectMapper = objectMapper;
     }

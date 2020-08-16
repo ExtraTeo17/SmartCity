@@ -1,25 +1,20 @@
 package osmproxy.elements;
 
 public class OSMStation extends OSMNode {
-
-    private String stopWawId;
-    private String stopWawNr;
+    private final String stopId;
+    private final String stopNumber;
 
     public OSMStation(final String osmId, final String lat, final String lon, final String stationRef) {
         super(osmId, lat, lon);
-        fillStopWawIdNr(stationRef);
-    }
-
-    private void fillStopWawIdNr(String stationRef) {
-        stopWawNr = stationRef.substring(stationRef.length() - 2);
-        stopWawId = stationRef.substring(0, stationRef.length() - 2);
+        stopNumber = stationRef.substring(stationRef.length() - 2);
+        stopId = stationRef.substring(0, stationRef.length() - 2);
     }
 
     public String getBusStopId() {
-        return stopWawId;
+        return stopId;
     }
 
     public String getBusStopNr() {
-        return stopWawNr;
+        return stopNumber;
     }
 }

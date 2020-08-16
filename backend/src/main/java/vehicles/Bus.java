@@ -1,11 +1,7 @@
 package vehicles;
 
 import gui.MapWindow;
-import org.jxmapviewer.viewer.GeoPosition;
-import routing.LightManagerNode;
-import routing.RouteNode;
-import routing.Router;
-import routing.StationNode;
+import routing.*;
 import smartcity.buses.Timetable;
 
 import java.util.ArrayList;
@@ -22,7 +18,7 @@ public class Bus extends MovingObject {
     private final List<StationNode> stationNodesOnRoute;
     private final String busLine;
     private final String brigadeNr;
-    public DrivingState State = DrivingState.STARTING;
+    private DrivingState state = DrivingState.STARTING;
     private List<RouteNode> displayRoute;
     private List<RouteNode> route;
     private int index = 0;
@@ -100,7 +96,7 @@ public class Bus extends MovingObject {
     }
 
     @Override
-    public LightManagerNode findNextTrafficLight() {
+    public LightManagerNode getNextTrafficLight() {
         for (int i = index + 1; i < route.size(); i++) {
             if (route.get(i) instanceof LightManagerNode) {
                 closestLightIndex = i;
@@ -142,12 +138,12 @@ public class Bus extends MovingObject {
 
     @Override
     public String getPositionString() {
-        return "Lat: " + route.get(index).getLatitude() + " Lon: " + route.get(index).getLongitude();
+        return "Lat: " + route.get(index).getLat() + " Lon: " + route.get(index).getLng();
     }
 
     @Override
-    public GeoPosition getPosition() {
-        return new GeoPosition(route.get(index).getLatitude(), route.get(index).getLongitude());
+    public IGeoPosition getPosition() {
+        return route.get(index);
     }
 
     @Override
@@ -186,7 +182,7 @@ public class Bus extends MovingObject {
     }
 
     @Override
-    public void Move() {
+    public void move() {
         if (isAtDestination()) {
             index = 0;
         }
@@ -216,12 +212,12 @@ public class Bus extends MovingObject {
 
     @Override
     public DrivingState getState() {
-        return State;
+        return state;
     }
 
     @Override
     public void setState(DrivingState state) {
-        State = state;
+        this.state = state;
     }
 
     public Date getBoardingTime() {

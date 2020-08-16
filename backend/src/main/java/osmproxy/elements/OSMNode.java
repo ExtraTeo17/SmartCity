@@ -1,54 +1,47 @@
 package osmproxy.elements;
 
-import org.jxmapviewer.viewer.GeoPosition;
+
+import org.jetbrains.annotations.NotNull;
 import org.w3c.dom.NamedNodeMap;
-import org.w3c.dom.Node;
+import routing.IGeoPosition;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
-public class OSMNode extends OSMElement {
+public class OSMNode extends OSMElement
+        implements IGeoPosition, Iterable<OSMWay> {
 
     protected final List<OSMWay> parentWays;
     protected double lat;
     protected double lon;
 
-    public OSMNode(final String id, final String lat, final String lon) {
+    OSMNode(long id, double lat, double lon) {
         super(id);
-        fillLatLon(lat, lon);
-        parentWays = new ArrayList<>();
+        this.lat = lat;
+        this.lon = lon;
+        this.parentWays = new ArrayList<>();
     }
 
-    public OSMNode(final OSMNode node) {
-        super(node.getId());
-        fillLatLon(node.lat, node.lon);
-        parentWays = new ArrayList<>();
+    public OSMNode(final String id, final String lat, final String lon) {
+        this(Long.parseLong(id),
+                Double.parseDouble(lat),
+                Double.parseDouble(lon));
     }
 
     public OSMNode(final NamedNodeMap attributes) {
-        super(attributes.getNamedItem("id").getNodeValue());
-        fillLatLon(attributes.getNamedItem("lat"), attributes.getNamedItem("lon"));
-        parentWays = new ArrayList<>();
+        this(attributes.getNamedItem("id").getNodeValue(),
+                attributes.getNamedItem("lat").getNodeValue(),
+                attributes.getNamedItem("lon").getNodeValue());
     }
 
-    private void fillLatLon(final Node latItem, final Node lonItem) {
-        fillLatLon(latItem.getNodeValue(), lonItem.getNodeValue());
-    }
-
-    private void fillLatLon(final String lat, final String lon) {
-        fillLatLon(Double.parseDouble(lat), Double.parseDouble(lon));
-    }
-
-    private void fillLatLon(final double lat, final double lon) {
-        this.lat = lat;
-        this.lon = lon;
-    }
-
+    @Override
     public final double getLat() {
         return lat;
     }
 
-    public final double getLon() {
+    @Override
+    public final double getLng() {
         return lon;
     }
 
@@ -56,20 +49,8 @@ public class OSMNode extends OSMElement {
         parentWays.add(osmWay);
     }
 
-    public final int getParentWayCount() {
-        return parentWays.size();
-    }
-
-    public OSMWay getParentWay(int i) {
-        return parentWays.get(i);
-    }
-
     public final boolean isTypeA() {
-        return getParentWayCount() > 1;
-    }
-
-    public final GeoPosition getPosition() {
-        return new GeoPosition(getLat(), getLon());
+        return parentWays.size() > 1;
     }
 
     @Override
@@ -96,5 +77,11 @@ public class OSMNode extends OSMElement {
             }
         }
         return true;
+    }
+
+    @NotNull
+    @Override
+    public Iterator<OSMWay> iterator() {
+        return parentWays.iterator();
     }
 }

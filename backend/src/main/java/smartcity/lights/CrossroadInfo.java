@@ -1,54 +1,43 @@
 package smartcity.lights;
 
+import com.google.common.collect.Iterables;
 import osmproxy.elements.OSMNode;
 import osmproxy.elements.OSMWay;
-import org.jxmapviewer.viewer.GeoPosition;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class CrossroadInfo {
-    private static final double cosineOf135degrees = -0.7071;
+class CrossroadInfo {
+    private static final double COSINE_OF_135_DEGREES = -0.7071;
     private final List<LightInfo> firstLightGroupInfo;
     private final List<LightInfo> secondLightGroupInfo;
 
-    public CrossroadInfo(OSMNode centerCrossroadNode) {
-        firstLightGroupInfo = new ArrayList<>();
-        secondLightGroupInfo = new ArrayList<>();
-        final OSMWay firstParentWay = centerCrossroadNode.getParentWay(0);
-        firstLightGroupInfo.add(new LightInfo(firstParentWay, centerCrossroadNode,
-                calculateDistance(firstParentWay.getLightNeighborPos(), centerCrossroadNode.getPosition())));
-        for (int i = 1; i < centerCrossroadNode.getParentWayCount(); ++i) {
-            determineLightGroup(firstParentWay, centerCrossroadNode.getParentWay(i), centerCrossroadNode);
+    CrossroadInfo(OSMNode centerNode) {
+        this.firstLightGroupInfo = new ArrayList<>();
+        this.secondLightGroupInfo = new ArrayList<>();
+
+        OSMWay firstWay = centerNode.iterator().next();
+        var firstWayNeighborPos = firstWay.getLightNeighborPos();
+        firstLightGroupInfo.add(new LightInfo(firstWay, centerNode));
+        for (OSMWay parentWay : Iterables.skip(centerNode, 1)) {
+            var nextWayLightNeighborPos = parentWay.getLightNeighborPos();
+            double cosineCenterNodeNextWay = firstWayNeighborPos.cosineAngle(centerNode, nextWayLightNeighborPos);
+            if (cosineCenterNodeNextWay < COSINE_OF_135_DEGREES) {
+                firstLightGroupInfo.add(new LightInfo(parentWay, centerNode));
+            }
+            else {
+                secondLightGroupInfo.add(new LightInfo(parentWay, centerNode));
+            }
         }
     }
 
-    private void determineLightGroup(OSMWay wayFromFirstGroup, OSMWay anotherWay, OSMNode centerNode) {
-        double a = calculateDistance(wayFromFirstGroup.getLightNeighborPos(), centerNode.getPosition());
-        double b = calculateDistance(anotherWay.getLightNeighborPos(), centerNode.getPosition());
-        double c = calculateDistance(wayFromFirstGroup.getLightNeighborPos(), anotherWay.getLightNeighborPos());
-        if (cosineFromLawOfCosinesInTriangle(a, b, c) < cosineOf135degrees) {
-            firstLightGroupInfo.add(new LightInfo(anotherWay, centerNode, b));
-        }
-        else {
-            secondLightGroupInfo.add(new LightInfo(anotherWay, centerNode, b));
-        }
-    }
-
-    public List<LightInfo> getFirstLightGroupInfo() {
+    List<LightInfo> getFirstLightGroupInfo() {
         return firstLightGroupInfo;
     }
 
-    public List<LightInfo> getSecondLightGroupInfo() {
+    List<LightInfo> getSecondLightGroupInfo() {
         return secondLightGroupInfo;
     }
 
-    private double cosineFromLawOfCosinesInTriangle(double a, double b, double c) {
-        return ((a * a) + (b * b) - (c * c)) / (2 * a * b);
-    }
 
-    private double calculateDistance(GeoPosition pos1, GeoPosition pos2) {
-        return Math.sqrt(((pos2.getLatitude() - pos1.getLatitude()) * (pos2.getLatitude() - pos1.getLatitude()))
-                + ((pos2.getLongitude() - pos1.getLongitude()) * (pos2.getLongitude() - pos1.getLongitude())));
-    }
 }

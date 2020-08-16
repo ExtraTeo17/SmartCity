@@ -61,7 +61,7 @@ public class PedestrianAgent extends AbstractAgent {
                             break;
                         case PASSING_LIGHT:
                             Print("Passing the light.");
-                            pedestrian.Move();
+                            pedestrian.move();
                             pedestrian.setState(DrivingState.MOVING);
                             break;
                     }
@@ -93,7 +93,7 @@ public class PedestrianAgent extends AbstractAgent {
                             break;
                         case PASSING_STATION:
 
-                            pedestrian.Move();
+                            pedestrian.move();
                             pedestrian.setState(DrivingState.MOVING);
                             break;
                     }
@@ -103,7 +103,7 @@ public class PedestrianAgent extends AbstractAgent {
                     Print("Reached destination.");
 
                     ACLMessage msg = new ACLMessage(ACLMessage.INFORM);
-                    msg.addReceiver(new AID("SmartCityAgent", AID.ISLOCALNAME));
+                    msg.addReceiver(new AID(MasterAgent.name, AID.ISLOCALNAME));
                     Properties prop = new Properties();
                     prop.setProperty(MessageParameter.TYPE, MessageParameter.PEDESTRIAN);
                     prop.setProperty(MessageParameter.AT_DESTINATION, String.valueOf(Boolean.TRUE));
@@ -112,7 +112,7 @@ public class PedestrianAgent extends AbstractAgent {
                     doDelete();
                 }
                 else {
-                    pedestrian.Move();
+                    pedestrian.move();
                 }
             }
         };
@@ -121,9 +121,17 @@ public class PedestrianAgent extends AbstractAgent {
             @Override
             public void action() {
                 ACLMessage rcv = receive();
-                if (rcv != null) {
-                    String type = rcv.getUserDefinedParameter(MessageParameter.TYPE);
-                    if (type.equals(MessageParameter.LIGHT)) {
+                if (rcv == null) {
+                    return;
+                }
+
+                String type = rcv.getUserDefinedParameter(MessageParameter.TYPE);
+                if (type == null) {
+                    return;
+                }
+
+                switch (type) {
+                    case MessageParameter.LIGHT:
                         switch (rcv.getPerformative()) {
                             case ACLMessage.REQUEST:
                                 if (pedestrian.getState() == DrivingState.WAITING_AT_LIGHT) {
@@ -136,14 +144,14 @@ public class PedestrianAgent extends AbstractAgent {
                                     response.setAllUserDefinedParameters(properties);
                                     send(response);
                                     if (pedestrian.findNextStop() instanceof LightManagerNode) {
-                                        findNextStop(pedestrian);
+                                        informLightManager(pedestrian);
                                     }
                                     pedestrian.setState(DrivingState.PASSING_LIGHT);
                                 }
                                 break;
                         }
-                    }
-                    else if (type.equals(MessageParameter.STATION)) {
+                        break;
+                    case MessageParameter.STATION:
                         switch (rcv.getPerformative()) {
                             case ACLMessage.REQUEST:
                                 ACLMessage response = new ACLMessage(ACLMessage.AGREE);
@@ -166,13 +174,13 @@ public class PedestrianAgent extends AbstractAgent {
                                 send(msg);
 
                                 while (!pedestrian.isAtStation()) {
-                                    pedestrian.Move();
+                                    pedestrian.move();
                                 }
 
                                 break;
                         }
-                    }
-                    else if (type.equals(MessageParameter.BUS)) {
+                        break;
+                    case MessageParameter.BUS:
                         switch (rcv.getPerformative()) {
                             case ACLMessage.REQUEST:
                                 ACLMessage response = new ACLMessage(ACLMessage.AGREE);
@@ -183,14 +191,14 @@ public class PedestrianAgent extends AbstractAgent {
                                 properties.setProperty(MessageParameter.STATION_ID, "" + pedestrian.getTargetStation().getStationId());
                                 response.setAllUserDefinedParameters(properties);
                                 send(response);
-                                pedestrian.Move();
+                                pedestrian.move();
                                 pedestrian.setState(DrivingState.PASSING_STATION);
 
-                                findNextStop(pedestrian);
+                                informLightManager(pedestrian);
 
                                 break;
                         }
-                    }
+                        break;
                 }
             }
         };
@@ -210,7 +218,7 @@ public class PedestrianAgent extends AbstractAgent {
             msg.addReceiver(dest);
             Properties properties = new Properties();
             Instant currentTime = MasterAgent.getSimulationTime().toInstant();
-            Instant time = currentTime.plusMillis(pedestrian.getMilisecondsToNextStation());
+            Instant time = currentTime.plusMillis(pedestrian.getMillisecondsToNextStation());
             properties.setProperty(MessageParameter.TYPE, MessageParameter.PEDESTRIAN);
             properties.setProperty(MessageParameter.ARRIVAL_TIME, "" + time);
             properties.setProperty(MessageParameter.DESIRED_BUS, "" + pedestrian.getPreferredBusLine());

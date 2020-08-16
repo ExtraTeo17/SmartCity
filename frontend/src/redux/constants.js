@@ -1,1 +1,2 @@
 export const CENTER_UPDATED = "Center/CENTER_UPDATED";
+export const LIGHT_LOCATIONS_UPDATED = "Lights/LOCATIONS_UPDATED";

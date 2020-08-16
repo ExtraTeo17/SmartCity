@@ -22,8 +22,8 @@
     "global-require": 0,
     "max-len": [
       2,
-      120,
-      2,
+      130,
+      2, // tabs
       {
         "ignoreUrls": true,
         "ignoreComments": false,
@@ -45,6 +45,16 @@
     "jest/no-focused-tests": 2,
     "jest/no-identical-title": 2,
     "jest/prefer-to-have-length": 1,
-    "jest/valid-expect": 2
+    "jest/valid-expect": 2,
+    "sort-imports": [
+      1,
+      {
+        "ignoreCase": false,
+        "ignoreDeclarationSort": false,
+        "ignoreMemberSort": false,
+        "memberSyntaxSortOrder": ["none", "all", "multiple", "single"],
+        "allowSeparatedGroups": false
+      }
+    ]
   }
 }

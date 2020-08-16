@@ -1,42 +1,18 @@
-import { SERVER_ADDRESS } from "../utils/constants";
-import { SET_ZONE } from "./MessageType";
+import { SET_ZONE_REQUEST } from "./MessageType";
+import WebServer from "./WebServer";
 
-var socket = new WebSocket(SERVER_ADDRESS);
-var subscribers = [];
-socket.onopen = () => {
-  console.log("Connected !!!");
-};
-socket.onmessage = e => {
-  console.log("Message received:" + e.data);
-};
+/** PUBLIC INTERFACE ---------------------------------------------------------- */
 
 export default {
   setZone({ lat, lng, rad } = { lat: 0, lng: 0, rad: 0 }) {
     var msg = {
-      type: SET_ZONE,
+      type: SET_ZONE_REQUEST,
       payload: {
         latitude: lat,
         longitude: lng,
         radius: rad,
       },
     };
-    this._send(msg);
-  },
-
-  /**
-   * @param {{ type: any; payload: any; }} msgObj
-   */
-  _send(msgObj) {
-    var msg = {
-      type: msgObj.type,
-      payload: JSON.stringify(msgObj.payload),
-    };
-
-    console.log(msg.payload);
-    socket.send(JSON.stringify(msg));
-  },
-
-  subscribe(listener) {
-    subscribers.push(listener);
+    WebServer.send(msg);
   },
 };

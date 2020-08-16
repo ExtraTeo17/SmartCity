@@ -2,17 +2,15 @@ import React from "react";
 import CityMap from "./CityMap";
 import "../styles/App.css";
 import Menu from "./Menu";
+import Notifications from "react-notify-toast";
 
-import appReducer from "../redux/reducers";
-import { createStore } from "redux";
-import { composeWithDevTools } from "redux-devtools-extension";
 import { Provider } from "react-redux";
-
-const store = createStore(appReducer, composeWithDevTools());
+import store from "../redux/store";
 
 const App = () => (
   <Provider store={store}>
     <div className="App">
+      <Notifications />
       <header className="App-header">
         <div className="row w-100 main-container">
           <div className="col-9">

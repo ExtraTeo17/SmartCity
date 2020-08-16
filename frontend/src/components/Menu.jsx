@@ -1,4 +1,3 @@
-/* eslint-disable react/prop-types */
 import React, { useState } from "react";
 import ApiManager from "../web/ApiManager";
 import { connect } from "react-redux";
@@ -6,6 +5,7 @@ import { centerUpdated } from "../redux/actions";
 
 const Menu = props => {
   const { lat, lng, rad } = props.center;
+  const dispatch = props.dispatch;
 
   /**
    * @param {number} val
@@ -13,7 +13,7 @@ const Menu = props => {
   const setLat = val => {
     if (!isNaN(val)) {
       let center = { ...props.center, lat: val };
-      props.dispatch(centerUpdated(center));
+      dispatch(centerUpdated(center));
     }
   };
 
@@ -23,7 +23,7 @@ const Menu = props => {
   const setLng = val => {
     if (!isNaN(val)) {
       let center = { ...props.center, lng: val };
-      props.dispatch(centerUpdated(center));
+      dispatch(centerUpdated(center));
     }
   };
 
@@ -33,7 +33,7 @@ const Menu = props => {
   const setRad = val => {
     if (!isNaN(val)) {
       let center = { ...props.center, rad: val };
-      props.dispatch(centerUpdated(center));
+      dispatch(centerUpdated(center));
     }
   };
 
@@ -91,7 +91,7 @@ const Menu = props => {
 
 const mapStateToProps = (state /* , ownProps */) => {
   return {
-    center: state.center,
+    center: state.interaction.center,
   };
 };
 

@@ -1,19 +1,19 @@
-package smartcity.buses;
+package osmproxy.buses;
 
-import org.jxmapviewer.viewer.GeoPosition;
-import osmproxy.MapAccessManager;
+import org.jetbrains.annotations.NotNull;
 import osmproxy.elements.OSMStation;
 import osmproxy.elements.OSMWay;
+import routing.IZone;
 import routing.RouteNode;
 import routing.Router;
 import smartcity.MasterAgent;
+import smartcity.buses.BrigadeInfo;
+import utilities.NumericHelper;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
+import java.util.*;
+import java.util.function.Consumer;
 
-// Bus Lines
-public class BusInfo {
+public class BusInfo implements Iterable<BrigadeInfo> {
     private String busLine;
     private List<OSMWay> route = new ArrayList<>();
     private List<BrigadeInfo> brigadeList = new ArrayList<>();
@@ -43,26 +43,39 @@ public class BusInfo {
         route = parseOsmWay;
     }
 
-    public void setBrigadeList(Collection<BrigadeInfo> values) {
+    void setBrigadeList(Collection<BrigadeInfo> values) {
         brigadeList = new ArrayList<>(values);
     }
 
-    public void prepareAgents() {
-        List<RouteNode> routeWithNodes = Router.generateRouteInfoForBuses(route, stationsOnRouteOsmIds);
-        for (BrigadeInfo brigade : brigadeList) {
-            brigade.prepareAgents(routeWithNodes, busLine);
-        }
+    public List<RouteNode> getRouteInfo() {
+        return Router.generateRouteInfoForBuses(route, stationsOnRouteOsmIds);
     }
 
-    public void filterStationsByCircle(double middleLat, double middleLon, int radius) {
+    // TODO: Zone injected when creating busInfo
+    public void filterStationsByCircle(IZone zone) {
         List<Long> filteredStationOsmIds = new ArrayList<>();
         for (Long osmStationId : stationsOnRouteOsmIds) {
             OSMStation station = MasterAgent.osmIdToStationOSMNode.get(osmStationId);
-            if (station != null && MapAccessManager.belongsToCircle(station.getLat(), station.getLon(),
-                    new GeoPosition(middleLat, middleLon), radius)) {
+            if (station != null && zone.isInZone(station)) {
                 filteredStationOsmIds.add(osmStationId);
             }
         }
         stationsOnRouteOsmIds = filteredStationOsmIds;
+    }
+
+    @NotNull
+    @Override
+    public Iterator<BrigadeInfo> iterator() {
+        return brigadeList.iterator();
+    }
+
+    @Override
+    public void forEach(Consumer<? super BrigadeInfo> action) {
+        brigadeList.forEach(action);
+    }
+
+    @Override
+    public Spliterator<BrigadeInfo> spliterator() {
+        return brigadeList.spliterator();
     }
 }

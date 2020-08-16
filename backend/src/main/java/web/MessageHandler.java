@@ -12,17 +12,17 @@ import web.message.payloads.requests.SetZoneRequest;
 import java.io.IOException;
 import java.util.Optional;
 
-public class MessageHandler {
+class MessageHandler {
     private static final ObjectMapper objectMapper = new ObjectMapper();
     private static final Logger logger = LoggerFactory.getLogger(MessageHandler.class);
     private final EventBus eventBus;
 
     @Inject
-    public MessageHandler(EventBus eventBus) {
+    MessageHandler(EventBus eventBus) {
         this.eventBus = eventBus;
     }
 
-    public void Handle(String messageString) {
+    void handle(String messageString) {
         logger.info("Handling message: " + messageString);
 
         var message = tryDeserialize(messageString, MessageDto.class);
@@ -30,10 +30,10 @@ public class MessageHandler {
             return;
         }
 
-        Handle(message.get());
+        handle(message.get());
     }
 
-    private void Handle(MessageDto message) {
+    private void handle(MessageDto message) {
         switch (message.type) {
             case SET_ZONE_REQUEST:
                 var payload = tryDeserialize(message.payload, SetZoneRequest.class);

@@ -1,13 +1,16 @@
-package smartcity;
+package gui;
 
 import org.jxmapviewer.JXMapViewer;
 import org.jxmapviewer.painter.Painter;
 import org.jxmapviewer.viewer.GeoPosition;
+import routing.IGeoPosition;
 
 import java.awt.*;
 import java.awt.geom.Point2D;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * Paints a route
@@ -16,19 +19,18 @@ import java.util.List;
  */
 public class RoutePainter implements Painter<JXMapViewer> {
     private Color color = Color.RED;
-    private boolean antiAlias = true;
-
-    private List<GeoPosition> track;
+    private final boolean antiAlias = true;
+    private final List<GeoPosition> track;
 
     /**
      * @param track the track
      * @param color route color
      */
-    public RoutePainter(List<GeoPosition> track, Color color) {
+    RoutePainter(Collection<IGeoPosition> track, Color color) {
         // copy the list so that changes in the 
         // original list do not have an effect here
         this.color = color;
-        this.track = new ArrayList<GeoPosition>(track);
+        this.track = track.stream().map(pos -> new GeoPosition(pos.getLat(), pos.getLng())).collect(Collectors.toList());
     }
 
     @Override

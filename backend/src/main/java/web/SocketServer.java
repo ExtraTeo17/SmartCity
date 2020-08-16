@@ -15,13 +15,13 @@ import java.util.List;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
-public class WebServer extends WebSocketServer {
-    private static final Logger logger = LoggerFactory.getLogger(WebServer.class);
+class SocketServer extends WebSocketServer {
+    private static final Logger logger = LoggerFactory.getLogger(SocketServer.class);
     private final MessageHandler messageHandler;
     private final HashSet<WebSocket> sockets;
 
     @Inject
-    WebServer(MessageHandler messageHandler, ExtendedProperties properties) {
+    SocketServer(MessageHandler messageHandler, ExtendedProperties properties) {
         super(getSocketAddress(properties));
         this.messageHandler = messageHandler;
         sockets = new HashSet<>();
@@ -68,7 +68,7 @@ public class WebServer extends WebSocketServer {
         else {
             logger.warn("Connection closed unexpectedly.\n"
                     + "Address: " + getSocketAddress(socket) + "\n"
-                    + "Error code: " + code
+                    + "Error code: " + code + "\n"
                     + "Reason: " + reason);
         }
         sockets.remove(socket);
@@ -82,7 +82,7 @@ public class WebServer extends WebSocketServer {
      **/
     @Override
     public void onMessage(WebSocket socket, String message) {
-        messageHandler.Handle(message);
+        messageHandler.handle(message);
     }
 
     /**

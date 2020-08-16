@@ -4,7 +4,6 @@ import agents.utils.LightColor;
 import gui.MapWindow;
 import org.jxmapviewer.JXMapViewer;
 import org.jxmapviewer.painter.Painter;
-import org.jxmapviewer.viewer.GeoPosition;
 import org.jxmapviewer.viewer.Waypoint;
 import org.jxmapviewer.viewer.WaypointPainter;
 import org.slf4j.Logger;
@@ -12,6 +11,7 @@ import org.slf4j.LoggerFactory;
 import org.w3c.dom.Node;
 import osmproxy.MapAccessManager;
 import osmproxy.elements.OSMNode;
+import routing.IGeoPosition;
 import smartcity.MasterAgent;
 
 import java.time.Instant;
@@ -152,8 +152,8 @@ public class SimpleCrossroad implements ICrossroad {
     }
 
     @Override
-    public List<GeoPosition> getLightsPositions() {
-        return lights.values().stream().map(Light::getPosition).collect(Collectors.toList());
+    public List<IGeoPosition> getLightsPositions() {
+        return lights.values().stream().map(light -> (IGeoPosition) light).collect(Collectors.toList());
     }
 
     @Override

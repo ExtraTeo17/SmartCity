@@ -4,11 +4,11 @@ import behaviourfactories.IBehaviourFactory;
 import behaviourfactories.LightManagerBehaviourFactory;
 import org.jxmapviewer.JXMapViewer;
 import org.jxmapviewer.painter.Painter;
-import org.jxmapviewer.viewer.GeoPosition;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Node;
 import osmproxy.elements.OSMNode;
+import routing.IGeoPosition;
 import smartcity.lights.ICrossroad;
 import smartcity.lights.SimpleCrossroad;
 
@@ -49,7 +49,7 @@ public class LightManager extends AbstractAgent {
         return crossroad;
     }
 
-    public List<GeoPosition> getLightsPositions() {
+    public List<IGeoPosition> getLightsPositions() {
         return crossroad.getLightsPositions();
     }
 

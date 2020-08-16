@@ -20,11 +20,11 @@ public class SetZoneEvent {
                 ')';
     }
 
-    public double getLatitude() {
+    public double getLat() {
         return latitude;
     }
 
-    public double getLongitude() {
+    public double getLng() {
         return longitude;
     }
 

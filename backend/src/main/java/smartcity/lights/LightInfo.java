@@ -1,78 +1,69 @@
 package smartcity.lights;
 
+
 import osmproxy.elements.OSMNode;
 import osmproxy.elements.OSMWay;
 import osmproxy.elements.OSMWaypoint;
-import org.jxmapviewer.viewer.GeoPosition;
+import routing.IGeoPosition;
 
-public class LightInfo {
+public class LightInfo implements IGeoPosition {
     private static final double DISTANCE_THRESHOLD = 0.00008;
-
     private final String osmLightId;
     private final String adjacentOsmWayId;
-    private GeoPosition position;
+    private IGeoPosition position;
     private String adjacentCrossingOsmId1;
     private String adjacentCrossingOsmId2;
 
-    public LightInfo(OSMWay adjacentOsmWay, OSMNode centerCrossroadNode,
-                     double distToCrossroad) {
-        adjacentOsmWayId = Long.toString(adjacentOsmWay.getId());
+    public LightInfo(OSMWay adjacentOsmWay, OSMNode centerCrossroadNode) {
+        this.adjacentOsmWayId = Long.toString(adjacentOsmWay.getId());
         this.osmLightId = Long.toString(centerCrossroadNode.getId());
         fillLightPositionAndCrossings(adjacentOsmWay);
-        shiftTowardsCrossroad(centerCrossroadNode.getPosition(), distToCrossroad);
+
+        var distToCrossroad = adjacentOsmWay.getLightNeighborPos().distance(centerCrossroadNode);
+        if (distToCrossroad > DISTANCE_THRESHOLD) {
+            position = position.midpoint(centerCrossroadNode);
+            position = position.midpoint(centerCrossroadNode);
+        }
     }
 
     private void fillLightPositionAndCrossings(OSMWay adjacentOsmWay) {
-        OSMWaypoint secondWaypoint = null, thirdWaypoint = null;
+        OSMWaypoint secondWaypoint = null;
+        OSMWaypoint thirdWaypoint = null;
         switch (adjacentOsmWay.getLightOrientation()) {
             case LIGHT_AT_ENTRY -> {
                 secondWaypoint = adjacentOsmWay.getWaypoint(1);
                 thirdWaypoint = adjacentOsmWay.getWaypointCount() > 2 ? adjacentOsmWay.getWaypoint(2) : null;
             }
             case LIGHT_AT_EXIT -> {
-                secondWaypoint = adjacentOsmWay.getWaypoint(adjacentOsmWay.getWaypointCount() - 1 - 1);
+                secondWaypoint = adjacentOsmWay.getWaypoint(adjacentOsmWay.getWaypointCount() - 2);
                 thirdWaypoint = adjacentOsmWay.getWaypointCount() > 2 ?
-                        adjacentOsmWay.getWaypoint(adjacentOsmWay.getWaypointCount() - 1 - 2) : null;
+                        adjacentOsmWay.getWaypoint(adjacentOsmWay.getWaypointCount() - 3) : null;
             }
         }
-        position = new GeoPosition(secondWaypoint.getLat(), secondWaypoint.getLon());
+        position = secondWaypoint;
         adjacentCrossingOsmId1 = secondWaypoint.getOsmNodeRef();
         adjacentCrossingOsmId2 = thirdWaypoint != null ? thirdWaypoint.getOsmNodeRef() : null;
-    }
-
-    private void shiftTowardsCrossroad(final GeoPosition crossroadPos, final double distToCrossroad) {
-        if (distToCrossroad > DISTANCE_THRESHOLD) {
-            shiftTowardsCrossroad(crossroadPos);
-            shiftTowardsCrossroad(crossroadPos);
-        }
-    }
-
-    private void shiftTowardsCrossroad(GeoPosition crossroadPos) {
-        position = getMiddlePoint(crossroadPos, position);
-    }
-
-    private GeoPosition getMiddlePoint(GeoPosition point1, GeoPosition point2) {
-        return new GeoPosition((point1.getLatitude() + point2.getLatitude()) / 2,
-                (point1.getLongitude() + point2.getLongitude()) / 2);
     }
 
     public String getOsmLightId() {
         return osmLightId;
     }
 
-    public String getLat() {
-        return Double.toString(position.getLatitude());
+    @Override
+    public double getLat() {
+        return position.getLat();
     }
 
-    public String getLon() {
-        return Double.toString(position.getLongitude());
+    @Override
+    public double getLng() {
+        return position.getLng();
     }
 
     public String getAdjacentOsmWayId() {
         return adjacentOsmWayId;
     }
 
-    public String getAdjacentCrossingOsmId1() {
+    String getAdjacentCrossingOsmId1() {
         return adjacentCrossingOsmId1;
     }
 
