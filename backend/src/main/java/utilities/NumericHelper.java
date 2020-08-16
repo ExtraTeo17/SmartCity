@@ -1,13 +1,12 @@
 package utilities;
 
 import org.jetbrains.annotations.Contract;
-import routing.IGeoPosition;
 
 import java.util.List;
 
 public final class NumericHelper {
-    public static final double EARTH_RADIUS = 6364.917;
-    public static final double METERS_PER_DEGREE = EARTH_RADIUS * 2 * Math.PI / 360.0 * 1000;
+    public static final double EARTH_RADIUS_METERS = 6_378_137;
+    public static final double METERS_PER_DEGREE = EARTH_RADIUS_METERS * Math.PI / 180.0;
 
     /**
      * @return cosine in radians, calculated from the Law of Cosines in triangle
@@ -15,15 +14,6 @@ public final class NumericHelper {
     @Contract(pure = true)
     public static double getCosineInTriangle(double a, double b, double c) {
         return ((a * a) + (b * b) - (c * c)) / (2 * a * b);
-    }
-
-    /**
-     * @param radius METER based radius
-     */
-    @Contract(pure = true)
-    public static boolean isInCircle(IGeoPosition point, IGeoPosition center, int radius) {
-        var degreeRadius = radius / METERS_PER_DEGREE;
-        return center.diff(point).squaredSum() < degreeRadius * degreeRadius;
     }
 
     @Contract(pure = true)

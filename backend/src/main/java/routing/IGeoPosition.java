@@ -1,9 +1,10 @@
 package routing;
 
+import org.jetbrains.annotations.NotNull;
 import org.jxmapviewer.viewer.GeoPosition;
 import utilities.NumericHelper;
 
-public interface IGeoPosition {
+public interface IGeoPosition extends Comparable<IGeoPosition> {
     double getLat();
 
     double getLng();
@@ -74,6 +75,28 @@ public interface IGeoPosition {
         return NumericHelper.getCosineInTriangle(a, b, c);
     }
 
+    default IGeoPosition toRadians(){
+        return new IGeoPosition() {
+            private final double lat = Math.toRadians(IGeoPosition.this.getLat());
+            private final double lng = Math.toRadians(IGeoPosition.this.getLng());
+
+            @Override
+            public double getLat() {
+                return lat;
+            }
+
+            @Override
+            public double getLng() {
+                return lng;
+            }
+        };
+    }
+
+    @Override
+    default int compareTo(@NotNull IGeoPosition o) {
+        var cmp = Double.compare(getLat(), o.getLat());
+        return cmp != 0 ? cmp : Double.compare(getLng(), o.getLng());
+    }
 
     @Deprecated
     default GeoPosition toMapGeoPosition() {

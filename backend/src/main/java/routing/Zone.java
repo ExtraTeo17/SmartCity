@@ -35,8 +35,21 @@ public class Zone implements IZone {
         this.radius = radius;
     }
 
+    @SuppressWarnings("FeatureEnvy")
+    // source: https://stackoverflow.com/a/27943/6841224
     @Override
     public boolean isInZone(IGeoPosition pos) {
-        return NumericHelper.isInCircle(pos, center, radius);
+        var delta = center.diff(pos).toRadians();
+        var dLat = delta.getLat() / 2;
+        var dLng = delta.getLng() / 2;
+
+        var latPos = pos.getLat();
+        var latCenter = center.getLat();
+        var haversine = Math.sin(dLat) * Math.sin(dLat) +
+                Math.cos(Math.toRadians(latPos)) * Math.cos(Math.toRadians(latCenter)) * Math.sin(dLng) * Math.sin(dLng);
+        var dist = 2 * Math.atan2(Math.sqrt(haversine), Math.sqrt(1 - haversine));
+        var distMeters = NumericHelper.EARTH_RADIUS_METERS * dist;
+
+        return distMeters <= radius;
     }
 }

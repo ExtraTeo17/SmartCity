@@ -3,18 +3,18 @@ package routing;
 import org.junit.Assert;
 import org.junit.jupiter.api.Test;
 
-class IGeoPositionTest {
+class PositionTest {
 
     @Test
     void midpoint_once_originalNotModified_correctResult() {
         // Arrange
         double latA = 52.23682;
         double lngA = 21.01681;
-        IGeoPosition warsaw = new Position(latA, lngA);
+        var warsaw = Position.of(latA, lngA);
 
         double latB = 48.8566;
         double lngB = 2.3522;
-        IGeoPosition paris = new Position(latB, lngB);
+        var paris = Position.of(latB, lngB);
 
         // Act
         var midpoint = warsaw.midpoint(paris);
@@ -41,7 +41,7 @@ class IGeoPositionTest {
 
         double latB = -33.918861;
         double lngB = 18.423300;
-        IGeoPosition capeTown = Position.of(latB, lngB);
+        var capeTown = Position.of(latB, lngB);
 
         // Act
         warsaw = warsaw.midpoint(capeTown);
@@ -68,11 +68,11 @@ class IGeoPositionTest {
         // Arrange
         double latA = 52.23682;
         double lngA = 21.01681;
-        IGeoPosition warsaw = Position.of(latA, lngA);
+        var warsaw = Position.of(latA, lngA);
 
         double latB = -23.149400874999998;
         double lngB = 18.747488750000002;
-        IGeoPosition omaheke = Position.of(latB, lngB);
+        var omaheke = Position.of(latB, lngB);
 
         // Act
         double dist = warsaw.distance(omaheke);
@@ -92,11 +92,11 @@ class IGeoPositionTest {
         // Arrange
         double latA = 52.23682;
         double lngA = 21.01681;
-        IGeoPosition warsaw = Position.of(latA, lngA);
+        var warsaw = Position.of(latA, lngA);
 
         double latB = -23.149400874999998;
         double lngB = 18.747488750000002;
-        IGeoPosition omaheke = Position.of(latB, lngB);
+        var omaheke = Position.of(latB, lngB);
 
         // Act
         var sumVertex = warsaw.sum(omaheke);
@@ -121,11 +121,11 @@ class IGeoPositionTest {
         // Arrange
         double latA = 52.23682;
         double lngA = 21.01681;
-        IGeoPosition warsaw = Position.of(latA, lngA);
+        var warsaw = Position.of(latA, lngA);
 
         double latB = -23.149400874999998;
         double lngB = 18.747488750000002;
-        IGeoPosition omaheke = Position.of(latB, lngB);
+        var omaheke = Position.of(latB, lngB);
 
         // Act
         var diffVertex = warsaw.diff(omaheke);
@@ -150,7 +150,7 @@ class IGeoPositionTest {
         // Arrange
         double latA = 52.23682;
         double lngA = 21.01681;
-        IGeoPosition warsaw = Position.of(latA, lngA);
+        var warsaw = Position.of(latA, lngA);
 
         // Act
         var result = warsaw.squaredSum();
@@ -169,15 +169,15 @@ class IGeoPositionTest {
         // Arrange
         double latA = 52.23682;
         double lngA = 21.01681;
-        IGeoPosition warsaw = Position.of(latA, lngA);
+        var warsaw = Position.of(latA, lngA);
 
         double latB = 48.8566;
         double lngB = 2.3522;
-        IGeoPosition paris = new Position(latB, lngB);
+        var paris = Position.of(latB, lngB);
 
         double latC = -23.149400874999998;
         double lngC = 18.747488750000002;
-        IGeoPosition omaheke = Position.of(latC, lngC);
+        var omaheke = Position.of(latC, lngC);
 
         // Act
         double saintTriangleCosine = warsaw.cosineAngle(paris, omaheke);
