@@ -50,7 +50,7 @@ public class MasterAgent extends Agent {
     private final IWebService webService;
     private final IBusLinesManager busLinesManager;
     private final IdGenerator<AbstractAgent> idGenerator;
-    private final IAgentsContainer<AbstractAgent> agentsContainer;
+    private final IAgentsContainer agentsContainer;
     private final TaskManager taskManager;
     private final LightAccessManager lightAccessManager;
     private final ConfigContainer configContainer;
@@ -72,7 +72,7 @@ public class MasterAgent extends Agent {
     public MasterAgent(IWebService webService,
                        IBusLinesManager busLinesManager,
                        IdGenerator<AbstractAgent> idGenerator,
-                       IAgentsContainer<AbstractAgent> agentsContainer,
+                       IAgentsContainer agentsContainer,
                        TaskManager taskManager,
                        LightAccessManager lightAccessManager,
                        ConfigContainer configContainer,

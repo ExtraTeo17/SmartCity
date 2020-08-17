@@ -50,7 +50,7 @@ public class MapWindow {
     private final static int PEDESTRIAN_STATION_RADIUS = 200;
     private final static int TIME_SCALE = 10;
     private final EventBus eventBus;
-    private final IAgentsContainer<AbstractAgent> agentsContainer;
+    private final IAgentsContainer agentsContainer;
     private final ConfigContainer configContainer;
 
     public JPanel MainPanel;
@@ -105,7 +105,7 @@ public class MapWindow {
 
     @Inject
     public MapWindow(EventBus eventBus,
-                     IAgentsContainer<AbstractAgent> agentsContainer,
+                     IAgentsContainer agentsContainer,
                      ConfigContainer configContainer) {
         this.eventBus = eventBus;
         this.agentsContainer = agentsContainer;

@@ -1,5 +1,6 @@
 package agents.abstractions;
 
+import agents.AbstractAgent;
 import jade.core.Agent;
 
 import java.util.Iterator;
@@ -8,16 +9,16 @@ import java.util.function.Predicate;
 
 
 // I hate Java generics.
-public interface IAgentsContainer<T extends Agent> extends IRegistrable {
-    boolean tryAdd(T agent);
+public interface IAgentsContainer extends IRegistrable {
+    boolean tryAdd(AbstractAgent agent);
 
-    <TSpec extends T> Iterator<TSpec> iterator(Class<TSpec> type);
+    <TAgent extends Agent> Iterator<TAgent> iterator(Class<TAgent> type);
 
-    boolean contains(T agent);
+    boolean contains(Agent agent);
 
-    <TSpec extends T> void removeIf(Class<TSpec> type, Predicate<TSpec> predicate);
+    <TAgent extends Agent> void removeIf(Class<TAgent> type, Predicate<TAgent> predicate);
 
-    <TSpec extends T> void forEach(Class<TSpec> type, Consumer<TSpec> consumer);
+    <TAgent extends Agent> void forEach(Class<TAgent> type, Consumer<TAgent> consumer);
 
     int size(Class<?> type);
 

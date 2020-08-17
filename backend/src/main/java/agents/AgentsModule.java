@@ -26,8 +26,8 @@ public class AgentsModule extends AbstractModule {
     @Provides
     @Singleton
     @Inject
-    IAgentsContainer<AbstractAgent> getAgentsContainer(ContainerController controller) {
-        var container = new HashAgentsContainer<>(controller);
+    IAgentsContainer getAgentsContainer(ContainerController controller) {
+        var container = new HashAgentsContainer(controller);
         container.registerAll(agentTypes);
         return container;
     }
