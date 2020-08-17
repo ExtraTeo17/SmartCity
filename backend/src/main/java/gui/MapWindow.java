@@ -196,7 +196,7 @@ public class MapWindow {
                             var vehicle = masterAgent.tryAddNewVehicleAgent(Router.generateRouteInfo(pointA, pointB));
                             vehicle.start();
 
-                            logger.info("Vehicles: " + MasterAgent.vehicles.size());
+                            logger.info("Vehicles: " + agentsContainer.size(VehicleAgent.class));
                             logger.info("Lights: " + MasterAgent.lightManagers.size());
                             pointA = null;
                             pointB = null;
@@ -364,10 +364,7 @@ public class MapWindow {
             masterAgent.activateLightManagerAgents();
 
             // start all
-            for (VehicleAgent agent : MasterAgent.vehicles) {
-                agent.start();
-            }
-
+            agentsContainer.forEach(VehicleAgent.class, AbstractAgent::start);
         });
         debug.add(runTest);
 
@@ -483,7 +480,7 @@ public class MapWindow {
     private void drawVehicles(List<Painter<JXMapViewer>> painters) {
         try {
             Set<Waypoint> set = new HashSet<>();
-            for (VehicleAgent a : MasterAgent.vehicles) {
+            agentsContainer.forEach(VehicleAgent.class, a -> {
                 var waypoint = new DefaultWaypoint(a.getVehicle().getPosition().toMapGeoPosition());
                 if (a.getVehicle() instanceof TestCar) {
                     Set<Waypoint> testCarWaypoint = new HashSet<>();
@@ -497,7 +494,7 @@ public class MapWindow {
                 else {
                     set.add(waypoint);
                 }
-            }
+            });
             WaypointPainter<Waypoint> waypointPainter = new WaypointPainter<>();
             waypointPainter.setWaypoints(set);
             waypointPainter.setRenderer(new CustomWaypointRenderer("cabriolet.png"));
@@ -509,13 +506,13 @@ public class MapWindow {
 
     private void drawRoutes(List<Painter<JXMapViewer>> painters) {
         try {
-            for (VehicleAgent a : MasterAgent.vehicles) {
+            agentsContainer.forEach(VehicleAgent.class, a -> {
                 List<IGeoPosition> track = new ArrayList<>(a.getVehicle().getDisplayRoute());
 
                 Random r = new Random(a.hashCode());
                 RoutePainter routePainter = new RoutePainter(track, new Color(r.nextInt(255), r.nextInt(255), r.nextInt(255)));
                 painters.add(routePainter);
-            }
+            });
         } catch (Exception e) {
             logger.warn("Error drawing routes", e);
         }
@@ -973,7 +970,7 @@ public class MapWindow {
 
         @Override
         public void run() {
-            if (!configContainer.shouldGenerateCars() || MasterAgent.vehicles.size() >= getCarLimit()) {
+            if (!configContainer.shouldGenerateCars() || agentsContainer.size(VehicleAgent.class) >= getCarLimit()) {
                 this.cancel();
             }
 

@@ -1,9 +1,9 @@
 package agents.abstractions;
 
 import agents.AbstractAgent;
-import jade.core.Agent;
 
 import java.util.Iterator;
+import java.util.Optional;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 
@@ -12,13 +12,19 @@ import java.util.function.Predicate;
 public interface IAgentsContainer extends IRegistrable {
     boolean tryAdd(AbstractAgent agent);
 
-    <TAgent extends Agent> Iterator<TAgent> iterator(Class<TAgent> type);
+    <TAgent extends AbstractAgent> Iterator<TAgent> iterator(Class<TAgent> type);
 
-    boolean contains(Agent agent);
+    boolean contains(AbstractAgent agent);
 
-    <TAgent extends Agent> void removeIf(Class<TAgent> type, Predicate<TAgent> predicate);
+    <TAgent extends AbstractAgent> Optional<TAgent> get(Class<TAgent> type, Predicate<TAgent> predicate);
 
-    <TAgent extends Agent> void forEach(Class<TAgent> type, Consumer<TAgent> consumer);
+    <TAgent extends AbstractAgent> boolean remove(TAgent agent);
+
+    <TAgent extends AbstractAgent> Optional<TAgent> remove(Class<TAgent> type, int agentId);
+
+    <TAgent extends AbstractAgent> void removeIf(Class<TAgent> type, Predicate<TAgent> predicate);
+
+    <TAgent extends AbstractAgent> void forEach(Class<TAgent> type, Consumer<TAgent> consumer);
 
     int size(Class<?> type);
 

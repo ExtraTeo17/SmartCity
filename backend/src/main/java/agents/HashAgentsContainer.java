@@ -2,16 +2,13 @@ package agents;
 
 import agents.abstractions.IAgentsContainer;
 import com.google.inject.Inject;
-import jade.core.Agent;
 import jade.wrapper.ContainerController;
 import jade.wrapper.StaleProxyException;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
@@ -19,7 +16,7 @@ import java.util.function.Predicate;
 class HashAgentsContainer implements IAgentsContainer {
     private final static Logger logger = LoggerFactory.getLogger(HashAgentsContainer.class);
     private final ContainerController controller;
-    private final Map<Class<?>, HashSet<Agent>> container;
+    private final Map<Class<?>, Map<Integer, AbstractAgent>> container;
 
     @Inject
     HashAgentsContainer(ContainerController controller) {
@@ -30,13 +27,13 @@ class HashAgentsContainer implements IAgentsContainer {
     @Override
     public boolean tryAdd(@NotNull AbstractAgent agent) {
         var type = agent.getClass();
-        var set = container.get(type);
-        if (set == null) {
+        var collection = container.get(type);
+        if (collection == null) {
             throw new NotRegisteredException(type);
         }
 
         if (tryAddAgent(agent)) {
-            return set.add(agent);
+            return collection.putIfAbsent(agent.getId(), agent) == null;
         }
 
         return false;
@@ -44,13 +41,13 @@ class HashAgentsContainer implements IAgentsContainer {
 
     @Override
     @SuppressWarnings("unchecked")
-    public <TAgent extends Agent> Iterator<TAgent> iterator(Class<TAgent> type) {
-        var set = container.get(type);
-        if (set == null) {
+    public <TAgent extends AbstractAgent> Iterator<TAgent> iterator(Class<TAgent> type) {
+        var collection = container.get(type);
+        if (collection == null) {
             throw new NotRegisteredException(type);
         }
 
-        return (Iterator<TAgent>) set.iterator();
+        return (Iterator<TAgent>) collection.values().iterator();
     }
 
 
@@ -66,69 +63,96 @@ class HashAgentsContainer implements IAgentsContainer {
     }
 
     @Override
-    public boolean contains(Agent agent) {
+    public boolean contains(AbstractAgent agent) {
         var type = agent.getClass();
-        var set = container.get(type);
-        if (set == null) {
+        var collection = container.get(type);
+        if (collection == null) {
             throw new NotRegisteredException(type);
         }
 
-        return set.contains(agent);
+        return collection.containsKey(agent.getId());
     }
 
     @Override
-    public <TAgent extends Agent>  void removeIf(Class<TAgent> type, Predicate<TAgent> predicate) {
-        var set = container.get(type);
-        if (set == null) {
+    public <TAgent extends AbstractAgent> Optional<TAgent> get(Class<TAgent> type, Predicate<TAgent> predicate) {
+        var collection = container.get(type);
+        if (collection == null) {
             throw new NotRegisteredException(type);
         }
 
-        set.removeIf(tAgent -> predicate.test(type.cast(tAgent)));
+        return collection.values().stream()
+                .filter(abstractAgent -> predicate.test(type.cast(abstractAgent))).map(type::cast)
+                .findFirst();
     }
 
     @Override
-    public <TAgent extends Agent> void forEach(Class<TAgent> type, Consumer<TAgent> consumer) {
-        var set = container.get(type);
-        if (set == null) {
+    public <TAgent extends AbstractAgent> boolean remove(TAgent agent) {
+        return remove(agent.getClass(), agent.getId()).isPresent();
+    }
+
+    @Override
+    public <TAgent extends AbstractAgent> Optional<TAgent> remove(Class<TAgent> type, int agentId) {
+        var collection = container.get(type);
+        if (collection == null) {
             throw new NotRegisteredException(type);
         }
 
+        var agent = collection.remove(agentId);
+        return agent != null ? Optional.of(type.cast(agent)) : Optional.empty();
+    }
 
-        set.forEach(tAgent -> consumer.accept(type.cast(tAgent)));
+    @Override
+    public <TAgent extends AbstractAgent> void removeIf(Class<TAgent> type, Predicate<TAgent> predicate) {
+        var collection = container.get(type);
+        if (collection == null) {
+            throw new NotRegisteredException(type);
+        }
+
+        collection.entrySet().removeIf(tAgent -> predicate.test(type.cast(tAgent)));
+    }
+
+    @Override
+    public <TAgent extends AbstractAgent> void forEach(Class<TAgent> type, Consumer<TAgent> consumer) {
+        var collection = container.get(type);
+        if (collection == null) {
+            throw new NotRegisteredException(type);
+        }
+
+        collection.forEach((key, tAgent) -> consumer.accept(type.cast(tAgent)));
     }
 
 
     @Override
     public int size(Class<?> type) {
-        var set = container.get(type);
-        if (set == null) {
+        var collection = container.get(type);
+        if (collection == null) {
             throw new NotRegisteredException(type);
         }
 
-        return set.size();
+        return collection.size();
     }
 
     @Override
     public void clear(Class<?> type) {
-        var set = container.get(type);
-        if (set == null) {
+        var collection = container.get(type);
+        if (collection == null) {
             throw new NotRegisteredException(type);
         }
 
-        set.clear();
+        collection.clear();
     }
 
     @Override
     public final void register(Class<?>... types) {
         for (var type : types) {
-            container.put(type, new HashSet<>());
+            container.put(type, new HashMap<>());
         }
     }
 
     @Override
     public void registerAll(Class<?>[] types) {
         for (var type : types) {
-            container.put(type, new HashSet<>());
+            container.put(type, new HashMap<>());
         }
     }
 }

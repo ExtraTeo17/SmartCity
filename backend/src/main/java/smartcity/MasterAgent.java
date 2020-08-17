@@ -58,7 +58,6 @@ public class MasterAgent extends Agent {
     // TODO: Delete this abomination (or at least make it private)
     public static final Set<LightManager> lightManagers = ConcurrentHashMap.newKeySet();
     public static final List<PedestrianAgent> pedestrians = new CopyOnWriteArrayList<>();
-    public static final List<VehicleAgent> vehicles = new ArrayList<>();
 
     public static Map<Pair<Long, Long>, LightManagerNode> wayIdLightIdToLightManagerNode = new HashMap<>();
     public static Map<Long, LightManagerNode> crossingOsmIdToLightManagerNode = new HashMap<>();
@@ -145,16 +144,17 @@ public class MasterAgent extends Agent {
     }
 
     private void onReceiveVehicle(ACLMessage rcv) {
-        for (int i = 0; i < vehicles.size(); i++) {
-            VehicleAgent v = vehicles.get(i);
-            if (v.getLocalName().equals(rcv.getSender().getLocalName())) {
-                if (v.getVehicle() instanceof TestCar) {
-                    TestCar car = (TestCar) v.getVehicle();
-                    setResultTime(car.start, car.end);
-                }
-                vehicles.remove(i);
-                break;
+        var name = rcv.getSender().getLocalName();
+        var agentOpt = agentsContainer.get(VehicleAgent.class, (v) -> v.getLocalName().equals(name));
+        if (agentOpt.isPresent()) {
+            var agent = agentOpt.get();
+            var vehicle = agent.getVehicle();
+            if (vehicle instanceof TestCar) {
+                var car = (TestCar) vehicle;
+                setResultTime(car.start, car.end);
             }
+
+            agentsContainer.remove(agent);
         }
     }
 
@@ -238,9 +238,8 @@ public class MasterAgent extends Agent {
     }
 
     private void tryAddNewVehicleAgent(VehicleAgent agent) {
-        // TODO: Move to container
-        vehicles.add(agent);
-        MasterAgent.tryAddAgent(agent);
+        agentsContainer.tryAdd(agent);
+        // TODO: Move id to the factory
         ++carId;
     }
 
@@ -287,8 +286,8 @@ public class MasterAgent extends Agent {
         delete(lightManagers.iterator());
         lightManagers.clear();
 
-        delete(vehicles.iterator());
-        vehicles.clear();
+        delete(agentsContainer.iterator(VehicleAgent.class));
+        agentsContainer.clear(VehicleAgent.class);
 
         delete(agentsContainer.iterator(BusAgent.class));
         agentsContainer.clear(BusAgent.class);
