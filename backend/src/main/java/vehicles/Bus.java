@@ -19,8 +19,8 @@ public class Bus extends MovingObject {
     private final String busLine;
     private final String brigadeNr;
     private DrivingState state = DrivingState.STARTING;
-    private List<RouteNode> displayRoute;
-    private List<RouteNode> route;
+    private final List<RouteNode> displayRoute;
+    private final List<RouteNode> route;
     private int index = 0;
     private int speed = 40;
     private int closestLightIndex = -1;
@@ -29,7 +29,7 @@ public class Bus extends MovingObject {
 
     public Bus(final List<RouteNode> route, final Timetable timetable, final String busLine,
                final String brigadeNr) {
-        displayRoute = route;
+        this.displayRoute = route;
 
         for (RouteNode node : route) {
             if (node instanceof StationNode) {
@@ -40,7 +40,7 @@ public class Bus extends MovingObject {
 
         this.route = Router.uniformRoute(displayRoute);
         this.timetable = timetable;
-        stationNodesOnRoute = extractStationsFromRoute();
+        this.stationNodesOnRoute = extractStationsFromRoute();
         this.busLine = busLine;
         this.brigadeNr = brigadeNr;
     }

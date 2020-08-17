@@ -23,7 +23,7 @@ public class Timetable {
         return timeOnStationChronological.get(0).getValue0();
     }
 
-    public void addEntryToTimetable(long stationOsmId, String time) {
+    void addEntryToTimetable(long stationOsmId, String time) {
         Date timeOnStation = null;
         try {
             timeOnStation = new SimpleDateFormat("HH:mm:ss").parse(time);

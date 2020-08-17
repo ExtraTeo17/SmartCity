@@ -225,9 +225,6 @@ public class MapWindow {
             currentTimeLabel.setVisible(true);
             ResultTimeLabel.setVisible(true);
             ResultTimeTitle.setVisible(true);
-            if (agentsContainer.size(LightManager.class) == 0) {
-                logger.warn("Why?");
-            }
             masterAgent.activateLightManagerAgents();
             random.setSeed(getSeed());
 

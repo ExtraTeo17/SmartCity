@@ -26,19 +26,11 @@ import java.util.Random;
 @SuppressWarnings("serial")
 public class BusAgent extends AbstractAgent {
     private static final Logger logger = LoggerFactory.getLogger(BusAgent.class);
-    private final List<RouteNode> route;
-    private final Timetable timetable;
-    private final String busLine;
-    private final String brigadeNr;
-    private Bus bus;
+    private final Bus bus;
 
-    public BusAgent(int busId, List<RouteNode> route, Timetable timetable, String busLine, String brigadeNr) {
+    public BusAgent(int busId, Bus bus) {
         super(busId);
-        this.route = route;
-        this.timetable = timetable;
-        this.busLine = busLine;
-        this.brigadeNr = brigadeNr;
-        this.bus = new Bus(route, timetable, busLine, brigadeNr);
+        this.bus = bus;
     }
 
     @Override
@@ -274,13 +266,11 @@ public class BusAgent extends AbstractAgent {
                 stationsOnRoute.get(halfIndex + random.nextInt(halfIndex)));
     }
 
+    // TODO: New bus was created each time - check if nothing was broken?
     public void runBasedOnTimetable(Date date) {
         if (this.getAgentState().getValue() != jade.wrapper.AgentState.cAGENT_STATE_INITIATED) {
             return;
         }
-
-        // TODO: New bus is created each time - is it needed?
-        this.bus = new Bus(route, timetable, busLine, brigadeNr);
 
         long hours = bus.getBoardingTime().getHours();
         long minutes = bus.getBoardingTime().getMinutes();

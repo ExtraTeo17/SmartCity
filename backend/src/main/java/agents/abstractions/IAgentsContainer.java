@@ -13,7 +13,9 @@ import java.util.stream.Stream;
 public interface IAgentsContainer extends IRegistrable {
     boolean tryAdd(AbstractAgent agent);
 
-    <TAgent extends AbstractAgent> Iterator<TAgent> iterator(Class<TAgent> type);
+    default <TAgent extends AbstractAgent> Iterator<TAgent> iterator(Class<TAgent> type) {
+        return  stream(type).iterator();
+    }
 
     <TAgent extends AbstractAgent> Stream<TAgent> stream(Class<TAgent> type);
 
@@ -27,7 +29,9 @@ public interface IAgentsContainer extends IRegistrable {
 
     <TAgent extends AbstractAgent> void removeIf(Class<TAgent> type, Predicate<TAgent> predicate);
 
-    <TAgent extends AbstractAgent> void forEach(Class<TAgent> type, Consumer<TAgent> consumer);
+    default <TAgent extends AbstractAgent> void forEach(Class<TAgent> type, Consumer<TAgent> consumer) {
+        stream(type).forEach(consumer);
+    }
 
     int size(Class<?> type);
 
