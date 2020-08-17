@@ -8,7 +8,6 @@ import routing.RouteNode;
 import routing.Router;
 import smartcity.MasterAgent;
 import smartcity.buses.BrigadeInfo;
-import utilities.NumericHelper;
 
 import java.util.*;
 import java.util.function.Consumer;
@@ -56,7 +55,7 @@ public class BusInfo implements Iterable<BrigadeInfo> {
         List<Long> filteredStationOsmIds = new ArrayList<>();
         for (Long osmStationId : stationsOnRouteOsmIds) {
             OSMStation station = MasterAgent.osmIdToStationOSMNode.get(osmStationId);
-            if (station != null && zone.isInZone(station)) {
+            if (station != null && zone.contains(station)) {
                 filteredStationOsmIds.add(osmStationId);
             }
         }

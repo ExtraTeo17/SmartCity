@@ -6,6 +6,7 @@ import java.util.Iterator;
 import java.util.Optional;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
+import java.util.stream.Stream;
 
 
 // I hate Java generics.
@@ -13,6 +14,8 @@ public interface IAgentsContainer extends IRegistrable {
     boolean tryAdd(AbstractAgent agent);
 
     <TAgent extends AbstractAgent> Iterator<TAgent> iterator(Class<TAgent> type);
+
+    <TAgent extends AbstractAgent> Stream<TAgent> stream(Class<TAgent> type);
 
     boolean contains(AbstractAgent agent);
 

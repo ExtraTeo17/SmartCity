@@ -12,6 +12,7 @@ import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
+import java.util.stream.Stream;
 
 class HashAgentsContainer implements IAgentsContainer {
     private final static Logger logger = LoggerFactory.getLogger(HashAgentsContainer.class);
@@ -48,6 +49,17 @@ class HashAgentsContainer implements IAgentsContainer {
         }
 
         return (Iterator<TAgent>) collection.values().iterator();
+    }
+
+    @Override
+    @SuppressWarnings("unchecked")
+    public <TAgent extends AbstractAgent> Stream<TAgent> stream(Class<TAgent> type) {
+        var collection = container.get(type);
+        if (collection == null) {
+            throw new NotRegisteredException(type);
+        }
+
+        return (Stream<TAgent>) collection.values().stream();
     }
 
 

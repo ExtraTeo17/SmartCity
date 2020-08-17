@@ -170,7 +170,7 @@ public class OSMWay extends OSMElement {
     }
 
     public boolean startsInZone(IZone zone) {
-        return zone.isInZone(waypoints.get(0));
+        return zone.contains(waypoints.get(0));
     }
 
     // TODO: What is returned here?

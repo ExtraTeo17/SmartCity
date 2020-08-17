@@ -197,7 +197,7 @@ public class MapWindow {
                             vehicle.start();
 
                             logger.info("Vehicles: " + agentsContainer.size(VehicleAgent.class));
-                            logger.info("Lights: " + MasterAgent.lightManagers.size());
+                            logger.info("Lights: " + agentsContainer.size(LightManager.class));
                             pointA = null;
                             pointB = null;
                         }
@@ -225,6 +225,9 @@ public class MapWindow {
             currentTimeLabel.setVisible(true);
             ResultTimeLabel.setVisible(true);
             ResultTimeTitle.setVisible(true);
+            if (agentsContainer.size(LightManager.class) == 0) {
+                logger.warn("Why?");
+            }
             masterAgent.activateLightManagerAgents();
             random.setSeed(getSeed());
 
@@ -470,9 +473,7 @@ public class MapWindow {
             return;
         }
 
-        for (LightManager mgr : MasterAgent.lightManagers) {
-            mgr.draw(painters);
-        }
+        agentsContainer.forEach(LightManager.class, man -> man.draw(painters));
 
         configContainer.unlockLightManagers();
     }

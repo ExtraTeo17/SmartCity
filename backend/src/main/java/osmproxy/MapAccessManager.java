@@ -15,7 +15,6 @@
  */
 package osmproxy;
 
-import jade.core.NotFoundException;
 import org.javatuples.Pair;
 import org.javatuples.Triplet;
 import org.slf4j.Logger;
@@ -31,22 +30,17 @@ import osmproxy.elements.OSMWay;
 import routing.IZone;
 import routing.Position;
 import routing.RouteInfo;
-import smartcity.MasterAgent;
 import utilities.IterableNodeList;
 import utilities.NumericHelper;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.transform.Transformer;
-import javax.xml.transform.TransformerFactory;
-import javax.xml.transform.dom.DOMSource;
-import javax.xml.transform.stream.StreamResult;
 import java.io.DataOutputStream;
 import java.io.File;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
@@ -147,26 +141,54 @@ public class MapAccessManager {
     }
 
     // TODO: Remove checked exceptions from here
+
     /**
      * @param query the overpass query
      * @return the nodes in the formulated query
      */
-    public static Document getNodesViaOverpass(String query) throws IOException, ParserConfigurationException, SAXException {
-        URL osm = new URL(OVERPASS_API);
-        HttpURLConnection connection = (HttpURLConnection) osm.openConnection();
+    public static Document getNodesViaOverpass(String query) {
+        HttpURLConnection connection = getConnection();
         connection.setDoInput(true);
         connection.setDoOutput(true);
         connection.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");
 
-        DataOutputStream printout = new DataOutputStream(connection.getOutputStream());
-        printout.writeBytes("data=" + URLEncoder.encode(query, StandardCharsets.UTF_8));
-        printout.flush();
-        printout.close();
+        try {
+            DataOutputStream printout = new DataOutputStream(connection.getOutputStream());
+            printout.writeBytes("data=" + URLEncoder.encode(query, StandardCharsets.UTF_8));
+            printout.flush();
+            printout.close();
+        } catch (IOException e) {
+            logger.warn("Error getting data from connection");
+            throw new RuntimeException(e);
+        }
 
         // TODO: Cache builder
-        DocumentBuilderFactory dbfac = DocumentBuilderFactory.newInstance();
-        DocumentBuilder docBuilder = dbfac.newDocumentBuilder();
-        return docBuilder.parse(connection.getInputStream());
+        try {
+            DocumentBuilderFactory dbfac = DocumentBuilderFactory.newInstance();
+            DocumentBuilder docBuilder = dbfac.newDocumentBuilder();
+            return docBuilder.parse(connection.getInputStream());
+        } catch (IOException | ParserConfigurationException | SAXException e) {
+            logger.error("Error parsing data from connection");
+            throw new RuntimeException(e);
+        }
+    }
+
+
+    private static HttpURLConnection getConnection() {
+        URL url;
+        try {
+            url = new URL(OVERPASS_API);
+        } catch (MalformedURLException e) {
+            logger.error("Error creating url: " + OVERPASS_API);
+            throw new RuntimeException(e);
+        }
+
+        try {
+            return (HttpURLConnection) url.openConnection();
+        } catch (IOException e) {
+            logger.error("Error opening connection to " + OVERPASS_API);
+            throw new RuntimeException(e);
+        }
     }
 
 
@@ -192,22 +214,32 @@ public class MapAccessManager {
         return info;
     }
 
-    public static boolean prepareLightManagersInRadiusAndLightIdToLightManagerIdHashSet(IZone zone) {
+    public static List<Node> getLightManagersNodes(IZone zone) {
+        var lightManagersNodes = new ArrayList<Node>();
+        Document xmlDocument = getXmlDocument(CROSSROADS_LOCATIONS_PATH);
+        Node osmRoot = xmlDocument.getFirstChild();
+        var districtXMLNodes = IterableNodeList.of(osmRoot.getChildNodes());
         try {
-            Document xmlDocument = getXmlDocument(CROSSROADS_LOCATIONS_PATH);
-            Node osmRoot = xmlDocument.getFirstChild();
-            NodeList districtXMLNodes = osmRoot.getChildNodes();
-            for (int i = 0; i < districtXMLNodes.getLength(); i++) {
-                if (districtXMLNodes.item(i).getNodeName().equals("district")) {
-                    addAllDesiredIdsInDistrict(districtXMLNodes.item(i), zone);
+            for (var districtNode : districtXMLNodes) {
+                if (districtNode.getNodeName().equals("district")) {
+                    Node crossroadsRoot = districtNode.getChildNodes().item(1);
+                    var crossroadXMLNodes = IterableNodeList.of(crossroadsRoot.getChildNodes());
+                    for (var crossroad : crossroadXMLNodes) {
+                        if (crossroad.getNodeName().equals("crossroad")) {
+                            var crossroadPos = calculateLatLonBasedOnInternalLights(crossroad);
+                            if (zone.contains(crossroadPos)) {
+                                lightManagersNodes.add(crossroad);
+                            }
+                        }
+                    }
                 }
             }
         } catch (Exception e) {
             logger.warn("Error preparing light managers", e);
-            return false;
+            return lightManagersNodes;
         }
 
-        return true;
+        return lightManagersNodes;
     }
 
     public static void parseChildNodesOfWays(Document childNodesOfWays, List<OSMNode> lightsOfTypeA) {
@@ -227,24 +259,6 @@ public class MapAccessManager {
                     parentWayIndex = 0;
                 }
             }
-        }
-    }
-
-    private static void addAllDesiredIdsInDistrict(Node districtRoot, IZone zone) {
-        Node crossroadsRoot = districtRoot.getChildNodes().item(1);
-        NodeList crossroadXMLNodes = crossroadsRoot.getChildNodes();
-        for (int i = 0; i < crossroadXMLNodes.getLength(); ++i) {
-            if (crossroadXMLNodes.item(i).getNodeName().equals("crossroad")) {
-                addCrossroadIdIfDesired(crossroadXMLNodes.item(i), zone);
-            }
-        }
-
-    }
-
-    private static void addCrossroadIdIfDesired(Node crossroad, IZone zone) {
-        var crossroadPos = calculateLatLonBasedOnInternalLights(crossroad);
-        if (zone.isInZone(crossroadPos)) {
-            MasterAgent.tryCreateLightManager(crossroad);
         }
     }
 

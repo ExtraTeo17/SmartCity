@@ -155,7 +155,7 @@ public class BusLinesManager implements IBusLinesManager {
                 String lat = attributes.getNamedItem("lat").getNodeValue();
                 String lon = attributes.getNamedItem("lon").getNodeValue();
 
-                if (zone.isInZone(Position.of(lat, lon)) &&
+                if (zone.contains(Position.of(lat, lon)) &&
                         !MasterAgent.osmIdToStationOSMNode.containsKey(Long.parseLong(osmId))) {
                     NodeList list_tags = item.getChildNodes();
                     for (int z = 0; z < list_tags.getLength(); z++) {

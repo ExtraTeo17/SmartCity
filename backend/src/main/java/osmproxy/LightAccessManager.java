@@ -5,14 +5,10 @@ import com.google.inject.Inject;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
-import org.xml.sax.SAXException;
 import osmproxy.elements.OSMNode;
 import osmproxy.elements.OSMWay;
 import routing.IZone;
-import smartcity.MasterAgent;
 
-import javax.xml.parsers.ParserConfigurationException;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -28,17 +24,14 @@ public class LightAccessManager extends MapAccessManager {
         this.zone = zone;
     }
 
-    public void constructLightManagers()
-            throws IOException, ParserConfigurationException, SAXException {
+    public List<OSMNode> getLights() {
         List<OSMNode> lightsAround = getLightNodesAround();
         List<OSMNode> lightNodeList = sendParentWaysOfLightOverpassQuery(lightsAround);
-        List<OSMNode> lightsOfTypeA = lightNodeList.stream().filter(OSMNode::isTypeA).collect(Collectors.toList());
 
-        createLightManagers(lightsOfTypeA);
+        return lightNodeList.stream().filter(OSMNode::isTypeA).collect(Collectors.toList());
     }
 
-    private List<OSMNode> getLightNodesAround()
-            throws IOException, ParserConfigurationException, SAXException {
+    private List<OSMNode> getLightNodesAround() {
         var lightsQuery = OsmQueryManager.getLightsAroundOverpassQuery(zone.getCenter(), zone.getRadius());
         var nodes = MapAccessManager.getNodesViaOverpass(lightsQuery);
         return MapAccessManager.getNodes(nodes);
@@ -54,8 +47,7 @@ public class LightAccessManager extends MapAccessManager {
         return lightNodeList;
     }
 
-    private List<OSMNode> sendParentWaysOfLightOverpassQuery(final List<OSMNode> lightsAround)
-            throws IOException, ParserConfigurationException, SAXException {
+    private List<OSMNode> sendParentWaysOfLightOverpassQuery(final List<OSMNode> lightsAround) {
         return parseLightNodeList(
                 MapAccessManager.getNodesViaOverpass(
                         getParentWaysOfLightOverpassQuery(lightsAround)
@@ -83,15 +75,5 @@ public class LightAccessManager extends MapAccessManager {
             builder.append(OsmQueryManager.getSingleParentWaysOfLightOverpassQuery(light.getId()));
         }
         return OsmQueryManager.getQueryWithPayload(builder.toString());
-    }
-
-    private void createLightManagers(List<OSMNode> lightsOfTypeA) {
-        for (final OSMNode centerCrossroadNode : lightsOfTypeA) {
-            if (centerCrossroadNode.determineParentOrientationsTowardsCrossroad()) {
-                // TODO: MasterAgent as instance or separate service for adding new agents to container
-                MasterAgent.tryCreateLightManager(centerCrossroadNode);
-            }
-        }
-
     }
 }

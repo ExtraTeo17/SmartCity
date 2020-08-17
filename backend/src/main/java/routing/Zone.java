@@ -38,7 +38,7 @@ public class Zone implements IZone {
     @SuppressWarnings("FeatureEnvy")
     // source: https://stackoverflow.com/a/27943/6841224
     @Override
-    public boolean isInZone(IGeoPosition pos) {
+    public boolean contains(IGeoPosition pos) {
         var delta = center.diff(pos).toRadians();
         var dLat = delta.getLat() / 2;
         var dLng = delta.getLng() / 2;

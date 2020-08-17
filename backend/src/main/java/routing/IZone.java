@@ -11,5 +11,5 @@ public interface IZone {
         Objects.requireNonNull(mutation);
     }
 
-    boolean isInZone(IGeoPosition pos);
+    boolean contains(IGeoPosition pos);
 }

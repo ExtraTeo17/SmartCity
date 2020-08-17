@@ -56,7 +56,6 @@ public class MasterAgent extends Agent {
     private final ConfigContainer configContainer;
 
     // TODO: Delete this abomination (or at least make it private)
-    public static final Set<LightManager> lightManagers = ConcurrentHashMap.newKeySet();
     public static final List<PedestrianAgent> pedestrians = new CopyOnWriteArrayList<>();
 
     public static Map<Pair<Long, Long>, LightManagerNode> wayIdLightIdToLightManagerNode = new HashMap<>();
@@ -165,7 +164,7 @@ public class MasterAgent extends Agent {
     @Subscribe
     public void handleSimulationReady(SimulationReadyEvent e) {
         logger.info("Handling SimulationReadyEvent");
-        var positions = lightManagers.stream()
+        var positions = agentsContainer.stream(LightManager.class)
                 .flatMap(man -> man.getLightsPositions().stream())
                 .collect(Collectors.toList());
         webService.setZone(positions);
@@ -197,18 +196,14 @@ public class MasterAgent extends Agent {
         return agentsContainer.tryAdd(agent);
     }
 
-    public static void tryCreateLightManager(Node crossroad) {
+    boolean tryCreateLightManager(Node crossroad) {
         LightManager manager = new LightManager(crossroad, IdGenerator.getLightManagerId());
-        lightManagers.add(manager);
-        if (!tryAddAgent(manager)) {
-            logger.warn("Failed to add LightManager.");
-        }
+        return agentsContainer.tryAdd(manager);
     }
 
-    public static void tryCreateLightManager(final OSMNode centerCrossroadNode) {
+    private boolean tryCreateLightManager(final OSMNode centerCrossroadNode) {
         LightManager manager = new LightManager(centerCrossroadNode, IdGenerator.getLightManagerId());
-        lightManagers.add(manager);
-        tryAddAgent(manager);
+        return agentsContainer.tryAdd(manager);
     }
 
     public static AbstractAgent tryAddNewStationAgent(OSMStation stationOSMNode) {
@@ -231,22 +226,17 @@ public class MasterAgent extends Agent {
 
     public VehicleAgent tryAddNewVehicleAgent(List<RouteNode> info, boolean testCar) {
         MovingObjectImpl car = testCar ? new TestCar(info) : new MovingObjectImpl(info);
-        VehicleAgent vehicle = new VehicleAgent(carId, car);
-        tryAddNewVehicleAgent(vehicle);
-
-        return vehicle;
-    }
-
-    private void tryAddNewVehicleAgent(VehicleAgent agent) {
+        VehicleAgent agent = new VehicleAgent(carId, car);
         agentsContainer.tryAdd(agent);
         // TODO: Move id to the factory
         ++carId;
+
+        return agent;
     }
 
+    // TODO: Move to agentsContainer
     public void activateLightManagerAgents() {
-        for (LightManager lightManager : lightManagers) {
-            lightManager.start();
-        }
+        agentsContainer.forEach(LightManager.class, AbstractAgent::start);
     }
 
     private boolean prepareLightManagers() {
@@ -256,13 +246,8 @@ public class MasterAgent extends Agent {
             return false;
         }
 
-        boolean result;
-        if (configContainer.USE_DEPRECATED_XML_FOR_LIGHT_MANAGERS) {
-            result = MapAccessManager.prepareLightManagersInRadiusAndLightIdToLightManagerIdHashSet(configContainer.getZone());
-        }
-        else {
-            result = tryConstructLightManagers();
-        }
+        boolean result = tryConstructLightManagers();
+
         configContainer.unlockLightManagers();
 
         return result;
@@ -270,7 +255,25 @@ public class MasterAgent extends Agent {
 
     private boolean tryConstructLightManagers() {
         try {
-            lightAccessManager.constructLightManagers();
+            if (configContainer.USE_DEPRECATED_XML_FOR_LIGHT_MANAGERS) {
+                var nodes =
+                        MapAccessManager.getLightManagersNodes(configContainer.getZone());
+                for (var node : nodes) {
+                    if (!tryCreateLightManager(node)) {
+                        return false;
+                    }
+                }
+            }
+            else {
+                var lights = lightAccessManager.getLights();
+                for (final OSMNode centerCrossroadNode : lights) {
+                    if (centerCrossroadNode.determineParentOrientationsTowardsCrossroad()) {
+                        if (!tryCreateLightManager(centerCrossroadNode)) {
+                            return false;
+                        }
+                    }
+                }
+            }
         } catch (Exception e) {
             logger.error("Error preparing light managers", e);
             return false;
@@ -283,8 +286,8 @@ public class MasterAgent extends Agent {
     public void reset() {
         logger.info("Resetting started");
 
-        delete(lightManagers.iterator());
-        lightManagers.clear();
+        delete(agentsContainer.iterator(LightManager.class));
+        agentsContainer.clear(LightManager.class);
 
         delete(agentsContainer.iterator(VehicleAgent.class));
         agentsContainer.clear(VehicleAgent.class);

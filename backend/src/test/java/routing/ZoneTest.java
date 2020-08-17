@@ -36,7 +36,7 @@ class ZoneTest {
         var eiffelTower = Position.of(latB, lngB);
 
         // Act
-        boolean result = zone.isInZone(eiffelTower);
+        boolean result = zone.contains(eiffelTower);
 
         // Assert
         Assert.assertEquals(latA, parisHotelDeVille.getLat(), 0);
@@ -70,7 +70,7 @@ class ZoneTest {
         var monumentToBartolomeoColleoni = Position.of(latB, lngB);
 
         // Act
-        boolean result = zone.isInZone(monumentToBartolomeoColleoni);
+        boolean result = zone.contains(monumentToBartolomeoColleoni);
 
         // Assert
         Assert.assertEquals(latA, warsawTD.getLat(), 0);
