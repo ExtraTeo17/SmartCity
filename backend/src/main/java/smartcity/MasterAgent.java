@@ -178,7 +178,6 @@ public class MasterAgent extends Agent {
     private boolean prepareStationsAndBuses() {
         int busCount = 0;
         for (var busInfo : busLinesManager.getBusInfos()) {
-            // TODO: Improve - accessing busInfo/bridgeInfo too much
             List<RouteNode> routeWithNodes = busInfo.getRouteInfo();
             var busLine = busInfo.getBusLine();
             for (var brigade : busInfo) {
@@ -194,6 +193,12 @@ public class MasterAgent extends Agent {
                 }
             }
         }
+
+        if (busCount == 0) {
+            logger.error("No buses were created");
+            return false;
+        }
+
         logger.info("Buses are created!");
         logger.info("NUMBER OF BUS AGENTS: " + busCount);
         return true;
