@@ -26,7 +26,7 @@ public class StationAgent extends AbstractAgent {
         return "Station";
     }
 
-    public StationAgent(OSMStation stationOSMNode, final int agentId) { // REMEMBER TO PRUNE BEYOND CIRCLE
+    public StationAgent(final int agentId, OSMStation stationOSMNode) { // REMEMBER TO PRUNE BEYOND CIRCLE
         super(agentId);
         this.stationStrategy = new StationStrategy(stationOSMNode, agentId);
 

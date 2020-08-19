@@ -47,16 +47,6 @@ public class IdGenerator<TAgent extends AbstractAgent> implements IRegistrable {
     }
 
     @Deprecated
-    public static int getLightManagerId() {
-        return lightManagerId.getAndIncrement();
-    }
-
-    @Deprecated
-    public static void resetLightManagerId() {
-        lightManagerId.set(resetValue);
-    }
-
-    @Deprecated
     public static int getStationAgentId() {
         return stationAgentId.getAndIncrement();
     }

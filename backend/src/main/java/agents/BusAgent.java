@@ -14,7 +14,6 @@ import routing.LightManagerNode;
 import routing.RouteNode;
 import routing.StationNode;
 import smartcity.MasterAgent;
-import smartcity.buses.Timetable;
 import vehicles.Bus;
 import vehicles.DrivingState;
 
@@ -40,7 +39,7 @@ public class BusAgent extends AbstractAgent {
 
     @Override
     protected void setup() {
-        GetNextStation();
+        getNextStation();
         StationNode station = bus.getCurrentStationNode();
         print("Started at station " + station.getStationId() + ".");
         bus.setState(DrivingState.MOVING);
@@ -132,7 +131,7 @@ public class BusAgent extends AbstractAgent {
                             if (node instanceof LightManagerNode) {
                                 informLightManager(bus);
                             }
-                            GetNextStation();
+                            getNextStation();
 
                             bus.setState(DrivingState.MOVING);
                             bus.move();
@@ -189,7 +188,7 @@ public class BusAgent extends AbstractAgent {
                                 response.setAllUserDefinedParameters(properties);
                                 send(response);
                                 logger.info("BUS: get REQUEST from station");
-                                GetNextStation();
+                                getNextStation();
                                 bus.setState(DrivingState.PASSING_STATION);
                             }
                         }
@@ -229,7 +228,7 @@ public class BusAgent extends AbstractAgent {
         addBehaviour(communication);
     }
 
-    void GetNextStation() {
+    void getNextStation() {
         // finds next station and announces his arrival
         StationNode nextStation = bus.findNextStation();
 
@@ -259,7 +258,8 @@ public class BusAgent extends AbstractAgent {
         return bus.getLine();
     }
 
-    public final Pair<StationNode, StationNode> getTwoSubsequentStations(final Random random) { // TODO: Fix situation where bus route contains only one station and pedestrians tries to choose two
+    // TODO: Fix situation where bus route contains only one station and pedestrians tries to choose two
+    public final Pair<StationNode, StationNode> getTwoSubsequentStations(final Random random) {
         List<StationNode> stationsOnRoute = bus.getStationNodesOnRoute();
         final int halfIndex = stationsOnRoute.size() / 2;
         return Pair.with(stationsOnRoute.get(random.nextInt(halfIndex)),

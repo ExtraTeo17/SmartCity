@@ -103,6 +103,7 @@ public class BusLinesManager implements IBusLinesManager {
 
                 if (zone.contains(Position.of(lat, lon)) &&
                         !MasterAgent.osmIdToStationOSMNode.containsKey(osmId)) {
+                    // TODO: Search for bus_stop
                     for (Node tag : IterableNodeList.of(osmNode.getChildNodes()).stream()
                             .filter(n -> n.getNodeName().equals("tag")).collect(Collectors.toList())) {
                         NamedNodeMap attr = tag.getAttributes();

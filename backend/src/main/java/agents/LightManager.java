@@ -20,13 +20,13 @@ public class LightManager extends AbstractAgent {
     private final IBehaviourFactory<LightManager> behaviourFactory;
     private final ICrossroad crossroad;
 
-    public LightManager(Node node, int id) {
+    public LightManager(int id, Node node) {
         super(id);
         behaviourFactory = new LightManagerBehaviourFactory();
         crossroad = new SimpleCrossroad(node, id);
     }
 
-    public LightManager(OSMNode centerCrossroadNode, int id) {
+    public LightManager(int id, OSMNode centerCrossroadNode) {
         super(id);
         behaviourFactory = new LightManagerBehaviourFactory();
         crossroad = new SimpleCrossroad(centerCrossroadNode, id);

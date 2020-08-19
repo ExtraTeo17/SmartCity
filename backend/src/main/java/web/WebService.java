@@ -10,11 +10,11 @@ import web.serialization.Converter;
 
 import java.util.List;
 
-public class WebService implements IWebService {
+class WebService implements IWebService {
     private final WebConnector webConnector;
 
     @Inject
-    public WebService(WebConnector webConnector) {
+    WebService(WebConnector webConnector) {
         this.webConnector = webConnector;
     }
 

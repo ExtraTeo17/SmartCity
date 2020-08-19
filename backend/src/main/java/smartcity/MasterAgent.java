@@ -3,9 +3,10 @@ package smartcity;
 import agents.*;
 import agents.abstractions.IAgentsContainer;
 import agents.utils.MessageParameter;
-import com.google.common.eventbus.Subscribe;
+import com.google.common.collect.ImmutableList;
+import com.google.common.eventbus.EventBus;
 import com.google.inject.Inject;
-import events.SimulationReadyEvent;
+import events.LightManagersReadyEvent;
 import gui.MapWindow;
 import jade.core.Agent;
 import jade.core.behaviours.CyclicBehaviour;
@@ -27,13 +28,11 @@ import routing.StationNode;
 import smartcity.buses.Timetable;
 import smartcity.task.TaskManager;
 import vehicles.*;
-import web.abstractions.IWebService;
 
 import java.time.Duration;
 import java.time.Instant;
 import java.util.*;
 import java.util.concurrent.CopyOnWriteArrayList;
-import java.util.stream.Collectors;
 
 // TODO: This class should have no more than 10 fields.
 // TODO: This class should be package private
@@ -43,13 +42,13 @@ public class MasterAgent extends Agent {
 
     private static AgentContainer container;
     private static MapWindow window;
-    private final IWebService webService;
     private final IBusLinesManager busLinesManager;
     private final IdGenerator<AbstractAgent> idGenerator;
     private final IAgentsContainer agentsContainer;
     private final TaskManager taskManager;
     private final LightAccessManager lightAccessManager;
     private final ConfigContainer configContainer;
+    private final EventBus eventBus;
 
     // TODO: Delete this abomination (or at least make it private)
     public static final List<PedestrianAgent> pedestrians = new CopyOnWriteArrayList<>();
@@ -63,21 +62,21 @@ public class MasterAgent extends Agent {
     public int pedestrianId = 0;
 
     @Inject
-    public MasterAgent(IWebService webService,
-                       IBusLinesManager busLinesManager,
+    public MasterAgent(IBusLinesManager busLinesManager,
                        IdGenerator<AbstractAgent> idGenerator,
                        IAgentsContainer agentsContainer,
                        TaskManager taskManager,
                        LightAccessManager lightAccessManager,
                        ConfigContainer configContainer,
+                       EventBus eventBus,
                        MapWindow window) {
-        this.webService = webService;
         this.busLinesManager = busLinesManager;
         this.idGenerator = idGenerator;
         this.agentsContainer = agentsContainer;
         this.taskManager = taskManager;
         this.lightAccessManager = lightAccessManager;
         this.configContainer = configContainer;
+        this.eventBus = eventBus;
 
         // TODO: Delete this abomination
         MasterAgent.window = window;
@@ -90,7 +89,6 @@ public class MasterAgent extends Agent {
         window.display();
 
         addBehaviour(getReceiveMessageBehaviour());
-        webService.start();
     }
 
     private CyclicBehaviour getReceiveMessageBehaviour() {
@@ -157,15 +155,6 @@ public class MasterAgent extends Agent {
         return window.getSimulationStartTime();
     }
 
-    @Subscribe
-    public void handleSimulationReady(SimulationReadyEvent e) {
-        logger.info("Handling SimulationReadyEvent");
-        var positions = agentsContainer.stream(LightManager.class)
-                .flatMap(man -> man.getLightsPositions().stream())
-                .collect(Collectors.toList());
-        webService.setZone(positions);
-    }
-
     public boolean prepareAgents() {
         if (configContainer.shouldGeneratePedestriansAndBuses()) {
             if (!prepareStationsAndBuses()) {
@@ -223,24 +212,24 @@ public class MasterAgent extends Agent {
     }
 
     private boolean tryCreateLightManager(Node crossroad) {
-        LightManager manager = new LightManager(crossroad, IdGenerator.getLightManagerId());
+        LightManager manager = new LightManager(idGenerator.get(LightManager.class), crossroad);
         return agentsContainer.tryAdd(manager);
     }
 
     private boolean tryCreateLightManager(final OSMNode centerCrossroadNode) {
-        LightManager manager = new LightManager(centerCrossroadNode, IdGenerator.getLightManagerId());
+        LightManager manager = new LightManager(idGenerator.get(LightManager.class), centerCrossroadNode);
         return agentsContainer.tryAdd(manager);
     }
 
     public static AbstractAgent tryAddNewStationAgent(OSMStation stationOSMNode) {
-        StationAgent stationAgent = new StationAgent(stationOSMNode, IdGenerator.getStationAgentId());
+        StationAgent stationAgent = new StationAgent(IdGenerator.getStationAgentId(), stationOSMNode);
         osmIdToStationOSMNode.put(stationOSMNode.getId(), stationOSMNode);
         tryAddAgent(stationAgent);
         return stationAgent;
     }
 
     public static AbstractAgent tryAddNewPedestrianAgent(Pedestrian pedestrian) {
-        PedestrianAgent pedestrianAgent = new PedestrianAgent(pedestrian, IdGenerator.getPedestrianId());
+        PedestrianAgent pedestrianAgent = new PedestrianAgent(IdGenerator.getPedestrianId(), pedestrian);
         pedestrians.add(pedestrianAgent);
         tryAddAgent(pedestrianAgent);
         return pedestrianAgent;
@@ -266,7 +255,6 @@ public class MasterAgent extends Agent {
     }
 
     private boolean prepareLightManagers() {
-        IdGenerator.resetLightManagerId();
         if (!configContainer.tryLockLightManagers()) {
             logger.error("Light managers are locked, cannot prepare.");
             return false;
@@ -275,6 +263,11 @@ public class MasterAgent extends Agent {
         boolean result = tryConstructLightManagers();
 
         configContainer.unlockLightManagers();
+
+        if (result) {
+            var lightManagers = ImmutableList.copyOf(agentsContainer.iterator(LightManager.class));
+            eventBus.post(new LightManagersReadyEvent(lightManagers));
+        }
 
         return result;
     }

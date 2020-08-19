@@ -26,7 +26,7 @@ public class PedestrianAgent extends AbstractAgent {
         return "Pedestrian";
     }
 
-    public PedestrianAgent(final Pedestrian pedestrian, final int agentId) {
+    public PedestrianAgent(int agentId, final Pedestrian pedestrian) {
         super(agentId);
         this.pedestrian = pedestrian;
     }
