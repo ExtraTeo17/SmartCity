@@ -204,6 +204,9 @@ public class MasterAgent extends Agent {
         return true;
     }
 
+    // TODO: Delete all tryAdd... from MasterAgent to separate class: AgentCreator
+    //  which will be invoked with setZone event, MasterAgent won't know anything about creation
+    //  except events to which he can subscribe
     private boolean tryAddBusAgent(List<RouteNode> route, Timetable timetable, String busLine,
                                    String brigadeNr) {
         var bus = new Bus(route, timetable, busLine, brigadeNr);
