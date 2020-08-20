@@ -1,6 +1,7 @@
 package agents;
 
 import agents.abstractions.IAgentsContainer;
+import agents.abstractions.IAgentsFactory;
 import com.google.inject.Binder;
 import com.google.inject.Inject;
 import com.google.inject.Provides;
@@ -21,6 +22,7 @@ public class AgentsModule extends AbstractModule {
     @Override
     public void configure(Binder binder) {
         super.configure(binder);
+        binder.bind(IAgentsFactory.class).to(AgentsFactory.class).in(Singleton.class);
     }
 
     @Provides
