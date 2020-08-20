@@ -1,6 +1,7 @@
 package smartcity;
 
 import agents.*;
+import agents.abstractions.AbstractAgent;
 import agents.abstractions.IAgentsContainer;
 import agents.utils.MessageParameter;
 import com.google.common.collect.ImmutableList;
@@ -43,7 +44,7 @@ public class MasterAgent extends Agent {
     private static AgentContainer container;
     private static MapWindow window;
     private final IBusLinesManager busLinesManager;
-    private final IdGenerator<AbstractAgent> idGenerator;
+    private final IdGenerator idGenerator;
     private final IAgentsContainer agentsContainer;
     private final TaskManager taskManager;
     private final LightAccessManager lightAccessManager;
@@ -63,7 +64,7 @@ public class MasterAgent extends Agent {
 
     @Inject
     public MasterAgent(IBusLinesManager busLinesManager,
-                       IdGenerator<AbstractAgent> idGenerator,
+                       IdGenerator idGenerator,
                        IAgentsContainer agentsContainer,
                        TaskManager taskManager,
                        LightAccessManager lightAccessManager,
@@ -236,20 +237,6 @@ public class MasterAgent extends Agent {
         pedestrians.add(pedestrianAgent);
         tryAddAgent(pedestrianAgent);
         return pedestrianAgent;
-    }
-
-    public VehicleAgent tryAddNewVehicleAgent(List<RouteNode> info) {
-        return tryAddNewVehicleAgent(info, false);
-    }
-
-    public VehicleAgent tryAddNewVehicleAgent(List<RouteNode> info, boolean testCar) {
-        MovingObjectImpl car = testCar ? new TestCar(info) : new MovingObjectImpl(info);
-        VehicleAgent agent = new VehicleAgent(carId, car);
-        agentsContainer.tryAdd(agent);
-        // TODO: Move id to the factory
-        ++carId;
-
-        return agent;
     }
 
     // TODO: Move to agentsContainer

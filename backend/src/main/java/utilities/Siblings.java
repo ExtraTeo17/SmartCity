@@ -17,4 +17,8 @@ public class Siblings<T> {
     public boolean isSecondPresent() {
         return second != null;
     }
+
+    public static <TSpec> Siblings<TSpec> of(TSpec first,  TSpec second) {
+        return new Siblings<>(first, second);
+    }
 }

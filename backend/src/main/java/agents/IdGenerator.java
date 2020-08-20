@@ -7,11 +7,10 @@ import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.atomic.AtomicInteger;
 
 // TODO: Move all static methods to getId/resetId
-public class IdGenerator<TAgent extends AbstractAgent> implements IRegistrable {
+public class IdGenerator implements IRegistrable {
     public static final int resetValue = 1;
     private final ConcurrentMap<Class<?>, AtomicInteger> idMap;
-
-    private static final AtomicInteger lightManagerId = new AtomicInteger();
+    
     private static final AtomicInteger stationAgentId = new AtomicInteger();
     private static final AtomicInteger pedestrianId = new AtomicInteger();
     private static final AtomicInteger vehicleId = new AtomicInteger();

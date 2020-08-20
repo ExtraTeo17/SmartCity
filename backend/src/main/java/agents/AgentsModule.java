@@ -34,8 +34,8 @@ public class AgentsModule extends AbstractModule {
 
     @Provides
     @Singleton
-    IdGenerator<AbstractAgent> getIdGenerator() {
-        var generator = new IdGenerator<>();
+    IdGenerator getIdGenerator() {
+        var generator = new IdGenerator();
         generator.registerAll(agentTypes);
         return generator;
     }

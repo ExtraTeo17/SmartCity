@@ -1,5 +1,6 @@
 package agents;
 
+import agents.abstractions.AbstractAgent;
 import agents.utils.MessageParameter;
 import jade.core.AID;
 import jade.core.behaviours.Behaviour;

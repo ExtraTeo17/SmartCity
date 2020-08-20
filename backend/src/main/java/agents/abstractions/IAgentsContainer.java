@@ -1,7 +1,5 @@
 package agents.abstractions;
 
-import agents.AbstractAgent;
-
 import java.util.Iterator;
 import java.util.Optional;
 import java.util.function.Consumer;
@@ -14,7 +12,7 @@ public interface IAgentsContainer extends IRegistrable {
     boolean tryAdd(AbstractAgent agent);
 
     default <TAgent extends AbstractAgent> Iterator<TAgent> iterator(Class<TAgent> type) {
-        return  stream(type).iterator();
+        return stream(type).iterator();
     }
 
     <TAgent extends AbstractAgent> Stream<TAgent> stream(Class<TAgent> type);

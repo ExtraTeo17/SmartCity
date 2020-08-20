@@ -7,6 +7,7 @@ import java.util.List;
 public final class NumericHelper {
     public static final double EARTH_RADIUS_METERS = 6_378_137;
     public static final double METERS_PER_DEGREE = EARTH_RADIUS_METERS * Math.PI / 180.0;
+    public static final double METERS_PER_DEGREE_INVERSE = 1 / METERS_PER_DEGREE;
 
     /**
      * @return cosine in radians, calculated from the Law of Cosines in triangle

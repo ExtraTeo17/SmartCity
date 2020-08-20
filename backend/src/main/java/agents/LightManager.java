@@ -1,5 +1,6 @@
 package agents;
 
+import agents.abstractions.AbstractAgent;
 import behaviourfactories.IBehaviourFactory;
 import behaviourfactories.LightManagerBehaviourFactory;
 import org.jxmapviewer.JXMapViewer;

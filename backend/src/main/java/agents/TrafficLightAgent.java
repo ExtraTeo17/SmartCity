@@ -1,5 +1,6 @@
 package agents;
 
+import agents.abstractions.AbstractAgent;
 import agents.utils.LightColor;
 import behaviourfactories.BasicLightsBehaviourFactory;
 import behaviourfactories.IBehaviourFactory;

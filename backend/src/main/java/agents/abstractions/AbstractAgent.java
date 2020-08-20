@@ -1,4 +1,4 @@
-package agents;
+package agents.abstractions;
 
 import agents.utils.MessageParameter;
 import jade.core.AID;
@@ -45,7 +45,7 @@ public abstract class AbstractAgent extends Agent {
     }
 
     // TODO: Pass only LightManager here, remove movingObject and pass additional parameters
-    void informLightManager(MovingObject movingObject) {
+    protected void informLightManager(MovingObject movingObject) {
         // finds next traffic light and announces his arrival
         LightManagerNode nextManager = movingObject.getNextTrafficLight();
         if (nextManager != null) {

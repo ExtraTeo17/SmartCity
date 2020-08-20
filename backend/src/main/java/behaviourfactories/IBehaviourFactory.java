@@ -1,6 +1,6 @@
 package behaviourfactories;
 
-import agents.AbstractAgent;
+import agents.abstractions.AbstractAgent;
 import jade.core.behaviours.CyclicBehaviour;
 import jade.core.behaviours.TickerBehaviour;
 
