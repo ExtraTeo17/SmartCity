@@ -6,9 +6,7 @@ import com.fasterxml.jackson.annotation.JsonValue;
 public enum MessageType {
     SET_ZONE_REQUEST(1),
     SET_ZONE_RESPONSE(2),
-    
-
-    ;
+    CREATE_CAR_INFO(3);
 
     private final int code;
 

@@ -1,4 +1,4 @@
-package web.message.payloads.responses;
+package web.message.payloads.models;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;

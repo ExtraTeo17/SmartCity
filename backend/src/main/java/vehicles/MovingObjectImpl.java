@@ -9,6 +9,7 @@ import routing.Router;
 
 import java.util.List;
 
+// TODO: Maybe rename to Car - more descriptive?
 public class MovingObjectImpl extends MovingObject {
     public DrivingState state = DrivingState.STARTING;
     private final List<RouteNode> displayRoute;

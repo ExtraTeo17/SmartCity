@@ -4,7 +4,8 @@ import com.google.inject.Inject;
 import routing.IGeoPosition;
 import web.abstractions.IWebService;
 import web.message.MessageType;
-import web.message.payloads.responses.Location;
+import web.message.payloads.infos.CreateCarInfo;
+import web.message.payloads.models.Location;
 import web.message.payloads.responses.SetZoneResponse;
 import web.serialization.Converter;
 
@@ -28,5 +29,12 @@ class WebService implements IWebService {
                 .toArray(Location[]::new);
         var payload = new SetZoneResponse(locations);
         webConnector.broadcastMessage(MessageType.SET_ZONE_RESPONSE, payload);
+    }
+
+    @Override
+    public void createCar(IGeoPosition position) {
+        var location = Converter.convert(position);
+        var payload = new CreateCarInfo(location);
+        webConnector.broadcastMessage(MessageType.CREATE_CAR_INFO, payload);
     }
 }

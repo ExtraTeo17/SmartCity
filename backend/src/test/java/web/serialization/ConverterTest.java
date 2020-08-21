@@ -4,7 +4,7 @@ import org.junit.Assert;
 import org.junit.jupiter.api.Test;
 import routing.IGeoPosition;
 import routing.Position;
-import web.message.payloads.responses.Location;
+import web.message.payloads.models.Location;
 
 class ConverterTest {
 

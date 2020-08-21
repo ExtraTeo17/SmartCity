@@ -3,6 +3,7 @@ package web;
 import com.google.common.eventbus.Subscribe;
 import com.google.inject.Inject;
 import events.LightManagersReadyEvent;
+import events.VehicleAgentCreatedEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import web.abstractions.IWebService;
@@ -27,7 +28,14 @@ class Communicator {
         webService.setZone(positions);
     }
 
-    private void onHandle(Object obj){
+
+    @Subscribe
+    public void handle(VehicleAgentCreatedEvent e) {
+        onHandle(e);
+        webService.createCar(e.agentPosition);
+    }
+
+    private void onHandle(Object obj) {
         logger.info("Handling " + obj.getClass().getSimpleName());
     }
 }

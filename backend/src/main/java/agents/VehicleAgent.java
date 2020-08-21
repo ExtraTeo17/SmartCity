@@ -8,16 +8,18 @@ import jade.core.behaviours.CyclicBehaviour;
 import jade.core.behaviours.TickerBehaviour;
 import jade.lang.acl.ACLMessage;
 import jade.util.leap.Properties;
+import routing.IGeoPosition;
 import routing.LightManagerNode;
 import smartcity.MasterAgent;
 import vehicles.DrivingState;
 import vehicles.MovingObject;
 
 @SuppressWarnings("serial")
+// TODO: Maybe rename to CarAgent? Bus is also a Vehicle
 public class VehicleAgent extends AbstractAgent {
     private final MovingObject vehicle;
 
-    public VehicleAgent(int id, MovingObject vehicle) {
+    VehicleAgent(int id, MovingObject vehicle) {
         super(id);
         this.vehicle = vehicle;
     }
@@ -110,6 +112,8 @@ public class VehicleAgent extends AbstractAgent {
     public MovingObject getVehicle() {
         return vehicle;
     }
+
+    public IGeoPosition getPosition() {return vehicle.getPosition();}
 
     @Override
     public void takeDown() {

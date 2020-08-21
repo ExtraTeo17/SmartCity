@@ -5,7 +5,9 @@ import agents.abstractions.IAgentsContainer;
 import agents.abstractions.IAgentsFactory;
 import com.google.common.collect.HashBasedTable;
 import com.google.common.collect.Table;
+import com.google.common.eventbus.EventBus;
 import com.google.inject.Inject;
+import events.VehicleAgentCreatedEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import routing.*;
@@ -25,6 +27,7 @@ public class TaskManager implements ITaskManager {
     private final IRunnableFactory runnableFactory;
     private final IAgentsFactory agentsFactory;
     private final IAgentsContainer agentsContainer;
+    private final EventBus eventBus;
     private final IZone zone;
 
     private final Random random;
@@ -34,10 +37,12 @@ public class TaskManager implements ITaskManager {
     TaskManager(IRunnableFactory runnableFactory,
                 IAgentsFactory agentsFactory,
                 IAgentsContainer agentsContainer,
+                EventBus eventBus,
                 IZone zone) {
         this.runnableFactory = runnableFactory;
         this.agentsFactory = agentsFactory;
         this.agentsContainer = agentsContainer;
+        this.eventBus = eventBus;
         this.zone = zone;
 
         this.random = new Random();
@@ -80,6 +85,7 @@ public class TaskManager implements ITaskManager {
             VehicleAgent agent = agentsFactory.create(info, testCar);
             if (agentsContainer.tryAdd(agent)) {
                 agent.start();
+                eventBus.post(new VehicleAgentCreatedEvent(agent.getPosition()));
             }
         };
     }
