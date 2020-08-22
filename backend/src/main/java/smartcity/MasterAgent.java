@@ -6,8 +6,10 @@ import agents.abstractions.IAgentsContainer;
 import agents.utilities.MessageParameter;
 import com.google.common.collect.ImmutableList;
 import com.google.common.eventbus.EventBus;
+import com.google.common.eventbus.Subscribe;
 import com.google.inject.Inject;
 import events.LightManagersReadyEvent;
+import events.StartSimulationEvent;
 import gui.MapWindow;
 import jade.core.Agent;
 import jade.core.behaviours.CyclicBehaviour;
@@ -157,6 +159,14 @@ public class MasterAgent extends Agent {
 
     public static Date getSimulationTime() {
         return window.getSimulationStartTime();
+    }
+
+    @Subscribe
+    public void handle(StartSimulationEvent e) {
+        activateLightManagerAgents();
+        if (configContainer.shouldGenerateCars()) {
+            taskManager.scheduleCarCreation(e.carsNum, e.testCarId);
+        }
     }
 
     public boolean prepareAgents() {

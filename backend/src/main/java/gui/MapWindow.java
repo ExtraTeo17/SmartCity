@@ -4,7 +4,6 @@ import agents.BusAgent;
 import agents.LightManager;
 import agents.PedestrianAgent;
 import agents.VehicleAgent;
-import agents.abstractions.AbstractAgent;
 import agents.abstractions.IAgentsContainer;
 import com.google.common.collect.ImmutableList;
 import com.google.common.eventbus.EventBus;
@@ -12,6 +11,7 @@ import com.google.common.eventbus.Subscribe;
 import com.google.inject.Inject;
 import events.SetZoneEvent;
 import events.SimulationReadyEvent;
+import events.StartSimulationEvent;
 import org.javatuples.Pair;
 import org.jxmapviewer.JXMapViewer;
 import org.jxmapviewer.OSMTileFactoryInfo;
@@ -217,31 +217,37 @@ public class MapWindow {
         MapPanel.add(MapViewer);
         MapPanel.revalidate();
         StartRouteButton.addActionListener(e -> {
-            if (state != SimulationState.READY_TO_RUN) {
-                return;
-            }
-            // TODO: To be moved into masterAgent probably (or other class)
-
-
-            setInputEnabled(false);
-            currentTimeTitle.setVisible(true);
-            currentTimeLabel.setVisible(true);
-            ResultTimeLabel.setVisible(true);
-            ResultTimeTitle.setVisible(true);
-            masterAgent.activateLightManagerAgents();
-            random.setSeed(getSeed());
-
-            if (configContainer.shouldGenerateCars()) {
-                taskManager.scheduleCarCreation(getCarLimit(), getTestCarId());
-            }
-            if (configContainer.shouldGeneratePedestriansAndBuses()) {
-                spawnTimer.scheduleAtFixedRate(new CreatePedestrianTask(), 0, CREATE_PEDESTRIAN_INTERVAL_MILLISECONDS);
-            }
-            simulationStart = getSimulationStartTime().toInstant();
-            refreshTimer.scheduleAtFixedRate(new BusControlTask(), 0, BUS_CONTROL_INTERVAL_MILLISECONDS);
-            setState(SimulationState.RUNNING);
+            startSimulation();
         });
         refreshTimer.scheduleAtFixedRate(new RefreshTask(), 0, REFRESH_MAP_INTERVAL_MILLISECONDS);
+    }
+
+    @Subscribe
+    public void handle(StartSimulationEvent e) {
+        carLimitSpinner.setValue(e.carsNum);
+        testCarIdSpinner.setValue(e.testCarId);
+        startSimulation();
+    }
+
+    // WARNING: This function will be replaced by new GUI
+    public void startSimulation() {
+        if (state != SimulationState.READY_TO_RUN) {
+            return;
+        }
+
+        setInputEnabled(false);
+        currentTimeTitle.setVisible(true);
+        currentTimeLabel.setVisible(true);
+        ResultTimeLabel.setVisible(true);
+        ResultTimeTitle.setVisible(true);
+        random.setSeed(getSeed());
+
+        if (configContainer.shouldGeneratePedestriansAndBuses()) {
+            spawnTimer.scheduleAtFixedRate(new CreatePedestrianTask(), 0, CREATE_PEDESTRIAN_INTERVAL_MILLISECONDS);
+        }
+        simulationStart = getSimulationStartTime().toInstant();
+        refreshTimer.scheduleAtFixedRate(new BusControlTask(), 0, BUS_CONTROL_INTERVAL_MILLISECONDS);
+        setState(SimulationState.RUNNING);
     }
 
     public void setState(SimulationState state) {
@@ -322,54 +328,12 @@ public class MapWindow {
             IGeoPosition E = Position.of(52.237225472020704, 21.019399166107178);
             IGeoPosition W = Position.of(52.23678526174392, 21.016663312911987);
 
-            // N to S
-            try {
-                var createCar = taskManager.getCreateCarTask(N, S, false);
-                for (int i = 0; i < 5; i++) {
-                    createCar.run();
-                }
-            } catch (Exception ex) {
-                logger.warn("Error adding vehicle", ex);
-                return;
-            }
-
-            // S to N
-            try {
-                var createCar = taskManager.getCreateCarTask(S, N, false);
-                for (int i = 0; i < 5; i++) {
-                    createCar.run();
-                }
-            } catch (Exception ex) {
-                logger.warn("Error adding vehicle", ex);
-                return;
-            }
-
-            // E to W
-            try {
-                var createCar = taskManager.getCreateCarTask(E, W, false);
-                for (int i = 0; i < 5; i++) {
-                    createCar.run();
-                }
-            } catch (Exception ex) {
-                logger.warn("Error adding vehicle", ex);
-                return;
-            }
-
-            // W to E
-            try {
-                var createCar = taskManager.getCreateCarTask(W, E, false);
-                for (int i = 0; i < 5; i++) {
-                    createCar.run();
-                }
-            } catch (Exception ex) {
-                logger.warn("Error adding vehicle", ex);
-                return;
-            }
-
             masterAgent.activateLightManagerAgents();
-
-            // start all
-            agentsContainer.forEach(VehicleAgent.class, AbstractAgent::start);
+            // N to S
+            createCars(N, S);
+            createCars(S, N);
+            createCars(E, W);
+            createCars(W, E);
         });
         debug.add(runTest);
 
@@ -381,6 +345,17 @@ public class MapWindow {
         frame.setSize(1200, 600);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setVisible(true);
+    }
+
+    private void createCars(IGeoPosition start, IGeoPosition end) {
+        try {
+            var createCar = taskManager.getCreateCarTask(start, end, false);
+            for (int i = 0; i < 5; ++i) {
+                createCar.run();
+            }
+        } catch (Exception ex) {
+            logger.warn("Error creating car", ex);
+        }
     }
 
     private void addGenerationMenu(JMenuBar menuBar) {
@@ -406,7 +381,7 @@ public class MapWindow {
             masterAgent.reset();
             state = SimulationState.SETTING_ZONE;
         }
-        prepareAgentsAndSetZone(e.getLat(), e.getLng(), (int) e.getRadius());
+        prepareAgentsAndSetZone(e.lat, e.lng, (int) e.radius);
         setState(SimulationState.READY_TO_RUN);
     }
 

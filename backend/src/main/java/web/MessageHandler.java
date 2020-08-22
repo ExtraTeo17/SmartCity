@@ -4,10 +4,12 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.eventbus.EventBus;
 import com.google.inject.Inject;
 import events.SetZoneEvent;
+import events.StartSimulationEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import web.message.MessageDto;
 import web.message.payloads.requests.SetZoneRequest;
+import web.message.payloads.requests.StartSimulationRequest;
 
 import java.io.IOException;
 import java.util.Optional;
@@ -35,14 +37,20 @@ class MessageHandler {
 
     private void handle(MessageDto message) {
         switch (message.type) {
-            case SET_ZONE_REQUEST:
+            case SET_ZONE_REQUEST: {
                 var payload = tryDeserialize(message.payload, SetZoneRequest.class);
                 if (payload.isPresent()) {
                     var pVal = payload.get();
-                    // TODO: Mapper?
                     eventBus.post(new SetZoneEvent(pVal.latitude, pVal.longitude, pVal.radius));
                 }
-                break;
+            }
+            case START_SIMULATION_REQUEST: {
+                var payload = tryDeserialize(message.payload, StartSimulationRequest.class);
+                if (payload.isPresent()) {
+                    var pVal = payload.get();
+                    eventBus.post(new StartSimulationEvent(pVal.carsNum, pVal.testCarId));
+                }
+            }
         }
     }
 
