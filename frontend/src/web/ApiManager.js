@@ -1,12 +1,12 @@
-import { SET_ZONE_REQUEST, START_SIMULATION_REQUEST } from "./MessageType";
+import { PREPARE_SIMULATION_REQUEST, START_SIMULATION_REQUEST } from "./MessageType";
 import WebServer from "./WebServer";
 
 /** PUBLIC INTERFACE ---------------------------------------------------------- */
 
 export default {
-  setZone({ lat, lng, rad } = { lat: 0, lng: 0, rad: 0 }) {
+  prepareSimulation({ lat, lng, rad } = { lat: 0, lng: 0, rad: 0 }) {
     const msg = {
-      type: SET_ZONE_REQUEST,
+      type: PREPARE_SIMULATION_REQUEST,
       payload: {
         latitude: lat,
         longitude: lng,

@@ -97,8 +97,8 @@ const Menu = props => {
             onChange={e => setRad(parseFloat(e.target.value))}
           />
         </div>
-        <button className="btn btn-primary" type="button" onClick={() => ApiManager.setZone({ lat, lng, rad })}>
-          Set zone
+        <button className="btn btn-primary" type="button" onClick={() => ApiManager.prepareSimulation({ lat, lng, rad })}>
+          Prepare simulation
         </button>
       </form>
       <form className="form-border">
