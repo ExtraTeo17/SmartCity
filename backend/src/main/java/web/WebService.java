@@ -1,7 +1,7 @@
 package web;
 
 import com.google.inject.Inject;
-import routing.IGeoPosition;
+import routing.core.IGeoPosition;
 import web.abstractions.IWebService;
 import web.message.MessageType;
 import web.message.payloads.infos.CreateCarInfo;

@@ -1,7 +1,7 @@
 package web.abstractions;
 
 
-import routing.IGeoPosition;
+import routing.core.IGeoPosition;
 
 import java.util.List;
 

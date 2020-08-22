@@ -1,7 +1,7 @@
 package behaviourfactories;
 
 import agents.TrafficLightAgent;
-import agents.utils.LightColor;
+import agents.utilities.LightColor;
 import jade.core.AID;
 import jade.core.behaviours.CyclicBehaviour;
 import jade.core.behaviours.TickerBehaviour;

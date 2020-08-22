@@ -1,9 +1,9 @@
 package vehicles;
 
 
-import routing.IGeoPosition;
 import routing.LightManagerNode;
 import routing.RouteNode;
+import routing.core.IGeoPosition;
 
 import java.util.List;
 

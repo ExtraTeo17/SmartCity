@@ -1,4 +1,4 @@
-package routing;
+package routing.core;
 
 import org.junit.Assert;
 import org.junit.jupiter.api.Test;

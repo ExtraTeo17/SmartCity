@@ -1,5 +1,6 @@
 package agents;
 
+import agents.abstractions.IAgentsFactory;
 import com.google.inject.Inject;
 import routing.RouteNode;
 import vehicles.MovingObjectImpl;
@@ -7,7 +8,7 @@ import vehicles.TestCar;
 
 import java.util.List;
 
-public class AgentsFactory implements agents.abstractions.IAgentsFactory {
+class AgentsFactory implements IAgentsFactory {
     private final IdGenerator idGenerator;
 
     @Inject

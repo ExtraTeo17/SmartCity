@@ -1,12 +1,12 @@
 package agents;
 
 import agents.abstractions.AbstractAgent;
-import agents.utils.LightColor;
+import agents.utilities.LightColor;
 import behaviourfactories.BasicLightsBehaviourFactory;
 import behaviourfactories.IBehaviourFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import routing.IGeoPosition;
+import routing.core.IGeoPosition;
 
 import java.util.ArrayList;
 import java.util.List;

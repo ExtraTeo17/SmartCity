@@ -1,7 +1,11 @@
 package vehicles;
 
 import gui.MapWindow;
-import routing.*;
+import routing.LightManagerNode;
+import routing.RouteNode;
+import routing.Router;
+import routing.StationNode;
+import routing.core.IGeoPosition;
 
 import java.util.ArrayList;
 import java.util.List;

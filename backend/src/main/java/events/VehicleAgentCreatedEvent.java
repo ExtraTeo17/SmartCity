@@ -1,6 +1,6 @@
 package events;
 
-import routing.IGeoPosition;
+import routing.core.IGeoPosition;
 
 public class VehicleAgentCreatedEvent {
     public final IGeoPosition agentPosition;

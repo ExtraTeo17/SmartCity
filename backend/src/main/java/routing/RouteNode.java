@@ -1,6 +1,9 @@
 package routing;
 
 
+import routing.core.IGeoPosition;
+import routing.core.Position;
+
 public class RouteNode extends Position {
     public RouteNode(double lat, double lng) {
         super(lat, lng);

@@ -1,6 +1,6 @@
 package smartcity;
 
-import routing.*;
+import routing.core.*;
 
 public final class ConfigContainer extends ZoneMutator {
     public final boolean USE_DEPRECATED_XML_FOR_LIGHT_MANAGERS = false;

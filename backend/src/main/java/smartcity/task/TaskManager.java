@@ -10,7 +10,11 @@ import com.google.inject.Inject;
 import events.VehicleAgentCreatedEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import routing.*;
+import routing.RouteNode;
+import routing.Router;
+import routing.core.IGeoPosition;
+import routing.core.IZone;
+import routing.core.Position;
 import smartcity.task.runnable.IRunnableFactory;
 import utilities.NumericHelper;
 

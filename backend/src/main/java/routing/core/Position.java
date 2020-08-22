@@ -1,4 +1,4 @@
-package routing;
+package routing.core;
 
 import org.jxmapviewer.viewer.GeoPosition;
 

@@ -1,4 +1,4 @@
-package agents.utils;
+package agents.utilities;
 
 import vehicles.MovingObject;
 import vehicles.VehicleType;

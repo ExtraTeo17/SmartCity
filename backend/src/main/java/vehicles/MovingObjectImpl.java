@@ -2,9 +2,9 @@ package vehicles;
 
 import gui.MapWindow;
 import routing.LightManagerNode;
-import routing.Position;
 import routing.RouteNode;
 import routing.Router;
+import routing.core.Position;
 
 import java.util.List;
 
@@ -19,7 +19,8 @@ public class MovingObjectImpl extends MovingObject {
 
     public MovingObjectImpl(List<RouteNode> displayRoute) {
         this.displayRoute = displayRoute;
-        route = Router.uniformRoute(this.displayRoute);
+        // TODO: Inject it via constructor, not create here
+        this.route = Router.uniformRoute(displayRoute);
     }
 
     // TODO: Why car is moving backwards here? Change name of the function to describe behaviour

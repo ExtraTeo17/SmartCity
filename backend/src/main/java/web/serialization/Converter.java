@@ -1,7 +1,7 @@
 package web.serialization;
 
 
-import routing.IGeoPosition;
+import routing.core.IGeoPosition;
 import web.message.payloads.models.Location;
 
 public class Converter {

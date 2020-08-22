@@ -1,7 +1,7 @@
 package agents;
 
 import agents.abstractions.AbstractAgent;
-import agents.utils.MessageParameter;
+import agents.utilities.MessageParameter;
 import jade.core.AID;
 import jade.core.behaviours.Behaviour;
 import jade.core.behaviours.CyclicBehaviour;

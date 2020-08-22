@@ -7,7 +7,7 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import osmproxy.elements.OSMNode;
 import osmproxy.elements.OSMWay;
-import routing.IZone;
+import routing.core.IZone;
 
 import java.util.ArrayList;
 import java.util.List;

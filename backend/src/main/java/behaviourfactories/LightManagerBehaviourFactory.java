@@ -1,7 +1,7 @@
 package behaviourfactories;
 
 import agents.LightManager;
-import agents.utils.MessageParameter;
+import agents.utilities.MessageParameter;
 import gui.MapWindow;
 import jade.core.AID;
 import jade.core.Agent;

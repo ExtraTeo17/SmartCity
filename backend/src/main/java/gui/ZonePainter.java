@@ -3,7 +3,7 @@ package gui;
 import org.jxmapviewer.JXMapViewer;
 import org.jxmapviewer.painter.Painter;
 import org.jxmapviewer.viewer.GeoPosition;
-import routing.IGeoPosition;
+import routing.core.IGeoPosition;
 
 import java.awt.*;
 import java.awt.geom.Point2D;

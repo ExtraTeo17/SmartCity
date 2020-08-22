@@ -1,6 +1,6 @@
 package agents.abstractions;
 
-import agents.utils.MessageParameter;
+import agents.utilities.MessageParameter;
 import jade.core.AID;
 import jade.core.Agent;
 import jade.lang.acl.ACLMessage;

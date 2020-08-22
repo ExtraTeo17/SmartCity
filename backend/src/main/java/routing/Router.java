@@ -10,6 +10,7 @@ import osmproxy.elements.OSMWay;
 import osmproxy.elements.OSMWay.RelationOrientation;
 import osmproxy.elements.OSMWay.RouteOrientation;
 import osmproxy.elements.OSMWaypoint;
+import routing.core.IGeoPosition;
 import smartcity.MasterAgent;
 import utilities.NumericHelper;
 

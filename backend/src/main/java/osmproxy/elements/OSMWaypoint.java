@@ -1,7 +1,7 @@
 package osmproxy.elements;
 
 
-import routing.Position;
+import routing.core.Position;
 
 public class OSMWaypoint extends Position {
     private final String osmNodeRef;

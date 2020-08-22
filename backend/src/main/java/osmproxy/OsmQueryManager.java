@@ -1,6 +1,6 @@
 package osmproxy;
 
-import routing.IGeoPosition;
+import routing.core.IGeoPosition;
 
 import java.util.List;
 
@@ -75,7 +75,7 @@ public class OsmQueryManager {
                 "</osm-script>";
     }
 
-    static String getLightsAroundOverpassQuery(IGeoPosition pos, int radius){
+    static String getLightsAroundOverpassQuery(IGeoPosition pos, int radius) {
         return getLightsAroundOverpassQuery(pos.getLat(), pos.getLng(), radius);
     }
 

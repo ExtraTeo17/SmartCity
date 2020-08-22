@@ -2,7 +2,7 @@ package smartcity.lights;
 
 import org.jxmapviewer.JXMapViewer;
 import org.jxmapviewer.painter.Painter;
-import routing.IGeoPosition;
+import routing.core.IGeoPosition;
 
 import java.time.Instant;
 import java.util.List;

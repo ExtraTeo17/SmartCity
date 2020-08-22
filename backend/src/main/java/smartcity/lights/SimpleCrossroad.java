@@ -1,6 +1,6 @@
 package smartcity.lights;
 
-import agents.utils.LightColor;
+import agents.utilities.LightColor;
 import gui.MapWindow;
 import org.jxmapviewer.JXMapViewer;
 import org.jxmapviewer.painter.Painter;
@@ -11,7 +11,7 @@ import org.slf4j.LoggerFactory;
 import org.w3c.dom.Node;
 import osmproxy.MapAccessManager;
 import osmproxy.elements.OSMNode;
-import routing.IGeoPosition;
+import routing.core.IGeoPosition;
 import smartcity.MasterAgent;
 
 import java.time.Instant;

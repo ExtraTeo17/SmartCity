@@ -3,14 +3,15 @@ package osmproxy.buses;
 import org.jetbrains.annotations.NotNull;
 import osmproxy.elements.OSMStation;
 import osmproxy.elements.OSMWay;
-import routing.IZone;
 import routing.RouteNode;
 import routing.Router;
 import smartcity.MasterAgent;
 import smartcity.buses.BrigadeInfo;
 
-import java.util.*;
-import java.util.function.Consumer;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Iterator;
+import java.util.List;
 
 public class BusInfo implements Iterable<BrigadeInfo> {
     private String busLine;

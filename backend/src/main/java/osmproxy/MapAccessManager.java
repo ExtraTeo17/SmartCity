@@ -27,9 +27,9 @@ import org.xml.sax.SAXException;
 import osmproxy.elements.OSMLight;
 import osmproxy.elements.OSMNode;
 import osmproxy.elements.OSMWay;
-import routing.IZone;
-import routing.Position;
 import routing.RouteInfo;
+import routing.core.IZone;
+import routing.core.Position;
 import utilities.IterableNodeList;
 import utilities.NumericHelper;
 

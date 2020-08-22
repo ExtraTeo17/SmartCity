@@ -1,7 +1,11 @@
 package vehicles;
 
 import gui.MapWindow;
-import routing.*;
+import routing.LightManagerNode;
+import routing.RouteNode;
+import routing.Router;
+import routing.StationNode;
+import routing.core.IGeoPosition;
 import smartcity.buses.Timetable;
 
 import java.util.ArrayList;

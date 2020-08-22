@@ -1,4 +1,4 @@
-package routing;
+package routing.core;
 
 import org.jetbrains.annotations.NotNull;
 import org.jxmapviewer.viewer.GeoPosition;
@@ -75,7 +75,7 @@ public interface IGeoPosition extends Comparable<IGeoPosition> {
         return NumericHelper.getCosineInTriangle(a, b, c);
     }
 
-    default IGeoPosition toRadians(){
+    default IGeoPosition toRadians() {
         return new IGeoPosition() {
             private final double lat = Math.toRadians(IGeoPosition.this.getLat());
             private final double lng = Math.toRadians(IGeoPosition.this.getLng());
