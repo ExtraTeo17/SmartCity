@@ -137,11 +137,6 @@ public class Bus extends MovingObject {
     }
 
     @Override
-    public String getPositionString() {
-        return "Lat: " + route.get(index).getLat() + " Lon: " + route.get(index).getLng();
-    }
-
-    @Override
     public IGeoPosition getPosition() {
         return route.get(index);
     }

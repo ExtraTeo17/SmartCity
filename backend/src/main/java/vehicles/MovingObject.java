@@ -8,12 +8,11 @@ import routing.RouteNode;
 import java.util.List;
 
 // TODO: Interface or move some functionality here
+// TODO: Change name to IVehicle/AbstractVehicle
 public abstract class MovingObject {
     public abstract String getVehicleType();
 
     public abstract LightManagerNode getNextTrafficLight();
-
-    public abstract String getPositionString();
 
     public abstract IGeoPosition getPosition();
 

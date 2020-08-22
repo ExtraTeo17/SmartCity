@@ -1,7 +1,6 @@
 package vehicles;
 
 import gui.MapWindow;
-import org.jetbrains.annotations.Contract;
 import routing.LightManagerNode;
 import routing.Position;
 import routing.RouteNode;
@@ -55,12 +54,6 @@ public class MovingObjectImpl extends MovingObject {
 
         closestLightIndex = Integer.MAX_VALUE;
         return null;
-    }
-
-    @Override
-    public String getPositionString() {
-        var node = route.get(index);
-        return "Lat: " + node.getLat() + " Lon: " + node.getLng();
     }
 
     @Override
