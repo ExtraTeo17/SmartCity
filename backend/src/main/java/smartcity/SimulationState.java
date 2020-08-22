@@ -1,4 +1,4 @@
-package gui;
+package smartcity;
 
 public enum SimulationState {
     SETTING_ZONE,

@@ -6,6 +6,7 @@ import com.google.inject.Provides;
 import com.google.inject.Singleton;
 import genesis.AbstractModule;
 import routing.core.IZone;
+import smartcity.config.ConfigContainer;
 import smartcity.task.TaskModule;
 
 public class SmartCityModule extends AbstractModule {

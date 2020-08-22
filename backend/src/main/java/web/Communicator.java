@@ -25,7 +25,7 @@ class Communicator {
         var positions = e.lightManagers.stream()
                 .flatMap(man -> man.getLightsPositions().stream())
                 .collect(Collectors.toList());
-        webService.setZone(positions);
+        webService.prepareSimulation(positions);
     }
 
 

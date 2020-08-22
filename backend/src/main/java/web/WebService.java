@@ -6,7 +6,7 @@ import web.abstractions.IWebService;
 import web.message.MessageType;
 import web.message.payloads.infos.CreateCarInfo;
 import web.message.payloads.models.Location;
-import web.message.payloads.responses.SetZoneResponse;
+import web.message.payloads.responses.PrepareResponse;
 import web.serialization.Converter;
 
 import java.util.List;
@@ -24,11 +24,11 @@ class WebService implements IWebService {
         webConnector.start();
     }
 
-    public void setZone(List<IGeoPosition> positions) {
+    public void prepareSimulation(List<IGeoPosition> positions) {
         var locations = positions.stream().map(Converter::convert)
                 .toArray(Location[]::new);
-        var payload = new SetZoneResponse(locations);
-        webConnector.broadcastMessage(MessageType.SET_ZONE_RESPONSE, payload);
+        var payload = new PrepareResponse(locations);
+        webConnector.broadcastMessage(MessageType.PREPARE_SIMULATION_RESPONSE, payload);
     }
 
     @Override

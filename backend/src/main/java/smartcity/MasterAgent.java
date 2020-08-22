@@ -9,6 +9,7 @@ import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
 import com.google.inject.Inject;
 import events.LightManagersReadyEvent;
+import events.PrepareSimulationEvent;
 import events.StartSimulationEvent;
 import gui.MapWindow;
 import jade.core.Agent;
@@ -29,6 +30,7 @@ import routing.LightManagerNode;
 import routing.RouteNode;
 import routing.StationNode;
 import smartcity.buses.Timetable;
+import smartcity.config.ConfigContainer;
 import smartcity.task.TaskManager;
 import vehicles.Bus;
 import vehicles.Pedestrian;
@@ -64,9 +66,6 @@ public class MasterAgent extends Agent {
     public static Map<Long, StationNode> osmStationIdToStationNode = new HashMap<>();
     public static Map<Long, OSMStation> osmIdToStationOSMNode = new HashMap<>();
 
-    public int carId = 0;
-    public int pedestrianId = 0;
-
     @Inject
     public MasterAgent(IBusLinesManager busLinesManager,
                        IdGenerator idGenerator,
@@ -91,7 +90,6 @@ public class MasterAgent extends Agent {
     @Override
     protected void setup() {
         container = getContainerController();
-        window.setSmartCityAgent(this);
         window.display();
 
         addBehaviour(getReceiveMessageBehaviour());
@@ -162,12 +160,27 @@ public class MasterAgent extends Agent {
     }
 
     @Subscribe
+    public void handle(PrepareSimulationEvent e) {
+        logger.info("Set zone event occurred: " + e.toString());
+        if (configContainer.getSimulationState() == SimulationState.READY_TO_RUN) {
+            reset();
+        }
+        configContainer.setZone(e.zone);
+
+        if (prepareAgents()) {
+            configContainer.setSimulationState(SimulationState.READY_TO_RUN);
+        }
+    }
+
+
+    @Subscribe
     public void handle(StartSimulationEvent e) {
         activateLightManagerAgents();
         if (configContainer.shouldGenerateCars()) {
             taskManager.scheduleCarCreation(e.carsNum, e.testCarId);
         }
     }
+
 
     public boolean prepareAgents() {
         if (configContainer.shouldGeneratePedestriansAndBuses()) {
@@ -277,7 +290,7 @@ public class MasterAgent extends Agent {
 
     private boolean tryConstructLightManagers() {
         try {
-            if (configContainer.USE_DEPRECATED_XML_FOR_LIGHT_MANAGERS) {
+            if (configContainer.useDeprecatedXmlForLightManagers) {
                 var nodes =
                         MapAccessManager.getLightManagersNodes(configContainer.getZone());
                 for (var node : nodes) {
