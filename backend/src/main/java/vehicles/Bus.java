@@ -1,6 +1,5 @@
 package vehicles;
 
-import gui.MapWindow;
 import routing.LightManagerNode;
 import routing.RouteNode;
 import routing.Router;
@@ -26,13 +25,13 @@ public class Bus extends MovingObject {
     private final List<RouteNode> displayRoute;
     private final List<RouteNode> route;
     private int index = 0;
-    private int speed = 40;
     private int closestLightIndex = -1;
     private int closestStationIndex = -1;
     private int passengersCount = 0;
 
     public Bus(final List<RouteNode> route, final Timetable timetable, final String busLine,
                final String brigadeNr) {
+        super(40);
         this.displayRoute = route;
 
         for (RouteNode node : route) {
@@ -197,16 +196,11 @@ public class Bus extends MovingObject {
 
     @Override
     public int getMillisecondsToNextLight() {
-        return ((closestLightIndex - index) * 3600) / getSpeed();
+        return ((closestLightIndex - index) * Router.STEP_CONSTANT) / getSpeed();
     }
 
     public int getMillisecondsToNextStation() {
-        return ((closestStationIndex - index) * 3600) / getSpeed();
-    }
-
-    @Override
-    public int getSpeed() {
-        return speed * MapWindow.getTimeScale();
+        return ((closestStationIndex - index) * Router.STEP_CONSTANT) / getSpeed();
     }
 
     @Override

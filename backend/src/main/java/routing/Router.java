@@ -3,6 +3,8 @@ package routing;
 import com.google.common.annotations.Beta;
 import com.google.common.collect.Lists;
 import org.javatuples.Pair;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import osmproxy.MapAccessManager;
 import osmproxy.elements.OSMLight;
 import osmproxy.elements.OSMNode;
@@ -12,13 +14,22 @@ import osmproxy.elements.OSMWay.RouteOrientation;
 import osmproxy.elements.OSMWaypoint;
 import routing.core.IGeoPosition;
 import smartcity.MasterAgent;
-import utilities.NumericHelper;
 
 import java.util.ArrayList;
 import java.util.List;
 
 // TODO: Add fields to this class and make it some kind of service (not static)
 public final class Router {
+    public final static int STEP_SIZE_METERS = 1;
+    public final static int M_MILLISECONDS_TO_KM_HOUR = 3600;
+    public final static int STEP_CONSTANT = STEP_SIZE_METERS * M_MILLISECONDS_TO_KM_HOUR;
+
+    public static final double EARTH_RADIUS_METERS = 6_378_137;
+    public static final double METERS_PER_DEGREE = EARTH_RADIUS_METERS * Math.PI / 180.0;
+    public static final double METERS_PER_DEGREE_INVERSE = 1 / METERS_PER_DEGREE;
+
+    private final static Logger logger = LoggerFactory.getLogger(Router.class);
+
     public static List<RouteNode> generateRouteInfo(IGeoPosition pointA, IGeoPosition pointB) {
         Pair<List<Long>, List<RouteNode>> osmWayIdsAndPointList = Router.findRoute(pointA, pointB, false);
         final List<OSMLight> lightInfo = MapAccessManager.sendFullTrafficSignalQuery(osmWayIdsAndPointList.getValue0());
@@ -151,9 +162,9 @@ public final class Router {
         }
     }
 
+    // TODO: In some cases distance is 0 -> dx/dy is NaN -> same nodes?
     public static List<RouteNode> uniformRoute(List<RouteNode> route) {
         List<RouteNode> newRoute = new ArrayList<>();
-
         for (int i = 0; i < route.size() - 1; i++) {
             RouteNode routeA = route.get(i);
             RouteNode routeB = route.get(i + 1);
@@ -161,7 +172,7 @@ public final class Router {
             double x = routeB.getLng() - routeA.getLng();
             double y = routeB.getLat() - routeA.getLat();
 
-            double distance = NumericHelper.METERS_PER_DEGREE * Math.sqrt(x * x + y * y);
+            double distance = METERS_PER_DEGREE * Math.sqrt(x * x + y * y);
 
             double dx = x / distance;
             double dy = y / distance;
@@ -169,13 +180,12 @@ public final class Router {
             double lon = routeA.getLng();
             double lat = routeA.getLat();
             newRoute.add(routeA);
-            for (int p = 1; p < distance; p++) {
-                lon = lon + dx;
-                lat = lat + dy;
+            for (int p = STEP_SIZE_METERS; p < distance; p += STEP_SIZE_METERS) {
+                lon = lon + STEP_SIZE_METERS * dx;
+                lat = lat + STEP_SIZE_METERS * dy;
                 newRoute.add(new RouteNode(lat, lon));
             }
         }
-
         newRoute.add(route.get(route.size() - 1));
 
         return newRoute;

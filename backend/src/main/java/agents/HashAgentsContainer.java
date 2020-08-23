@@ -9,7 +9,6 @@ import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Optional;
@@ -106,6 +105,7 @@ class HashAgentsContainer implements IAgentsContainer {
         return remove(agent.getClass(), agent.getId()).isPresent();
     }
 
+    // TODO: Kill agent here and remove from container
     @Override
     public <TAgent extends AbstractAgent> Optional<TAgent> remove(Class<TAgent> type, int agentId) {
         var collection = container.get(type);
@@ -159,16 +159,9 @@ class HashAgentsContainer implements IAgentsContainer {
     }
 
     @Override
-    public final void register(Class<?>... types) {
-        for (var type : types) {
-            container.put(type, new HashMap<>());
-        }
-    }
-
-    @Override
     public void registerAll(Class<?>[] types) {
         for (var type : types) {
-            container.put(type, new HashMap<>());
+            container.put(type, new ConcurrentHashMap<>());
         }
     }
 }

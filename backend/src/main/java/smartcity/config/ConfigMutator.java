@@ -2,7 +2,7 @@ package smartcity.config;
 
 // contribution: https://stackoverflow.com/a/18634125/6841224
 public abstract class ConfigMutator {
-    final static class Mutation {
+    public final static class Mutation {
         private Mutation() {}
     }
 

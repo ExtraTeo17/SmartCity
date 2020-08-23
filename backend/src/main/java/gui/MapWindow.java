@@ -29,6 +29,7 @@ import routing.StationNode;
 import routing.core.IGeoPosition;
 import routing.core.IZone;
 import routing.core.Position;
+import smartcity.ITimeManager;
 import smartcity.MasterAgent;
 import smartcity.SimulationState;
 import smartcity.config.ConfigContainer;
@@ -45,8 +46,6 @@ import javax.swing.event.MouseInputListener;
 import java.awt.*;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-import java.time.Duration;
-import java.time.Instant;
 import java.util.List;
 import java.util.Timer;
 import java.util.*;
@@ -58,11 +57,11 @@ public class MapWindow {
     private final static int BUS_CONTROL_INTERVAL_MILLISECONDS = 2000; //60000
     private static final long CREATE_PEDESTRIAN_INTERVAL_MILLISECONDS = 100;
     private final static int PEDESTRIAN_STATION_RADIUS = 200;
-    private final static int TIME_SCALE = 10;
     private final EventBus eventBus;
     private final IAgentsContainer agentsContainer;
     private final ConfigContainer configContainer;
     private final ITaskManager taskManager;
+    private final ITimeManager timeManager;
 
     public JPanel MainPanel;
     private final JXMapViewer MapViewer;
@@ -97,9 +96,9 @@ public class MapWindow {
     private final Timer spawnTimer = new Timer(true);
     private IGeoPosition pointA;
     private IGeoPosition pointB;
-    private SimulationState state = SimulationState.SETTING_ZONE;
     private final Random random = new Random();
     private final Random testCarRandom = new Random(96);
+    private static final DateFormat dateFormat = new SimpleDateFormat("kk:mm:ss dd-MM-yyyy");
     private final IZone zone;
     // TODO: Temporary solution to make it work with old gui
     private Runnable simulationReadyCallback = () -> {};
@@ -108,12 +107,14 @@ public class MapWindow {
     public MapWindow(EventBus eventBus,
                      IAgentsContainer agentsContainer,
                      ConfigContainer configContainer,
-                     ITaskManager taskManager) {
+                     ITaskManager taskManager,
+                     ITimeManager timeManager) {
         this.eventBus = eventBus;
         this.agentsContainer = agentsContainer;
         this.configContainer = configContainer;
         this.zone = configContainer.getZone();
         this.taskManager = taskManager;
+        this.timeManager = timeManager;
 
         MapViewer = new JXMapViewer();
         currentTimeLabel.setVisible(false);
@@ -128,11 +129,13 @@ public class MapWindow {
         MapViewer.setZoom(7);
         MapViewer.setAddressLocation(warsaw);
         radiusSpinner.setModel(new SpinnerNumberModel(200, 100, 50000, 100));
-        carLimitSpinner.setModel(new SpinnerNumberModel(1, 1, 1000, 1));
+        carLimitSpinner.setModel(new SpinnerNumberModel(4, 1, 1000, 1));
         carLimitSpinner.addChangeListener(e -> {
-            if (getCarLimit() - 1 < getTestCarId()) {
-                testCarIdSpinner.setValue(getCarLimit() - 1);
+            int value = (int) carLimitSpinner.getValue();
+            if (getTestCarId() > value) {
+                testCarIdSpinner.setValue(value);
             }
+            configContainer.setCarsNumber(value);
         });
 
         UseStrategyCheckBox.addItemListener(e -> SimpleCrossroad.STRATEGY_ACTIVE = UseStrategyCheckBox.isSelected());
@@ -141,11 +144,15 @@ public class MapWindow {
         latSpinner.setModel(new SpinnerNumberModel(52.203342, -90, 90, 1));
         lonSpinner.setModel(new SpinnerNumberModel(20.861213, -180, 180, 0.001));
 
-        testCarIdSpinner.setModel(new SpinnerNumberModel(40, 0, 100, 1));
+        testCarIdSpinner.setModel(new SpinnerNumberModel(2, 1, 100, 1));
         testCarIdSpinner.addChangeListener(e -> {
-            if (getTestCarId() >= getCarLimit()) {
-                testCarIdSpinner.setValue(testCarIdSpinner.getPreviousValue());
+            int value = (int) testCarIdSpinner.getValue();
+            int limit = getCarLimit();
+            if (value > limit) {
+                value = limit;
+                testCarIdSpinner.setValue(value);
             }
+            configContainer.setTestCarId(value);
         });
         setZoneButton.addActionListener(e -> eventBus.post(
                 new PrepareSimulationEvent(
@@ -218,7 +225,8 @@ public class MapWindow {
 
         MapPanel.add(MapViewer);
         MapPanel.revalidate();
-        StartRouteButton.addActionListener(e -> startSimulation());
+        StartRouteButton.addActionListener(e -> eventBus.post(new StartSimulationEvent((int) carLimitSpinner.getValue(),
+                (int) testCarIdSpinner.getValue())));
         refreshTimer.scheduleAtFixedRate(new RefreshTask(), 0, REFRESH_MAP_INTERVAL_MILLISECONDS);
     }
 
@@ -230,15 +238,6 @@ public class MapWindow {
         simulationReadyCallback.run();
     }
 
-    public void setState(SimulationState state) {
-        if (this.state != state) {
-            this.state = state;
-            if (state == SimulationState.READY_TO_RUN) {
-                eventBus.post(new SimulationReadyEvent());
-            }
-        }
-    }
-
     @Subscribe
     public void handle(StartSimulationEvent e) {
         carLimitSpinner.setValue(e.carsNum);
@@ -247,8 +246,9 @@ public class MapWindow {
     }
 
     // WARNING: This function will be replaced by new GUI
-    public void startSimulation() {
-        if (state != SimulationState.READY_TO_RUN) {
+    @Deprecated(forRemoval = true, since = "When new GUI will replace this one")
+    private void startSimulation() {
+        if (configContainer.getSimulationState() != SimulationState.READY_TO_RUN) {
             return;
         }
 
@@ -261,9 +261,11 @@ public class MapWindow {
 
         if (configContainer.shouldGeneratePedestriansAndBuses()) {
             spawnTimer.scheduleAtFixedRate(new CreatePedestrianTask(), 0, CREATE_PEDESTRIAN_INTERVAL_MILLISECONDS);
+            refreshTimer.scheduleAtFixedRate(new BusControlTask(), 0, BUS_CONTROL_INTERVAL_MILLISECONDS);
         }
-        refreshTimer.scheduleAtFixedRate(new BusControlTask(), 0, BUS_CONTROL_INTERVAL_MILLISECONDS);
-        setState(SimulationState.RUNNING);
+
+        configContainer.setSimulationState(SimulationState.RUNNING);
+        timeManager.setSimulationStartTime((Date) setTimeSpinner.getValue());
     }
 
     private int getZoneRadius() {
@@ -376,10 +378,6 @@ public class MapWindow {
         menuBar.add(generation);
     }
 
-    public static int getTimeScale() {
-        return TIME_SCALE;
-    }
-
     public void setResultTime(String val) {
         ResultTimeLabel.setText(val);
     }
@@ -402,7 +400,7 @@ public class MapWindow {
         return configContainer.getCarsNumber();
     }
 
-    public int getTestCarId() {
+    private int getTestCarId() {
         return configContainer.getTestCarId();
     }
 
@@ -415,14 +413,7 @@ public class MapWindow {
     }
 
     private void refreshTime() {
-        Date date = getSimulationStartTime();
-        Duration timeDiff = Duration.ofSeconds((TIME_SCALE * REFRESH_MAP_INTERVAL_MILLISECONDS) / 1000);
-        Instant inst = date.toInstant();
-        inst = inst.plus(timeDiff);
-        DateFormat dateFormat = new SimpleDateFormat("kk:mm:ss dd-MM-yyyy");
-        String strDate = dateFormat.format(Date.from(inst));
-        currentTimeLabel.setText(strDate);
-        setTimeSpinner.setValue(Date.from(inst));
+        currentTimeLabel.setText(dateFormat.format(timeManager.getCurrentSimulationTime()));
     }
 
     private void drawLights(List<Painter<JXMapViewer>> painters) {
@@ -898,7 +889,7 @@ public class MapWindow {
 
                 CompoundPainter<JXMapViewer> painter = new CompoundPainter<>(painters);
                 MapViewer.setOverlayPainter(painter);
-                if (state == SimulationState.RUNNING) {
+                if (configContainer.getSimulationState() == SimulationState.RUNNING) {
                     refreshTime();
                 }
             } catch (Exception e) {
@@ -911,7 +902,7 @@ public class MapWindow {
         @Override
         public void run() {
             try {
-                if (state == SimulationState.RUNNING) {
+                if (configContainer.getSimulationState() == SimulationState.RUNNING) {
                     runBusBasedOnTimeTable();
                 }
             } catch (Exception e) {

@@ -61,7 +61,7 @@ public abstract class AbstractAgent extends Agent {
         msg.addReceiver(dest);
 
         Properties properties = new Properties();
-        var agentType = MessageParameter.GetTypeByMovingObject(movingObject);
+        var agentType = MessageParameter.getTypeByMovingObject(movingObject);
         properties.setProperty(MessageParameter.TYPE, agentType);
         Instant time = MasterAgent.getSimulationTime().toInstant().plusMillis(movingObject.getMillisecondsToNextLight());
         properties.setProperty(MessageParameter.ARRIVAL_TIME, "" + time);

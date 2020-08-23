@@ -1,7 +1,9 @@
 package agents.abstractions;
 
 public interface IRegistrable {
-    void register(Class<?>... types);
+    default void register(Class<?>... types) {
+        registerAll(types);
+    }
 
     void registerAll(Class<?>[] types);
 

@@ -49,7 +49,7 @@ public class MasterAgent extends Agent {
     private static final Logger logger = LoggerFactory.getLogger(MasterAgent.class);
 
     private static AgentContainer container;
-    private static MapWindow window;
+    private final MapWindow window;
     private final IBusLinesManager busLinesManager;
     private final IdGenerator idGenerator;
     private final IAgentsContainer agentsContainer;
@@ -57,6 +57,7 @@ public class MasterAgent extends Agent {
     private final LightAccessManager lightAccessManager;
     private final ConfigContainer configContainer;
     private final EventBus eventBus;
+    private static ITimeManager timeManager;
 
     // TODO: Delete this abomination (or at least make it private)
     public static final List<PedestrianAgent> pedestrians = new CopyOnWriteArrayList<>();
@@ -74,6 +75,7 @@ public class MasterAgent extends Agent {
                        LightAccessManager lightAccessManager,
                        ConfigContainer configContainer,
                        EventBus eventBus,
+                       ITimeManager timeManager,
                        MapWindow window) {
         this.busLinesManager = busLinesManager;
         this.idGenerator = idGenerator;
@@ -82,9 +84,10 @@ public class MasterAgent extends Agent {
         this.lightAccessManager = lightAccessManager;
         this.configContainer = configContainer;
         this.eventBus = eventBus;
+        this.window = window;
 
         // TODO: Delete this abomination
-        MasterAgent.window = window;
+        this.timeManager = timeManager;
     }
 
     @Override
@@ -137,6 +140,7 @@ public class MasterAgent extends Agent {
                 seconds / 3600,
                 (seconds % 3600) / 60,
                 seconds % 60);
+        // TODO: Push message to gui
         window.setResultTime(time);
     }
 
@@ -155,8 +159,9 @@ public class MasterAgent extends Agent {
         }
     }
 
+    @Deprecated(forRemoval = true,since = "When all users have TimeManager service")
     public static Date getSimulationTime() {
-        return window.getSimulationStartTime();
+        return timeManager.getCurrentSimulationTime();
     }
 
     @Subscribe
@@ -182,7 +187,7 @@ public class MasterAgent extends Agent {
     }
 
 
-    public boolean prepareAgents() {
+    private boolean prepareAgents() {
         if (configContainer.shouldGeneratePedestriansAndBuses()) {
             if (!prepareStationsAndBuses()) {
                 return false;
@@ -265,8 +270,8 @@ public class MasterAgent extends Agent {
         return pedestrianAgent;
     }
 
-    // TODO: Move to agentsContainer
-    public void activateLightManagerAgents() {
+    // TODO: Move to AgentsCreator
+    private void activateLightManagerAgents() {
         agentsContainer.forEach(LightManager.class, AbstractAgent::start);
     }
 

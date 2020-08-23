@@ -96,8 +96,8 @@ public class TaskManager implements ITaskManager {
 
     private IGeoPosition generateRandomOffset(int radius) {
         double angle = random.nextDouble() * Math.PI * 2;
-        double lat = Math.sin(angle) * radius * NumericHelper.METERS_PER_DEGREE_INVERSE;
-        double lng = Math.cos(angle) * radius * NumericHelper.METERS_PER_DEGREE_INVERSE * Math.cos(lat);
+        double lat = Math.sin(angle) * radius * Router.METERS_PER_DEGREE_INVERSE;
+        double lng = Math.cos(angle) * radius * Router.METERS_PER_DEGREE_INVERSE * Math.cos(lat);
         return Position.of(lat, lng);
     }
 }

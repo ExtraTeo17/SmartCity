@@ -91,7 +91,15 @@ public final class ConfigContainer extends ConfigMutator
         return carsConfig.getTestObjectNumber();
     }
 
+    public void setTestCarId(int id) {
+        carsConfig.setTestObjectNumber(mutation, id);
+    }
+
     public int getCarsNumber() {
         return carsConfig.getNumber();
+    }
+
+    public void setCarsNumber(int num) {
+        carsConfig.setNumber(mutation, num);
     }
 }

@@ -11,6 +11,7 @@ import jade.util.leap.Properties;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import routing.LightManagerNode;
+import routing.Router;
 import routing.StationNode;
 import smartcity.MasterAgent;
 import vehicles.DrivingState;
@@ -39,7 +40,7 @@ public class PedestrianAgent extends AbstractAgent {
         getNextStation();
 
         pedestrian.setState(DrivingState.MOVING);
-        Behaviour move = new TickerBehaviour(this, 3600 / pedestrian.getSpeed()) {
+        Behaviour move = new TickerBehaviour(this, Router.STEP_CONSTANT / pedestrian.getSpeed()) {
             @Override
             public void onTick() {
                 if (pedestrian.isAtTrafficLights()) {

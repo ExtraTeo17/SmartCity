@@ -13,6 +13,7 @@ import osmproxy.MapAccessManager;
 import osmproxy.elements.OSMNode;
 import routing.core.IGeoPosition;
 import smartcity.MasterAgent;
+import smartcity.TimeManager;
 
 import java.time.Instant;
 import java.util.*;
@@ -71,7 +72,7 @@ public class SimpleCrossroad implements ICrossroad {
 
     private void startTimer() {
         int delayBeforeStart = 0;
-        int repeatIntervalInMilliseconds = SimpleCrossroad.EXTEND_TIME * 1000 / MapWindow.getTimeScale();
+        int repeatIntervalInMilliseconds = SimpleCrossroad.EXTEND_TIME * 1000 / TimeManager.TIME_SCALE;
         timer.scheduleAtFixedRate(new SwitchLightsTask(), delayBeforeStart, repeatIntervalInMilliseconds);
     }
 
@@ -195,6 +196,7 @@ public class SimpleCrossroad implements ICrossroad {
         lights.get(adjacentOsmWayId).removePedestrianFromFarAwayQueue(pedestrianName);
     }
 
+    // TODO: Move this task to TaskManager
     private class SwitchLightsTask extends TimerTask {
 
         @Override
@@ -209,7 +211,7 @@ public class SimpleCrossroad implements ICrossroad {
                     else if (shouldExtendBecauseOfFarAwayQueue()) {
                         prepareTimer();
                         logger.info("-------------------------------------shouldExtendBecauseOfFarAwayQueue--------------");
-                        timer.schedule(new SwitchLightsTask(), SimpleCrossroad.EXTEND_TIME * 1000 / MapWindow.getTimeScale());
+                        timer.schedule(new SwitchLightsTask(), SimpleCrossroad.EXTEND_TIME * 1000 / TimeManager.TIME_SCALE);
                         alreadyExtendedGreen = true;
                         return;
                     }

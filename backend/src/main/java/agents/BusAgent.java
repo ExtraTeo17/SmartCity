@@ -13,6 +13,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import routing.LightManagerNode;
 import routing.RouteNode;
+import routing.Router;
 import routing.StationNode;
 import smartcity.MasterAgent;
 import vehicles.Bus;
@@ -45,7 +46,9 @@ public class BusAgent extends AbstractAgent {
         print("Started at station " + station.getStationId() + ".");
         bus.setState(DrivingState.MOVING);
 
-        Behaviour move = new TickerBehaviour(this, 3600 / bus.getSpeed()) {
+        // TODO: Executed each x = 3600 / bus.getSpeed() = 3600m / (40 * TIME_SCALE) = 3600 / 400 = 9ms
+        //   Maybe decrease the interval? - I don't think processor can keep up with.
+        Behaviour move = new TickerBehaviour(this, Router.STEP_CONSTANT / bus.getSpeed()) {
             @Override
             public void onTick() {
                 if (bus.isAtTrafficLights()) {

@@ -14,9 +14,9 @@ import java.util.Iterator;
 import java.util.List;
 
 public class BusInfo implements Iterable<BrigadeInfo> {
-    private String busLine;
+    private final String busLine;
+    private final List<Long> stationIds;
     private List<OSMWay> route;
-    private List<Long> stationIds;
     private List<BrigadeInfo> brigadeList = new ArrayList<>();
 
     BusInfo(String busLine, List<OSMWay> route, List<Long> stationIds) {
@@ -45,6 +45,7 @@ public class BusInfo implements Iterable<BrigadeInfo> {
         brigadeList = new ArrayList<>(values);
     }
 
+    // TODO: as field.
     public List<RouteNode> getRouteInfo() {
         return Router.generateRouteInfoForBuses(route, stationIds);
     }

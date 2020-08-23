@@ -1,6 +1,5 @@
 package vehicles;
 
-import gui.MapWindow;
 import routing.LightManagerNode;
 import routing.RouteNode;
 import routing.Router;
@@ -14,10 +13,10 @@ public class MovingObjectImpl extends MovingObject {
     private final List<RouteNode> displayRoute;
     private final List<RouteNode> route;
     private int index = 0;
-    private final int speed = 50;
     private int closestLightIndex = Integer.MAX_VALUE;
 
     public MovingObjectImpl(List<RouteNode> displayRoute) {
+        super(50);
         this.displayRoute = displayRoute;
         // TODO: Inject it via constructor, not create here
         this.route = Router.uniformRoute(displayRoute);
@@ -102,12 +101,7 @@ public class MovingObjectImpl extends MovingObject {
 
     @Override
     public int getMillisecondsToNextLight() {
-        return ((closestLightIndex - index) * 3600) / getSpeed();
-    }
-
-    @Override
-    public int getSpeed() {
-        return speed * MapWindow.getTimeScale();
+        return ((closestLightIndex - index) * Router.STEP_CONSTANT) / getSpeed();
     }
 
     @Override

@@ -9,6 +9,7 @@ import jade.core.behaviours.TickerBehaviour;
 import jade.lang.acl.ACLMessage;
 import jade.util.leap.Properties;
 import routing.LightManagerNode;
+import routing.Router;
 import routing.core.IGeoPosition;
 import smartcity.MasterAgent;
 import vehicles.DrivingState;
@@ -35,7 +36,7 @@ public class VehicleAgent extends AbstractAgent {
         vehicle.setState(DrivingState.MOVING);
 
         int speed = vehicle.getSpeed();
-        Behaviour move = new TickerBehaviour(this, 3600 / speed) {
+        Behaviour move = new TickerBehaviour(this, Router.STEP_CONSTANT / speed) {
             @Override
             public void onTick() {
                 if (vehicle.isAtTrafficLights()) {
