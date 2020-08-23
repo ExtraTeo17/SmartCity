@@ -1,7 +1,19 @@
 package smartcity;
 
 public enum SimulationState {
-    SETTING_ZONE,
+    INITIAL,
+    IN_PREPARATION,
     READY_TO_RUN,
-    RUNNING
+    RUNNING,
+    FINISHED;
+
+    public boolean isOneOf(SimulationState... states) {
+        for (var state : states) {
+            if (state.equals(this)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
 }

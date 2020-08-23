@@ -20,15 +20,15 @@ import java.util.List;
 
 // TODO: Add fields to this class and make it some kind of service (not static)
 public final class Router {
-    public final static int STEP_SIZE_METERS = 1;
-    public final static int M_MILLISECONDS_TO_KM_HOUR = 3600;
-    public final static int STEP_CONSTANT = STEP_SIZE_METERS * M_MILLISECONDS_TO_KM_HOUR;
+    public static final int STEP_SIZE_METERS = 1;
+    public static final int M_MILLISECONDS_TO_KM_HOUR = 3600;
+    public static final int STEP_CONSTANT = STEP_SIZE_METERS * M_MILLISECONDS_TO_KM_HOUR;
 
     public static final double EARTH_RADIUS_METERS = 6_378_137;
     public static final double METERS_PER_DEGREE = EARTH_RADIUS_METERS * Math.PI / 180.0;
-    public static final double METERS_PER_DEGREE_INVERSE = 1 / METERS_PER_DEGREE;
+    public static final double DEGREES_PER_METER = 1 / METERS_PER_DEGREE;
 
-    private final static Logger logger = LoggerFactory.getLogger(Router.class);
+    private static final Logger logger = LoggerFactory.getLogger(Router.class);
 
     public static List<RouteNode> generateRouteInfo(IGeoPosition pointA, IGeoPosition pointB) {
         Pair<List<Long>, List<RouteNode>> osmWayIdsAndPointList = Router.findRoute(pointA, pointB, false);

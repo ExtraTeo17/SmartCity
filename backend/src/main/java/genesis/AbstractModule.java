@@ -10,7 +10,7 @@ import com.google.inject.spi.TypeEncounter;
 import com.google.inject.spi.TypeListener;
 
 public abstract class AbstractModule implements Module {
-    protected final static EventBus eventBus;
+    protected static final EventBus eventBus;
 
     static {
         eventBus = new EventBus();

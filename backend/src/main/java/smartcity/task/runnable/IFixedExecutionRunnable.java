@@ -3,5 +3,5 @@ package smartcity.task.runnable;
 import java.util.concurrent.TimeUnit;
 
 public interface IFixedExecutionRunnable extends Runnable {
-    void runNTimes(long period, TimeUnit timeUnit);
+    void runFixed(long period, TimeUnit timeUnit);
 }

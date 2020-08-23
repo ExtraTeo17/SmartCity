@@ -9,16 +9,14 @@ import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.Iterator;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
 
 class HashAgentsContainer implements IAgentsContainer {
-    private final static Logger logger = LoggerFactory.getLogger(HashAgentsContainer.class);
+    private static final Logger logger = LoggerFactory.getLogger(HashAgentsContainer.class);
     private final ContainerController controller;
     private final Map<Class<?>, Map<Integer, AbstractAgent>> container;
 
@@ -31,10 +29,7 @@ class HashAgentsContainer implements IAgentsContainer {
     @Override
     public boolean tryAdd(@NotNull AbstractAgent agent) {
         var type = agent.getClass();
-        var collection = container.get(type);
-        if (collection == null) {
-            throw new NotRegisteredException(type);
-        }
+        var collection = getOrThrow(type);
 
         if (tryAddAgent(agent)) {
             return collection.putIfAbsent(agent.getId(), agent) == null;
@@ -42,29 +37,6 @@ class HashAgentsContainer implements IAgentsContainer {
 
         return false;
     }
-
-    @Override
-    @SuppressWarnings("unchecked")
-    public <TAgent extends AbstractAgent> Iterator<TAgent> iterator(Class<TAgent> type) {
-        var collection = container.get(type);
-        if (collection == null) {
-            throw new NotRegisteredException(type);
-        }
-
-        return (Iterator<TAgent>) collection.values().iterator();
-    }
-
-    @Override
-    @SuppressWarnings("unchecked")
-    public <TAgent extends AbstractAgent> Stream<TAgent> stream(Class<TAgent> type) {
-        var collection = container.get(type);
-        if (collection == null) {
-            throw new NotRegisteredException(type);
-        }
-
-        return (Stream<TAgent>) collection.values().stream();
-    }
-
 
     private boolean tryAddAgent(@NotNull AbstractAgent agent) {
         try {
@@ -78,25 +50,36 @@ class HashAgentsContainer implements IAgentsContainer {
     }
 
     @Override
+    @SuppressWarnings("unchecked")
+    public <TAgent extends AbstractAgent> Iterator<TAgent> iterator(Class<TAgent> type) {
+        return (Iterator<TAgent>) getOrThrow(type).values().iterator();
+    }
+
+    @Override
+    @SuppressWarnings("unchecked")
+    public <TAgent extends AbstractAgent> Stream<TAgent> stream(Class<TAgent> type) {
+        return (Stream<TAgent>) getOrThrow(type).values().stream();
+    }
+
+    @Override
     public boolean contains(AbstractAgent agent) {
         var type = agent.getClass();
-        var collection = container.get(type);
-        if (collection == null) {
-            throw new NotRegisteredException(type);
-        }
-
-        return collection.containsKey(agent.getId());
+        return getOrThrow(type).containsKey(agent.getId());
     }
 
     @Override
     public <TAgent extends AbstractAgent> Optional<TAgent> get(Class<TAgent> type, Predicate<TAgent> predicate) {
-        var collection = container.get(type);
-        if (collection == null) {
-            throw new NotRegisteredException(type);
-        }
+        return getOrThrow(type).values().stream().map(type::cast)
+                .filter(predicate)
+                .findFirst();
+    }
 
-        return collection.values().stream()
-                .filter(abstractAgent -> predicate.test(type.cast(abstractAgent))).map(type::cast)
+    @Override
+    public <TAgent extends AbstractAgent> Optional<TAgent> getRandom(Class<TAgent> type, Random random) {
+        var collection = getOrThrow(type).values();
+        int ind = random.nextInt(collection.size());
+        return collection.stream().map(type::cast)
+                .skip(ind)
                 .findFirst();
     }
 
@@ -105,57 +88,58 @@ class HashAgentsContainer implements IAgentsContainer {
         return remove(agent.getClass(), agent.getId()).isPresent();
     }
 
-    // TODO: Kill agent here and remove from container
     @Override
     public <TAgent extends AbstractAgent> Optional<TAgent> remove(Class<TAgent> type, int agentId) {
-        var collection = container.get(type);
-        if (collection == null) {
-            throw new NotRegisteredException(type);
+        var agent = getOrThrow(type).remove(agentId);
+        if (agent != null) {
+            agent.doDelete();
+            return Optional.of(type.cast(agent));
         }
 
-        var agent = collection.remove(agentId);
-        return agent != null ? Optional.of(type.cast(agent)) : Optional.empty();
-    }
-
-    @Override
-    public <TAgent extends AbstractAgent> void removeIf(Class<TAgent> type, Predicate<TAgent> predicate) {
-        var collection = container.get(type);
-        if (collection == null) {
-            throw new NotRegisteredException(type);
-        }
-
-        collection.entrySet().removeIf(tAgent -> predicate.test(type.cast(tAgent)));
+        return Optional.empty();
     }
 
     @Override
     public <TAgent extends AbstractAgent> void forEach(Class<TAgent> type, Consumer<TAgent> consumer) {
-        var collection = container.get(type);
-        if (collection == null) {
-            throw new NotRegisteredException(type);
-        }
-
-        collection.forEach((key, tAgent) -> consumer.accept(type.cast(tAgent)));
+        getOrThrow(type).forEach((key, tAgent) -> consumer.accept(type.cast(tAgent)));
     }
-
 
     @Override
     public int size(Class<?> type) {
-        var collection = container.get(type);
-        if (collection == null) {
-            throw new NotRegisteredException(type);
-        }
-
-        return collection.size();
+        return getOrThrow(type).size();
     }
 
     @Override
-    public void clear(Class<?> type) {
+    public synchronized void clear(Class<?> type) {
+        var collection = getOrThrow(type);
+        tryDeleteAll(collection.values());
+    }
+
+    @Override
+    public synchronized void clearAll() {
+        for (var collection : container.values()) {
+            tryDeleteAll(collection.values());
+        }
+    }
+
+    private void tryDeleteAll(Collection<AbstractAgent> collection) {
+        for (var agent : collection) {
+            try {
+                agent.doDelete();
+            } catch (Exception e) {
+                logger.warn("Failed to delete agent from container.", e);
+            }
+        }
+        collection.clear();
+    }
+
+    private Map<Integer, AbstractAgent> getOrThrow(Class<?> type) {
         var collection = container.get(type);
         if (collection == null) {
             throw new NotRegisteredException(type);
         }
 
-        collection.clear();
+        return collection;
     }
 
     @Override

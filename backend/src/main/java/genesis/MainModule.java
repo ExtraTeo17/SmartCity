@@ -16,7 +16,7 @@ import java.io.InputStream;
 import java.net.URL;
 
 public class MainModule extends AbstractModule {
-    private final static Logger logger = LoggerFactory.getLogger(MainModule.class);
+    private static final Logger logger = LoggerFactory.getLogger(MainModule.class);
     private final String[] args;
 
     public MainModule(String... args) {

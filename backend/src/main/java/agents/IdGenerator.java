@@ -54,24 +54,4 @@ public class IdGenerator implements IRegistrable {
     public static void resetStationAgentId() {
         stationAgentId.set(resetValue);
     }
-
-    @Deprecated
-    public static int getPedestrianId() {
-        return pedestrianId.getAndIncrement();
-    }
-
-    @Deprecated
-    public static void resetPedestrianId() {
-        pedestrianId.set(resetValue);
-    }
-
-    @Deprecated
-    public static int getVehicleId() {
-        return vehicleId.getAndIncrement();
-    }
-
-    @Deprecated
-    public static void resetVehicleId() {
-        vehicleId.set(resetValue);
-    }
 }

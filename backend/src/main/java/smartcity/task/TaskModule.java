@@ -10,6 +10,6 @@ public class TaskModule extends AbstractModule {
     public void configure(Binder binder) {
         super.configure(binder);
         binder.install(new RunnableModule());
-        binder.bind(ITaskManager.class).to(TaskManager.class).in(Singleton.class);
+        binder.bind(ITaskManager.class).to(TaskManager.class).asEagerSingleton();
     }
 }

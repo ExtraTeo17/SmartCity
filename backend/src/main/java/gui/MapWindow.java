@@ -5,14 +5,12 @@ import agents.LightManager;
 import agents.PedestrianAgent;
 import agents.VehicleAgent;
 import agents.abstractions.IAgentsContainer;
-import com.google.common.collect.ImmutableList;
 import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
 import com.google.inject.Inject;
 import events.PrepareSimulationEvent;
 import events.SimulationReadyEvent;
 import events.StartSimulationEvent;
-import org.javatuples.Pair;
 import org.jxmapviewer.JXMapViewer;
 import org.jxmapviewer.OSMTileFactoryInfo;
 import org.jxmapviewer.input.MapClickListener;
@@ -23,9 +21,6 @@ import org.jxmapviewer.viewer.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import osmproxy.elements.OSMStation;
-import routing.RouteNode;
-import routing.Router;
-import routing.StationNode;
 import routing.core.IGeoPosition;
 import routing.core.IZone;
 import routing.core.Position;
@@ -36,7 +31,6 @@ import smartcity.config.ConfigContainer;
 import smartcity.lights.SimpleCrossroad;
 import smartcity.task.ITaskManager;
 import vehicles.Bus;
-import vehicles.Pedestrian;
 import vehicles.TestCar;
 import vehicles.TestPedestrian;
 
@@ -53,10 +47,7 @@ import java.util.*;
 @Deprecated
 public class MapWindow {
     private static final Logger logger = LoggerFactory.getLogger(MapWindow.class);
-    private final static int REFRESH_MAP_INTERVAL_MILLISECONDS = 100;
-    private final static int BUS_CONTROL_INTERVAL_MILLISECONDS = 2000; //60000
-    private static final long CREATE_PEDESTRIAN_INTERVAL_MILLISECONDS = 100;
-    private final static int PEDESTRIAN_STATION_RADIUS = 200;
+    private static final int REFRESH_MAP_INTERVAL_MILLISECONDS = 100;
     private final EventBus eventBus;
     private final IAgentsContainer agentsContainer;
     private final ConfigContainer configContainer;
@@ -97,7 +88,6 @@ public class MapWindow {
     private IGeoPosition pointA;
     private IGeoPosition pointB;
     private final Random random = new Random();
-    private final Random testCarRandom = new Random(96);
     private static final DateFormat dateFormat = new SimpleDateFormat("kk:mm:ss dd-MM-yyyy");
     private final IZone zone;
     // TODO: Temporary solution to make it work with old gui
@@ -196,7 +186,7 @@ public class MapWindow {
                 var lng = geoPosition.getLongitude();
                 logger.info("Lat: " + lat + " Lon: " + lng);
                 switch (configContainer.getSimulationState()) {
-                    case SETTING_ZONE, READY_TO_RUN -> {
+                    case INITIAL, READY_TO_RUN -> {
                         latSpinner.setValue(lat);
                         lonSpinner.setValue(lng);
                     }
@@ -240,6 +230,7 @@ public class MapWindow {
 
     @Subscribe
     public void handle(StartSimulationEvent e) {
+        logger.info("Handling " + e.getClass().getSimpleName());
         carLimitSpinner.setValue(e.carsNum);
         testCarIdSpinner.setValue(e.testCarId);
         startSimulation();
@@ -248,7 +239,8 @@ public class MapWindow {
     // WARNING: This function will be replaced by new GUI
     @Deprecated(forRemoval = true, since = "When new GUI will replace this one")
     private void startSimulation() {
-        if (configContainer.getSimulationState() != SimulationState.READY_TO_RUN) {
+        var state = configContainer.getSimulationState();
+        if (state.isOneOf(SimulationState.INITIAL, SimulationState.IN_PREPARATION, SimulationState.FINISHED)) {
             return;
         }
 
@@ -258,13 +250,6 @@ public class MapWindow {
         ResultTimeLabel.setVisible(true);
         ResultTimeTitle.setVisible(true);
         random.setSeed(getSeed());
-
-        if (configContainer.shouldGeneratePedestriansAndBuses()) {
-            spawnTimer.scheduleAtFixedRate(new CreatePedestrianTask(), 0, CREATE_PEDESTRIAN_INTERVAL_MILLISECONDS);
-            refreshTimer.scheduleAtFixedRate(new BusControlTask(), 0, BUS_CONTROL_INTERVAL_MILLISECONDS);
-        }
-
-        configContainer.setSimulationState(SimulationState.RUNNING);
         timeManager.setSimulationStartTime((Date) setTimeSpinner.getValue());
     }
 
@@ -408,10 +393,6 @@ public class MapWindow {
         return (int) seedSpinner.getValue();
     }
 
-    public Date getSimulationStartTime() {
-        return (Date) setTimeSpinner.getValue();
-    }
-
     private void refreshTime() {
         currentTimeLabel.setText(dateFormat.format(timeManager.getCurrentSimulationTime()));
     }
@@ -430,7 +411,11 @@ public class MapWindow {
         try {
             Set<Waypoint> set = new HashSet<>();
             agentsContainer.forEach(VehicleAgent.class, a -> {
-                var waypoint = new DefaultWaypoint(a.getVehicle().getPosition().toMapGeoPosition());
+                var vehicle = a.getVehicle();
+                if (vehicle.isAtDestination()) {
+                    return;
+                }
+                var waypoint = new DefaultWaypoint(vehicle.getPosition().toMapGeoPosition());
                 if (a.getVehicle() instanceof TestCar) {
                     Set<Waypoint> testCarWaypoint = new HashSet<>();
                     testCarWaypoint.add(waypoint);
@@ -470,7 +455,7 @@ public class MapWindow {
     private void drawPedestrians(List<Painter<JXMapViewer>> painters) {
         try {
             Set<Waypoint> set = new HashSet<>();
-            for (PedestrianAgent a : MasterAgent.pedestrians) {
+            agentsContainer.forEach(PedestrianAgent.class, (a) -> {
                 if (!a.isInBus()) {
                     var waypoint = new DefaultWaypoint(a.getPedestrian().getPosition().toMapGeoPosition());
                     if (a.getPedestrian() instanceof TestPedestrian) {
@@ -486,7 +471,7 @@ public class MapWindow {
                         set.add(waypoint);
                     }
                 }
-            }
+            });
             WaypointPainter<Waypoint> waypointPainter = new WaypointPainter<>();
             waypointPainter.setWaypoints(set);
             waypointPainter.setRenderer(new CustomWaypointRenderer("pedestrian_small.png"));
@@ -498,7 +483,7 @@ public class MapWindow {
 
     private void drawPedestrianRoutes(List<Painter<JXMapViewer>> painters) {
         try {
-            for (PedestrianAgent a : MasterAgent.pedestrians) {
+            agentsContainer.forEach(PedestrianAgent.class, (a) -> {
                 List<IGeoPosition> trackBefore = new ArrayList<>(a.getPedestrian().getDisplayRouteBeforeBus());
                 List<IGeoPosition> trackAfter = new ArrayList<>(a.getPedestrian().getDisplayRouteAfterBus());
 
@@ -508,7 +493,7 @@ public class MapWindow {
                 RoutePainter routePainterAfter = new RoutePainter(trackAfter, c);
                 painters.add(routePainterBefore);
                 painters.add(routePainterAfter);
-            }
+            });
         } catch (Exception e) {
             logger.warn("Error drawing pedestrian routes", e);
         }
@@ -844,49 +829,40 @@ public class MapWindow {
      */
     public JComponent $$$getRootComponent$$$() { return MainPanel; }
 
-    private IGeoPosition generateRandomGeoPosOffsetWithRadius(final int radius) {
-        double angle = random.nextDouble() * Math.PI * 2;
-        if (getTestCarId() == agentsContainer.size(VehicleAgent.class)) {
-            angle = testCarRandom.nextDouble() * Math.PI * 2;
-        }
-        double lat = Math.sin(angle) * radius * 0.0000089;
-        double lng = Math.cos(angle) * radius * 0.0000089 * Math.cos(lat);
-        return Position.of(lat, lng);
-    }
-
     public class RefreshTask extends TimerTask { // OCB ?????? TOO OFTEN
         @Override
         public void run() {
             try {
                 List<Painter<JXMapViewer>> painters = new ArrayList<>();
-                if (renderBusRoutes) {
-                    drawBusRoutes(painters);
-                }
-                if (renderCarRoutes) {
-                    drawRoutes(painters);
-                }
-                if (renderPedestrianRoutes) {
-                    drawPedestrianRoutes(painters);
-                }
                 if (renderZone) {
                     drawZones(painters);
                 }
-                if (renderStations) {
-                    drawStations(painters);
+                if (configContainer.getSimulationState() != SimulationState.INITIAL) {
+                    if (renderBusRoutes) {
+                        drawBusRoutes(painters);
+                    }
+                    if (renderCarRoutes) {
+                        drawRoutes(painters);
+                    }
+                    if (renderPedestrianRoutes) {
+                        drawPedestrianRoutes(painters);
+                    }
+                    if (renderStations) {
+                        drawStations(painters);
+                    }
+                    if (renderLights) {
+                        drawLights(painters);
+                    }
+                    if (renderCars) {
+                        drawVehicles(painters);
+                    }
+                    if (renderBuses) {
+                        drawBuses(painters);
+                    }
+                    if (renderPedestrians) {
+                        drawPedestrians(painters);
+                    }
                 }
-                if (renderLights) {
-                    drawLights(painters);
-                }
-                if (renderCars) {
-                    drawVehicles(painters);
-                }
-                if (renderBuses) {
-                    drawBuses(painters);
-                }
-                if (renderPedestrians) {
-                    drawPedestrians(painters);
-                }
-
                 CompoundPainter<JXMapViewer> painter = new CompoundPainter<>(painters);
                 MapViewer.setOverlayPainter(painter);
                 if (configContainer.getSimulationState() == SimulationState.RUNNING) {
@@ -895,86 +871,6 @@ public class MapWindow {
             } catch (Exception e) {
                 logger.error("Error refreshing simulation", e);
             }
-        }
-    }
-
-    public class BusControlTask extends TimerTask { // OCB ?????? TOO OFTEN
-        @Override
-        public void run() {
-            try {
-                if (configContainer.getSimulationState() == SimulationState.RUNNING) {
-                    runBusBasedOnTimeTable();
-                }
-            } catch (Exception e) {
-                logger.warn("Error in bus control task", e);
-            }
-        }
-
-        private void runBusBasedOnTimeTable() {
-            agentsContainer.forEach(BusAgent.class, busAgent -> busAgent.runBasedOnTimetable(getSimulationStartTime()));
-        }
-    }
-
-    public class CreatePedestrianTask extends TimerTask {
-
-        @Override
-        public void run() {
-            if (!configContainer.shouldGeneratePedestriansAndBuses()) {
-                this.cancel();
-                return;
-            }
-
-            try {
-                // TODO: add people limit
-                final Pair<Pair<StationNode, StationNode>, String> stationNodePairAndBusLine = getStationPairAndLineFromRandomBus();
-                final StationNode startStation = stationNodePairAndBusLine.getValue0().getValue0();
-                final StationNode finishStation = stationNodePairAndBusLine.getValue0().getValue1();
-                // TODO: Generating this offset doesn't work!
-                var geoPosInFirstStationCircle = generateRandomGeoPosOffsetWithRadius(PEDESTRIAN_STATION_RADIUS);
-                IGeoPosition pedestrianStartPoint = startStation.sum(geoPosInFirstStationCircle);
-                IGeoPosition pedestrianFinishPoint = finishStation.sum(geoPosInFirstStationCircle);
-
-                List<RouteNode> routeToStation = Router.generateRouteInfoForPedestrians(pedestrianStartPoint, startStation,
-                        null, startStation.getOsmStationId());
-                List<RouteNode> routeFromStation = Router.generateRouteInfoForPedestrians(finishStation, pedestrianFinishPoint,
-                        finishStation.getOsmStationId(), null);
-
-                // TODO: Separate fields for testPedestrian and pedestriansLimit
-                if (getTestCarId() == agentsContainer.size(PedestrianAgent.class)) {
-                    final TestPedestrian pedestrian = new TestPedestrian(routeToStation, routeFromStation, startStation.getStationId(), stationNodePairAndBusLine.getValue1(),
-                            stationNodePairAndBusLine.getValue0().getValue0(), stationNodePairAndBusLine.getValue0().getValue1());
-                    var agent = MasterAgent.tryAddNewPedestrianAgent(pedestrian);
-                    agent.start();
-                }
-                else {
-                    final Pedestrian pedestrian = new Pedestrian(routeToStation, routeFromStation, startStation.getStationId(), stationNodePairAndBusLine.getValue1(),
-                            stationNodePairAndBusLine.getValue0().getValue0(), stationNodePairAndBusLine.getValue0().getValue1());
-                    var agent = MasterAgent.tryAddNewPedestrianAgent(pedestrian);
-                    agent.start();
-                }
-            } catch (Exception e) {
-                logger.warn("Unknown error.", e);
-                this.cancel();
-            }
-        }
-
-        private Pair<Pair<StationNode, StationNode>, String> getStationPairAndLineFromRandomBus() {
-            final BusAgent randomBusAgent = getRandomBusAgent();
-            return Pair.with(randomBusAgent.getTwoSubsequentStations(random), randomBusAgent.getLine());
-        }
-
-        private BusAgent getRandomBusAgent() {
-            final List<BusAgent> busArray = ImmutableList.copyOf(agentsContainer.iterator(BusAgent.class)); // TODO RETHINK!!!
-            BusAgent bus;
-            try {
-                bus = busArray.get(random.nextInt(busArray.size()));
-            } catch (Exception e) {
-                logger.error("The 'shouldPrepareBuses' toggle in smartCityAgent is probably switched off (pedestrians " +
-                        "cannot exist without buses)", e);
-                throw e;
-            }
-
-            return bus;
         }
     }
 }

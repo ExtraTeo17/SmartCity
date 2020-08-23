@@ -16,7 +16,7 @@ import java.util.NoSuchElementException;
 import java.util.Optional;
 
 public class OSMWay extends OSMElement {
-    private final static Logger logger = LoggerFactory.getLogger(OSMWay.class);
+    private static final Logger logger = LoggerFactory.getLogger(OSMWay.class);
     private final List<String> childNodeIds;
     private final boolean isOneWay;
     private List<OSMWaypoint> waypoints;

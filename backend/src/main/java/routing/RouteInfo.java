@@ -9,7 +9,7 @@ import java.util.*;
 import java.util.function.Consumer;
 
 public class RouteInfo implements Iterable<OSMWay> {
-    private final static Logger logger = LoggerFactory.getLogger(RouteInfo.class);
+    private static final Logger logger = LoggerFactory.getLogger(RouteInfo.class);
     private final List<OSMWay> ways = new ArrayList<>();
     private final Set<Long> lightOsmIds = new HashSet<>();
 

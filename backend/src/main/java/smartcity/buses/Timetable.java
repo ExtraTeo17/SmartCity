@@ -3,15 +3,13 @@ package smartcity.buses;
 import org.javatuples.Pair;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import routing.RouteNode;
-import smartcity.MasterAgent;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
 public class Timetable {
-    private final static Logger logger = LoggerFactory.getLogger(Timetable.class);
+    private static final Logger logger = LoggerFactory.getLogger(Timetable.class);
     private final Map<Long, Date> stationOsmIdToTime = new HashMap<>();
     private final List<Pair<Date, Long>> timeOnStationChronological = new ArrayList<>();
 

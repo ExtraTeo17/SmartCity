@@ -29,8 +29,8 @@ public class Bus extends MovingObject {
     private int closestStationIndex = -1;
     private int passengersCount = 0;
 
-    public Bus(final List<RouteNode> route, final Timetable timetable, final String busLine,
-               final String brigadeNr) {
+    public Bus(List<RouteNode> route, Timetable timetable, String busLine,
+               String brigadeNr) {
         super(40);
         this.displayRoute = route;
 

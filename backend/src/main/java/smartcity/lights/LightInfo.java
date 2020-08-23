@@ -4,10 +4,11 @@ package smartcity.lights;
 import osmproxy.elements.OSMNode;
 import osmproxy.elements.OSMWay;
 import osmproxy.elements.OSMWaypoint;
+import routing.Router;
 import routing.core.IGeoPosition;
 
 public class LightInfo implements IGeoPosition {
-    private static final double DISTANCE_THRESHOLD = 0.00008;
+    private static final double DISTANCE_THRESHOLD = 10 * Router.DEGREES_PER_METER;
     private final String osmLightId;
     private final String adjacentOsmWayId;
     private IGeoPosition position;

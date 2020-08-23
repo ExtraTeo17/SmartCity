@@ -115,9 +115,4 @@ public class VehicleAgent extends AbstractAgent {
     }
 
     public IGeoPosition getPosition() {return vehicle.getPosition();}
-
-    @Override
-    public void takeDown() {
-        super.takeDown();
-    }
 }

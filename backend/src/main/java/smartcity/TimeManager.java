@@ -1,35 +1,39 @@
 package smartcity;
 
-import java.util.Calendar;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.time.Clock;
 import java.util.Date;
 
 public class TimeManager implements ITimeManager {
-    public final static int TIME_SCALE = 10;
+    public static final int TIME_SCALE = 10;
+    private static final Logger logger = LoggerFactory.getLogger(TimeManager.class);
 
-    private final Calendar calendar;
+    private final Clock clock;
     private long simulationStartTime;
     private long realStartTime;
 
     public TimeManager() {
-        calendar = Calendar.getInstance();
-        simulationStartTime = realStartTime = calendar.getTimeInMillis();
+        clock = Clock.systemDefaultZone();
+        simulationStartTime = realStartTime = clock.millis();
     }
 
     @Override
     public Date getCurrentSimulationTime() {
-        var delta = calendar.getTimeInMillis() - realStartTime;
+        var delta = clock.millis() - realStartTime;
         return new Date(simulationStartTime + TIME_SCALE * delta);
     }
 
     @Override
     public Date getCurrentRealTime() {
-        return calendar.getTime();
+        return new Date(clock.millis());
     }
 
     @Override
     public void setSimulationStartTime(Date simulationTime) {
         simulationStartTime = simulationTime.getTime();
-        realStartTime = calendar.getTimeInMillis();
+        realStartTime = clock.millis();
     }
 
     @Override

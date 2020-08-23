@@ -13,7 +13,7 @@ import java.util.Optional;
 
 class MessageObjectMapper implements IMessageObjectMapper {
     private static final Logger logger = LoggerFactory.getLogger(MessageObjectMapper.class);
-    private final static ObjectMapper objectMapper = new ObjectMapper();
+    private static final ObjectMapper objectMapper = new ObjectMapper();
 
     @Override
     public Optional<String> serialize(MessageType type, AbstractPayload payload) {

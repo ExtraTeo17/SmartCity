@@ -15,7 +15,9 @@ import routing.LightManagerNode;
 import routing.RouteNode;
 import routing.Router;
 import routing.StationNode;
+import smartcity.ITimeManager;
 import smartcity.MasterAgent;
+import utilities.Siblings;
 import vehicles.Bus;
 import vehicles.DrivingState;
 
@@ -27,10 +29,13 @@ import java.util.Random;
 @SuppressWarnings("serial")
 public class BusAgent extends AbstractAgent {
     private static final Logger logger = LoggerFactory.getLogger(BusAgent.class);
+    private final ITimeManager timeManager;
     private final Bus bus;
 
-    public BusAgent(int busId, Bus bus) {
+    public BusAgent(int busId, ITimeManager timeManager,
+                    Bus bus) {
         super(busId);
+        this.timeManager = timeManager;
         this.bus = bus;
     }
 
@@ -263,19 +268,20 @@ public class BusAgent extends AbstractAgent {
     }
 
     // TODO: Fix situation where bus route contains only one station and pedestrians tries to choose two
-    public final Pair<StationNode, StationNode> getTwoSubsequentStations(final Random random) {
+    public final Siblings<StationNode> getTwoSubsequentStations(final Random random) {
         List<StationNode> stationsOnRoute = bus.getStationNodesOnRoute();
         final int halfIndex = stationsOnRoute.size() / 2;
-        return Pair.with(stationsOnRoute.get(random.nextInt(halfIndex)),
+        return Siblings.of(stationsOnRoute.get(random.nextInt(halfIndex)),
                 stationsOnRoute.get(halfIndex + random.nextInt(halfIndex)));
     }
 
     // TODO: New bus was created each time - check if nothing was broken?
-    public void runBasedOnTimetable(Date date) {
+    public void runBasedOnTimetable() {
         if (this.getAgentState().getValue() != jade.wrapper.AgentState.cAGENT_STATE_INITIATED) {
             return;
         }
 
+        var date = timeManager.getCurrentSimulationTime();
         long hours = bus.getBoardingTime().getHours();
         long minutes = bus.getBoardingTime().getMinutes();
         if (hours == date.getHours() && minutes == date.getMinutes()) {

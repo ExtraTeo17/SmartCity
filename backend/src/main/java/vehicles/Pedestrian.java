@@ -26,7 +26,7 @@ public class Pedestrian extends MovingObject {
     private int stationIndex = 0;
 
     public Pedestrian(List<RouteNode> routeToStation, List<RouteNode> routeFromStation,
-                      final long startingStationId, final String preferredBusLine, StationNode startStation, StationNode finishStation) {
+                      String preferredBusLine, StationNode startStation, StationNode finishStation) {
         super(10);
         displayRouteBeforeBus = routeToStation;
         displayRouteAfterBus = routeFromStation;

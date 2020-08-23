@@ -16,13 +16,14 @@ public class AgentsModule extends AbstractModule {
             BusAgent.class,
             LightManager.class,
             StationAgent.class,
-            Pedestrian.class
+            PedestrianAgent.class
     };
 
     @Override
     public void configure(Binder binder) {
         super.configure(binder);
         binder.bind(IAgentsFactory.class).to(AgentsFactory.class).in(Singleton.class);
+        binder.bind(AgentsCreator.class).asEagerSingleton();
     }
 
     @Provides

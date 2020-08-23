@@ -15,7 +15,7 @@ public final class ConfigContainer extends ConfigMutator
     public final boolean useDeprecatedXmlForLightManagers = false;
 
     private final EventBus eventBus;
-    private SimulationState simulationState = SimulationState.SETTING_ZONE;
+    private SimulationState simulationState = SimulationState.INITIAL;
     private boolean shouldGeneratePedestriansAndBuses = false;
     private boolean shouldGenerateCars = true;
     private boolean lightManagersLock = false;
@@ -71,7 +71,6 @@ public final class ConfigContainer extends ConfigMutator
     @Override
     public void setZone(IGeoPosition pos, int radius) {
         zone.set(mutation, pos, radius);
-        setSimulationState(SimulationState.SETTING_ZONE);
     }
 
     public SimulationState getSimulationState() {
