@@ -1,14 +1,14 @@
 package smartcity.lights;
 
-import agents.utils.LightColor;
+import agents.utilities.LightColor;
 import gui.CustomWaypointRenderer;
 import org.javatuples.Pair;
 import org.jxmapviewer.viewer.DefaultWaypoint;
 import org.jxmapviewer.viewer.Waypoint;
 import org.jxmapviewer.viewer.WaypointPainter;
 import org.w3c.dom.Node;
-import routing.IGeoPosition;
 import routing.LightManagerNode;
+import routing.core.IGeoPosition;
 import smartcity.MasterAgent;
 
 import java.time.Instant;

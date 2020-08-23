@@ -11,8 +11,9 @@ public class TestPedestrian extends Pedestrian {
     public Instant start;
     public Instant end;
 
-    public TestPedestrian(List<RouteNode> routeToStation, List<RouteNode> routeFromStation, long startingStationId, String preferredBusLine, StationNode startStation, StationNode finishStation) {
-        super(routeToStation, routeFromStation, startingStationId, preferredBusLine, startStation, finishStation);
+    public TestPedestrian(List<RouteNode> routeToStation, List<RouteNode> routeFromStation, String preferredBusLine,
+                          StationNode startStation, StationNode finishStation) {
+        super(routeToStation, routeFromStation, preferredBusLine, startStation, finishStation);
     }
 
     @Override

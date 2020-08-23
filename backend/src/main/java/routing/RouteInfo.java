@@ -9,7 +9,7 @@ import java.util.*;
 import java.util.function.Consumer;
 
 public class RouteInfo implements Iterable<OSMWay> {
-    private final static Logger logger = LoggerFactory.getLogger(RouteInfo.class);
+    private static final Logger logger = LoggerFactory.getLogger(RouteInfo.class);
     private final List<OSMWay> ways = new ArrayList<>();
     private final Set<Long> lightOsmIds = new HashSet<>();
 
@@ -31,6 +31,7 @@ public class RouteInfo implements Iterable<OSMWay> {
     }
 
     // TODO: ways.size() == 1?
+    // TODO: Add some tests for this function
     void determineRouteOrientationsAndFilterRelevantNodes(String startingOsmNodeRef, String finishingOsmNodeRef) {
         if (ways.size() == 0 || ways.size() == 1) {
             logger.warn("No ways to determine");

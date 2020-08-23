@@ -1,4 +1,4 @@
-import { SET_ZONE_RESPONSE } from "./MessageType";
+import { PREPARE_SIMULATION_RESPONSE } from "./MessageType";
 import { dispatch } from "../redux/store";
 import { lightLocationsUpdated } from "../redux/actions";
 
@@ -6,7 +6,7 @@ export default {
   handle(msg) {
     const payload = msg.payload;
     switch (msg.type) {
-      case SET_ZONE_RESPONSE:
+      case PREPARE_SIMULATION_RESPONSE:
         const locations = payload.locations;
         dispatch(lightLocationsUpdated(locations));
         break;

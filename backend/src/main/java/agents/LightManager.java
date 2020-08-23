@@ -1,5 +1,6 @@
 package agents;
 
+import agents.abstractions.AbstractAgent;
 import behaviourfactories.IBehaviourFactory;
 import behaviourfactories.LightManagerBehaviourFactory;
 import org.jxmapviewer.JXMapViewer;
@@ -8,7 +9,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Node;
 import osmproxy.elements.OSMNode;
-import routing.IGeoPosition;
+import routing.core.IGeoPosition;
 import smartcity.lights.ICrossroad;
 import smartcity.lights.SimpleCrossroad;
 
@@ -20,13 +21,13 @@ public class LightManager extends AbstractAgent {
     private final IBehaviourFactory<LightManager> behaviourFactory;
     private final ICrossroad crossroad;
 
-    public LightManager(Node node, int id) {
+    public LightManager(int id, Node node) {
         super(id);
         behaviourFactory = new LightManagerBehaviourFactory();
         crossroad = new SimpleCrossroad(node, id);
     }
 
-    public LightManager(OSMNode centerCrossroadNode, int id) {
+    public LightManager(int id, OSMNode centerCrossroadNode) {
         super(id);
         behaviourFactory = new LightManagerBehaviourFactory();
         crossroad = new SimpleCrossroad(centerCrossroadNode, id);

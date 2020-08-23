@@ -11,18 +11,18 @@ import web.message.payloads.AbstractPayload;
 
 class WebConnector implements IWebConnector {
     private static final Logger logger = LoggerFactory.getLogger(WebConnector.class);
-    private final SocketServer webServer;
+    private final SocketServer socketServer;
     private final IMessageObjectMapper objectMapper;
 
     @Inject
-    public WebConnector(SocketServer webServer, IMessageObjectMapper objectMapper) {
-        this.webServer = webServer;
+    WebConnector(SocketServer socketServer, IMessageObjectMapper objectMapper) {
+        this.socketServer = socketServer;
         this.objectMapper = objectMapper;
     }
 
     @Override
     public void start() {
-        webServer.start();
+        socketServer.start();
     }
 
     @Override
@@ -30,7 +30,7 @@ class WebConnector implements IWebConnector {
         var messageOpt = objectMapper.serialize(type, payload);
         if (messageOpt.isPresent()) {
             String serializedMessage = messageOpt.get();
-            for (var bus : webServer.getMessageBuses()) {
+            for (var bus : socketServer.getMessageBuses()) {
                 bus.accept(serializedMessage);
             }
         }

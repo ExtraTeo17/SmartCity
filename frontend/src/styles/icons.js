@@ -7,6 +7,3 @@ export const greenLightIcon = new L.Icon({
   popupAnchor: [10, 17],
   iconSize: [20, 34],
 });
-
-console.log("Green icon: ");
-console.log(greenLightIcon);

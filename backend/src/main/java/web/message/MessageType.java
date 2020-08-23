@@ -4,11 +4,11 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
 
 public enum MessageType {
-    SET_ZONE_REQUEST(1),
-    SET_ZONE_RESPONSE(2),
-    
-
-    ;
+    PREPARE_SIMULATION_REQUEST(1),
+    PREPARE_SIMULATION_RESPONSE(2),
+    START_SIMULATION_REQUEST(3),
+    START_SIMULATION_RESPONSE(4),
+    CREATE_CAR_INFO(5);
 
     private final int code;
 

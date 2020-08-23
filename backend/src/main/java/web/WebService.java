@@ -1,20 +1,21 @@
 package web;
 
 import com.google.inject.Inject;
-import routing.IGeoPosition;
+import routing.core.IGeoPosition;
 import web.abstractions.IWebService;
 import web.message.MessageType;
-import web.message.payloads.responses.Location;
-import web.message.payloads.responses.SetZoneResponse;
+import web.message.payloads.infos.CreateCarInfo;
+import web.message.payloads.models.Location;
+import web.message.payloads.responses.PrepareResponse;
 import web.serialization.Converter;
 
 import java.util.List;
 
-public class WebService implements IWebService {
+class WebService implements IWebService {
     private final WebConnector webConnector;
 
     @Inject
-    public WebService(WebConnector webConnector) {
+    WebService(WebConnector webConnector) {
         this.webConnector = webConnector;
     }
 
@@ -23,10 +24,17 @@ public class WebService implements IWebService {
         webConnector.start();
     }
 
-    public void setZone(List<IGeoPosition> positions) {
+    public void prepareSimulation(List<IGeoPosition> positions) {
         var locations = positions.stream().map(Converter::convert)
                 .toArray(Location[]::new);
-        var payload = new SetZoneResponse(locations);
-        webConnector.broadcastMessage(MessageType.SET_ZONE_RESPONSE, payload);
+        var payload = new PrepareResponse(locations);
+        webConnector.broadcastMessage(MessageType.PREPARE_SIMULATION_RESPONSE, payload);
+    }
+
+    @Override
+    public void createCar(IGeoPosition position) {
+        var location = Converter.convert(position);
+        var payload = new CreateCarInfo(location);
+        webConnector.broadcastMessage(MessageType.CREATE_CAR_INFO, payload);
     }
 }

@@ -3,7 +3,7 @@ package osmproxy.elements;
 
 import org.jetbrains.annotations.NotNull;
 import org.w3c.dom.NamedNodeMap;
-import routing.IGeoPosition;
+import routing.core.IGeoPosition;
 
 import java.util.ArrayList;
 import java.util.Iterator;

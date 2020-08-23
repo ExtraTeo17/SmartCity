@@ -1,4 +1,4 @@
-package agents.utils;
+package agents.utilities;
 
 import vehicles.MovingObject;
 import vehicles.VehicleType;
@@ -19,7 +19,7 @@ public class MessageParameter {
     public static final String DESIRED_BUS = "desired_bus";
     public static final String BUS_LINE = "bus_line";
 
-    public static String GetTypeByMovingObject(MovingObject movingObject) {
+    public static String getTypeByMovingObject(MovingObject movingObject) {
         var type = movingObject.getVehicleType();
         var value = VehicleType.getValue(type);
         return switch (value) {

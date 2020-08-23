@@ -1,19 +1,23 @@
 package vehicles;
 
 
-import routing.IGeoPosition;
 import routing.LightManagerNode;
 import routing.RouteNode;
+import routing.core.IGeoPosition;
+import smartcity.TimeManager;
 
 import java.util.List;
 
 // TODO: Interface or move some functionality here
+// TODO: Change name to IVehicle/AbstractVehicle
 public abstract class MovingObject {
+    protected final int speed;
+
+    protected MovingObject(int speed) {this.speed = speed;}
+
     public abstract String getVehicleType();
 
     public abstract LightManagerNode getNextTrafficLight();
-
-    public abstract String getPositionString();
 
     public abstract IGeoPosition getPosition();
 
@@ -31,7 +35,13 @@ public abstract class MovingObject {
 
     public abstract int getMillisecondsToNextLight();
 
-    public abstract int getSpeed();
+
+    /**
+     * @return Scaled speed in KM/H
+     */
+    public int getSpeed() {
+        return speed * TimeManager.TIME_SCALE;
+    }
 
     public abstract DrivingState getState();
 

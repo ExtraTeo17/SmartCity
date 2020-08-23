@@ -2,16 +2,31 @@ import React, { useState } from "react";
 import ApiManager from "../web/ApiManager";
 import { connect } from "react-redux";
 import { centerUpdated } from "../redux/actions";
+import "../styles/Menu.css";
+
+const DEFAULT_CARS_NUM = 4;
+const DEFAULT_TEST_CAR = 2;
 
 const Menu = props => {
   const { lat, lng, rad } = props.center;
+  const [carsNum, setCarsNum] = useState(DEFAULT_CARS_NUM);
+  const [testCarNum, setTestCarNum] = useState(DEFAULT_TEST_CAR);
   const dispatch = props.dispatch;
+
+  const latMin = -90,
+    latMax = 90;
+  const lngMin = -180,
+    lngMax = 180;
+  const radMin = 20,
+    radMax = 10000;
+  const carMin = 1,
+    carMax = 50;
 
   /**
    * @param {number} val
    */
   const setLat = val => {
-    if (!isNaN(val)) {
+    if (!isNaN(val) && val >= latMin && val <= latMax) {
       let center = { ...props.center, lat: val };
       dispatch(centerUpdated(center));
     }
@@ -21,7 +36,7 @@ const Menu = props => {
    * @param {number} val
    */
   const setLng = val => {
-    if (!isNaN(val)) {
+    if (!isNaN(val) && val >= lngMin && val <= lngMax) {
       let center = { ...props.center, lng: val };
       dispatch(centerUpdated(center));
     }
@@ -31,15 +46,15 @@ const Menu = props => {
    * @param {number} val
    */
   const setRad = val => {
-    if (!isNaN(val)) {
+    if (!isNaN(val) && val >= radMin && val <= radMax) {
       let center = { ...props.center, rad: val };
       dispatch(centerUpdated(center));
     }
   };
 
   return (
-    <div className="row justify-content-center">
-      <form>
+    <div>
+      <form className="mb-4 form-border">
         <div className="form-group">
           <label htmlFor="lat">Latitude</label>
           <input
@@ -48,22 +63,22 @@ const Menu = props => {
             className="form-control"
             id="lat"
             step="0.0001"
-            min="-90"
-            max="90"
+            min={latMin}
+            max={latMax}
             placeholder="Enter latitude"
             onChange={e => setLat(parseFloat(e.target.value))}
           />
         </div>
         <div className="form-group">
-          <label htmlFor="long">Longitude</label>
+          <label htmlFor="lng">Longitude</label>
           <input
             type="number"
             defaultValue={lng}
             className="form-control"
-            id="long"
+            id="lng"
             step="0.0001"
-            min="-180"
-            max="180"
+            min={lngMin}
+            max={lngMax}
             placeholder="Enter longitude"
             onChange={e => setLng(parseFloat(e.target.value))}
           />
@@ -76,13 +91,45 @@ const Menu = props => {
             className="form-control"
             id="rad"
             step="10"
-            max="10000"
+            min={radMin}
+            max={radMax}
             placeholder="Enter radius"
             onChange={e => setRad(parseFloat(e.target.value))}
           />
         </div>
-        <button className="btn btn-primary" type="button" onClick={() => ApiManager.setZone({ lat, lng, rad })}>
-          Set zone
+        <button className="btn btn-primary" type="button" onClick={() => ApiManager.prepareSimulation({ lat, lng, rad })}>
+          Prepare simulation
+        </button>
+      </form>
+      <form className="form-border">
+        <div className="form-group">
+          <label htmlFor="carsNum">Cars number</label>
+          <input
+            type="number"
+            defaultValue={carsNum}
+            className="form-control"
+            id="carsNum"
+            min={carMin}
+            max={carMax}
+            placeholder="Enter number of cars"
+            onChange={e => setCarsNum(parseInt(e.target.value))}
+          />
+        </div>
+        <div className="form-group">
+          <label htmlFor="testCarNum">Test car number</label>
+          <input
+            type="number"
+            defaultValue={testCarNum}
+            className="form-control"
+            id="testCarNum"
+            min={carMin}
+            max={carsNum}
+            placeholder="Enter test car number"
+            onChange={e => setTestCarNum(parseInt(e.target.value))}
+          />
+        </div>
+        <button className="btn btn-success" type="button" onClick={() => ApiManager.startVehicles({ carsNum, testCarNum })}>
+          Start simulation
         </button>
       </form>
     </div>

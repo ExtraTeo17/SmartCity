@@ -1,25 +1,25 @@
 package vehicles;
 
-import gui.MapWindow;
-import org.jetbrains.annotations.Contract;
 import routing.LightManagerNode;
-import routing.Position;
 import routing.RouteNode;
 import routing.Router;
+import routing.core.Position;
 
 import java.util.List;
 
+// TODO: Maybe rename to Car - more descriptive?
 public class MovingObjectImpl extends MovingObject {
     public DrivingState state = DrivingState.STARTING;
     private final List<RouteNode> displayRoute;
     private final List<RouteNode> route;
     private int index = 0;
-    private final int speed = 50;
     private int closestLightIndex = Integer.MAX_VALUE;
 
     public MovingObjectImpl(List<RouteNode> displayRoute) {
+        super(50);
         this.displayRoute = displayRoute;
-        route = Router.uniformRoute(this.displayRoute);
+        // TODO: Inject it via constructor, not create here
+        this.route = Router.uniformRoute(displayRoute);
     }
 
     // TODO: Why car is moving backwards here? Change name of the function to describe behaviour
@@ -54,12 +54,6 @@ public class MovingObjectImpl extends MovingObject {
 
         closestLightIndex = Integer.MAX_VALUE;
         return null;
-    }
-
-    @Override
-    public String getPositionString() {
-        var node = route.get(index);
-        return "Lat: " + node.getLat() + " Lon: " + node.getLng();
     }
 
     @Override
@@ -107,12 +101,7 @@ public class MovingObjectImpl extends MovingObject {
 
     @Override
     public int getMillisecondsToNextLight() {
-        return ((closestLightIndex - index) * 3600) / getSpeed();
-    }
-
-    @Override
-    public int getSpeed() {
-        return speed * MapWindow.getTimeScale();
+        return ((closestLightIndex - index) * Router.STEP_CONSTANT) / getSpeed();
     }
 
     @Override

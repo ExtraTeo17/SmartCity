@@ -1,8 +1,8 @@
 package web.serialization;
 
 
-import routing.IGeoPosition;
-import web.message.payloads.responses.Location;
+import routing.core.IGeoPosition;
+import web.message.payloads.models.Location;
 
 public class Converter {
     public static Location convert(IGeoPosition geoPosition) {

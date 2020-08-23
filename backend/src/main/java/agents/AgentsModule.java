@@ -1,6 +1,7 @@
 package agents;
 
 import agents.abstractions.IAgentsContainer;
+import agents.abstractions.IAgentsFactory;
 import com.google.inject.Binder;
 import com.google.inject.Inject;
 import com.google.inject.Provides;
@@ -15,27 +16,29 @@ public class AgentsModule extends AbstractModule {
             BusAgent.class,
             LightManager.class,
             StationAgent.class,
-            Pedestrian.class
+            PedestrianAgent.class
     };
 
     @Override
     public void configure(Binder binder) {
         super.configure(binder);
+        binder.bind(IAgentsFactory.class).to(AgentsFactory.class).in(Singleton.class);
+        binder.bind(AgentsCreator.class).asEagerSingleton();
     }
 
     @Provides
     @Singleton
     @Inject
-    IAgentsContainer<AbstractAgent> getAgentsContainer(ContainerController controller) {
-        var container = new HashAgentsContainer<>(controller);
+    IAgentsContainer getAgentsContainer(ContainerController controller) {
+        var container = new HashAgentsContainer(controller);
         container.registerAll(agentTypes);
         return container;
     }
 
     @Provides
     @Singleton
-    IdGenerator<AbstractAgent> getIdGenerator() {
-        var generator = new IdGenerator<>();
+    IdGenerator getIdGenerator() {
+        var generator = new IdGenerator();
         generator.registerAll(agentTypes);
         return generator;
     }

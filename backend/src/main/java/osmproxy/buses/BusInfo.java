@@ -3,37 +3,35 @@ package osmproxy.buses;
 import org.jetbrains.annotations.NotNull;
 import osmproxy.elements.OSMStation;
 import osmproxy.elements.OSMWay;
-import routing.IZone;
 import routing.RouteNode;
 import routing.Router;
 import smartcity.MasterAgent;
 import smartcity.buses.BrigadeInfo;
-import utilities.NumericHelper;
 
-import java.util.*;
-import java.util.function.Consumer;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Iterator;
+import java.util.List;
 
 public class BusInfo implements Iterable<BrigadeInfo> {
-    private String busLine;
-    private List<OSMWay> route = new ArrayList<>();
+    private final String busLine;
+    private final List<Long> stationIds;
+    private List<OSMWay> route;
     private List<BrigadeInfo> brigadeList = new ArrayList<>();
-    private List<Long> stationsOnRouteOsmIds = new ArrayList<>();
+
+    BusInfo(String busLine, List<OSMWay> route, List<Long> stationIds) {
+        this.busLine = busLine;
+        this.route = route;
+        this.stationIds = stationIds;
+    }
 
     public String getBusLine() {
         return busLine;
     }
 
-    public void setBusLine(String nodeValue) {
-        busLine = nodeValue;
-    }
-
-    public void addStation(String nodeValue) {
-        stationsOnRouteOsmIds.add(Long.parseLong(nodeValue));
-    }
-
     public List<OSMStation> getStations() {
         List<OSMStation> stations = new ArrayList<>();
-        for (long osmId : stationsOnRouteOsmIds) {
+        for (long osmId : stationIds) {
             stations.add(MasterAgent.osmIdToStationOSMNode.get(osmId));
         }
         return stations;
@@ -47,35 +45,14 @@ public class BusInfo implements Iterable<BrigadeInfo> {
         brigadeList = new ArrayList<>(values);
     }
 
+    // TODO: as field.
     public List<RouteNode> getRouteInfo() {
-        return Router.generateRouteInfoForBuses(route, stationsOnRouteOsmIds);
-    }
-
-    // TODO: Zone injected when creating busInfo
-    public void filterStationsByCircle(IZone zone) {
-        List<Long> filteredStationOsmIds = new ArrayList<>();
-        for (Long osmStationId : stationsOnRouteOsmIds) {
-            OSMStation station = MasterAgent.osmIdToStationOSMNode.get(osmStationId);
-            if (station != null && zone.isInZone(station)) {
-                filteredStationOsmIds.add(osmStationId);
-            }
-        }
-        stationsOnRouteOsmIds = filteredStationOsmIds;
+        return Router.generateRouteInfoForBuses(route, stationIds);
     }
 
     @NotNull
     @Override
     public Iterator<BrigadeInfo> iterator() {
         return brigadeList.iterator();
-    }
-
-    @Override
-    public void forEach(Consumer<? super BrigadeInfo> action) {
-        brigadeList.forEach(action);
-    }
-
-    @Override
-    public Spliterator<BrigadeInfo> spliterator() {
-        return brigadeList.spliterator();
     }
 }

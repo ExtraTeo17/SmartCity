@@ -1,10 +1,12 @@
 package web.abstractions;
 
 
-import routing.IGeoPosition;
+import routing.core.IGeoPosition;
 
 import java.util.List;
 
 public interface IWebService extends IStartable {
-    void setZone(List<IGeoPosition> positions);
+    void prepareSimulation(List<IGeoPosition> positions);
+
+    void createCar(IGeoPosition position);
 }

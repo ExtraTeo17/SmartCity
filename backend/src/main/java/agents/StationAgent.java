@@ -1,6 +1,7 @@
 package agents;
 
-import agents.utils.MessageParameter;
+import agents.abstractions.AbstractAgent;
+import agents.utilities.MessageParameter;
 import jade.core.AID;
 import jade.core.behaviours.Behaviour;
 import jade.core.behaviours.CyclicBehaviour;
@@ -26,7 +27,7 @@ public class StationAgent extends AbstractAgent {
         return "Station";
     }
 
-    public StationAgent(OSMStation stationOSMNode, final int agentId) { // REMEMBER TO PRUNE BEYOND CIRCLE
+    public StationAgent(final int agentId, OSMStation stationOSMNode) { // REMEMBER TO PRUNE BEYOND CIRCLE
         super(agentId);
         this.stationStrategy = new StationStrategy(stationOSMNode, agentId);
 

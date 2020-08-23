@@ -1,7 +1,10 @@
 package vehicles;
 
-import gui.MapWindow;
-import routing.*;
+import routing.LightManagerNode;
+import routing.RouteNode;
+import routing.Router;
+import routing.StationNode;
+import routing.core.IGeoPosition;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -12,23 +15,24 @@ public class Pedestrian extends MovingObject {
 
     private final String preferredBusLine;
     public DrivingState state = DrivingState.STARTING;
-    private List<RouteNode> displayRouteBeforeBus, displayRouteAfterBus;
-    private List<RouteNode> routeBeforeBus, routeAfterBus;
-    private StationNode stationStart;
-    private StationNode stationFinish;
-    private List<RouteNode> route = new ArrayList<>();
+    private final List<RouteNode> displayRouteBeforeBus;
+    private final List<RouteNode> displayRouteAfterBus;
+    private final List<RouteNode> routeBeforeBus;
+    private final StationNode stationStart;
+    private final StationNode stationFinish;
+    private final List<RouteNode> route = new ArrayList<>();
     private int index = 0;
-    private int speed = 10;
     private int closestLightIndex = 0;
     private int stationIndex = 0;
 
     public Pedestrian(List<RouteNode> routeToStation, List<RouteNode> routeFromStation,
-                      final long startingStationId, final String preferredBusLine, StationNode startStation, StationNode finishStation) {
+                      String preferredBusLine, StationNode startStation, StationNode finishStation) {
+        super(10);
         displayRouteBeforeBus = routeToStation;
         displayRouteAfterBus = routeFromStation;
         routeBeforeBus = Router.uniformRoute(displayRouteBeforeBus);
         routeBeforeBus.add(startStation);
-        routeAfterBus = Router.uniformRoute(displayRouteAfterBus);
+        List<RouteNode> routeAfterBus = Router.uniformRoute(displayRouteAfterBus);
         routeAfterBus.add(0, finishStation);
         route.addAll(routeBeforeBus);
         route.addAll(routeAfterBus);
@@ -85,11 +89,6 @@ public class Pedestrian extends MovingObject {
     }
 
     @Override
-    public String getPositionString() {
-        return "Lat: " + route.get(index).getLat() + " Lon: " + route.get(index).getLng();
-    }
-
-    @Override
     public IGeoPosition getPosition() {
         return route.get(index);
     }
@@ -134,12 +133,7 @@ public class Pedestrian extends MovingObject {
 
     @Override
     public int getMillisecondsToNextLight() {
-        return ((closestLightIndex - index) * 3600) / getSpeed();
-    }
-
-    @Override
-    public int getSpeed() {
-        return speed * MapWindow.getTimeScale();
+        return ((closestLightIndex - index) * Router.STEP_CONSTANT) / getSpeed();
     }
 
     @Override
@@ -161,7 +155,7 @@ public class Pedestrian extends MovingObject {
     }
 
     public long getMillisecondsToNextStation() {
-        return ((routeBeforeBus.size() - 1 - index) * 3600) / getSpeed();
+        return ((routeBeforeBus.size() - 1 - index) * Router.STEP_CONSTANT) / getSpeed();
 
     }
 

@@ -6,8 +6,8 @@ import org.slf4j.LoggerFactory;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
-import routing.IZone;
-import routing.Position;
+import routing.core.IZone;
+import routing.core.Position;
 import utilities.Siblings;
 
 import java.util.ArrayList;
@@ -16,7 +16,7 @@ import java.util.NoSuchElementException;
 import java.util.Optional;
 
 public class OSMWay extends OSMElement {
-    private final static Logger logger = LoggerFactory.getLogger(OSMWay.class);
+    private static final Logger logger = LoggerFactory.getLogger(OSMWay.class);
     private final List<String> childNodeIds;
     private final boolean isOneWay;
     private List<OSMWaypoint> waypoints;
@@ -170,7 +170,7 @@ public class OSMWay extends OSMElement {
     }
 
     public boolean startsInZone(IZone zone) {
-        return zone.isInZone(waypoints.get(0));
+        return zone.contains(waypoints.get(0));
     }
 
     // TODO: What is returned here?

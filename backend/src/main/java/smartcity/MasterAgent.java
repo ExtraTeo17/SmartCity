@@ -1,11 +1,11 @@
 package smartcity;
 
 import agents.*;
+import agents.abstractions.AbstractAgent;
 import agents.abstractions.IAgentsContainer;
-import agents.utils.MessageParameter;
-import com.google.common.eventbus.Subscribe;
+import agents.utilities.MessageParameter;
+import com.google.common.eventbus.EventBus;
 import com.google.inject.Inject;
-import events.SimulationReadyEvent;
 import gui.MapWindow;
 import jade.core.Agent;
 import jade.core.behaviours.CyclicBehaviour;
@@ -15,29 +15,21 @@ import jade.wrapper.StaleProxyException;
 import org.javatuples.Pair;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.w3c.dom.Node;
 import osmproxy.LightAccessManager;
-import osmproxy.MapAccessManager;
 import osmproxy.buses.IBusLinesManager;
-import osmproxy.elements.OSMNode;
 import osmproxy.elements.OSMStation;
 import routing.LightManagerNode;
-import routing.RouteNode;
 import routing.StationNode;
-import smartcity.buses.Timetable;
-import smartcity.task.TaskManager;
-import vehicles.MovingObjectImpl;
+import smartcity.config.ConfigContainer;
+import smartcity.task.ITaskManager;
 import vehicles.Pedestrian;
 import vehicles.TestCar;
 import vehicles.TestPedestrian;
-import web.abstractions.IWebService;
 
 import java.time.Duration;
 import java.time.Instant;
 import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
-import java.util.stream.Collectors;
 
 // TODO: This class should have no more than 10 fields.
 // TODO: This class should be package private
@@ -46,59 +38,36 @@ public class MasterAgent extends Agent {
     private static final Logger logger = LoggerFactory.getLogger(MasterAgent.class);
 
     private static AgentContainer container;
-    private static MapWindow window;
-    private final IWebService webService;
-    private final IBusLinesManager busLinesManager;
-    private final IdGenerator<AbstractAgent> idGenerator;
-    private final IAgentsContainer<AbstractAgent> agentsContainer;
-    private final TaskManager taskManager;
-    private final LightAccessManager lightAccessManager;
-    private final ConfigContainer configContainer;
+    private final MapWindow window;
+    private final IAgentsContainer agentsContainer;
+    private static ITimeManager timeManager;
 
     // TODO: Delete this abomination (or at least make it private)
-    public static final Set<LightManager> lightManagers = ConcurrentHashMap.newKeySet();
-    public static final List<PedestrianAgent> pedestrians = new CopyOnWriteArrayList<>();
-    public static final List<VehicleAgent> vehicles = new ArrayList<>();
-
     public static Map<Pair<Long, Long>, LightManagerNode> wayIdLightIdToLightManagerNode = new HashMap<>();
     public static Map<Long, LightManagerNode> crossingOsmIdToLightManagerNode = new HashMap<>();
     public static Map<Long, StationNode> osmStationIdToStationNode = new HashMap<>();
     public static Map<Long, OSMStation> osmIdToStationOSMNode = new HashMap<>();
 
-    public int carId = 0;
-    public int pedestrianId = 0;
-
     @Inject
-    public MasterAgent(IWebService webService,
-                       IBusLinesManager busLinesManager,
-                       IdGenerator<AbstractAgent> idGenerator,
-                       IAgentsContainer<AbstractAgent> agentsContainer,
-                       TaskManager taskManager,
-                       LightAccessManager lightAccessManager,
-                       ConfigContainer configContainer,
+    public MasterAgent(IAgentsContainer agentsContainer,
+                       ITimeManager timeManager,
                        MapWindow window) {
-        this.webService = webService;
-        this.busLinesManager = busLinesManager;
-        this.idGenerator = idGenerator;
         this.agentsContainer = agentsContainer;
-        this.taskManager = taskManager;
-        this.lightAccessManager = lightAccessManager;
-        this.configContainer = configContainer;
+        this.window = window;
 
         // TODO: Delete this abomination
-        MasterAgent.window = window;
+        this.timeManager = timeManager;
     }
 
     @Override
     protected void setup() {
         container = getContainerController();
-        window.setSmartCityAgent(this);
         window.display();
 
         addBehaviour(getReceiveMessageBehaviour());
-        webService.start();
     }
 
+    // TODO: Set simulationState to Finished when no longer needed and post event
     private CyclicBehaviour getReceiveMessageBehaviour() {
         return new CyclicBehaviour() {
             @Override
@@ -111,8 +80,7 @@ public class MasterAgent extends Agent {
                     switch (type) {
                         case MessageParameter.VEHICLE -> onReceiveVehicle(rcv);
                         case MessageParameter.PEDESTRIAN -> onReceivePedestrian(rcv);
-                        case MessageParameter.BUS -> agentsContainer.removeIf(BusAgent.class,
-                                v -> v.getLocalName().equals(rcv.getSender().getLocalName()));
+                        case MessageParameter.BUS -> onReceiveBus(rcv);
                     }
                 }
                 block(1000);
@@ -120,17 +88,19 @@ public class MasterAgent extends Agent {
         };
     }
 
+    // TODO: Almost the same as ReceiveVehicle - merge when TestPedestrian/TestCar will have common Interface
     private void onReceivePedestrian(ACLMessage rcv) {
-        for (int i = 0; i < pedestrians.size(); i++) {
-            PedestrianAgent v = pedestrians.get(i);
-            if (v.getLocalName().equals(rcv.getSender().getLocalName())) {
-                if (v.getPedestrian() instanceof TestPedestrian) {
-                    TestPedestrian pedestrian = (TestPedestrian) v.getPedestrian();
-                    setResultTime(pedestrian.start, pedestrian.end);
-                }
-                pedestrians.remove(i);
-                break;
+        var name = rcv.getSender().getLocalName();
+        var agentOpt = agentsContainer.get(PedestrianAgent.class, (v) -> v.getLocalName().equals(name));
+        if (agentOpt.isPresent()) {
+            var agent = agentOpt.get();
+            var pedestrian = agent.getPedestrian();
+            if (pedestrian instanceof TestPedestrian) {
+                var testPedestrian = (TestPedestrian) pedestrian;
+                setResultTime(testPedestrian.start, testPedestrian.end);
             }
+
+            agentsContainer.remove(agent);
         }
     }
 
@@ -141,44 +111,36 @@ public class MasterAgent extends Agent {
                 seconds / 3600,
                 (seconds % 3600) / 60,
                 seconds % 60);
+        // TODO: Push message to gui
         window.setResultTime(time);
     }
 
     private void onReceiveVehicle(ACLMessage rcv) {
-        for (int i = 0; i < vehicles.size(); i++) {
-            VehicleAgent v = vehicles.get(i);
-            if (v.getLocalName().equals(rcv.getSender().getLocalName())) {
-                if (v.getVehicle() instanceof TestCar) {
-                    TestCar car = (TestCar) v.getVehicle();
-                    setResultTime(car.start, car.end);
-                }
-                vehicles.remove(i);
-                break;
+        var name = rcv.getSender().getLocalName();
+        var agentOpt = agentsContainer.get(VehicleAgent.class, (v) -> v.getLocalName().equals(name));
+        if (agentOpt.isPresent()) {
+            var agent = agentOpt.get();
+            var vehicle = agent.getVehicle();
+            if (vehicle instanceof TestCar) {
+                var testVehicle = (TestCar) vehicle;
+                setResultTime(testVehicle.start, testVehicle.end);
             }
+
+            agentsContainer.remove(agent);
         }
     }
 
+    private void onReceiveBus(ACLMessage rcv) {
+        agentsContainer.removeIf(BusAgent.class,
+                v -> v.getLocalName().equals(rcv.getSender().getLocalName()));
+    }
+
+
+    @Deprecated(forRemoval = true, since = "When all users have TimeManager service")
     public static Date getSimulationTime() {
-        return window.getSimulationStartTime();
+        return timeManager.getCurrentSimulationTime();
     }
 
-    @Subscribe
-    public void handleSimulationReady(SimulationReadyEvent e) {
-        logger.info("Handling SimulationReadyEvent");
-        var positions = lightManagers.stream()
-                .flatMap(man -> man.getLightsPositions().stream())
-                .collect(Collectors.toList());
-        webService.setZone(positions);
-    }
-
-    public boolean prepareAgents() {
-        if (configContainer.shouldGeneratePedestriansAndBuses()) {
-            if (!busLinesManager.prepareStationsAndBuses(this::tryAddNewBusAgent)) {
-                return false;
-            }
-        }
-        return prepareLightManagers();
-    }
 
     private static boolean tryAddAgent(AbstractAgent agent) {
         try {
@@ -191,120 +153,11 @@ public class MasterAgent extends Agent {
         return true;
     }
 
-    private boolean tryAddNewBusAgent(final Timetable timetable, List<RouteNode> route,
-                                      final String busLine, final String brigadeNr) {
-        BusAgent agent = new BusAgent(idGenerator.get(BusAgent.class), route, timetable, busLine, brigadeNr);
-        return agentsContainer.tryAdd(agent);
-    }
-
-    public static void tryCreateLightManager(Node crossroad) {
-        LightManager manager = new LightManager(crossroad, IdGenerator.getLightManagerId());
-        lightManagers.add(manager);
-        if (!tryAddAgent(manager)) {
-            logger.warn("Failed to add LightManager.");
-        }
-    }
-
-    public static void tryCreateLightManager(final OSMNode centerCrossroadNode) {
-        LightManager manager = new LightManager(centerCrossroadNode, IdGenerator.getLightManagerId());
-        lightManagers.add(manager);
-        tryAddAgent(manager);
-    }
-
+    @Deprecated(forRemoval = true)
     public static AbstractAgent tryAddNewStationAgent(OSMStation stationOSMNode) {
-        StationAgent stationAgent = new StationAgent(stationOSMNode, IdGenerator.getStationAgentId());
+        StationAgent stationAgent = new StationAgent(IdGenerator.getStationAgentId(), stationOSMNode);
         osmIdToStationOSMNode.put(stationOSMNode.getId(), stationOSMNode);
         tryAddAgent(stationAgent);
         return stationAgent;
-    }
-
-    public static AbstractAgent tryAddNewPedestrianAgent(Pedestrian pedestrian) {
-        PedestrianAgent pedestrianAgent = new PedestrianAgent(pedestrian, IdGenerator.getPedestrianId());
-        pedestrians.add(pedestrianAgent);
-        tryAddAgent(pedestrianAgent);
-        return pedestrianAgent;
-    }
-
-    public VehicleAgent tryAddNewVehicleAgent(List<RouteNode> info) {
-        return tryAddNewVehicleAgent(info, false);
-    }
-
-    public VehicleAgent tryAddNewVehicleAgent(List<RouteNode> info, boolean testCar) {
-        MovingObjectImpl car = testCar ? new TestCar(info) : new MovingObjectImpl(info);
-        VehicleAgent vehicle = new VehicleAgent(carId, car);
-        tryAddNewVehicleAgent(vehicle);
-
-        return vehicle;
-    }
-
-    private void tryAddNewVehicleAgent(VehicleAgent agent) {
-        // TODO: Move to container
-        vehicles.add(agent);
-        MasterAgent.tryAddAgent(agent);
-        ++carId;
-    }
-
-    public void activateLightManagerAgents() {
-        for (LightManager lightManager : lightManagers) {
-            lightManager.start();
-        }
-    }
-
-    private boolean prepareLightManagers() {
-        IdGenerator.resetLightManagerId();
-        if (!configContainer.tryLockLightManagers()) {
-            logger.error("Light managers are locked, cannot prepare.");
-            return false;
-        }
-
-        boolean result;
-        if (configContainer.USE_DEPRECATED_XML_FOR_LIGHT_MANAGERS) {
-            result = MapAccessManager.prepareLightManagersInRadiusAndLightIdToLightManagerIdHashSet(configContainer.getZone());
-        }
-        else {
-            result = tryConstructLightManagers();
-        }
-        configContainer.unlockLightManagers();
-
-        return result;
-    }
-
-    private boolean tryConstructLightManagers() {
-        try {
-            lightAccessManager.constructLightManagers();
-        } catch (Exception e) {
-            logger.error("Error preparing light managers", e);
-            return false;
-        }
-
-        return true;
-    }
-
-    // TODO: Still not removed from container - how to do that?
-    public void reset() {
-        logger.info("Resetting started");
-
-        delete(lightManagers.iterator());
-        lightManagers.clear();
-
-        delete(vehicles.iterator());
-        vehicles.clear();
-
-        delete(agentsContainer.iterator(BusAgent.class));
-        agentsContainer.clear(BusAgent.class);
-
-        // People die last
-        delete(pedestrians.iterator());
-        pedestrians.clear();
-
-        logger.info("Resetting finished");
-    }
-
-    private void delete(Iterator<? extends AbstractAgent> it) {
-        try {
-            it.forEachRemaining(AbstractAgent::takeDown);
-        } catch (Exception e) {
-            logger.warn("Failed to delete agent", e);
-        }
     }
 }

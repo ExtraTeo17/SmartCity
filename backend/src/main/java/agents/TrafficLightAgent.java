@@ -1,15 +1,17 @@
 package agents;
 
-import agents.utils.LightColor;
+import agents.abstractions.AbstractAgent;
+import agents.utilities.LightColor;
 import behaviourfactories.BasicLightsBehaviourFactory;
 import behaviourfactories.IBehaviourFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import routing.IGeoPosition;
+import routing.core.IGeoPosition;
 
 import java.util.ArrayList;
 import java.util.List;
 
+// TODO: Unused?
 public class TrafficLightAgent extends AbstractAgent {
     private static final Logger logger = LoggerFactory.getLogger(TrafficLightAgent.class);
     // TODO: Inject as dependency

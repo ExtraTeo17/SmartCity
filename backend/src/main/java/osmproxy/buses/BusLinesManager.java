@@ -13,15 +13,16 @@ import org.w3c.dom.NodeList;
 import osmproxy.MapAccessManager;
 import osmproxy.OsmQueryManager;
 import osmproxy.elements.OSMStation;
-import routing.IZone;
-import routing.Position;
-import routing.RouteNode;
+import osmproxy.elements.OSMWay;
+import routing.core.IZone;
+import routing.core.Position;
 import smartcity.MasterAgent;
 import smartcity.buses.BrigadeInfo;
-import smartcity.buses.Timetable;
+import utilities.IterableNodeList;
 
 import java.net.URL;
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class BusLinesManager implements IBusLinesManager {
     private static final Logger logger = LoggerFactory.getLogger(BusLinesManager.class);
@@ -34,167 +35,158 @@ public class BusLinesManager implements IBusLinesManager {
         this.zone = zone;
     }
 
-    // TODO: CreateBusFunc - Temporary
     @Override
-    public boolean prepareStationsAndBuses(CreateBusFunc<Boolean, Timetable, List<RouteNode>, String, String> createBusFunc) {
+    public Set<BusInfo> getBusInfos() {
         logger.info("STEP 1/" + BUS_PREPARATION_STEPS + ": Starting bus preparation");
-        Set<BusInfo> busInfoSet;
-        try {
-            logger.info("STEP 2/" + BUS_PREPARATION_STEPS + ": Sending bus overpass query");
-            // TODO: Move part of the logic from MapAccess manager here
-            logger.info("STEP 3/" + BUS_PREPARATION_STEPS + ": Starting overpass bus info parsing");
-            busInfoSet = sendBusOverpassQuery();
-        } catch (Exception e) {
-            return false;
+        logger.info("STEP 2/" + BUS_PREPARATION_STEPS + ": Sending bus overpass query");
+        var overpassInfo = sendBusOverpassQuery();
+        if (overpassInfo.isEmpty()) {
+            return new HashSet<>();
         }
+
+        logger.info("STEP 3/" + BUS_PREPARATION_STEPS + ": Starting overpass bus info parsing");
+        Set<BusInfo> busInfoSet = parseBusInfos(overpassInfo.get());
 
         logger.info("STEP 4/" + BUS_PREPARATION_STEPS + ": Starting warszawskie query and parsing");
         logger.info("STEP 5/" + BUS_PREPARATION_STEPS + ": Starting agent preparation based on queries");
         int substepCounter = 0;
-        int busCount = 0;
         for (var busInfo : busInfoSet) {
-            logger.info("STEP 4/" + BUS_PREPARATION_STEPS + " (SUBSTEP " + (++substepCounter) + "/" + busInfoSet.size() + "): Warszawskie " +
-                    "query " +
-                    "sending & parsing substep");
+            logger.info("STEP 4/" + BUS_PREPARATION_STEPS + " (SUBSTEP " + (++substepCounter) + "/" + busInfoSet.size() +
+                    "): Warszawskie query sending & parsing substep");
             var brigadeInfos = generateBrigadeInfos(busInfo);
             busInfo.setBrigadeList(brigadeInfos);
-
-
             logger.info("STEP 5/" + BUS_PREPARATION_STEPS + " (SUBSTEP " + (substepCounter) + "/" + busInfoSet.size() +
                     "): Agent preparation substep");
-
-            // TODO: Improve - accessing busInfo/bridgeInfo too much
-            List<RouteNode> routeWithNodes = busInfo.getRouteInfo();
-            var busLine = busInfo.getBusLine();
-            for (var brigade : busInfo) {
-                var brigadeNr = brigade.getBrigadeNr();
-                for (Timetable timetable : brigade) {
-                    boolean result = createBusFunc.apply(timetable, routeWithNodes, busLine, brigadeNr);
-                    if (result) {
-                        ++busCount;
-                    }
-                    else {
-                        logger.warn("Bus agent could not be added");
-                    }
-                }
-            }
-
         }
-        logger.info("STEP 6/" + BUS_PREPARATION_STEPS + ": Buses are created!");
-        logger.info("NUMBER OF BUS AGENTS: " + busCount);
 
-        return true;
+        return busInfoSet;
     }
 
-    public Set<BusInfo> sendBusOverpassQuery() {
-        Set<BusInfo> infoSet;
+    private Optional<Document> sendBusOverpassQuery() {
         var overpassQuery = OsmQueryManager.getBusOverpassQuery(zone.getCenter(), zone.getRadius());
+        Document overpassInfo;
         try {
-            var overpassInfo = MapAccessManager.getNodesViaOverpass(overpassQuery);
-            infoSet = parseBusInfo(overpassInfo);
+            overpassInfo = MapAccessManager.getNodesViaOverpass(overpassQuery);
         } catch (Exception e) {
             logger.warn("Error getting bus info.", e);
-            throw new RuntimeException(e);
+            return Optional.empty();
         }
 
-        return infoSet;
+        return Optional.of(overpassInfo);
     }
 
-    private Set<BusInfo> parseBusInfo(Document nodesViaOverpass) {
-        Set<BusInfo> infoSet = new LinkedHashSet<>();
+    private Set<BusInfo> parseBusInfos(Document nodesViaOverpass) {
         Node osmRoot = nodesViaOverpass.getFirstChild();
         NodeList osmXMLNodes = osmRoot.getChildNodes();
+        Set<BusInfo> busInfos = new LinkedHashSet<>();
+
+        int errors = 0;
+        // TODO: Starts from 1, intended?
         for (int i = 1; i < osmXMLNodes.getLength(); i++) {
-            Node item = osmXMLNodes.item(i);
-            if (item.getNodeName().equals("relation")) {
-                BusInfo info = new BusInfo();
-                infoSet.add(info);
-                NodeList member_list = item.getChildNodes();
-                StringBuilder builder = new StringBuilder();
-                for (int j = 0; j < member_list.getLength(); j++) {
-                    Node member = member_list.item(j);
-                    if (member.getNodeName().equals("member")) {
-                        NamedNodeMap attributes = member.getAttributes();
-                        Node namedItemID = attributes.getNamedItem("ref");
-                        if (attributes.getNamedItem("role").getNodeValue().contains("stop") &&
-                                attributes.getNamedItem("type").getNodeValue().equals("node")) {
-                            info.addStation(namedItemID.getNodeValue());
-                        }
-                        else if (attributes.getNamedItem("role").getNodeValue().length() == 0 &&
-                                attributes.getNamedItem("type").getNodeValue().equals("way")) {
-                            long id = Long.parseLong(namedItemID.getNodeValue());
-                            builder.append(OsmQueryManager.getSingleBusWayOverpassQuery(id));
-                        }
+            Node osmNode = osmXMLNodes.item(i);
+            var nodeName = osmNode.getNodeName();
+            if (nodeName.equals("relation")) {
+                var busInfo = parseSingleBusInfo(osmNode);
+                if (busInfo.isEmpty()) {
+                    if (++errors < 5) {
+                        continue;
                     }
-                    else if (member.getNodeName().equals("tag")) {
-                        NamedNodeMap attributes = member.getAttributes();
-                        Node namedItemID = attributes.getNamedItem("k");
-                        if (namedItemID.getNodeValue().equals("ref")) {
-                            Node number_of_line = attributes.getNamedItem("v");
-                            info.setBusLine(number_of_line.getNodeValue());
-                        }
-                    }
+                    throw new RuntimeException("Too much errors when parsing busInfo");
                 }
-
-                try {
-                    var overpassNodes =
-                            MapAccessManager.getNodesViaOverpass(OsmQueryManager.getQueryWithPayload(builder.toString()));
-                    var osmWays = MapAccessManager.parseOsmWay(overpassNodes, zone);
-                    info.setRoute(osmWays);
-                } catch (NoSuchElementException | UnsupportedOperationException e) {
-                    logger.warn("Please change the zone, this one is not supported yet.", e);
-                    throw new IllegalArgumentException(e);
-                } catch (Exception e) {
-                    logger.error("Error setting osm way", e);
-                    throw new IllegalArgumentException(e);
-                }
+                busInfos.add(busInfo.get());
             }
-            else if (item.getNodeName().equals("node")) {
-                NamedNodeMap attributes = item.getAttributes();
-                String osmId = attributes.getNamedItem("id").getNodeValue();
-                String lat = attributes.getNamedItem("lat").getNodeValue();
-                String lon = attributes.getNamedItem("lon").getNodeValue();
+            else if (nodeName.equals("node")) {
+                NamedNodeMap attributes = osmNode.getAttributes();
+                long osmId = Long.parseLong(attributes.getNamedItem("id").getNodeValue());
+                double lat = Double.parseDouble(attributes.getNamedItem("lat").getNodeValue());
+                double lon = Double.parseDouble(attributes.getNamedItem("lon").getNodeValue());
 
-                if (zone.isInZone(Position.of(lat, lon)) &&
-                        !MasterAgent.osmIdToStationOSMNode.containsKey(Long.parseLong(osmId))) {
-                    NodeList list_tags = item.getChildNodes();
-                    for (int z = 0; z < list_tags.getLength(); z++) {
-                        Node tag = list_tags.item(z);
-                        if (tag.getNodeName().equals("tag")) {
-                            NamedNodeMap attr = tag.getAttributes();
-                            Node kAttr = attr.getNamedItem("k");
-                            if (kAttr.getNodeValue().equals("public_transport")) {
-                                Node vAttr = attr.getNamedItem("v");
-                                if (!vAttr.getNodeValue().contains("stop")) {
-                                    break;
-                                }
+                if (zone.contains(Position.of(lat, lon)) &&
+                        !MasterAgent.osmIdToStationOSMNode.containsKey(osmId)) {
+                    // TODO: Search for bus_stop
+                    for (Node tag : IterableNodeList.of(osmNode.getChildNodes()).stream()
+                            .filter(n -> n.getNodeName().equals("tag")).collect(Collectors.toList())) {
+                        NamedNodeMap attr = tag.getAttributes();
+                        Node key = attr.getNamedItem("k");
+                        if (key.getNodeValue().equals("public_transport")) {
+                            var value = attr.getNamedItem("v").getNodeValue();
+                            if (!value.contains("stop")) {
+                                break;
                             }
-                            else if (kAttr.getNodeValue().equals("ref")) {
-                                Node number_of_station = attr.getNamedItem("v");
-                                OSMStation stationOSMNode = new OSMStation(osmId, lat, lon, number_of_station.getNodeValue());
-                                var agent = MasterAgent.tryAddNewStationAgent(stationOSMNode);
-                                agent.start();
-                            }
+                        }
+                        else if (key.getNodeValue().equals("ref")) {
+                            var stationNumber = attr.getNamedItem("v").getNodeValue();
+                            OSMStation stationOSMNode = new OSMStation(osmId, lat, lon, stationNumber);
+                            var agent = MasterAgent.tryAddNewStationAgent(stationOSMNode);
+                            agent.start();
                         }
                     }
                 }
             }
         }
 
-        for (BusInfo info : infoSet) {
-            info.filterStationsByCircle(zone);
+        return busInfos;
+    }
+
+    private Optional<BusInfo> parseSingleBusInfo(Node osmNode) {
+        List<Long> stationIds = new ArrayList<>();
+        String busLine = "";
+        StringBuilder builder = new StringBuilder();
+        for (var member : IterableNodeList.of(osmNode.getChildNodes())) {
+            if (member.getNodeName().equals("member")) {
+                NamedNodeMap attributes = member.getAttributes();
+                long id = Long.parseLong(attributes.getNamedItem("ref").getNodeValue());
+                if (attributes.getNamedItem("role").getNodeValue().contains("stop") &&
+                        attributes.getNamedItem("type").getNodeValue().equals("node")) {
+                    stationIds.add(id);
+                }
+                else if (attributes.getNamedItem("role").getNodeValue().length() == 0 &&
+                        attributes.getNamedItem("type").getNodeValue().equals("way")) {
+                    builder.append(OsmQueryManager.getSingleBusWayOverpassQuery(id));
+                }
+            }
+            else if (member.getNodeName().equals("tag")) {
+                NamedNodeMap attributes = member.getAttributes();
+                Node namedItemID = attributes.getNamedItem("k");
+                if (namedItemID.getNodeValue().equals("ref")) {
+                    Node lineNumber = attributes.getNamedItem("v");
+                    busLine = lineNumber.getNodeValue();
+                }
+            }
         }
 
-        return infoSet;
+        List<OSMWay> ways;
+        try {
+            var overpassNodes =
+                    MapAccessManager.getNodesViaOverpass(OsmQueryManager.getQueryWithPayload(builder.toString()));
+            ways = MapAccessManager.parseOsmWay(overpassNodes, zone);
+        } catch (NoSuchElementException | UnsupportedOperationException e) {
+            logger.warn("Please change the zone, this one is not supported yet.", e);
+            return Optional.empty();
+        } catch (Exception e) {
+            logger.error("Error setting osm way", e);
+            return Optional.empty();
+        }
+
+        List<Long> filteredStationOsmIds = new ArrayList<>();
+        for (Long osmStationId : stationIds) {
+            // TODO: Remove
+            OSMStation station = MasterAgent.osmIdToStationOSMNode.get(osmStationId);
+            if (station != null && zone.contains(station)) {
+                filteredStationOsmIds.add(osmStationId);
+            }
+        }
+
+        return Optional.of(new BusInfo(busLine, ways, filteredStationOsmIds));
     }
 
     private Collection<BrigadeInfo> generateBrigadeInfos(BusInfo info) {
         Map<String, BrigadeInfo> brigadeNrToBrigadeInfo = new HashMap<>();
         var busLine = info.getBusLine();
         for (OSMStation station : info.getStations()) {
-            var query = getBusWarszawskieQuery(station.getBusStopId(), station.getBusStopNr(), busLine);
+            var query = BusLinesManager.getBusWarszawskieQuery(station.getBusStopId(), station.getBusStopNr(), busLine);
             var nodesOptional = getNodesViaWarszawskie(query);
-            nodesOptional.ifPresent(jsonObject -> parseBusInfo(brigadeNrToBrigadeInfo, station, jsonObject));
+            nodesOptional.ifPresent(jsonObject -> parseBusInfos(brigadeNrToBrigadeInfo, station, jsonObject));
         }
 
         return brigadeNrToBrigadeInfo.values();
@@ -220,7 +212,7 @@ public class BusLinesManager implements IBusLinesManager {
         return Optional.of(jObject);
     }
 
-    private void parseBusInfo(Map<String, BrigadeInfo> brigadeNrToBrigadeInfo, OSMStation station, JSONObject jsonObject) {
+    private void parseBusInfos(Map<String, BrigadeInfo> brigadeNrToBrigadeInfo, OSMStation station, JSONObject jsonObject) {
         JSONArray msg = (JSONArray) jsonObject.get("result");
         String currentBrigadeNr = "";
         for (Object o : msg) {

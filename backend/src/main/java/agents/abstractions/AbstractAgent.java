@@ -1,6 +1,6 @@
-package agents;
+package agents.abstractions;
 
-import agents.utils.MessageParameter;
+import agents.utilities.MessageParameter;
 import jade.core.AID;
 import jade.core.Agent;
 import jade.lang.acl.ACLMessage;
@@ -45,7 +45,7 @@ public abstract class AbstractAgent extends Agent {
     }
 
     // TODO: Pass only LightManager here, remove movingObject and pass additional parameters
-    void informLightManager(MovingObject movingObject) {
+    protected void informLightManager(MovingObject movingObject) {
         // finds next traffic light and announces his arrival
         LightManagerNode nextManager = movingObject.getNextTrafficLight();
         if (nextManager != null) {
@@ -61,7 +61,7 @@ public abstract class AbstractAgent extends Agent {
         msg.addReceiver(dest);
 
         Properties properties = new Properties();
-        var agentType = MessageParameter.GetTypeByMovingObject(movingObject);
+        var agentType = MessageParameter.getTypeByMovingObject(movingObject);
         properties.setProperty(MessageParameter.TYPE, agentType);
         Instant time = MasterAgent.getSimulationTime().toInstant().plusMillis(movingObject.getMillisecondsToNextLight());
         properties.setProperty(MessageParameter.ARRIVAL_TIME, "" + time);
@@ -69,9 +69,5 @@ public abstract class AbstractAgent extends Agent {
         msg.setAllUserDefinedParameters(properties);
 
         return msg;
-    }
-
-    public void takeDown() {
-        super.takeDown();
     }
 }

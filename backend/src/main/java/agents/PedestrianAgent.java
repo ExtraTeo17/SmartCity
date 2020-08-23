@@ -1,6 +1,7 @@
 package agents;
 
-import agents.utils.MessageParameter;
+import agents.abstractions.AbstractAgent;
+import agents.utilities.MessageParameter;
 import jade.core.AID;
 import jade.core.behaviours.Behaviour;
 import jade.core.behaviours.CyclicBehaviour;
@@ -10,6 +11,7 @@ import jade.util.leap.Properties;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import routing.LightManagerNode;
+import routing.Router;
 import routing.StationNode;
 import smartcity.MasterAgent;
 import vehicles.DrivingState;
@@ -26,7 +28,7 @@ public class PedestrianAgent extends AbstractAgent {
         return "Pedestrian";
     }
 
-    public PedestrianAgent(final Pedestrian pedestrian, final int agentId) {
+    public PedestrianAgent(int agentId, final Pedestrian pedestrian) {
         super(agentId);
         this.pedestrian = pedestrian;
     }
@@ -38,7 +40,7 @@ public class PedestrianAgent extends AbstractAgent {
         getNextStation();
 
         pedestrian.setState(DrivingState.MOVING);
-        Behaviour move = new TickerBehaviour(this, 3600 / pedestrian.getSpeed()) {
+        Behaviour move = new TickerBehaviour(this, Router.STEP_CONSTANT / pedestrian.getSpeed()) {
             @Override
             public void onTick() {
                 if (pedestrian.isAtTrafficLights()) {

@@ -1,6 +1,7 @@
 package agents;
 
-import agents.utils.MessageParameter;
+import agents.abstractions.AbstractAgent;
+import agents.utilities.MessageParameter;
 import jade.core.AID;
 import jade.core.behaviours.Behaviour;
 import jade.core.behaviours.CyclicBehaviour;
@@ -12,9 +13,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import routing.LightManagerNode;
 import routing.RouteNode;
+import routing.Router;
 import routing.StationNode;
+import smartcity.ITimeManager;
 import smartcity.MasterAgent;
-import smartcity.buses.Timetable;
+import utilities.Siblings;
 import vehicles.Bus;
 import vehicles.DrivingState;
 
@@ -26,19 +29,14 @@ import java.util.Random;
 @SuppressWarnings("serial")
 public class BusAgent extends AbstractAgent {
     private static final Logger logger = LoggerFactory.getLogger(BusAgent.class);
-    private final List<RouteNode> route;
-    private final Timetable timetable;
-    private final String busLine;
-    private final String brigadeNr;
-    private Bus bus;
+    private final ITimeManager timeManager;
+    private final Bus bus;
 
-    public BusAgent(int busId, List<RouteNode> route, Timetable timetable, String busLine, String brigadeNr) {
+    public BusAgent(int busId, ITimeManager timeManager,
+                    Bus bus) {
         super(busId);
-        this.route = route;
-        this.timetable = timetable;
-        this.busLine = busLine;
-        this.brigadeNr = brigadeNr;
-        this.bus = new Bus(route, timetable, busLine, brigadeNr);
+        this.timeManager = timeManager;
+        this.bus = bus;
     }
 
     @Override
@@ -48,12 +46,14 @@ public class BusAgent extends AbstractAgent {
 
     @Override
     protected void setup() {
-        GetNextStation();
+        getNextStation();
         StationNode station = bus.getCurrentStationNode();
         print("Started at station " + station.getStationId() + ".");
         bus.setState(DrivingState.MOVING);
 
-        Behaviour move = new TickerBehaviour(this, 3600 / bus.getSpeed()) {
+        // TODO: Executed each x = 3600 / bus.getSpeed() = 3600m / (40 * TIME_SCALE) = 3600 / 400 = 9ms
+        //   Maybe decrease the interval? - I don't think processor can keep up with.
+        Behaviour move = new TickerBehaviour(this, Router.STEP_CONSTANT / bus.getSpeed()) {
             @Override
             public void onTick() {
                 if (bus.isAtTrafficLights()) {
@@ -140,7 +140,7 @@ public class BusAgent extends AbstractAgent {
                             if (node instanceof LightManagerNode) {
                                 informLightManager(bus);
                             }
-                            GetNextStation();
+                            getNextStation();
 
                             bus.setState(DrivingState.MOVING);
                             bus.move();
@@ -197,7 +197,7 @@ public class BusAgent extends AbstractAgent {
                                 response.setAllUserDefinedParameters(properties);
                                 send(response);
                                 logger.info("BUS: get REQUEST from station");
-                                GetNextStation();
+                                getNextStation();
                                 bus.setState(DrivingState.PASSING_STATION);
                             }
                         }
@@ -237,7 +237,7 @@ public class BusAgent extends AbstractAgent {
         addBehaviour(communication);
     }
 
-    void GetNextStation() {
+    void getNextStation() {
         // finds next station and announces his arrival
         StationNode nextStation = bus.findNextStation();
 
@@ -267,21 +267,21 @@ public class BusAgent extends AbstractAgent {
         return bus.getLine();
     }
 
-    public final Pair<StationNode, StationNode> getTwoSubsequentStations(final Random random) { // TODO: Fix situation where bus route contains only one station and pedestrians tries to choose two
+    // TODO: Fix situation where bus route contains only one station and pedestrians tries to choose two
+    public final Siblings<StationNode> getTwoSubsequentStations(final Random random) {
         List<StationNode> stationsOnRoute = bus.getStationNodesOnRoute();
         final int halfIndex = stationsOnRoute.size() / 2;
-        return Pair.with(stationsOnRoute.get(random.nextInt(halfIndex)),
+        return Siblings.of(stationsOnRoute.get(random.nextInt(halfIndex)),
                 stationsOnRoute.get(halfIndex + random.nextInt(halfIndex)));
     }
 
-    public void runBasedOnTimetable(Date date) {
+    // TODO: New bus was created each time - check if nothing was broken?
+    public void runBasedOnTimetable() {
         if (this.getAgentState().getValue() != jade.wrapper.AgentState.cAGENT_STATE_INITIATED) {
             return;
         }
 
-        // TODO: New bus is created each time - is it needed?
-        this.bus = new Bus(route, timetable, busLine, brigadeNr);
-
+        var date = timeManager.getCurrentSimulationTime();
         long hours = bus.getBoardingTime().getHours();
         long minutes = bus.getBoardingTime().getMinutes();
         if (hours == date.getHours() && minutes == date.getMinutes()) {

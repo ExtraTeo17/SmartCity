@@ -1,10 +1,11 @@
-package routing;
+package routing.core;
 
 import org.junit.Assert;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
+import smartcity.config.ConfigMutator;
 import testutils.ReflectionHelper;
 
 import java.util.stream.Stream;
@@ -36,7 +37,7 @@ class ZoneTest {
         var eiffelTower = Position.of(latB, lngB);
 
         // Act
-        boolean result = zone.isInZone(eiffelTower);
+        boolean result = zone.contains(eiffelTower);
 
         // Assert
         Assert.assertEquals(latA, parisHotelDeVille.getLat(), 0);
@@ -70,7 +71,7 @@ class ZoneTest {
         var monumentToBartolomeoColleoni = Position.of(latB, lngB);
 
         // Act
-        boolean result = zone.isInZone(monumentToBartolomeoColleoni);
+        boolean result = zone.contains(monumentToBartolomeoColleoni);
 
         // Assert
         Assert.assertEquals(latA, warsawTD.getLat(), 0);
@@ -91,10 +92,10 @@ class ZoneTest {
         var warsaw = Position.of(latA, lngA);
         int radius = 1000;
         var warsawZone = new Zone(warsaw, radius);
-        ReflectionHelper.setStatic("counter", ZoneMutator.class, 0);
-        var mutator = new ZoneMutator() {
+        ReflectionHelper.setStatic("counter", ConfigMutator.class, 0);
+        var mutator = new ConfigMutator() {
             private void setZone(IGeoPosition pos, int radius) {
-                warsawZone.setZone(mutation, pos, radius);
+                warsawZone.set(mutation, pos, radius);
             }
         };
 
@@ -114,12 +115,12 @@ class ZoneTest {
     @Test
     void setZone_secondMutator_throwsException() {
         // Arrange
-        ReflectionHelper.setStatic("counter", ZoneMutator.class, 0);
-        new ZoneMutator() {};
+        ReflectionHelper.setStatic("counter", ConfigMutator.class, 0);
+        new ConfigMutator() {};
 
         // Act & Assert
         assertThrows(IllegalCallerException.class, () -> {
-            new ZoneMutator() {};
+            new ConfigMutator() {};
         }, "You should not try to create second mutator.\n");
     }
 }

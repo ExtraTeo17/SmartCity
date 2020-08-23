@@ -11,11 +11,7 @@ import java.util.stream.Stream;
 public class IterableNodeList implements Iterable<Node> {
     private final NodeList nodeList;
 
-    public static IterableNodeList of(NodeList list) {
-        return new IterableNodeList(list);
-    }
-
-    IterableNodeList(NodeList list) {
+    private IterableNodeList(NodeList list) {
         this.nodeList = list;
     }
 
@@ -40,5 +36,9 @@ public class IterableNodeList implements Iterable<Node> {
                 return nodeList.item(iter++);
             }
         };
+    }
+
+    public static IterableNodeList of(NodeList list) {
+        return new IterableNodeList(list);
     }
 }
