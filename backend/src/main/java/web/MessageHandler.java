@@ -1,6 +1,7 @@
 package web;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.exc.UnrecognizedPropertyException;
 import com.google.common.eventbus.EventBus;
 import com.google.inject.Inject;
 import events.PrepareSimulationEvent;
@@ -37,14 +38,14 @@ class MessageHandler {
 
     private void handle(MessageDto message) {
         switch (message.type) {
-            case PREPARE_SIMULATION_REQUEST: {
+            case PREPARE_SIMULATION_REQUEST -> {
                 var payload = tryDeserialize(message.payload, PrepareSimulationRequest.class);
                 if (payload.isPresent()) {
                     var pVal = payload.get();
                     eventBus.post(new PrepareSimulationEvent(pVal.latitude, pVal.longitude, pVal.radius));
                 }
             }
-            case START_SIMULATION_REQUEST: {
+            case START_SIMULATION_REQUEST -> {
                 var payload = tryDeserialize(message.payload, StartSimulationRequest.class);
                 if (payload.isPresent()) {
                     var pVal = payload.get();
