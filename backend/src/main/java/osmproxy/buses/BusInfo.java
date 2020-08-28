@@ -5,7 +5,6 @@ import osmproxy.elements.OSMStation;
 import osmproxy.elements.OSMWay;
 import routing.RouteNode;
 import routing.Router;
-import smartcity.MasterAgent;
 import smartcity.buses.BrigadeInfo;
 
 import java.util.ArrayList;
@@ -15,26 +14,25 @@ import java.util.List;
 
 public class BusInfo implements Iterable<BrigadeInfo> {
     private final String busLine;
-    private final List<Long> stationIds;
+    private List<OSMStation> stops;
     private List<OSMWay> route;
     private List<BrigadeInfo> brigadeList = new ArrayList<>();
 
-    BusInfo(String busLine, List<OSMWay> route, List<Long> stationIds) {
+    BusInfo(String busLine, List<OSMWay> route) {
         this.busLine = busLine;
         this.route = route;
-        this.stationIds = stationIds;
     }
 
     public String getBusLine() {
         return busLine;
     }
 
-    public List<OSMStation> getStations() {
-        List<OSMStation> stations = new ArrayList<>();
-        for (long osmId : stationIds) {
-            stations.add(MasterAgent.osmIdToStationOSMNode.get(osmId));
-        }
-        return stations;
+    public void setStops(Collection<OSMStation> stops) {
+        this.stops = new ArrayList<>(stops);
+    }
+
+    public List<OSMStation> getStops() {
+        return stops;
     }
 
     public void setRoute(List<OSMWay> parseOsmWay) {
@@ -47,7 +45,7 @@ public class BusInfo implements Iterable<BrigadeInfo> {
 
     // TODO: as field.
     public List<RouteNode> getRouteInfo() {
-        return Router.generateRouteInfoForBuses(route, stationIds);
+        return Router.generateRouteInfoForBuses(route, stops);
     }
 
     @NotNull

@@ -23,7 +23,6 @@ public class StationStrategy {
     final private Map<String, PedestrianArrivalInfo> farAwayPedestrianMap = new HashMap<>();
     final private Map<String, PedestrianArrivalInfo> pedestrianOnStationMap = new HashMap<>();
 
-    //private final OSMStation stationOSMNode;
     public StationStrategy(OSMStation stationOSMNode, int agentId) {
         MasterAgent.osmStationIdToStationNode.put(stationOSMNode.getId(),
                 new StationNode(stationOSMNode.getLat(), stationOSMNode.getLng(),

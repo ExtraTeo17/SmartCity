@@ -58,11 +58,11 @@ public final class Router {
         return createRouteNodeList(routeInfo);
     }
 
-    public static List<RouteNode> generateRouteInfoForBuses(List<OSMWay> router, List<Long> osmStationIds) {
+    public static List<RouteNode> generateRouteInfoForBuses(List<OSMWay> router, List<? extends OSMNode> osmStations) {
         Pair<List<Long>, List<RouteNode>> osmWayIdsAndPointList = findBusRoute(router);
         List<OSMLight> lightsOnRoute = MapAccessManager.sendFullTrafficSignalQuery(osmWayIdsAndPointList.getValue0());
         List<RouteNode> managers = getManagersForLights(lightsOnRoute);
-        List<RouteNode> stationNodes = getAgentStationsForRoute(getOSMNodesForStations(osmStationIds));
+        List<RouteNode> stationNodes = getAgentStationsForRoute(osmStations);
         managers.addAll(stationNodes);
         return getRouteWithAdditionalNodes(osmWayIdsAndPointList.getValue1(), managers);
     }
@@ -191,22 +191,14 @@ public final class Router {
         return newRoute;
     }
 
-    private static List<OSMNode> getOSMNodesForStations(List<Long> stationsIDs) {
-        List<OSMNode> listOsmNodes = new ArrayList<>();
-        for (long station : stationsIDs) {
-            listOsmNodes.add(MasterAgent.osmIdToStationOSMNode.get(station));
-        }
-        return listOsmNodes;
-    }
-
     private static Pair<List<Long>, List<RouteNode>> findBusRoute(List<OSMWay> router) {
-        List<Long> osmWayIds_list = new ArrayList<>();
-        List<RouteNode> RouteNodes_list = new ArrayList<>();
+        List<Long> osmWaysIds = new ArrayList<>();
+        List<RouteNode> routeNodes = new ArrayList<>();
         for (OSMWay el : router) {
-            osmWayIds_list.add(el.getId());
-            addRouteNodesBasedOnOrientation(el, RouteNodes_list);
+            osmWaysIds.add(el.getId());
+            addRouteNodesBasedOnOrientation(el, routeNodes);
         }
-        return new Pair<>(osmWayIds_list, RouteNodes_list);
+        return new Pair<>(osmWaysIds, routeNodes);
     }
 
     private static void addRouteNodesBasedOnOrientation(OSMWay osmWay, List<RouteNode> routeNodes) {
@@ -219,7 +211,7 @@ public final class Router {
             return;
         }
         else if (orientation == RelationOrientation.BACK) {
-            // Warn: waypoints list is not changed here.
+            // Waypoints list is not changed here.
             for (var point : Lists.reverse(waypoints)) {
                 routeNodes.add(new RouteNode(point));
             }
@@ -229,16 +221,12 @@ public final class Router {
         throw new UnsupportedOperationException("Orientation " + orientation.toString() + " is not supported");
     }
 
-    private static List<RouteNode> getAgentStationsForRoute(List<OSMNode> stations) {
+    private static List<RouteNode> getAgentStationsForRoute(List<? extends OSMNode> stations) {
         List<RouteNode> managers = new ArrayList<>();
         for (OSMNode station : stations) {
-            addStationNodeToList(managers, station);
+            RouteNode nodeToAdd = MasterAgent.osmStationIdToStationNode.get(station.getId());
+            managers.add(nodeToAdd);
         }
         return managers;
-    }
-
-    private static void addStationNodeToList(List<RouteNode> stations, OSMNode station) {
-        RouteNode nodeToAdd = MasterAgent.osmStationIdToStationNode.get(station.getId());
-        stations.add(nodeToAdd);
     }
 }

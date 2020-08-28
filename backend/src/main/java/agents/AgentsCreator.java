@@ -71,8 +71,32 @@ public class AgentsCreator {
     }
 
     private boolean prepareStationsAndBuses() {
+        var busData = busLinesManager.getBusData();
+
+        int stationsCount = 0;
+        for (var station : busData.stations.values()) {
+            var agent = factory.create(station);
+            boolean result = agentsContainer.tryAdd(agent);
+            if (result) {
+                ++stationsCount;
+                agent.start();
+            }
+            else {
+                logger.info("Station agent could not be added");
+            }
+        }
+
+        if (stationsCount == 0) {
+            logger.error("No stations were created");
+            return false;
+        }
+
+        logger.info("Stations are created!");
+        logger.info("NUMBER OF STATION AGENTS: " + stationsCount);
+
+
         int busCount = 0;
-        for (var busInfo : busLinesManager.getBusInfos()) {
+        for (var busInfo : busData.busInfos) {
             List<RouteNode> route = busInfo.getRouteInfo();
             var busLine = busInfo.getBusLine();
             for (var brigade : busInfo) {

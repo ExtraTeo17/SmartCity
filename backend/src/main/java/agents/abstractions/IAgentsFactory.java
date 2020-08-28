@@ -1,11 +1,9 @@
 package agents.abstractions;
 
-import agents.BusAgent;
-import agents.LightManager;
-import agents.PedestrianAgent;
-import agents.VehicleAgent;
+import agents.*;
 import org.w3c.dom.Node;
 import osmproxy.elements.OSMNode;
+import osmproxy.elements.OSMStation;
 import routing.RouteNode;
 import routing.StationNode;
 import smartcity.buses.Timetable;
@@ -16,6 +14,8 @@ public interface IAgentsFactory {
     VehicleAgent create(List<RouteNode> route, boolean testCar);
 
     VehicleAgent create(List<RouteNode> route);
+
+    StationAgent create(OSMStation osmStation);
 
     BusAgent create(List<RouteNode> route, Timetable timetable, String busLine,
                     String brigadeNr);

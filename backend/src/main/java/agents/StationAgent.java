@@ -20,6 +20,7 @@ import java.util.List;
 
 public class StationAgent extends AbstractAgent {
     private static final Logger logger = LoggerFactory.getLogger(StationAgent.class);
+    private final OSMStation station;
     private final StationStrategy stationStrategy;
 
     @Override
@@ -27,9 +28,10 @@ public class StationAgent extends AbstractAgent {
         return "Station";
     }
 
-    public StationAgent(final int agentId, OSMStation stationOSMNode) { // REMEMBER TO PRUNE BEYOND CIRCLE
+    public StationAgent(final int agentId, OSMStation station) { // REMEMBER TO PRUNE BEYOND CIRCLE
         super(agentId);
-        this.stationStrategy = new StationStrategy(stationOSMNode, agentId);
+        this.station = station;
+        this.stationStrategy = new StationStrategy(station, agentId);
 
         Behaviour communication = new CyclicBehaviour() {
             @Override
@@ -166,5 +168,9 @@ public class StationAgent extends AbstractAgent {
 
         addBehaviour(communication);
         addBehaviour(checkState);
+    }
+
+    public OSMStation getStation() {
+        return station;
     }
 }

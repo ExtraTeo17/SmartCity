@@ -4,6 +4,7 @@ import agents.abstractions.IAgentsFactory;
 import com.google.inject.Inject;
 import org.w3c.dom.Node;
 import osmproxy.elements.OSMNode;
+import osmproxy.elements.OSMStation;
 import routing.RouteNode;
 import routing.StationNode;
 import smartcity.ITimeManager;
@@ -31,6 +32,11 @@ class AgentsFactory implements IAgentsFactory {
     @Override
     public VehicleAgent create(List<RouteNode> route) {
         return create(route, false);
+    }
+
+    @Override
+    public StationAgent create(OSMStation osmStation) {
+        return new StationAgent(idGenerator.get(StationAgent.class), osmStation);
     }
 
     @Override

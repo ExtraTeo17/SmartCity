@@ -1,35 +1,28 @@
 package smartcity;
 
-import agents.*;
-import agents.abstractions.AbstractAgent;
+import agents.BusAgent;
+import agents.PedestrianAgent;
+import agents.VehicleAgent;
 import agents.abstractions.IAgentsContainer;
 import agents.utilities.MessageParameter;
-import com.google.common.eventbus.EventBus;
 import com.google.inject.Inject;
 import gui.MapWindow;
 import jade.core.Agent;
 import jade.core.behaviours.CyclicBehaviour;
 import jade.lang.acl.ACLMessage;
-import jade.wrapper.AgentContainer;
-import jade.wrapper.StaleProxyException;
 import org.javatuples.Pair;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import osmproxy.LightAccessManager;
-import osmproxy.buses.IBusLinesManager;
-import osmproxy.elements.OSMStation;
 import routing.LightManagerNode;
 import routing.StationNode;
-import smartcity.config.ConfigContainer;
-import smartcity.task.ITaskManager;
-import vehicles.Pedestrian;
 import vehicles.TestCar;
 import vehicles.TestPedestrian;
 
 import java.time.Duration;
 import java.time.Instant;
-import java.util.*;
-import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
 // TODO: This class should have no more than 10 fields.
 // TODO: This class should be package private
@@ -37,7 +30,6 @@ public class MasterAgent extends Agent {
     public static final String name = MasterAgent.class.getName().replace("Agent", "");
     private static final Logger logger = LoggerFactory.getLogger(MasterAgent.class);
 
-    private static AgentContainer container;
     private final MapWindow window;
     private final IAgentsContainer agentsContainer;
     private static ITimeManager timeManager;
@@ -46,7 +38,6 @@ public class MasterAgent extends Agent {
     public static Map<Pair<Long, Long>, LightManagerNode> wayIdLightIdToLightManagerNode = new HashMap<>();
     public static Map<Long, LightManagerNode> crossingOsmIdToLightManagerNode = new HashMap<>();
     public static Map<Long, StationNode> osmStationIdToStationNode = new HashMap<>();
-    public static Map<Long, OSMStation> osmIdToStationOSMNode = new HashMap<>();
 
     @Inject
     public MasterAgent(IAgentsContainer agentsContainer,
@@ -61,7 +52,6 @@ public class MasterAgent extends Agent {
 
     @Override
     protected void setup() {
-        container = getContainerController();
         window.display();
 
         addBehaviour(getReceiveMessageBehaviour());
@@ -139,25 +129,5 @@ public class MasterAgent extends Agent {
     @Deprecated(forRemoval = true, since = "When all users have TimeManager service")
     public static Date getSimulationTime() {
         return timeManager.getCurrentSimulationTime();
-    }
-
-
-    private static boolean tryAddAgent(AbstractAgent agent) {
-        try {
-            container.acceptNewAgent(agent.getPredictedName(), agent);
-        } catch (StaleProxyException e) {
-            logger.warn("Error adding agent");
-            return false;
-        }
-
-        return true;
-    }
-
-    @Deprecated(forRemoval = true)
-    public static AbstractAgent tryAddNewStationAgent(OSMStation stationOSMNode) {
-        StationAgent stationAgent = new StationAgent(IdGenerator.getStationAgentId(), stationOSMNode);
-        osmIdToStationOSMNode.put(stationOSMNode.getId(), stationOSMNode);
-        tryAddAgent(stationAgent);
-        return stationAgent;
     }
 }

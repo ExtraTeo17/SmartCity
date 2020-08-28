@@ -168,7 +168,9 @@ public class TaskManager implements ITaskManager {
                 // TODO: Separate fields for testPedestrian and pedestriansLimit
                 var agent = agentsFactory.create(routeToStation, routeFromStation,
                         busLine, startStation, endStation, testPedestrian);
-                agent.start();
+                if(agentsContainer.tryAdd(agent)) {
+                    agent.start();
+                }
             } catch (Exception e) {
                 logger.warn("Unknown error in pedestrian creation", e);
             }

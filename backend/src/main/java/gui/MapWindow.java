@@ -1,9 +1,6 @@
 package gui;
 
-import agents.BusAgent;
-import agents.LightManager;
-import agents.PedestrianAgent;
-import agents.VehicleAgent;
+import agents.*;
 import agents.abstractions.IAgentsContainer;
 import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
@@ -20,12 +17,10 @@ import org.jxmapviewer.painter.Painter;
 import org.jxmapviewer.viewer.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import osmproxy.elements.OSMStation;
 import routing.core.IGeoPosition;
 import routing.core.IZone;
 import routing.core.Position;
 import smartcity.ITimeManager;
-import smartcity.MasterAgent;
 import smartcity.SimulationState;
 import smartcity.config.ConfigContainer;
 import smartcity.lights.SimpleCrossroad;
@@ -84,7 +79,6 @@ public class MapWindow {
     private JButton testBusZoneButton;
     private JButton testCarZoneButton;
     private Timer refreshTimer = new Timer(true);
-    private final Timer spawnTimer = new Timer(true);
     private IGeoPosition pointA;
     private IGeoPosition pointB;
     private final Random random = new Random();
@@ -570,9 +564,9 @@ public class MapWindow {
 
     private void drawStations(List<Painter<JXMapViewer>> painters) {
         Set<Waypoint> set = new HashSet<>();
-        for (OSMStation stationOSMNode : MasterAgent.osmIdToStationOSMNode.values()) {
-            set.add(new DefaultWaypoint(stationOSMNode.toMapGeoPosition()));
-        }
+        agentsContainer.forEach(StationAgent.class, ag -> {
+            set.add(new DefaultWaypoint(ag.getStation().toMapGeoPosition()));
+        });
         WaypointPainter<Waypoint> waypointPainter = new WaypointPainter<>();
         waypointPainter.setWaypoints(set);
         waypointPainter.setRenderer(new CustomWaypointRenderer("bus_stop.png"));
