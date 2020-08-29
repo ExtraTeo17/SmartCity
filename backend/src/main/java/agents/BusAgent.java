@@ -242,7 +242,7 @@ public class BusAgent extends AbstractAgent {
         addBehaviour(communication);
     }
 
-    void getNextStation() {
+    private void getNextStation() {
         // finds next station and announces his arrival
         var stationOpt = bus.findNextStation();
         if (stationOpt.isPresent()) {
@@ -286,6 +286,7 @@ public class BusAgent extends AbstractAgent {
     // TODO: New bus was created each time - check if nothing was broken?
     public void runBasedOnTimetable() {
         if (this.getAgentState().getValue() != AgentState.cAGENT_STATE_INITIATED) {
+            logger.warn("Agent not initiated.");
             return;
         }
 
@@ -294,6 +295,11 @@ public class BusAgent extends AbstractAgent {
         long minutes = bus.getBoardingTime().getMinutes();
         if (hours == date.getHours() && minutes == date.getMinutes()) {
             start();
+        }
+        else {
+            logger.debug("Cant run yet: \n"
+                    + "hours: " + hours + "!=" + date.getHours() + "\n"
+                    + "minutes: " + minutes + "!=" + date.getMinutes());
         }
     }
 }

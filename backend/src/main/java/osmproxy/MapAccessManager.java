@@ -125,7 +125,8 @@ public class MapAccessManager {
             if (item.getNodeName().equals("way")) {
                 info.addWay(new OSMWay(item));
             }
-            else if (item.getNodeName().equals("node")) { // TODO: for further future: add support for rare way-traffic-signal-crossings cases
+            // TODO: for further future: add support for rare way-traffic-signal-crossings cases
+            else if (item.getNodeName().equals("node")) {
                 NodeList nodeChildren = item.getChildNodes();
                 for (int j = 0; j < nodeChildren.getLength(); ++j) {
                     Node nodeChild = nodeChildren.item(j);
