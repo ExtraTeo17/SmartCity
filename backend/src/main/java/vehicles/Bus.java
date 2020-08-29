@@ -11,6 +11,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class Bus extends MovingObject {
     public static int CAPACITY_MID = 10;
@@ -43,7 +44,8 @@ public class Bus extends MovingObject {
 
         this.route = Router.uniformRoute(displayRoute);
         this.timetable = timetable;
-        this.stationNodesOnRoute = extractStationsFromRoute();
+        this.stationNodesOnRoute =route.stream().filter(node -> node instanceof StationNode)
+                .map(node -> (StationNode)node).collect(Collectors.toList());
         this.busLine = busLine;
         this.brigadeNr = brigadeNr;
     }
@@ -67,16 +69,6 @@ public class Bus extends MovingObject {
 
     public List<String> getPassengersToLeave(int id) {
         return stationsForPassengers.get(id);
-    }
-
-    private List<StationNode> extractStationsFromRoute() {
-        List<StationNode> stationsOnRoute = new ArrayList<>();
-        for (final RouteNode node : route) {
-            if (node instanceof StationNode) {
-                stationsOnRoute.add((StationNode) node);
-            }
-        }
-        return stationsOnRoute;
     }
 
     public final String getLine() {

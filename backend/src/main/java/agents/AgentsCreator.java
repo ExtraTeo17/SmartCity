@@ -130,7 +130,9 @@ public class AgentsCreator {
             return false;
         }
 
+        logger.info("LightManagers construction started");
         boolean result = tryConstructLightManagers();
+        logger.info("LightManagers construction finished");
 
         configContainer.unlockLightManagers();
 
@@ -169,6 +171,7 @@ public class AgentsCreator {
             logger.error("Error preparing light managers", e);
             return false;
         }
+
 
         return true;
     }

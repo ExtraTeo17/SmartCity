@@ -1,8 +1,8 @@
 package osmproxy.buses;
 
+import com.google.common.collect.Iterables;
 import com.google.common.collect.Sets;
 import com.google.inject.Inject;
-import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.slf4j.Logger;
@@ -19,10 +19,12 @@ import osmproxy.elements.OSMWay;
 import routing.core.IZone;
 import routing.core.Position;
 import smartcity.buses.BrigadeInfo;
+import utilities.IterableJsonArray;
 import utilities.IterableNodeList;
 
 import java.net.URL;
 import java.util.*;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 public class BusLinesManager implements IBusLinesManager {
@@ -68,20 +70,18 @@ public class BusLinesManager implements IBusLinesManager {
     }
 
     // TODO: Add tests for this function
-    private BusPreparationData parseBusData(Document nodesViaOverpass) {
-        Node osmRoot = nodesViaOverpass.getFirstChild();
-        NodeList osmXMLNodes = osmRoot.getChildNodes();
+    private BusPreparationData parseBusData(Document busData) {
+        Node osmRoot = busData.getFirstChild();
+        var osmXMLNodes = IterableNodeList.of(osmRoot.getChildNodes());
 
         Set<BusInfoData> busInfoDataSet = new LinkedHashSet<>();
         HashMap<Long, OSMStation> busStopsMap = new LinkedHashMap<>();
-
         int errors = 0;
         // TODO: Starts from 1, intended?
-        for (int i = 1; i < osmXMLNodes.getLength(); i++) {
-            Node osmNode = osmXMLNodes.item(i);
+        for (var osmNode : Iterables.skip(osmXMLNodes, 1)) {
             var nodeName = osmNode.getNodeName();
             if (nodeName.equals("relation")) {
-                var busInfo = parseSingleBusInfo(osmNode);
+                var busInfo = parseRelation(osmNode);
                 if (busInfo.isEmpty()) {
                     if (++errors < 5) {
                         continue;
@@ -91,27 +91,12 @@ public class BusLinesManager implements IBusLinesManager {
                 busInfoDataSet.add(busInfo.get());
             }
             else if (nodeName.equals("node")) {
-                NamedNodeMap attributes = osmNode.getAttributes();
-                long osmId = Long.parseLong(attributes.getNamedItem("id").getNodeValue());
-                double lat = Double.parseDouble(attributes.getNamedItem("lat").getNodeValue());
-                double lon = Double.parseDouble(attributes.getNamedItem("lon").getNodeValue());
-
-                if (!busStopsMap.containsKey(osmId) && zone.contains(Position.of(lat, lon))) {
-                    var stationNumber = searchForStationNumber(osmNode.getChildNodes());
-                    stationNumber.ifPresent(s -> busStopsMap.put(osmId, new OSMStation(osmId, lat, lon, s)));
-                }
+                var station = parseNode(osmNode, busStopsMap::containsKey);
+                station.ifPresent(s -> busStopsMap.put(s.getId(), s));
             }
         }
 
-        var busInfos = new LinkedHashSet<BusInfo>();
-        var busStopsSet = new LinkedHashSet<>(busStopsMap.values());
-        for (var busInfoData : busInfoDataSet) {
-            var allBusStops = busInfoData.busStopIds.stream().map(OSMElement::of).collect(Collectors.toSet());
-            var validBusStops = Sets.intersection(busStopsSet, allBusStops);
-            var info = busInfoData.busInfo;
-            info.setStops(validBusStops);
-            busInfos.add(info);
-        }
+        var busInfos = getBusInfosWithStops(busInfoDataSet, new LinkedHashSet<>(busStopsMap.values()));
 
         return new BusPreparationData(busInfos, busStopsMap);
     }
@@ -126,11 +111,11 @@ public class BusLinesManager implements IBusLinesManager {
         }
     }
 
-    private Optional<BusInfoData> parseSingleBusInfo(Node osmNode) {
+    private Optional<BusInfoData> parseRelation(Node relation) {
         List<Long> stationIds = new ArrayList<>();
         String busLine = "";
         StringBuilder builder = new StringBuilder();
-        for (var member : IterableNodeList.of(osmNode.getChildNodes())) {
+        for (var member : IterableNodeList.of(relation.getChildNodes())) {
             if (member.getNodeName().equals("member")) {
                 NamedNodeMap attributes = member.getAttributes();
                 long id = Long.parseLong(attributes.getNamedItem("ref").getNodeValue());
@@ -169,6 +154,22 @@ public class BusLinesManager implements IBusLinesManager {
         return Optional.of(new BusInfoData(new BusInfo(busLine, ways), stationIds));
     }
 
+    private Optional<OSMStation> parseNode(Node node, Predicate<Long> isPresent) {
+        NamedNodeMap attributes = node.getAttributes();
+        long osmId = Long.parseLong(attributes.getNamedItem("id").getNodeValue());
+        double lat = Double.parseDouble(attributes.getNamedItem("lat").getNodeValue());
+        double lon = Double.parseDouble(attributes.getNamedItem("lon").getNodeValue());
+
+        if (!isPresent.test(osmId) && zone.contains(Position.of(lat, lon))) {
+            var stationNumber = searchForStationNumber(node.getChildNodes());
+            if (stationNumber.isPresent()) {
+                return Optional.of(new OSMStation(osmId, lat, lon, stationNumber.get()));
+            }
+        }
+
+        return Optional.empty();
+    }
+
     private Optional<String> searchForStationNumber(NodeList nodes) {
         return IterableNodeList.of(nodes)
                 .stream()
@@ -185,17 +186,13 @@ public class BusLinesManager implements IBusLinesManager {
         for (OSMStation station : osmStations) {
             var query = BusLinesManager.getBusWarszawskieQuery(station.getBusStopId(), station.getBusStopNr(), busLine);
             var nodesOptional = getNodesViaWarszawskieAPI(query);
-            var stationId = station.getId();
             nodesOptional.ifPresent(jsonObject -> {
-                JSONArray msg = (JSONArray) jsonObject.get("result");
+                var stationId = station.getId();
                 BrigadeInfo lastInfo = null;
-                for (Object o : msg) {
-                    JSONObject jsonObj = (JSONObject) o;
-                    JSONArray valuesArray = (JSONArray) jsonObj.get("values");
-                    for (Object item : valuesArray) {
-                        JSONObject valueObject = (JSONObject) item;
-                        String key = (String) valueObject.get("key");
-                        String brigadeNr = (String) valueObject.get("value");
+                for (JSONObject obj : IterableJsonArray.of(jsonObject,"result")) {
+                    for (JSONObject item : IterableJsonArray.of(obj, "value")) {
+                        String key = (String) item.get("key");
+                        String brigadeNr = (String) item.get("value");
                         if (key.equals("brygada")) {
                             if (!brigadeNrToBrigadeInfo.containsKey(brigadeNr)) {
                                 lastInfo = new BrigadeInfo(brigadeNr);
@@ -235,5 +232,18 @@ public class BusLinesManager implements IBusLinesManager {
 
     private static String getBusWarszawskieQuery(String busStopId, String busStopNr, String busLine) {
         return "https://api.um.warszawa.pl/api/action/dbtimetable_get/?id=e923fa0e-d96c-43f9-ae6e-60518c9f3238&busstopId=" + busStopId + "&busstopNr=" + busStopNr + "&line=" + busLine + "&apikey=400dacf8-9cc4-4d6c-82cc-88d9311401a5";
+    }
+
+    private LinkedHashSet<BusInfo> getBusInfosWithStops(Collection<BusInfoData> busInfoDataSet, Set<OSMStation> busStopsSet) {
+        var busInfos = new LinkedHashSet<BusInfo>();
+        for (var busInfoData : busInfoDataSet) {
+            var allBusStops = busInfoData.busStopIds.stream().map(OSMElement::of).collect(Collectors.toSet());
+            var validBusStops = Sets.intersection(busStopsSet, allBusStops);
+            var info = busInfoData.busInfo;
+            info.setStops(validBusStops);
+            busInfos.add(info);
+        }
+
+        return busInfos;
     }
 }
