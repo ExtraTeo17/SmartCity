@@ -7,8 +7,6 @@ import com.google.inject.Singleton;
 import genesis.AbstractModule;
 import routing.core.IZone;
 import smartcity.config.ConfigContainer;
-import smartcity.task.ITaskManager;
-import smartcity.task.TaskManager;
 import smartcity.task.TaskModule;
 
 public class SmartCityModule extends AbstractModule {
@@ -19,7 +17,7 @@ public class SmartCityModule extends AbstractModule {
         binder.install(new TaskModule());
         binder.bind(MasterAgent.class).in(Singleton.class);
         binder.bind(ConfigContainer.class).in(Singleton.class);
-        binder.bind(ITimeManager.class).to(TimeManager.class).asEagerSingleton();
+        binder.bind(ITimeProvider.class).to(TimeProvider.class).asEagerSingleton();
     }
 
     @Provides

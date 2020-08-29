@@ -14,12 +14,10 @@ import osmproxy.LightAccessManager;
 import osmproxy.MapAccessManager;
 import osmproxy.buses.IBusLinesManager;
 import osmproxy.elements.OSMNode;
-import routing.RouteNode;
 import smartcity.SimulationState;
+import smartcity.TimeProvider;
 import smartcity.buses.Timetable;
 import smartcity.config.ConfigContainer;
-
-import java.util.List;
 
 public class AgentsCreator {
     private static final Logger logger = LoggerFactory.getLogger(AgentsCreator.class);
@@ -71,8 +69,14 @@ public class AgentsCreator {
     }
 
     private boolean prepareStationsAndBuses() {
+        logger.info("Starting bus data preparation.");
+        long time = System.nanoTime();
         var busData = busLinesManager.getBusData();
+        logger.info("Bus data preparation finished! Took: " + TimeProvider.getTimeInMs(time) + "ms");
 
+
+        logger.info("Stations creation started.");
+        time = System.nanoTime();
         int stationsCount = 0;
         for (var station : busData.stations.values()) {
             var agent = factory.create(station);
@@ -91,18 +95,22 @@ public class AgentsCreator {
             return false;
         }
 
-        logger.info("Stations are created!");
+        logger.info("Stations are created! Took: " + TimeProvider.getTimeInMs(time) + "ms");
         logger.info("NUMBER OF STATION AGENTS: " + stationsCount);
 
-
+        logger.info("Buses creation started.");
+        time = System.nanoTime();
         int busCount = 0;
         for (var busInfo : busData.busInfos) {
-            List<RouteNode> route = busInfo.getRouteInfo();
+            var timeNow = System.nanoTime();
+            var routeInfo = busInfo.generateRouteInfo();
+            logger.info("Generating routeInfo finished. Took: " + (TimeProvider.getTimeInMs(timeNow)) + "ms");
+
             var busLine = busInfo.getBusLine();
             for (var brigade : busInfo) {
                 var brigadeNr = brigade.getBrigadeNr();
                 for (Timetable timetable : brigade) {
-                    var agent = factory.create(route, timetable, busLine, brigadeNr);
+                    var agent = factory.create(routeInfo, timetable, busLine, brigadeNr);
                     boolean result = agentsContainer.tryAdd(agent);
                     if (result) {
                         ++busCount;
@@ -119,7 +127,7 @@ public class AgentsCreator {
             return false;
         }
 
-        logger.info("Buses are created!");
+        logger.info("Buses are created! Took: " + TimeProvider.getTimeInMs(time) + "ms");
         logger.info("NUMBER OF BUS AGENTS: " + busCount);
         return true;
     }
@@ -130,9 +138,10 @@ public class AgentsCreator {
             return false;
         }
 
-        logger.info("LightManagers construction started");
+        logger.info("LightManagers construction started.");
+        long time = System.nanoTime();
         boolean result = tryConstructLightManagers();
-        logger.info("LightManagers construction finished");
+        logger.info("LightManagers construction finished! Took: " + TimeProvider.getTimeInMs(time) + "ms");
 
         configContainer.unlockLightManagers();
 

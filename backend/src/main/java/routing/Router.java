@@ -17,6 +17,7 @@ import smartcity.MasterAgent;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 // TODO: Add fields to this class and make it some kind of service (not static)
 public final class Router {
@@ -59,12 +60,12 @@ public final class Router {
     }
 
     public static List<RouteNode> generateRouteInfoForBuses(List<OSMWay> router, List<? extends OSMNode> osmStations) {
-        Pair<List<Long>, List<RouteNode>> osmWayIdsAndPointList = findBusRoute(router);
-        List<OSMLight> lightsOnRoute = MapAccessManager.sendFullTrafficSignalQuery(osmWayIdsAndPointList.getValue0());
+        var busRouteData = generateBusRoute(router);
+        List<OSMLight> lightsOnRoute = MapAccessManager.sendFullTrafficSignalQuery(busRouteData.waysIds);
         List<RouteNode> managers = getManagersForLights(lightsOnRoute);
         List<RouteNode> stationNodes = getAgentStationsForRoute(osmStations);
         managers.addAll(stationNodes);
-        return getRouteWithAdditionalNodes(osmWayIdsAndPointList.getValue1(), managers);
+        return getRouteWithAdditionalNodes(busRouteData.route, managers);
     }
 
     private static List<RouteNode> createRouteNodeList(RouteInfo routeInfo) {
@@ -115,7 +116,6 @@ public final class Router {
     private static void addLightManagerNodeToManagersList(List<RouteNode> managers, OSMLight light) {
         Pair<Long, Long> osmWayIdOsmLightId = Pair.with(light.getAdherentWayId(), light.getId());
         RouteNode nodeToAdd = MasterAgent.wayIdLightIdToLightManagerNode.get(osmWayIdOsmLightId);
-
         if (nodeToAdd != null && !lastManagerIdEqualTo(managers, nodeToAdd)) {
             managers.add(nodeToAdd);
         }
@@ -191,31 +191,35 @@ public final class Router {
         return newRoute;
     }
 
-    private static Pair<List<Long>, List<RouteNode>> findBusRoute(List<OSMWay> router) {
+    private static BusRouteData generateBusRoute(List<OSMWay> route) {
         List<Long> osmWaysIds = new ArrayList<>();
         List<RouteNode> routeNodes = new ArrayList<>();
-        for (OSMWay el : router) {
-            osmWaysIds.add(el.getId());
-            addRouteNodesBasedOnOrientation(el, routeNodes);
+        for (OSMWay way : route) {
+            osmWaysIds.add(way.getId());
+            routeNodes.addAll(getNodesBasedOnOrientation(way));
         }
-        return new Pair<>(osmWaysIds, routeNodes);
+        return new BusRouteData(osmWaysIds, routeNodes);
     }
 
-    private static void addRouteNodesBasedOnOrientation(OSMWay osmWay, List<RouteNode> routeNodes) {
+    private static class BusRouteData {
+        private final List<Long> waysIds;
+        private final List<RouteNode> route;
+
+        private BusRouteData(List<Long> waysIds, List<RouteNode> route) {
+            this.waysIds = waysIds;
+            this.route = route;
+        }
+    }
+
+    private static List<RouteNode> getNodesBasedOnOrientation(OSMWay osmWay) {
         var orientation = osmWay.getRelationOrientation();
         var waypoints = osmWay.getWaypoints();
         if (orientation == RelationOrientation.FRONT) {
-            for (var point : waypoints) {
-                routeNodes.add(new RouteNode(point));
-            }
-            return;
+            return waypoints.stream().map(RouteNode::new).collect(Collectors.toList());
         }
         else if (orientation == RelationOrientation.BACK) {
             // Waypoints list is not changed here.
-            for (var point : Lists.reverse(waypoints)) {
-                routeNodes.add(new RouteNode(point));
-            }
-            return;
+            return Lists.reverse(waypoints).stream().map(RouteNode::new).collect(Collectors.toList());
         }
 
         throw new UnsupportedOperationException("Orientation " + orientation.toString() + " is not supported");

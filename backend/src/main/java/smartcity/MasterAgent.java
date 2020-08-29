@@ -32,7 +32,7 @@ public class MasterAgent extends Agent {
 
     private final MapWindow window;
     private final IAgentsContainer agentsContainer;
-    private static ITimeManager timeManager;
+    private static ITimeProvider timeProvider;
 
     // TODO: Delete this abomination (or at least make it private)
     public static Map<Pair<Long, Long>, LightManagerNode> wayIdLightIdToLightManagerNode = new HashMap<>();
@@ -41,13 +41,13 @@ public class MasterAgent extends Agent {
 
     @Inject
     public MasterAgent(IAgentsContainer agentsContainer,
-                       ITimeManager timeManager,
+                       ITimeProvider timeProvider,
                        MapWindow window) {
         this.agentsContainer = agentsContainer;
         this.window = window;
 
         // TODO: Delete this abomination
-        this.timeManager = timeManager;
+        this.timeProvider = timeProvider;
     }
 
     @Override
@@ -128,6 +128,6 @@ public class MasterAgent extends Agent {
 
     @Deprecated(forRemoval = true, since = "When all users have TimeManager service")
     public static Date getSimulationTime() {
-        return timeManager.getCurrentSimulationTime();
+        return timeProvider.getCurrentSimulationTime();
     }
 }

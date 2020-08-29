@@ -4,7 +4,7 @@ package vehicles;
 import routing.LightManagerNode;
 import routing.RouteNode;
 import routing.core.IGeoPosition;
-import smartcity.TimeManager;
+import smartcity.TimeProvider;
 
 import java.util.List;
 
@@ -40,7 +40,7 @@ public abstract class MovingObject {
      * @return Scaled speed in KM/H
      */
     public int getSpeed() {
-        return speed * TimeManager.TIME_SCALE;
+        return speed * TimeProvider.TIME_SCALE;
     }
 
     public abstract DrivingState getState();

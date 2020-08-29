@@ -91,7 +91,7 @@ public class MapAccessManager {
         return Triplet.with(id, latitude, longitude);
     }
 
-    private static List<OSMLight> getLights(Document xmlDocument) {
+    private static List<OSMLight> parseLights(Document xmlDocument) {
         Node osmRoot = xmlDocument.getFirstChild();
         IterableNodeList osmXMLNodes = IterableNodeList.of(osmRoot.getChildNodes());
         List<OSMLight> osmLights = new ArrayList<>();
@@ -196,7 +196,7 @@ public class MapAccessManager {
         List<OSMLight> lightNodes = new ArrayList<>();
         try {
             var overpassNodes = getNodesViaOverpass(OsmQueryManager.getFullTrafficSignalQuery(osmWayIds));
-            lightNodes = getLights(overpassNodes);
+            lightNodes = parseLights(overpassNodes);
         } catch (Exception e) {
             logger.error("Error trying to get light nodes", e);
         }

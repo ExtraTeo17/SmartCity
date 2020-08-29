@@ -1,5 +1,7 @@
 package vehicles;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import routing.LightManagerNode;
 import routing.RouteNode;
 import routing.Router;
@@ -7,24 +9,22 @@ import routing.StationNode;
 import routing.core.IGeoPosition;
 import smartcity.buses.Timetable;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.stream.Collectors;
+import java.util.*;
 
 public class Bus extends MovingObject {
     public static int CAPACITY_MID = 10;
     public static int CAPACITY_HIGH = 25;
 
+    private static final Logger logger = LoggerFactory.getLogger(Bus.class);
+
     private final Timetable timetable;
-    private final HashMap<Integer, List<String>> stationsForPassengers = new HashMap<>();
+    private final HashMap<Integer, List<String>> stationsForPassengers;
     private final List<StationNode> stationNodesOnRoute;
     private final String busLine;
-    private final String brigadeNr;
-    private DrivingState state = DrivingState.STARTING;
     private final List<RouteNode> displayRoute;
     private final List<RouteNode> route;
+
+    private DrivingState state = DrivingState.STARTING;
     private int index = 0;
     private int closestLightIndex = -1;
     private int closestStationIndex = -1;
@@ -35,40 +35,56 @@ public class Bus extends MovingObject {
         super(40);
         this.displayRoute = route;
 
+        this.stationsForPassengers = new HashMap<>();
+        this.stationNodesOnRoute = new ArrayList<>();
         for (RouteNode node : route) {
             if (node instanceof StationNode) {
                 StationNode station = (StationNode) node;
                 stationsForPassengers.put(station.getStationId(), new ArrayList<>());
+                stationNodesOnRoute.add(station);
             }
+        }
+
+        if (stationNodesOnRoute.size() < 2) {
+            logger.warn("Only one station on route");
         }
 
         this.route = Router.uniformRoute(displayRoute);
         this.timetable = timetable;
-        this.stationNodesOnRoute =route.stream().filter(node -> node instanceof StationNode)
-                .map(node -> (StationNode)node).collect(Collectors.toList());
         this.busLine = busLine;
-        this.brigadeNr = brigadeNr;
     }
 
     public int getPassengersCount() {
         return passengersCount;
     }
 
-    public void addPassengerToStation(int id, String passenger) {
-        stationsForPassengers.get(id).add(passenger);
-        passengersCount++;
+    public void addPassengerToStation(int id, String name) {
+        var passengers = stationsForPassengers.get(id);
+        if (passengers != null) {
+            passengers.add(name);
+            ++passengersCount;
+        }
+        else {
+            logger.warn("Unrecognized station id: " + id);
+        }
     }
 
-    public boolean removePassengerFromStation(int id, String passenger) {
-        if (stationsForPassengers.get(id).remove(passenger)) {
-            passengersCount--;
+    public boolean removePassengerFromStation(int id, String name) {
+        if (getPassengers(id).remove(name)) {
+            --passengersCount;
             return true;
         }
+
         return false;
     }
 
-    public List<String> getPassengersToLeave(int id) {
-        return stationsForPassengers.get(id);
+    public List<String> getPassengers(int id) {
+        var result = stationsForPassengers.get(id);
+        if (result == null) {
+            return new ArrayList<>();
+        }
+
+        return result;
     }
 
     public final String getLine() {
@@ -102,22 +118,20 @@ public class Bus extends MovingObject {
         return getCurrentTrafficLightNode();
     }
 
-    public StationNode findNextStation() {
-        for (int i = index + 1; i < route.size(); i++) {
+    public Optional<StationNode> findNextStation() {
+        for (int i = index + 1; i < route.size(); ++i) {
             if (route.get(i) instanceof StationNode) {
                 closestStationIndex = i;
-                return (StationNode) route.get(i);
+                return Optional.of((StationNode) route.get(i));
             }
         }
         closestStationIndex = -1;
-        return null;
+        return Optional.empty();
     }
 
-    public Date getTimeOnStation(String osmStationId) {
+    public Optional<Date> getTimeOnStation(String osmStationId) {
         return timetable.getTimeOnStation(Long.parseLong(osmStationId));
-
     }
-
 
     public RouteNode findNextStop() {
         for (int i = index + 1; i < route.size(); i++) {
@@ -205,9 +219,8 @@ public class Bus extends MovingObject {
         this.state = state;
     }
 
+    // TODO: Replace with shouldStart()
     public Date getBoardingTime() {
         return timetable.getBoardingTime();
     }
-
-
 }

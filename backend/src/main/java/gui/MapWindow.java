@@ -20,7 +20,7 @@ import org.slf4j.LoggerFactory;
 import routing.core.IGeoPosition;
 import routing.core.IZone;
 import routing.core.Position;
-import smartcity.ITimeManager;
+import smartcity.ITimeProvider;
 import smartcity.SimulationState;
 import smartcity.config.ConfigContainer;
 import smartcity.lights.SimpleCrossroad;
@@ -47,7 +47,7 @@ public class MapWindow {
     private final IAgentsContainer agentsContainer;
     private final ConfigContainer configContainer;
     private final ITaskManager taskManager;
-    private final ITimeManager timeManager;
+    private final ITimeProvider timeProvider;
 
     public JPanel MainPanel;
     private final JXMapViewer MapViewer;
@@ -92,13 +92,13 @@ public class MapWindow {
                      IAgentsContainer agentsContainer,
                      ConfigContainer configContainer,
                      ITaskManager taskManager,
-                     ITimeManager timeManager) {
+                     ITimeProvider timeProvider) {
         this.eventBus = eventBus;
         this.agentsContainer = agentsContainer;
         this.configContainer = configContainer;
         this.zone = configContainer.getZone();
         this.taskManager = taskManager;
-        this.timeManager = timeManager;
+        this.timeProvider = timeProvider;
 
         MapViewer = new JXMapViewer();
         currentTimeLabel.setVisible(false);
@@ -244,7 +244,7 @@ public class MapWindow {
         ResultTimeLabel.setVisible(true);
         ResultTimeTitle.setVisible(true);
         random.setSeed(getSeed());
-        timeManager.setSimulationStartTime((Date) setTimeSpinner.getValue());
+        timeProvider.setSimulationStartTime((Date) setTimeSpinner.getValue());
     }
 
     private int getZoneRadius() {
@@ -388,7 +388,7 @@ public class MapWindow {
     }
 
     private void refreshTime() {
-        currentTimeLabel.setText(dateFormat.format(timeManager.getCurrentSimulationTime()));
+        currentTimeLabel.setText(dateFormat.format(timeProvider.getCurrentSimulationTime()));
     }
 
     private void drawLights(List<Painter<JXMapViewer>> painters) {

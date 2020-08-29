@@ -16,7 +16,7 @@ public final class ConfigContainer extends ConfigMutator
 
     private final EventBus eventBus;
     private SimulationState simulationState = SimulationState.INITIAL;
-    private boolean shouldGeneratePedestriansAndBuses = false;
+    private boolean shouldGeneratePedestriansAndBuses = true;
     private boolean shouldGenerateCars = true;
     private boolean lightManagersLock = false;
     private final IZone zone;

@@ -10,12 +10,12 @@ public class BusPreparationData {
     public final Set<BusInfo> busInfos;
     public final HashMap<Long, OSMStation> stations;
 
-    public BusPreparationData(Set<BusInfo> busInfos, HashMap<Long, OSMStation> stations) {
+    BusPreparationData(Set<BusInfo> busInfos, HashMap<Long, OSMStation> stations) {
         this.busInfos = busInfos;
         this.stations = stations;
     }
 
-    public BusPreparationData() {
+    BusPreparationData() {
         this.busInfos = new HashSet<>();
         this.stations = new HashMap<>();
     }

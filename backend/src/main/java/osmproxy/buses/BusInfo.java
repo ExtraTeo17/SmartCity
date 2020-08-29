@@ -14,38 +14,40 @@ import java.util.List;
 
 public class BusInfo implements Iterable<BrigadeInfo> {
     private final String busLine;
+    private final List<OSMWay> route;
     private List<OSMStation> stops;
-    private List<OSMWay> route;
-    private List<BrigadeInfo> brigadeList = new ArrayList<>();
+    private List<BrigadeInfo> brigadeList;
+    private List<RouteNode> routeInfo;
 
     BusInfo(String busLine, List<OSMWay> route) {
         this.busLine = busLine;
         this.route = route;
+        this.stops = new ArrayList<>();
+        this.brigadeList = new ArrayList<>();
     }
 
     public String getBusLine() {
         return busLine;
     }
 
-    public void setStops(Collection<OSMStation> stops) {
-        this.stops = new ArrayList<>(stops);
-    }
-
-    public List<OSMStation> getStops() {
+    List<OSMStation> getStops() {
         return stops;
     }
 
-    public void setRoute(List<OSMWay> parseOsmWay) {
-        route = parseOsmWay;
+    void setStops(Collection<OSMStation> stops) {
+        this.stops = new ArrayList<>(stops);
     }
 
     void setBrigadeList(Collection<BrigadeInfo> values) {
         brigadeList = new ArrayList<>(values);
     }
 
-    // TODO: as field.
-    public List<RouteNode> getRouteInfo() {
-        return Router.generateRouteInfoForBuses(route, stops);
+    // TODO: Not static
+    public List<RouteNode> generateRouteInfo() {
+        if (routeInfo == null) {
+            routeInfo = Router.generateRouteInfoForBuses(route, stops);
+        }
+        return routeInfo;
     }
 
     @NotNull

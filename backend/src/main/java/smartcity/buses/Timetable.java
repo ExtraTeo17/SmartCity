@@ -13,8 +13,14 @@ public class Timetable {
     private final Map<Long, Date> stationOsmIdToTime = new HashMap<>();
     private final List<Pair<Date, Long>> timeOnStationChronological = new ArrayList<>();
 
-    public Date getTimeOnStation(final long stationOsmId) {
-        return stationOsmIdToTime.get(stationOsmId);
+    public Optional<Date> getTimeOnStation(final long stationId) {
+        var time = stationOsmIdToTime.get(stationId);
+        if (time == null) {
+            logger.warn("Could not retrieve time for " + stationId);
+            return Optional.empty();
+        }
+
+        return Optional.of(time);
     }
 
     public Date getBoardingTime() {

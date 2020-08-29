@@ -7,7 +7,7 @@ import osmproxy.elements.OSMNode;
 import osmproxy.elements.OSMStation;
 import routing.RouteNode;
 import routing.StationNode;
-import smartcity.ITimeManager;
+import smartcity.ITimeProvider;
 import smartcity.buses.Timetable;
 import vehicles.*;
 
@@ -15,12 +15,12 @@ import java.util.List;
 
 class AgentsFactory implements IAgentsFactory {
     private final IdGenerator idGenerator;
-    private final ITimeManager timeManager;
+    private final ITimeProvider timeProvider;
 
     @Inject
-    public AgentsFactory(IdGenerator idGenerator, ITimeManager timeManager) {
+    public AgentsFactory(IdGenerator idGenerator, ITimeProvider timeProvider) {
         this.idGenerator = idGenerator;
-        this.timeManager = timeManager;
+        this.timeProvider = timeProvider;
     }
 
     @Override
@@ -42,7 +42,7 @@ class AgentsFactory implements IAgentsFactory {
     @Override
     public BusAgent create(List<RouteNode> route, Timetable timetable, String busLine, String brigadeNr) {
         var bus = new Bus(route, timetable, busLine, brigadeNr);
-        return new BusAgent(idGenerator.get(BusAgent.class), timeManager, bus);
+        return new BusAgent(idGenerator.get(BusAgent.class), timeProvider, bus);
     }
 
     @Override

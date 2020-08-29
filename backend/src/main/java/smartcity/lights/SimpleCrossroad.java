@@ -1,7 +1,6 @@
 package smartcity.lights;
 
 import agents.utilities.LightColor;
-import gui.MapWindow;
 import org.jxmapviewer.JXMapViewer;
 import org.jxmapviewer.painter.Painter;
 import org.jxmapviewer.viewer.Waypoint;
@@ -13,7 +12,7 @@ import osmproxy.MapAccessManager;
 import osmproxy.elements.OSMNode;
 import routing.core.IGeoPosition;
 import smartcity.MasterAgent;
-import smartcity.TimeManager;
+import smartcity.TimeProvider;
 
 import java.time.Instant;
 import java.util.*;
@@ -72,7 +71,7 @@ public class SimpleCrossroad implements ICrossroad {
 
     private void startTimer() {
         int delayBeforeStart = 0;
-        int repeatIntervalInMilliseconds = SimpleCrossroad.EXTEND_TIME * 1000 / TimeManager.TIME_SCALE;
+        int repeatIntervalInMilliseconds = SimpleCrossroad.EXTEND_TIME * 1000 / TimeProvider.TIME_SCALE;
         timer.scheduleAtFixedRate(new SwitchLightsTask(), delayBeforeStart, repeatIntervalInMilliseconds);
     }
 
@@ -211,7 +210,7 @@ public class SimpleCrossroad implements ICrossroad {
                     else if (shouldExtendBecauseOfFarAwayQueue()) {
                         prepareTimer();
                         logger.info("-------------------------------------shouldExtendBecauseOfFarAwayQueue--------------");
-                        timer.schedule(new SwitchLightsTask(), SimpleCrossroad.EXTEND_TIME * 1000 / TimeManager.TIME_SCALE);
+                        timer.schedule(new SwitchLightsTask(), SimpleCrossroad.EXTEND_TIME * 1000 / TimeProvider.TIME_SCALE);
                         alreadyExtendedGreen = true;
                         return;
                     }

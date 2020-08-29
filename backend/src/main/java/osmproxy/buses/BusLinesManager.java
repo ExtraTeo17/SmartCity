@@ -40,7 +40,6 @@ public class BusLinesManager implements IBusLinesManager {
 
     @Override
     public BusPreparationData getBusData() {
-        logger.info("STEP 1/" + BUS_PREPARATION_STEPS + ": Starting bus preparation");
         var overpassInfo = getBusDataXml();
         if (overpassInfo.isEmpty()) {
             return new BusPreparationData();
@@ -102,8 +101,8 @@ public class BusLinesManager implements IBusLinesManager {
     }
 
     private static class BusInfoData {
-        public final BusInfo busInfo;
-        public final List<Long> busStopIds;
+        private final BusInfo busInfo;
+        private final List<Long> busStopIds;
 
         private BusInfoData(BusInfo busInfo, List<Long> busStopIds) {
             this.busInfo = busInfo;
@@ -189,8 +188,8 @@ public class BusLinesManager implements IBusLinesManager {
             nodesOptional.ifPresent(jsonObject -> {
                 var stationId = station.getId();
                 BrigadeInfo lastInfo = null;
-                for (JSONObject obj : IterableJsonArray.of(jsonObject,"result")) {
-                    for (JSONObject item : IterableJsonArray.of(obj, "value")) {
+                for (JSONObject obj : IterableJsonArray.of(jsonObject, "result")) {
+                    for (JSONObject item : IterableJsonArray.of(obj, "values")) {
                         String key = (String) item.get("key");
                         String brigadeNr = (String) item.get("value");
                         if (key.equals("brygada")) {
@@ -231,7 +230,8 @@ public class BusLinesManager implements IBusLinesManager {
     }
 
     private static String getBusWarszawskieQuery(String busStopId, String busStopNr, String busLine) {
-        return "https://api.um.warszawa.pl/api/action/dbtimetable_get/?id=e923fa0e-d96c-43f9-ae6e-60518c9f3238&busstopId=" + busStopId + "&busstopNr=" + busStopNr + "&line=" + busLine + "&apikey=400dacf8-9cc4-4d6c-82cc-88d9311401a5";
+        return "https://api.um.warszawa.pl/api/action/dbtimetable_get/?id=e923fa0e-d96c-43f9-ae6e-60518c9f3238&busstopId=" +
+                busStopId + "&busstopNr=" + busStopNr + "&line=" + busLine + "&apikey=400dacf8-9cc4-4d6c-82cc-88d9311401a5";
     }
 
     private LinkedHashSet<BusInfo> getBusInfosWithStops(Collection<BusInfoData> busInfoDataSet, Set<OSMStation> busStopsSet) {
