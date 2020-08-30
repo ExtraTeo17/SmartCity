@@ -59,8 +59,8 @@ public final class Router {
         return createRouteNodeList(routeInfo);
     }
 
-    public static List<RouteNode> generateRouteInfoForBuses(List<OSMWay> router, List<? extends OSMNode> osmStations) {
-        var busRouteData = generateBusRoute(router);
+    public static List<RouteNode> generateRouteInfoForBuses(List<OSMWay> route, List<? extends OSMNode> osmStations) {
+        var busRouteData = generateBusRoute(route);
         List<OSMLight> lightsOnRoute = MapAccessManager.sendFullTrafficSignalQuery(busRouteData.waysIds);
         List<RouteNode> managers = getManagersForLights(lightsOnRoute);
         List<RouteNode> stationNodes = getAgentStationsForRoute(osmStations);

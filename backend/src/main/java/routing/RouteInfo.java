@@ -6,7 +6,6 @@ import org.slf4j.LoggerFactory;
 import osmproxy.elements.OSMWay;
 
 import java.util.*;
-import java.util.function.Consumer;
 
 public class RouteInfo implements Iterable<OSMWay> {
     private static final Logger logger = LoggerFactory.getLogger(RouteInfo.class);

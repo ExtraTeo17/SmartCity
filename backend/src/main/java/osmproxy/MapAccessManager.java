@@ -310,7 +310,7 @@ public class MapAccessManager {
         return document;
     }
 
-    public static List<OSMWay> parseOsmWay(Document nodesViaOverpass, IZone zone) {
+    public static List<OSMWay> parseOsmWays(Document nodesViaOverpass, IZone zone) {
         List<OSMWay> route = new ArrayList<>();
         Node osmRoot = nodesViaOverpass.getFirstChild();
         NodeList osmXMLNodes = osmRoot.getChildNodes();

@@ -112,7 +112,7 @@ public class MapWindow {
         GeoPosition warsaw = new GeoPosition(52.24, 21.02);
         MapViewer.setZoom(7);
         MapViewer.setAddressLocation(warsaw);
-        radiusSpinner.setModel(new SpinnerNumberModel(200, 100, 50000, 100));
+        radiusSpinner.setModel(new SpinnerNumberModel(600, 100, 50000, 100));
         carLimitSpinner.setModel(new SpinnerNumberModel(4, 1, 1000, 1));
         carLimitSpinner.addChangeListener(e -> {
             int value = (int) carLimitSpinner.getValue();
@@ -125,8 +125,8 @@ public class MapWindow {
         UseStrategyCheckBox.addItemListener(e -> SimpleCrossroad.STRATEGY_ACTIVE = UseStrategyCheckBox.isSelected());
 
         seedSpinner.setModel(new SpinnerNumberModel(69, 0, 999999, 1));
-        latSpinner.setModel(new SpinnerNumberModel(52.203342, -90, 90, 1));
-        lonSpinner.setModel(new SpinnerNumberModel(20.861213, -180, 180, 0.001));
+        latSpinner.setModel(new SpinnerNumberModel(52.23682, -90, 90, 1));
+        lonSpinner.setModel(new SpinnerNumberModel(21.01681, -180, 180, 0.001));
 
         testCarIdSpinner.setModel(new SpinnerNumberModel(2, 1, 100, 1));
         testCarIdSpinner.addChangeListener(e -> {

@@ -42,7 +42,6 @@ public class StationAgent extends AbstractAgent {
                     String type = rcv.getUserDefinedParameter(MessageParameter.TYPE);
                     if (type.equals(MessageParameter.BUS)) {
                         handleMessageFromBus(rcv);
-
                     }
                     else if (type.equals(MessageParameter.PEDESTRIAN)) {
                         handleMessageFromPedestrian(rcv);

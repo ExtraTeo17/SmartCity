@@ -76,6 +76,7 @@ public class OSMNode extends OSMElement
                 return false;
             }
         }
+
         return true;
     }
 

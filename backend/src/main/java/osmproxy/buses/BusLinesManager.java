@@ -113,7 +113,7 @@ public class BusLinesManager implements IBusLinesManager {
     private Optional<BusInfoData> parseRelation(Node relation) {
         List<Long> stationIds = new ArrayList<>();
         String busLine = "";
-        StringBuilder builder = new StringBuilder();
+        StringBuilder busWayQueryBuilder = new StringBuilder();
         for (var member : IterableNodeList.of(relation.getChildNodes())) {
             if (member.getNodeName().equals("member")) {
                 NamedNodeMap attributes = member.getAttributes();
@@ -124,7 +124,7 @@ public class BusLinesManager implements IBusLinesManager {
                 }
                 else if (attributes.getNamedItem("role").getNodeValue().length() == 0 &&
                         attributes.getNamedItem("type").getNodeValue().equals("way")) {
-                    builder.append(OsmQueryManager.getSingleBusWayOverpassQuery(id));
+                    busWayQueryBuilder.append(OsmQueryManager.getSingleBusWayOverpassQuery(id));
                 }
             }
             else if (member.getNodeName().equals("tag")) {
@@ -140,8 +140,8 @@ public class BusLinesManager implements IBusLinesManager {
         List<OSMWay> ways;
         try {
             var overpassNodes =
-                    MapAccessManager.getNodesViaOverpass(OsmQueryManager.getQueryWithPayload(builder.toString()));
-            ways = MapAccessManager.parseOsmWay(overpassNodes, zone);
+                    MapAccessManager.getNodesViaOverpass(OsmQueryManager.getQueryWithPayload(busWayQueryBuilder.toString()));
+            ways = MapAccessManager.parseOsmWays(overpassNodes, zone);
         } catch (NoSuchElementException | UnsupportedOperationException e) {
             logger.warn("Please change the zone, this one is not supported yet.", e);
             return Optional.empty();
