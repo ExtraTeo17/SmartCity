@@ -18,6 +18,7 @@ import smartcity.SimulationState;
 import smartcity.TimeProvider;
 import smartcity.buses.Timetable;
 import smartcity.config.ConfigContainer;
+import smartcity.config.StaticConfig;
 
 public class AgentsCreator {
     private static final Logger logger = LoggerFactory.getLogger(AgentsCreator.class);
@@ -156,7 +157,7 @@ public class AgentsCreator {
 
     private boolean tryConstructLightManagers() {
         try {
-            if (configContainer.useDeprecatedXmlForLightManagers) {
+            if (StaticConfig.USE_DEPRECATED_XML_FOR_LIGHT_MANAGERS) {
                 var nodes = MapAccessManager.getLightManagersNodes(configContainer.getZone());
                 for (var node : nodes) {
                     var manager = factory.create(node);

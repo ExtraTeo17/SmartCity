@@ -19,8 +19,10 @@ import osmproxy.elements.OSMWay;
 import routing.core.IZone;
 import routing.core.Position;
 import smartcity.buses.BrigadeInfo;
+import smartcity.config.StaticConfig;
 import utilities.IterableJsonArray;
 import utilities.IterableNodeList;
+import utilities.XmlWriter;
 
 import java.net.URL;
 import java.util.*;
@@ -43,6 +45,9 @@ public class BusLinesManager implements IBusLinesManager {
         var overpassInfo = getBusDataXml();
         if (overpassInfo.isEmpty()) {
             return new BusPreparationData();
+        }
+        else if (StaticConfig.DEBUG) {
+            XmlWriter.write(overpassInfo.get());
         }
 
         var busInfoData = parseBusData(overpassInfo.get());

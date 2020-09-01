@@ -7,7 +7,7 @@ import org.java_websocket.handshake.ClientHandshake;
 import org.java_websocket.server.WebSocketServer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import utilities.ExtendedProperties;
+import smartcity.config.StaticConfig;
 
 import java.net.InetSocketAddress;
 import java.util.HashSet;
@@ -21,14 +21,13 @@ class SocketServer extends WebSocketServer {
     private final HashSet<WebSocket> sockets;
 
     @Inject
-    SocketServer(MessageHandler messageHandler, ExtendedProperties properties) {
-        super(getSocketAddress(properties));
+    SocketServer(MessageHandler messageHandler) {
+        super(getSocketAddress(StaticConfig.WEB_PORT));
         this.messageHandler = messageHandler;
         sockets = new HashSet<>();
     }
 
-    private static InetSocketAddress getSocketAddress(ExtendedProperties properties) {
-        var port = properties.getOrDefault("port", 8000);
+    private static InetSocketAddress getSocketAddress(int port) {
         return new InetSocketAddress(port);
     }
 

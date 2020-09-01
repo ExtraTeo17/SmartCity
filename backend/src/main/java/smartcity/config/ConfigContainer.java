@@ -12,8 +12,6 @@ import smartcity.SimulationState;
 
 public final class ConfigContainer extends ConfigMutator
         implements IZoneMutator {
-    public final boolean useDeprecatedXmlForLightManagers = false;
-
     private final EventBus eventBus;
     private SimulationState simulationState = SimulationState.INITIAL;
     private boolean shouldGeneratePedestriansAndBuses = true;
