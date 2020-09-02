@@ -285,8 +285,9 @@ public class BusAgent extends AbstractAgent {
 
     // TODO: New bus was created each time - check if nothing was broken?
     public void runBasedOnTimetable() {
-        if (this.getAgentState().getValue() != AgentState.cAGENT_STATE_INITIATED) {
-            logger.warn("Agent not initiated.");
+        var state = this.getAgentState().getValue();
+        if (state != AgentState.cAGENT_STATE_INITIATED) {
+            logger.debug("Agent " + getName() + " not in initiated state. State: " + this.getAgentState().getName());
             return;
         }
 
@@ -294,12 +295,8 @@ public class BusAgent extends AbstractAgent {
         long hours = bus.getBoardingTime().getHours();
         long minutes = bus.getBoardingTime().getMinutes();
         if (hours == date.getHours() && minutes == date.getMinutes()) {
+            logger.debug("Running! (" + hours + ":" + minutes+ ")");
             start();
-        }
-        else {
-            logger.debug("Cant run yet: \n"
-                    + "hours: " + hours + "!=" + date.getHours() + "\n"
-                    + "minutes: " + minutes + "!=" + date.getMinutes());
         }
     }
 }

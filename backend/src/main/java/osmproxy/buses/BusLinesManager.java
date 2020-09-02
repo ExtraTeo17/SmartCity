@@ -1,5 +1,6 @@
 package osmproxy.buses;
 
+import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Sets;
 import com.google.inject.Inject;
@@ -19,7 +20,7 @@ import osmproxy.elements.OSMWay;
 import routing.core.IZone;
 import routing.core.Position;
 import smartcity.buses.BrigadeInfo;
-import smartcity.config.StaticConfig;
+import utilities.ConditionalExecutor;
 import utilities.IterableJsonArray;
 import utilities.IterableNodeList;
 import utilities.XmlWriter;
@@ -46,8 +47,11 @@ public class BusLinesManager implements IBusLinesManager {
         if (overpassInfo.isEmpty()) {
             return new BusPreparationData();
         }
-        else if (StaticConfig.DEBUG) {
-            XmlWriter.write(overpassInfo.get());
+        else {
+            ConditionalExecutor.debug(() -> {
+                logger.info("Writing bus-data to: " + XmlWriter.DEFAULT_OUTPUT_PATH);
+                XmlWriter.write(overpassInfo.get());
+            });
         }
 
         var busInfoData = parseBusData(overpassInfo.get());
@@ -81,7 +85,6 @@ public class BusLinesManager implements IBusLinesManager {
         Set<BusInfoData> busInfoDataSet = new LinkedHashSet<>();
         HashMap<Long, OSMStation> busStopsMap = new LinkedHashMap<>();
         int errors = 0;
-        // TODO: Starts from 1, intended?
         for (var osmNode : Iterables.skip(osmXMLNodes, 1)) {
             var nodeName = osmNode.getNodeName();
             if (nodeName.equals("relation")) {
@@ -105,11 +108,12 @@ public class BusLinesManager implements IBusLinesManager {
         return new BusPreparationData(busInfos, busStopsMap);
     }
 
-    private static class BusInfoData {
+    @VisibleForTesting
+    static class BusInfoData {
         private final BusInfo busInfo;
         private final List<Long> busStopIds;
 
-        private BusInfoData(BusInfo busInfo, List<Long> busStopIds) {
+        BusInfoData(BusInfo busInfo, List<Long> busStopIds) {
             this.busInfo = busInfo;
             this.busStopIds = busStopIds;
         }
@@ -164,11 +168,15 @@ public class BusLinesManager implements IBusLinesManager {
         double lat = Double.parseDouble(attributes.getNamedItem("lat").getNodeValue());
         double lon = Double.parseDouble(attributes.getNamedItem("lon").getNodeValue());
 
-        if (!isPresent.test(osmId) && zone.contains(Position.of(lat, lon))) {
+        boolean isPresentVal = isPresent.test(osmId);
+        if (!isPresentVal && zone.contains(Position.of(lat, lon))) {
             var stationNumber = searchForStationNumber(node.getChildNodes());
             if (stationNumber.isPresent()) {
                 return Optional.of(new OSMStation(osmId, lat, lon, stationNumber.get()));
             }
+        }
+        else {
+            logger.debug("Station: " + osmId + " won't be included. IsPresent: " + isPresentVal);
         }
 
         return Optional.empty();
@@ -239,7 +247,8 @@ public class BusLinesManager implements IBusLinesManager {
                 busStopId + "&busstopNr=" + busStopNr + "&line=" + busLine + "&apikey=400dacf8-9cc4-4d6c-82cc-88d9311401a5";
     }
 
-    private LinkedHashSet<BusInfo> getBusInfosWithStops(Collection<BusInfoData> busInfoDataSet, Set<OSMStation> busStopsSet) {
+    @VisibleForTesting
+    LinkedHashSet<BusInfo> getBusInfosWithStops(Collection<BusInfoData> busInfoDataSet, Set<OSMStation> busStopsSet) {
         var busInfos = new LinkedHashSet<BusInfo>();
         for (var busInfoData : busInfoDataSet) {
             var allBusStops = busInfoData.busStopIds.stream().map(OSMElement::of).collect(Collectors.toSet());

@@ -141,8 +141,6 @@ public class MapAccessManager {
         return info;
     }
 
-    // TODO: Remove checked exceptions from here
-
     /**
      * @param query the overpass query
      * @return the nodes in the formulated query

@@ -11,7 +11,7 @@ import java.io.File;
 import java.io.FileWriter;
 
 public class XmlWriter {
-    public static final String DEFAULT_OUTPUT_PATH = "output.xml";
+    public static final String DEFAULT_OUTPUT_PATH = "target/output.xml";
 
     private static final Logger logger = LoggerFactory.getLogger(XmlWriter.class);
     private static final TransformerFactory transformerFactory = TransformerFactory.newInstance();
