@@ -23,10 +23,11 @@ public class StationStrategy {
     final private Map<String, PedestrianArrivalInfo> farAwayPedestrianMap = new HashMap<>();
     final private Map<String, PedestrianArrivalInfo> pedestrianOnStationMap = new HashMap<>();
 
-    public StationStrategy(OSMStation stationOSMNode, int agentId) {
-        MasterAgent.osmStationIdToStationNode.put(stationOSMNode.getId(),
-                new StationNode(stationOSMNode.getLat(), stationOSMNode.getLng(),
-                        Long.toString(stationOSMNode.getId()), agentId));
+    public StationStrategy(OSMStation station, int agentId) {
+        var id = station.getId();
+        MasterAgent.osmStationIdToStationNode.put(id,
+                new StationNode(station.getLat(), station.getLng(),
+                        Long.toString(id), agentId));
     }
 
     public void addBusToFarAwayQueue(String agentBusName, Instant arrivalTime, Instant scheduleArrivalTime) {

@@ -2,7 +2,6 @@ package osmproxy.buses;
 
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.Iterables;
-import com.google.common.collect.Sets;
 import com.google.inject.Inject;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
@@ -14,7 +13,6 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import osmproxy.MapAccessManager;
 import osmproxy.OsmQueryManager;
-import osmproxy.elements.OSMElement;
 import osmproxy.elements.OSMStation;
 import osmproxy.elements.OSMWay;
 import routing.core.IZone;
@@ -28,7 +26,6 @@ import utilities.XmlWriter;
 import java.net.URL;
 import java.util.*;
 import java.util.function.Predicate;
-import java.util.stream.Collectors;
 
 public class BusLinesManager implements IBusLinesManager {
     private static final Logger logger = LoggerFactory.getLogger(BusLinesManager.class);
@@ -103,7 +100,7 @@ public class BusLinesManager implements IBusLinesManager {
             }
         }
 
-        var busInfos = getBusInfosWithStops(busInfoDataSet, new LinkedHashSet<>(busStopsMap.values()));
+        var busInfos = getBusInfosWithStops(busInfoDataSet, busStopsMap);
 
         return new BusPreparationData(busInfos, busStopsMap);
     }
@@ -194,7 +191,7 @@ public class BusLinesManager implements IBusLinesManager {
     }
 
     private Collection<BrigadeInfo> generateBrigadeInfos(String busLine, Collection<OSMStation> osmStations) {
-        Map<String, BrigadeInfo> brigadeNrToBrigadeInfo = new HashMap<>();
+        Map<String, BrigadeInfo> brigadeNrToBrigadeInfo = new LinkedHashMap<>();
         for (OSMStation station : osmStations) {
             var query = BusLinesManager.getBusWarszawskieQuery(station.getBusStopId(), station.getBusStopNr(), busLine);
             var nodesOptional = getNodesViaWarszawskieAPI(query);
@@ -248,11 +245,17 @@ public class BusLinesManager implements IBusLinesManager {
     }
 
     @VisibleForTesting
-    LinkedHashSet<BusInfo> getBusInfosWithStops(Collection<BusInfoData> busInfoDataSet, Set<OSMStation> busStopsSet) {
+    LinkedHashSet<BusInfo> getBusInfosWithStops(Collection<BusInfoData> busInfoDataSet, Map<Long, OSMStation> busStops) {
         var busInfos = new LinkedHashSet<BusInfo>();
         for (var busInfoData : busInfoDataSet) {
-            var allBusStops = busInfoData.busStopIds.stream().map(OSMElement::of).collect(Collectors.toSet());
-            var validBusStops = Sets.intersection(busStopsSet, allBusStops);
+            List<OSMStation> validBusStops = new ArrayList<>(busInfoData.busStopIds.size());
+            for (var id : busInfoData.busStopIds) {
+                var station = busStops.get(id);
+                if (station != null) {
+                    // WARN: Station is not copied here - should not be modified in any way
+                    validBusStops.add(station);
+                }
+            }
             var info = busInfoData.busInfo;
             info.setStops(validBusStops);
             busInfos.add(info);
