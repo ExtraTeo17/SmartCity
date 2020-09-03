@@ -1,11 +1,13 @@
 package agents.abstractions;
 
+import agents.utilities.LoggerLevel;
 import agents.utilities.MessageParameter;
 import jade.core.AID;
 import jade.core.Agent;
 import jade.lang.acl.ACLMessage;
 import jade.util.leap.Properties;
 import jade.wrapper.ControllerException;
+import org.apache.commons.logging.Log;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import routing.LightManagerNode;
@@ -40,8 +42,20 @@ public abstract class AbstractAgent extends Agent {
         }
     }
 
+    public void print(String message, LoggerLevel level) {
+        var fullMsg = getLocalName() + ": " + message;
+        switch (level) {
+            case TRACE -> logger.trace(fullMsg);
+            case DEBUG -> logger.debug(fullMsg);
+            case INFO -> logger.info(fullMsg);
+            case WARN -> logger.warn(fullMsg);
+            case ERROR -> logger.error(fullMsg);
+        }
+    }
+
+    // TODO: Protected
     public void print(String message) {
-        logger.info(getLocalName() + ": " + message);
+        print(message, LoggerLevel.INFO);
     }
 
     // TODO: Pass only LightManager here, remove movingObject and pass additional parameters

@@ -1,6 +1,7 @@
 package agents;
 
 import agents.abstractions.AbstractAgent;
+import agents.utilities.LoggerLevel;
 import agents.utilities.MessageParameter;
 import jade.core.AID;
 import jade.core.behaviours.Behaviour;
@@ -208,7 +209,8 @@ public class BusAgent extends AbstractAgent {
                             case ACLMessage.REQUEST_WHEN:
                                 int stationId =
                                         Integer.parseInt(rcv.getUserDefinedParameter(MessageParameter.STATION_ID));
-                                print("Passenger " + rcv.getSender().getLocalName() + " entered the bus.");
+                                print("Passenger " + rcv.getSender().getLocalName() + " entered the bus.",
+                                        LoggerLevel.DEBUG);
                                 bus.addPassengerToStation(stationId, rcv.getSender().getLocalName());
 
                                 ACLMessage response = new ACLMessage(ACLMessage.AGREE);
@@ -218,7 +220,7 @@ public class BusAgent extends AbstractAgent {
                                 properties.setProperty(MessageParameter.TYPE, MessageParameter.BUS);
                                 response.setAllUserDefinedParameters(properties);
                                 send(response);
-                                print("Passengers: " + bus.getPassengersCount());
+                                print("Passengers: " + bus.getPassengersCount(), LoggerLevel.DEBUG);
                                 break;
                             case ACLMessage.AGREE:
                                 stationId = Integer.parseInt(rcv.getUserDefinedParameter(MessageParameter.STATION_ID));
@@ -295,7 +297,7 @@ public class BusAgent extends AbstractAgent {
         long hours = bus.getBoardingTime().getHours();
         long minutes = bus.getBoardingTime().getMinutes();
         if (hours == date.getHours() && minutes == date.getMinutes()) {
-            logger.debug("Running! (" + hours + ":" + minutes+ ")");
+            logger.debug("Running! (" + hours + ":" + minutes + ")");
             start();
         }
     }
