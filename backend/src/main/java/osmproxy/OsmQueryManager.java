@@ -48,7 +48,7 @@ public class OsmQueryManager {
     }
 
 
-    public static String getSingleBusWayOverpassQuery(long osmWayId) {
+    public static String getSingleBusWayQuery(long osmWayId) {
         return "<id-query type=\"way\" ref=\"" + osmWayId + "\"/>\r\n" +
                 "  <print e=\"\" from=\"_\" geometry=\"full\" ids=\"yes\" limit=\"\" mode=\"skeleton\" n=\"\" order=\"id\" s=\"\" w=\"\"/>";
     }
@@ -59,11 +59,11 @@ public class OsmQueryManager {
                 "</osm-script>";
     }
 
-    public static String getBusOverpassQuery(IGeoPosition pos, int radius) {
-        return getBusOverpassQuery(pos.getLat(), pos.getLng(), radius);
+    public static String getBusQuery(IGeoPosition pos, int radius) {
+        return getBusQuery(pos.getLat(), pos.getLng(), radius);
     }
 
-    public static String getBusOverpassQuery(double middleLat, double middleLon, int radius) {
+    public static String getBusQuery(double middleLat, double middleLon, int radius) {
         return "<osm-script>\r\n" +
                 "  <query into=\"_\" type=\"relation\">\r\n" +
                 "    <has-kv k=\"route\" modv=\"\" v=\"bus\"/>\r\n" +
@@ -75,11 +75,11 @@ public class OsmQueryManager {
                 "</osm-script>";
     }
 
-    static String getLightsAroundOverpassQuery(IGeoPosition pos, int radius) {
-        return getLightsAroundOverpassQuery(pos.getLat(), pos.getLng(), radius);
+    static String getLightsAroundQuery(IGeoPosition pos, int radius) {
+        return getLightsAroundQuery(pos.getLat(), pos.getLng(), radius);
     }
 
-    static String getLightsAroundOverpassQuery(double lat, double lon, int radius) {
+    static String getLightsAroundQuery(double lat, double lon, int radius) {
         return "<osm-script>\r\n" +
                 "  <query into=\"_\" type=\"node\">\r\n" +
                 "    <has-kv k=\"highway\" modv=\"\" v=\"traffic_signals\"/>\r\n" +
@@ -89,7 +89,7 @@ public class OsmQueryManager {
                 "</osm-script>";
     }
 
-    static String getSingleParentWaysOfLightOverpassQuery(final long osmLightId) {
+    static String getSingleParentWaysOfLightQuery(final long osmLightId) {
         return "<id-query type=\"node\" ref=\"" + osmLightId + "\" into=\"crossroad\"/>\r\n" +
                 "  <union into=\"_\">\r\n" +
                 "    <item from=\"crossroad\" into=\"_\"/>\r\n" +

@@ -73,7 +73,8 @@ class BusLinesManagerTest {
     void getBusInfosWithStops_manySets_correctResult(long[][] stopsSets, String testCaseName) {
         // Arrange
         random.setSeed(30);
-        BusLinesManager manager = new BusLinesManager(busZone);
+        var busApiManager = new BusApiManagerMock();
+        BusLinesManager manager = new BusLinesManager(busApiManager, busZone);
         String lineName = "test";
         var busInfoDataSet = generateBusDataSet(lineName, stopsSets);
         var busStopsSet = generateStations(stopsSets);

@@ -4,7 +4,6 @@ import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.Iterables;
 import com.google.inject.Inject;
 import org.json.simple.JSONObject;
-import org.json.simple.parser.JSONParser;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
@@ -19,35 +18,35 @@ import routing.core.IZone;
 import routing.core.Position;
 import smartcity.buses.BrigadeInfo;
 import utilities.ConditionalExecutor;
+import utilities.FileWriterWrapper;
 import utilities.IterableJsonArray;
 import utilities.IterableNodeList;
-import utilities.XmlWriter;
 
-import java.net.URL;
 import java.util.*;
 import java.util.function.Predicate;
 
 public class BusLinesManager implements IBusLinesManager {
     private static final Logger logger = LoggerFactory.getLogger(BusLinesManager.class);
-    private static final JSONParser jsonParser = new JSONParser();
-    private static final int BUS_PREPARATION_STEPS = 5;
+
+    private final IBusApiManager busApiManager;
     private final IZone zone;
 
     @Inject
-    BusLinesManager(IZone zone) {
+    BusLinesManager(IBusApiManager busApiManager, IZone zone) {
+        this.busApiManager = busApiManager;
         this.zone = zone;
     }
 
     @Override
     public BusPreparationData getBusData() {
-        var overpassInfo = getBusDataXml();
+        var overpassInfo = busApiManager.getBusDataXml(zone);
         if (overpassInfo.isEmpty()) {
             return new BusPreparationData();
         }
         else {
             ConditionalExecutor.debug(() -> {
-                logger.info("Writing bus-data to: " + XmlWriter.DEFAULT_OUTPUT_PATH);
-                XmlWriter.write(overpassInfo.get());
+                logger.info("Writing bus-data to: " + FileWriterWrapper.DEFAULT_OUTPUT_PATH_XML);
+                FileWriterWrapper.write(overpassInfo.get());
             });
         }
 
@@ -59,19 +58,6 @@ public class BusLinesManager implements IBusLinesManager {
         }
 
         return busInfoData;
-    }
-
-    private Optional<Document> getBusDataXml() {
-        var overpassQuery = OsmQueryManager.getBusOverpassQuery(zone.getCenter(), zone.getRadius());
-        Document overpassInfo;
-        try {
-            overpassInfo = MapAccessManager.getNodesViaOverpass(overpassQuery);
-        } catch (Exception e) {
-            logger.warn("Error getting bus info.", e);
-            return Optional.empty();
-        }
-
-        return Optional.of(overpassInfo);
     }
 
     // TODO: Add tests for this function
@@ -130,7 +116,7 @@ public class BusLinesManager implements IBusLinesManager {
                 }
                 else if (attributes.getNamedItem("role").getNodeValue().length() == 0 &&
                         attributes.getNamedItem("type").getNodeValue().equals("way")) {
-                    busWayQueryBuilder.append(OsmQueryManager.getSingleBusWayOverpassQuery(id));
+                    busWayQueryBuilder.append(OsmQueryManager.getSingleBusWayQuery(id));
                 }
             }
             else if (member.getNodeName().equals("tag")) {
@@ -193,8 +179,8 @@ public class BusLinesManager implements IBusLinesManager {
     private Collection<BrigadeInfo> generateBrigadeInfos(String busLine, Collection<OSMStation> osmStations) {
         Map<String, BrigadeInfo> brigadeNrToBrigadeInfo = new LinkedHashMap<>();
         for (OSMStation station : osmStations) {
-            var query = BusLinesManager.getBusWarszawskieQuery(station.getBusStopId(), station.getBusStopNr(), busLine);
-            var nodesOptional = getNodesViaWarszawskieAPI(query);
+            var nodesOptional = busApiManager.getNodesViaWarszawskieAPI(station.getBusStopId(),
+                    station.getBusStopNr(), busLine);
             nodesOptional.ifPresent(jsonObject -> {
                 var stationId = station.getId();
                 BrigadeInfo lastInfo = null;
@@ -217,31 +203,6 @@ public class BusLinesManager implements IBusLinesManager {
         }
 
         return brigadeNrToBrigadeInfo.values();
-    }
-
-    private Optional<JSONObject> getNodesViaWarszawskieAPI(String query) {
-        URL url;
-        Scanner scanner;
-        StringBuilder json = new StringBuilder();
-        JSONObject jObject;
-        try {
-            url = new URL(query);
-            scanner = new Scanner(url.openStream());
-            while (scanner.hasNext()) {
-                json.append(scanner.nextLine());
-            }
-            jObject = (JSONObject) jsonParser.parse(json.toString());
-        } catch (Exception e) {
-            logger.warn("Error trying to get 'Warszawskie busy'", e);
-            return Optional.empty();
-        }
-
-        return Optional.of(jObject);
-    }
-
-    private static String getBusWarszawskieQuery(String busStopId, String busStopNr, String busLine) {
-        return "https://api.um.warszawa.pl/api/action/dbtimetable_get/?id=e923fa0e-d96c-43f9-ae6e-60518c9f3238&busstopId=" +
-                busStopId + "&busstopNr=" + busStopNr + "&line=" + busLine + "&apikey=400dacf8-9cc4-4d6c-82cc-88d9311401a5";
     }
 
     @VisibleForTesting

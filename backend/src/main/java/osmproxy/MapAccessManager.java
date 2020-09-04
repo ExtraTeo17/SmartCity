@@ -308,9 +308,9 @@ public class MapAccessManager {
         return document;
     }
 
-    public static List<OSMWay> parseOsmWays(Document nodesViaOverpass, IZone zone) {
+    public static List<OSMWay> parseOsmWays(Document nodes, IZone zone) {
         List<OSMWay> route = new ArrayList<>();
-        Node osmRoot = nodesViaOverpass.getFirstChild();
+        Node osmRoot = nodes.getFirstChild();
         NodeList osmXMLNodes = osmRoot.getChildNodes();
         Pair<OSMWay, String> wayAdjacentNodeRef = determineInitialWayRelOrientation(osmXMLNodes);
         String adjacentNodeRef = wayAdjacentNodeRef.getValue1();

@@ -32,7 +32,7 @@ public class LightAccessManager extends MapAccessManager {
     }
 
     private List<OSMNode> getLightNodesAround() {
-        var lightsQuery = OsmQueryManager.getLightsAroundOverpassQuery(zone.getCenter(), zone.getRadius());
+        var lightsQuery = OsmQueryManager.getLightsAroundQuery(zone.getCenter(), zone.getRadius());
         var nodes = MapAccessManager.getNodesViaOverpass(lightsQuery);
         return MapAccessManager.getNodes(nodes);
     }
@@ -72,7 +72,7 @@ public class LightAccessManager extends MapAccessManager {
     private String getParentWaysOfLightOverpassQuery(final List<OSMNode> lightsAround) {
         StringBuilder builder = new StringBuilder();
         for (final OSMNode light : lightsAround) {
-            builder.append(OsmQueryManager.getSingleParentWaysOfLightOverpassQuery(light.getId()));
+            builder.append(OsmQueryManager.getSingleParentWaysOfLightQuery(light.getId()));
         }
         return OsmQueryManager.getQueryWithPayload(builder.toString());
     }
