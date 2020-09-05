@@ -1,7 +1,7 @@
 package smartcity.task;
 
 import agents.BusAgent;
-import agents.LightManager;
+import agents.LightManagerAgent;
 import agents.VehicleAgent;
 import agents.abstractions.AbstractAgent;
 import agents.abstractions.IAgentsContainer;
@@ -37,7 +37,7 @@ public class TaskManager implements ITaskManager {
     private static final Logger logger = LoggerFactory.getLogger(TaskManager.class);
     private static final TimeUnit TIME_UNIT = TimeUnit.MILLISECONDS;
     private static final int CREATE_CAR_INTERVAL = 500;
-    private static final int CREATE_PEDESTRIAN_INTERVAL = 100;
+    private static final int CREATE_PEDESTRIAN_INTERVAL = 150;
     private static final int BUS_CONTROL_INTERVAL = 2000;
 
     private final IRunnableFactory runnableFactory;
@@ -61,7 +61,7 @@ public class TaskManager implements ITaskManager {
         this.agentsContainer = agentsContainer;
         this.eventBus = eventBus;
         this.zone = configContainer.getZone();
-        this.configContainer =configContainer;
+        this.configContainer = configContainer;
 
         this.random = new Random();
         this.routeInfoCache = HashBasedTable.create();
@@ -85,7 +85,7 @@ public class TaskManager implements ITaskManager {
     }
 
     private void activateLightManagerAgents() {
-        agentsContainer.forEach(LightManager.class, AbstractAgent::start);
+        agentsContainer.forEach(LightManagerAgent.class, AbstractAgent::start);
     }
 
     @Override
@@ -168,7 +168,7 @@ public class TaskManager implements ITaskManager {
                 // TODO: Separate fields for testPedestrian and pedestriansLimit
                 var agent = agentsFactory.create(routeToStation, routeFromStation,
                         busLine, startStation, endStation, testPedestrian);
-                if(agentsContainer.tryAdd(agent)) {
+                if (agentsContainer.tryAdd(agent)) {
                     agent.start();
                 }
             } catch (Exception e) {

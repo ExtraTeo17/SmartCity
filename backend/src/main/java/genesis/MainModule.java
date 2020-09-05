@@ -15,6 +15,8 @@ import utilities.ExtendedProperties;
 import java.io.InputStream;
 import java.net.URL;
 
+import static smartcity.config.StaticConfig.JADE_PORT;
+
 public class MainModule extends AbstractModule {
     private static final Logger logger = LoggerFactory.getLogger(MainModule.class);
     private final String[] args;
@@ -51,7 +53,7 @@ public class MainModule extends AbstractModule {
             }
         }
 
-        return new ProfileImpl();
+        return new ProfileImpl("localhost", JADE_PORT, "1");
     }
 
     @Provides

@@ -30,6 +30,12 @@ public class BusApiManager implements IBusApiManager {
             return Optional.empty();
         }
 
+        ConditionalExecutor.debug(() -> {
+            logger.info("Writing bus-data to: " + FileWriterWrapper.DEFAULT_OUTPUT_PATH_XML);
+            FileWriterWrapper.write(overpassInfo);
+        });
+
+
         return Optional.of(overpassInfo);
     }
 
@@ -53,7 +59,7 @@ public class BusApiManager implements IBusApiManager {
         ConditionalExecutor.debug(() -> {
             String path = "target/brigade" + busStopId + ".json";
             logger.info("Writing bus-brigade-date to: " + path);
-            FileWriterWrapper.write(jObject);
+            FileWriterWrapper.write(jObject, path);
         });
 
         return Optional.of(jObject);

@@ -1,6 +1,6 @@
 package behaviourfactories;
 
-import agents.LightManager;
+import agents.LightManagerAgent;
 import agents.utilities.MessageParameter;
 import jade.core.AID;
 import jade.core.Agent;
@@ -16,11 +16,12 @@ import smartcity.lights.OptimizationResult;
 import java.time.Instant;
 import java.util.List;
 
-public class LightManagerBehaviourFactory implements IBehaviourFactory<LightManager> {
+// TODO: Move to agent
+public class LightManagerBehaviourFactory implements IBehaviourFactory<LightManagerAgent> {
     private static final Logger logger = LoggerFactory.getLogger(LightManagerBehaviourFactory.class);
 
     @Override
-    public CyclicBehaviour createCyclicBehaviour(final LightManager agent) {
+    public CyclicBehaviour createCyclicBehaviour(final LightManagerAgent agent) {
         return new CyclicBehaviour() {
             @Override
             public void action() {
@@ -113,7 +114,7 @@ public class LightManagerBehaviourFactory implements IBehaviourFactory<LightMana
     }
 
     @Override
-    public TickerBehaviour createTickerBehaviour(final LightManager agent) {
+    public TickerBehaviour createTickerBehaviour(final LightManagerAgent agent) {
         return new TickerBehaviour(agent, 100 / TimeProvider.TIME_SCALE) {
             @Override
             protected void onTick() {

@@ -66,7 +66,7 @@ public class Light implements IGeoPosition {
         return adjacentOsmWayId;
     }
 
-    private void addHashMapsEntries(long managerId) {
+    private void addHashMapsEntries(int managerId) {
         final LightManagerNode lightManagerNode = new LightManagerNode(lat, lng,
                 adjacentOsmWayId,
                 adjacentCrossingOsmId1 != null ? Long.parseLong(adjacentCrossingOsmId1) : 0,

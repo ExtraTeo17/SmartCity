@@ -2,11 +2,11 @@ package agents.abstractions;
 
 import agents.*;
 import org.w3c.dom.Node;
+import osmproxy.buses.Timetable;
 import osmproxy.elements.OSMNode;
 import osmproxy.elements.OSMStation;
 import routing.RouteNode;
 import routing.StationNode;
-import smartcity.buses.Timetable;
 
 import java.util.List;
 
@@ -20,9 +20,9 @@ public interface IAgentsFactory {
     BusAgent create(List<RouteNode> route, Timetable timetable, String busLine,
                     String brigadeNr);
 
-    LightManager create(Node crossroad);
+    LightManagerAgent create(Node crossroad);
 
-    LightManager create(OSMNode centerCrossroad);
+    LightManagerAgent create(OSMNode centerCrossroad);
 
     PedestrianAgent create(List<RouteNode> routeToStation, List<RouteNode> routeFromStation,
                            String preferredBusLine, StationNode startStation, StationNode finishStation,

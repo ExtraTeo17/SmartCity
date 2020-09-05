@@ -192,7 +192,7 @@ public class MapWindow {
                         pointB = Position.of(lat, lng);
                         taskManager.getCreateCarTask(pointA, pointB, false).run();
                         logger.info("Vehicles: " + agentsContainer.size(VehicleAgent.class));
-                        logger.info("Lights: " + agentsContainer.size(LightManager.class));
+                        logger.info("Lights: " + agentsContainer.size(LightManagerAgent.class));
                         pointA = pointB = null;
                     }
                 }
@@ -396,7 +396,7 @@ public class MapWindow {
             return;
         }
 
-        agentsContainer.forEach(LightManager.class, man -> man.draw(painters));
+        agentsContainer.forEach(LightManagerAgent.class, man -> man.draw(painters));
 
         configContainer.unlockLightManagers();
     }

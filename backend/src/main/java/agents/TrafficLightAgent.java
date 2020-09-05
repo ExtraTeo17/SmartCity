@@ -13,7 +13,9 @@ import java.util.List;
 
 // TODO: Unused?
 public class TrafficLightAgent extends AbstractAgent {
+    public static final String name = StationAgent.class.getName().replace("Agent", "");
     private static final Logger logger = LoggerFactory.getLogger(TrafficLightAgent.class);
+
     // TODO: Inject as dependency
     private final IBehaviourFactory<TrafficLightAgent> behaviourFactory;
     private final IGeoPosition position;
@@ -30,7 +32,7 @@ public class TrafficLightAgent extends AbstractAgent {
 
     @Override
     public String getNamePrefix() {
-        return "TrafficLight";
+        return name;
     }
 
     @Override

@@ -1,13 +1,10 @@
-package smartcity.buses;
+package osmproxy.buses;
 
 import org.jetbrains.annotations.NotNull;
-import routing.RouteNode;
 
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Spliterator;
-import java.util.function.Consumer;
 
 public class BrigadeInfo implements Iterable<Timetable> {
     private final String brigadeNr;
@@ -15,7 +12,7 @@ public class BrigadeInfo implements Iterable<Timetable> {
     private int timetablesCounter;
     private long currentlyConsideredStation = -1;
 
-    public BrigadeInfo(final String brigadeNr) {
+    BrigadeInfo(final String brigadeNr) {
         this.brigadeNr = brigadeNr;
     }
 
@@ -23,12 +20,12 @@ public class BrigadeInfo implements Iterable<Timetable> {
         return brigadeNr;
     }
 
-    private void stampCounterAndUpdateTimetableList(final long stationOsmId) {
-        stampCounter(stationOsmId);
-        updateTimetableList();
+    private boolean shouldReset(final long stationOsmId) {
+        return stationOsmId != currentlyConsideredStation;
     }
 
-    private void stampCounter(final long stationOsmId) {
+    // TODO: Is shouldReset executed only at first or may be more than one time?
+    public void addToTimetable(long stationOsmId, String time) {
         if (shouldReset(stationOsmId)) {
             timetablesCounter = 0;
             currentlyConsideredStation = stationOsmId;
@@ -36,20 +33,9 @@ public class BrigadeInfo implements Iterable<Timetable> {
         else {
             ++timetablesCounter;
         }
-    }
-
-    private boolean shouldReset(final long stationOsmId) {
-        return stationOsmId != currentlyConsideredStation;
-    }
-
-    private void updateTimetableList() {
         if (timetables.size() == timetablesCounter) {
             timetables.add(new Timetable());
         }
-    }
-
-    public void addToTimetable(long stationOsmId, String time) {
-        stampCounterAndUpdateTimetableList(stationOsmId);
         timetables.get(timetablesCounter).addEntryToTimetable(stationOsmId, time);
     }
 

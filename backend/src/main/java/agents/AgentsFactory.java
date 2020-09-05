@@ -3,12 +3,12 @@ package agents;
 import agents.abstractions.IAgentsFactory;
 import com.google.inject.Inject;
 import org.w3c.dom.Node;
+import osmproxy.buses.Timetable;
 import osmproxy.elements.OSMNode;
 import osmproxy.elements.OSMStation;
 import routing.RouteNode;
 import routing.StationNode;
 import smartcity.ITimeProvider;
-import smartcity.buses.Timetable;
 import vehicles.*;
 
 import java.util.List;
@@ -46,13 +46,13 @@ class AgentsFactory implements IAgentsFactory {
     }
 
     @Override
-    public LightManager create(Node crossroad) {
-        return new LightManager(idGenerator.get(LightManager.class), crossroad);
+    public LightManagerAgent create(Node crossroad) {
+        return new LightManagerAgent(idGenerator.get(LightManagerAgent.class), crossroad);
     }
 
     @Override
-    public LightManager create(OSMNode centerCrossroad) {
-        return new LightManager(idGenerator.get(LightManager.class), centerCrossroad);
+    public LightManagerAgent create(OSMNode centerCrossroad) {
+        return new LightManagerAgent(idGenerator.get(LightManagerAgent.class), centerCrossroad);
     }
 
     // TODO: Simplify to avoid 6 arguments

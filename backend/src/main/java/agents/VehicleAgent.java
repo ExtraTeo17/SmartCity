@@ -2,7 +2,6 @@ package agents;
 
 import agents.abstractions.AbstractAgent;
 import agents.utilities.MessageParameter;
-import jade.core.AID;
 import jade.core.behaviours.Behaviour;
 import jade.core.behaviours.CyclicBehaviour;
 import jade.core.behaviours.TickerBehaviour;
@@ -44,8 +43,8 @@ public class VehicleAgent extends AbstractAgent {
                         case MOVING:
                             vehicle.setState(DrivingState.WAITING_AT_LIGHT);
                             LightManagerNode light = vehicle.getNextTrafficLight();
-                            ACLMessage msg = new ACLMessage(ACLMessage.REQUEST_WHEN);
-                            msg.addReceiver(new AID("LightManager" + light.getLightManagerId(), AID.ISLOCALNAME));
+                            ACLMessage msg = createMessage(ACLMessage.REQUEST_WHEN, LightManagerAgent.name,
+                                    light.getLightManagerId());
                             Properties properties = new Properties();
                             properties.setProperty(MessageParameter.TYPE, MessageParameter.VEHICLE);
                             properties.setProperty(MessageParameter.ADJACENT_OSM_WAY_ID, Long.toString(vehicle.getAdjacentOsmWayId()));
@@ -67,8 +66,7 @@ public class VehicleAgent extends AbstractAgent {
                     vehicle.setState(DrivingState.AT_DESTINATION);
                     print("Reached destination.");
 
-                    ACLMessage msg = new ACLMessage(ACLMessage.INFORM);
-                    msg.addReceiver(new AID(MasterAgent.name, AID.ISLOCALNAME));
+                    ACLMessage msg = createMessage(ACLMessage.INFORM, MasterAgent.name);
                     Properties prop = new Properties();
                     prop.setProperty(MessageParameter.TYPE, MessageParameter.VEHICLE);
                     prop.setProperty(MessageParameter.AT_DESTINATION, String.valueOf(Boolean.TRUE));
@@ -89,8 +87,7 @@ public class VehicleAgent extends AbstractAgent {
                 if (rcv != null) {
                     switch (rcv.getPerformative()) {
                         case ACLMessage.REQUEST -> {
-                            ACLMessage response = new ACLMessage(ACLMessage.AGREE);
-                            response.addReceiver(rcv.getSender());
+                            ACLMessage response = createMessage(ACLMessage.AGREE, rcv.getSender());
                             Properties properties = new Properties();
                             properties.setProperty(MessageParameter.TYPE, MessageParameter.VEHICLE);
                             properties.setProperty(MessageParameter.ADJACENT_OSM_WAY_ID, Long.toString(vehicle.getAdjacentOsmWayId()));

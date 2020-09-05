@@ -1,5 +1,6 @@
 package agents.abstractions;
 
+import agents.LightManagerAgent;
 import agents.utilities.LoggerLevel;
 import agents.utilities.MessageParameter;
 import jade.core.AID;
@@ -7,7 +8,6 @@ import jade.core.Agent;
 import jade.lang.acl.ACLMessage;
 import jade.util.leap.Properties;
 import jade.wrapper.ControllerException;
-import org.apache.commons.logging.Log;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import routing.LightManagerNode;
@@ -15,6 +15,7 @@ import smartcity.MasterAgent;
 import vehicles.MovingObject;
 
 import java.time.Instant;
+import java.util.List;
 
 public abstract class AbstractAgent extends Agent {
     private static final Logger logger = LoggerFactory.getLogger(AbstractAgent.class);
@@ -25,7 +26,11 @@ public abstract class AbstractAgent extends Agent {
     }
 
     public String getPredictedName() {
-        return getNamePrefix() + id;
+        return getPredictedName(getNamePrefix(), id);
+    }
+
+    protected String getPredictedName(String prefix, int id) {
+        return prefix + id;
     }
 
     public abstract String getNamePrefix();
@@ -63,25 +68,47 @@ public abstract class AbstractAgent extends Agent {
         // finds next traffic light and announces his arrival
         LightManagerNode nextManager = movingObject.getNextTrafficLight();
         if (nextManager != null) {
-            ACLMessage msg = prepareMessage(nextManager, movingObject);
+            ACLMessage msg = prepareMessageForManager(nextManager, movingObject);
             send(msg);
             print("Sending INFORM to LightManager" + nextManager.getLightManagerId() + ".");
         }
     }
 
-    private ACLMessage prepareMessage(LightManagerNode nextManager, MovingObject movingObject) {
-        ACLMessage msg = new ACLMessage(ACLMessage.INFORM);
-        AID dest = new AID("LightManager" + nextManager.getLightManagerId(), AID.ISLOCALNAME);
-        msg.addReceiver(dest);
+    private ACLMessage prepareMessageForManager(LightManagerNode managerNode, MovingObject movingObject) {
+        ACLMessage msg = createMessage(ACLMessage.INFORM, LightManagerAgent.name, managerNode.getLightManagerId());
 
         Properties properties = new Properties();
         var agentType = MessageParameter.getTypeByMovingObject(movingObject);
         properties.setProperty(MessageParameter.TYPE, agentType);
         Instant time = MasterAgent.getSimulationTime().toInstant().plusMillis(movingObject.getMillisecondsToNextLight());
         properties.setProperty(MessageParameter.ARRIVAL_TIME, "" + time);
-        properties.setProperty(MessageParameter.ADJACENT_OSM_WAY_ID, "" + nextManager.getOsmWayId());
+        properties.setProperty(MessageParameter.ADJACENT_OSM_WAY_ID, "" + managerNode.getOsmWayId());
         msg.setAllUserDefinedParameters(properties);
 
+        return msg;
+    }
+
+    protected ACLMessage createMessage(int type, List<String> receivers) {
+        ACLMessage msg = new ACLMessage(type);
+        for(var name : receivers){
+            msg.addReceiver(new AID(name, AID.ISLOCALNAME));
+        }
+        return msg;
+    }
+
+    protected ACLMessage createMessage(int type, String receiverName) {
+        var receiver = new AID(receiverName, AID.ISLOCALNAME);
+        return createMessage(type, receiver);
+    }
+
+    protected ACLMessage createMessage(int type, String receiverName, int receiverId) {
+        var receiver = new AID(getPredictedName(receiverName, receiverId), AID.ISLOCALNAME);
+        return createMessage(type, receiver);
+    }
+
+    protected ACLMessage createMessage(int type, AID receiver) {
+        ACLMessage msg = new ACLMessage(type);
+        msg.addReceiver(receiver);
         return msg;
     }
 }

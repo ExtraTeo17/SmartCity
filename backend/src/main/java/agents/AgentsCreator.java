@@ -13,10 +13,10 @@ import org.slf4j.LoggerFactory;
 import osmproxy.LightAccessManager;
 import osmproxy.MapAccessManager;
 import osmproxy.buses.IBusLinesManager;
+import osmproxy.buses.Timetable;
 import osmproxy.elements.OSMNode;
 import smartcity.SimulationState;
 import smartcity.TimeProvider;
-import smartcity.buses.Timetable;
 import smartcity.config.ConfigContainer;
 import smartcity.config.StaticConfig;
 
@@ -148,7 +148,7 @@ public class AgentsCreator {
 
         if (result) {
             // TODO: Maybe only positions?
-            var lightManagers = ImmutableList.copyOf(agentsContainer.iterator(LightManager.class));
+            var lightManagers = ImmutableList.copyOf(agentsContainer.iterator(LightManagerAgent.class));
             eventBus.post(new LightManagersReadyEvent(lightManagers));
         }
 

@@ -16,9 +16,6 @@ import osmproxy.elements.OSMStation;
 import osmproxy.elements.OSMWay;
 import routing.core.IZone;
 import routing.core.Position;
-import smartcity.buses.BrigadeInfo;
-import utilities.ConditionalExecutor;
-import utilities.FileWriterWrapper;
 import utilities.IterableJsonArray;
 import utilities.IterableNodeList;
 
@@ -42,12 +39,6 @@ public class BusLinesManager implements IBusLinesManager {
         var overpassInfo = busApiManager.getBusDataXml(zone);
         if (overpassInfo.isEmpty()) {
             return new BusPreparationData();
-        }
-        else {
-            ConditionalExecutor.debug(() -> {
-                logger.info("Writing bus-data to: " + FileWriterWrapper.DEFAULT_OUTPUT_PATH_XML);
-                FileWriterWrapper.write(overpassInfo.get());
-            });
         }
 
         var busInfoData = parseBusData(overpassInfo.get());
@@ -189,7 +180,8 @@ public class BusLinesManager implements IBusLinesManager {
                         String key = (String) item.get("key");
                         String brigadeNr = (String) item.get("value");
                         if (key.equals("brygada")) {
-                            if (!brigadeNrToBrigadeInfo.containsKey(brigadeNr)) {
+                            lastInfo = brigadeNrToBrigadeInfo.get(brigadeNr);
+                            if (lastInfo == null) {
                                 lastInfo = new BrigadeInfo(brigadeNr);
                                 brigadeNrToBrigadeInfo.put(brigadeNr, lastInfo);
                             }

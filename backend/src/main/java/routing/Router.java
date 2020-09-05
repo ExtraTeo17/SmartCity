@@ -137,7 +137,6 @@ public final class Router {
         return route;
     }
 
-
     private static void findPositionOfElementOnRoute(List<RouteNode> route, RouteNode manager) {
         int minIndex = -1;
         double minDistance = Double.MAX_VALUE;
@@ -152,6 +151,7 @@ public final class Router {
             route.add(minIndex + 1, manager);
             return;
         }
+
         double distMgrToMinPrev = route.get(minIndex - 1).distance(manager);
         double distMinToMinPrev = route.get(minIndex - 1).distance(route.get(minIndex));
         if (distMgrToMinPrev < distMinToMinPrev) {
@@ -162,7 +162,7 @@ public final class Router {
         }
     }
 
-    // TODO: In some cases distance is 0 -> dx/dy is NaN -> same nodes?
+    // TODO: In some cases distance is 0 -> dx|dy is NaN -> same nodes?
     public static List<RouteNode> uniformRoute(List<RouteNode> route) {
         List<RouteNode> newRoute = new ArrayList<>();
         for (int i = 0; i < route.size() - 1; i++) {

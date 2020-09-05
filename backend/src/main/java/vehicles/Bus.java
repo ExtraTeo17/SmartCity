@@ -2,19 +2,18 @@ package vehicles;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import osmproxy.buses.Timetable;
 import routing.LightManagerNode;
 import routing.RouteNode;
 import routing.Router;
 import routing.StationNode;
 import routing.core.IGeoPosition;
-import smartcity.buses.Timetable;
 
 import java.util.*;
 
 public class Bus extends MovingObject {
     public static int CAPACITY_MID = 10;
     public static int CAPACITY_HIGH = 25;
-
     private static final Logger logger = LoggerFactory.getLogger(Bus.class);
 
     private final Timetable timetable;
@@ -25,7 +24,7 @@ public class Bus extends MovingObject {
     private final List<RouteNode> route;
 
     private DrivingState state = DrivingState.STARTING;
-    private int index = 0;
+    private int moveIndex = 0;
     private int closestLightIndex = -1;
     private int closestStationIndex = -1;
     private int passengersCount = 0;
@@ -93,12 +92,11 @@ public class Bus extends MovingObject {
 
     public final List<StationNode> getStationNodesOnRoute() {
         return stationNodesOnRoute;
-
     }
 
     @Override
     public long getAdjacentOsmWayId() {
-        return ((LightManagerNode) route.get(index)).getOsmWayId();
+        return ((LightManagerNode) route.get(moveIndex)).getOsmWayId();
     }
 
     @Override
@@ -108,7 +106,7 @@ public class Bus extends MovingObject {
 
     @Override
     public LightManagerNode getNextTrafficLight() {
-        for (int i = index + 1; i < route.size(); i++) {
+        for (int i = moveIndex + 1; i < route.size(); i++) {
             if (route.get(i) instanceof LightManagerNode) {
                 closestLightIndex = i;
                 return getCurrentTrafficLightNode();
@@ -119,7 +117,7 @@ public class Bus extends MovingObject {
     }
 
     public Optional<StationNode> findNextStation() {
-        for (int i = index + 1; i < route.size(); ++i) {
+        for (int i = moveIndex + 1; i < route.size(); ++i) {
             if (route.get(i) instanceof StationNode) {
                 closestStationIndex = i;
                 return Optional.of((StationNode) route.get(i));
@@ -134,12 +132,12 @@ public class Bus extends MovingObject {
     }
 
     public RouteNode findNextStop() {
-        for (int i = index + 1; i < route.size(); i++) {
+        for (int i = moveIndex + 1; i < route.size(); i++) {
             if (route.get(i) instanceof StationNode) {
-                return (StationNode) route.get(i);
+                return route.get(i);
             }
-            if (route.get(i) instanceof LightManagerNode) {
-                return (LightManagerNode) route.get(i);
+            else if (route.get(i) instanceof LightManagerNode) {
+                return route.get(i);
             }
         }
         return null;
@@ -147,7 +145,7 @@ public class Bus extends MovingObject {
 
     @Override
     public IGeoPosition getPosition() {
-        return route.get(index);
+        return route.get(moveIndex);
     }
 
     @Override
@@ -160,17 +158,17 @@ public class Bus extends MovingObject {
 
     @Override
     public boolean isAtTrafficLights() {
-        if (index == route.size()) {
+        if (moveIndex == route.size()) {
             return false;
         }
-        return route.get(index) instanceof LightManagerNode;
+        return route.get(moveIndex) instanceof LightManagerNode;
     }
 
     public boolean isAtStation() {
-        if (index == route.size()) {
+        if (moveIndex == route.size()) {
             return true;
         }
-        return route.get(index) instanceof StationNode;
+        return route.get(moveIndex) instanceof StationNode;
     }
 
     public StationNode getCurrentStationNode() {
@@ -182,16 +180,16 @@ public class Bus extends MovingObject {
 
     @Override
     public boolean isAtDestination() {
-        return index == route.size();
+        return moveIndex == route.size();
     }
 
     @Override
     public void move() {
         if (isAtDestination()) {
-            index = 0;
+            moveIndex = 0;
         }
         else {
-            index++;
+            moveIndex++;
         }
     }
 
@@ -202,11 +200,11 @@ public class Bus extends MovingObject {
 
     @Override
     public int getMillisecondsToNextLight() {
-        return ((closestLightIndex - index) * Router.STEP_CONSTANT) / getSpeed();
+        return ((closestLightIndex - moveIndex) * Router.STEP_CONSTANT) / getSpeed();
     }
 
     public int getMillisecondsToNextStation() {
-        return ((closestStationIndex - index) * Router.STEP_CONSTANT) / getSpeed();
+        return ((closestStationIndex - moveIndex) * Router.STEP_CONSTANT) / getSpeed();
     }
 
     @Override

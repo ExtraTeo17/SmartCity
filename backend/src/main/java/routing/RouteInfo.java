@@ -33,7 +33,7 @@ public class RouteInfo implements Iterable<OSMWay> {
     // TODO: Add some tests for this function
     void determineRouteOrientationsAndFilterRelevantNodes(String startingOsmNodeRef, String finishingOsmNodeRef) {
         if (ways.size() == 0 || ways.size() == 1) {
-            logger.warn("No ways to determine");
+            logger.info("No ways to determine for: " + startingOsmNodeRef + "-" + finishingOsmNodeRef);
             return;
         }
 
@@ -41,7 +41,8 @@ public class RouteInfo implements Iterable<OSMWay> {
                 determineRouteOrientationAndFilterRelevantNodes(ways.get(1), startingOsmNodeRef);
         var lastInd = ways.size() - 1;
         for (int i = 1; i < lastInd; ++i) {
-            startingNodeIndex = ways.get(i).determineRouteOrientationAndFilterRelevantNodes(ways.get(i + 1), startingNodeIndex);
+            startingNodeIndex = ways.get(i)
+                    .determineRouteOrientationAndFilterRelevantNodes(ways.get(i + 1), startingNodeIndex);
         }
 
         ways.get(lastInd).determineRouteOrientationAndFilterRelevantNodes(startingNodeIndex, finishingOsmNodeRef);

@@ -5,7 +5,6 @@ import osmproxy.elements.OSMStation;
 import osmproxy.elements.OSMWay;
 import routing.RouteNode;
 import routing.Router;
-import smartcity.buses.BrigadeInfo;
 
 import java.util.ArrayList;
 import java.util.Collection;
