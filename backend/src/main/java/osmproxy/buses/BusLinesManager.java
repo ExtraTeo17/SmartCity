@@ -1,7 +1,6 @@
 package osmproxy.buses;
 
 import com.google.common.annotations.VisibleForTesting;
-import com.google.common.collect.Iterables;
 import com.google.inject.Inject;
 import org.json.simple.JSONObject;
 import org.slf4j.Logger;
@@ -59,7 +58,7 @@ public class BusLinesManager implements IBusLinesManager {
         Set<BusInfoData> busInfoDataSet = new LinkedHashSet<>();
         HashMap<Long, OSMStation> busStopsMap = new LinkedHashMap<>();
         int errors = 0;
-        for (var osmNode : Iterables.skip(osmXMLNodes, 1)) {
+        for (var osmNode : osmXMLNodes) {
             var nodeName = osmNode.getNodeName();
             if (nodeName.equals("relation")) {
                 var busInfo = parseRelation(osmNode);
@@ -73,7 +72,7 @@ public class BusLinesManager implements IBusLinesManager {
             }
             else if (nodeName.equals("node")) {
                 var station = parseNode(osmNode, busStopsMap::containsKey);
-                station.ifPresent(s -> busStopsMap.put(s.getId(), s));
+                station.ifPresent(st -> busStopsMap.put(st.getId(), st));
             }
         }
 
@@ -97,9 +96,9 @@ public class BusLinesManager implements IBusLinesManager {
         List<Long> stationIds = new ArrayList<>();
         String busLine = "";
         StringBuilder busWayQueryBuilder = new StringBuilder();
-        for (var member : IterableNodeList.of(relation.getChildNodes())) {
-            if (member.getNodeName().equals("member")) {
-                NamedNodeMap attributes = member.getAttributes();
+        for (var node : IterableNodeList.of(relation.getChildNodes())) {
+            if (node.getNodeName().equals("member")) {
+                NamedNodeMap attributes = node.getAttributes();
                 long id = Long.parseLong(attributes.getNamedItem("ref").getNodeValue());
                 if (attributes.getNamedItem("role").getNodeValue().contains("stop") &&
                         attributes.getNamedItem("type").getNodeValue().equals("node")) {
@@ -110,8 +109,8 @@ public class BusLinesManager implements IBusLinesManager {
                     busWayQueryBuilder.append(OsmQueryManager.getSingleBusWayQuery(id));
                 }
             }
-            else if (member.getNodeName().equals("tag")) {
-                NamedNodeMap attributes = member.getAttributes();
+            else if (node.getNodeName().equals("tag")) {
+                NamedNodeMap attributes = node.getAttributes();
                 Node namedItemID = attributes.getNamedItem("k");
                 if (namedItemID.getNodeValue().equals("ref")) {
                     Node lineNumber = attributes.getNamedItem("v");
@@ -122,8 +121,8 @@ public class BusLinesManager implements IBusLinesManager {
 
         List<OSMWay> ways;
         try {
-            var overpassNodes =
-                    MapAccessManager.getNodesViaOverpass(OsmQueryManager.getQueryWithPayload(busWayQueryBuilder.toString()));
+            var query = OsmQueryManager.getQueryWithPayload(busWayQueryBuilder.toString());
+            var overpassNodes = MapAccessManager.getNodesViaOverpass(query);
             ways = MapAccessManager.parseOsmWays(overpassNodes, zone);
         } catch (NoSuchElementException | UnsupportedOperationException e) {
             logger.warn("Please change the zone, this one is not supported yet.", e);
@@ -146,6 +145,7 @@ public class BusLinesManager implements IBusLinesManager {
         if (!isPresentVal && zone.contains(Position.of(lat, lon))) {
             var stationNumber = searchForStationNumber(node.getChildNodes());
             if (stationNumber.isPresent()) {
+                logger.debug("Parsing station with number: " + stationNumber.get());
                 return Optional.of(new OSMStation(osmId, lat, lon, stationNumber.get()));
             }
         }
@@ -167,7 +167,7 @@ public class BusLinesManager implements IBusLinesManager {
     }
 
     private Collection<BrigadeInfo> generateBrigadeInfos(String busLine, Collection<OSMStation> osmStations) {
-        Map<String, BrigadeInfo> brigadeNrToBrigadeInfo = new LinkedHashMap<>();
+        Map<String, BrigadeInfo> brigadeInfoMap = new LinkedHashMap<>();
         for (OSMStation station : osmStations) {
             var nodesOptional = busApiManager.getNodesViaWarszawskieAPI(station.getBusStopId(),
                     station.getBusStopNr(), busLine);
@@ -179,10 +179,10 @@ public class BusLinesManager implements IBusLinesManager {
                         String key = (String) item.get("key");
                         String brigadeNr = (String) item.get("value");
                         if (key.equals("brygada")) {
-                            lastInfo = brigadeNrToBrigadeInfo.get(brigadeNr);
+                            lastInfo = brigadeInfoMap.get(brigadeNr);
                             if (lastInfo == null) {
                                 lastInfo = new BrigadeInfo(brigadeNr);
-                                brigadeNrToBrigadeInfo.put(brigadeNr, lastInfo);
+                                brigadeInfoMap.put(brigadeNr, lastInfo);
                             }
                         }
                         else if (key.equals("czas") && lastInfo != null) {
@@ -193,7 +193,7 @@ public class BusLinesManager implements IBusLinesManager {
             });
         }
 
-        return brigadeNrToBrigadeInfo.values();
+        return brigadeInfoMap.values();
     }
 
     @VisibleForTesting

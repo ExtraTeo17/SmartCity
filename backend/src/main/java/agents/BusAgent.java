@@ -268,7 +268,7 @@ public class BusAgent extends AbstractAgent {
     }
 
     private void logAllStations() {
-        print("Printing station nodes: ", LoggerLevel.DEBUG);
+        print("Printing station nodes: ");
         var stations = bus.getStationNodesOnRoute();
         for (int i = 0; i < stations.size(); ++i) {
             var station = stations.get(i);
@@ -276,9 +276,9 @@ public class BusAgent extends AbstractAgent {
             var stationId = station.getStationId();
             var timeOnStation = bus.getTimeOnStation(osmId);
             var timeString = timeOnStation.isPresent() ? timeOnStation.get().toString() : "";
-            print(i + ": " + stationId + " on '" + timeString + "'", LoggerLevel.DEBUG);
+            print(i + ": " + stationId + " on '" + timeString + "'");
         }
-        print("Printing station nodes finished.", LoggerLevel.DEBUG);
+        print("Printing station nodes finished.");
     }
 
     public Bus getBus() {

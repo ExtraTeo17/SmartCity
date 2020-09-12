@@ -41,7 +41,7 @@ public class BusInfo implements Iterable<BrigadeInfo> {
         brigadeList = new ArrayList<>(values);
     }
 
-    // TODO: Not static
+    // TODO: Remove routeInfo from here
     public List<RouteNode> generateRouteInfo() {
         if (routeInfo == null) {
             routeInfo = Router.generateRouteInfoForBuses(route, stops);

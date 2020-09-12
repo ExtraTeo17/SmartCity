@@ -7,8 +7,6 @@ import jade.core.behaviours.CyclicBehaviour;
 import jade.core.behaviours.TickerBehaviour;
 import jade.lang.acl.ACLMessage;
 import jade.util.leap.Properties;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import routing.LightManagerNode;
 import routing.Router;
 import routing.StationNode;
@@ -20,7 +18,6 @@ import java.time.Instant;
 
 public class PedestrianAgent extends AbstractAgent {
     public static final String name = Pedestrian.class.getName().replace("Agent", "");
-    private static final Logger logger = LoggerFactory.getLogger(PedestrianAgent.class);
     private final Pedestrian pedestrian;
 
     @Override

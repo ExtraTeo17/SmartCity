@@ -18,11 +18,12 @@ import java.time.Instant;
 import java.util.List;
 
 public abstract class AbstractAgent extends Agent {
-    private static final Logger logger = LoggerFactory.getLogger(AbstractAgent.class);
+    protected final Logger logger;
     private final int id;
 
     public AbstractAgent(int id) {
         this.id = id;
+        this.logger = LoggerFactory.getLogger(this.getPredictedName());
     }
 
     public String getPredictedName() {
@@ -48,13 +49,12 @@ public abstract class AbstractAgent extends Agent {
     }
 
     public void print(String message, LoggerLevel level) {
-        var fullMsg = getLocalName() + ": " + message;
         switch (level) {
-            case TRACE -> logger.trace(fullMsg);
-            case DEBUG -> logger.debug(fullMsg);
-            case INFO -> logger.info(fullMsg);
-            case WARN -> logger.warn(fullMsg);
-            case ERROR -> logger.error(fullMsg);
+            case TRACE -> logger.trace(message);
+            case DEBUG -> logger.debug(message);
+            case INFO -> logger.info(message);
+            case WARN -> logger.warn(message);
+            case ERROR -> logger.error(message);
         }
     }
 
@@ -91,7 +91,7 @@ public abstract class AbstractAgent extends Agent {
     // TODO: Special class - MessageCreator for all msg-related code, protected, dependency, injected
     protected ACLMessage createMessage(int type, List<String> receivers) {
         ACLMessage msg = new ACLMessage(type);
-        for(var name : receivers){
+        for (var name : receivers) {
             msg.addReceiver(new AID(name, AID.ISLOCALNAME));
         }
         return msg;

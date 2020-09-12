@@ -1,6 +1,7 @@
 package agents;
 
 import agents.abstractions.AbstractAgent;
+import agents.utilities.LoggerLevel;
 import agents.utilities.MessageParameter;
 import jade.core.behaviours.Behaviour;
 import jade.core.behaviours.CyclicBehaviour;
@@ -8,9 +9,8 @@ import jade.core.behaviours.TickerBehaviour;
 import jade.lang.acl.ACLMessage;
 import jade.util.leap.Properties;
 import org.javatuples.Pair;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import osmproxy.elements.OSMStation;
+import smartcity.MasterAgent;
 import smartcity.lights.OptimizationResult;
 import smartcity.stations.StationStrategy;
 
@@ -19,7 +19,6 @@ import java.util.List;
 
 public class StationAgent extends AbstractAgent {
     public static final String name = StationAgent.class.getName().replace("Agent", "");
-    private static final Logger logger = LoggerFactory.getLogger(StationAgent.class);
 
     private final OSMStation station;
     private final StationStrategy stationStrategy;
@@ -53,7 +52,13 @@ public class StationAgent extends AbstractAgent {
             }
 
             private Instant getInstantParameter(ACLMessage rcv, String param) {
-                return Instant.parse(rcv.getUserDefinedParameter(param));
+                var paramValue = rcv.getUserDefinedParameter(param);
+                if (paramValue == null) {
+                    print("Did not receive " + param + " from " + rcv.getSender(), LoggerLevel.ERROR);
+                    return MasterAgent.getSimulationTime().toInstant();
+                }
+
+                return Instant.parse(paramValue);
             }
 
             private void handleMessageFromBus(ACLMessage rcv) {
@@ -86,7 +91,7 @@ public class StationAgent extends AbstractAgent {
 
                 }
                 else {
-                    logger.warn("Unknown message type from Bus: " + messageKind);
+                    print("Unknown message type from Bus: " + messageKind, LoggerLevel.WARN);
                 }
             }
 
@@ -98,7 +103,7 @@ public class StationAgent extends AbstractAgent {
                             getInstantParameter(rcv, MessageParameter.ARRIVAL_TIME));
                 }
                 else if (messageKind == ACLMessage.REQUEST_WHEN) {
-                    logger.debug("GET MESSAGE FROM PEDESTRIAN REQUEST_WHEN");
+                    print("GET MESSAGE FROM PEDESTRIAN REQUEST_WHEN", LoggerLevel.DEBUG);
                     stationStrategy.removePedestrianFromFarAwayQueue(rcv.getSender().getLocalName(), rcv.getUserDefinedParameter(MessageParameter.DESIRED_BUS));
                     stationStrategy.addPedestrianToQueue(rcv.getSender().getLocalName(),
                             rcv.getUserDefinedParameter(MessageParameter.DESIRED_BUS),
@@ -108,11 +113,11 @@ public class StationAgent extends AbstractAgent {
                     send(msg);
                 }
                 else if (messageKind == ACLMessage.AGREE) {
-                    logger.debug("-----GET AGREE from PEDESTRIAN------");
+                    print("-----GET AGREE from PEDESTRIAN------", LoggerLevel.DEBUG);
                     stationStrategy.removePedestrianFromBusOnStationQueue(rcv.getSender().getLocalName(), rcv.getUserDefinedParameter(MessageParameter.DESIRED_BUS));
                 }
                 else {
-                    logger.warn("Unknown message type from Pedestrian: " + messageKind);
+                    print("Unknown message type from Pedestrian: " + messageKind, LoggerLevel.WARN);
                 }
             }
         };
@@ -120,7 +125,6 @@ public class StationAgent extends AbstractAgent {
             @Override
             protected void onTick() {
                 OptimizationResult result = stationStrategy.requestBusesAndPeopleFreeToGo();
-
                 handleOptimizationResult(result);
             }
 

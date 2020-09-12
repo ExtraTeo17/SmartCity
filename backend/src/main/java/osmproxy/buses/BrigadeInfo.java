@@ -33,6 +33,7 @@ public class BrigadeInfo implements Iterable<Timetable> {
         else {
             ++timetablesCounter;
         }
+        
         if (timetables.size() == timetablesCounter) {
             timetables.add(new Timetable());
         }
