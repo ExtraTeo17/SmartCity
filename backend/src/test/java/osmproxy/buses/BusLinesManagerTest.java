@@ -1,5 +1,6 @@
 package osmproxy.buses;
 
+import mocks.BusApiManagerMock;
 import org.junit.Assert;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;

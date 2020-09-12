@@ -30,7 +30,7 @@ public abstract class AbstractAgent extends Agent {
     }
 
     protected String getPredictedName(String prefix, int id) {
-        return prefix + id;
+        return prefix.concat(Integer.toString(id));
     }
 
     public abstract String getNamePrefix();
@@ -88,6 +88,7 @@ public abstract class AbstractAgent extends Agent {
         return msg;
     }
 
+    // TODO: Special class - MessageCreator for all msg-related code, protected, dependency, injected
     protected ACLMessage createMessage(int type, List<String> receivers) {
         ACLMessage msg = new ACLMessage(type);
         for(var name : receivers){

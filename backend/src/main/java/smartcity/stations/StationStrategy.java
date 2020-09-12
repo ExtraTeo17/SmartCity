@@ -24,6 +24,10 @@ public class StationStrategy {
     final private Map<String, PedestrianArrivalInfo> pedestrianOnStationMap = new HashMap<>();
 
     public StationStrategy(OSMStation station, int agentId) {
+        if (station == null) {
+            // Temporary workaround, because of static container in MasterAgent
+            return;
+        }
         var id = station.getId();
         MasterAgent.osmStationIdToStationNode.put(id,
                 new StationNode(station.getLat(), station.getLng(),

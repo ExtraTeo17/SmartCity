@@ -29,15 +29,16 @@ public class Timetable {
     }
 
     void addEntryToTimetable(long stationOsmId, String time) {
-        Date timeOnStation = null;
+        Date timeOnStation;
         try {
             timeOnStation = new SimpleDateFormat("HH:mm:ss").parse(time);
         } catch (ParseException e) {
             logger.warn("Error parsing new entry", e);
+            return;
         }
 
-        if (timeOnStationChronological.size() == 0 || (timeOnStation != null &&
-                timeOnStation.after(timeOnStationChronological.get(timeOnStationChronological.size() - 1)))) {
+        if (timeOnStationChronological.size() == 0 ||
+                timeOnStation.after(timeOnStationChronological.get(timeOnStationChronological.size() - 1))){
             stationOsmIdToTime.put(stationOsmId, timeOnStation);
             timeOnStationChronological.add(timeOnStation);
         }

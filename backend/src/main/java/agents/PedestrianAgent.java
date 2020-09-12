@@ -19,7 +19,7 @@ import vehicles.Pedestrian;
 import java.time.Instant;
 
 public class PedestrianAgent extends AbstractAgent {
-    public static final String name = StationAgent.class.getName().replace("Agent", "");
+    public static final String name = Pedestrian.class.getName().replace("Agent", "");
     private static final Logger logger = LoggerFactory.getLogger(PedestrianAgent.class);
     private final Pedestrian pedestrian;
 

@@ -149,9 +149,8 @@ public class BusLinesManager implements IBusLinesManager {
                 return Optional.of(new OSMStation(osmId, lat, lon, stationNumber.get()));
             }
         }
-        else {
-            logger.debug("Station: " + osmId + " won't be included. IsPresent: " + isPresentVal);
-        }
+
+        logger.debug("Station: " + osmId + " won't be included. IsPresent: " + isPresentVal);
 
         return Optional.empty();
     }

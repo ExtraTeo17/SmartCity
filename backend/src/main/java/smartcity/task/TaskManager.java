@@ -2,6 +2,7 @@ package smartcity.task;
 
 import agents.BusAgent;
 import agents.LightManagerAgent;
+import agents.PedestrianAgent;
 import agents.VehicleAgent;
 import agents.abstractions.AbstractAgent;
 import agents.abstractions.IAgentsContainer;
@@ -166,7 +167,7 @@ public class TaskManager implements ITaskManager {
                         endStation.getOsmStationId(), null);
 
                 // TODO: Separate fields for testPedestrian and pedestriansLimit
-                var agent = agentsFactory.create(routeToStation, routeFromStation,
+                PedestrianAgent agent = agentsFactory.create(routeToStation, routeFromStation,
                         busLine, startStation, endStation, testPedestrian);
                 if (agentsContainer.tryAdd(agent)) {
                     agent.start();

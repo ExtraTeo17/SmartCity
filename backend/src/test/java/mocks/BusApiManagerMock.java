@@ -1,7 +1,8 @@
-package osmproxy.buses;
+package mocks;
 
 import org.json.simple.JSONObject;
 import org.w3c.dom.Document;
+import osmproxy.buses.IBusApiManager;
 import routing.core.IZone;
 
 import java.util.Optional;

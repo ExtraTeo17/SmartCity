@@ -10,7 +10,7 @@ import genesis.AbstractModule;
 import jade.wrapper.ContainerController;
 
 public class AgentsModule extends AbstractModule {
-    private static final Class<?>[] agentTypes = {
+    public static final Class<?>[] agentTypes = {
             VehicleAgent.class,
             BusAgent.class,
             LightManagerAgent.class,
