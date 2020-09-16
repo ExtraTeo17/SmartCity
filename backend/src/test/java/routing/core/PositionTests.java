@@ -3,7 +3,7 @@ package routing.core;
 import org.junit.Assert;
 import org.junit.jupiter.api.Test;
 
-class PositionTest {
+class PositionTests {
 
     @Test
     void midpoint_once_originalNotModified_correctResult() {

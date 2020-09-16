@@ -14,7 +14,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.params.provider.Arguments.arguments;
 
 
-class ZoneTest {
+class ZoneTests {
 
     static Stream<Arguments> parisZoneProvider() {
         return Stream.of(

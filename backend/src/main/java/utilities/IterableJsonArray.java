@@ -5,6 +5,7 @@ import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 
 import java.util.Iterator;
+import java.util.stream.Stream;
 
 public class IterableJsonArray<T> implements Iterable<T> {
     private final JSONArray jsonArray;
@@ -33,12 +34,17 @@ public class IterableJsonArray<T> implements Iterable<T> {
         };
     }
 
+    @SuppressWarnings("unchecked")
+    public Stream<T> stream() {
+        return jsonArray.stream();
+    }
+
     public static <TArray> IterableJsonArray<TArray> of(JSONArray jsonArray, Class<TArray> type) {
         return new IterableJsonArray<TArray>(jsonArray, type);
     }
 
     public static <TArray> IterableJsonArray<TArray> of(Object jsonArray, Class<TArray> type) {
-        return IterableJsonArray.of((JSONArray)jsonArray, type);
+        return IterableJsonArray.of((JSONArray) jsonArray, type);
     }
 
     public static <TArray> IterableJsonArray<TArray> of(JSONObject jsonObject, String key, Class<TArray> type) {

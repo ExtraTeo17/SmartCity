@@ -7,6 +7,7 @@ import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 import osmproxy.MapAccessManager;
 import osmproxy.OsmQueryManager;
+import osmproxy.buses.abstractions.IBusApiManager;
 import routing.core.IZone;
 import utilities.ConditionalExecutor;
 import utilities.FileWriterWrapper;

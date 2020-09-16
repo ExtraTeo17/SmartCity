@@ -1,5 +1,6 @@
-package osmproxy.buses;
+package osmproxy.buses.data;
 
+import osmproxy.buses.BusInfo;
 import osmproxy.elements.OSMStation;
 
 import java.util.HashMap;
@@ -10,12 +11,12 @@ public class BusPreparationData {
     public final Set<BusInfo> busInfos;
     public final HashMap<Long, OSMStation> stations;
 
-    BusPreparationData(Set<BusInfo> busInfos, HashMap<Long, OSMStation> stations) {
+    public BusPreparationData(Set<BusInfo> busInfos, HashMap<Long, OSMStation> stations) {
         this.busInfos = busInfos;
         this.stations = stations;
     }
 
-    BusPreparationData() {
+    public BusPreparationData() {
         this.busInfos = new HashSet<>();
         this.stations = new HashMap<>();
     }

@@ -1,14 +1,12 @@
 package osmproxy.buses;
 
-import mocks.BusApiManagerMock;
 import org.junit.Assert;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
+import osmproxy.buses.data.BusInfoData;
 import osmproxy.elements.OSMElement;
 import osmproxy.elements.OSMStation;
-import routing.core.IZone;
-import routing.core.Zone;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -17,8 +15,7 @@ import java.util.stream.Stream;
 import static org.junit.jupiter.params.provider.Arguments.arguments;
 
 
-class BusLinesManagerTest {
-    private final IZone busZone = Zone.of(52.203342, 20.861213, 300);
+class BusDataMergerTests {
     private final Random random = new Random();
 
     static Stream<Arguments> stopIdsProvider() {
@@ -74,14 +71,13 @@ class BusLinesManagerTest {
     void getBusInfosWithStops_manySets_correctResult(long[][] stopsSets, String testCaseName) {
         // Arrange
         random.setSeed(30);
-        var busApiManager = new BusApiManagerMock();
-        BusLinesManager manager = new BusLinesManager(busApiManager, busZone);
+        var merger = new BusDataMerger();
         String lineName = "test";
         var busInfoDataSet = generateBusDataSet(lineName, stopsSets);
         var busStopsSet = generateStations(stopsSets);
 
         // Act
-        var result = manager.getBusInfosWithStops(busInfoDataSet, busStopsSet);
+        var result = merger.getBusInfosWithStops(busInfoDataSet, busStopsSet);
 
         // Assert
         for (var info : result) {
@@ -93,12 +89,12 @@ class BusLinesManagerTest {
         }
     }
 
-    private Set<BusLinesManager.BusInfoData> generateBusDataSet(String line, long[][] stopIdsPerInfo) {
-        var result = new HashSet<BusLinesManager.BusInfoData>();
+    private Set<BusInfoData> generateBusDataSet(String line, long[][] stopIdsPerInfo) {
+        var result = new HashSet<BusInfoData>();
         for (int infoIt = 0; infoIt < stopIdsPerInfo.length; ++infoIt) {
             var info = new BusInfo(line + infoIt, new ArrayList<>());
             var idsList = Arrays.stream(stopIdsPerInfo[infoIt]).boxed().collect(Collectors.toList());
-            result.add(new BusLinesManager.BusInfoData(info, idsList));
+            result.add(new BusInfoData(info, idsList));
         }
 
         return result;
