@@ -24,20 +24,15 @@ public class LightManagerAgent extends AbstractAgent {
     private final ICrossroad crossroad;
 
     public LightManagerAgent(int id, Node node) {
-        super(id);
+        super(id, name);
         behaviourFactory = new LightManagerBehaviourFactory();
         crossroad = new SimpleCrossroad(node, id);
     }
 
     public LightManagerAgent(int id, OSMNode centerCrossroadNode) {
-        super(id);
+        super(id, name);
         behaviourFactory = new LightManagerBehaviourFactory();
         crossroad = new SimpleCrossroad(centerCrossroadNode, id);
-    }
-
-    @Override
-    public String getNamePrefix() {
-        return name;
     }
 
     @Override

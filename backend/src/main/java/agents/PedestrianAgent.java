@@ -20,13 +20,8 @@ public class PedestrianAgent extends AbstractAgent {
     public static final String name = Pedestrian.class.getName().replace("Agent", "");
     private final Pedestrian pedestrian;
 
-    @Override
-    public String getNamePrefix() {
-        return name;
-    }
-
     public PedestrianAgent(int agentId, final Pedestrian pedestrian) {
-        super(agentId);
+        super(agentId, name);
         this.pedestrian = pedestrian;
     }
 

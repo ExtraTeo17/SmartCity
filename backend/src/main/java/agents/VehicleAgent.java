@@ -20,13 +20,8 @@ public class VehicleAgent extends AbstractAgent {
     private final MovingObject vehicle;
 
     VehicleAgent(int id, MovingObject vehicle) {
-        super(id);
+        super(id, vehicle.getVehicleType());
         this.vehicle = vehicle;
-    }
-
-    @Override
-    public String getNamePrefix() {
-        return vehicle.getVehicleType();
     }
 
     @Override

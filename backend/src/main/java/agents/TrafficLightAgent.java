@@ -14,7 +14,6 @@ import java.util.List;
 // TODO: Unused?
 public class TrafficLightAgent extends AbstractAgent {
     public static final String name = StationAgent.class.getName().replace("Agent", "");
-    private static final Logger logger = LoggerFactory.getLogger(TrafficLightAgent.class);
 
     // TODO: Inject as dependency
     private final IBehaviourFactory<TrafficLightAgent> behaviourFactory;
@@ -23,16 +22,11 @@ public class TrafficLightAgent extends AbstractAgent {
     private final List<String> agentsQueue;
 
     public TrafficLightAgent(int id, IGeoPosition position) {
-        super(id);
+        super(id, name);
         this.position = position;
         this.behaviourFactory = new BasicLightsBehaviourFactory();
         this.lightColor = LightColor.RED;
         this.agentsQueue = new ArrayList<>();
-    }
-
-    @Override
-    public String getNamePrefix() {
-        return name;
     }
 
     @Override

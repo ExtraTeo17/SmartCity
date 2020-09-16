@@ -33,7 +33,10 @@ public class Bus extends MovingObject {
                String brigadeNr) {
         super(40);
         this.displayRoute = route;
+        this.timetable = timetable;
+        this.busLine = busLine;
 
+        this.route = Router.uniformRoute(displayRoute);
         this.stationsForPassengers = new HashMap<>();
         this.stationNodesOnRoute = new ArrayList<>();
         for (RouteNode node : route) {
@@ -47,10 +50,6 @@ public class Bus extends MovingObject {
         if (stationNodesOnRoute.size() < 2) {
             logger.warn("Only one station on route");
         }
-
-        this.route = Router.uniformRoute(displayRoute);
-        this.timetable = timetable;
-        this.busLine = busLine;
     }
 
     public int getPassengersCount() {

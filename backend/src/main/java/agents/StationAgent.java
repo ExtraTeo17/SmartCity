@@ -23,13 +23,8 @@ public class StationAgent extends AbstractAgent {
     private final OSMStation station;
     private final StationStrategy stationStrategy;
 
-    @Override
-    public String getNamePrefix() {
-        return name;
-    }
-
     StationAgent(final int agentId, OSMStation station) { // REMEMBER TO PRUNE BEYOND CIRCLE
-        super(agentId);
+        super(agentId, name);
         this.station = station;
         this.stationStrategy = new StationStrategy(station, agentId);
 

@@ -12,8 +12,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import osmproxy.LightAccessManager;
 import osmproxy.MapAccessManager;
-import osmproxy.buses.IBusLinesManager;
 import osmproxy.buses.Timetable;
+import osmproxy.buses.abstractions.IBusLinesManager;
 import osmproxy.elements.OSMNode;
 import smartcity.SimulationState;
 import smartcity.TimeProvider;
@@ -74,7 +74,6 @@ public class AgentsCreator {
         long time = System.nanoTime();
         var busData = busLinesManager.getBusData();
         logger.info("Bus data preparation finished! Took: " + TimeProvider.getTimeInMs(time) + "ms");
-
 
         logger.info("Stations creation started.");
         time = System.nanoTime();

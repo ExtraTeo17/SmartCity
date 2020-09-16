@@ -9,8 +9,6 @@ import jade.core.behaviours.TickerBehaviour;
 import jade.lang.acl.ACLMessage;
 import jade.util.leap.Properties;
 import jade.wrapper.AgentState;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import routing.LightManagerNode;
 import routing.RouteNode;
 import routing.Router;
@@ -28,21 +26,15 @@ import java.util.Random;
 
 @SuppressWarnings("serial")
 public class BusAgent extends AbstractAgent {
-    private static final Logger logger = LoggerFactory.getLogger(BusAgent.class);
     private final ITimeProvider timeProvider;
     private final Bus bus;
 
     BusAgent(int busId,
              ITimeProvider timeProvider,
              Bus bus) {
-        super(busId);
+        super(busId, "Bus");
         this.timeProvider = timeProvider;
         this.bus = bus;
-    }
-
-    @Override
-    public String getNamePrefix() {
-        return "Bus";
     }
 
     @Override

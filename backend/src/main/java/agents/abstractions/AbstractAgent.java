@@ -18,23 +18,24 @@ import java.time.Instant;
 import java.util.List;
 
 public abstract class AbstractAgent extends Agent {
-    protected final Logger logger;
     private final int id;
+    private final String namePrefix;
+    protected final Logger logger;
 
-    public AbstractAgent(int id) {
+
+    public AbstractAgent(int id, String namePrefix) {
         this.id = id;
+        this.namePrefix = namePrefix;
         this.logger = LoggerFactory.getLogger(this.getPredictedName());
     }
 
     public String getPredictedName() {
-        return getPredictedName(getNamePrefix(), id);
+        return getPredictedName(this.namePrefix, id);
     }
 
-    protected String getPredictedName(String prefix, int id) {
-        return prefix.concat(Integer.toString(id));
+    private String getPredictedName(String prefix, int id) {
+        return prefix + id;
     }
-
-    public abstract String getNamePrefix();
 
     public int getId() {
         return id;
