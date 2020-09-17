@@ -2,10 +2,11 @@ package routing;
 
 import com.google.common.annotations.Beta;
 import com.google.common.collect.Lists;
+import com.google.inject.Inject;
 import org.javatuples.Pair;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import osmproxy.MapAccessManager;
+import osmproxy.abstractions.IMapAccessManager;
 import osmproxy.elements.OSMLight;
 import osmproxy.elements.OSMNode;
 import osmproxy.elements.OSMWay;
@@ -20,7 +21,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 // TODO: Add fields to this class and make it some kind of service (not static)
-public final class Router {
+public final class Router implements IRouteGenerator {
     public static final int STEP_SIZE_METERS = 1;
     public static final int M_MILLISECONDS_TO_KM_HOUR = 3600;
     public static final int STEP_CONSTANT = STEP_SIZE_METERS * M_MILLISECONDS_TO_KM_HOUR;
@@ -31,37 +32,48 @@ public final class Router {
 
     private static final Logger logger = LoggerFactory.getLogger(Router.class);
 
-    public static List<RouteNode> generateRouteInfo(IGeoPosition pointA, IGeoPosition pointB) {
+    private final IMapAccessManager mapAccessManager;
+
+    @Inject
+    public Router(IMapAccessManager mapAccessManager) {
+        this.mapAccessManager = mapAccessManager;
+    }
+
+    @Override
+    public List<RouteNode> generateRouteInfo(IGeoPosition pointA, IGeoPosition pointB) {
         Pair<List<Long>, List<RouteNode>> osmWayIdsAndPointList = Router.findRoute(pointA, pointB, false);
-        final List<OSMLight> lightInfo = MapAccessManager.sendFullTrafficSignalQuery(osmWayIdsAndPointList.getValue0());
+        final List<OSMLight> lightInfo = mapAccessManager.sendFullTrafficSignalQuery(osmWayIdsAndPointList.getValue0());
         List<RouteNode> managers = Router.getManagersForLights(lightInfo);
         return Router.getRouteWithAdditionalNodes(osmWayIdsAndPointList.getValue1(), managers);
     }
 
     // TODO: Merge with function for cars if testing proves they are identical
+    @Override
     @Deprecated
-    public static List<RouteNode> generateRouteInfoForPedestrians(IGeoPosition pointA, IGeoPosition pointB) {
+    public List<RouteNode> generateRouteInfoForPedestrians(IGeoPosition pointA, IGeoPosition pointB) {
         Pair<List<Long>, List<RouteNode>> osmWayIdsAndPointList = Router.findRoute(pointA, pointB, true);
-        final List<OSMLight> lightInfo = MapAccessManager.sendFullTrafficSignalQuery(osmWayIdsAndPointList.getValue0());
+        final List<OSMLight> lightInfo = mapAccessManager.sendFullTrafficSignalQuery(osmWayIdsAndPointList.getValue0());
         List<RouteNode> managers = Router.getManagersForLights(lightInfo);
         return getRouteWithAdditionalNodes(osmWayIdsAndPointList.getValue1(), managers);
     }
 
     // TODO: Improve routing to consider random OSM nodes as start/end points instead of random lat/lng
     // TODO: Always: either starting == null or finishing == null
+    @Override
     @Beta
-    public static List<RouteNode> generateRouteInfoForPedestrians(IGeoPosition pointA, IGeoPosition pointB,
-                                                                  String startingOsmNodeRef, String finishingOsmNodeRef) {
+    public List<RouteNode> generateRouteInfoForPedestrians(IGeoPosition pointA, IGeoPosition pointB,
+                                                           String startingOsmNodeRef, String finishingOsmNodeRef) {
         Pair<List<Long>, List<RouteNode>> osmWayIdsAndPointList = Router.findRoute(pointA, pointB, true);
-        final RouteInfo routeInfo = MapAccessManager.sendMultipleWayAndItsNodesQuery(osmWayIdsAndPointList.getValue0());
+        final RouteInfo routeInfo = mapAccessManager.sendMultipleWayAndItsNodesQuery(osmWayIdsAndPointList.getValue0());
         routeInfo.determineRouteOrientationsAndFilterRelevantNodes(startingOsmNodeRef, finishingOsmNodeRef);
 
         return createRouteNodeList(routeInfo);
     }
 
-    public static List<RouteNode> generateRouteInfoForBuses(List<OSMWay> route, List<? extends OSMNode> osmStations) {
+    @Override
+    public List<RouteNode> generateRouteInfoForBuses(List<OSMWay> route, List<? extends OSMNode> osmStations) {
         var busRouteData = generateBusRoute(route);
-        List<OSMLight> lightsOnRoute = MapAccessManager.sendFullTrafficSignalQuery(busRouteData.waysIds);
+        List<OSMLight> lightsOnRoute = mapAccessManager.sendFullTrafficSignalQuery(busRouteData.waysIds);
         List<RouteNode> managers = getManagersForLights(lightsOnRoute);
         List<RouteNode> stationNodes = getAgentStationsForRoute(osmStations);
         managers.addAll(stationNodes);

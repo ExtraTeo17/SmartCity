@@ -16,6 +16,7 @@ import events.StartSimulationEvent;
 import events.VehicleAgentCreatedEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import routing.IRouteGenerator;
 import routing.RouteNode;
 import routing.Router;
 import routing.StationNode;
@@ -44,6 +45,7 @@ public class TaskManager implements ITaskManager {
     private final IRunnableFactory runnableFactory;
     private final IAgentsFactory agentsFactory;
     private final IAgentsContainer agentsContainer;
+    private final IRouteGenerator routeGenerator;
     private final EventBus eventBus;
     private final IZone zone;
     private final ConfigContainer configContainer;
@@ -55,11 +57,12 @@ public class TaskManager implements ITaskManager {
     TaskManager(IRunnableFactory runnableFactory,
                 IAgentsFactory agentsFactory,
                 IAgentsContainer agentsContainer,
-                EventBus eventBus,
+                IRouteGenerator routeGenerator, EventBus eventBus,
                 ConfigContainer configContainer) {
         this.runnableFactory = runnableFactory;
         this.agentsFactory = agentsFactory;
         this.agentsContainer = agentsContainer;
+        this.routeGenerator = routeGenerator;
         this.eventBus = eventBus;
         this.zone = configContainer.getZone();
         this.configContainer = configContainer;
@@ -109,7 +112,7 @@ public class TaskManager implements ITaskManager {
             try {
                 info = routeInfoCache.get(start, end);
                 if (info == null) {
-                    info = Router.generateRouteInfo(start, end);
+                    info = routeGenerator.generateRouteInfo(start, end);
                     routeInfoCache.put(start, end, info);
                 }
             } catch (Exception e) {
@@ -161,10 +164,16 @@ public class TaskManager implements ITaskManager {
                 IGeoPosition pedestrianFinishPoint = endStation.diff(geoPosInFirstStationCircle);
 
                 // TODO: No null here
-                List<RouteNode> routeToStation = Router.generateRouteInfoForPedestrians(pedestrianStartPoint, startStation,
-                        null, startStation.getOsmStationId());
-                List<RouteNode> routeFromStation = Router.generateRouteInfoForPedestrians(endStation, pedestrianFinishPoint,
-                        endStation.getOsmStationId(), null);
+                List<RouteNode> routeToStation = routeGenerator.generateRouteInfoForPedestrians(
+                        pedestrianStartPoint,
+                        startStation,
+                        null,
+                        startStation.getOsmStationId());
+                List<RouteNode> routeFromStation = routeGenerator.generateRouteInfoForPedestrians(
+                        endStation,
+                        pedestrianFinishPoint,
+                        endStation.getOsmStationId(),
+                        null);
 
                 // TODO: Separate fields for testPedestrian and pedestriansLimit
                 PedestrianAgent agent = agentsFactory.create(routeToStation, routeFromStation,

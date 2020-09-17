@@ -15,7 +15,6 @@
  */
 package osmproxy;
 
-import org.javatuples.Pair;
 import org.javatuples.Triplet;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -24,6 +23,7 @@ import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
+import osmproxy.abstractions.IMapAccessManager;
 import osmproxy.elements.OSMLight;
 import osmproxy.elements.OSMNode;
 import osmproxy.elements.OSMWay;
@@ -46,7 +46,6 @@ import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.NoSuchElementException;
 
 //import org.osm.lights.diff.OSMNode;
 //import org.osm.lights.upload.BasicAuthenticator;
@@ -54,18 +53,17 @@ import java.util.NoSuchElementException;
 /**
  *
  */
-public class MapAccessManager {
+public class MapAccessManager implements IMapAccessManager {
     private static final Logger logger = LoggerFactory.getLogger(MapAccessManager.class);
     private static final String OVERPASS_API = "https://lz4.overpass-api.de/api/interpreter";
     private static final String CROSSROADS_LOCATIONS_PATH = "config/crossroads.xml";
 
-
     /**
      * @return a list of openseamap nodes extracted from xml
      */
+    @Override
     @SuppressWarnings("nls")
-
-    static List<OSMNode> getNodes(Document xmlDocument) {
+    public List<OSMNode> getNodes(Document xmlDocument) {
         List<OSMNode> osmNodes = new ArrayList<>();
         Node osmRoot = xmlDocument.getFirstChild();
         NodeList osmXMLNodes = osmRoot.getChildNodes();
@@ -89,6 +87,67 @@ public class MapAccessManager {
         String longitude = attributes.getNamedItem("lon").getNodeValue();
 
         return Triplet.with(id, latitude, longitude);
+    }
+
+    /**
+     * @param query the overpass query
+     * @return the nodes in the formulated query
+     */
+    @Override
+    public Document getNodesViaOverpass(String query) {
+        HttpURLConnection connection = getConnection();
+        connection.setDoInput(true);
+        connection.setDoOutput(true);
+        connection.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");
+
+        try {
+            DataOutputStream printout = new DataOutputStream(connection.getOutputStream());
+            printout.writeBytes("data=" + URLEncoder.encode(query, StandardCharsets.UTF_8));
+            printout.flush();
+            printout.close();
+        } catch (IOException e) {
+            logger.warn("Error getting data from connection");
+            throw new RuntimeException(e);
+        }
+
+        // TODO: Cache builder
+        try {
+            DocumentBuilderFactory dbfac = DocumentBuilderFactory.newInstance();
+            DocumentBuilder docBuilder = dbfac.newDocumentBuilder();
+            return docBuilder.parse(connection.getInputStream());
+        } catch (IOException | ParserConfigurationException | SAXException e) {
+            logger.error("Error parsing data from connection");
+            throw new RuntimeException(e);
+        }
+    }
+
+    private static HttpURLConnection getConnection() {
+        URL url;
+        try {
+            url = new URL(OVERPASS_API);
+        } catch (MalformedURLException e) {
+            logger.error("Error creating url: " + OVERPASS_API);
+            throw new RuntimeException(e);
+        }
+
+        try {
+            return (HttpURLConnection) url.openConnection();
+        } catch (IOException e) {
+            logger.error("Error opening connection to " + OVERPASS_API);
+            throw new RuntimeException(e);
+        }
+    }
+
+    @Override
+    public List<OSMLight> sendFullTrafficSignalQuery(List<Long> osmWayIds) {
+        List<OSMLight> lightNodes = new ArrayList<>();
+        try {
+            var overpassNodes = getNodesViaOverpass(OsmQueryManager.getFullTrafficSignalQuery(osmWayIds));
+            lightNodes = parseLights(overpassNodes);
+        } catch (Exception e) {
+            logger.error("Error trying to get light nodes", e);
+        }
+        return lightNodes;
     }
 
     private static List<OSMLight> parseLights(Document xmlDocument) {
@@ -116,6 +175,18 @@ public class MapAccessManager {
         return osmLights;
     }
 
+    @Override
+    public RouteInfo sendMultipleWayAndItsNodesQuery(List<Long> osmWayIds) {
+        RouteInfo info = null;
+        try {
+            var overpassNodes = getNodesViaOverpass(OsmQueryManager.getMultipleWayAndItsNodesQuery(osmWayIds));
+            info = parseWayAndNodes(overpassNodes);
+        } catch (Exception e) {
+            logger.warn("Error trying to get route info", e);
+        }
+        return info;
+    }
+
     private static RouteInfo parseWayAndNodes(Document nodesViaOverpass) {
         final RouteInfo info = new RouteInfo();
         Node osmRoot = nodesViaOverpass.getFirstChild();
@@ -141,79 +212,8 @@ public class MapAccessManager {
         return info;
     }
 
-    /**
-     * @param query the overpass query
-     * @return the nodes in the formulated query
-     */
-    public static Document getNodesViaOverpass(String query) {
-        HttpURLConnection connection = getConnection();
-        connection.setDoInput(true);
-        connection.setDoOutput(true);
-        connection.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");
-
-        try {
-            DataOutputStream printout = new DataOutputStream(connection.getOutputStream());
-            printout.writeBytes("data=" + URLEncoder.encode(query, StandardCharsets.UTF_8));
-            printout.flush();
-            printout.close();
-        } catch (IOException e) {
-            logger.warn("Error getting data from connection");
-            throw new RuntimeException(e);
-        }
-
-        // TODO: Cache builder
-        try {
-            DocumentBuilderFactory dbfac = DocumentBuilderFactory.newInstance();
-            DocumentBuilder docBuilder = dbfac.newDocumentBuilder();
-            return docBuilder.parse(connection.getInputStream());
-        } catch (IOException | ParserConfigurationException | SAXException e) {
-            logger.error("Error parsing data from connection");
-            throw new RuntimeException(e);
-        }
-    }
-
-
-    private static HttpURLConnection getConnection() {
-        URL url;
-        try {
-            url = new URL(OVERPASS_API);
-        } catch (MalformedURLException e) {
-            logger.error("Error creating url: " + OVERPASS_API);
-            throw new RuntimeException(e);
-        }
-
-        try {
-            return (HttpURLConnection) url.openConnection();
-        } catch (IOException e) {
-            logger.error("Error opening connection to " + OVERPASS_API);
-            throw new RuntimeException(e);
-        }
-    }
-
-
-    public static List<OSMLight> sendFullTrafficSignalQuery(List<Long> osmWayIds) {
-        List<OSMLight> lightNodes = new ArrayList<>();
-        try {
-            var overpassNodes = getNodesViaOverpass(OsmQueryManager.getFullTrafficSignalQuery(osmWayIds));
-            lightNodes = parseLights(overpassNodes);
-        } catch (Exception e) {
-            logger.error("Error trying to get light nodes", e);
-        }
-        return lightNodes;
-    }
-
-    public static RouteInfo sendMultipleWayAndItsNodesQuery(List<Long> osmWayIds) {
-        RouteInfo info = null;
-        try {
-            var overpassNodes = getNodesViaOverpass(OsmQueryManager.getMultipleWayAndItsNodesQuery(osmWayIds));
-            info = parseWayAndNodes(overpassNodes);
-        } catch (Exception e) {
-            logger.warn("Error trying to get route info", e);
-        }
-        return info;
-    }
-
-    public static List<Node> getLightManagersNodes(IZone zone) {
+    @Override
+    public List<Node> getLightManagersNodes(IZone zone) {
         var lightManagersNodes = new ArrayList<Node>();
         Document xmlDocument = getXmlDocument(CROSSROADS_LOCATIONS_PATH);
         Node osmRoot = xmlDocument.getFirstChild();
@@ -241,7 +241,8 @@ public class MapAccessManager {
         return lightManagersNodes;
     }
 
-    public static void parseChildNodesOfWays(Document childNodesOfWays, List<OSMNode> lightsOfTypeA) {
+    @Override
+    public void parseChildNodesOfWays(Document childNodesOfWays, List<OSMNode> lightsOfTypeA) {
         Node osmRoot = childNodesOfWays.getFirstChild();
         NodeList osmXMLNodes = osmRoot.getChildNodes();
         int lightIndex = 0, parentWayIndex = 0;
@@ -261,7 +262,8 @@ public class MapAccessManager {
         }
     }
 
-    private static Position calculateLatLonBasedOnInternalLights(Node crossroad) {
+    @Override
+    public Position calculateLatLonBasedOnInternalLights(Node crossroad) {
         var crossroadA = getCrossroadGroup(crossroad, 1);
         var crossroadB = getCrossroadGroup(crossroad, 3);
         List<Double> latList = getParametersFromGroup(crossroadA, crossroadB, "lat");
@@ -287,7 +289,7 @@ public class MapAccessManager {
         }
     }
 
-    public static Node getCrossroadGroup(Node crossroad, int index) {
+    private Node getCrossroadGroup(Node crossroad, int index) {
         return crossroad.getChildNodes().item(index);
     }
 
@@ -306,65 +308,5 @@ public class MapAccessManager {
         }
 
         return document;
-    }
-
-    public static List<OSMWay> parseOsmWays(Document nodes, IZone zone) {
-        List<OSMWay> route = new ArrayList<>();
-        Node osmRoot = nodes.getFirstChild();
-        NodeList osmXMLNodes = osmRoot.getChildNodes();
-        Pair<OSMWay, String> wayAdjacentNodeRef = determineInitialWayRelOrientation(osmXMLNodes);
-        String adjacentNodeRef = wayAdjacentNodeRef.getValue1();
-        boolean isFirst = true;
-        for (int i = 1; i < osmXMLNodes.getLength(); i++) {
-            Node item = osmXMLNodes.item(i);
-            if (item.getNodeName().equals("way")) {
-                OSMWay way;
-                if (isFirst) {
-                    way = wayAdjacentNodeRef.getValue0();
-                    isFirst = false;
-                }
-                else {
-                    way = new OSMWay(item);
-                    try {
-                        adjacentNodeRef = way.determineRelationOrientation(adjacentNodeRef);
-                    } catch (UnsupportedOperationException e) {
-                        logger.warn("Failed to determine orientation", e);
-                        break;
-                    }
-                }
-
-                // TODO: CORRECT POTENTIAL BUGS CAUSING ROUTE TO BE CUT INTO PIECES BECAUSE OF RZĄŻEWSKI CASE
-                if (way.startsInZone(zone)) {
-                    route.add(way);
-                }
-            }
-        }
-        return route;
-    }
-
-    // TODO: Is it returning orientation of next way or current way?
-    private static Pair<OSMWay, String> determineInitialWayRelOrientation(final NodeList osmXMLNodes) {
-        OSMWay firstWay = null;
-        OSMWay lastWay = null;
-        for (int it = 1; it < osmXMLNodes.getLength(); ++it) {
-            Node node = osmXMLNodes.item(it);
-            if (node.getNodeName().equals("way")) {
-                var way = new OSMWay(node);
-                if (firstWay == null) {
-                    firstWay = way;
-                }
-                else {
-                    lastWay = way;
-                    break;
-                }
-            }
-        }
-
-        if (firstWay != null && lastWay != null) {
-            var orientation = firstWay.determineRelationOrientation(lastWay);
-            return Pair.with(lastWay, orientation);
-        }
-
-        throw new NoSuchElementException("Did not find two 'way'-type nodes in provided list.");
     }
 }

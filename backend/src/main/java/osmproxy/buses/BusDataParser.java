@@ -1,16 +1,17 @@
 package osmproxy.buses;
 
 import com.google.inject.Inject;
+import org.javatuples.Pair;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
-import osmproxy.MapAccessManager;
 import osmproxy.OsmQueryManager;
-import osmproxy.buses.abstractions.IBusDataMerger;
+import osmproxy.buses.abstractions.IBusApiManager;
 import osmproxy.buses.abstractions.IBusDataParser;
+import osmproxy.buses.abstractions.IDataMerger;
 import osmproxy.buses.data.BusInfoData;
 import osmproxy.buses.data.BusPreparationData;
 import osmproxy.elements.OSMStation;
@@ -25,12 +26,16 @@ import java.util.function.Predicate;
 public class BusDataParser implements IBusDataParser {
     private static final Logger logger = LoggerFactory.getLogger(BusDataParser.class);
 
-    private final IBusDataMerger busDataMerger;
+    private final IDataMerger busDataMerger;
+    private final IBusApiManager busApiManager;
     private final IZone zone;
 
     @Inject
-    BusDataParser(IBusDataMerger busDataMerger, IZone zone) {
+    BusDataParser(IDataMerger busDataMerger,
+                  IBusApiManager busApiManager,
+                  IZone zone) {
         this.busDataMerger = busDataMerger;
+        this.busApiManager = busApiManager;
         this.zone = zone;
     }
 
@@ -93,20 +98,76 @@ public class BusDataParser implements IBusDataParser {
             }
         }
 
-        List<OSMWay> ways;
-        try {
-            var query = OsmQueryManager.getQueryWithPayload(busWayQueryBuilder.toString());
-            var overpassNodes = MapAccessManager.getNodesViaOverpass(query);
-            ways = MapAccessManager.parseOsmWays(overpassNodes, zone);
-        } catch (NoSuchElementException | UnsupportedOperationException e) {
-            logger.warn("Please change the zone, this one is not supported yet.", e);
-            return Optional.empty();
-        } catch (Exception e) {
-            logger.error("Error setting osm way", e);
+        var query = OsmQueryManager.getQueryWithPayload(busWayQueryBuilder.toString());
+        var waysDoc = busApiManager.getBusWays(query);
+        if (waysDoc.isEmpty()) {
             return Optional.empty();
         }
 
+        List<OSMWay> ways = parseOsmWays(waysDoc.get());
+
         return Optional.of(new BusInfoData(new BusInfo(busLine, ways), stationIds));
+    }
+
+    public List<OSMWay> parseOsmWays(Document nodes) {
+        List<OSMWay> route = new ArrayList<>();
+        Node osmRoot = nodes.getFirstChild();
+        NodeList osmXMLNodes = osmRoot.getChildNodes();
+        Pair<OSMWay, String> wayAdjacentNodeRef = determineInitialWayRelOrientation(osmXMLNodes);
+        String adjacentNodeRef = wayAdjacentNodeRef.getValue1();
+        boolean isFirst = true;
+        for (int i = 1; i < osmXMLNodes.getLength(); i++) {
+            Node item = osmXMLNodes.item(i);
+            if (item.getNodeName().equals("way")) {
+                OSMWay way;
+                if (isFirst) {
+                    way = wayAdjacentNodeRef.getValue0();
+                    isFirst = false;
+                }
+                else {
+                    way = new OSMWay(item);
+                    try {
+                        adjacentNodeRef = way.determineRelationOrientation(adjacentNodeRef);
+                    } catch (UnsupportedOperationException e) {
+                        logger.warn("Failed to determine orientation", e);
+                        break;
+                    }
+                }
+
+                // TODO: CORRECT POTENTIAL BUGS CAUSING ROUTE TO BE CUT INTO PIECES BECAUSE OF RZĄŻEWSKI CASE
+                if (way.startsInZone(zone)) {
+                    route.add(way);
+                }
+            }
+        }
+
+        return route;
+    }
+
+    // TODO: Is it returning orientation of next way or current way?
+    private static Pair<OSMWay, String> determineInitialWayRelOrientation(final NodeList osmXMLNodes) {
+        OSMWay firstWay = null;
+        OSMWay lastWay = null;
+        for (int it = 1; it < osmXMLNodes.getLength(); ++it) {
+            Node node = osmXMLNodes.item(it);
+            if (node.getNodeName().equals("way")) {
+                var way = new OSMWay(node);
+                if (firstWay == null) {
+                    firstWay = way;
+                }
+                else {
+                    lastWay = way;
+                    break;
+                }
+            }
+        }
+
+        if (firstWay != null && lastWay != null) {
+            var orientation = firstWay.determineRelationOrientation(lastWay);
+            return Pair.with(lastWay, orientation);
+        }
+
+        throw new NoSuchElementException("Did not find two 'way'-type nodes in provided list.");
     }
 
     private Optional<OSMStation> parseNode(Node node, Predicate<Long> isPresent) {

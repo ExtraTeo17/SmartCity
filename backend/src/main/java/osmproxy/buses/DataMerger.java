@@ -1,12 +1,12 @@
 package osmproxy.buses;
 
-import osmproxy.buses.abstractions.IBusDataMerger;
+import osmproxy.buses.abstractions.IDataMerger;
 import osmproxy.buses.data.BusInfoData;
 import osmproxy.elements.OSMStation;
 
 import java.util.*;
 
-public class BusDataMerger implements IBusDataMerger {
+public class DataMerger implements IDataMerger {
     @Override
     public Set<BusInfo> getBusInfosWithStops(Collection<BusInfoData> busInfoDataSet,
                                              Map<Long, OSMStation> busStops) {
@@ -21,7 +21,7 @@ public class BusDataMerger implements IBusDataMerger {
                 }
             }
             var info = busInfoData.busInfo;
-            info.setStops(validBusStops);
+            info.addStops(validBusStops);
             busInfos.add(info);
         }
 

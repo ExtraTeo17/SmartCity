@@ -18,6 +18,29 @@ import static org.junit.jupiter.params.provider.Arguments.arguments;
 class BusDataMergerTests {
     private final Random random = new Random();
 
+    @ParameterizedTest
+    @MethodSource("stopIdsProvider")
+    void getBusInfosWithStops_manySets_correctResult(long[][] stopsSets, String testCaseName) {
+        // Arrange
+        random.setSeed(30);
+        var merger = new DataMerger();
+        String lineName = "test";
+        var busInfoDataSet = generateBusDataSet(lineName, stopsSets);
+        var busStopsSet = generateStations(stopsSets);
+
+        // Act
+        var result = merger.getBusInfosWithStops(busInfoDataSet, busStopsSet);
+
+        // Assert
+        for (var info : result) {
+            var stopIds = info.stops.stream()
+                    .map(OSMElement::getId).mapToLong(l -> l).toArray();
+            var line = info.busLine;
+            var lineIndex = Integer.parseInt(line.substring(lineName.length()));
+            Assert.assertArrayEquals(testCaseName + ": Invalid set\n", stopIds, stopsSets[lineIndex]);
+        }
+    }
+
     static Stream<Arguments> stopIdsProvider() {
         return Stream.of(arguments(
                 new long[][]{
@@ -64,29 +87,6 @@ class BusDataMergerTests {
                         {},
                 }, "AllSubsetsOrdered")
         );
-    }
-
-    @ParameterizedTest
-    @MethodSource("stopIdsProvider")
-    void getBusInfosWithStops_manySets_correctResult(long[][] stopsSets, String testCaseName) {
-        // Arrange
-        random.setSeed(30);
-        var merger = new BusDataMerger();
-        String lineName = "test";
-        var busInfoDataSet = generateBusDataSet(lineName, stopsSets);
-        var busStopsSet = generateStations(stopsSets);
-
-        // Act
-        var result = merger.getBusInfosWithStops(busInfoDataSet, busStopsSet);
-
-        // Assert
-        for (var info : result) {
-            var stopIds = info.getStops().stream()
-                    .map(OSMElement::getId).mapToLong(l -> l).toArray();
-            var line = info.getBusLine();
-            var lineIndex = Integer.parseInt(line.substring(lineName.length()));
-            Assert.assertArrayEquals(testCaseName + ": Invalid set\n", stopIds, stopsSets[lineIndex]);
-        }
     }
 
     private Set<BusInfoData> generateBusDataSet(String line, long[][] stopIdsPerInfo) {

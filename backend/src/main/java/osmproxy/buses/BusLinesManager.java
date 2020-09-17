@@ -43,8 +43,8 @@ public class BusLinesManager implements IBusLinesManager {
         var busInfoData = busDataParser.parseBusData(overpassInfo.get());
 
         for (var busInfo : busInfoData.busInfos) {
-            var brigadeInfos = generateBrigadeInfos(busInfo.getBusLine(), busInfo.getStops());
-            busInfo.setBrigadeList(brigadeInfos);
+            var brigadeInfos = generateBrigadeInfos(busInfo.busLine, busInfo.stops);
+            busInfo.addBrigades(brigadeInfos);
         }
 
         return busInfoData;

@@ -5,6 +5,7 @@ import com.google.inject.Inject;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
+import osmproxy.abstractions.ILightAccessManager;
 import osmproxy.elements.OSMNode;
 import osmproxy.elements.OSMWay;
 import routing.core.IZone;
@@ -16,7 +17,8 @@ import java.util.stream.Collectors;
 
 // TODO: Interface
 @Beta
-public class LightAccessManager extends MapAccessManager {
+public class LightAccessManager extends MapAccessManager
+        implements ILightAccessManager {
     private final IZone zone;
 
     @Inject
@@ -24,6 +26,7 @@ public class LightAccessManager extends MapAccessManager {
         this.zone = zone;
     }
 
+    @Override
     public List<OSMNode> getLights() {
         List<OSMNode> lightsAround = getLightNodesAround();
         List<OSMNode> lightNodeList = sendParentWaysOfLightOverpassQuery(lightsAround);
@@ -33,8 +36,8 @@ public class LightAccessManager extends MapAccessManager {
 
     private List<OSMNode> getLightNodesAround() {
         var lightsQuery = OsmQueryManager.getLightsAroundQuery(zone.getCenter(), zone.getRadius());
-        var nodes = MapAccessManager.getNodesViaOverpass(lightsQuery);
-        return MapAccessManager.getNodes(nodes);
+        var nodes = getNodesViaOverpass(lightsQuery);
+        return getNodes(nodes);
     }
 
     private List<OSMNode> parseLightNodeList(Document nodesViaOverpass) {
@@ -49,7 +52,7 @@ public class LightAccessManager extends MapAccessManager {
 
     private List<OSMNode> sendParentWaysOfLightOverpassQuery(final List<OSMNode> lightsAround) {
         return parseLightNodeList(
-                MapAccessManager.getNodesViaOverpass(
+                getNodesViaOverpass(
                         getParentWaysOfLightOverpassQuery(lightsAround)
                 )
         );

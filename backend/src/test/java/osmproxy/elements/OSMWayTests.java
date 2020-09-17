@@ -8,8 +8,6 @@ import utilities.IterableNodeList;
 import java.util.stream.Collectors;
 
 class OSMWayTests {
-    private static final String resourcePath = "src/test/resources/";
-
     // TODO: More cases with tangent nodes
     @Test
     void determineRouteOrientationAndFilterRelevantNodes_startFromFirst_setsFrontOrientation() {

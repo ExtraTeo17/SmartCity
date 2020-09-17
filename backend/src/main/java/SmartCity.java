@@ -7,6 +7,8 @@ import jade.wrapper.StaleProxyException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import osmproxy.OsmModule;
+import osmproxy.buses.BusModule;
+import routing.RoutingModule;
 import smartcity.MasterAgent;
 import smartcity.SmartCityModule;
 import web.WebModule;
@@ -21,7 +23,9 @@ public class SmartCity {
                 new AgentsModule(),
                 new GuiModule(),
                 new WebModule(),
+                new BusModule(),
                 new OsmModule(),
+                new RoutingModule(),
                 new SmartCityModule()
         );
 

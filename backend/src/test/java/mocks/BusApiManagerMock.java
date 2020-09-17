@@ -17,4 +17,9 @@ public class BusApiManagerMock implements IBusApiManager {
     public Optional<JSONObject> getNodesViaWarszawskieAPI(String busStopId, String busStopNr, String busLine) {
         return Optional.empty();
     }
+
+    @Override
+    public Optional<Document> getBusWays(String query) {
+        return Optional.empty();
+    }
 }

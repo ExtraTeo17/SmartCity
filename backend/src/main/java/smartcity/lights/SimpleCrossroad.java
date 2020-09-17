@@ -8,7 +8,6 @@ import org.jxmapviewer.viewer.WaypointPainter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Node;
-import osmproxy.MapAccessManager;
 import osmproxy.elements.OSMNode;
 import routing.core.IGeoPosition;
 import smartcity.MasterAgent;
@@ -48,8 +47,12 @@ public class SimpleCrossroad implements ICrossroad {
     }
 
     private void prepareLightGroups(Node crossroad, int managerId) {
-        lightGroup1 = new SimpleLightGroup(MapAccessManager.getCrossroadGroup(crossroad, 1), LightColor.RED, managerId);
-        lightGroup2 = new SimpleLightGroup(MapAccessManager.getCrossroadGroup(crossroad, 3), LightColor.GREEN, managerId);
+        lightGroup1 = new SimpleLightGroup(getCrossroadGroup(crossroad, 1), LightColor.RED, managerId);
+        lightGroup2 = new SimpleLightGroup(getCrossroadGroup(crossroad, 3), LightColor.GREEN, managerId);
+    }
+
+    private Node getCrossroadGroup(Node crossroad, int index) {
+        return crossroad.getChildNodes().item(index);
     }
 
     private void prepareLightGroups(OSMNode centerCrossroadNode, int managerId) {

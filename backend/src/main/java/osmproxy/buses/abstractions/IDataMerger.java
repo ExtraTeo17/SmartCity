@@ -8,7 +8,7 @@ import java.util.Collection;
 import java.util.Map;
 import java.util.Set;
 
-public interface IBusDataMerger {
+public interface IDataMerger {
     Set<BusInfo> getBusInfosWithStops(Collection<BusInfoData> busInfoDataSet,
                                       Map<Long, OSMStation> busStops);
 }

@@ -1,18 +1,20 @@
 package osmproxy.buses;
 
+import com.google.inject.Inject;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
-import osmproxy.MapAccessManager;
 import osmproxy.OsmQueryManager;
+import osmproxy.abstractions.IMapAccessManager;
 import osmproxy.buses.abstractions.IBusApiManager;
 import routing.core.IZone;
 import utilities.ConditionalExecutor;
 import utilities.FileWriterWrapper;
 
 import java.net.URL;
+import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.Scanner;
 
@@ -20,12 +22,19 @@ public class BusApiManager implements IBusApiManager {
     private static final Logger logger = LoggerFactory.getLogger(BusApiManager.class);
     private static final JSONParser jsonParser = new JSONParser();
 
+    private final IMapAccessManager mapAccessManager;
+
+    @Inject
+    public BusApiManager(IMapAccessManager mapAccessManager) {
+        this.mapAccessManager = mapAccessManager;
+    }
+
     @Override
     public Optional<Document> getBusDataXml(IZone zone) {
         var overpassQuery = OsmQueryManager.getBusQuery(zone.getCenter(), zone.getRadius());
         Document overpassInfo;
         try {
-            overpassInfo = MapAccessManager.getNodesViaOverpass(overpassQuery);
+            overpassInfo = mapAccessManager.getNodesViaOverpass(overpassQuery);
         } catch (Exception e) {
             logger.warn("Error getting bus info.", e);
             return Optional.empty();
@@ -64,6 +73,19 @@ public class BusApiManager implements IBusApiManager {
         });
 
         return Optional.of(jObject);
+    }
+
+    @Override
+    public Optional<Document> getBusWays(String query) {
+        try {
+            return Optional.ofNullable(mapAccessManager.getNodesViaOverpass(query));
+        } catch (NoSuchElementException | UnsupportedOperationException e) {
+            logger.warn("Please change the zone, this one is not supported yet.", e);
+            return Optional.empty();
+        } catch (Exception e) {
+            logger.error("Error setting osm way", e);
+            return Optional.empty();
+        }
     }
 
     private static String getBusWarszawskieQuery(String busStopId, String busStopNr, String busLine) {

@@ -50,7 +50,7 @@ class HashAgentsContainerTest {
         Mockito.when(mockVehicle.getVehicleType()).thenReturn("car");
 
         for (int i = 0; i < agentsPerTypeCount; ++i) {
-            // TODO: Mocks
+            // TODO: Mocks, not null
             agents.add(new PedestrianAgent(idGenerator.get(PedestrianAgent.class), null));
             agents.add(new BusAgent(idGenerator.get(BusAgent.class), null, null));
             agents.add(new StationAgent(idGenerator.get(StationAgent.class), null));

@@ -10,11 +10,12 @@ import events.LightManagersReadyEvent;
 import events.PrepareSimulationEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import osmproxy.LightAccessManager;
-import osmproxy.MapAccessManager;
+import osmproxy.abstractions.ILightAccessManager;
+import osmproxy.abstractions.IMapAccessManager;
 import osmproxy.buses.Timetable;
 import osmproxy.buses.abstractions.IBusLinesManager;
 import osmproxy.elements.OSMNode;
+import routing.IRouteGenerator;
 import smartcity.SimulationState;
 import smartcity.TimeProvider;
 import smartcity.config.ConfigContainer;
@@ -27,7 +28,9 @@ public class AgentsCreator {
     private final IBusLinesManager busLinesManager;
     private final IAgentsFactory factory;
     private final EventBus eventBus;
-    private final LightAccessManager lightAccessManager;
+    private final ILightAccessManager lightAccessManager;
+    private final IMapAccessManager mapAccessManager;
+    private final IRouteGenerator routeGenerator;
 
     @Inject
     public AgentsCreator(IAgentsContainer agentsContainer,
@@ -35,13 +38,17 @@ public class AgentsCreator {
                          IBusLinesManager busLinesManager,
                          IAgentsFactory factory,
                          EventBus eventBus,
-                         LightAccessManager lightAccessManager) {
+                         ILightAccessManager lightAccessManager,
+                         IMapAccessManager mapAccessManager,
+                         IRouteGenerator routeGenerator) {
         this.agentsContainer = agentsContainer;
         this.configContainer = configContainer;
         this.busLinesManager = busLinesManager;
         this.factory = factory;
         this.eventBus = eventBus;
         this.lightAccessManager = lightAccessManager;
+        this.mapAccessManager = mapAccessManager;
+        this.routeGenerator = routeGenerator;
     }
 
 
@@ -103,10 +110,11 @@ public class AgentsCreator {
         int busCount = 0;
         for (var busInfo : busData.busInfos) {
             var timeNow = System.nanoTime();
-            var routeInfo = busInfo.generateRouteInfo();
+            var routeInfo = routeGenerator.generateRouteInfoForBuses(
+                    busInfo.route, busInfo.stops);
             logger.info("Generating routeInfo finished. Took: " + (TimeProvider.getTimeInMs(timeNow)) + "ms");
 
-            var busLine = busInfo.getBusLine();
+            var busLine = busInfo.busLine;
             for (var brigade : busInfo) {
                 var brigadeNr = brigade.getBrigadeNr();
                 for (Timetable timetable : brigade) {
@@ -157,7 +165,7 @@ public class AgentsCreator {
     private boolean tryConstructLightManagers() {
         try {
             if (StaticConfig.USE_DEPRECATED_XML_FOR_LIGHT_MANAGERS) {
-                var nodes = MapAccessManager.getLightManagersNodes(configContainer.getZone());
+                var nodes = mapAccessManager.getLightManagersNodes(configContainer.getZone());
                 for (var node : nodes) {
                     var manager = factory.create(node);
                     if (!agentsContainer.tryAdd(manager)) {
