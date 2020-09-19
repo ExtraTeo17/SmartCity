@@ -2,7 +2,7 @@ package osmproxy.elements;
 
 import org.junit.Assert;
 import org.junit.jupiter.api.Test;
-import testutils.XmlParser;
+import testutils.XmlLoader;
 import utilities.IterableNodeList;
 
 import java.util.stream.Collectors;
@@ -12,7 +12,7 @@ class OSMWayTests {
     @Test
     void determineRouteOrientationAndFilterRelevantNodes_startFromFirst_setsFrontOrientation() {
         // Arrange
-        var document = XmlParser.getDocument("OSMTwoWays.xml");
+        var document = XmlLoader.getDocument("OSMTwoWays.xml");
         var mainNode = document.getFirstChild();
         var children = mainNode.getChildNodes();
         var nodes = IterableNodeList.of(children).stream()
@@ -36,7 +36,7 @@ class OSMWayTests {
     @Test
     void determineRouteOrientationAndFilterRelevantNodes_startFromLast_setsBackOrientation() {
         // Arrange
-        var document = XmlParser.getDocument("OSMTwoWays.xml");
+        var document = XmlLoader.getDocument("OSMTwoWays.xml");
         var mainNode = document.getFirstChild();
         var children = mainNode.getChildNodes();
         var nodes = IterableNodeList.of(children).stream()

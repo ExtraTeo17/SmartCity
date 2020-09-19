@@ -9,7 +9,7 @@ import javax.xml.parsers.ParserConfigurationException;
 import java.io.File;
 import java.io.IOException;
 
-public class XmlParser {
+public class XmlLoader {
     private static final String resourcePath = "src/test/resources/";
     private static final DocumentBuilder builder;
 

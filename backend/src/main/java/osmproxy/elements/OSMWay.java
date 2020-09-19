@@ -26,9 +26,9 @@ public class OSMWay extends OSMElement {
 
     public OSMWay(Node item) {
         super(item.getAttributes().getNamedItem("id").getNodeValue());
-        this.waypoints = new ArrayList<>();
         this.childNodeIds = new ArrayList<>();
 
+        this.waypoints = new ArrayList<>();
         NodeList childNodes = item.getChildNodes();
         Boolean oneWayValue = null;
         for (int k = 0; k < childNodes.getLength(); ++k) {
@@ -38,7 +38,7 @@ public class OSMWay extends OSMElement {
                 String nodeRef = attributes.getNamedItem("ref").getNodeValue();
                 double lat = Double.parseDouble(attributes.getNamedItem("lat").getNodeValue());
                 double lng = Double.parseDouble(attributes.getNamedItem("lon").getNodeValue());
-                waypoints.add(new OSMWaypoint(nodeRef, lat, lng));
+                this.waypoints.add(new OSMWaypoint(nodeRef, lat, lng));
             }
             else if (el.getNodeName().equals("tag") &&
                     el.getAttributes().getNamedItem("k").getNodeValue().equals("oneway")
@@ -65,7 +65,13 @@ public class OSMWay extends OSMElement {
         return waypoints;
     }
 
+    /**
+     * @param index - negative indicates that it should start from end (waypoints.size() + index)
+     */
     public final OSMWaypoint getWaypoint(int i) {
+        if (i < 0) {
+            return waypoints.get(waypoints.size() + i);
+        }
         return waypoints.get(i);
     }
 
@@ -133,13 +139,10 @@ public class OSMWay extends OSMElement {
 
 
     /**
-     * @param index - negative indicates that it should start from end (waypoints.size() - index)
+     * @param index - negative indicates that it should start from end (waypoints.size() + index)
      */
     private String getNodeReference(int index) {
-        if (index < 0) {
-            index = waypoints.size() + index;
-        }
-        return waypoints.get(index).getOsmNodeRef();
+        return getWaypoint(index).getOsmNodeRef();
     }
 
     // TODO: Describe this function - what it is returning?
