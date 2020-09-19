@@ -96,12 +96,11 @@ public class BusDataParser implements IBusDataParser {
                 }
             }
         }
-        
+
         var waysDoc = busApiManager.getBusWays(wayIds);
         if (waysDoc.isEmpty()) {
             return Optional.empty();
         }
-
         List<OSMWay> ways = parseOsmWays(waysDoc.get());
 
         return Optional.of(new BusInfoData(new BusInfo(busLine, ways), stationIds));
