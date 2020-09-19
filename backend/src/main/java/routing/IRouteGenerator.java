@@ -12,13 +12,13 @@ public interface IRouteGenerator {
 
     // TODO: Merge with function for cars if testing proves they are identical
     @Deprecated
-    List<RouteNode> generateRouteInfoForPedestrians(IGeoPosition pointA, IGeoPosition pointB);
+    List<RouteNode> generateRouteForPedestrians(IGeoPosition pointA, IGeoPosition pointB);
 
     // TODO: Improve routing to consider random OSM nodes as start/end points instead of random lat/lng
     // TODO: Always: either starting == null or finishing == null
     @Beta
-    List<RouteNode> generateRouteInfoForPedestrians(IGeoPosition pointA, IGeoPosition pointB,
-                                                    String startingOsmNodeRef, String finishingOsmNodeRef);
+    List<RouteNode> generateRouteForPedestrians(IGeoPosition pointA, IGeoPosition pointB,
+                                                String startingOsmNodeRef, String finishingOsmNodeRef);
 
     List<RouteNode> generateRouteInfoForBuses(List<OSMWay> route, List<? extends OSMNode> osmStations);
 }

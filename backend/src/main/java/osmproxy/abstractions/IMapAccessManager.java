@@ -9,15 +9,16 @@ import routing.core.IZone;
 import routing.core.Position;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface IMapAccessManager {
-    List<OSMNode> getNodes(Document xmlDocument);
+    List<OSMNode> parseNodes(Document xmlDocument);
 
-    Document getNodesViaOverpass(String query);
+    Optional<Document> getNodesDocument(String query);
 
-    List<OSMLight> sendFullTrafficSignalQuery(List<Long> osmWayIds);
+    List<OSMLight> getOsmLights(List<Long> osmWayIds);
 
-    RouteInfo sendMultipleWayAndItsNodesQuery(List<Long> osmWayIds);
+    Optional<RouteInfo> getRouteInfo(List<Long> osmWayIds);
 
     List<Node> getLightManagersNodes(IZone zone);
 

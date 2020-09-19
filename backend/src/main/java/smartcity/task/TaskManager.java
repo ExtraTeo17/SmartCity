@@ -164,12 +164,12 @@ public class TaskManager implements ITaskManager {
                 IGeoPosition pedestrianFinishPoint = endStation.diff(geoPosInFirstStationCircle);
 
                 // TODO: No null here
-                List<RouteNode> routeToStation = routeGenerator.generateRouteInfoForPedestrians(
+                List<RouteNode> routeToStation = routeGenerator.generateRouteForPedestrians(
                         pedestrianStartPoint,
                         startStation,
                         null,
                         startStation.getOsmStationId());
-                List<RouteNode> routeFromStation = routeGenerator.generateRouteInfoForPedestrians(
+                List<RouteNode> routeFromStation = routeGenerator.generateRouteForPedestrians(
                         endStation,
                         pedestrianFinishPoint,
                         endStation.getOsmStationId(),

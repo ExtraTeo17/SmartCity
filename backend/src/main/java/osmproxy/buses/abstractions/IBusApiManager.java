@@ -2,7 +2,6 @@ package osmproxy.buses.abstractions;
 
 import org.json.simple.JSONObject;
 import org.w3c.dom.Document;
-import osmproxy.elements.OSMWay;
 import routing.core.IZone;
 
 import java.util.List;
@@ -13,5 +12,5 @@ public interface IBusApiManager {
 
     Optional<JSONObject> getNodesViaWarszawskieAPI(String busStopId, String busStopNr, String busLine);
 
-    Optional<Document> getBusWays(String query);
+    Optional<Document> getBusWays(List<Long> waysIds);
 }

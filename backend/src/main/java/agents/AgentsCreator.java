@@ -174,7 +174,7 @@ public class AgentsCreator {
                 }
             }
             else {
-                var lights = lightAccessManager.getLights();
+                var lights = lightAccessManager.getLightsOfTypeA();
                 for (final OSMNode centerCrossroad : lights) {
                     if (centerCrossroad.determineParentOrientationsTowardsCrossroad()) {
                         var manager = factory.create(centerCrossroad);

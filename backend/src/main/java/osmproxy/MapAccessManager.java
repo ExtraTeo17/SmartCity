@@ -46,6 +46,7 @@ import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 //import org.osm.lights.diff.OSMNode;
 //import org.osm.lights.upload.BasicAuthenticator;
@@ -58,12 +59,18 @@ public class MapAccessManager implements IMapAccessManager {
     private static final String OVERPASS_API = "https://lz4.overpass-api.de/api/interpreter";
     private static final String CROSSROADS_LOCATIONS_PATH = "config/crossroads.xml";
 
+    private final DocumentBuilderFactory xmlBuilderFactory;
+
+    public MapAccessManager() {
+        this.xmlBuilderFactory = DocumentBuilderFactory.newInstance();
+    }
+
     /**
      * @return a list of openseamap nodes extracted from xml
      */
     @Override
     @SuppressWarnings("nls")
-    public List<OSMNode> getNodes(Document xmlDocument) {
+    public List<OSMNode> parseNodes(Document xmlDocument) {
         List<OSMNode> osmNodes = new ArrayList<>();
         Node osmRoot = xmlDocument.getFirstChild();
         NodeList osmXMLNodes = osmRoot.getChildNodes();
@@ -94,7 +101,7 @@ public class MapAccessManager implements IMapAccessManager {
      * @return the nodes in the formulated query
      */
     @Override
-    public Document getNodesViaOverpass(String query) {
+    public Optional<Document> getNodesDocument(String query) {
         HttpURLConnection connection = getConnection();
         connection.setDoInput(true);
         connection.setDoOutput(true);
@@ -106,19 +113,21 @@ public class MapAccessManager implements IMapAccessManager {
             printout.flush();
             printout.close();
         } catch (IOException e) {
-            logger.warn("Error getting data from connection");
-            throw new RuntimeException(e);
+            logger.error("Error getting data from connection", e);
+            return Optional.empty();
         }
 
-        // TODO: Cache builder
+        Document result;
         try {
-            DocumentBuilderFactory dbfac = DocumentBuilderFactory.newInstance();
-            DocumentBuilder docBuilder = dbfac.newDocumentBuilder();
-            return docBuilder.parse(connection.getInputStream());
+            var xmlBuilder = xmlBuilderFactory.newDocumentBuilder();
+            var stream = connection.getInputStream();
+            result = xmlBuilder.parse(stream);
         } catch (IOException | ParserConfigurationException | SAXException e) {
-            logger.error("Error parsing data from connection");
-            throw new RuntimeException(e);
+            logger.error("Error parsing data from connection", e);
+            return Optional.empty();
         }
+
+        return Optional.of(result);
     }
 
     private static HttpURLConnection getConnection() {
@@ -139,14 +148,21 @@ public class MapAccessManager implements IMapAccessManager {
     }
 
     @Override
-    public List<OSMLight> sendFullTrafficSignalQuery(List<Long> osmWayIds) {
-        List<OSMLight> lightNodes = new ArrayList<>();
+    public List<OSMLight> getOsmLights(List<Long> osmWayIds) {
+        var query = OsmQueryManager.getFullTrafficSignalQuery(osmWayIds);
+        var overpassNodes = getNodesDocument(query);
+        if (overpassNodes.isEmpty()) {
+            return new ArrayList<>();
+        }
+
+        List<OSMLight> lightNodes;
         try {
-            var overpassNodes = getNodesViaOverpass(OsmQueryManager.getFullTrafficSignalQuery(osmWayIds));
-            lightNodes = parseLights(overpassNodes);
+            lightNodes = parseLights(overpassNodes.get());
         } catch (Exception e) {
             logger.error("Error trying to get light nodes", e);
+            return new ArrayList<>();
         }
+
         return lightNodes;
     }
 
@@ -176,15 +192,22 @@ public class MapAccessManager implements IMapAccessManager {
     }
 
     @Override
-    public RouteInfo sendMultipleWayAndItsNodesQuery(List<Long> osmWayIds) {
-        RouteInfo info = null;
+    public Optional<RouteInfo> getRouteInfo(List<Long> osmWayIds) {
+        var query = OsmQueryManager.getMultipleWayAndItsNodesQuery(osmWayIds);
+        var overpassNodes = getNodesDocument(query);
+        if (overpassNodes.isEmpty()) {
+            return Optional.empty();
+        }
+
+        RouteInfo info;
         try {
-            var overpassNodes = getNodesViaOverpass(OsmQueryManager.getMultipleWayAndItsNodesQuery(osmWayIds));
-            info = parseWayAndNodes(overpassNodes);
+            info = parseWayAndNodes(overpassNodes.get());
         } catch (Exception e) {
             logger.warn("Error trying to get route info", e);
+            return Optional.empty();
         }
-        return info;
+
+        return Optional.of(info);
     }
 
     private static RouteInfo parseWayAndNodes(Document nodesViaOverpass) {

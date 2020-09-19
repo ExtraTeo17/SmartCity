@@ -5,6 +5,7 @@ import org.w3c.dom.Document;
 import osmproxy.buses.abstractions.IBusApiManager;
 import routing.core.IZone;
 
+import java.util.List;
 import java.util.Optional;
 
 public class BusApiManagerMock implements IBusApiManager {
@@ -19,7 +20,7 @@ public class BusApiManagerMock implements IBusApiManager {
     }
 
     @Override
-    public Optional<Document> getBusWays(String query) {
+    public Optional<Document> getBusWays(List<Long> waysIds) {
         return Optional.empty();
     }
 }

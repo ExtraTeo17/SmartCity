@@ -8,7 +8,6 @@ import org.w3c.dom.Document;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
-import osmproxy.OsmQueryManager;
 import osmproxy.buses.abstractions.IBusApiManager;
 import osmproxy.buses.abstractions.IBusDataParser;
 import osmproxy.buses.abstractions.IDataMerger;
@@ -74,7 +73,7 @@ public class BusDataParser implements IBusDataParser {
     private Optional<BusInfoData> parseRelation(Node relation) {
         List<Long> stationIds = new ArrayList<>();
         String busLine = "";
-        StringBuilder busWayQueryBuilder = new StringBuilder();
+        List<Long> wayIds = new ArrayList<>();
         for (var node : IterableNodeList.of(relation.getChildNodes())) {
             if (node.getNodeName().equals("member")) {
                 NamedNodeMap attributes = node.getAttributes();
@@ -85,7 +84,7 @@ public class BusDataParser implements IBusDataParser {
                 }
                 else if (attributes.getNamedItem("role").getNodeValue().length() == 0 &&
                         attributes.getNamedItem("type").getNodeValue().equals("way")) {
-                    busWayQueryBuilder.append(OsmQueryManager.getSingleBusWayQuery(id));
+                    wayIds.add(id);
                 }
             }
             else if (node.getNodeName().equals("tag")) {
@@ -97,9 +96,8 @@ public class BusDataParser implements IBusDataParser {
                 }
             }
         }
-
-        var query = OsmQueryManager.getQueryWithPayload(busWayQueryBuilder.toString());
-        var waysDoc = busApiManager.getBusWays(query);
+        
+        var waysDoc = busApiManager.getBusWays(wayIds);
         if (waysDoc.isEmpty()) {
             return Optional.empty();
         }

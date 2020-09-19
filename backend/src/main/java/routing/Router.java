@@ -41,18 +41,26 @@ public final class Router implements IRouteGenerator {
 
     @Override
     public List<RouteNode> generateRouteInfo(IGeoPosition pointA, IGeoPosition pointB) {
-        Pair<List<Long>, List<RouteNode>> osmWayIdsAndPointList = Router.findRoute(pointA, pointB, false);
-        final List<OSMLight> lightInfo = mapAccessManager.sendFullTrafficSignalQuery(osmWayIdsAndPointList.getValue0());
-        List<RouteNode> managers = Router.getManagersForLights(lightInfo);
-        return Router.getRouteWithAdditionalNodes(osmWayIdsAndPointList.getValue1(), managers);
+        Pair<List<Long>, List<RouteNode>> osmWayIdsAndPointList = findRoute(pointA, pointB, false);
+        var wayIds = osmWayIdsAndPointList.getValue0();
+        if (wayIds == null || wayIds.isEmpty()) {
+            logger.warn("Generating routeInfo failed because of empty wayIds.");
+            return new ArrayList<>();
+        }
+
+        List<OSMLight> lightInfo = mapAccessManager.getOsmLights(wayIds);
+        List<RouteNode> managers = getManagersForLights(lightInfo);
+        var points = osmWayIdsAndPointList.getValue1();
+
+        return getRouteWithAdditionalNodes(points, managers);
     }
 
     // TODO: Merge with function for cars if testing proves they are identical
     @Override
     @Deprecated
-    public List<RouteNode> generateRouteInfoForPedestrians(IGeoPosition pointA, IGeoPosition pointB) {
+    public List<RouteNode> generateRouteForPedestrians(IGeoPosition pointA, IGeoPosition pointB) {
         Pair<List<Long>, List<RouteNode>> osmWayIdsAndPointList = Router.findRoute(pointA, pointB, true);
-        final List<OSMLight> lightInfo = mapAccessManager.sendFullTrafficSignalQuery(osmWayIdsAndPointList.getValue0());
+        final List<OSMLight> lightInfo = mapAccessManager.getOsmLights(osmWayIdsAndPointList.getValue0());
         List<RouteNode> managers = Router.getManagersForLights(lightInfo);
         return getRouteWithAdditionalNodes(osmWayIdsAndPointList.getValue1(), managers);
     }
@@ -61,10 +69,17 @@ public final class Router implements IRouteGenerator {
     // TODO: Always: either starting == null or finishing == null
     @Override
     @Beta
-    public List<RouteNode> generateRouteInfoForPedestrians(IGeoPosition pointA, IGeoPosition pointB,
-                                                           String startingOsmNodeRef, String finishingOsmNodeRef) {
-        Pair<List<Long>, List<RouteNode>> osmWayIdsAndPointList = Router.findRoute(pointA, pointB, true);
-        final RouteInfo routeInfo = mapAccessManager.sendMultipleWayAndItsNodesQuery(osmWayIdsAndPointList.getValue0());
+    public List<RouteNode> generateRouteForPedestrians(IGeoPosition pointA, IGeoPosition pointB,
+                                                       String startingOsmNodeRef, String finishingOsmNodeRef) {
+        var osmWayIdsAndPointList = findRoute(pointA, pointB, true);
+        var osmWayIds = osmWayIdsAndPointList.getValue0();
+        var routeInfoOpt = mapAccessManager.getRouteInfo(osmWayIds);
+        if (routeInfoOpt.isEmpty()) {
+            logger.warn("Generating route for pedestrians failed because of empty routeInfo");
+            return new ArrayList<>();
+        }
+
+        var routeInfo = routeInfoOpt.get();
         routeInfo.determineRouteOrientationsAndFilterRelevantNodes(startingOsmNodeRef, finishingOsmNodeRef);
 
         return createRouteNodeList(routeInfo);
@@ -73,7 +88,7 @@ public final class Router implements IRouteGenerator {
     @Override
     public List<RouteNode> generateRouteInfoForBuses(List<OSMWay> route, List<? extends OSMNode> osmStations) {
         var busRouteData = generateBusRoute(route);
-        List<OSMLight> lightsOnRoute = mapAccessManager.sendFullTrafficSignalQuery(busRouteData.waysIds);
+        List<OSMLight> lightsOnRoute = mapAccessManager.getOsmLights(busRouteData.waysIds);
         List<RouteNode> managers = getManagersForLights(lightsOnRoute);
         List<RouteNode> stationNodes = getAgentStationsForRoute(osmStations);
         managers.addAll(stationNodes);

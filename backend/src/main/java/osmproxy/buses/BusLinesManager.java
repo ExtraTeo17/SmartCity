@@ -51,6 +51,7 @@ public class BusLinesManager implements IBusLinesManager {
     }
 
 
+    // TODO: Move to busDataParser
     private Collection<BrigadeInfo> generateBrigadeInfos(String busLine, Collection<OSMStation> osmStations) {
         Map<String, BrigadeInfo> brigadeInfoMap = new LinkedHashMap<>();
         for (OSMStation station : osmStations) {

@@ -15,7 +15,7 @@ import java.util.stream.Stream;
 import static org.junit.jupiter.params.provider.Arguments.arguments;
 
 
-class BusDataMergerTests {
+class DataMergerTests {
     private final Random random = new Random();
 
     @ParameterizedTest

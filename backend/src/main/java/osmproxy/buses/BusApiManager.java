@@ -14,7 +14,7 @@ import utilities.ConditionalExecutor;
 import utilities.FileWriterWrapper;
 
 import java.net.URL;
-import java.util.NoSuchElementException;
+import java.util.List;
 import java.util.Optional;
 import java.util.Scanner;
 
@@ -31,22 +31,17 @@ public class BusApiManager implements IBusApiManager {
 
     @Override
     public Optional<Document> getBusDataXml(IZone zone) {
-        var overpassQuery = OsmQueryManager.getBusQuery(zone.getCenter(), zone.getRadius());
-        Document overpassInfo;
-        try {
-            overpassInfo = mapAccessManager.getNodesViaOverpass(overpassQuery);
-        } catch (Exception e) {
-            logger.warn("Error getting bus info.", e);
-            return Optional.empty();
-        }
+        var query = OsmQueryManager.getBusQuery(zone.getCenter(), zone.getRadius());
+        var overpassInfo = mapAccessManager.getNodesDocument(query);
 
         ConditionalExecutor.debug(() -> {
-            logger.info("Writing bus-data to: " + FileWriterWrapper.DEFAULT_OUTPUT_PATH_XML);
-            FileWriterWrapper.write(overpassInfo);
+            overpassInfo.ifPresent(info -> {
+                logger.info("Writing bus-data to: " + FileWriterWrapper.DEFAULT_OUTPUT_PATH_XML);
+                FileWriterWrapper.write(info);
+            });
         });
 
-
-        return Optional.of(overpassInfo);
+        return overpassInfo;
     }
 
     @Override
@@ -76,16 +71,29 @@ public class BusApiManager implements IBusApiManager {
     }
 
     @Override
-    public Optional<Document> getBusWays(String query) {
-        try {
-            return Optional.ofNullable(mapAccessManager.getNodesViaOverpass(query));
-        } catch (NoSuchElementException | UnsupportedOperationException e) {
-            logger.warn("Please change the zone, this one is not supported yet.", e);
-            return Optional.empty();
-        } catch (Exception e) {
-            logger.error("Error setting osm way", e);
-            return Optional.empty();
+    public Optional<Document> getBusWays(List<Long> waysIds) {
+        var query = buildWaysQuery(waysIds);
+        var resultOpt = mapAccessManager.getNodesDocument(query);
+
+        ConditionalExecutor.debug(() -> {
+            resultOpt.ifPresent(result -> {
+                String path = "target/busWays_" + waysIds.get(0) + "_" +
+                        waysIds.get(waysIds.size() - 1) + ".xml";
+                logger.info("Writing bus-ways to: " + path);
+                FileWriterWrapper.write(result, path);
+            });
+        });
+
+        return resultOpt;
+    }
+
+    private String buildWaysQuery(List<Long> waysIds) {
+        StringBuilder busWayQueryBuilder = new StringBuilder();
+        for (var id : waysIds) {
+            busWayQueryBuilder.append(OsmQueryManager.getSingleBusWayQuery(id));
         }
+
+        return OsmQueryManager.getQueryWithPayload(busWayQueryBuilder.toString());
     }
 
     private static String getBusWarszawskieQuery(String busStopId, String busStopNr, String busLine) {
