@@ -18,6 +18,7 @@ import java.util.Map;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.when;
 
 class BusDataParserTests {
@@ -51,17 +52,19 @@ class BusDataParserTests {
 
         // Assert
         // TODO - more assertions
-        var stationsMap = lambdaContext.stationsMap;
         for (var busData : lambdaContext.busInfoDataSet) {
             var route = busData.busInfo.route;
+            var firstWay = route.get(0);
+            assertTrue(firstWay.endsInZone(defaultBusZone), "First way should always end in Zone");
             for (int i = 0; i < route.size() - 1; ++i) {
                 var wayA = route.get(i);
                 var wayB = route.get(i + 1);
 
-                var endA = wayA.getWaypoint(0);
-                var startB = wayB.getWaypoint(-1);
+                var endA = wayA.getWaypoint(-1);
+                var startB = wayB.getWaypoint(0);
 
-                assertEquals(endA.getOsmNodeRef(), startB.getOsmNodeRef(), "Bus ways should not be cut in pieces");
+                assertEquals(endA.getOsmNodeRef(), startB.getOsmNodeRef(),
+                        "Bus ways should not be reversed or cut in pieces");
             }
         }
     }

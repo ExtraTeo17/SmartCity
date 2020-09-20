@@ -10,7 +10,6 @@ import osmproxy.abstractions.IMapAccessManager;
 import osmproxy.elements.OSMLight;
 import osmproxy.elements.OSMNode;
 import osmproxy.elements.OSMWay;
-import osmproxy.elements.OSMWay.RelationOrientation;
 import osmproxy.elements.OSMWay.RouteOrientation;
 import osmproxy.elements.OSMWaypoint;
 import routing.core.IGeoPosition;
@@ -124,7 +123,7 @@ public final class Router implements IRouteGenerator {
     }
 
     /////////////////////////////////////////////////////////////
-    //  HELPERS
+    //  HELPERS - Most are abominable :(
     /////////////////////////////////////////////////////////////
 
     private static Pair<List<Long>, List<RouteNode>> findRoute(IGeoPosition pointA, IGeoPosition pointB, boolean onFoot) {
@@ -153,18 +152,20 @@ public final class Router implements IRouteGenerator {
             return false;
         }
         LightManagerNode lastNodeOnList = (LightManagerNode) managers.get(managers.size() - 1);
+
         return lastNodeOnList.getLightManagerId() == ((LightManagerNode) nodeToAdd).getLightManagerId();
     }
 
 
-    private static List<RouteNode> getRouteWithAdditionalNodes(List<RouteNode> route, List<RouteNode> more_nodes) {
-        for (RouteNode node : more_nodes) {
-            findPositionOfElementOnRoute(route, node);
+    private static List<RouteNode> getRouteWithAdditionalNodes(List<RouteNode> route, List<RouteNode> additionalNodes) {
+        for (RouteNode node : additionalNodes) {
+            int index = findPositionOfElementOnRoute(route, node);
+            route.add(index, node);
         }
         return route;
     }
 
-    private static void findPositionOfElementOnRoute(List<RouteNode> route, RouteNode manager) {
+    private static int findPositionOfElementOnRoute(List<RouteNode> route, RouteNode manager) {
         int minIndex = -1;
         double minDistance = Double.MAX_VALUE;
         for (int i = 0; i < route.size(); ++i) {
@@ -175,18 +176,18 @@ public final class Router implements IRouteGenerator {
             }
         }
         if (minIndex <= 0) {
-            route.add(minIndex + 1, manager);
-            return;
+            return minIndex + 1;
         }
 
-        double distMgrToMinPrev = route.get(minIndex - 1).distance(manager);
-        double distMinToMinPrev = route.get(minIndex - 1).distance(route.get(minIndex));
-        if (distMgrToMinPrev < distMinToMinPrev) {
-            route.add(minIndex, manager);
+        var nodeA = route.get(minIndex - 1);
+        var nodeB = route.get(minIndex);
+        double distAToManager = nodeA.distance(manager);
+        double distAB = nodeA.distance(nodeB);
+        if (distAToManager < distAB) {
+            return minIndex;
         }
-        else {
-            route.add(minIndex + 1, manager);
-        }
+
+        return minIndex + 1;
     }
 
     // TODO: In some cases distance is 0 -> dx|dy is NaN -> same nodes?
@@ -223,7 +224,9 @@ public final class Router implements IRouteGenerator {
         List<RouteNode> routeNodes = new ArrayList<>();
         for (OSMWay way : route) {
             osmWaysIds.add(way.getId());
-            routeNodes.addAll(getNodesBasedOnOrientation(way));
+            var nodes = way.getWaypoints().stream()
+                    .map(RouteNode::new).collect(Collectors.toList());
+            routeNodes.addAll(nodes);
         }
         return new BusRouteData(osmWaysIds, routeNodes);
     }
@@ -236,20 +239,6 @@ public final class Router implements IRouteGenerator {
             this.waysIds = waysIds;
             this.route = route;
         }
-    }
-
-    private static List<RouteNode> getNodesBasedOnOrientation(OSMWay osmWay) {
-        var orientation = osmWay.getRelationOrientation();
-        var waypoints = osmWay.getWaypoints();
-        if (orientation == RelationOrientation.FRONT) {
-            return waypoints.stream().map(RouteNode::new).collect(Collectors.toList());
-        }
-        else if (orientation == RelationOrientation.BACK) {
-            // Waypoints list is not changed here.
-            return Lists.reverse(waypoints).stream().map(RouteNode::new).collect(Collectors.toList());
-        }
-
-        throw new UnsupportedOperationException("Orientation " + orientation.toString() + " is not supported");
     }
 
     private static List<RouteNode> getAgentStationsForRoute(List<? extends OSMNode> stations) {

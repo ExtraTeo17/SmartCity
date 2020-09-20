@@ -47,13 +47,8 @@ import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
-//import org.osm.lights.diff.OSMNode;
-//import org.osm.lights.upload.BasicAuthenticator;
-
-/**
- *
- */
 public class MapAccessManager implements IMapAccessManager {
     private static final Logger logger = LoggerFactory.getLogger(MapAccessManager.class);
     private static final String OVERPASS_API = "https://lz4.overpass-api.de/api/interpreter";
@@ -297,30 +292,26 @@ public class MapAccessManager implements IMapAccessManager {
     }
 
     private static List<Double> getParametersFromGroup(Node group1, Node group2, String parameterName) {
-        List<Double> parameterList = new ArrayList<>();
-        addLightParametersFromGroup(parameterList, group1, parameterName);
-        addLightParametersFromGroup(parameterList, group2, parameterName);
+        List<Double> parameterList = new ArrayList<>(getLightParametersFromGroup(group1, parameterName));
+        parameterList.addAll(getLightParametersFromGroup(group2, parameterName));
         return parameterList;
     }
 
-    private static void addLightParametersFromGroup(List<Double> list, Node group, String parameterName) {
-        NodeList lightNodes = group.getChildNodes();
-        for (int i = 0; i < lightNodes.getLength(); ++i) {
-            if (lightNodes.item(i).getNodeName().equals("light")) {
-                list.add(Double.parseDouble(lightNodes.item(i).getAttributes().getNamedItem(parameterName).getNodeValue()));
-            }
-        }
+    private static List<Double> getLightParametersFromGroup(Node group, String parameterName) {
+        return IterableNodeList.of(group.getChildNodes()).stream()
+                .filter(item -> item.getNodeName().equals("light"))
+                .map(item -> Double.parseDouble(item.getAttributes().getNamedItem(parameterName).getNodeName()))
+                .collect(Collectors.toList());
     }
 
     private Node getCrossroadGroup(Node crossroad, int index) {
         return crossroad.getChildNodes().item(index);
     }
 
-    private static Document getXmlDocument(String filepath) {
-        DocumentBuilderFactory dbfac = DocumentBuilderFactory.newInstance();
+    private Document getXmlDocument(String filepath) {
         Document document = null;
         try {
-            DocumentBuilder docBuilder = dbfac.newDocumentBuilder();
+            DocumentBuilder docBuilder = xmlBuilderFactory.newDocumentBuilder();
             document = docBuilder.parse(new File(filepath));
         } catch (SAXException e) {
             logger.warn("Error parsing xml.", e);

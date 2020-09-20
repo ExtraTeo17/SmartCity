@@ -6,14 +6,9 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.atomic.AtomicInteger;
 
-// TODO: Move all static methods to getId/resetId
 public class IdGenerator implements IRegistrable {
     public static final int resetValue = 1;
     private final ConcurrentMap<Class<?>, AtomicInteger> idMap;
-    
-    private static final AtomicInteger stationAgentId = new AtomicInteger();
-    private static final AtomicInteger pedestrianId = new AtomicInteger();
-    private static final AtomicInteger vehicleId = new AtomicInteger();
 
     IdGenerator() {
         this.idMap = new ConcurrentHashMap<>();
@@ -43,15 +38,5 @@ public class IdGenerator implements IRegistrable {
 
     public void reset(Class<?> type) {
         idMap.get(type).set(resetValue);
-    }
-
-    @Deprecated
-    public static int getStationAgentId() {
-        return stationAgentId.getAndIncrement();
-    }
-
-    @Deprecated
-    public static void resetStationAgentId() {
-        stationAgentId.set(resetValue);
     }
 }

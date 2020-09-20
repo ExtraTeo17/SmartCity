@@ -36,6 +36,7 @@ public class Position implements IGeoPosition {
         if (o == null || getClass() != o.getClass()) {
             return false;
         }
+        
         Position position = (Position) o;
         return Double.compare(position.lat, lat) == 0 &&
                 Double.compare(position.lng, lng) == 0;

@@ -1,7 +1,6 @@
 package osmproxy.buses;
 
 import com.google.inject.Inject;
-import org.javatuples.Pair;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
@@ -18,6 +17,7 @@ import osmproxy.elements.OSMWay;
 import routing.core.IZone;
 import routing.core.Position;
 import utilities.IterableNodeList;
+import utilities.Siblings;
 
 import java.util.*;
 import java.util.function.Predicate;
@@ -110,30 +110,34 @@ public class BusDataParser implements IBusDataParser {
     public List<OSMWay> parseOsmWays(Document nodes) {
         List<OSMWay> route = new ArrayList<>();
         Node osmRoot = nodes.getFirstChild();
-        NodeList osmXMLNodes = osmRoot.getChildNodes();
-        Pair<OSMWay, String> wayAdjacentNodeRef = determineInitialWayRelOrientation(osmXMLNodes);
-        String adjacentNodeRef = wayAdjacentNodeRef.getValue1();
-        boolean isFirst = true;
-        for (int i = 1; i < osmXMLNodes.getLength(); i++) {
-            Node item = osmXMLNodes.item(i);
-            if (item.getNodeName().equals("way")) {
-                OSMWay way;
-                if (isFirst) {
-                    way = wayAdjacentNodeRef.getValue0();
-                    isFirst = false;
-                }
-                else {
-                    way = new OSMWay(item);
-                    try {
-                        adjacentNodeRef = way.determineRelationOrientation(adjacentNodeRef);
-                    } catch (UnsupportedOperationException e) {
-                        logger.warn("Failed to determine orientation", e);
-                        break;
-                    }
-                }
+        var osmNodes = IterableNodeList.of(osmRoot.getChildNodes());
+        var nodesIter = osmNodes.iterator();
+        var twoFirstWaysOpt = findTwoFirstWaysInZone(nodesIter);
+        if (twoFirstWaysOpt.isEmpty()) {
+            logger.error("Didn't find two connected ways in provided zone");
+            return route;
+        }
 
+        var twoFirstWays = twoFirstWaysOpt.get();
+        var firstWay = twoFirstWays.first;
+        var secondWay = twoFirstWays.second;
+
+        route.add(firstWay);
+        route.add(secondWay);
+        String adjacentNodeRef = firstWay.orientateWith(secondWay);
+        while (nodesIter.hasNext()) {
+            Node item = nodesIter.next();
+            if (item.getNodeName().equals("way")) {
+                OSMWay way = new OSMWay(item);
                 // TODO: CORRECT POTENTIAL BUGS CAUSING ROUTE TO BE CUT INTO PIECES BECAUSE OF RZĄŻEWSKI CASE
                 if (way.startsInZone(zone)) {
+                    var referenceOpt = way.reverseTowardsNode(adjacentNodeRef);
+                    if (referenceOpt.isEmpty()) {
+                        logger.warn("Failed to match way:\n" + way + " with " + adjacentNodeRef);
+                        continue;
+                    }
+
+                    adjacentNodeRef = referenceOpt.get();
                     route.add(way);
                 }
             }
@@ -142,30 +146,29 @@ public class BusDataParser implements IBusDataParser {
         return route;
     }
 
-    // TODO: Is it returning orientation of next way or current way?
-    private static Pair<OSMWay, String> determineInitialWayRelOrientation(final NodeList osmXMLNodes) {
+    private Optional<Siblings<OSMWay>> findTwoFirstWaysInZone(Iterator<Node> nodeIterator) {
         OSMWay firstWay = null;
-        OSMWay lastWay = null;
-        for (int it = 1; it < osmXMLNodes.getLength(); ++it) {
-            Node node = osmXMLNodes.item(it);
-            if (node.getNodeName().equals("way")) {
-                var way = new OSMWay(node);
+        OSMWay secondWay = null;
+        while (nodeIterator.hasNext() && secondWay == null) {
+            Node item = nodeIterator.next();
+            if (item.getNodeName().equals("way")) {
+                OSMWay way = new OSMWay(item);
                 if (firstWay == null) {
-                    firstWay = way;
+                    if (way.isInZone(zone)) {
+                        firstWay = way;
+                    }
                 }
-                else {
-                    lastWay = way;
-                    break;
+                else if (firstWay.isConnectedTo(way)) {
+                    secondWay = way;
                 }
             }
         }
 
-        if (firstWay != null && lastWay != null) {
-            var orientation = firstWay.determineRelationOrientation(lastWay);
-            return Pair.with(lastWay, orientation);
+        if (secondWay == null) {
+            return Optional.empty();
         }
 
-        throw new NoSuchElementException("Did not find two 'way'-type nodes in provided list.");
+        return Optional.of(new Siblings<>(firstWay, secondWay));
     }
 
     private Optional<OSMStation> parseNode(Node node, Predicate<Long> isPresent) {

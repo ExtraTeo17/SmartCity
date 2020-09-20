@@ -34,9 +34,12 @@ public class MasterAgent extends Agent {
     private final IAgentsContainer agentsContainer;
     private static ITimeProvider timeProvider;
 
-    // TODO: Delete this abomination (or at least make it private)
+    // TODO: Delete this
+    @Deprecated(forRemoval = true, since = "Always - Eldritch Abomination")
     public static Map<Pair<Long, Long>, LightManagerNode> wayIdLightIdToLightManagerNode = new HashMap<>();
+    @Deprecated(forRemoval = true, since = "Always - Eldritch Abomination")
     public static Map<Long, LightManagerNode> crossingOsmIdToLightManagerNode = new HashMap<>();
+    @Deprecated(forRemoval = true, since = "Always - Eldritch Abomination")
     public static Map<Long, StationNode> osmStationIdToStationNode = new HashMap<>();
 
     @Inject

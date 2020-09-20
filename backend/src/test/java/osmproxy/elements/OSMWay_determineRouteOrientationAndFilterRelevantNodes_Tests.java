@@ -7,10 +7,10 @@ import utilities.IterableNodeList;
 
 import java.util.stream.Collectors;
 
-class OSMWayTests {
+class OSMWay_determineRouteOrientationAndFilterRelevantNodes_Tests {
     // TODO: More cases with tangent nodes
     @Test
-    void determineRouteOrientationAndFilterRelevantNodes_startFromFirst_setsFrontOrientation() {
+    void startFromFirst_setsFrontOrientation() {
         // Arrange
         var document = XmlLoader.getDocument("OSMTwoWays.xml");
         var mainNode = document.getFirstChild();
@@ -34,7 +34,7 @@ class OSMWayTests {
     }
 
     @Test
-    void determineRouteOrientationAndFilterRelevantNodes_startFromLast_setsBackOrientation() {
+    void startFromLast_setsBackOrientation() {
         // Arrange
         var document = XmlLoader.getDocument("OSMTwoWays.xml");
         var mainNode = document.getFirstChild();
