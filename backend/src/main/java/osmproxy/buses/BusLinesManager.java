@@ -55,13 +55,13 @@ public class BusLinesManager implements IBusLinesManager {
     private Collection<BrigadeInfo> generateBrigadeInfos(String busLine, Collection<OSMStation> osmStations) {
         Map<String, BrigadeInfo> brigadeInfoMap = new LinkedHashMap<>();
         for (OSMStation station : osmStations) {
-            var nodesOptional = busApiManager.getNodesViaWarszawskieAPI(station.getBusStopId(),
+            var jsonObjOpt = busApiManager.getNodesViaWarszawskieAPI(station.getBusStopId(),
                     station.getBusStopNr(), busLine);
-            if (nodesOptional.isEmpty()) {
+            if (jsonObjOpt.isEmpty()) {
                 continue;
             }
 
-            var jsonObject = nodesOptional.get();
+            var jsonObject = jsonObjOpt.get();
             var stationId = station.getId();
             for (JSONObject valuesArray : IterableJsonArray.of(jsonObject, "result")) {
                 var brigadeAndTime = IterableJsonArray.of(valuesArray, "values").stream()
