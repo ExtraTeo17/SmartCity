@@ -16,12 +16,7 @@ public class Timetable {
 
     public Optional<Date> getTimeOnStation(final long stationId) {
         var time = stationOsmIdToTime.get(stationId);
-        if (time == null) {
-            logger.warn("Could not retrieve time for " + stationId);
-            return Optional.empty();
-        }
-
-        return Optional.of(time);
+        return Optional.ofNullable(time);
     }
 
     public Date getBoardingTime() {
@@ -38,7 +33,7 @@ public class Timetable {
         }
 
         if (timeOnStationChronological.size() == 0 ||
-                timeOnStation.after(timeOnStationChronological.get(timeOnStationChronological.size() - 1))){
+                timeOnStation.after(timeOnStationChronological.get(timeOnStationChronological.size() - 1))) {
             stationOsmIdToTime.put(stationOsmId, timeOnStation);
             timeOnStationChronological.add(timeOnStation);
         }

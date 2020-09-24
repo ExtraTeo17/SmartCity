@@ -8,20 +8,22 @@ import routing.RouteNode;
 import routing.Router;
 import routing.StationNode;
 import routing.core.IGeoPosition;
+import smartcity.ITimeProvider;
 
 import java.util.*;
 
 public class Bus extends MovingObject {
     public static int CAPACITY_MID = 10;
     public static int CAPACITY_HIGH = 25;
-    private static final Logger logger = LoggerFactory.getLogger(Bus.class);
 
+    private final Logger logger;
     private final Timetable timetable;
     private final HashMap<Integer, List<String>> stationsForPassengers;
     private final List<StationNode> stationNodesOnRoute;
     private final String busLine;
     private final List<RouteNode> displayRoute;
     private final List<RouteNode> route;
+    private final ITimeProvider timeProvider;
 
     private DrivingState state = DrivingState.STARTING;
     private int moveIndex = 0;
@@ -29,12 +31,16 @@ public class Bus extends MovingObject {
     private int closestStationIndex = -1;
     private int passengersCount = 0;
 
-    public Bus(List<RouteNode> route, Timetable timetable, String busLine,
+    // TODO: Factory for vehicles - inject
+    public Bus(ITimeProvider timeProvider,
+               List<RouteNode> route, Timetable timetable, String busLine,
                String brigadeNr) {
         super(40);
+        this.timeProvider = timeProvider;
         this.displayRoute = route;
         this.timetable = timetable;
         this.busLine = busLine;
+        this.logger = LoggerFactory.getLogger(Bus.class.getName() + " (l_" + busLine + ") (br_" + brigadeNr + ")");
 
         this.route = Router.uniformRoute(displayRoute);
         this.stationsForPassengers = new HashMap<>();
@@ -42,7 +48,7 @@ public class Bus extends MovingObject {
         for (RouteNode node : route) {
             if (node instanceof StationNode) {
                 StationNode station = (StationNode) node;
-                stationsForPassengers.put(station.getStationId(), new ArrayList<>());
+                stationsForPassengers.put(station.getStationAgentId(), new ArrayList<>());
                 stationNodesOnRoute.add(station);
             }
         }
@@ -127,7 +133,12 @@ public class Bus extends MovingObject {
     }
 
     public Optional<Date> getTimeOnStation(String osmStationId) {
-        return timetable.getTimeOnStation(Long.parseLong(osmStationId));
+        var timeOnStation = timetable.getTimeOnStation(Long.parseLong(osmStationId));
+        if (timeOnStation.isEmpty()) {
+            logger.warn("Could not retrieve time for " + osmStationId);
+        }
+
+        return timeOnStation;
     }
 
     public RouteNode findNextStop() {
@@ -202,6 +213,10 @@ public class Bus extends MovingObject {
         return ((closestLightIndex - moveIndex) * Router.STEP_CONSTANT) / getSpeed();
     }
 
+    // TODO: Are they though?
+    //  Suppose Bus.move task is late by 5ms because of lags (performance issues)
+    //  Then his speed is actually 3600 / (9ms + 5ms) = 257 / TIME_SCALE = 25.7 instead of 40
+    //  This calculation is highly dependent on processor speed :(
     public int getMillisecondsToNextStation() {
         return ((closestStationIndex - moveIndex) * Router.STEP_CONSTANT) / getSpeed();
     }
@@ -216,8 +231,12 @@ public class Bus extends MovingObject {
         this.state = state;
     }
 
-    // TODO: Replace with shouldStart()
-    public Date getBoardingTime() {
-        return timetable.getBoardingTime();
+    public boolean shouldStart() {
+        var dateNow = timeProvider.getCurrentSimulationTime();
+        var boardingTime = timetable.getBoardingTime();
+        long hours = boardingTime.getHours();
+        long minutes = boardingTime.getMinutes();
+
+        return hours == dateNow.getHours() && minutes == dateNow.getMinutes();
     }
 }

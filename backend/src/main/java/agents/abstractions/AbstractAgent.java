@@ -113,4 +113,10 @@ public abstract class AbstractAgent extends Agent {
         msg.addReceiver(receiver);
         return msg;
     }
+
+    protected Properties createProperties(String senderType){
+        var result = new Properties();
+        result.setProperty(MessageParameter.TYPE, senderType);
+        return result;
+    }
 }

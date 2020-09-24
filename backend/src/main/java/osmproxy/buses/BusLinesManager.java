@@ -74,13 +74,13 @@ public class BusLinesManager implements IBusLinesManager {
                         .toArray(String[]::new);
 
                 var brigadeNr = brigadeAndTime[0];
-                var time = brigadeAndTime[1];
                 var brigadeInfo = brigadeInfoMap.get(brigadeNr);
                 if (brigadeInfo == null) {
                     brigadeInfo = new BrigadeInfo(brigadeNr);
                     brigadeInfoMap.put(brigadeNr, brigadeInfo);
                 }
 
+                var time = brigadeAndTime[1];
                 brigadeInfo.addToTimetable(stationId, time);
             }
         }

@@ -41,7 +41,8 @@ class AgentsFactory implements IAgentsFactory {
 
     @Override
     public BusAgent create(List<RouteNode> route, Timetable timetable, String busLine, String brigadeNr) {
-        var bus = new Bus(route, timetable, busLine, brigadeNr);
+        var bus = new Bus(timeProvider,
+                route, timetable, busLine, brigadeNr);
         return new BusAgent(idGenerator.get(BusAgent.class), timeProvider, bus);
     }
 

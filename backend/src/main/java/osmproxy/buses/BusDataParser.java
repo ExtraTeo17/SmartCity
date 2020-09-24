@@ -106,6 +106,7 @@ public class BusDataParser implements IBusDataParser {
         return Optional.of(new BusInfoData(new BusInfo(busLine, ways), stationIds));
     }
 
+    @SuppressWarnings("FeatureEnvy")
     @Override
     public List<OSMWay> parseOsmWays(Document nodes) {
         List<OSMWay> route = new ArrayList<>();

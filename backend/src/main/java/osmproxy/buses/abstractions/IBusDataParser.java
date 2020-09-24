@@ -8,5 +8,6 @@ import java.util.List;
 
 public interface IBusDataParser {
     BusPreparationData parseBusData(Document busData);
+
     List<OSMWay> parseOsmWays(Document nodes);
 }

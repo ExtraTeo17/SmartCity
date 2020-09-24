@@ -200,7 +200,7 @@ public class TaskManager implements ITaskManager {
     public Runnable getScheduleBusControlTask() {
         return () -> {
             try {
-                agentsContainer.forEach(BusAgent.class, BusAgent::runBasedOnTimetable);
+                agentsContainer.removeIf(BusAgent.class, BusAgent::runBasedOnTimetable);
             } catch (Exception e) {
                 logger.warn("Error in bus control task", e);
             }
