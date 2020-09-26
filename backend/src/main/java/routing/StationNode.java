@@ -1,7 +1,6 @@
 package routing;
 
 public class StationNode extends RouteNode {
-
     private final int stationAgentId;
     private final String osmStationId;
 
@@ -11,7 +10,7 @@ public class StationNode extends RouteNode {
         this.osmStationId = osmStationId;
     }
 
-    public int getStationId() {
+    public int getStationAgentId() {
         return stationAgentId;
     }
 

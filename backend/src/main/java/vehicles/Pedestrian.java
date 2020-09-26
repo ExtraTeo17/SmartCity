@@ -90,6 +90,11 @@ public class Pedestrian extends MovingObject {
 
     @Override
     public IGeoPosition getPosition() {
+        // TODO: Should not happen - prevent it
+        if (index >= route.size()) {
+            return route.get(route.size() - 1);
+        }
+
         return route.get(index);
     }
 

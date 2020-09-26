@@ -1,82 +1,94 @@
 package vehicles;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import osmproxy.buses.Timetable;
 import routing.LightManagerNode;
 import routing.RouteNode;
 import routing.Router;
 import routing.StationNode;
 import routing.core.IGeoPosition;
-import smartcity.buses.Timetable;
+import smartcity.ITimeProvider;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
+import java.util.*;
 
 public class Bus extends MovingObject {
     public static int CAPACITY_MID = 10;
     public static int CAPACITY_HIGH = 25;
 
+    private final Logger logger;
     private final Timetable timetable;
-    private final HashMap<Integer, List<String>> stationsForPassengers = new HashMap<>();
+    private final HashMap<Integer, List<String>> stationsForPassengers;
     private final List<StationNode> stationNodesOnRoute;
     private final String busLine;
-    private final String brigadeNr;
-    private DrivingState state = DrivingState.STARTING;
     private final List<RouteNode> displayRoute;
     private final List<RouteNode> route;
-    private int index = 0;
+    private final ITimeProvider timeProvider;
+
+    private DrivingState state = DrivingState.STARTING;
+    private int moveIndex = 0;
     private int closestLightIndex = -1;
     private int closestStationIndex = -1;
     private int passengersCount = 0;
 
-    public Bus(List<RouteNode> route, Timetable timetable, String busLine,
+    // TODO: Factory for vehicles - inject
+    public Bus(ITimeProvider timeProvider,
+               List<RouteNode> route, Timetable timetable, String busLine,
                String brigadeNr) {
         super(40);
+        this.timeProvider = timeProvider;
         this.displayRoute = route;
+        this.timetable = timetable;
+        this.busLine = busLine;
+        this.logger = LoggerFactory.getLogger(Bus.class.getName() + " (l_" + busLine + ") (br_" + brigadeNr + ")");
 
+        this.route = Router.uniformRoute(displayRoute);
+        this.stationsForPassengers = new HashMap<>();
+        this.stationNodesOnRoute = new ArrayList<>();
         for (RouteNode node : route) {
             if (node instanceof StationNode) {
                 StationNode station = (StationNode) node;
-                stationsForPassengers.put(station.getStationId(), new ArrayList<>());
+                stationsForPassengers.put(station.getStationAgentId(), new ArrayList<>());
+                stationNodesOnRoute.add(station);
             }
         }
 
-        this.route = Router.uniformRoute(displayRoute);
-        this.timetable = timetable;
-        this.stationNodesOnRoute = extractStationsFromRoute();
-        this.busLine = busLine;
-        this.brigadeNr = brigadeNr;
+        if (stationNodesOnRoute.size() < 2) {
+            logger.debug("Only one station on route");
+        }
     }
 
     public int getPassengersCount() {
         return passengersCount;
     }
 
-    public void addPassengerToStation(int id, String passenger) {
-        stationsForPassengers.get(id).add(passenger);
-        passengersCount++;
+    public void addPassengerToStation(int id, String name) {
+        var passengers = stationsForPassengers.get(id);
+        if (passengers != null) {
+            passengers.add(name);
+            ++passengersCount;
+        }
+        else {
+            logger.warn("Unrecognized station id: " + id);
+        }
     }
 
-    public boolean removePassengerFromStation(int id, String passenger) {
-        if (stationsForPassengers.get(id).remove(passenger)) {
-            passengersCount--;
+    public boolean removePassengerFromStation(int id, String name) {
+        if (getPassengers(id).remove(name)) {
+            --passengersCount;
             return true;
         }
+
         return false;
     }
 
-    public List<String> getPassengersToLeave(int id) {
-        return stationsForPassengers.get(id);
-    }
-
-    private List<StationNode> extractStationsFromRoute() {
-        List<StationNode> stationsOnRoute = new ArrayList<>();
-        for (final RouteNode node : route) {
-            if (node instanceof StationNode) {
-                stationsOnRoute.add((StationNode) node);
-            }
+    public List<String> getPassengers(int id) {
+        var result = stationsForPassengers.get(id);
+        if (result == null) {
+            return new ArrayList<>();
         }
-        return stationsOnRoute;
+
+        return result;
     }
 
     public final String getLine() {
@@ -85,12 +97,11 @@ public class Bus extends MovingObject {
 
     public final List<StationNode> getStationNodesOnRoute() {
         return stationNodesOnRoute;
-
     }
 
     @Override
     public long getAdjacentOsmWayId() {
-        return ((LightManagerNode) route.get(index)).getOsmWayId();
+        return ((LightManagerNode) route.get(moveIndex)).getOsmWayId();
     }
 
     @Override
@@ -100,7 +111,7 @@ public class Bus extends MovingObject {
 
     @Override
     public LightManagerNode getNextTrafficLight() {
-        for (int i = index + 1; i < route.size(); i++) {
+        for (int i = moveIndex + 1; i < route.size(); i++) {
             if (route.get(i) instanceof LightManagerNode) {
                 closestLightIndex = i;
                 return getCurrentTrafficLightNode();
@@ -110,30 +121,33 @@ public class Bus extends MovingObject {
         return getCurrentTrafficLightNode();
     }
 
-    public StationNode findNextStation() {
-        for (int i = index + 1; i < route.size(); i++) {
+    public Optional<StationNode> findNextStation() {
+        for (int i = moveIndex + 1; i < route.size(); ++i) {
             if (route.get(i) instanceof StationNode) {
                 closestStationIndex = i;
-                return (StationNode) route.get(i);
+                return Optional.of((StationNode) route.get(i));
             }
         }
         closestStationIndex = -1;
-        return null;
+        return Optional.empty();
     }
 
-    public Date getTimeOnStation(String osmStationId) {
-        return timetable.getTimeOnStation(Long.parseLong(osmStationId));
+    public Optional<Date> getTimeOnStation(String osmStationId) {
+        var timeOnStation = timetable.getTimeOnStation(Long.parseLong(osmStationId));
+        if (timeOnStation.isEmpty()) {
+            logger.warn("Could not retrieve time for " + osmStationId);
+        }
 
+        return timeOnStation;
     }
-
 
     public RouteNode findNextStop() {
-        for (int i = index + 1; i < route.size(); i++) {
+        for (int i = moveIndex + 1; i < route.size(); i++) {
             if (route.get(i) instanceof StationNode) {
-                return (StationNode) route.get(i);
+                return route.get(i);
             }
-            if (route.get(i) instanceof LightManagerNode) {
-                return (LightManagerNode) route.get(i);
+            else if (route.get(i) instanceof LightManagerNode) {
+                return route.get(i);
             }
         }
         return null;
@@ -141,7 +155,7 @@ public class Bus extends MovingObject {
 
     @Override
     public IGeoPosition getPosition() {
-        return route.get(index);
+        return route.get(moveIndex);
     }
 
     @Override
@@ -154,17 +168,17 @@ public class Bus extends MovingObject {
 
     @Override
     public boolean isAtTrafficLights() {
-        if (index == route.size()) {
+        if (moveIndex == route.size()) {
             return false;
         }
-        return route.get(index) instanceof LightManagerNode;
+        return route.get(moveIndex) instanceof LightManagerNode;
     }
 
     public boolean isAtStation() {
-        if (index == route.size()) {
+        if (moveIndex == route.size()) {
             return true;
         }
-        return route.get(index) instanceof StationNode;
+        return route.get(moveIndex) instanceof StationNode;
     }
 
     public StationNode getCurrentStationNode() {
@@ -176,16 +190,16 @@ public class Bus extends MovingObject {
 
     @Override
     public boolean isAtDestination() {
-        return index == route.size();
+        return moveIndex == route.size();
     }
 
     @Override
     public void move() {
         if (isAtDestination()) {
-            index = 0;
+            moveIndex = 0;
         }
         else {
-            index++;
+            moveIndex++;
         }
     }
 
@@ -196,11 +210,15 @@ public class Bus extends MovingObject {
 
     @Override
     public int getMillisecondsToNextLight() {
-        return ((closestLightIndex - index) * Router.STEP_CONSTANT) / getSpeed();
+        return ((closestLightIndex - moveIndex) * Router.STEP_CONSTANT) / getSpeed();
     }
 
+    // TODO: Are they though?
+    //  Suppose Bus.move task is late by 5ms because of lags (performance issues)
+    //  Then his speed is actually 3600 / (9ms + 5ms) = 257 / TIME_SCALE = 25.7 instead of 40
+    //  This calculation is highly dependent on processor speed :(
     public int getMillisecondsToNextStation() {
-        return ((closestStationIndex - index) * Router.STEP_CONSTANT) / getSpeed();
+        return ((closestStationIndex - moveIndex) * Router.STEP_CONSTANT) / getSpeed();
     }
 
     @Override
@@ -213,9 +231,12 @@ public class Bus extends MovingObject {
         this.state = state;
     }
 
-    public Date getBoardingTime() {
-        return timetable.getBoardingTime();
+    public boolean shouldStart() {
+        var dateNow = timeProvider.getCurrentSimulationTime();
+        var boardingTime = timetable.getBoardingTime();
+        long hours = boardingTime.getHours();
+        long minutes = boardingTime.getMinutes();
+
+        return hours == dateNow.getHours() && minutes == dateNow.getMinutes();
     }
-
-
 }

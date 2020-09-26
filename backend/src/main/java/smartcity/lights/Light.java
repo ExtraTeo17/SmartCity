@@ -34,10 +34,10 @@ public class Light implements IGeoPosition {
 
     Light(Node node, LightColor color, int managerId) {
         this.carLightColor = color;
-        osmId = Long.parseLong(node.getAttributes().getNamedItem(Light.OSM_LIGHT_ID).getNodeValue());
-        lat = Double.parseDouble((node.getAttributes().getNamedItem(Light.LAT).getNodeValue()));
-        lng = Double.parseDouble((node.getAttributes().getNamedItem(Light.LON).getNodeValue()));
-        adjacentOsmWayId = Long.parseLong((node.getAttributes().getNamedItem(Light.WAY_ID).getNodeValue())); // TODO: Retrieve crossings!
+        osmId = Long.parseLong(node.getAttributes().getNamedItem(OSM_LIGHT_ID).getNodeValue());
+        lat = Double.parseDouble((node.getAttributes().getNamedItem(LAT).getNodeValue()));
+        lng = Double.parseDouble((node.getAttributes().getNamedItem(LON).getNodeValue()));
+        adjacentOsmWayId = Long.parseLong((node.getAttributes().getNamedItem(WAY_ID).getNodeValue())); // TODO: Retrieve crossings!
         addHashMapsEntries(managerId);
     }
 
@@ -66,7 +66,7 @@ public class Light implements IGeoPosition {
         return adjacentOsmWayId;
     }
 
-    private void addHashMapsEntries(long managerId) {
+    private void addHashMapsEntries(int managerId) {
         final LightManagerNode lightManagerNode = new LightManagerNode(lat, lng,
                 adjacentOsmWayId,
                 adjacentCrossingOsmId1 != null ? Long.parseLong(adjacentCrossingOsmId1) : 0,

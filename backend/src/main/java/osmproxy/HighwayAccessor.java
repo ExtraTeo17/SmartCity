@@ -40,7 +40,13 @@ import java.util.List;
 public class HighwayAccessor {
     private static final String CONFIG_PATH = "config/graphHopper.properties";
     private static final String[] args = new String[]{"config=" + CONFIG_PATH, "datareader.file=mazowieckie-latest.osm.pbf"};
+    private static final ExtendedGraphHopper graphHopper;
 
+    static {
+        graphHopper = new ExtendedGraphHopper();
+        graphHopper.init(CmdArgs.read(args));
+        graphHopper.importOrLoad();
+    }
 
     public static Pair<List<Long>, List<RouteNode>> getOsmWayIdsAndPointList(double fromLat, double fromLon,
                                                                              double toLat, double toLon,
@@ -48,13 +54,9 @@ public class HighwayAccessor {
         List<Long> osmWayIds = new ArrayList<>();
         List<RouteNode> pointList = new ArrayList<>();
 
-        ExtendedGraphHopper graphHopper = new ExtendedGraphHopper();
-        graphHopper.init(CmdArgs.read(args));
-        graphHopper.importOrLoad();
-
-        GHResponse rsp = new GHResponse();
+        GHResponse response = new GHResponse();
         List<Path> paths = graphHopper.calcPaths(new GHRequest(fromLat, fromLon, toLat, toLon).
-                setWeighting("fastest").setVehicle(onFoot ? "foot" : "car"), rsp);
+                setWeighting("fastest").setVehicle(onFoot ? "foot" : "car"), response);
         Path path0 = paths.get(0);
 
         long previousWayId = 0;

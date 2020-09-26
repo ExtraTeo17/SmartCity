@@ -31,18 +31,19 @@ class HashAgentsContainer implements IAgentsContainer {
         var type = agent.getClass();
         var collection = getOrThrow(type);
 
-        if (tryAddAgent(agent)) {
+        if (tryAccept(agent)) {
             return collection.putIfAbsent(agent.getId(), agent) == null;
         }
 
         return false;
     }
 
-    private boolean tryAddAgent(@NotNull AbstractAgent agent) {
+    @Override
+    public boolean tryAccept(@NotNull AbstractAgent agent) {
         try {
             controller.acceptNewAgent(agent.getPredictedName(), agent);
         } catch (StaleProxyException e) {
-            logger.warn("Error adding agent");
+            logger.warn("Error adding agent", e);
             return false;
         }
 

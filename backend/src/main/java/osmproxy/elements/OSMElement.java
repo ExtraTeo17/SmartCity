@@ -1,6 +1,6 @@
 package osmproxy.elements;
 
-import utilities.NumericHelper;
+import java.util.Objects;
 
 public class OSMElement {
     protected final long id;
@@ -28,7 +28,16 @@ public class OSMElement {
     }
 
     @Override
+    public int hashCode() {
+        return Objects.hash(id);
+    }
+
+    @Override
     public String toString() {
         return "id: " + id + "\n";
+    }
+
+    public static OSMElement of(long id) {
+        return new OSMElement(id);
     }
 }

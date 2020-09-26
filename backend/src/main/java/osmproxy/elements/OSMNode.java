@@ -13,8 +13,8 @@ public class OSMNode extends OSMElement
         implements IGeoPosition, Iterable<OSMWay> {
 
     protected final List<OSMWay> parentWays;
-    protected double lat;
-    protected double lon;
+    protected final double lat;
+    protected final double lon;
 
     OSMNode(long id, double lat, double lon) {
         super(id);
@@ -76,6 +76,7 @@ public class OSMNode extends OSMElement
                 return false;
             }
         }
+
         return true;
     }
 

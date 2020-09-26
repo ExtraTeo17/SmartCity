@@ -1,13 +1,13 @@
 package routing;
 
 public class LightManagerNode extends RouteNode {
-    private final long lightManagerId;
+    private final int lightManagerId;
     private final long crossingOsmId1;
     private final long crossingOsmId2;
     private long osmWayId;
 
     public LightManagerNode(double lat, double lon, long osmWayId, long adjacentCrossingOsmId1,
-                            long adjacentCrossingOsmId2, long lightManagerId) {
+                            long adjacentCrossingOsmId2, int lightManagerId) {
         super(lat, lon);
         this.lightManagerId = lightManagerId;
         this.osmWayId = osmWayId;
@@ -15,7 +15,7 @@ public class LightManagerNode extends RouteNode {
         this.crossingOsmId2 = adjacentCrossingOsmId2;
     }
 
-    public long getLightManagerId() {
+    public int getLightManagerId() {
         return lightManagerId;
     }
 

@@ -1,19 +1,19 @@
 package osmproxy.elements;
 
 
+import com.google.common.annotations.VisibleForTesting;
+import com.google.common.collect.Lists;
+import org.jetbrains.annotations.Contract;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
 import routing.core.IZone;
 import routing.core.Position;
+import utilities.IterableNodeList;
 import utilities.Siblings;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.NoSuchElementException;
-import java.util.Optional;
+import java.util.*;
 
 public class OSMWay extends OSMElement {
     private static final Logger logger = LoggerFactory.getLogger(OSMWay.class);
@@ -21,24 +21,21 @@ public class OSMWay extends OSMElement {
     private final boolean isOneWay;
     private List<OSMWaypoint> waypoints;
     private LightOrientation lightOrientation = null;
-    private RelationOrientation relationOrientation = null;
     private RouteOrientation routeOrientation = RouteOrientation.FRONT;
 
     public OSMWay(Node item) {
         super(item.getAttributes().getNamedItem("id").getNodeValue());
-        this.waypoints = new ArrayList<>();
         this.childNodeIds = new ArrayList<>();
 
-        NodeList childNodes = item.getChildNodes();
         Boolean oneWayValue = null;
-        for (int k = 0; k < childNodes.getLength(); ++k) {
-            Node el = childNodes.item(k);
+        this.waypoints = new ArrayList<>();
+        for (var el : IterableNodeList.of(item.getChildNodes())) {
             if (el.getNodeName().equals("nd")) {
                 NamedNodeMap attributes = el.getAttributes();
                 String nodeRef = attributes.getNamedItem("ref").getNodeValue();
                 double lat = Double.parseDouble(attributes.getNamedItem("lat").getNodeValue());
                 double lng = Double.parseDouble(attributes.getNamedItem("lon").getNodeValue());
-                waypoints.add(new OSMWaypoint(nodeRef, lat, lng));
+                this.waypoints.add(new OSMWaypoint(nodeRef, lat, lng));
             }
             else if (el.getNodeName().equals("tag") &&
                     el.getAttributes().getNamedItem("k").getNodeValue().equals("oneway")
@@ -56,20 +53,53 @@ public class OSMWay extends OSMElement {
         this.isOneWay = oneWayValue != null ? oneWayValue : false;
     }
 
+    @VisibleForTesting
+    OSMWay(long id, final List<OSMWaypoint> waypoints) {
+        super(id);
+        this.waypoints = waypoints;
+        this.childNodeIds = new ArrayList<>();
+        this.isOneWay = false;
+    }
+
+    @Override
+    public String toString() {
+        StringBuilder builder = new StringBuilder()
+                .append(super.toString())
+                .append(", waypoints:" + "\n");
+        for (final OSMWaypoint waypoint : waypoints) {
+            builder.append(waypoint).append(", ");
+        }
+        return builder.append("\n").toString();
+    }
+
     // TODO: Result is not queried anywhere, why are we adding it?
     void addChildNodeId(final String id) {
         childNodeIds.add(id);
     }
 
-    public final List<OSMWaypoint> getWaypoints() {
-        return waypoints;
+    public List<OSMWaypoint> getWaypoints() {
+        return Lists.newCopyOnWriteArrayList(waypoints);
     }
 
-    public final OSMWaypoint getWaypoint(int i) {
-        return waypoints.get(i);
+    /**
+     * @param index Negative indicates that it should start from end (waypoints.size() + index)
+     */
+    public OSMWaypoint getWaypoint(int index) {
+        if (index < 0) {
+            return waypoints.get(waypoints.size() + index);
+        }
+        return waypoints.get(index);
     }
 
-    public final int getWaypointCount() {
+    public OSMWaypoint getStart() {
+        return getWaypoint(0);
+    }
+
+    public OSMWaypoint getEnd() {
+        return getWaypoint(-1);
+    }
+
+    public int getWaypointCount() {
         return waypoints.size();
     }
 
@@ -82,28 +112,14 @@ public class OSMWay extends OSMElement {
         return lightOrientation != null;
     }
 
-    public final LightOrientation getLightOrientation() {
+    public LightOrientation getLightOrientation() {
         return lightOrientation;
     }
 
-    public final RelationOrientation getRelationOrientation() {
-        return relationOrientation;
-    }
-
-    public final RouteOrientation getRouteOrientation() {
+    public RouteOrientation getRouteOrientation() {
         return routeOrientation;
     }
 
-    @Override
-    public String toString() {
-        final StringBuilder builder = new StringBuilder()
-                .append(super.toString())
-                .append("waypoints:" + "\n");
-        for (final OSMWaypoint waypoint : waypoints) {
-            builder.append(waypoint);
-        }
-        return builder.append("\n").toString();
-    }
 
     void determineLightOrientationTowardsCrossroad(final String osmLightId) {
         if (waypoints.get(0).getOsmNodeRef().equals(osmLightId)) {
@@ -114,52 +130,63 @@ public class OSMWay extends OSMElement {
         }
     }
 
-    // TODO: Describe this function - what it is returning?
-    // TODO: Return optional instead of throwing
-    public String determineRelationOrientation(final String adjacentNodeRef) {
+    /**
+     * @param adjacentWaypoint Last waypoint on the previous way
+     * @return Last nodeReference on the current way
+     */
+    public Optional<String> reverseTowardsNode(OSMWaypoint adjacentWaypoint) {
+        return reverseTowardsNode(adjacentWaypoint.getOsmNodeRef());
+    }
+
+    /**
+     * @param adjacentNodeRef Last node on the previous way
+     * @return Last node on the current way
+     */
+    public Optional<String> reverseTowardsNode(String adjacentNodeRef) {
         String firstOsmNodeRef = getNodeReference(0);
         String lastOsmNodeRef = getNodeReference(-1);
+        String result = null;
         if (firstOsmNodeRef.equals(adjacentNodeRef)) {
-            relationOrientation = RelationOrientation.FRONT;
-            return lastOsmNodeRef;
+            result = lastOsmNodeRef;
         }
         else if (lastOsmNodeRef.equals(adjacentNodeRef)) {
-            relationOrientation = RelationOrientation.BACK;
-            return firstOsmNodeRef;
+            Collections.reverse(waypoints);
+            result = firstOsmNodeRef;
         }
 
-        throw new UnsupportedOperationException("This orientation is not yet known :(");
+        return Optional.ofNullable(result);
+    }
+
+    /**
+     * @param index - negative indicates that it should start from end (waypoints.size() + index)
+     */
+    private String getNodeReference(int index) {
+        return getWaypoint(index).getOsmNodeRef();
     }
 
 
     /**
-     * @param index - negative indicates that it should start from end (waypoints.size() - index)
+     * @param other OsmWay connected with currentWay
+     * @return lastNodeRef of other way after orientation
      */
-    private String getNodeReference(int index) {
-        if (index < 0) {
-            index = waypoints.size() + index;
+    public String orientateWith(OSMWay other) {
+        Optional<String> nodeRef;
+        var end = getEnd();
+        if (endIsConnectedTo(other)) {
+            nodeRef = other.reverseTowardsNode(end);
         }
-        return waypoints.get(index).getOsmNodeRef();
-    }
-
-    // TODO: Describe this function - what it is returning?
-    public String determineRelationOrientation(final OSMWay nextWay) {
-        String firstWayFirstOsmNodeRef = getNodeReference(0);
-        String firstWayLastOsmNodeRef = getNodeReference(-1);
-        String secondWayFirstOsmNodeRef = nextWay.getNodeReference(0);
-        String secondWayLastOsmNodeRef = nextWay.getNodeReference(-1);
-        if (firstWayFirstOsmNodeRef.equals(secondWayFirstOsmNodeRef) ||
-                firstWayFirstOsmNodeRef.equals(secondWayLastOsmNodeRef)) {
-            relationOrientation = RelationOrientation.BACK;
-            return firstWayFirstOsmNodeRef;
-        }
-        else if (firstWayLastOsmNodeRef.equals(secondWayFirstOsmNodeRef) ||
-                firstWayLastOsmNodeRef.equals(secondWayLastOsmNodeRef)) {
-            relationOrientation = RelationOrientation.FRONT;
-            return firstWayLastOsmNodeRef;
+        else { // startIsConnectedTo(second)
+            nodeRef = reverseTowardsNode(end);
+            if(nodeRef.isPresent()) {
+                nodeRef = other.reverseTowardsNode(nodeRef.get());
+            }
         }
 
-        throw new UnsupportedOperationException("This orientation is not yet known :(");
+        if (nodeRef.isEmpty()) {
+            throw new IllegalStateException("Way + " + other + " + is not connected to " + this);
+        }
+
+        return nodeRef.get();
     }
 
     public Position getLightNeighborPos() {
@@ -169,8 +196,48 @@ public class OSMWay extends OSMElement {
         };
     }
 
+
+    /**
+     * @return Starts or ends in zone
+     */
+    public boolean isInZone(IZone zone) {
+        return startsInZone(zone) || endsInZone(zone);
+    }
+
     public boolean startsInZone(IZone zone) {
-        return zone.contains(waypoints.get(0));
+        return zone.contains(getWaypoint(0));
+    }
+
+    public boolean endsInZone(IZone zone) {
+        return zone.contains(getWaypoint(-1));
+    }
+
+    /**
+     * @return Starts or ends with same Waypoint as other
+     */
+    @Contract(pure = true)
+    public boolean isConnectedTo(final OSMWay other) {
+        return startIsConnectedTo(other) || endIsConnectedTo(other);
+    }
+
+    @Contract(pure = true)
+    public boolean startIsConnectedTo(final OSMWay other) {
+        return startsWith(other.getStart()) || startsWith(other.getEnd());
+    }
+
+    @Contract(pure = true)
+    public boolean startsWith(OSMWaypoint waypoint) {
+        return getStart().equals(waypoint);
+    }
+
+    @Contract(pure = true)
+    public boolean endIsConnectedTo(final OSMWay other) {
+        return endsWith(other.getStart()) || endsWith(other.getEnd());
+    }
+
+    @Contract(pure = true)
+    public boolean endsWith(OSMWaypoint waypoint) {
+        return getEnd().equals(waypoint);
     }
 
     // TODO: What is returned here?
@@ -270,11 +337,6 @@ public class OSMWay extends OSMElement {
     public enum LightOrientation {
         LIGHT_AT_ENTRY,
         LIGHT_AT_EXIT
-    }
-
-    public enum RelationOrientation {
-        BACK,
-        FRONT
     }
 
     public enum RouteOrientation {

@@ -1,5 +1,7 @@
 package agents.abstractions;
 
+import agents.LightManagerAgent;
+import agents.utilities.LoggerLevel;
 import agents.utilities.MessageParameter;
 import jade.core.AID;
 import jade.core.Agent;
@@ -13,20 +15,27 @@ import smartcity.MasterAgent;
 import vehicles.MovingObject;
 
 import java.time.Instant;
+import java.util.List;
 
 public abstract class AbstractAgent extends Agent {
-    private static final Logger logger = LoggerFactory.getLogger(AbstractAgent.class);
     private final int id;
+    private final String namePrefix;
+    protected final Logger logger;
 
-    public AbstractAgent(int id) {
+
+    public AbstractAgent(int id, String namePrefix) {
         this.id = id;
+        this.namePrefix = namePrefix;
+        this.logger = LoggerFactory.getLogger(this.getPredictedName());
     }
 
     public String getPredictedName() {
-        return getNamePrefix() + id;
+        return getPredictedName(this.namePrefix, id);
     }
 
-    public abstract String getNamePrefix();
+    private String getPredictedName(String prefix, int id) {
+        return prefix + id;
+    }
 
     public int getId() {
         return id;
@@ -40,8 +49,19 @@ public abstract class AbstractAgent extends Agent {
         }
     }
 
+    public void print(String message, LoggerLevel level) {
+        switch (level) {
+            case TRACE -> logger.trace(message);
+            case DEBUG -> logger.debug(message);
+            case INFO -> logger.info(message);
+            case WARN -> logger.warn(message);
+            case ERROR -> logger.error(message);
+        }
+    }
+
+    // TODO: Protected
     public void print(String message) {
-        logger.info(getLocalName() + ": " + message);
+        print(message, LoggerLevel.INFO);
     }
 
     // TODO: Pass only LightManager here, remove movingObject and pass additional parameters
@@ -49,25 +69,54 @@ public abstract class AbstractAgent extends Agent {
         // finds next traffic light and announces his arrival
         LightManagerNode nextManager = movingObject.getNextTrafficLight();
         if (nextManager != null) {
-            ACLMessage msg = prepareMessage(nextManager, movingObject);
+            ACLMessage msg = prepareMessageForManager(nextManager, movingObject);
             send(msg);
             print("Sending INFORM to LightManager" + nextManager.getLightManagerId() + ".");
         }
     }
 
-    private ACLMessage prepareMessage(LightManagerNode nextManager, MovingObject movingObject) {
-        ACLMessage msg = new ACLMessage(ACLMessage.INFORM);
-        AID dest = new AID("LightManager" + nextManager.getLightManagerId(), AID.ISLOCALNAME);
-        msg.addReceiver(dest);
+    private ACLMessage prepareMessageForManager(LightManagerNode managerNode, MovingObject movingObject) {
+        ACLMessage msg = createMessage(ACLMessage.INFORM, LightManagerAgent.name, managerNode.getLightManagerId());
 
         Properties properties = new Properties();
         var agentType = MessageParameter.getTypeByMovingObject(movingObject);
         properties.setProperty(MessageParameter.TYPE, agentType);
         Instant time = MasterAgent.getSimulationTime().toInstant().plusMillis(movingObject.getMillisecondsToNextLight());
         properties.setProperty(MessageParameter.ARRIVAL_TIME, "" + time);
-        properties.setProperty(MessageParameter.ADJACENT_OSM_WAY_ID, "" + nextManager.getOsmWayId());
+        properties.setProperty(MessageParameter.ADJACENT_OSM_WAY_ID, "" + managerNode.getOsmWayId());
         msg.setAllUserDefinedParameters(properties);
 
         return msg;
+    }
+
+    // TODO: Special class - MessageCreator for all msg-related code, protected, dependency, injected
+    protected ACLMessage createMessage(int type, List<String> receivers) {
+        ACLMessage msg = new ACLMessage(type);
+        for (var name : receivers) {
+            msg.addReceiver(new AID(name, AID.ISLOCALNAME));
+        }
+        return msg;
+    }
+
+    protected ACLMessage createMessage(int type, String receiverName) {
+        var receiver = new AID(receiverName, AID.ISLOCALNAME);
+        return createMessage(type, receiver);
+    }
+
+    protected ACLMessage createMessage(int type, String receiverName, int receiverId) {
+        var receiver = new AID(getPredictedName(receiverName, receiverId), AID.ISLOCALNAME);
+        return createMessage(type, receiver);
+    }
+
+    protected ACLMessage createMessage(int type, AID receiver) {
+        ACLMessage msg = new ACLMessage(type);
+        msg.addReceiver(receiver);
+        return msg;
+    }
+
+    protected Properties createProperties(String senderType){
+        var result = new Properties();
+        result.setProperty(MessageParameter.TYPE, senderType);
+        return result;
     }
 }

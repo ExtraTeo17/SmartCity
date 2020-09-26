@@ -1,7 +1,9 @@
 package genesis;
 
+import com.google.inject.Binder;
 import com.google.inject.Provides;
 import com.google.inject.Singleton;
+import com.google.inject.name.Names;
 import jade.Boot;
 import jade.core.ProfileException;
 import jade.core.ProfileImpl;
@@ -15,12 +17,29 @@ import utilities.ExtendedProperties;
 import java.io.InputStream;
 import java.net.URL;
 
+import static smartcity.config.StaticConfig.JADE_PORT;
+
 public class MainModule extends AbstractModule {
     private static final Logger logger = LoggerFactory.getLogger(MainModule.class);
+
+    private final int port;
     private final String[] args;
 
     public MainModule(String... args) {
+        this(JADE_PORT, args);
+    }
+
+    public MainModule(Integer port, String... args) {
+        this.port = port;
         this.args = args;
+    }
+
+    @Override
+    public void configure(Binder binder) {
+        super.configure(binder);
+        binder.bind(Integer.class)
+                .annotatedWith(Names.named("JADE_PORT"))
+                .toInstance(port);
     }
 
     @Provides
@@ -51,7 +70,7 @@ public class MainModule extends AbstractModule {
             }
         }
 
-        return new ProfileImpl();
+        return new ProfileImpl("localhost", port, "1");
     }
 
     @Provides

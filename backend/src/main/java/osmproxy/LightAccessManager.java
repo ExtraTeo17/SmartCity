@@ -2,9 +2,13 @@ package osmproxy;
 
 import com.google.common.annotations.Beta;
 import com.google.inject.Inject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
+import osmproxy.abstractions.ILightAccessManager;
+import osmproxy.abstractions.IMapAccessManager;
 import osmproxy.elements.OSMNode;
 import osmproxy.elements.OSMWay;
 import routing.core.IZone;
@@ -16,64 +20,76 @@ import java.util.stream.Collectors;
 
 // TODO: Interface
 @Beta
-public class LightAccessManager extends MapAccessManager {
+public class LightAccessManager implements ILightAccessManager {
+    private static final Logger logger = LoggerFactory.getLogger(LightAccessManager.class);
+
     private final IZone zone;
+    private final IMapAccessManager mapAccessManager;
 
     @Inject
-    public LightAccessManager(IZone zone) {
+    public LightAccessManager(IMapAccessManager mapAccessManager, IZone zone) {
+        this.mapAccessManager = mapAccessManager;
         this.zone = zone;
     }
 
-    public List<OSMNode> getLights() {
-        List<OSMNode> lightsAround = getLightNodesAround();
-        List<OSMNode> lightNodeList = sendParentWaysOfLightOverpassQuery(lightsAround);
+    @Override
+    public List<OSMNode> getLightsOfTypeA() {
+        List<OSMNode> lightsAround = getLightNodesInZone();
+        List<OSMNode> lightNodeList = getLightNodes(lightsAround);
 
         return lightNodeList.stream().filter(OSMNode::isTypeA).collect(Collectors.toList());
     }
 
-    private List<OSMNode> getLightNodesAround() {
-        var lightsQuery = OsmQueryManager.getLightsAroundOverpassQuery(zone.getCenter(), zone.getRadius());
-        var nodes = MapAccessManager.getNodesViaOverpass(lightsQuery);
-        return MapAccessManager.getNodes(nodes);
+    private List<OSMNode> getLightNodesInZone() {
+        var lightsQuery = OsmQueryManager.getLightsAroundQuery(zone.getCenter(), zone.getRadius());
+        var nodes = mapAccessManager.getNodesDocument(lightsQuery);
+        if (nodes.isEmpty()) {
+            logger.warn("Failed to get lightNodes due to empty document");
+            return new ArrayList<>();
+        }
+
+        return mapAccessManager.parseNodes(nodes.get());
     }
 
-    private List<OSMNode> parseLightNodeList(Document nodesViaOverpass) {
-        List<OSMNode> lightNodeList = new ArrayList<>();
+    private List<OSMNode> getLightNodes(final List<OSMNode> lightsAround) {
+        var query = getParentWaysOfLightsQuery(lightsAround);
+        var documentOpt = mapAccessManager.getNodesDocument(query);
+        if (documentOpt.isEmpty()) {
+            logger.warn("Failed to getLightNodes due to emptyDocument");
+            return new ArrayList<>();
+        }
+
+        return parseLightNodesDocument(documentOpt.get());
+    }
+
+    private List<OSMNode> parseLightNodesDocument(Document nodesViaOverpass) {
+        List<OSMNode> lightNodes = new ArrayList<>();
         Node osmRoot = nodesViaOverpass.getFirstChild();
-        NodeList osmXMLNodes = osmRoot.getChildNodes();
-        for (int i = 1; i < osmXMLNodes.getLength(); i++) {
-            parseLightNode(lightNodeList, osmXMLNodes.item(i));
-        }
-        return lightNodeList;
-    }
-
-    private List<OSMNode> sendParentWaysOfLightOverpassQuery(final List<OSMNode> lightsAround) {
-        return parseLightNodeList(
-                MapAccessManager.getNodesViaOverpass(
-                        getParentWaysOfLightOverpassQuery(lightsAround)
-                )
-        );
-    }
-
-    private void parseLightNode(List<OSMNode> lightNodeList, Node item) {
-        if (item.getNodeName().equals("node")) {
-            final OSMNode nodeWithParents = new OSMNode(item.getAttributes());
-            lightNodeList.add(nodeWithParents);
-        }
-        else if (item.getNodeName().equals("way")) {
-            final OSMWay osmWay = new OSMWay(item);
-            final OSMNode listLastLight = lightNodeList.get(lightNodeList.size() - 1);
-            if (osmWay.isOneWayAndLightContiguous(listLastLight.getId())) {
-                listLastLight.addParentWay(osmWay);
+        NodeList osmNodes = osmRoot.getChildNodes();
+        for (int i = 1; i < osmNodes.getLength(); ++i) {
+            var item = osmNodes.item(i);
+            if (item.getNodeName().equals("node")) {
+                OSMNode nodeWithParents = new OSMNode(item.getAttributes());
+                lightNodes.add(nodeWithParents);
+            }
+            else if (item.getNodeName().equals("way")) {
+                OSMWay osmWay = new OSMWay(item);
+                OSMNode listLastLight = lightNodes.get(lightNodes.size() - 1);
+                if (osmWay.isOneWayAndLightContiguous(listLastLight.getId())) {
+                    listLastLight.addParentWay(osmWay);
+                }
             }
         }
+
+        return lightNodes;
     }
 
-    private String getParentWaysOfLightOverpassQuery(final List<OSMNode> lightsAround) {
+    private String getParentWaysOfLightsQuery(final List<OSMNode> lightsAround) {
         StringBuilder builder = new StringBuilder();
         for (final OSMNode light : lightsAround) {
-            builder.append(OsmQueryManager.getSingleParentWaysOfLightOverpassQuery(light.getId()));
+            builder.append(OsmQueryManager.getSingleParentWaysOfLightQuery(light.getId()));
         }
+
         return OsmQueryManager.getQueryWithPayload(builder.toString());
     }
 }

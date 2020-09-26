@@ -1,7 +1,6 @@
 package smartcity.lights;
 
 import agents.utilities.LightColor;
-import gui.MapWindow;
 import org.jxmapviewer.JXMapViewer;
 import org.jxmapviewer.painter.Painter;
 import org.jxmapviewer.viewer.Waypoint;
@@ -9,11 +8,10 @@ import org.jxmapviewer.viewer.WaypointPainter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Node;
-import osmproxy.MapAccessManager;
 import osmproxy.elements.OSMNode;
 import routing.core.IGeoPosition;
 import smartcity.MasterAgent;
-import smartcity.TimeManager;
+import smartcity.TimeProvider;
 
 import java.time.Instant;
 import java.util.*;
@@ -49,8 +47,12 @@ public class SimpleCrossroad implements ICrossroad {
     }
 
     private void prepareLightGroups(Node crossroad, int managerId) {
-        lightGroup1 = new SimpleLightGroup(MapAccessManager.getCrossroadGroup(crossroad, 1), LightColor.RED, managerId);
-        lightGroup2 = new SimpleLightGroup(MapAccessManager.getCrossroadGroup(crossroad, 3), LightColor.GREEN, managerId);
+        lightGroup1 = new SimpleLightGroup(getCrossroadGroup(crossroad, 1), LightColor.RED, managerId);
+        lightGroup2 = new SimpleLightGroup(getCrossroadGroup(crossroad, 3), LightColor.GREEN, managerId);
+    }
+
+    private Node getCrossroadGroup(Node crossroad, int index) {
+        return crossroad.getChildNodes().item(index);
     }
 
     private void prepareLightGroups(OSMNode centerCrossroadNode, int managerId) {
@@ -72,7 +74,7 @@ public class SimpleCrossroad implements ICrossroad {
 
     private void startTimer() {
         int delayBeforeStart = 0;
-        int repeatIntervalInMilliseconds = SimpleCrossroad.EXTEND_TIME * 1000 / TimeManager.TIME_SCALE;
+        int repeatIntervalInMilliseconds = SimpleCrossroad.EXTEND_TIME * 1000 / TimeProvider.TIME_SCALE;
         timer.scheduleAtFixedRate(new SwitchLightsTask(), delayBeforeStart, repeatIntervalInMilliseconds);
     }
 
@@ -211,7 +213,7 @@ public class SimpleCrossroad implements ICrossroad {
                     else if (shouldExtendBecauseOfFarAwayQueue()) {
                         prepareTimer();
                         logger.info("-------------------------------------shouldExtendBecauseOfFarAwayQueue--------------");
-                        timer.schedule(new SwitchLightsTask(), SimpleCrossroad.EXTEND_TIME * 1000 / TimeManager.TIME_SCALE);
+                        timer.schedule(new SwitchLightsTask(), SimpleCrossroad.EXTEND_TIME * 1000 / TimeProvider.TIME_SCALE);
                         alreadyExtendedGreen = true;
                         return;
                     }

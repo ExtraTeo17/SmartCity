@@ -1,9 +1,6 @@
 package gui;
 
-import agents.BusAgent;
-import agents.LightManager;
-import agents.PedestrianAgent;
-import agents.VehicleAgent;
+import agents.*;
 import agents.abstractions.IAgentsContainer;
 import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
@@ -20,12 +17,10 @@ import org.jxmapviewer.painter.Painter;
 import org.jxmapviewer.viewer.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import osmproxy.elements.OSMStation;
 import routing.core.IGeoPosition;
 import routing.core.IZone;
 import routing.core.Position;
-import smartcity.ITimeManager;
-import smartcity.MasterAgent;
+import smartcity.ITimeProvider;
 import smartcity.SimulationState;
 import smartcity.config.ConfigContainer;
 import smartcity.lights.SimpleCrossroad;
@@ -52,7 +47,7 @@ public class MapWindow {
     private final IAgentsContainer agentsContainer;
     private final ConfigContainer configContainer;
     private final ITaskManager taskManager;
-    private final ITimeManager timeManager;
+    private final ITimeProvider timeProvider;
 
     public JPanel MainPanel;
     private final JXMapViewer MapViewer;
@@ -84,7 +79,6 @@ public class MapWindow {
     private JButton testBusZoneButton;
     private JButton testCarZoneButton;
     private Timer refreshTimer = new Timer(true);
-    private final Timer spawnTimer = new Timer(true);
     private IGeoPosition pointA;
     private IGeoPosition pointB;
     private final Random random = new Random();
@@ -98,13 +92,13 @@ public class MapWindow {
                      IAgentsContainer agentsContainer,
                      ConfigContainer configContainer,
                      ITaskManager taskManager,
-                     ITimeManager timeManager) {
+                     ITimeProvider timeProvider) {
         this.eventBus = eventBus;
         this.agentsContainer = agentsContainer;
         this.configContainer = configContainer;
         this.zone = configContainer.getZone();
         this.taskManager = taskManager;
-        this.timeManager = timeManager;
+        this.timeProvider = timeProvider;
 
         MapViewer = new JXMapViewer();
         currentTimeLabel.setVisible(false);
@@ -118,7 +112,7 @@ public class MapWindow {
         GeoPosition warsaw = new GeoPosition(52.24, 21.02);
         MapViewer.setZoom(7);
         MapViewer.setAddressLocation(warsaw);
-        radiusSpinner.setModel(new SpinnerNumberModel(200, 100, 50000, 100));
+        radiusSpinner.setModel(new SpinnerNumberModel(600, 100, 50000, 100));
         carLimitSpinner.setModel(new SpinnerNumberModel(4, 1, 1000, 1));
         carLimitSpinner.addChangeListener(e -> {
             int value = (int) carLimitSpinner.getValue();
@@ -131,8 +125,8 @@ public class MapWindow {
         UseStrategyCheckBox.addItemListener(e -> SimpleCrossroad.STRATEGY_ACTIVE = UseStrategyCheckBox.isSelected());
 
         seedSpinner.setModel(new SpinnerNumberModel(69, 0, 999999, 1));
-        latSpinner.setModel(new SpinnerNumberModel(52.203342, -90, 90, 1));
-        lonSpinner.setModel(new SpinnerNumberModel(20.861213, -180, 180, 0.001));
+        latSpinner.setModel(new SpinnerNumberModel(52.23682, -90, 90, 1));
+        lonSpinner.setModel(new SpinnerNumberModel(21.01681, -180, 180, 0.001));
 
         testCarIdSpinner.setModel(new SpinnerNumberModel(2, 1, 100, 1));
         testCarIdSpinner.addChangeListener(e -> {
@@ -198,7 +192,7 @@ public class MapWindow {
                         pointB = Position.of(lat, lng);
                         taskManager.getCreateCarTask(pointA, pointB, false).run();
                         logger.info("Vehicles: " + agentsContainer.size(VehicleAgent.class));
-                        logger.info("Lights: " + agentsContainer.size(LightManager.class));
+                        logger.info("Lights: " + agentsContainer.size(LightManagerAgent.class));
                         pointA = pointB = null;
                     }
                 }
@@ -250,7 +244,7 @@ public class MapWindow {
         ResultTimeLabel.setVisible(true);
         ResultTimeTitle.setVisible(true);
         random.setSeed(getSeed());
-        timeManager.setSimulationStartTime((Date) setTimeSpinner.getValue());
+        timeProvider.setSimulationStartTime((Date) setTimeSpinner.getValue());
     }
 
     private int getZoneRadius() {
@@ -394,7 +388,7 @@ public class MapWindow {
     }
 
     private void refreshTime() {
-        currentTimeLabel.setText(dateFormat.format(timeManager.getCurrentSimulationTime()));
+        currentTimeLabel.setText(dateFormat.format(timeProvider.getCurrentSimulationTime()));
     }
 
     private void drawLights(List<Painter<JXMapViewer>> painters) {
@@ -402,7 +396,7 @@ public class MapWindow {
             return;
         }
 
-        agentsContainer.forEach(LightManager.class, man -> man.draw(painters));
+        agentsContainer.forEach(LightManagerAgent.class, man -> man.draw(painters));
 
         configContainer.unlockLightManagers();
     }
@@ -570,9 +564,9 @@ public class MapWindow {
 
     private void drawStations(List<Painter<JXMapViewer>> painters) {
         Set<Waypoint> set = new HashSet<>();
-        for (OSMStation stationOSMNode : MasterAgent.osmIdToStationOSMNode.values()) {
-            set.add(new DefaultWaypoint(stationOSMNode.toMapGeoPosition()));
-        }
+        agentsContainer.forEach(StationAgent.class, ag -> {
+            set.add(new DefaultWaypoint(ag.getStation().toMapGeoPosition()));
+        });
         WaypointPainter<Waypoint> waypointPainter = new WaypointPainter<>();
         waypointPainter.setWaypoints(set);
         waypointPainter.setRenderer(new CustomWaypointRenderer("bus_stop.png"));

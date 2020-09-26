@@ -1,49 +1,18 @@
 package osmproxy.elements;
 
 import org.junit.Assert;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
-import org.w3c.dom.Document;
-import org.xml.sax.SAXException;
+import testutils.FileLoader;
 import utilities.IterableNodeList;
 
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
-import java.io.File;
-import java.io.IOException;
 import java.util.stream.Collectors;
 
-class OSMWayTest {
-    private static DocumentBuilder builder;
-    private static final String resourcePath = "src/test/resources/";
-    private Document document;
-
-    @BeforeAll
-    static void setupAll() {
-        var factory = DocumentBuilderFactory.newDefaultInstance();
-        try {
-            builder = factory.newDocumentBuilder();
-        } catch (ParserConfigurationException e) {
-            e.printStackTrace();
-        }
-    }
-
-    private void setupDocument(String filename) {
-        File file = new File(resourcePath + filename);
-        try {
-            document = builder.parse(file);
-        } catch (SAXException | IOException e) {
-            e.printStackTrace();
-        }
-    }
-
-
+class OSMWay_determineRouteOrientationAndFilterRelevantNodes_Tests {
     // TODO: More cases with tangent nodes
     @Test
-    void determineRouteOrientationAndFilterRelevantNodes_startFromFirst_setsFrontOrientation() {
+    void startFromFirst_setsFrontOrientation() {
         // Arrange
-        setupDocument("OSMTwoWays.xml");
+        var document = FileLoader.getDocument("OSMTwoWays.xml");
         var mainNode = document.getFirstChild();
         var children = mainNode.getChildNodes();
         var nodes = IterableNodeList.of(children).stream()
@@ -65,9 +34,9 @@ class OSMWayTest {
     }
 
     @Test
-    void determineRouteOrientationAndFilterRelevantNodes_startFromLast_setsBackOrientation() {
+    void startFromLast_setsBackOrientation() {
         // Arrange
-        setupDocument("OSMTwoWays.xml");
+        var document = FileLoader.getDocument("OSMTwoWays.xml");
         var mainNode = document.getFirstChild();
         var children = mainNode.getChildNodes();
         var nodes = IterableNodeList.of(children).stream()

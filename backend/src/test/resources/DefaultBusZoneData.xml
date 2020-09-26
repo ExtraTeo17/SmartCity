@@ -1,0 +1,571 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?><osm generator="Overpass API 0.7.56.7 b85c4387" version="0.6">
+    <note>The data included in this document is from www.openstreetmap.org. The data is made available under ODbL.</note>
+    <meta osm_base="2020-09-12T14:45:03Z"/>
+
+    <relation id="3290957">
+        <member ref="1997281404" role="stop_entry_only" type="node"/>
+        <member ref="285445863" role="platform_entry_only" type="way"/>
+        <member ref="338752882" role="stop" type="node"/>
+        <member ref="285420961" role="platform" type="way"/>
+        <member ref="348010441" role="stop" type="node"/>
+        <member ref="265844136" role="platform" type="way"/>
+        <member ref="411513048" role="stop" type="node"/>
+        <member ref="270649108" role="platform" type="way"/>
+        <member ref="3035438370" role="stop" type="node"/>
+        <member ref="333627329" role="platform" type="node"/>
+        <member ref="3035438424" role="stop" type="node"/>
+        <member ref="333627330" role="platform" type="node"/>
+        <member ref="3035438368" role="stop" type="node"/>
+        <member ref="410506641" role="platform" type="node"/>
+        <member ref="3035438389" role="stop" type="node"/>
+        <member ref="410506561" role="platform" type="node"/>
+        <member ref="3035438411" role="stop" type="node"/>
+        <member ref="2901420980" role="platform" type="node"/>
+        <member ref="3039342001" role="stop" type="node"/>
+        <member ref="2508330384" role="platform" type="node"/>
+        <member ref="3039342012" role="stop" type="node"/>
+        <member ref="2508330386" role="platform" type="node"/>
+        <member ref="3035438418" role="stop" type="node"/>
+        <member ref="1670202273" role="platform" type="node"/>
+        <member ref="3035438360" role="stop" type="node"/>
+        <member ref="1670202262" role="platform" type="node"/>
+        <member ref="2444909567" role="stop" type="node"/>
+        <member ref="3896998609" role="platform" type="node"/>
+        <member ref="3035438429" role="stop" type="node"/>
+        <member ref="2444909572" role="platform" type="node"/>
+        <member ref="3035438342" role="stop" type="node"/>
+        <member ref="2444909566" role="platform" type="node"/>
+        <member ref="3035438416" role="stop" type="node"/>
+        <member ref="2444909569" role="platform" type="node"/>
+        <member ref="3037874276" role="stop" type="node"/>
+        <member ref="3037874277" role="platform" type="node"/>
+        <member ref="7420890654" role="stop" type="node"/>
+        <member ref="2504791519" role="platform" type="node"/>
+        <member ref="3199906802" role="stop" type="node"/>
+        <member ref="4197049422" role="platform" type="node"/>
+        <member ref="3035438430" role="stop" type="node"/>
+        <member ref="768601005" role="platform" type="node"/>
+        <member ref="2498497851" role="stop" type="node"/>
+        <member ref="2498541412" role="platform" type="node"/>
+        <member ref="3075614509" role="stop" type="node"/>
+        <member ref="2508330388" role="platform" type="node"/>
+        <member ref="3075614502" role="stop" type="node"/>
+        <member ref="2508330382" role="platform" type="node"/>
+        <member ref="3075614500" role="stop" type="node"/>
+        <member ref="2508330380" role="platform" type="node"/>
+        <member ref="4016884903" role="stop" type="node"/>
+        <member ref="4016884902" role="platform" type="node"/>
+        <member ref="4016884901" role="stop_exit_only" type="node"/>
+        <member ref="2508330385" role="platform_exit_only" type="node"/>
+        <member ref="243412451" role="" type="way"/>
+        <member ref="823181507" role="" type="way"/>
+        <member ref="243412449" role="" type="way"/>
+        <member ref="845693228" role="" type="way"/>
+        <member ref="35079406" role="" type="way"/>
+        <member ref="243423028" role="" type="way"/>
+        <member ref="35079407" role="" type="way"/>
+        <member ref="243412454" role="" type="way"/>
+        <member ref="285420975" role="" type="way"/>
+        <member ref="243412452" role="" type="way"/>
+        <member ref="272426280" role="" type="way"/>
+        <member ref="272426278" role="" type="way"/>
+        <member ref="272426269" role="" type="way"/>
+        <member ref="272426274" role="" type="way"/>
+        <member ref="35079335" role="" type="way"/>
+        <member ref="35079336" role="" type="way"/>
+        <member ref="271011459" role="" type="way"/>
+        <member ref="5114230" role="" type="way"/>
+        <member ref="271011443" role="" type="way"/>
+        <member ref="270853045" role="" type="way"/>
+        <member ref="137322694" role="" type="way"/>
+        <member ref="184744211" role="" type="way"/>
+        <member ref="173671297" role="" type="way"/>
+        <member ref="4811544" role="" type="way"/>
+        <member ref="270853018" role="" type="way"/>
+        <member ref="5000689" role="" type="way"/>
+        <member ref="830862212" role="" type="way"/>
+        <member ref="166321644" role="" type="way"/>
+        <member ref="166475409" role="" type="way"/>
+        <member ref="166475408" role="" type="way"/>
+        <member ref="166475411" role="" type="way"/>
+        <member ref="166475410" role="" type="way"/>
+        <member ref="5000681" role="" type="way"/>
+        <member ref="220492713" role="" type="way"/>
+        <member ref="4811545" role="" type="way"/>
+        <member ref="23620876" role="" type="way"/>
+        <member ref="494418614" role="" type="way"/>
+        <member ref="121806325" role="" type="way"/>
+        <member ref="286465482" role="" type="way"/>
+        <member ref="633223190" role="" type="way"/>
+        <member ref="449638381" role="" type="way"/>
+        <member ref="449638380" role="" type="way"/>
+        <member ref="529651709" role="" type="way"/>
+        <member ref="286465483" role="" type="way"/>
+        <member ref="229326070" role="" type="way"/>
+        <member ref="531284761" role="" type="way"/>
+        <member ref="309116293" role="" type="way"/>
+        <member ref="309116288" role="" type="way"/>
+        <member ref="523345725" role="" type="way"/>
+        <member ref="339103880" role="" type="way"/>
+        <member ref="120016755" role="" type="way"/>
+        <member ref="120016758" role="" type="way"/>
+        <member ref="523347726" role="" type="way"/>
+        <member ref="246175401" role="" type="way"/>
+        <member ref="460877461" role="" type="way"/>
+        <member ref="132313517" role="" type="way"/>
+        <member ref="316087869" role="" type="way"/>
+        <member ref="248895766" role="" type="way"/>
+        <member ref="248895764" role="" type="way"/>
+        <member ref="436898674" role="" type="way"/>
+        <member ref="207960196" role="" type="way"/>
+        <member ref="436897736" role="" type="way"/>
+        <member ref="436897609" role="" type="way"/>
+        <member ref="436897608" role="" type="way"/>
+        <member ref="632897498" role="" type="way"/>
+        <member ref="16104108" role="" type="way"/>
+        <member ref="29115576" role="" type="way"/>
+        <member ref="62248300" role="" type="way"/>
+        <member ref="144072224" role="" type="way"/>
+        <member ref="248993462" role="" type="way"/>
+        <member ref="144072218" role="" type="way"/>
+        <member ref="236462873" role="" type="way"/>
+        <member ref="29115574" role="" type="way"/>
+        <member ref="243037019" role="" type="way"/>
+        <member ref="144072216" role="" type="way"/>
+        <member ref="236462870" role="" type="way"/>
+        <member ref="62310657" role="" type="way"/>
+        <member ref="62236050" role="" type="way"/>
+        <member ref="370540451" role="" type="way"/>
+        <member ref="443860131" role="" type="way"/>
+        <member ref="352806199" role="" type="way"/>
+        <member ref="441773514" role="" type="way"/>
+        <member ref="436297072" role="" type="way"/>
+        <member ref="352806196" role="" type="way"/>
+        <member ref="352806212" role="" type="way"/>
+        <member ref="352806197" role="" type="way"/>
+        <member ref="236466177" role="" type="way"/>
+        <member ref="386509100" role="" type="way"/>
+        <member ref="649725606" role="" type="way"/>
+        <member ref="28156469" role="" type="way"/>
+        <member ref="654329464" role="" type="way"/>
+        <member ref="240195288" role="" type="way"/>
+        <member ref="240195291" role="" type="way"/>
+        <member ref="240195292" role="" type="way"/>
+        <member ref="113937057" role="" type="way"/>
+        <member ref="113937061" role="" type="way"/>
+        <member ref="236466216" role="" type="way"/>
+        <member ref="236466189" role="" type="way"/>
+        <member ref="236466208" role="" type="way"/>
+        <member ref="236466195" role="" type="way"/>
+        <member ref="236466185" role="" type="way"/>
+        <member ref="115164136" role="" type="way"/>
+        <member ref="64846443" role="" type="way"/>
+        <member ref="115701972" role="" type="way"/>
+        <member ref="79003382" role="" type="way"/>
+        <member ref="54679030" role="" type="way"/>
+        <member ref="121783657" role="" type="way"/>
+        <member ref="243423032" role="" type="way"/>
+        <member ref="124708077" role="" type="way"/>
+        <member ref="124708076" role="" type="way"/>
+        <member ref="29115610" role="" type="way"/>
+        <member ref="316142030" role="" type="way"/>
+        <member ref="65967996" role="" type="way"/>
+        <tag k="from" v="Cm. Wolski"/>
+        <tag k="name" v="Bus 194: Cm. Wolski =&gt; PKP Go??bki"/>
+        <tag k="network" v="ZTM Warszawa"/>
+        <tag k="public_transport:version" v="2"/>
+        <tag k="ref" v="194"/>
+        <tag k="route" v="bus"/>
+        <tag k="source" v="Rozk?ad jazdy ZTM Warszawa, trasa wygenerowana przez bot"/>
+        <tag k="to" v="PKP Go??bki"/>
+        <tag k="type" v="route"/>
+    </relation>
+    <node id="333627329" lat="52.2118446" lon="20.9135833">
+        <tag k="highway" v="bus_stop"/>
+        <tag k="name" v="Parowcowa 01"/>
+        <tag k="network" v="ZTM Warszawa"/>
+        <tag k="public_transport" v="platform"/>
+        <tag k="ref" v="421201"/>
+    </node>
+    <node id="333627330" lat="52.2088160" lon="20.9137784">
+        <tag k="highway" v="bus_stop"/>
+        <tag k="name" v="Wa?owicka 01"/>
+        <tag k="network" v="ZTM Warszawa"/>
+        <tag k="public_transport" v="platform"/>
+        <tag k="ref" v="421301"/>
+    </node>
+    <node id="338752882" lat="52.2230555" lon="20.9285173">
+        <tag k="bus" v="yes"/>
+        <tag k="highway" v="bus_stop"/>
+        <tag k="name" v="Fort Wola 02"/>
+        <tag k="network" v="ZTM Warszawa"/>
+        <tag k="operator" v="Zarz?d Transportu Miejskiego w Warszawie"/>
+        <tag k="public_transport" v="stop_position"/>
+        <tag k="ref" v="502102"/>
+    </node>
+    <node id="348010441" lat="52.2216071" lon="20.9223930">
+        <tag k="bus" v="yes"/>
+        <tag k="highway" v="bus_stop"/>
+        <tag k="name" v="Po?czy?ska-Parking P+R 02"/>
+        <tag k="network" v="ZTM Warszawa"/>
+        <tag k="operator" v="Zarz?d Transportu Miejskiego w Warszawie"/>
+        <tag k="public_transport" v="stop_position"/>
+        <tag k="ref" v="500102"/>
+    </node>
+    <node id="410506561" lat="52.2074540" lon="20.9058718">
+        <tag k="highway" v="bus_stop"/>
+        <tag k="name" v="Rybnicka 02"/>
+        <tag k="network" v="ZTM Warszawa"/>
+        <tag k="public_transport" v="platform"/>
+        <tag k="ref" v="422202"/>
+    </node>
+    <node id="410506641" lat="52.2064112" lon="20.9145421">
+        <tag k="bus" v="yes"/>
+        <tag k="highway" v="bus_stop"/>
+        <tag k="name" v="PKP W?ochy 04"/>
+        <tag k="network" v="ZTM Warszawa"/>
+        <tag k="public_transport" v="platform"/>
+        <tag k="ref" v="421404"/>
+    </node>
+    <node id="411513048" lat="52.2194343" lon="20.9160737">
+        <tag k="bus" v="yes"/>
+        <tag k="highway" v="bus_stop"/>
+        <tag k="name" v="Ciep?ownia Wola 06"/>
+        <tag k="network" v="ZTM Warszawa"/>
+        <tag k="operator" v="Zarz?d Transportu Miejskiego w Warszawie"/>
+        <tag k="public_transport" v="stop_position"/>
+        <tag k="ref" v="501206"/>
+    </node>
+    <node id="768601005" lat="52.1951332" lon="20.8630825">
+        <tag k="highway" v="bus_stop"/>
+        <tag k="name" v="W?adys?awa Hermana 01"/>
+        <tag k="network" v="ZTM Warszawa"/>
+        <tag k="public_transport" v="platform"/>
+        <tag k="ref" v="422001"/>
+    </node>
+    <node id="1670202262" lat="52.1974770" lon="20.8873803">
+        <tag k="bus" v="yes"/>
+        <tag k="departures_board" v="timetable"/>
+        <tag k="highway" v="bus_stop"/>
+        <tag k="name" v="PKP Ursus 02"/>
+        <tag k="network" v="ZTM Warszawa"/>
+        <tag k="public_transport" v="platform"/>
+        <tag k="ref" v="421702"/>
+        <tag k="shelter" v="yes"/>
+    </node>
+    <node id="1670202273" lat="52.2009777" lon="20.8960803">
+        <tag k="bus" v="yes"/>
+        <tag k="highway" v="bus_stop"/>
+        <tag k="name" v="Ursus-Ratusz 02"/>
+        <tag k="network" v="ZTM Warszawa"/>
+        <tag k="public_transport" v="platform"/>
+        <tag k="ref" v="421602"/>
+    </node>
+    <node id="1997281404" lat="52.2250381" lon="20.9305926">
+        <tag k="bus" v="yes"/>
+        <tag k="highway" v="bus_stop"/>
+        <tag k="name" v="Cm. Wolski 08"/>
+        <tag k="network" v="ZTM Warszawa"/>
+        <tag k="operator" v="Zarz?d Transportu Miejskiego w Warszawie"/>
+        <tag k="public_transport" v="stop_position"/>
+        <tag k="ref" v="501108"/>
+    </node>
+    <node id="2444909566" lat="52.1951870" lon="20.8729660">
+        <tag k="highway" v="bus_stop"/>
+        <tag k="name" v="Be?zy 02"/>
+        <tag k="network" v="ZTM Warszawa"/>
+        <tag k="public_transport" v="platform"/>
+        <tag k="ref" v="420502"/>
+    </node>
+    <node id="2444909567" lat="52.1962822" lon="20.8821186">
+        <tag k="bus" v="yes"/>
+        <tag k="name" v="PKP Ursus 12"/>
+        <tag k="network" v="ZTM Warszawa"/>
+        <tag k="public_transport" v="stop_position"/>
+        <tag k="ref" v="421712"/>
+    </node>
+    <node id="2444909569" lat="52.1946126" lon="20.8688471">
+        <tag k="highway" v="bus_stop"/>
+        <tag k="name" v="Keniga 04"/>
+        <tag k="network" v="ZTM Warszawa"/>
+        <tag k="public_transport" v="platform"/>
+        <tag k="ref" v="434304"/>
+    </node>
+    <node id="2444909572" lat="52.1958985" lon="20.8786205">
+        <tag k="bench" v="yes"/>
+        <tag k="highway" v="bus_stop"/>
+        <tag k="name" v="Wojciechowskiego 02"/>
+        <tag k="network" v="ZTM Warszawa"/>
+        <tag k="public_transport" v="platform"/>
+        <tag k="ref" v="422802"/>
+        <tag k="shelter" v="yes"/>
+    </node>
+    <node id="2498497851" lat="52.2005628" lon="20.8677455">
+        <tag k="bus" v="yes"/>
+        <tag k="name" v="Kr󬯷ej Bony 02"/>
+        <tag k="network" v="ZTM Warszawa"/>
+        <tag k="public_transport" v="stop_position"/>
+        <tag k="ref" v="422602"/>
+    </node>
+    <node id="2498541412" lat="52.2005568" lon="20.8678177">
+        <tag k="highway" v="bus_stop"/>
+        <tag k="name" v="Kr󬯷ej Bony 02"/>
+        <tag k="network" v="ZTM Warszawa"/>
+        <tag k="public_transport" v="platform"/>
+        <tag k="ref" v="422602"/>
+    </node>
+    <node id="2504791519" lat="52.1916140" lon="20.8614825">
+        <tag k="bench" v="yes"/>
+        <tag k="highway" v="bus_stop"/>
+        <tag k="name" v="Ursus-Sanktuarium 02"/>
+        <tag k="network" v="ZTM Warszawa"/>
+        <tag k="public_transport" v="platform"/>
+        <tag k="ref" v="421102"/>
+        <tag k="shelter" v="yes"/>
+    </node>
+    <node id="2508330380" lat="52.2036584" lon="20.8596403">
+        <tag k="highway" v="bus_stop"/>
+        <tag k="name" v="Boles?awa Krzywoustego 02"/>
+        <tag k="network" v="ZTM Warszawa"/>
+        <tag k="public_transport" v="platform"/>
+        <tag k="ref" v="414202"/>
+    </node>
+    <node id="2508330382" lat="52.2031155" lon="20.8627465">
+        <tag k="bus" v="yes"/>
+        <tag k="departures_board" v="timetable"/>
+        <tag k="highway" v="bus_stop"/>
+        <tag k="name" v="Boles?awa ?mia?ego 02"/>
+        <tag k="network" v="ZTM Warszawa"/>
+        <tag k="public_transport" v="platform"/>
+        <tag k="ref" v="412402"/>
+        <tag k="shelter" v="no"/>
+    </node>
+    <node id="2508330384" lat="52.2091589" lon="20.8932156">
+        <tag k="bus" v="yes"/>
+        <tag k="highway" v="bus_stop"/>
+        <tag k="name" v="Nowe W?ochy 05"/>
+        <tag k="network" v="ZTM Warszawa"/>
+        <tag k="public_transport" v="platform"/>
+        <tag k="ref" v="422405"/>
+    </node>
+    <node id="2508330385" lat="52.2078471" lon="20.8636655">
+        <tag k="bus" v="yes"/>
+        <tag k="highway" v="bus_stop"/>
+        <tag k="name" v="PKP Go??bki 01"/>
+        <tag k="network" v="ZTM Warszawa"/>
+        <tag k="public_transport" v="platform"/>
+        <tag k="ref" v="414901"/>
+    </node>
+    <node id="2508330386" lat="52.2059541" lon="20.8913979">
+        <tag k="bench" v="yes"/>
+        <tag k="bus" v="yes"/>
+        <tag k="highway" v="bus_stop"/>
+        <tag k="name" v="PKP Ursus P?n. 03"/>
+        <tag k="network" v="ZTM Warszawa"/>
+        <tag k="public_transport" v="platform"/>
+        <tag k="ref" v="412903"/>
+        <tag k="shelter" v="yes"/>
+        <tag k="tactile_paving" v="yes"/>
+    </node>
+    <node id="2508330388" lat="52.2033840" lon="20.8649501">
+        <tag k="bus" v="yes"/>
+        <tag k="departures_board" v="timetable"/>
+        <tag k="highway" v="bus_stop"/>
+        <tag k="name" v="Przemys?awa II 02"/>
+        <tag k="network" v="ZTM Warszawa"/>
+        <tag k="public_transport" v="platform"/>
+        <tag k="ref" v="411502"/>
+        <tag k="shelter" v="no"/>
+    </node>
+    <node id="2901420980" lat="52.2083875" lon="20.9000055">
+        <tag k="bus" v="yes"/>
+        <tag k="highway" v="bus_stop"/>
+        <tag k="name" v="Szuberta 02"/>
+        <tag k="network" v="ZTM Warszawa"/>
+        <tag k="public_transport" v="platform"/>
+        <tag k="ref" v="422302"/>
+    </node>
+    <node id="3035438342" lat="52.1951244" lon="20.8729826">
+        <tag k="bus" v="yes"/>
+        <tag k="name" v="Be?zy 02"/>
+        <tag k="network" v="ZTM Warszawa"/>
+        <tag k="public_transport" v="stop_position"/>
+        <tag k="ref" v="420502"/>
+    </node>
+    <node id="3035438360" lat="52.1974017" lon="20.8874371">
+        <tag k="bus" v="yes"/>
+        <tag k="name" v="PKP Ursus 02"/>
+        <tag k="network" v="ZTM Warszawa"/>
+        <tag k="public_transport" v="stop_position"/>
+        <tag k="ref" v="421702"/>
+    </node>
+    <node id="3035438368" lat="52.2063529" lon="20.9145884">
+        <tag k="bus" v="yes"/>
+        <tag k="name" v="PKP W?ochy 04"/>
+        <tag k="network" v="ZTM Warszawa"/>
+        <tag k="public_transport" v="stop_position"/>
+        <tag k="ref" v="421404"/>
+    </node>
+    <node id="3035438370" lat="52.2116944" lon="20.9136416">
+        <tag k="bus" v="yes"/>
+        <tag k="name" v="Parowcowa 01"/>
+        <tag k="network" v="ZTM Warszawa"/>
+        <tag k="public_transport" v="stop_position"/>
+        <tag k="ref" v="421201"/>
+    </node>
+    <node id="3035438389" lat="52.2074099" lon="20.9058535">
+        <tag k="bus" v="yes"/>
+        <tag k="name" v="Rybnicka 02"/>
+        <tag k="network" v="ZTM Warszawa"/>
+        <tag k="public_transport" v="stop_position"/>
+        <tag k="ref" v="422202"/>
+    </node>
+    <node id="3035438411" lat="52.2083500" lon="20.8999855">
+        <tag k="bus" v="yes"/>
+        <tag k="name" v="Szuberta 02"/>
+        <tag k="network" v="ZTM Warszawa"/>
+        <tag k="public_transport" v="stop_position"/>
+        <tag k="ref" v="422302"/>
+    </node>
+    <node id="3035438416" lat="52.1945558" lon="20.8689882">
+        <tag k="bus" v="yes"/>
+        <tag k="name" v="Keniga 04"/>
+        <tag k="network" v="ZTM Warszawa"/>
+        <tag k="public_transport" v="stop_position"/>
+        <tag k="ref" v="434304"/>
+    </node>
+    <node id="3035438418" lat="52.2009730" lon="20.8962258">
+        <tag k="bus" v="yes"/>
+        <tag k="name" v="Ursus-Ratusz 02"/>
+        <tag k="network" v="ZTM Warszawa"/>
+        <tag k="public_transport" v="stop_position"/>
+        <tag k="ref" v="421602"/>
+    </node>
+    <node id="3035438424" lat="52.2088323" lon="20.9138286">
+        <tag k="bus" v="yes"/>
+        <tag k="name" v="Wa?owicka 01"/>
+        <tag k="network" v="ZTM Warszawa"/>
+        <tag k="public_transport" v="stop_position"/>
+        <tag k="ref" v="421301"/>
+    </node>
+    <node id="3035438429" lat="52.1958475" lon="20.8786576">
+        <tag k="bus" v="yes"/>
+        <tag k="name" v="Wojciechowskiego 02"/>
+        <tag k="network" v="ZTM Warszawa"/>
+        <tag k="public_transport" v="stop_position"/>
+        <tag k="ref" v="422802"/>
+    </node>
+    <node id="3035438430" lat="52.1951777" lon="20.8630042">
+        <tag k="bus" v="yes"/>
+        <tag k="name" v="W?adys?awa Hermana 01"/>
+        <tag k="network" v="ZTM Warszawa"/>
+        <tag k="public_transport" v="stop_position"/>
+        <tag k="ref" v="422001"/>
+    </node>
+    <node id="3037874276" lat="52.1914406" lon="20.8679426">
+        <tag k="bus" v="yes"/>
+        <tag k="name" v="PKP Ursus-Nied?wiadek 02"/>
+        <tag k="network" v="ZTM Warszawa"/>
+        <tag k="public_transport" v="stop_position"/>
+        <tag k="ref" v="434202"/>
+    </node>
+    <node id="3037874277" lat="52.1915000" lon="20.8679000">
+        <tag k="highway" v="bus_stop"/>
+        <tag k="name" v="PKP Ursus-Nied?wiadek 02"/>
+        <tag k="network" v="ZTM Warszawa"/>
+        <tag k="public_transport" v="platform"/>
+        <tag k="ref" v="434202"/>
+    </node>
+    <node id="3039342001" lat="52.2091201" lon="20.8933482">
+        <tag k="bus" v="yes"/>
+        <tag k="name" v="Nowe W?ochy 05"/>
+        <tag k="network" v="ZTM Warszawa"/>
+        <tag k="public_transport" v="stop_position"/>
+        <tag k="ref" v="422405"/>
+    </node>
+    <node id="3039342012" lat="52.2059681" lon="20.8915379">
+        <tag k="bus" v="yes"/>
+        <tag k="name" v="PKP Ursus P?n. 03"/>
+        <tag k="network" v="ZTM Warszawa"/>
+        <tag k="public_transport" v="stop_position"/>
+        <tag k="ref" v="412903"/>
+    </node>
+    <node id="3075614500" lat="52.2036542" lon="20.8595804">
+        <tag k="bus" v="yes"/>
+        <tag k="name" v="Boles?awa Krzywoustego 02"/>
+        <tag k="network" v="ZTM Warszawa"/>
+        <tag k="public_transport" v="stop_position"/>
+        <tag k="ref" v="414202"/>
+    </node>
+    <node id="3075614502" lat="52.2030836" lon="20.8627699">
+        <tag k="bus" v="yes"/>
+        <tag k="name" v="Boles?awa ?mia?ego 02"/>
+        <tag k="network" v="ZTM Warszawa"/>
+        <tag k="public_transport" v="stop_position"/>
+        <tag k="ref" v="412402"/>
+    </node>
+    <node id="3075614509" lat="52.2033541" lon="20.8649786">
+        <tag k="bus" v="yes"/>
+        <tag k="name" v="Przemys?awa II 02"/>
+        <tag k="network" v="ZTM Warszawa"/>
+        <tag k="public_transport" v="stop_position"/>
+        <tag k="ref" v="411502"/>
+    </node>
+    <node id="3199906802" lat="52.1937863" lon="20.8600175">
+        <tag k="bench" v="yes"/>
+        <tag k="bus" v="yes"/>
+        <tag k="covered" v="no"/>
+        <tag k="name" v="Henryka Brodatego 01"/>
+        <tag k="network" v="ZTM Warszawa"/>
+        <tag k="public_transport" v="stop_position"/>
+        <tag k="ref" v="433701"/>
+        <tag k="shelter" v="no"/>
+    </node>
+    <node id="3896998609" lat="52.1963316" lon="20.8821106">
+        <tag k="highway" v="bus_stop"/>
+        <tag k="name" v="PKP Ursus 12"/>
+        <tag k="network" v="ZTM Warszawa"/>
+        <tag k="public_transport" v="platform"/>
+        <tag k="ref" v="421712"/>
+    </node>
+    <node id="4016884901" lat="52.2079004" lon="20.8636497">
+        <tag k="bus" v="yes"/>
+        <tag k="name" v="PKP Go??bki 01"/>
+        <tag k="network" v="ZTM Warszawa"/>
+        <tag k="public_transport" v="stop_position"/>
+        <tag k="ref" v="414901"/>
+    </node>
+    <node id="4016884902" lat="52.2073158" lon="20.8595175">
+        <tag k="highway" v="bus_stop"/>
+        <tag k="name" v="Zielonej G?si 01"/>
+        <tag k="network" v="ZTM Warszawa"/>
+        <tag k="public_transport" v="platform"/>
+        <tag k="ref" v="433901"/>
+    </node>
+    <node id="4016884903" lat="52.2073610" lon="20.8594904">
+        <tag k="bus" v="yes"/>
+        <tag k="name" v="Zielonej G?si 01"/>
+        <tag k="network" v="ZTM Warszawa"/>
+        <tag k="public_transport" v="stop_position"/>
+        <tag k="ref" v="433901"/>
+    </node>
+    <node id="4197049422" lat="52.1937321" lon="20.8600880">
+        <tag k="bench" v="yes"/>
+        <tag k="covered" v="no"/>
+        <tag k="highway" v="bus_stop"/>
+        <tag k="name" v="Henryka Brodatego 01"/>
+        <tag k="network" v="ZTM Warszawa"/>
+        <tag k="operator" v="Zarz?d Transportu Miejskiego w Warszawie"/>
+        <tag k="public_transport" v="platform"/>
+        <tag k="ref" v="433701"/>
+        <tag k="shelter" v="no"/>
+    </node>
+    <node id="7420890654" lat="52.1915838" lon="20.8613692">
+        <tag k="bus" v="yes"/>
+        <tag k="name" v="Ursus-Sanktuarium 02"/>
+        <tag k="network" v="ZTM Warszawa"/>
+        <tag k="public_transport" v="stop_position"/>
+        <tag k="ref" v="421102"/>
+    </node>
+
+</osm>

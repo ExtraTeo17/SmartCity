@@ -15,27 +15,24 @@ import smartcity.lights.SimpleCrossroad;
 
 import java.util.List;
 
-public class LightManager extends AbstractAgent {
-    private static final Logger logger = LoggerFactory.getLogger(LightManager.class);
+public class LightManagerAgent extends AbstractAgent {
+    public static final String name = LightManagerAgent.class.getName().replace("Agent", "");
+    private static final Logger logger = LoggerFactory.getLogger(LightManagerAgent.class);
+
     // TODO: Inject it as dependency
-    private final IBehaviourFactory<LightManager> behaviourFactory;
+    private final IBehaviourFactory<LightManagerAgent> behaviourFactory;
     private final ICrossroad crossroad;
 
-    public LightManager(int id, Node node) {
-        super(id);
+    public LightManagerAgent(int id, Node node) {
+        super(id, name);
         behaviourFactory = new LightManagerBehaviourFactory();
         crossroad = new SimpleCrossroad(node, id);
     }
 
-    public LightManager(int id, OSMNode centerCrossroadNode) {
-        super(id);
+    public LightManagerAgent(int id, OSMNode centerCrossroadNode) {
+        super(id, name);
         behaviourFactory = new LightManagerBehaviourFactory();
         crossroad = new SimpleCrossroad(centerCrossroadNode, id);
-    }
-
-    @Override
-    public String getNamePrefix() {
-        return "LightManager";
     }
 
     @Override

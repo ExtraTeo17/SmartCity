@@ -1,13 +1,14 @@
 package web;
 
 import com.google.inject.Inject;
+import com.google.inject.name.Named;
 import org.java_websocket.WebSocket;
 import org.java_websocket.framing.CloseFrame;
 import org.java_websocket.handshake.ClientHandshake;
 import org.java_websocket.server.WebSocketServer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import utilities.ExtendedProperties;
+import smartcity.config.StaticConfig;
 
 import java.net.InetSocketAddress;
 import java.util.HashSet;
@@ -21,14 +22,14 @@ class SocketServer extends WebSocketServer {
     private final HashSet<WebSocket> sockets;
 
     @Inject
-    SocketServer(MessageHandler messageHandler, ExtendedProperties properties) {
-        super(getSocketAddress(properties));
+    SocketServer(@Named("WEB_PORT") Integer port,
+                 MessageHandler messageHandler) {
+        super(getSocketAddress(port));
         this.messageHandler = messageHandler;
         sockets = new HashSet<>();
     }
 
-    private static InetSocketAddress getSocketAddress(ExtendedProperties properties) {
-        var port = properties.getOrDefault("port", 8000);
+    private static InetSocketAddress getSocketAddress(int port) {
         return new InetSocketAddress(port);
     }
 

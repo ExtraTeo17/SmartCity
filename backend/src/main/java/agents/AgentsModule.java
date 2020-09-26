@@ -8,13 +8,12 @@ import com.google.inject.Provides;
 import com.google.inject.Singleton;
 import genesis.AbstractModule;
 import jade.wrapper.ContainerController;
-import vehicles.Pedestrian;
 
 public class AgentsModule extends AbstractModule {
-    private static final Class<?>[] agentTypes = {
+    public static final Class<?>[] agentTypes = {
             VehicleAgent.class,
             BusAgent.class,
-            LightManager.class,
+            LightManagerAgent.class,
             StationAgent.class,
             PedestrianAgent.class
     };

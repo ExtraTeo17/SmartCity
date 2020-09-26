@@ -5,8 +5,6 @@ import osmproxy.elements.OSMStation;
 import osmproxy.elements.OSMWay;
 import routing.RouteNode;
 import routing.Router;
-import smartcity.MasterAgent;
-import smartcity.buses.BrigadeInfo;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -14,40 +12,25 @@ import java.util.Iterator;
 import java.util.List;
 
 public class BusInfo implements Iterable<BrigadeInfo> {
-    private final String busLine;
-    private final List<Long> stationIds;
-    private List<OSMWay> route;
-    private List<BrigadeInfo> brigadeList = new ArrayList<>();
+    public final String busLine;
+    public final List<OSMWay> route;
+    public final List<OSMStation> stops;
 
-    BusInfo(String busLine, List<OSMWay> route, List<Long> stationIds) {
+    private final List<BrigadeInfo> brigadeList;
+
+    BusInfo(String busLine, List<OSMWay> route) {
         this.busLine = busLine;
         this.route = route;
-        this.stationIds = stationIds;
+        this.stops = new ArrayList<>();
+        this.brigadeList = new ArrayList<>();
     }
 
-    public String getBusLine() {
-        return busLine;
+    void addStops(Collection<OSMStation> stops) {
+        this.stops.addAll(stops);
     }
 
-    public List<OSMStation> getStations() {
-        List<OSMStation> stations = new ArrayList<>();
-        for (long osmId : stationIds) {
-            stations.add(MasterAgent.osmIdToStationOSMNode.get(osmId));
-        }
-        return stations;
-    }
-
-    public void setRoute(List<OSMWay> parseOsmWay) {
-        route = parseOsmWay;
-    }
-
-    void setBrigadeList(Collection<BrigadeInfo> values) {
-        brigadeList = new ArrayList<>(values);
-    }
-
-    // TODO: as field.
-    public List<RouteNode> getRouteInfo() {
-        return Router.generateRouteInfoForBuses(route, stationIds);
+    void addBrigades(Collection<BrigadeInfo> brigades) {
+        brigadeList.addAll(brigades);
     }
 
     @NotNull

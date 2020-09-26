@@ -56,7 +56,6 @@ public class ExtendedGraphHopper extends GraphHopper {
     @Override
     protected DataReader createReader(GraphHopperStorage ghStorage) {
         OSMReader reader = new OSMReader(ghStorage) {
-
             {
                 edgeMapping.create(1000);
             }
@@ -84,7 +83,7 @@ public class ExtendedGraphHopper extends GraphHopper {
         return initDataReader(reader);
     }
 
-    public long getOSMWay(int internalEdgeId) {
+    long getOSMWay(int internalEdgeId) {
         long pointer = 8L * internalEdgeId;
         return bitUtil.combineIntsToLong(edgeMapping.getInt(pointer), edgeMapping.getInt(pointer + 4L));
     }

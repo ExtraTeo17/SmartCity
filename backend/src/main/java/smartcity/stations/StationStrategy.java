@@ -23,11 +23,16 @@ public class StationStrategy {
     final private Map<String, PedestrianArrivalInfo> farAwayPedestrianMap = new HashMap<>();
     final private Map<String, PedestrianArrivalInfo> pedestrianOnStationMap = new HashMap<>();
 
-    //private final OSMStation stationOSMNode;
-    public StationStrategy(OSMStation stationOSMNode, int agentId) {
-        MasterAgent.osmStationIdToStationNode.put(stationOSMNode.getId(),
-                new StationNode(stationOSMNode.getLat(), stationOSMNode.getLng(),
-                        Long.toString(stationOSMNode.getId()), agentId));
+    public StationStrategy(OSMStation station, int agentId) {
+        // Temporary workaround, because of static container in MasterAgent
+        if (station == null) {
+            return;
+        }
+
+        var id = station.getId();
+        MasterAgent.osmStationIdToStationNode.put(id,
+                new StationNode(station.getLat(), station.getLng(),
+                        Long.toString(id), agentId));
     }
 
     public void addBusToFarAwayQueue(String agentBusName, Instant arrivalTime, Instant scheduleArrivalTime) {
@@ -98,13 +103,13 @@ public class StationStrategy {
 
             if (scheduleAndArrivalTime.getValue1().isAfter(scheduleAndArrivalTime.getValue0().plusSeconds(StationStrategy.WAIT_PERIOD))) {
 
-                StationStrategy.logger.info("------------------BUS WAS LATE-----------------------");
+                logger.info("------------------BUS WAS LATE-----------------------");
                 List<String> passengersThatCanLeave = checkPassengersWhoAreReadyToGo(bus);
                 result.addBusAndPedestrianGrantedPassthrough(bus, passengersThatCanLeave);
             }
             else if ((scheduleAndArrivalTime.getValue1().isAfter((scheduleAndArrivalTime.getValue0().minusSeconds(StationStrategy.WAIT_PERIOD))) &&
                     scheduleAndArrivalTime.getValue1().isBefore((scheduleAndArrivalTime.getValue0().plusSeconds(StationStrategy.WAIT_PERIOD))))) {
-                StationStrategy.logger.info("------------------BUS WAS ON TIME-----------------------");
+                logger.info("------------------BUS WAS ON TIME-----------------------");
                 List<String> passengersThatCanLeave = checkPassengersWhoAreReadyToGo(bus);
                 List<String> farPassengers = new ArrayList<>();
                 if (StationStrategy.SHOULD_USE_STRATEGY) {
@@ -112,13 +117,14 @@ public class StationStrategy {
                 }
                 passengersThatCanLeave.addAll(farPassengers);
                 result.addBusAndPedestrianGrantedPassthrough(bus, passengersThatCanLeave);
-                StationStrategy.logger.info("-----------------WAITING FOR: " + farPassengers.size() + " PASSENGERS------------------");
+                logger.info("-----------------WAITING FOR: " + farPassengers.size() + " PASSENGERS------------------");
             }
-            else if (scheduleAndArrivalTime.getValue1().isBefore((scheduleAndArrivalTime.getValue0().minusSeconds(StationStrategy.WAIT_PERIOD)))) {
-                StationStrategy.logger.info("------------------BUS TOO EARLY-----------------------");
+            else if (scheduleAndArrivalTime.getValue1().isBefore((scheduleAndArrivalTime.getValue0()
+                    .minusSeconds(StationStrategy.WAIT_PERIOD)))) {
+                logger.info("------------------BUS TOO EARLY-----------------------");
             }
             else {
-                StationStrategy.logger.info("------------------SOMETHING HAPPENED-----------------------");
+                logger.info("------------------SOMETHING HAPPENED-----------------------");
             }
         }
         return result;

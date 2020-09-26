@@ -6,15 +6,15 @@ import org.slf4j.LoggerFactory;
 import java.time.Clock;
 import java.util.Date;
 
-public class TimeManager implements ITimeManager {
-    public static final int TIME_SCALE = 10;
-    private static final Logger logger = LoggerFactory.getLogger(TimeManager.class);
+public class TimeProvider implements ITimeProvider {
+    public static final int TIME_SCALE = 12;
+    private static final Logger logger = LoggerFactory.getLogger(TimeProvider.class);
 
     private final Clock clock;
     private long simulationStartTime;
     private long realStartTime;
 
-    public TimeManager() {
+    public TimeProvider() {
         clock = Clock.systemDefaultZone();
         simulationStartTime = realStartTime = clock.millis();
     }
@@ -44,5 +44,9 @@ public class TimeManager implements ITimeManager {
     @Override
     public Date getStartRealTime() {
         return new Date(realStartTime);
+    }
+
+    public static long getTimeInMs(long timeNanoStart) {
+        return (System.nanoTime() - timeNanoStart) / 1_000_000;
     }
 }

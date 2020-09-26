@@ -3,23 +3,24 @@ package agents;
 import agents.abstractions.IAgentsFactory;
 import com.google.inject.Inject;
 import org.w3c.dom.Node;
+import osmproxy.buses.Timetable;
 import osmproxy.elements.OSMNode;
+import osmproxy.elements.OSMStation;
 import routing.RouteNode;
 import routing.StationNode;
-import smartcity.ITimeManager;
-import smartcity.buses.Timetable;
+import smartcity.ITimeProvider;
 import vehicles.*;
 
 import java.util.List;
 
 class AgentsFactory implements IAgentsFactory {
     private final IdGenerator idGenerator;
-    private final ITimeManager timeManager;
+    private final ITimeProvider timeProvider;
 
     @Inject
-    public AgentsFactory(IdGenerator idGenerator, ITimeManager timeManager) {
+    public AgentsFactory(IdGenerator idGenerator, ITimeProvider timeProvider) {
         this.idGenerator = idGenerator;
-        this.timeManager = timeManager;
+        this.timeProvider = timeProvider;
     }
 
     @Override
@@ -34,19 +35,25 @@ class AgentsFactory implements IAgentsFactory {
     }
 
     @Override
+    public StationAgent create(OSMStation osmStation) {
+        return new StationAgent(idGenerator.get(StationAgent.class), osmStation);
+    }
+
+    @Override
     public BusAgent create(List<RouteNode> route, Timetable timetable, String busLine, String brigadeNr) {
-        var bus = new Bus(route, timetable, busLine, brigadeNr);
-        return new BusAgent(idGenerator.get(BusAgent.class), timeManager, bus);
+        var bus = new Bus(timeProvider,
+                route, timetable, busLine, brigadeNr);
+        return new BusAgent(idGenerator.get(BusAgent.class), timeProvider, bus);
     }
 
     @Override
-    public LightManager create(Node crossroad) {
-        return new LightManager(idGenerator.get(LightManager.class), crossroad);
+    public LightManagerAgent create(Node crossroad) {
+        return new LightManagerAgent(idGenerator.get(LightManagerAgent.class), crossroad);
     }
 
     @Override
-    public LightManager create(OSMNode centerCrossroad) {
-        return new LightManager(idGenerator.get(LightManager.class), centerCrossroad);
+    public LightManagerAgent create(OSMNode centerCrossroad) {
+        return new LightManagerAgent(idGenerator.get(LightManagerAgent.class), centerCrossroad);
     }
 
     // TODO: Simplify to avoid 6 arguments

@@ -1,5 +1,7 @@
 package agents.abstractions;
 
+import org.jetbrains.annotations.NotNull;
+
 import java.util.Iterator;
 import java.util.Optional;
 import java.util.Random;
@@ -11,7 +13,9 @@ import java.util.stream.Stream;
 
 // I hate Java generics.
 public interface IAgentsContainer extends IRegistrable {
-    boolean tryAdd(AbstractAgent agent);
+    boolean tryAdd(@NotNull AbstractAgent agent);
+
+    boolean tryAccept(@NotNull AbstractAgent agent);
 
     default <TAgent extends AbstractAgent> Iterator<TAgent> iterator(Class<TAgent> type) {
         return stream(type).iterator();

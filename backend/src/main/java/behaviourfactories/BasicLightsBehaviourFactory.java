@@ -7,6 +7,7 @@ import jade.core.behaviours.CyclicBehaviour;
 import jade.core.behaviours.TickerBehaviour;
 import jade.lang.acl.ACLMessage;
 
+// TODO: Move to agent
 public class BasicLightsBehaviourFactory implements IBehaviourFactory<TrafficLightAgent> {
     @Override
     public CyclicBehaviour createCyclicBehaviour(final TrafficLightAgent agent) {
