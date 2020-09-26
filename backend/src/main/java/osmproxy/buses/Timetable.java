@@ -23,7 +23,7 @@ public class Timetable {
         return timeOnStationChronological.get(0);
     }
 
-    void addEntryToTimetable(long stationOsmId, String time) {
+    void addEntryToTimetable(long stationId, String time) {
         Date timeOnStation;
         try {
             timeOnStation = new SimpleDateFormat("HH:mm:ss").parse(time);
@@ -32,10 +32,20 @@ public class Timetable {
             return;
         }
 
-        if (timeOnStationChronological.size() == 0 ||
-                timeOnStation.after(timeOnStationChronological.get(timeOnStationChronological.size() - 1))) {
-            stationOsmIdToTime.put(stationOsmId, timeOnStation);
+        var lastEntry = getLastChronologicalEntry();
+        if (lastEntry.isEmpty() || !timeOnStation.before(lastEntry.get())) {
+            stationOsmIdToTime.put(stationId, timeOnStation);
             timeOnStationChronological.add(timeOnStation);
         }
+        else {
+            logger.debug("Did not put '" + time + "' for '" + stationId + "'\n"
+                    + "lastEntry: '" + lastEntry.orElse(null) + "'");
+        }
+    }
+
+    private Optional<Date> getLastChronologicalEntry() {
+        return timeOnStationChronological.size() != 0 ?
+                Optional.of(timeOnStationChronological.get(timeOnStationChronological.size() - 1)) :
+                Optional.empty();
     }
 }

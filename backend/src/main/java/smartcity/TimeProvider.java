@@ -7,7 +7,7 @@ import java.time.Clock;
 import java.util.Date;
 
 public class TimeProvider implements ITimeProvider {
-    public static final int TIME_SCALE = 10;
+    public static final int TIME_SCALE = 12;
     private static final Logger logger = LoggerFactory.getLogger(TimeProvider.class);
 
     private final Clock clock;
