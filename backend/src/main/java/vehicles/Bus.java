@@ -54,7 +54,7 @@ public class Bus extends MovingObject {
         }
 
         if (stationNodesOnRoute.size() < 2) {
-            logger.warn("Only one station on route");
+            logger.debug("Only one station on route");
         }
     }
 
