@@ -10,7 +10,7 @@ import osmproxy.buses.data.BusPreparationData;
 import osmproxy.elements.OSMStation;
 import routing.core.IZone;
 import routing.core.Zone;
-import testutils.XmlLoader;
+import testutils.FileLoader;
 
 import java.util.Collection;
 import java.util.HashSet;
@@ -41,11 +41,11 @@ class BusDataParserTests {
 
         var apiManager = Mockito.mock(IBusApiManager.class);
         when(apiManager.getBusWays(ArgumentMatchers.anyList()))
-                .thenReturn(Optional.of(XmlLoader.getDocument("DefaultBusZoneWays.xml")));
+                .thenReturn(Optional.of(FileLoader.getDocument("DefaultBusZoneWays.xml")));
 
         var parser = new BusDataParser(mockMerger, apiManager, defaultBusZone);
 
-        var document = XmlLoader.getDocument("DefaultBusZoneData.xml");
+        var document = FileLoader.getDocument("DefaultBusZoneData.xml");
 
         // Act
         parser.parseBusData(document);

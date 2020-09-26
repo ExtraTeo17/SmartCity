@@ -2,6 +2,7 @@ import agents.AgentsModule;
 import com.google.inject.Guice;
 import genesis.GuiModule;
 import genesis.MainModule;
+import genesis.SharedModule;
 import jade.wrapper.ContainerController;
 import jade.wrapper.StaleProxyException;
 import org.slf4j.Logger;
@@ -20,6 +21,7 @@ public class SmartCity {
     public static void main(String[] args) {
         var injector = Guice.createInjector(
                 new MainModule(args),
+                new SharedModule(),
                 new AgentsModule(),
                 new GuiModule(),
                 new WebModule(),
