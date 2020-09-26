@@ -1,6 +1,7 @@
 package web;
 
 import com.google.inject.Inject;
+import com.google.inject.name.Named;
 import org.java_websocket.WebSocket;
 import org.java_websocket.framing.CloseFrame;
 import org.java_websocket.handshake.ClientHandshake;
@@ -21,8 +22,9 @@ class SocketServer extends WebSocketServer {
     private final HashSet<WebSocket> sockets;
 
     @Inject
-    SocketServer(MessageHandler messageHandler) {
-        super(getSocketAddress(StaticConfig.WEB_PORT));
+    SocketServer(@Named("WEB_PORT") Integer port,
+                 MessageHandler messageHandler) {
+        super(getSocketAddress(port));
         this.messageHandler = messageHandler;
         sockets = new HashSet<>();
     }

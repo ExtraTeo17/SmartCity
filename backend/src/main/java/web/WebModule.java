@@ -1,13 +1,25 @@
 package web;
 
 import com.google.inject.*;
+import com.google.inject.name.Names;
 import genesis.AbstractModule;
+import smartcity.config.StaticConfig;
 import web.abstractions.IWebConnector;
 import web.abstractions.IWebService;
 import web.serialization.SerializationModule;
 
 
 public class WebModule extends AbstractModule {
+    private final Integer port;
+
+    public WebModule() {
+        this(StaticConfig.WEB_PORT);
+    }
+
+    public WebModule(int port) {
+        this.port = port;
+    }
+
     @Override
     public void configure(Binder binder) {
         super.configure(binder);
@@ -15,6 +27,11 @@ public class WebModule extends AbstractModule {
         binder.install(new PrivateModule() {
             @Override
             protected void configure() {
+                bind(Integer.class)
+                        .annotatedWith(Names.named("WEB_PORT"))
+                        .toInstance(port);
+                bind(SocketServer.class).in(Singleton.class);
+
                 bind(IWebConnector.class).to(WebConnector.class).in(Singleton.class);
                 bind(MessageHandler.class).in(Singleton.class);
                 bind(SocketServer.class).in(Singleton.class);
