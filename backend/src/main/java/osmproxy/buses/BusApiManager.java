@@ -14,6 +14,7 @@ import utilities.ConditionalExecutor;
 import utilities.FileWriterWrapper;
 
 import java.net.URL;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 import java.util.Scanner;
@@ -62,7 +63,7 @@ public class BusApiManager implements IBusApiManager {
         }
 
         ConditionalExecutor.debug(() -> {
-            String path = "target/brigade" + busStopId + ".json";
+            String path = "target/line_" + busLine + "_stop_" + busStopId + "_" + busStopNr + ".json";
             logger.info("Writing bus-brigade-date to: " + path);
             FileWriterWrapper.write(jObject, path);
         });
@@ -96,6 +97,13 @@ public class BusApiManager implements IBusApiManager {
         return OsmQueryManager.getQueryWithPayload(busWayQueryBuilder.toString());
     }
 
+
+    /**
+     * @param busStopId Represents id of group of busStops - example 'Marszałkowska'
+     * @param busStopNr Represents number of stop in group of busStops - example 01 -> 'Marszałkowska 01'
+     * @param busLine   Represents concrete busLine, example '523'
+     * @return Query string for downloading timetable for specified line from WarszawskieAPI
+     */
     private static String getBusWarszawskieQuery(String busStopId, String busStopNr, String busLine) {
         return "https://api.um.warszawa.pl/api/action/dbtimetable_get/?id=e923fa0e-d96c-43f9-ae6e-60518c9f3238&busstopId=" +
                 busStopId + "&busstopNr=" + busStopNr + "&line=" + busLine + "&apikey=400dacf8-9cc4-4d6c-82cc-88d9311401a5";

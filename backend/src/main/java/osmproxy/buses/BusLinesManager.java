@@ -10,6 +10,7 @@ import osmproxy.buses.abstractions.IBusLinesManager;
 import osmproxy.buses.data.BusPreparationData;
 import osmproxy.elements.OSMStation;
 import routing.core.IZone;
+import utilities.ConditionalExecutor;
 import utilities.IterableJsonArray;
 
 import java.util.Collection;
@@ -81,6 +82,9 @@ public class BusLinesManager implements IBusLinesManager {
                 }
 
                 var time = brigadeAndTime[1];
+                ConditionalExecutor.trace(() -> {
+                        logBrigadeData(time, station, busLine);
+                });
                 brigadeInfo.addToTimetable(stationId, time);
             }
         }
@@ -88,5 +92,12 @@ public class BusLinesManager implements IBusLinesManager {
         return brigadeInfoMap.values();
     }
 
-
+    private void logBrigadeData(String time, OSMStation station, String busLine) {
+        logger.info("Printing data for brigade1:\n" +
+                "  time: " + time + "\n" +
+                "  stationId: " + station.getId() + "\n" +
+                "  busStopId: " + station.getBusStopId() + "\n" +
+                "  busStopNr: " + station.getBusStopNr() + "\n" +
+                "  busLine: " + busLine + "\n");
+    }
 }
