@@ -10,7 +10,10 @@ import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.FileWriter;
+import java.io.OutputStreamWriter;
+import java.nio.charset.StandardCharsets;
 
 public class FileWriterWrapper {
     public static final String DEFAULT_OUTPUT_PATH_XML = "target/output.xml";
@@ -48,7 +51,7 @@ public class FileWriterWrapper {
         try {
             File file = new File(path);
             if (file.exists() || file.createNewFile()) {
-                FileWriter writer = new FileWriter(file);
+                var writer = new OutputStreamWriter(new FileOutputStream(file), StandardCharsets.UTF_8);
                 mapper.writerWithDefaultPrettyPrinter().writeValue(writer, jsonObj);
             }
         } catch (Exception e) {
