@@ -3,6 +3,7 @@ package osmproxy.buses;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentMatchers;
 import org.mockito.Mockito;
+import osmproxy.buses.abstractions.IApiSerializer;
 import osmproxy.buses.abstractions.IBusApiManager;
 import osmproxy.buses.abstractions.IDataMerger;
 import osmproxy.buses.data.BusInfoData;
@@ -42,8 +43,9 @@ class BusDataParserTests {
         var apiManager = Mockito.mock(IBusApiManager.class);
         when(apiManager.getBusWays(ArgumentMatchers.anyList()))
                 .thenReturn(Optional.of(FileLoader.getDocument("DefaultBusZoneWays.xml")));
+        var apiSerializer = Mockito.mock(IApiSerializer.class);
 
-        var parser = new BusDataParser(mockMerger, apiManager, defaultBusZone);
+        var parser = new BusDataParser(mockMerger, apiSerializer, apiManager, defaultBusZone);
 
         var document = FileLoader.getDocument("DefaultBusZoneData.xml");
 

@@ -161,6 +161,7 @@
             <version>3.0.0</version>
             <scope>test</scope>
         </dependency>
+        <!-- For date parsing via mapper -->
         <dependency>
             <groupId>com.fasterxml.jackson.datatype</groupId>
             <artifactId>jackson-datatype-jsr310</artifactId>

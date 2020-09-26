@@ -7,6 +7,7 @@ import org.w3c.dom.Document;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
+import osmproxy.buses.abstractions.IApiSerializer;
 import osmproxy.buses.abstractions.IBusApiManager;
 import osmproxy.buses.abstractions.IBusDataParser;
 import osmproxy.buses.abstractions.IDataMerger;
@@ -26,14 +27,16 @@ public class BusDataParser implements IBusDataParser {
     private static final Logger logger = LoggerFactory.getLogger(BusDataParser.class);
 
     private final IDataMerger busDataMerger;
+    private final IApiSerializer apiSerializer;
     private final IBusApiManager busApiManager;
     private final IZone zone;
 
     @Inject
     BusDataParser(IDataMerger busDataMerger,
-                  IBusApiManager busApiManager,
+                  IApiSerializer apiSerializer, IBusApiManager busApiManager,
                   IZone zone) {
         this.busDataMerger = busDataMerger;
+        this.apiSerializer = apiSerializer;
         this.busApiManager = busApiManager;
         this.zone = zone;
     }

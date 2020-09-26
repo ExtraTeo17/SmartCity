@@ -5,6 +5,7 @@ import com.google.common.annotations.VisibleForTesting;
 import com.google.inject.Inject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import osmproxy.buses.abstractions.IApiSerializer;
 import osmproxy.buses.models.ApiResult;
 import osmproxy.buses.models.SingleTimetable;
 
@@ -14,7 +15,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-public class WarszawskieApiSerializer {
+public class WarszawskieApiSerializer implements IApiSerializer {
     private final static Logger logger = LoggerFactory.getLogger(WarszawskieApiSerializer.class);
     private final ObjectMapper objectMapper;
 
@@ -23,6 +24,7 @@ public class WarszawskieApiSerializer {
         this.objectMapper = objectMapper;
     }
 
+    @Override
     public List<SingleTimetable> serializeTimetables(String jsonString) {
         var apiResult = serializeJsonString(jsonString);
         if (apiResult.isEmpty()) {

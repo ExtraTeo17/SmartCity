@@ -1,27 +1,28 @@
 package osmproxy.buses.models;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import osmproxy.buses.serialization.WrappingDateTimeDeserializer;
 
-import java.time.LocalTime;
+import java.time.LocalDateTime;
 
 public class SingleTimetable {
-    public final int brigadeNr;
-    public final LocalTime timeOnStop;
+    public final String brigadeId;
+    public final LocalDateTime timeOnStop;
     public final String direction;
     public final String path;
 
     @JsonCreator(mode = JsonCreator.Mode.PROPERTIES)
     public SingleTimetable(@JsonProperty("brygada")
-                                       int brigadeNr,
-                           @JsonProperty("czas") @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "kk:mm:ss")
-                                   LocalTime timeOnStop,
+                                   String brigadeId,
+                           @JsonProperty("czas") @JsonDeserialize(using = WrappingDateTimeDeserializer.class)
+                                       LocalDateTime timeOnStop,
                            @JsonProperty("kierunek")
-                                       String direction,
+                                   String direction,
                            @JsonProperty("trasa")
-                                       String path) {
-        this.brigadeNr = brigadeNr;
+                                   String path) {
+        this.brigadeId = brigadeId;
         this.timeOnStop = timeOnStop;
         this.direction = direction;
         this.path = path;

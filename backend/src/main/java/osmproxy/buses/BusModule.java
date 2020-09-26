@@ -4,10 +4,8 @@ import com.google.inject.Binder;
 import com.google.inject.PrivateModule;
 import com.google.inject.Singleton;
 import genesis.AbstractModule;
-import osmproxy.buses.abstractions.IBusApiManager;
-import osmproxy.buses.abstractions.IBusDataParser;
-import osmproxy.buses.abstractions.IBusLinesManager;
-import osmproxy.buses.abstractions.IDataMerger;
+import osmproxy.buses.abstractions.*;
+import osmproxy.buses.serialization.WarszawskieApiSerializer;
 
 public class BusModule extends AbstractModule {
     @Override
@@ -16,6 +14,7 @@ public class BusModule extends AbstractModule {
         binder.install(new PrivateModule() {
             @Override
             protected void configure() {
+                bind(IApiSerializer.class).to(WarszawskieApiSerializer.class).in(Singleton.class);
                 bind(IBusApiManager.class).to(BusApiManager.class).in(Singleton.class);
                 bind(IDataMerger.class).to(DataMerger.class).in(Singleton.class);
                 bind(IBusDataParser.class).to(BusDataParser.class).in(Singleton.class);

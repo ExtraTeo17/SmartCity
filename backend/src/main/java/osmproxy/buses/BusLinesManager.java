@@ -52,7 +52,7 @@ public class BusLinesManager implements IBusLinesManager {
     }
 
 
-    // TODO: Move to busDataParser
+    // TODO: Move to busDataParser and use IApiSerializer
     private Collection<BrigadeInfo> generateBrigadeInfos(String busLine, Collection<OSMStation> osmStations) {
         Map<String, BrigadeInfo> brigadeInfoMap = new LinkedHashMap<>();
         for (OSMStation station : osmStations) {
