@@ -5,6 +5,7 @@
       <w>busstop</w>
       <w>colleoni</w>
       <w>czas</w>
+      <w>kierunek</w>
       <w>marszałkowska</w>
       <w>mazowieckie</w>
       <w>modv</w>
@@ -13,6 +14,7 @@
       <w>schleiz</w>
       <w>startable</w>
       <w>substep</w>
+      <w>trasa</w>
       <w>warszawskie</w>
     </words>
   </dictionary>

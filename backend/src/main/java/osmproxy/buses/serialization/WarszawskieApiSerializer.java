@@ -12,6 +12,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 public class WarszawskieApiSerializer {
     private final static Logger logger = LoggerFactory.getLogger(WarszawskieApiSerializer.class);
@@ -23,18 +24,16 @@ public class WarszawskieApiSerializer {
     }
 
     public List<SingleTimetable> serializeTimetables(String jsonString) {
-        var apiResult = serializeApiResult(jsonString);
+        var apiResult = serializeJsonString(jsonString);
         if (apiResult.isEmpty()) {
             return new ArrayList<>();
         }
 
-        var result = new ArrayList<SingleTimetable>();
-
-        return result;
+        return serializeApiResult(apiResult.get());
     }
 
     @VisibleForTesting
-    Optional<ApiResult> serializeApiResult(String jsonString) {
+    Optional<ApiResult> serializeJsonString(String jsonString) {
         ApiResult apiResult;
         try {
             apiResult = objectMapper.readValue(jsonString, ApiResult.class);
@@ -44,5 +43,18 @@ public class WarszawskieApiSerializer {
         }
 
         return Optional.of(apiResult);
+    }
+
+    @VisibleForTesting
+    List<SingleTimetable> serializeApiResult(ApiResult result) {
+        var timetables = new ArrayList<SingleTimetable>();
+        for (var apiValue : result) {
+            var valuesMap = apiValue.values.stream()
+                    .collect(Collectors.toMap(keyValue -> keyValue.key, keyValue -> keyValue.value));
+            var record = objectMapper.convertValue(valuesMap, SingleTimetable.class);
+            timetables.add(record);
+        }
+
+        return timetables;
     }
 }
