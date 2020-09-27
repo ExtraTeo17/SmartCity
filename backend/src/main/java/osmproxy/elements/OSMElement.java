@@ -34,7 +34,7 @@ public class OSMElement {
 
     @Override
     public String toString() {
-        return "id: " + id + "\n";
+        return "id: " + id;
     }
 
     public static OSMElement of(long id) {

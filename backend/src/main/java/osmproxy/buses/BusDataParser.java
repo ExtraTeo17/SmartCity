@@ -76,7 +76,7 @@ public class BusDataParser implements IBusDataParser {
     private Optional<BusInfoData> parseRelation(Node relation) {
         List<Long> stationIds = new ArrayList<>();
         String busLine = "";
-        List<Long> wayIds = new ArrayList<>();
+        List<Long> waysIds = new ArrayList<>();
         for (var node : IterableNodeList.of(relation.getChildNodes())) {
             if (node.getNodeName().equals("member")) {
                 NamedNodeMap attributes = node.getAttributes();
@@ -87,7 +87,7 @@ public class BusDataParser implements IBusDataParser {
                 }
                 else if (attributes.getNamedItem("role").getNodeValue().length() == 0 &&
                         attributes.getNamedItem("type").getNodeValue().equals("way")) {
-                    wayIds.add(id);
+                    waysIds.add(id);
                 }
             }
             else if (node.getNodeName().equals("tag")) {
@@ -100,10 +100,11 @@ public class BusDataParser implements IBusDataParser {
             }
         }
 
-        var waysDoc = busApiManager.getBusWays(wayIds);
+        var waysDoc = busApiManager.getBusWays(waysIds);
         if (waysDoc.isEmpty()) {
             return Optional.empty();
         }
+        logger.debug("Started parsing ways: " + waysIds.get(0) + "_" + waysIds.get(waysIds.size() - 1));
         List<OSMWay> ways = parseOsmWays(waysDoc.get());
 
         return Optional.of(new BusInfoData(new BusInfo(busLine, ways), stationIds));
@@ -129,16 +130,21 @@ public class BusDataParser implements IBusDataParser {
         route.add(firstWay);
         route.add(secondWay);
         String adjacentNodeRef = firstWay.orientateWith(secondWay);
+        boolean failedToMatchPreviously = false;
         while (nodesIter.hasNext()) {
             Node item = nodesIter.next();
             if (item.getNodeName().equals("way")) {
-                OSMWay way = new OSMWay(item);
+                var way = new OSMWay(item);
                 // TODO: CORRECT POTENTIAL BUGS CAUSING ROUTE TO BE CUT INTO PIECES BECAUSE OF RZĄŻEWSKI CASE
                 if (way.startsInZone(zone)) {
                     var referenceOpt = way.reverseTowardsNode(adjacentNodeRef);
                     if (referenceOpt.isEmpty()) {
-                        logger.warn("Failed to match way:\n" + way + " with " + adjacentNodeRef);
+                        logger.debug("Failed to match way: " + way + " with " + adjacentNodeRef);
+                        failedToMatchPreviously = true;
                         continue;
+                    }
+                    else if (failedToMatchPreviously) {
+                        logger.info("Reconnected to way: " + way + " after failed match with " + adjacentNodeRef);
                     }
 
                     adjacentNodeRef = referenceOpt.get();
