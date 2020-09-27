@@ -101,7 +101,8 @@ public class StationStrategy {
 
             scheduleAndArrivalTime = new Pair<>(scheduleCalendar.toInstant(), arrivalTime.toInstant());
 
-            if (scheduleAndArrivalTime.getValue1().isAfter(scheduleAndArrivalTime.getValue0().plusSeconds(StationStrategy.WAIT_PERIOD))) {
+            if (scheduleAndArrivalTime.getValue1().isAfter(scheduleAndArrivalTime.getValue0()
+                    .plusSeconds(StationStrategy.WAIT_PERIOD))) {
 
                 logger.info("------------------BUS WAS LATE-----------------------");
                 List<String> passengersThatCanLeave = checkPassengersWhoAreReadyToGo(bus);

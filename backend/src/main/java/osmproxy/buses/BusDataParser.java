@@ -189,10 +189,12 @@ public class BusDataParser implements IBusDataParser {
 
         boolean isPresentVal = isPresent.test(osmId);
         if (!isPresentVal && zone.contains(Position.of(lat, lon))) {
-            var stationNumber = searchForStationNumber(node.getChildNodes());
-            if (stationNumber.isPresent()) {
-                logger.debug("Parsing station with number: " + stationNumber.get());
-                return Optional.of(new OSMStation(osmId, lat, lon, stationNumber.get()));
+            var stationNumberOpt = searchForStationNumber(node.getChildNodes());
+            if (stationNumberOpt.isPresent()) {
+                var stationNumber = stationNumberOpt.get();
+
+                logger.debug("Parsing station with number: " + stationNumber);
+                return Optional.of(new OSMStation(osmId, lat, lon, stationNumber));
             }
         }
 

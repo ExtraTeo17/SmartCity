@@ -20,6 +20,5 @@ public interface IRouteGenerator {
     List<RouteNode> generateRouteForPedestrians(IGeoPosition pointA, IGeoPosition pointB,
                                                 String startingOsmNodeRef, String finishingOsmNodeRef);
 
-    // TODO: Is it needed? Why route is reversed in generation instead of creating it at the beginning?
     List<RouteNode> generateRouteInfoForBuses(List<OSMWay> route, List<? extends OSMNode> osmStations);
 }
