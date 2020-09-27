@@ -7,17 +7,17 @@ import osmproxy.buses.serialization.WrappingDateTimeDeserializer;
 
 import java.time.LocalDateTime;
 
-public class SingleTimetable {
+public class TimetableRecord {
     public final String brigadeId;
     public final LocalDateTime timeOnStop;
     public final String direction;
     public final String path;
 
     @JsonCreator(mode = JsonCreator.Mode.PROPERTIES)
-    public SingleTimetable(@JsonProperty("brygada")
+    public TimetableRecord(@JsonProperty("brygada")
                                    String brigadeId,
                            @JsonProperty("czas") @JsonDeserialize(using = WrappingDateTimeDeserializer.class)
-                                       LocalDateTime timeOnStop,
+                                   LocalDateTime timeOnStop,
                            @JsonProperty("kierunek")
                                    String direction,
                            @JsonProperty("trasa")
@@ -26,5 +26,10 @@ public class SingleTimetable {
         this.timeOnStop = timeOnStop;
         this.direction = direction;
         this.path = path;
+    }
+
+    @Override
+    public String toString() {
+        return "[" + timeOnStop + "]";
     }
 }

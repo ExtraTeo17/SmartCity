@@ -8,10 +8,10 @@ import org.w3c.dom.NodeList;
 
 import java.util.*;
 
-public class SimpleLightGroup {
+class SimpleLightGroup {
     private final Set<Light> lights;
 
-    public SimpleLightGroup(Node crossroadGroup, LightColor color, int managerId) {
+    SimpleLightGroup(Node crossroadGroup, LightColor color, int managerId) {
         lights = new HashSet<>();
         NodeList lightsInGroup = crossroadGroup.getChildNodes();
         for (int i = 0; i < lightsInGroup.getLength(); ++i) {
@@ -21,16 +21,15 @@ public class SimpleLightGroup {
         }
     }
 
-    public SimpleLightGroup(List<LightInfo> infoList, LightColor color, int managerId) {
+    SimpleLightGroup(List<LightInfo> infoList, LightColor color, int managerId) {
         lights = new HashSet<>();
         for (LightInfo info : infoList) {
             lights.add(new Light(info, color, managerId));
         }
     }
 
-    public void drawLights(WaypointPainter<Waypoint> painter) {
+    void drawLights(WaypointPainter<Waypoint> painter) {
         HashSet<Waypoint> set = new HashSet<>();
-
         for (Light light : lights) {
             light.draw(set, painter);
         }
@@ -38,16 +37,16 @@ public class SimpleLightGroup {
         painter.setWaypoints(set);
     }
 
-    public void switchLights() {
+    void switchLights() {
         for (Light light : lights) {
             light.switchLight();
         }
     }
 
-    public Map<? extends Long, ? extends Light> prepareMap() {
+    Map<? extends Long, ? extends Light> prepareMap() {
         Map<Long, Light> lightMap = new HashMap<>();
         for (Light light : lights) {
-            lightMap.put(light.getAdjacentOSMWayId(), light);
+            lightMap.put(light.getAdjacentWayId(), light);
         }
         return lightMap;
     }

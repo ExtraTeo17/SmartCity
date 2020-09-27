@@ -1,9 +1,9 @@
 package osmproxy.buses.abstractions;
 
-import osmproxy.buses.models.SingleTimetable;
+import osmproxy.buses.models.TimetableRecord;
 
 import java.util.List;
 
 public interface IApiSerializer {
-    List<SingleTimetable> serializeTimetables(String jsonString);
+    List<TimetableRecord> serializeTimetables(String jsonString);
 }

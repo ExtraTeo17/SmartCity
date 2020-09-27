@@ -17,7 +17,7 @@ import org.junit.jupiter.params.provider.MethodSource;
 import osmproxy.buses.models.ApiKeyValue;
 import osmproxy.buses.models.ApiResult;
 import osmproxy.buses.models.ApiValues;
-import osmproxy.buses.models.SingleTimetable;
+import osmproxy.buses.models.TimetableRecord;
 import testutils.FileLoader;
 import utilities.IterableJsonArray;
 
@@ -236,7 +236,7 @@ class WarszawskieApiSerializerTests {
         return new ApiValues(apiKeyValues);
     }
 
-    private void assertTimetableIsEqual(SingleTimetable timetable,
+    private void assertTimetableIsEqual(TimetableRecord timetable,
                                         String brigadeNr, LocalDateTime timeOnStop,
                                         String direction, String path) {
         assertEquals(brigadeNr, timetable.brigadeId);

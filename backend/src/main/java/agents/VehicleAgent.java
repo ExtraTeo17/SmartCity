@@ -10,6 +10,7 @@ import jade.util.leap.Properties;
 import routing.LightManagerNode;
 import routing.Router;
 import routing.core.IGeoPosition;
+import smartcity.ITimeProvider;
 import smartcity.MasterAgent;
 import vehicles.DrivingState;
 import vehicles.MovingObject;
@@ -19,14 +20,14 @@ import vehicles.MovingObject;
 public class VehicleAgent extends AbstractAgent {
     private final MovingObject vehicle;
 
-    VehicleAgent(int id, MovingObject vehicle) {
-        super(id, vehicle.getVehicleType());
+    VehicleAgent(int id, MovingObject vehicle, ITimeProvider timeProvider) {
+        super(id, vehicle.getVehicleType(), timeProvider);
         this.vehicle = vehicle;
     }
 
     @Override
     protected void setup() {
-        vehicle.getNextTrafficLight();
+        informLightManager(vehicle);
         vehicle.setState(DrivingState.MOVING);
 
         int speed = vehicle.getSpeed();
@@ -40,8 +41,7 @@ public class VehicleAgent extends AbstractAgent {
                             LightManagerNode light = vehicle.getNextTrafficLight();
                             ACLMessage msg = createMessage(ACLMessage.REQUEST_WHEN, LightManagerAgent.name,
                                     light.getLightManagerId());
-                            Properties properties = new Properties();
-                            properties.setProperty(MessageParameter.TYPE, MessageParameter.VEHICLE);
+                            Properties properties = createProperties(MessageParameter.VEHICLE);
                             properties.setProperty(MessageParameter.ADJACENT_OSM_WAY_ID, Long.toString(vehicle.getAdjacentOsmWayId()));
                             msg.setAllUserDefinedParameters(properties);
                             send(msg);
@@ -88,7 +88,8 @@ public class VehicleAgent extends AbstractAgent {
                             properties.setProperty(MessageParameter.ADJACENT_OSM_WAY_ID, Long.toString(vehicle.getAdjacentOsmWayId()));
                             response.setAllUserDefinedParameters(properties);
                             send(response);
-                            vehicle.getNextTrafficLight();
+
+                            informLightManager(vehicle);
                             vehicle.setState(DrivingState.PASSING_LIGHT);
                         }
                         case ACLMessage.AGREE -> vehicle.setState(DrivingState.WAITING_AT_LIGHT);

@@ -10,7 +10,11 @@ import routing.StationNode;
 import routing.core.IGeoPosition;
 import smartcity.ITimeProvider;
 
-import java.util.*;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Optional;
 
 public class Bus extends MovingObject {
     public static int CAPACITY_MID = 10;
@@ -48,7 +52,7 @@ public class Bus extends MovingObject {
         for (RouteNode node : route) {
             if (node instanceof StationNode) {
                 StationNode station = (StationNode) node;
-                stationsForPassengers.put(station.getStationAgentId(), new ArrayList<>());
+                stationsForPassengers.put(station.getAgentId(), new ArrayList<>());
                 stationNodesOnRoute.add(station);
             }
         }
@@ -132,10 +136,14 @@ public class Bus extends MovingObject {
         return Optional.empty();
     }
 
-    public Optional<Date> getTimeOnStation(String osmStationId) {
-        var timeOnStation = timetable.getTimeOnStation(Long.parseLong(osmStationId));
+    public Optional<LocalDateTime> getTimeOnStation(String stationId) {
+        return getTimeOnStation(Long.parseLong(stationId));
+    }
+
+    public Optional<LocalDateTime> getTimeOnStation(long stationId) {
+        var timeOnStation = timetable.getTimeOnStation(stationId);
         if (timeOnStation.isEmpty()) {
-            logger.warn("Could not retrieve time for " + osmStationId);
+            logger.warn("Could not retrieve time for " + stationId);
         }
 
         return timeOnStation;
@@ -234,9 +242,9 @@ public class Bus extends MovingObject {
     public boolean shouldStart() {
         var dateNow = timeProvider.getCurrentSimulationTime();
         var boardingTime = timetable.getBoardingTime();
-        long hours = boardingTime.getHours();
-        long minutes = boardingTime.getMinutes();
+        long hours = boardingTime.getHour();
+        long minutes = boardingTime.getMinute();
 
-        return hours == dateNow.getHours() && minutes == dateNow.getMinutes();
+        return hours == dateNow.getHour() && minutes == dateNow.getMinute();
     }
 }

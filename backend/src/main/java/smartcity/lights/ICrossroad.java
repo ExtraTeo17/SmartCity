@@ -3,29 +3,30 @@ package smartcity.lights;
 import org.jxmapviewer.JXMapViewer;
 import org.jxmapviewer.painter.Painter;
 import routing.core.IGeoPosition;
+import smartcity.stations.ArrivalInfo;
 
-import java.time.Instant;
 import java.util.List;
 
 // TODO: Interface is too big and too specific, make it more general and move some methods to different interface
+@SuppressWarnings("UnusedReturnValue")
 public interface ICrossroad {
     List<IGeoPosition> getLightsPositions();
 
-    void addCarToQueue(String carName, long adjacentOsmWayId);
+    boolean addCarToQueue(long adjacentWayId, String agentName);
 
-    void addCarToFarAwayQueue(String carName, long adjacentOsmWayId, Instant journeyTime);
+    boolean removeCarFromQueue(long adjacentWayId);
 
-    void removeCarFromQueue(long adjacentOsmWayId);
+    boolean addCarToFarAwayQueue(long adjacentWayId, ArrivalInfo arrivalInfo);
 
-    void removeCarFromFarAwayQueue(String carName, long adjacentOsmWayId);
+    boolean removeCarFromFarAwayQueue(long adjacentWayId, String agentName);
 
-    void addPedestrianToQueue(String pedestrianName, long adjacentOsmWayId);
+    boolean addPedestrianToQueue(long adjacentWayId, String agentName);
 
-    void addPedestrianToFarAwayQueue(String pedestrianName, long adjacentOsmWayId, Instant journeyTime);
+    boolean removePedestrianFromQueue(long adjacentWayId);
 
-    void removePedestrianFromQueue(long adjacentOsmWayId);
+    boolean addPedestrianToFarAwayQueue(long adjacentWayId, ArrivalInfo arrivalInfo);
 
-    void removePedestrianFromFarAwayQueue(String pedestrianName, long adjacentOsmWayId);
+    boolean removePedestrianFromFarAwayQueue(long adjacentWayId, String agentName);
 
     OptimizationResult requestOptimizations();
 

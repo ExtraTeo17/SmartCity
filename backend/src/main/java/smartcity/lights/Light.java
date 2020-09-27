@@ -10,8 +10,9 @@ import org.w3c.dom.Node;
 import routing.LightManagerNode;
 import routing.core.IGeoPosition;
 import smartcity.MasterAgent;
+import smartcity.stations.ArrivalInfo;
 
-import java.time.Instant;
+import java.time.LocalDateTime;
 import java.util.*;
 
 public class Light implements IGeoPosition {
@@ -22,10 +23,12 @@ public class Light implements IGeoPosition {
 
     private final double lat;
     private final double lng;
-    Map<String, Instant> farAwayCarMap = new HashMap<>();
-    Map<String, Instant> farAwayPedestrianMap = new HashMap<>();
-    Queue<String> carQueue = new LinkedList<>();
-    Queue<String> pedestrianQueue = new LinkedList<>();
+
+    final Map<String, LocalDateTime> farAwayCarMap = new HashMap<>();
+    final Map<String, LocalDateTime> farAwayPedestrianMap = new HashMap<>();
+    final Queue<String> carQueue = new LinkedList<>();
+    final Queue<String> pedestrianQueue = new LinkedList<>();
+
     private LightColor carLightColor;
     private final long adjacentOsmWayId;
     private String adjacentCrossingOsmId1;
@@ -62,7 +65,7 @@ public class Light implements IGeoPosition {
         return lng;
     }
 
-    public long getAdjacentOSMWayId() {
+    public long getAdjacentWayId() {
         return adjacentOsmWayId;
     }
 
@@ -104,8 +107,8 @@ public class Light implements IGeoPosition {
         }
     }
 
-    void addCarToFarAwayQueue(String carName, Instant journeyTime) {
-        farAwayCarMap.put(carName, journeyTime);
+    void addCarToFarAwayQueue(ArrivalInfo arrivalInfo) {
+        farAwayCarMap.put(arrivalInfo.agentName, arrivalInfo.arrivalTime);
     }
 
     void addCarToQueue(String carName) {
@@ -122,8 +125,8 @@ public class Light implements IGeoPosition {
         }
     }
 
-    void addPedestrianToFarAwayQueue(String pedestrianName, Instant journeyTime) {
-        farAwayPedestrianMap.put(pedestrianName, journeyTime);
+    void addPedestrianToFarAwayQueue(ArrivalInfo arrivalInfo) {
+        farAwayPedestrianMap.put(arrivalInfo.agentName, arrivalInfo.arrivalTime);
     }
 
     void addPedestrianToQueue(String pedestrianName) {

@@ -168,11 +168,11 @@ public class TaskManager implements ITaskManager {
                         pedestrianStartPoint,
                         startStation,
                         null,
-                        startStation.getOsmStationId());
+                        String.valueOf(startStation.getStationNodeId()));
                 List<RouteNode> routeFromStation = routeGenerator.generateRouteForPedestrians(
                         endStation,
                         pedestrianFinishPoint,
-                        endStation.getOsmStationId(),
+                        String.valueOf(endStation.getStationNodeId()),
                         null);
 
                 // TODO: Separate fields for testPedestrian and pedestriansLimit

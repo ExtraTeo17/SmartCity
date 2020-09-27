@@ -1,5 +1,6 @@
 package osmproxy.buses;
 
+import com.google.common.base.Joiner;
 import com.google.inject.Inject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -13,15 +14,18 @@ import osmproxy.buses.abstractions.IBusDataParser;
 import osmproxy.buses.abstractions.IDataMerger;
 import osmproxy.buses.data.BusInfoData;
 import osmproxy.buses.data.BusPreparationData;
+import osmproxy.buses.models.TimetableRecord;
 import osmproxy.elements.OSMStation;
 import osmproxy.elements.OSMWay;
 import routing.core.IZone;
 import routing.core.Position;
+import utilities.ConditionalExecutor;
 import utilities.IterableNodeList;
 import utilities.Siblings;
 
 import java.util.*;
 import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
 public class BusDataParser implements IBusDataParser {
     private static final Logger logger = LoggerFactory.getLogger(BusDataParser.class);
@@ -69,6 +73,10 @@ public class BusDataParser implements IBusDataParser {
         }
 
         var busInfos = busDataMerger.getBusInfosWithStops(busInfoDataSet, busStopsMap);
+        for (var busInfo : busInfos) {
+            var brigadeInfos = generateBrigadeInfos(busInfo.busLine, busInfo.stops);
+            busInfo.addBrigades(brigadeInfos);
+        }
 
         return new BusPreparationData(busInfos, busStopsMap);
     }
@@ -212,5 +220,47 @@ public class BusDataParser implements IBusDataParser {
                 .filter(attr -> attr.getNamedItem("k").getNodeValue().equals("ref"))
                 .findFirst()
                 .map(attr -> attr.getNamedItem("v").getNodeValue());
+    }
+
+    private Collection<BrigadeInfo> generateBrigadeInfos(String busLine, Collection<OSMStation> osmStations) {
+        Map<String, BrigadeInfo> brigadeInfoMap = new LinkedHashMap<>();
+        for (OSMStation station : osmStations) {
+            var jsonStringOpt = busApiManager.getBusTimetablesViaWarszawskieAPI(station.getBusStopId(),
+                    station.getBusStopNr(), busLine);
+            if (jsonStringOpt.isEmpty()) {
+                continue;
+            }
+
+            var jsonString = jsonStringOpt.get();
+            var timetableRecords = apiSerializer.serializeTimetables(jsonString);
+            var brigadeIdToRecords = timetableRecords.stream()
+                    .collect(Collectors.groupingBy(record -> record.brigadeId));
+            var stationId = station.getId();
+            for (var entry : brigadeIdToRecords.entrySet()) {
+                var brigadeId = entry.getKey();
+                var brigadeTimeRecords = entry.getValue();
+                var brigadeInfo = brigadeInfoMap.get(brigadeId);
+                if (brigadeInfo == null) {
+                    brigadeInfoMap.put(brigadeId, new BrigadeInfo(brigadeId, stationId, brigadeTimeRecords));
+                }
+                else {
+                    brigadeInfo.addTimetableRecords(stationId, brigadeTimeRecords);
+                }
+
+                ConditionalExecutor.trace(() -> logBrigadeData(brigadeTimeRecords, station, busLine));
+            }
+        }
+
+        return brigadeInfoMap.values();
+    }
+
+    private void logBrigadeData(List<TimetableRecord> timetableRecords, OSMStation station, String busLine) {
+        var recordsString = Joiner.on(" \n").join(timetableRecords);
+        logger.info("Printing data for brigade " + timetableRecords.get(0).brigadeId + " :\n" +
+                "  times:\n" + recordsString + "\n" +
+                "  stationId: " + station.getId() + "\n" +
+                "  busStopId: " + station.getBusStopId() + "\n" +
+                "  busStopNr: " + station.getBusStopNr() + "\n" +
+                "  busLine: " + busLine + "\n");
     }
 }

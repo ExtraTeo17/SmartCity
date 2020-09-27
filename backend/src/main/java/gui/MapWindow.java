@@ -35,6 +35,7 @@ import javax.swing.event.MouseInputListener;
 import java.awt.*;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.time.ZoneId;
 import java.util.List;
 import java.util.Timer;
 import java.util.*;
@@ -244,7 +245,10 @@ public class MapWindow {
         ResultTimeLabel.setVisible(true);
         ResultTimeTitle.setVisible(true);
         random.setSeed(getSeed());
-        timeProvider.setSimulationStartTime((Date) setTimeSpinner.getValue());
+
+        var simulationTime = ((Date) setTimeSpinner.getValue()).toInstant().atZone(ZoneId.systemDefault())
+                .toLocalDateTime();
+        timeProvider.setSimulationStartTime(simulationTime);
     }
 
     private int getZoneRadius() {

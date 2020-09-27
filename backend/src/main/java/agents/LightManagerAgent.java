@@ -10,29 +10,30 @@ import org.slf4j.LoggerFactory;
 import org.w3c.dom.Node;
 import osmproxy.elements.OSMNode;
 import routing.core.IGeoPosition;
+import smartcity.ITimeProvider;
 import smartcity.lights.ICrossroad;
 import smartcity.lights.SimpleCrossroad;
 
 import java.util.List;
 
 public class LightManagerAgent extends AbstractAgent {
-    public static final String name = LightManagerAgent.class.getName().replace("Agent", "");
+    public static final String name = LightManagerAgent.class.getSimpleName().replace("Agent", "");
     private static final Logger logger = LoggerFactory.getLogger(LightManagerAgent.class);
 
     // TODO: Inject it as dependency
     private final IBehaviourFactory<LightManagerAgent> behaviourFactory;
     private final ICrossroad crossroad;
 
-    public LightManagerAgent(int id, Node node) {
-        super(id, name);
+    public LightManagerAgent(int id, ITimeProvider timeProvider, Node node) {
+        super(id, name, timeProvider);
         behaviourFactory = new LightManagerBehaviourFactory();
-        crossroad = new SimpleCrossroad(node, id);
+        crossroad = new SimpleCrossroad(timeProvider, node, id);
     }
 
-    public LightManagerAgent(int id, OSMNode centerCrossroadNode) {
-        super(id, name);
+    public LightManagerAgent(int id, ITimeProvider timeProvider, OSMNode centerCrossroadNode) {
+        super(id, name, timeProvider);
         behaviourFactory = new LightManagerBehaviourFactory();
-        crossroad = new SimpleCrossroad(centerCrossroadNode, id);
+        crossroad = new SimpleCrossroad(timeProvider, centerCrossroadNode, id);
     }
 
     @Override

@@ -20,6 +20,8 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Random;
 
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 @RunWith(MockitoJUnitRunner.class)
 class HashAgentsContainerTest {
     private final Random random = new Random();
@@ -51,11 +53,11 @@ class HashAgentsContainerTest {
 
         for (int i = 0; i < agentsPerTypeCount; ++i) {
             // TODO: Mocks, not null
-            agents.add(new PedestrianAgent(idGenerator.get(PedestrianAgent.class), null));
+            agents.add(new PedestrianAgent(idGenerator.get(PedestrianAgent.class), null, null));
             agents.add(new BusAgent(idGenerator.get(BusAgent.class), null, null));
-            agents.add(new StationAgent(idGenerator.get(StationAgent.class), null));
-            agents.add(new VehicleAgent(idGenerator.get(VehicleAgent.class), mockVehicle));
-            agents.add(new LightManagerAgent(idGenerator.get(LightManagerAgent.class), mockNode));
+            agents.add(new StationAgent(idGenerator.get(StationAgent.class), null, null));
+            agents.add(new VehicleAgent(idGenerator.get(VehicleAgent.class), mockVehicle, null));
+            agents.add(new LightManagerAgent(idGenerator.get(LightManagerAgent.class), null, mockNode));
         }
         int agentTypes = agents.size() / agentsPerTypeCount;
 
@@ -66,7 +68,8 @@ class HashAgentsContainerTest {
 
             // Helps to randomize order of adding agents
             do {
-                Assert.assertTrue(agentsContainer.tryAdd(agents.get(currIndex)));
+                var agent = agents.get(currIndex);
+                assertTrue(agentsContainer.tryAdd(agent), "Should add agent: " + agent.getPredictedName());
                 currIndex = rotateIndex(currIndex, i, i + agentTypes);
             } while (currIndex != begIndex);
         }

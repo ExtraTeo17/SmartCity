@@ -20,6 +20,7 @@ import vehicles.TestPedestrian;
 
 import java.time.Duration;
 import java.time.Instant;
+import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -97,7 +98,7 @@ public class MasterAgent extends Agent {
         }
     }
 
-    private void setResultTime(Instant start, Instant end) {
+    private void setResultTime(LocalDateTime start, LocalDateTime end) {
         long seconds = Duration.between(start, end).getSeconds();
         String time = String.format(
                 "%d:%02d:%02d",
@@ -126,11 +127,5 @@ public class MasterAgent extends Agent {
     private void onReceiveBus(ACLMessage rcv) {
         agentsContainer.removeIf(BusAgent.class,
                 v -> v.getLocalName().equals(rcv.getSender().getLocalName()));
-    }
-
-
-    @Deprecated(forRemoval = true, since = "When all users have TimeManager service")
-    public static Date getSimulationTime() {
-        return timeProvider.getCurrentSimulationTime();
     }
 }

@@ -10,23 +10,26 @@ import jade.lang.acl.ACLMessage;
 import jade.util.leap.Properties;
 import org.javatuples.Pair;
 import osmproxy.elements.OSMStation;
-import smartcity.MasterAgent;
+import smartcity.ITimeProvider;
 import smartcity.lights.OptimizationResult;
 import smartcity.stations.StationStrategy;
 
-import java.time.Instant;
+import java.time.LocalDateTime;
 import java.util.List;
 
 public class StationAgent extends AbstractAgent {
-    public static final String name = StationAgent.class.getName().replace("Agent", "");
+    public static final String name = StationAgent.class.getSimpleName().replace("Agent", "");
 
     private final OSMStation station;
     private final StationStrategy stationStrategy;
 
-    StationAgent(final int agentId, OSMStation station) { // REMEMBER TO PRUNE BEYOND CIRCLE
-        super(agentId, name);
+    StationAgent(int id,
+                 ITimeProvider timeProvider,
+                 OSMStation station) { // REMEMBER TO PRUNE BEYOND CIRCLE
+        super(id, name, timeProvider);
+
         this.station = station;
-        this.stationStrategy = new StationStrategy(station, agentId);
+        this.stationStrategy = new StationStrategy(station, id);
 
         Behaviour communication = new CyclicBehaviour() {
             @Override
@@ -46,67 +49,77 @@ public class StationAgent extends AbstractAgent {
                 block(100);
             }
 
-            private Instant getInstantParameter(ACLMessage rcv, String param) {
+            private LocalDateTime getDateParameter(ACLMessage rcv, String param) {
                 var paramValue = rcv.getUserDefinedParameter(param);
                 if (paramValue == null) {
                     print("Did not receive " + param + " from " + rcv.getSender(), LoggerLevel.ERROR);
-                    return MasterAgent.getSimulationTime().toInstant();
+                    return timeProvider.getCurrentSimulationTime();
                 }
 
-                return Instant.parse(paramValue);
+                return LocalDateTime.parse(paramValue);
             }
 
             private void handleMessageFromBus(ACLMessage rcv) {
                 var messageKind = rcv.getPerformative();
+                String agentName = rcv.getSender().getLocalName();
                 if (messageKind == ACLMessage.INFORM) {
-                    String agentBusName = rcv.getSender().getLocalName();
                     String busLine = rcv.getUserDefinedParameter(MessageParameter.BUS_LINE);
-                    stationStrategy.addBusToFarAwayQueue(agentBusName,
-                            getInstantParameter(rcv, MessageParameter.ARRIVAL_TIME),
-                            getInstantParameter(rcv, MessageParameter.SCHEDULE_ARRIVAL));
-                    stationStrategy.addMappingOfBusAndTheirAgent(agentBusName, busLine);
-                    print("Got INFORM from " + rcv.getSender().getLocalName());
+                    stationStrategy.addBusAgentWithLine(agentName, busLine);
+
+                    var scheduled = getDateParameter(rcv, MessageParameter.SCHEDULE_ARRIVAL);
+                    var actual = getDateParameter(rcv, MessageParameter.ARRIVAL_TIME);
+                    stationStrategy.addBusToFarAwayQueue(agentName, scheduled, actual);
+
+                    print("Got INFORM from " + agentName);
                     // TODO: SEND MESSAGE ABOUT PASSENGERS
                 }
                 else if (messageKind == ACLMessage.REQUEST_WHEN) {
-                    stationStrategy.removeBusFromFarAwayQueue(rcv.getSender().getLocalName());
-                    stationStrategy.addBusToQueue(rcv.getSender().getLocalName(),
-                            getInstantParameter(rcv, MessageParameter.ARRIVAL_TIME),
-                            getInstantParameter(rcv, MessageParameter.SCHEDULE_ARRIVAL));
-                    ACLMessage msg = createMessage(ACLMessage.AGREE, rcv.getSender());
-                    print("Got REQUEST_WHEN from " + rcv.getSender().getLocalName());
+                    stationStrategy.removeBusFromFarAwayQueue(agentName);
+
+                    var scheduled = getDateParameter(rcv, MessageParameter.SCHEDULE_ARRIVAL);
+                    var actual = getDateParameter(rcv, MessageParameter.ARRIVAL_TIME);
+                    stationStrategy.addBusToQueue(agentName, scheduled, actual);
+
+                    var msg = createMessage(ACLMessage.AGREE, rcv.getSender());
+                    print("Got REQUEST_WHEN from " + agentName);
                     send(msg);
                 }
                 else if (messageKind == ACLMessage.AGREE) {
-                    stationStrategy.removeBusFromBusOnStationQueue(rcv.getSender().getLocalName());
-                    print("Got AGREE from " + rcv.getSender().getLocalName());
+                    stationStrategy.removeBusFromQueue(agentName);
+                    print("Got AGREE from " + agentName);
 
                 }
                 else {
-                    print("Unknown message type from Bus: " + messageKind, LoggerLevel.WARN);
+                    print("Unknown message type from " + agentName + ", type: " + messageKind, LoggerLevel.WARN);
                 }
             }
 
             private void handleMessageFromPedestrian(ACLMessage rcv) {
                 var messageKind = rcv.getPerformative();
+                var agentName = rcv.getSender().getLocalName();
                 if (messageKind == ACLMessage.INFORM) {
-                    stationStrategy.addPedestrianToFarAwayQueue(rcv.getSender().getLocalName(),
-                            rcv.getUserDefinedParameter(MessageParameter.DESIRED_BUS),
-                            getInstantParameter(rcv, MessageParameter.ARRIVAL_TIME));
+                    stationStrategy.addPedestrianToFarAwayQueue(agentName,
+                            rcv.getUserDefinedParameter(MessageParameter.DESIRED_BUS_LINE),
+                            getDateParameter(rcv, MessageParameter.ARRIVAL_TIME));
                 }
                 else if (messageKind == ACLMessage.REQUEST_WHEN) {
                     print("GET MESSAGE FROM PEDESTRIAN REQUEST_WHEN", LoggerLevel.DEBUG);
-                    stationStrategy.removePedestrianFromFarAwayQueue(rcv.getSender().getLocalName(), rcv.getUserDefinedParameter(MessageParameter.DESIRED_BUS));
-                    stationStrategy.addPedestrianToQueue(rcv.getSender().getLocalName(),
-                            rcv.getUserDefinedParameter(MessageParameter.DESIRED_BUS),
-                            getInstantParameter(rcv, MessageParameter.ARRIVAL_TIME));
+                    stationStrategy.removePedestrianFromFarAwayQueue(agentName,
+                            rcv.getUserDefinedParameter(MessageParameter.DESIRED_BUS_LINE));
+                    stationStrategy.addPedestrianToQueue(agentName,
+                            rcv.getUserDefinedParameter(MessageParameter.DESIRED_BUS_LINE),
+                            getDateParameter(rcv, MessageParameter.ARRIVAL_TIME));
 
                     var msg = createMessage(ACLMessage.REQUEST, rcv.getSender());
                     send(msg);
                 }
                 else if (messageKind == ACLMessage.AGREE) {
                     print("-----GET AGREE from PEDESTRIAN------", LoggerLevel.DEBUG);
-                    stationStrategy.removePedestrianFromBusOnStationQueue(rcv.getSender().getLocalName(), rcv.getUserDefinedParameter(MessageParameter.DESIRED_BUS));
+
+                    var desiredBusLine = rcv.getUserDefinedParameter(MessageParameter.DESIRED_BUS_LINE);
+                    if (!stationStrategy.removePedestrianFromQueue(agentName, desiredBusLine)) {
+                        stationStrategy.removePedestrianFromFarAwayQueue(agentName, desiredBusLine);
+                    }
                 }
                 else {
                     print("Unknown message type from Pedestrian: " + messageKind, LoggerLevel.WARN);

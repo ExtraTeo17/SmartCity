@@ -18,15 +18,18 @@ class AgentsFactory implements IAgentsFactory {
     private final ITimeProvider timeProvider;
 
     @Inject
-    public AgentsFactory(IdGenerator idGenerator, ITimeProvider timeProvider) {
+    public AgentsFactory(IdGenerator idGenerator,
+                         ITimeProvider timeProvider) {
         this.idGenerator = idGenerator;
         this.timeProvider = timeProvider;
     }
 
     @Override
     public VehicleAgent create(List<RouteNode> route, boolean testCar) {
-        MovingObjectImpl car = testCar ? new TestCar(route) : new MovingObjectImpl(route);
-        return new VehicleAgent(idGenerator.get(VehicleAgent.class), car);
+        MovingObjectImpl car = testCar ?
+                new TestCar(route, timeProvider) :
+                new MovingObjectImpl(route);
+        return new VehicleAgent(idGenerator.get(VehicleAgent.class), car, timeProvider);
     }
 
     @Override
@@ -36,7 +39,7 @@ class AgentsFactory implements IAgentsFactory {
 
     @Override
     public StationAgent create(OSMStation osmStation) {
-        return new StationAgent(idGenerator.get(StationAgent.class), osmStation);
+        return new StationAgent(idGenerator.get(StationAgent.class), timeProvider, osmStation);
     }
 
     @Override
@@ -48,12 +51,12 @@ class AgentsFactory implements IAgentsFactory {
 
     @Override
     public LightManagerAgent create(Node crossroad) {
-        return new LightManagerAgent(idGenerator.get(LightManagerAgent.class), crossroad);
+        return new LightManagerAgent(idGenerator.get(LightManagerAgent.class), timeProvider, crossroad);
     }
 
     @Override
     public LightManagerAgent create(OSMNode centerCrossroad) {
-        return new LightManagerAgent(idGenerator.get(LightManagerAgent.class), centerCrossroad);
+        return new LightManagerAgent(idGenerator.get(LightManagerAgent.class), timeProvider, centerCrossroad);
     }
 
     // TODO: Simplify to avoid 6 arguments
@@ -61,9 +64,9 @@ class AgentsFactory implements IAgentsFactory {
     public PedestrianAgent create(List<RouteNode> routeToStation, List<RouteNode> routeFromStation, String preferredBusLine,
                                   StationNode startStation, StationNode finishStation, boolean testPedestrian) {
         var pedestrian = testPedestrian ?
-                new TestPedestrian(routeToStation, routeFromStation, preferredBusLine, startStation, finishStation) :
+                new TestPedestrian(routeToStation, routeFromStation, preferredBusLine, startStation, finishStation, timeProvider) :
                 new Pedestrian(routeToStation, routeFromStation, preferredBusLine, startStation, finishStation);
-        return new PedestrianAgent(idGenerator.get(PedestrianAgent.class), pedestrian);
+        return new PedestrianAgent(idGenerator.get(PedestrianAgent.class), timeProvider, pedestrian);
     }
 
     @Override

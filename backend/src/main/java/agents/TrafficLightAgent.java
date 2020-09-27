@@ -4,16 +4,15 @@ import agents.abstractions.AbstractAgent;
 import agents.utilities.LightColor;
 import behaviourfactories.BasicLightsBehaviourFactory;
 import behaviourfactories.IBehaviourFactory;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import routing.core.IGeoPosition;
+import smartcity.ITimeProvider;
 
 import java.util.ArrayList;
 import java.util.List;
 
 // TODO: Unused?
 public class TrafficLightAgent extends AbstractAgent {
-    public static final String name = StationAgent.class.getName().replace("Agent", "");
+    public static final String name = StationAgent.class.getSimpleName().replace("Agent", "");
 
     // TODO: Inject as dependency
     private final IBehaviourFactory<TrafficLightAgent> behaviourFactory;
@@ -21,8 +20,8 @@ public class TrafficLightAgent extends AbstractAgent {
     private LightColor lightColor;
     private final List<String> agentsQueue;
 
-    public TrafficLightAgent(int id, IGeoPosition position) {
-        super(id, name);
+    public TrafficLightAgent(int id, ITimeProvider timeProvider, IGeoPosition position) {
+        super(id, name, timeProvider);
         this.position = position;
         this.behaviourFactory = new BasicLightsBehaviourFactory();
         this.lightColor = LightColor.RED;

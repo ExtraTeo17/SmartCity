@@ -116,7 +116,7 @@ public class AgentsCreator {
 
             var busLine = busInfo.busLine;
             for (var brigade : busInfo) {
-                var brigadeNr = brigade.getBrigadeNr();
+                var brigadeNr = brigade.brigadeId;
                 for (Timetable timetable : brigade) {
                     var agent = factory.create(routeInfo, timetable, busLine, brigadeNr);
                     boolean result = agentsContainer.tryAdd(agent);

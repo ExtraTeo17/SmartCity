@@ -2,28 +2,36 @@ package vehicles;
 
 import routing.RouteNode;
 import routing.StationNode;
-import smartcity.MasterAgent;
+import smartcity.ITimeProvider;
 
-import java.time.Instant;
+import java.time.LocalDateTime;
 import java.util.List;
 
 public class TestPedestrian extends Pedestrian {
-    public Instant start;
-    public Instant end;
+    private final ITimeProvider timeProvider;
 
-    public TestPedestrian(List<RouteNode> routeToStation, List<RouteNode> routeFromStation, String preferredBusLine,
-                          StationNode startStation, StationNode finishStation) {
+    public LocalDateTime start;
+    public LocalDateTime end;
+
+    public TestPedestrian(List<RouteNode> routeToStation,
+                          List<RouteNode> routeFromStation,
+                          String preferredBusLine,
+                          StationNode startStation,
+                          StationNode finishStation,
+                          ITimeProvider timeProvider) {
         super(routeToStation, routeFromStation, preferredBusLine, startStation, finishStation);
+        this.timeProvider = timeProvider;
     }
 
     @Override
     public void setState(DrivingState state) {
-        if (getState() == DrivingState.STARTING) {
-            start = MasterAgent.getSimulationTime().toInstant();
-        }
         super.setState(state);
-        if (state == DrivingState.AT_DESTINATION) {
-            end = MasterAgent.getSimulationTime().toInstant();
+        var currentTime = timeProvider.getCurrentSimulationTime();
+        if (state == DrivingState.STARTING) {
+            start = currentTime;
+        }
+        else if (state == DrivingState.AT_DESTINATION) {
+            end = currentTime;
         }
     }
 }

@@ -12,8 +12,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import smartcity.TimeProvider;
 import smartcity.lights.OptimizationResult;
+import smartcity.stations.ArrivalInfo;
 
-import java.time.Instant;
+import java.time.LocalDateTime;
 import java.util.List;
 
 // TODO: Move to agent
@@ -47,25 +48,26 @@ public class LightManagerBehaviourFactory implements IBehaviourFactory<LightMana
                 var crossroad = agent.getCrossroad();
                 switch (rcv.getPerformative()) {
                     case ACLMessage.INFORM -> {
-                        print(agent, rcv.getSender().getLocalName() + " is approaching in " + getInstantParameter(rcv,
-                                MessageParameter.ARRIVAL_TIME) + "ms.");
-                        crossroad.addCarToFarAwayQueue(getCarName(rcv),
-                                getIntParameter(rcv, MessageParameter.ADJACENT_OSM_WAY_ID),
-                                getInstantParameter(rcv, MessageParameter.ARRIVAL_TIME));
+                        var agentName = getAgentName(rcv);
+                        var time = getTimeParameter(rcv, MessageParameter.ARRIVAL_TIME);
+                        print(agent, agentName + " is approaching at " + time);
+
+                        var arrivalInfo = ArrivalInfo.of(agentName, time);
+                        crossroad.addCarToFarAwayQueue(getIntParameter(rcv, MessageParameter.ADJACENT_OSM_WAY_ID), arrivalInfo);
                     }
                     case ACLMessage.REQUEST_WHEN -> {
                         print(agent, rcv.getSender().getLocalName() + " is waiting on way " + getIntParameter(rcv,
                                 MessageParameter.ADJACENT_OSM_WAY_ID) + ".");
-                        crossroad.removeCarFromFarAwayQueue(getCarName(rcv), getIntParameter(rcv,
-                                MessageParameter.ADJACENT_OSM_WAY_ID));
+                        crossroad.removeCarFromFarAwayQueue(getIntParameter(rcv,
+                                MessageParameter.ADJACENT_OSM_WAY_ID), getAgentName(rcv));
                         ACLMessage agree = new ACLMessage(ACLMessage.AGREE);
                         agree.addReceiver(rcv.getSender());
                         Properties properties = new Properties();
                         properties.setProperty(MessageParameter.TYPE, MessageParameter.LIGHT);
                         agree.setAllUserDefinedParameters(properties);
                         agent.send(agree);
-                        crossroad.addCarToQueue(getCarName(rcv),
-                                getIntParameter(rcv, MessageParameter.ADJACENT_OSM_WAY_ID));
+                        crossroad.addCarToQueue(getIntParameter(rcv, MessageParameter.ADJACENT_OSM_WAY_ID), getAgentName(rcv)
+                        );
                     }
                     case ACLMessage.AGREE -> {
                         print(agent, rcv.getSender().getLocalName() + " passed the light.");
@@ -79,34 +81,33 @@ public class LightManagerBehaviourFactory implements IBehaviourFactory<LightMana
                 // TODO: Should be refactored - too much usage of crossroad methods.
                 var crossroad = agent.getCrossroad();
                 switch (rcv.getPerformative()) {
-                    case ACLMessage.INFORM:
-                        print(agent, rcv.getSender().getLocalName() + " is approaching in " + getInstantParameter(rcv,
-                                MessageParameter.ARRIVAL_TIME) + "ms.");
-
-                        crossroad.addPedestrianToFarAwayQueue(rcv.getSender().getLocalName(),
-                                getIntParameter(rcv, MessageParameter.ADJACENT_OSM_WAY_ID),
-                                getInstantParameter(rcv, MessageParameter.ARRIVAL_TIME));
-
-                    case ACLMessage.REQUEST_WHEN:
+                    case ACLMessage.INFORM -> {
+                        var agentName = getAgentName(rcv);
+                        var time = getTimeParameter(rcv, MessageParameter.ARRIVAL_TIME);
+                        print(agent, agentName + " is approaching in " + time + "ms.");
+                        var arrivalInfo = ArrivalInfo.of(agentName, time);
+                        crossroad.addPedestrianToFarAwayQueue(getIntParameter(rcv, MessageParameter.ADJACENT_OSM_WAY_ID),
+                                arrivalInfo);
+                    }
+                    case ACLMessage.REQUEST_WHEN -> {
                         print(agent, rcv.getSender().getLocalName() + " is waiting on way " + getIntParameter(rcv,
                                 MessageParameter.ADJACENT_OSM_WAY_ID) + ".");
-                        crossroad.removePedestrianFromFarAwayQueue(rcv.getSender().getLocalName(),
-                                getIntParameter(rcv, MessageParameter.ADJACENT_OSM_WAY_ID));
+                        crossroad.removePedestrianFromFarAwayQueue(getIntParameter(rcv, MessageParameter.ADJACENT_OSM_WAY_ID), rcv.getSender().getLocalName()
+                        );
                         ACLMessage agree = new ACLMessage(ACLMessage.AGREE);
                         agree.addReceiver(rcv.getSender());
                         Properties properties = new Properties();
                         properties.setProperty(MessageParameter.TYPE, MessageParameter.LIGHT);
                         agree.setAllUserDefinedParameters(properties);
                         agent.send(agree);
-
-                        crossroad.addPedestrianToQueue(rcv.getSender().getLocalName(),
-                                getIntParameter(rcv, MessageParameter.ADJACENT_OSM_WAY_ID));
-                        break;
-                    case ACLMessage.AGREE:
+                        crossroad.addPedestrianToQueue(getIntParameter(rcv, MessageParameter.ADJACENT_OSM_WAY_ID), rcv.getSender().getLocalName()
+                        );
+                    }
+                    case ACLMessage.AGREE -> {
                         print(agent, rcv.getSender().getLocalName() + " passed the light.");
                         crossroad.removePedestrianFromQueue(getIntParameter(rcv, MessageParameter.ADJACENT_OSM_WAY_ID));
-                    default:
-                        print(agent, "Wait");
+                    }
+                    default -> print(agent, "Wait");
                 }
             }
         };
@@ -155,11 +156,11 @@ public class LightManagerBehaviourFactory implements IBehaviourFactory<LightMana
         return Integer.parseInt(rcv.getUserDefinedParameter(param));
     }
 
-    private Instant getInstantParameter(ACLMessage rcv, String param) {
-        return Instant.parse(rcv.getUserDefinedParameter(param));
+    private LocalDateTime getTimeParameter(ACLMessage rcv, String param) {
+        return LocalDateTime.parse(rcv.getUserDefinedParameter(param));
     }
 
-    private String getCarName(ACLMessage rcv) {
+    private String getAgentName(ACLMessage rcv) {
         return rcv.getSender().getLocalName();
     }
 
