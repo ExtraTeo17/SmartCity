@@ -1,7 +1,6 @@
 package osmproxy.elements;
 
 
-import org.jetbrains.annotations.NotNull;
 import org.w3c.dom.NamedNodeMap;
 import routing.core.IGeoPosition;
 
@@ -10,7 +9,7 @@ import java.util.Iterator;
 import java.util.List;
 
 public class OSMNode extends OSMElement
-        implements IGeoPosition, Iterable<OSMWay> {
+        implements IGeoPosition {
 
     protected final List<OSMWay> parentWays;
     protected final double lat;
@@ -45,11 +44,13 @@ public class OSMNode extends OSMElement
         return lon;
     }
 
-    public final void addParentWay(final OSMWay osmWay) {
+    public void addParentWay(final OSMWay osmWay) {
         parentWays.add(osmWay);
     }
 
-    public final boolean isTypeA() {
+    public Iterator<OSMWay> getParentWaysIterator() {return parentWays.iterator();}
+
+    public boolean isTypeA() {
         return parentWays.size() > 1;
     }
 
@@ -78,11 +79,5 @@ public class OSMNode extends OSMElement
         }
 
         return true;
-    }
-
-    @NotNull
-    @Override
-    public Iterator<OSMWay> iterator() {
-        return parentWays.iterator();
     }
 }

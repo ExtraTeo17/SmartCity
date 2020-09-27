@@ -45,7 +45,7 @@ class HashAgentsContainerTest {
         List<AbstractAgent> agents = new ArrayList<>(agentsPerTypeCount);
 
         var mockNode = Mockito.mock(OSMNode.class);
-        Mockito.when(mockNode.iterator()).thenReturn(Collections.emptyIterator());
+        Mockito.when(mockNode.getParentWaysIterator()).thenReturn(Collections.emptyIterator());
         var mockVehicle = Mockito.mock(MovingObject.class);
         Mockito.when(mockVehicle.getVehicleType()).thenReturn("car");
 

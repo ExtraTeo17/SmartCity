@@ -1,6 +1,5 @@
 package smartcity.lights;
 
-import com.google.common.collect.Iterables;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import osmproxy.elements.OSMNode;
@@ -19,7 +18,7 @@ class CrossroadInfo {
         this.firstLightGroupInfo = new ArrayList<>();
         this.secondLightGroupInfo = new ArrayList<>();
 
-        var waysIter = centerNode.iterator();
+        var waysIter = centerNode.getParentWaysIterator();
         if (!waysIter.hasNext()) {
             logger.warn("Empty node: " + centerNode.getId());
             return;
@@ -28,7 +27,7 @@ class CrossroadInfo {
         OSMWay firstWay = waysIter.next();
         var firstWayNeighborPos = firstWay.getLightNeighborPos();
         firstLightGroupInfo.add(new LightInfo(firstWay, centerNode));
-        for (OSMWay parentWay : Iterables.skip(centerNode, 1)) {
+        for (OSMWay parentWay = waysIter.next(); waysIter.hasNext(); parentWay = waysIter.next()) {
             var nextWayLightNeighborPos = parentWay.getLightNeighborPos();
             double cosineCenterNodeNextWay = firstWayNeighborPos.cosineAngle(centerNode, nextWayLightNeighborPos);
             if (cosineCenterNodeNextWay < COSINE_OF_135_DEGREES) {
