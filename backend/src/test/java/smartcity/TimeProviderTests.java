@@ -12,7 +12,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 class TimeProviderTests {
 
     @Test
-    void getCurrentSimulationTime() {
+    void getCurrentSimulationTime_happyPath() {
         // Arrange
         var startTime = LocalDateTime.of(LocalDate.now().minusDays(1),
                 LocalTime.of(10, 10, 10));

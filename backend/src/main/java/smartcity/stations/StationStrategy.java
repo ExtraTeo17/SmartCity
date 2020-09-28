@@ -123,7 +123,7 @@ public class StationStrategy {
                 result.addBusAndPedestrianGrantedPassthrough(busLine, passengersThatCanLeave);
             }
             else if (actualTime.isBefore(scheduledTimeMinusWait)) {
-                logger.info("------------------BUS TOO EARLY-----------------------");
+                logger.trace("------------------BUS TOO EARLY-----------------------");
             }
             else {
                 logger.warn("Undetermined situation for line " + busLine + ", scheduledTime" + scheduledTime +

@@ -14,6 +14,7 @@ import routing.LightManagerNode;
 import smartcity.ITimeProvider;
 import vehicles.MovingObject;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 public abstract class AbstractAgent extends Agent {
@@ -120,5 +121,29 @@ public abstract class AbstractAgent extends Agent {
         var result = new Properties();
         result.setProperty(MessageParameter.TYPE, senderType);
         return result;
+    }
+
+    protected String getSender(ACLMessage rcv) {
+        return rcv.getSender().getLocalName();
+    }
+
+    protected LocalDateTime getDateParameter(ACLMessage rcv, String param) {
+        var paramValue = rcv.getUserDefinedParameter(param);
+        if (paramValue == null) {
+            print("Did not receive " + param + " from " + rcv.getSender(), LoggerLevel.ERROR);
+            return timeProvider.getCurrentSimulationTime();
+        }
+
+        return LocalDateTime.parse(paramValue);
+    }
+
+    protected int getIntParameter(ACLMessage rcv, String param) {
+        var paramValue = rcv.getUserDefinedParameter(param);
+        if (paramValue == null) {
+            print("Did not receive " + param + " from " + rcv.getSender(), LoggerLevel.ERROR);
+            return 0;
+        }
+
+        return Integer.parseInt(rcv.getUserDefinedParameter(param));
     }
 }

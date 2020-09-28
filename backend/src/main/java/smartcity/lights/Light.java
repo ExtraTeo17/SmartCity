@@ -111,12 +111,12 @@ public class Light implements IGeoPosition {
         farAwayCarMap.put(arrivalInfo.agentName, arrivalInfo.arrivalTime);
     }
 
-    void addCarToQueue(String carName) {
-        carQueue.add(carName);
+    void addCarToQueue(String agentName) {
+        carQueue.add(agentName);
     }
 
-    void removeCarFromFarAwayQueue(String carName) {
-        farAwayCarMap.remove(carName);
+    void removeCarFromFarAwayQueue(String agentName) {
+        farAwayCarMap.remove(agentName);
     }
 
     void removeCarFromQueue() {

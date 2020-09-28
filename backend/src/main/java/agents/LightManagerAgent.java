@@ -1,8 +1,11 @@
 package agents;
 
 import agents.abstractions.AbstractAgent;
-import behaviourfactories.IBehaviourFactory;
-import behaviourfactories.LightManagerBehaviourFactory;
+import agents.utilities.MessageParameter;
+import jade.core.behaviours.CyclicBehaviour;
+import jade.core.behaviours.TickerBehaviour;
+import jade.lang.acl.ACLMessage;
+import jade.util.leap.Properties;
 import org.jxmapviewer.JXMapViewer;
 import org.jxmapviewer.painter.Painter;
 import org.slf4j.Logger;
@@ -11,8 +14,11 @@ import org.w3c.dom.Node;
 import osmproxy.elements.OSMNode;
 import routing.core.IGeoPosition;
 import smartcity.ITimeProvider;
+import smartcity.TimeProvider;
 import smartcity.lights.ICrossroad;
+import smartcity.lights.OptimizationResult;
 import smartcity.lights.SimpleCrossroad;
+import smartcity.stations.ArrivalInfo;
 
 import java.util.List;
 
@@ -21,18 +27,15 @@ public class LightManagerAgent extends AbstractAgent {
     private static final Logger logger = LoggerFactory.getLogger(LightManagerAgent.class);
 
     // TODO: Inject it as dependency
-    private final IBehaviourFactory<LightManagerAgent> behaviourFactory;
     private final ICrossroad crossroad;
 
     public LightManagerAgent(int id, ITimeProvider timeProvider, Node node) {
         super(id, name, timeProvider);
-        behaviourFactory = new LightManagerBehaviourFactory();
         crossroad = new SimpleCrossroad(timeProvider, node, id);
     }
 
     public LightManagerAgent(int id, ITimeProvider timeProvider, OSMNode centerCrossroadNode) {
         super(id, name, timeProvider);
-        behaviourFactory = new LightManagerBehaviourFactory();
         crossroad = new SimpleCrossroad(timeProvider, centerCrossroadNode, id);
     }
 
@@ -40,8 +43,127 @@ public class LightManagerAgent extends AbstractAgent {
     protected void setup() {
         print("I'm a traffic manager.");
         crossroad.startLifetime();
-        addBehaviour(behaviourFactory.createCyclicBehaviour(this));
-        addBehaviour(behaviourFactory.createTickerBehaviour(this));
+
+        var switchLights = new TickerBehaviour(this, 100 / TimeProvider.TIME_SCALE) {
+            @Override
+            protected void onTick() {
+                //for all Light check
+                //check if time from last green > written time
+                // if so, put in the queue
+                //if not
+                // check count of people (remember about 2 person on pedestrian light= 1 car)
+                // if queue is empty
+                // apply strategy
+                //for elements in queue (if there are elements in queue, make green)
+                var crossroad = getCrossroad();
+                OptimizationResult result = crossroad.requestOptimizations();
+                handleOptimizationResult(result);
+            }
+
+            private void handleOptimizationResult(OptimizationResult result) {
+                List<String> agents = result.carsFreeToProceed();
+                for (String agentName : agents) {
+                    answerCanProceed(agentName);
+                }
+            }
+
+            private void answerCanProceed(String carName) {
+                print(carName + " can proceed.");
+                ACLMessage msg = createMessage(ACLMessage.REQUEST, carName);
+                Properties properties =  createProperties(MessageParameter.LIGHT);
+                msg.setAllUserDefinedParameters(properties);
+                send(msg);
+            }
+
+        };
+
+        var communicate = new CyclicBehaviour() {
+            @Override
+            public void action() {
+                ACLMessage rcv = receive();
+                if (rcv != null) {
+                    handleMessageFromRecipient(rcv);
+                }
+                else {
+                    block();
+                }
+            }
+
+            private void handleMessageFromRecipient(ACLMessage rcv) {
+                String recipientType = rcv.getUserDefinedParameter(MessageParameter.TYPE);
+                switch (recipientType) {
+                    case MessageParameter.VEHICLE -> handleMessageFromVehicle(rcv);
+                    case MessageParameter.PEDESTRIAN -> handleMessageFromPedestrian(rcv);
+                }
+            }
+
+            private void handleMessageFromVehicle(ACLMessage rcv) {
+                // TODO: Should be refactored - too much usage of crossroad methods.
+                var crossroad = getCrossroad();
+                var agentName = getSender(rcv);
+                switch (rcv.getPerformative()) {
+                    case ACLMessage.INFORM -> {
+                        var time = getDateParameter(rcv, MessageParameter.ARRIVAL_TIME);
+                        print(agentName + " is approaching at " + time);
+
+                        var arrivalInfo = ArrivalInfo.of(agentName, time);
+                        crossroad.addCarToFarAwayQueue(getIntParameter(rcv, MessageParameter.ADJACENT_OSM_WAY_ID), arrivalInfo);
+                    }
+                    case ACLMessage.REQUEST_WHEN -> {
+                        print(agentName + " is waiting on way " + getIntParameter(rcv,
+                                MessageParameter.ADJACENT_OSM_WAY_ID) + ".");
+                        crossroad.removeCarFromFarAwayQueue(getIntParameter(rcv,
+                                MessageParameter.ADJACENT_OSM_WAY_ID), agentName);
+                        ACLMessage agree = createMessage(ACLMessage.AGREE, agentName);
+                        Properties properties = createProperties(MessageParameter.LIGHT);
+                        agree.setAllUserDefinedParameters(properties);
+                        send(agree);
+                        crossroad.addCarToQueue(getIntParameter(rcv, MessageParameter.ADJACENT_OSM_WAY_ID), agentName);
+                    }
+                    case ACLMessage.AGREE -> {
+                        print(agentName + " passed the light.");
+                        crossroad.removeCarFromQueue(getIntParameter(rcv, MessageParameter.ADJACENT_OSM_WAY_ID));
+                    }
+                    default -> logger.info("Wait");
+                }
+            }
+
+            private void handleMessageFromPedestrian(ACLMessage rcv) {
+                // TODO: Should be refactored - too much usage of crossroad methods.
+                var crossroad = getCrossroad();
+                var agentName = getSender(rcv);
+                switch (rcv.getPerformative()) {
+                    case ACLMessage.INFORM -> {
+                        var time = getDateParameter(rcv, MessageParameter.ARRIVAL_TIME);
+                        print(agentName + " is approaching in " + time);
+                        var arrivalInfo = ArrivalInfo.of(agentName, time);
+                        crossroad.addPedestrianToFarAwayQueue(getIntParameter(rcv, MessageParameter.ADJACENT_OSM_WAY_ID),
+                                arrivalInfo);
+                    }
+                    case ACLMessage.REQUEST_WHEN -> {
+                        print(agentName + " is waiting on way " + getIntParameter(rcv,
+                                MessageParameter.ADJACENT_OSM_WAY_ID) + ".");
+                        crossroad.removePedestrianFromFarAwayQueue(getIntParameter(rcv, MessageParameter.ADJACENT_OSM_WAY_ID),
+                                agentName);
+                        ACLMessage agree = new ACLMessage(ACLMessage.AGREE);
+                        agree.addReceiver(rcv.getSender());
+                        Properties properties = createProperties(MessageParameter.LIGHT);
+                        agree.setAllUserDefinedParameters(properties);
+                        send(agree);
+                        crossroad.addPedestrianToQueue(getIntParameter(rcv, MessageParameter.ADJACENT_OSM_WAY_ID), agentName
+                        );
+                    }
+                    case ACLMessage.AGREE -> {
+                        print(agentName + " passed the light.");
+                        crossroad.removePedestrianFromQueue(getIntParameter(rcv, MessageParameter.ADJACENT_OSM_WAY_ID));
+                    }
+                    default -> print("Wait");
+                }
+            }
+        };
+
+        addBehaviour(switchLights);
+        addBehaviour(communicate);
     }
 
     public ICrossroad getCrossroad() {

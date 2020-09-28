@@ -14,7 +14,6 @@ import smartcity.ITimeProvider;
 import smartcity.lights.OptimizationResult;
 import smartcity.stations.StationStrategy;
 
-import java.time.LocalDateTime;
 import java.util.List;
 
 public class StationAgent extends AbstractAgent {
@@ -49,15 +48,6 @@ public class StationAgent extends AbstractAgent {
                 block(100);
             }
 
-            private LocalDateTime getDateParameter(ACLMessage rcv, String param) {
-                var paramValue = rcv.getUserDefinedParameter(param);
-                if (paramValue == null) {
-                    print("Did not receive " + param + " from " + rcv.getSender(), LoggerLevel.ERROR);
-                    return timeProvider.getCurrentSimulationTime();
-                }
-
-                return LocalDateTime.parse(paramValue);
-            }
 
             private void handleMessageFromBus(ACLMessage rcv) {
                 var messageKind = rcv.getPerformative();
