@@ -5,7 +5,7 @@ import org.slf4j.LoggerFactory;
 import osmproxy.buses.Timetable;
 import routing.LightManagerNode;
 import routing.RouteNode;
-import routing.Router;
+import routing.RoutingConstants;
 import routing.StationNode;
 import routing.core.IGeoPosition;
 import smartcity.ITimeProvider;
@@ -37,7 +37,10 @@ public class Bus extends MovingObject {
 
     // TODO: Factory for vehicles - inject
     public Bus(ITimeProvider timeProvider,
-               List<RouteNode> route, Timetable timetable, String busLine,
+               List<RouteNode> route,
+               List<RouteNode> uniformRoute,
+               Timetable timetable,
+               String busLine,
                String brigadeNr) {
         super(40);
         this.timeProvider = timeProvider;
@@ -46,7 +49,7 @@ public class Bus extends MovingObject {
         this.busLine = busLine;
         this.logger = LoggerFactory.getLogger(Bus.class.getName() + " (l_" + busLine + ") (br_" + brigadeNr + ")");
 
-        this.route = Router.uniformRoute(displayRoute);
+        this.route = uniformRoute;
         this.stationsForPassengers = new HashMap<>();
         this.stationNodesOnRoute = new ArrayList<>();
         for (RouteNode node : route) {
@@ -218,7 +221,7 @@ public class Bus extends MovingObject {
 
     @Override
     public int getMillisecondsToNextLight() {
-        return ((closestLightIndex - moveIndex) * Router.STEP_CONSTANT) / getSpeed();
+        return ((closestLightIndex - moveIndex) * RoutingConstants.STEP_CONSTANT) / getSpeed();
     }
 
     // TODO: Are they though?
@@ -226,7 +229,7 @@ public class Bus extends MovingObject {
     //  Then his speed is actually 3600 / (9ms + 5ms) = 257 / TIME_SCALE = 25.7 instead of 40
     //  This calculation is highly dependent on processor speed :(
     public int getMillisecondsToNextStation() {
-        return ((closestStationIndex - moveIndex) * Router.STEP_CONSTANT) / getSpeed();
+        return ((closestStationIndex - moveIndex) * RoutingConstants.STEP_CONSTANT) / getSpeed();
     }
 
     @Override

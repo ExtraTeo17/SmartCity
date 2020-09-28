@@ -8,7 +8,7 @@ import jade.core.behaviours.TickerBehaviour;
 import jade.lang.acl.ACLMessage;
 import jade.util.leap.Properties;
 import routing.LightManagerNode;
-import routing.Router;
+import routing.RoutingConstants;
 import routing.StationNode;
 import smartcity.ITimeProvider;
 import smartcity.MasterAgent;
@@ -34,7 +34,7 @@ public class PedestrianAgent extends AbstractAgent {
         getNextStation();
 
         pedestrian.setState(DrivingState.MOVING);
-        Behaviour move = new TickerBehaviour(this, Router.STEP_CONSTANT / pedestrian.getSpeed()) {
+        Behaviour move = new TickerBehaviour(this, RoutingConstants.STEP_CONSTANT / pedestrian.getSpeed()) {
             @Override
             public void onTick() {
                 if (pedestrian.isAtTrafficLights()) {

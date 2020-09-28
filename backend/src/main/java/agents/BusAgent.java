@@ -11,7 +11,7 @@ import jade.util.leap.Properties;
 import jade.wrapper.AgentState;
 import routing.LightManagerNode;
 import routing.RouteNode;
-import routing.Router;
+import routing.RoutingConstants;
 import routing.StationNode;
 import smartcity.ITimeProvider;
 import smartcity.MasterAgent;
@@ -46,7 +46,7 @@ public class BusAgent extends AbstractAgent {
 
         // TODO: Executed each x = 3600 / bus.getSpeed() = 3600m / (40 * TIME_SCALE) = 3600 / 400 = 9ms
         //   Maybe decrease the interval? - I don't think processor can keep up with all of this.
-        Behaviour move = new TickerBehaviour(this, Router.STEP_CONSTANT / bus.getSpeed()) {
+        Behaviour move = new TickerBehaviour(this, RoutingConstants.STEP_CONSTANT / bus.getSpeed()) {
             @Override
             public void onTick() {
                 if (bus.isAtTrafficLights()) {

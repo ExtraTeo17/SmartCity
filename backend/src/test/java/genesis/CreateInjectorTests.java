@@ -9,6 +9,8 @@ import osmproxy.OsmModule;
 import osmproxy.buses.BusModule;
 import routing.RoutingModule;
 import smartcity.SmartCityModule;
+import smartcity.config.ConfigMutator;
+import testutils.ReflectionHelper;
 import web.WebModule;
 
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
@@ -19,6 +21,7 @@ class CreateInjectorTests {
     @Test
     void getInstance_fromAllModules() {
         // Arrange
+        ReflectionHelper.setStatic("counter", ConfigMutator.class, 0);
         var injector =
                 Guice.createInjector(
                         new MainModule(4001),

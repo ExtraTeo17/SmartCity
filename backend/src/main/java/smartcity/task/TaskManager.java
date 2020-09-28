@@ -18,7 +18,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import routing.IRouteGenerator;
 import routing.RouteNode;
-import routing.Router;
+import routing.RoutingConstants;
 import routing.StationNode;
 import routing.core.IGeoPosition;
 import routing.core.IZone;
@@ -130,8 +130,8 @@ public class TaskManager implements ITaskManager {
 
     private IGeoPosition generateRandomOffset(int radius) {
         double angle = random.nextDouble() * Math.PI * 2;
-        double lat = Math.sin(angle) * radius * Router.DEGREES_PER_METER;
-        double lng = Math.cos(angle) * radius * Router.DEGREES_PER_METER * Math.cos(lat);
+        double lat = Math.sin(angle) * radius * RoutingConstants.DEGREES_PER_METER;
+        double lng = Math.cos(angle) * radius * RoutingConstants.DEGREES_PER_METER * Math.cos(lat);
         return Position.of(lat, lng);
     }
 

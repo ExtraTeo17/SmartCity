@@ -19,9 +19,7 @@ import vehicles.TestCar;
 import vehicles.TestPedestrian;
 
 import java.time.Duration;
-import java.time.Instant;
 import java.time.LocalDateTime;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -91,7 +89,7 @@ public class MasterAgent extends Agent {
             var pedestrian = agent.getPedestrian();
             if (pedestrian instanceof TestPedestrian) {
                 var testPedestrian = (TestPedestrian) pedestrian;
-                setResultTime(testPedestrian.start, testPedestrian.end);
+                setResultTime(testPedestrian.getStart(), testPedestrian.getEnd());
             }
 
             agentsContainer.remove(agent);
@@ -117,7 +115,7 @@ public class MasterAgent extends Agent {
             var vehicle = agent.getVehicle();
             if (vehicle instanceof TestCar) {
                 var testVehicle = (TestCar) vehicle;
-                setResultTime(testVehicle.start, testVehicle.end);
+                setResultTime(testVehicle.getStart(), testVehicle.getEnd());
             }
 
             agentsContainer.remove(agent);

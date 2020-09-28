@@ -1,7 +1,6 @@
 package routing;
 
 import com.google.common.annotations.Beta;
-import com.google.common.collect.Lists;
 import com.google.inject.Inject;
 import org.javatuples.Pair;
 import org.slf4j.Logger;
@@ -20,15 +19,9 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 // TODO: Add fields to this class and make it some kind of service (not static)
-public final class Router implements IRouteGenerator {
-    public static final int STEP_SIZE_METERS = 1;
-    public static final int M_MILLISECONDS_TO_KM_HOUR = 3600;
-    public static final int STEP_CONSTANT = STEP_SIZE_METERS * M_MILLISECONDS_TO_KM_HOUR;
-
-    public static final double EARTH_RADIUS_METERS = 6_378_137;
-    public static final double METERS_PER_DEGREE = EARTH_RADIUS_METERS * Math.PI / 180.0;
-    public static final double DEGREES_PER_METER = 1 / METERS_PER_DEGREE;
-
+final class Router implements
+        IRouteGenerator,
+        IRouteTransformer {
     private static final Logger logger = LoggerFactory.getLogger(Router.class);
 
     private final IMapAccessManager mapAccessManager;
@@ -94,6 +87,43 @@ public final class Router implements IRouteGenerator {
         return getRouteWithAdditionalNodes(busRouteData.route, managers);
     }
 
+    // TODO: In some cases distance is 0 -> dx|dy is NaN -> same nodes?
+    @SuppressWarnings("FeatureEnvy")
+    @Override
+    public List<RouteNode> uniformRoute(List<RouteNode> route) {
+        List<RouteNode> newRoute = new ArrayList<>();
+        for (int i = 0; i < route.size() - 1; ++i) {
+            RouteNode routeA = route.get(i);
+            RouteNode routeB = route.get(i + 1);
+
+            double x = routeB.getLng() - routeA.getLng();
+            double y = routeB.getLat() - routeA.getLat();
+
+            double distance = RoutingConstants.METERS_PER_DEGREE * Math.sqrt(x * x + y * y);
+
+            double dx = x / distance;
+            double dy = y / distance;
+
+            double lon = routeA.getLng();
+            double lat = routeA.getLat();
+            newRoute.add(routeA);
+            for (int p = RoutingConstants.STEP_SIZE_METERS; p < distance; p += RoutingConstants.STEP_SIZE_METERS) {
+                lon = lon + RoutingConstants.STEP_SIZE_METERS * dx;
+                lat = lat + RoutingConstants.STEP_SIZE_METERS * dy;
+                newRoute.add(new RouteNode(lat, lon));
+            }
+        }
+
+        if (route.size() > 0) {
+            newRoute.add(route.get(route.size() - 1));
+        }
+
+        return newRoute;
+    }
+
+    /////////////////////////////////////////////////////////////
+    //  HELPERS - Most are abominable :(
+    /////////////////////////////////////////////////////////////
     private static List<RouteNode> createRouteNodeList(RouteInfo routeInfo) {
         List<RouteNode> routeNodes = new ArrayList<>();
         for (var route : routeInfo) {
@@ -122,10 +152,6 @@ public final class Router implements IRouteGenerator {
         return new RouteNode(waypoint.getLat(), waypoint.getLng());
     }
 
-    /////////////////////////////////////////////////////////////
-    //  HELPERS - Most are abominable :(
-    /////////////////////////////////////////////////////////////
-
     private static Pair<List<Long>, List<RouteNode>> findRoute(IGeoPosition pointA, IGeoPosition pointB, boolean onFoot) {
         return osmproxy.HighwayAccessor.getOsmWayIdsAndPointList(pointA.getLat(), pointA.getLng(), pointB.getLat(),
                 pointB.getLng(), onFoot);
@@ -134,17 +160,13 @@ public final class Router implements IRouteGenerator {
     private static List<RouteNode> getManagersForLights(List<OSMLight> lights) {
         List<RouteNode> managers = new ArrayList<>();
         for (OSMLight light : lights) {
-            addLightManagerNodeToManagersList(managers, light);
+            Pair<Long, Long> osmWayIdOsmLightId = Pair.with(light.getAdherentWayId(), light.getId());
+            RouteNode nodeToAdd = MasterAgent.wayIdLightIdToLightManagerNode.get(osmWayIdOsmLightId);
+            if (nodeToAdd != null && !lastManagerIdEqualTo(managers, nodeToAdd)) {
+                managers.add(nodeToAdd);
+            }
         }
         return managers;
-    }
-
-    private static void addLightManagerNodeToManagersList(List<RouteNode> managers, OSMLight light) {
-        Pair<Long, Long> osmWayIdOsmLightId = Pair.with(light.getAdherentWayId(), light.getId());
-        RouteNode nodeToAdd = MasterAgent.wayIdLightIdToLightManagerNode.get(osmWayIdOsmLightId);
-        if (nodeToAdd != null && !lastManagerIdEqualTo(managers, nodeToAdd)) {
-            managers.add(nodeToAdd);
-        }
     }
 
     private static boolean lastManagerIdEqualTo(List<RouteNode> managers, RouteNode nodeToAdd) {
@@ -165,6 +187,7 @@ public final class Router implements IRouteGenerator {
         return route;
     }
 
+    @SuppressWarnings("FeatureEnvy")
     private static int findPositionOfElementOnRoute(List<RouteNode> route, RouteNode manager) {
         int minIndex = -1;
         double minDistance = Double.MAX_VALUE;
@@ -188,35 +211,6 @@ public final class Router implements IRouteGenerator {
         }
 
         return minIndex + 1;
-    }
-
-    // TODO: In some cases distance is 0 -> dx|dy is NaN -> same nodes?
-    public static List<RouteNode> uniformRoute(List<RouteNode> route) {
-        List<RouteNode> newRoute = new ArrayList<>();
-        for (int i = 0; i < route.size() - 1; i++) {
-            RouteNode routeA = route.get(i);
-            RouteNode routeB = route.get(i + 1);
-
-            double x = routeB.getLng() - routeA.getLng();
-            double y = routeB.getLat() - routeA.getLat();
-
-            double distance = METERS_PER_DEGREE * Math.sqrt(x * x + y * y);
-
-            double dx = x / distance;
-            double dy = y / distance;
-
-            double lon = routeA.getLng();
-            double lat = routeA.getLat();
-            newRoute.add(routeA);
-            for (int p = STEP_SIZE_METERS; p < distance; p += STEP_SIZE_METERS) {
-                lon = lon + STEP_SIZE_METERS * dx;
-                lat = lat + STEP_SIZE_METERS * dy;
-                newRoute.add(new RouteNode(lat, lon));
-            }
-        }
-        newRoute.add(route.get(route.size() - 1));
-
-        return newRoute;
     }
 
     private static BusRouteData generateBusRoute(List<OSMWay> route) {

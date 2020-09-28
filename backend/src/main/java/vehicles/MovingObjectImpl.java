@@ -2,24 +2,24 @@ package vehicles;
 
 import routing.LightManagerNode;
 import routing.RouteNode;
-import routing.Router;
+import routing.RoutingConstants;
 import routing.core.Position;
 
 import java.util.List;
 
 // TODO: Maybe rename to Car - more descriptive?
 public class MovingObjectImpl extends MovingObject {
-    public DrivingState state = DrivingState.STARTING;
     private final List<RouteNode> displayRoute;
     private final List<RouteNode> route;
+
+    private DrivingState state = DrivingState.STARTING;
     private int index = 0;
     private int closestLightIndex = Integer.MAX_VALUE;
 
-    public MovingObjectImpl(List<RouteNode> displayRoute) {
+    public MovingObjectImpl(List<RouteNode> displayRoute, List<RouteNode> uniformRoute) {
         super(50);
         this.displayRoute = displayRoute;
-        // TODO: Inject it via constructor, not create here
-        this.route = Router.uniformRoute(displayRoute);
+        this.route = uniformRoute;
     }
 
     // TODO: Why car is moving backwards here? Change name of the function to describe behaviour
@@ -101,7 +101,7 @@ public class MovingObjectImpl extends MovingObject {
 
     @Override
     public int getMillisecondsToNextLight() {
-        return ((closestLightIndex - index) * Router.STEP_CONSTANT) / getSpeed();
+        return ((closestLightIndex - index) * RoutingConstants.STEP_CONSTANT) / getSpeed();
     }
 
     @Override

@@ -6,6 +6,7 @@ import org.w3c.dom.Node;
 import osmproxy.buses.Timetable;
 import osmproxy.elements.OSMNode;
 import osmproxy.elements.OSMStation;
+import routing.IRouteTransformer;
 import routing.RouteNode;
 import routing.StationNode;
 import smartcity.ITimeProvider;
@@ -16,19 +17,23 @@ import java.util.List;
 class AgentsFactory implements IAgentsFactory {
     private final IdGenerator idGenerator;
     private final ITimeProvider timeProvider;
+    private final IRouteTransformer routeTransformer;
 
     @Inject
     public AgentsFactory(IdGenerator idGenerator,
-                         ITimeProvider timeProvider) {
+                         ITimeProvider timeProvider,
+                         IRouteTransformer routeTransformer) {
         this.idGenerator = idGenerator;
         this.timeProvider = timeProvider;
+        this.routeTransformer = routeTransformer;
     }
 
     @Override
     public VehicleAgent create(List<RouteNode> route, boolean testCar) {
+        var uniformRoute = routeTransformer.uniformRoute(route);
         MovingObjectImpl car = testCar ?
-                new TestCar(route, timeProvider) :
-                new MovingObjectImpl(route);
+                new TestCar(route, uniformRoute, timeProvider) :
+                new MovingObjectImpl(route, uniformRoute);
         return new VehicleAgent(idGenerator.get(VehicleAgent.class), car, timeProvider);
     }
 
@@ -44,8 +49,9 @@ class AgentsFactory implements IAgentsFactory {
 
     @Override
     public BusAgent create(List<RouteNode> route, Timetable timetable, String busLine, String brigadeNr) {
-        var bus = new Bus(timeProvider,
-                route, timetable, busLine, brigadeNr);
+        var uniformRoute = routeTransformer.uniformRoute(route);
+        var bus = new Bus(timeProvider, route, uniformRoute,
+                timetable, busLine, brigadeNr);
         return new BusAgent(idGenerator.get(BusAgent.class), timeProvider, bus);
     }
 
@@ -62,10 +68,19 @@ class AgentsFactory implements IAgentsFactory {
     // TODO: Simplify to avoid 6 arguments
     @Override
     public PedestrianAgent create(List<RouteNode> routeToStation, List<RouteNode> routeFromStation, String preferredBusLine,
-                                  StationNode startStation, StationNode finishStation, boolean testPedestrian) {
+                                  StationNode startStation, StationNode finishStation,
+                                  boolean testPedestrian) {
+        var uniformRouteToStation = routeTransformer.uniformRoute(routeToStation);
+        var uniformRouteFromStation = routeTransformer.uniformRoute(routeFromStation);
         var pedestrian = testPedestrian ?
-                new TestPedestrian(routeToStation, routeFromStation, preferredBusLine, startStation, finishStation, timeProvider) :
-                new Pedestrian(routeToStation, routeFromStation, preferredBusLine, startStation, finishStation);
+                new TestPedestrian(routeToStation, uniformRouteToStation,
+                        routeFromStation, uniformRouteFromStation,
+                        preferredBusLine, startStation, finishStation,
+                        timeProvider) :
+                new Pedestrian(routeToStation, uniformRouteToStation,
+                        routeFromStation, uniformRouteFromStation,
+                        preferredBusLine,
+                        startStation, finishStation);
         return new PedestrianAgent(idGenerator.get(PedestrianAgent.class), timeProvider, pedestrian);
     }
 
