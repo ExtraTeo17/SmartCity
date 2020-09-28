@@ -36,6 +36,7 @@ import java.awt.*;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.time.ZoneId;
+import java.time.ZoneOffset;
 import java.util.List;
 import java.util.Timer;
 import java.util.*;
@@ -392,7 +393,10 @@ public class MapWindow {
     }
 
     private void refreshTime() {
-        currentTimeLabel.setText(dateFormat.format(timeProvider.getCurrentSimulationTime()));
+        var simulationTime = timeProvider.getCurrentSimulationTime();
+        var instant = simulationTime.atZone(ZoneId.systemDefault()).toInstant();
+        var date = Date.from(instant);
+        currentTimeLabel.setText(dateFormat.format(date));
     }
 
     private void drawLights(List<Painter<JXMapViewer>> painters) {
