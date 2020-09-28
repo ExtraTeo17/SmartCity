@@ -6,11 +6,9 @@ import java.time.LocalDateTime;
 public interface ITimeProvider {
     LocalDateTime getCurrentSimulationTime();
 
-    LocalDateTime getCurrentRealTime();
-
     void setSimulationStartTime(LocalDateTime simulationTime);
 
     LocalDateTime getStartSimulationTime();
 
-    LocalDateTime getStartRealTime();
+    long getNanoStartTime();
 }

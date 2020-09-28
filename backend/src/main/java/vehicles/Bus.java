@@ -17,8 +17,8 @@ import java.util.List;
 import java.util.Optional;
 
 public class Bus extends MovingObject {
-    public static int CAPACITY_MID = 10;
-    public static int CAPACITY_HIGH = 25;
+    public static final int CAPACITY_MID = 10;
+    public static final int CAPACITY_HIGH = 25;
 
     private final Logger logger;
     private final Timetable timetable;
