@@ -13,6 +13,7 @@ import org.junit.runner.RunWith;
 import org.mockito.Mockito;
 import org.mockito.junit.MockitoJUnitRunner;
 import osmproxy.elements.OSMNode;
+import smartcity.lights.ICrossroad;
 import vehicles.MovingObject;
 
 import java.util.ArrayList;
@@ -46,8 +47,7 @@ class HashAgentsContainerTest {
         int agentsPerTypeCount = 10;
         List<AbstractAgent> agents = new ArrayList<>(agentsPerTypeCount);
 
-        var mockNode = Mockito.mock(OSMNode.class);
-        Mockito.when(mockNode.getParentWaysIterator()).thenReturn(Collections.emptyIterator());
+        var mockCrossroad = Mockito.mock(ICrossroad.class);
         var mockVehicle = Mockito.mock(MovingObject.class);
         Mockito.when(mockVehicle.getVehicleType()).thenReturn("car");
 
@@ -57,7 +57,7 @@ class HashAgentsContainerTest {
             agents.add(new BusAgent(idGenerator.get(BusAgent.class), null, null));
             agents.add(new StationAgent(idGenerator.get(StationAgent.class), null, null));
             agents.add(new VehicleAgent(idGenerator.get(VehicleAgent.class), mockVehicle, null));
-            agents.add(new LightManagerAgent(idGenerator.get(LightManagerAgent.class), null, mockNode));
+            agents.add(new LightManagerAgent(idGenerator.get(LightManagerAgent.class), null, mockCrossroad));
         }
         int agentTypes = agents.size() / agentsPerTypeCount;
 

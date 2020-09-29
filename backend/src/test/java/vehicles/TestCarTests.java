@@ -4,7 +4,6 @@ import org.junit.jupiter.api.Test;
 import smartcity.ITimeProvider;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.mock;
@@ -53,6 +52,6 @@ class TestCarTests {
     }
 
     private TestCar createCar(ITimeProvider timeProvider) {
-        return new TestCar(new ArrayList<>(), new ArrayList<>(), timeProvider);
+        return new TestCar(timeProvider);
     }
 }

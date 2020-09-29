@@ -192,7 +192,6 @@ public class SimpleCrossroad implements ICrossroad {
         return tryConsume(adjacentWayId, light -> light.removeCarFromFarAwayQueue(agentName));
     }
 
-
     @Override
     public boolean addPedestrianToQueue(long adjacentWayId, String agentName) {
         return tryConsume(adjacentWayId, light -> light.addPedestrianToQueue(agentName));

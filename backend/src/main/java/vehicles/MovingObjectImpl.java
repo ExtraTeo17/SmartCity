@@ -12,14 +12,20 @@ public class MovingObjectImpl extends MovingObject {
     private final List<RouteNode> displayRoute;
     private final List<RouteNode> route;
 
-    private DrivingState state = DrivingState.STARTING;
-    private int index = 0;
-    private int closestLightIndex = Integer.MAX_VALUE;
+    private transient DrivingState state = DrivingState.STARTING;
+    private transient int index = 0;
+    private transient int closestLightIndex = Integer.MAX_VALUE;
 
     public MovingObjectImpl(List<RouteNode> displayRoute, List<RouteNode> uniformRoute) {
         super(50);
         this.displayRoute = displayRoute;
         this.route = uniformRoute;
+    }
+
+    protected MovingObjectImpl(MovingObjectImpl movingObject) {
+        super(movingObject.getSpeed());
+        this.displayRoute = movingObject.displayRoute;
+        this.route = movingObject.route;
     }
 
     // TODO: Why car is moving backwards here? Change name of the function to describe behaviour

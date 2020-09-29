@@ -19,23 +19,12 @@ public class Pedestrian extends MovingObject {
     private final List<RouteNode> routeBeforeBus;
     private final StationNode stationStart;
     private final StationNode stationFinish;
-    private final List<RouteNode> route = new ArrayList<>();
+    private final List<RouteNode> route;
 
-    private DrivingState state = DrivingState.STARTING;
-    private int index = 0;
-    private int closestLightIndex = 0;
-    private int stationIndex = 0;
-
-    @VisibleForTesting
-    Pedestrian() {
-        super(10);
-        preferredBusLine = "";
-        displayRouteBeforeBus = new ArrayList<>();
-        displayRouteAfterBus = new ArrayList<>();
-        routeBeforeBus = new ArrayList<>();
-        stationStart = new StationNode(5, 5, 1L, 1);
-        stationFinish = new StationNode(5, 10, 2L, 2);
-    }
+    private transient DrivingState state = DrivingState.STARTING;
+    private transient int index = 0;
+    private transient int closestLightIndex = 0;
+    private transient int stationIndex = 0;
 
     public Pedestrian(List<RouteNode> routeToStation,
                       List<RouteNode> uniformRouteToStation,
@@ -50,14 +39,43 @@ public class Pedestrian extends MovingObject {
         this.routeBeforeBus.add(startStation);
 
         this.displayRouteAfterBus = routeFromStation;
+
+        this.route = new ArrayList<>();
         this.route.addAll(routeBeforeBus);
         this.route.add(finishStation);
         this.route.addAll(uniformRouteFromStation);
+
         this.stationIndex = routeBeforeBus.size() - 1;
         this.preferredBusLine = preferredBusLine;
 
         this.stationStart = startStation;
         this.stationFinish = finishStation;
+    }
+
+    Pedestrian(Pedestrian ped) {
+        super(ped.getSpeed());
+        this.displayRouteBeforeBus = ped.displayRouteBeforeBus;
+        this.routeBeforeBus = ped.routeBeforeBus;
+
+        this.displayRouteAfterBus = ped.displayRouteAfterBus;
+        this.route = ped.route;
+        this.stationIndex = ped.stationIndex;
+        this.preferredBusLine = ped.preferredBusLine;
+
+        this.stationStart = ped.stationStart;
+        this.stationFinish = ped.stationFinish;
+    }
+
+    @VisibleForTesting
+    Pedestrian() {
+        super(10);
+        preferredBusLine = "";
+        displayRouteBeforeBus = new ArrayList<>();
+        displayRouteAfterBus = new ArrayList<>();
+        routeBeforeBus = new ArrayList<>();
+        route = new ArrayList<>();
+        stationStart = new StationNode(5, 5, 1L, 1);
+        stationFinish = new StationNode(5, 10, 2L, 2);
     }
 
     public StationNode getStartingStation() {

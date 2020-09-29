@@ -1,10 +1,10 @@
 package vehicles;
 
-import routing.RouteNode;
+import com.google.common.annotations.VisibleForTesting;
 import smartcity.ITimeProvider;
 
 import java.time.LocalDateTime;
-import java.util.List;
+import java.util.ArrayList;
 
 public class TestCar extends MovingObjectImpl {
     private final ITimeProvider timeProvider;
@@ -12,10 +12,15 @@ public class TestCar extends MovingObjectImpl {
     private LocalDateTime start;
     private LocalDateTime end;
 
-    public TestCar(List<RouteNode> route,
-                   List<RouteNode> uniformRoute,
+    public TestCar(MovingObjectImpl movingObject,
                    ITimeProvider timeProvider) {
-        super(route, uniformRoute);
+        super(movingObject);
+        this.timeProvider = timeProvider;
+    }
+
+    @VisibleForTesting
+    TestCar(ITimeProvider timeProvider) {
+        super(new ArrayList<>(), new ArrayList<>());
         this.timeProvider = timeProvider;
     }
 
