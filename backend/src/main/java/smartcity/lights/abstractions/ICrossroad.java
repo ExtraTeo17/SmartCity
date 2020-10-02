@@ -1,8 +1,9 @@
-package smartcity.lights;
+package smartcity.lights.abstractions;
 
 import org.jxmapviewer.JXMapViewer;
 import org.jxmapviewer.painter.Painter;
 import routing.core.IGeoPosition;
+import smartcity.lights.OptimizationResult;
 import smartcity.stations.ArrivalInfo;
 
 import java.util.List;

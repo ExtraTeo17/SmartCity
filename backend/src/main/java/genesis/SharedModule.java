@@ -7,7 +7,16 @@ import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.google.inject.Provides;
 import com.google.inject.Singleton;
 
+import java.util.Random;
+
 public class SharedModule extends AbstractModule {
+
+    @Provides
+    @Singleton
+    Random getRandom() {
+        return new Random();
+    }
+
     @Provides
     @Singleton
     ObjectMapper getObjectMapper() {

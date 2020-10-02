@@ -10,6 +10,7 @@ import osmproxy.buses.BusModule;
 import routing.RoutingModule;
 import smartcity.SmartCityModule;
 import smartcity.config.ConfigMutator;
+import smartcity.lights.core.LightsModule;
 import testutils.ReflectionHelper;
 import web.WebModule;
 
@@ -26,6 +27,7 @@ class CreateInjectorTests {
                 Guice.createInjector(
                         new MainModule(4001),
                         new SharedModule(),
+                        new LightsModule(),
                         new AgentsModule(),
                         new GuiModule(),
                         new WebModule(4002),

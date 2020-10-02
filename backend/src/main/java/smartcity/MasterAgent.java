@@ -31,7 +31,6 @@ public class MasterAgent extends Agent {
 
     private final MapWindow window;
     private final IAgentsContainer agentsContainer;
-    private static ITimeProvider timeProvider;
 
     // TODO: Delete this
     @Deprecated(forRemoval = true, since = "Always - Eldritch Abomination")
@@ -43,19 +42,14 @@ public class MasterAgent extends Agent {
 
     @Inject
     public MasterAgent(IAgentsContainer agentsContainer,
-                       ITimeProvider timeProvider,
                        MapWindow window) {
         this.agentsContainer = agentsContainer;
         this.window = window;
-
-        // TODO: Delete this abomination
-        this.timeProvider = timeProvider;
     }
 
     @Override
     protected void setup() {
         window.display();
-
         addBehaviour(getReceiveMessageBehaviour());
     }
 

@@ -3,6 +3,7 @@ package smartcity.task.runnable;
 import com.google.inject.Binder;
 import com.google.inject.Singleton;
 import genesis.AbstractModule;
+import smartcity.task.runnable.abstractions.IRunnableFactory;
 
 public class RunnableModule extends AbstractModule {
     @Override

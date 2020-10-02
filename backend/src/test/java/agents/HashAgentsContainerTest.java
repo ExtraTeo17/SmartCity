@@ -5,19 +5,16 @@ import agents.abstractions.IAgentsContainer;
 import jade.wrapper.ContainerController;
 import jade.wrapper.StaleProxyException;
 import mocks.ContainerControllerMock;
-import org.junit.Assert;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mockito;
 import org.mockito.junit.MockitoJUnitRunner;
-import osmproxy.elements.OSMNode;
-import smartcity.lights.ICrossroad;
+import smartcity.lights.abstractions.ICrossroad;
 import vehicles.MovingObject;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Random;
 

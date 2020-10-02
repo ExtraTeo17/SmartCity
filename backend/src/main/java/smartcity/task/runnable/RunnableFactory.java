@@ -1,9 +1,13 @@
 package smartcity.task.runnable;
 
+import smartcity.task.runnable.abstractions.IFixedExecutionRunnable;
+import smartcity.task.runnable.abstractions.IRunnableFactory;
+import smartcity.task.runnable.abstractions.IVariableExecutionRunnable;
+
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
+import java.util.function.BooleanSupplier;
 import java.util.function.Consumer;
-import java.util.function.Predicate;
 import java.util.function.Supplier;
 
 class RunnableFactory implements IRunnableFactory {
@@ -29,7 +33,12 @@ class RunnableFactory implements IRunnableFactory {
     }
 
     @Override
-    public <T> IFixedExecutionRunnable create(Predicate<T> predicate, Supplier<T> supplier, Runnable runnable) {
-        return new PredicateRunnable<T>(executor, predicate, supplier, runnable);
+    public <T> IFixedExecutionRunnable create(BooleanSupplier test, Runnable runnable) {
+        return new TestingRunnable(executor, test, runnable);
+    }
+
+    @Override
+    public IVariableExecutionRunnable create(Supplier<Integer> delayRunnable, int initialDelay) {
+        return new InfiniteVariableExecutionRunnable(executor, delayRunnable);
     }
 }

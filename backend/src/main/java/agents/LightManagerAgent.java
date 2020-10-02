@@ -13,8 +13,8 @@ import org.slf4j.LoggerFactory;
 import routing.core.IGeoPosition;
 import smartcity.ITimeProvider;
 import smartcity.TimeProvider;
-import smartcity.lights.ICrossroad;
 import smartcity.lights.OptimizationResult;
+import smartcity.lights.abstractions.ICrossroad;
 import smartcity.stations.ArrivalInfo;
 
 import java.util.List;
@@ -61,7 +61,7 @@ public class LightManagerAgent extends AbstractAgent {
             private void answerCanProceed(String carName) {
                 print(carName + " can proceed.");
                 ACLMessage msg = createMessage(ACLMessage.REQUEST, carName);
-                Properties properties =  createProperties(MessageParameter.LIGHT);
+                Properties properties = createProperties(MessageParameter.LIGHT);
                 msg.setAllUserDefinedParameters(properties);
                 send(msg);
             }

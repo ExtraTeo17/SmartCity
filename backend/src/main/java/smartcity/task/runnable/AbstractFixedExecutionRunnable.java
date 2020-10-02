@@ -1,15 +1,17 @@
 package smartcity.task.runnable;
 
+import smartcity.task.runnable.abstractions.IFixedExecutionRunnable;
+
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 
+// source: https://stackoverflow.com/a/7299823/6841224
 abstract class AbstractFixedExecutionRunnable implements IFixedExecutionRunnable {
     private final ScheduledExecutorService executor;
-    volatile ScheduledFuture<?> self;
+    private volatile ScheduledFuture<?> self;
 
-
-    protected AbstractFixedExecutionRunnable(ScheduledExecutorService executor) {
+    AbstractFixedExecutionRunnable(ScheduledExecutorService executor) {
         this.executor = executor;
     }
 

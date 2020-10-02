@@ -1,4 +1,4 @@
-package smartcity.lights;
+package smartcity.lights.core;
 
 import agents.utilities.LightColor;
 import org.jxmapviewer.viewer.Waypoint;

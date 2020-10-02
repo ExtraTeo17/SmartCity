@@ -1,11 +1,9 @@
 package smartcity.task.runnable;
 
 import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Consumer;
 
-// source: https://stackoverflow.com/a/7299823/6841224
 class CounterRunnable extends AbstractFixedExecutionRunnable {
     private final AtomicInteger runCount = new AtomicInteger();
     private final Consumer<Integer> action;

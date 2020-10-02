@@ -1,4 +1,4 @@
-package smartcity.lights;
+package smartcity.lights.core;
 
 import agents.utilities.LightColor;
 import gui.CustomWaypointRenderer;
@@ -40,7 +40,8 @@ public class Light implements IGeoPosition {
         osmId = Long.parseLong(node.getAttributes().getNamedItem(OSM_LIGHT_ID).getNodeValue());
         lat = Double.parseDouble((node.getAttributes().getNamedItem(LAT).getNodeValue()));
         lng = Double.parseDouble((node.getAttributes().getNamedItem(LON).getNodeValue()));
-        adjacentOsmWayId = Long.parseLong((node.getAttributes().getNamedItem(WAY_ID).getNodeValue())); // TODO: Retrieve crossings!
+        // TODO: Retrieve crossings!
+        adjacentOsmWayId = Long.parseLong((node.getAttributes().getNamedItem(WAY_ID).getNodeValue()));
         addHashMapsEntries(managerId);
     }
 
@@ -84,6 +85,29 @@ public class Light implements IGeoPosition {
         }
     }
 
+    public int getGreenGroupSize() {
+        if (isGreen()) {
+            return carQueue.size();
+        }
+
+        return pedestrianQueue.size();
+    }
+
+    public int getRedGroupSize() {
+        if (isGreen()) {
+            return pedestrianQueue.size();
+        }
+
+        return carQueue.size();
+    }
+
+    public Collection<LocalDateTime> getFarAwayTimeCollection() {
+        if (isGreen()) {
+            return farAwayCarMap.values();
+        }
+
+        return farAwayPedestrianMap.values();
+    }
 
     boolean isGreen() {
         return carLightColor == LightColor.GREEN;

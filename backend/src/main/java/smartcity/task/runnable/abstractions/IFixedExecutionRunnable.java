@@ -1,4 +1,4 @@
-package smartcity.task.runnable;
+package smartcity.task.runnable.abstractions;
 
 import java.util.concurrent.TimeUnit;
 

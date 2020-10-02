@@ -1,4 +1,4 @@
-package events;
+package events.web;
 
 public class StartSimulationEvent {
     public final int carsNum;

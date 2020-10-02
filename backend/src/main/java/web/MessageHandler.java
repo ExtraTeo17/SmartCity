@@ -1,11 +1,10 @@
 package web;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.exc.UnrecognizedPropertyException;
 import com.google.common.eventbus.EventBus;
 import com.google.inject.Inject;
-import events.PrepareSimulationEvent;
-import events.StartSimulationEvent;
+import events.web.PrepareSimulationEvent;
+import events.web.StartSimulationEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import web.message.MessageDto;

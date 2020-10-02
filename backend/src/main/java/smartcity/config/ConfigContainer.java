@@ -2,7 +2,7 @@ package smartcity.config;
 
 import com.google.common.eventbus.EventBus;
 import com.google.inject.Inject;
-import events.SimulationReadyEvent;
+import events.web.SimulationReadyEvent;
 import routing.core.IGeoPosition;
 import routing.core.IZone;
 import routing.core.Position;
@@ -17,6 +17,7 @@ public final class ConfigContainer extends ConfigMutator
     private boolean shouldGeneratePedestriansAndBuses = true;
     private boolean shouldGenerateCars = true;
     private boolean lightManagersLock = false;
+    private boolean isLightStrategyActive = true;
     private final IZone zone;
     private final ObjectsConfig carsConfig;
 
@@ -98,5 +99,13 @@ public final class ConfigContainer extends ConfigMutator
 
     public void setCarsNumber(int num) {
         carsConfig.setNumber(mutation, num);
+    }
+
+    public boolean isLightStrategyActive() {
+        return isLightStrategyActive;
+    }
+
+    public void setLightStrategyActive(boolean lightStrategyActive) {
+        isLightStrategyActive = lightStrategyActive;
     }
 }

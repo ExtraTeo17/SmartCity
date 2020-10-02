@@ -1,4 +1,4 @@
-package smartcity.lights;
+package smartcity.lights.core;
 
 
 import osmproxy.elements.OSMNode;
@@ -7,7 +7,7 @@ import osmproxy.elements.OSMWaypoint;
 import routing.RoutingConstants;
 import routing.core.IGeoPosition;
 
-public class LightInfo implements IGeoPosition {
+class LightInfo implements IGeoPosition {
     private static final double DISTANCE_THRESHOLD = 10 * RoutingConstants.DEGREES_PER_METER;
     private final String osmLightId;
     private final String adjacentOsmWayId;
@@ -15,7 +15,7 @@ public class LightInfo implements IGeoPosition {
     private String adjacentCrossingOsmId1;
     private String adjacentCrossingOsmId2;
 
-    public LightInfo(OSMWay adjacentOsmWay, OSMNode centerCrossroadNode) {
+    LightInfo(OSMWay adjacentOsmWay, OSMNode centerCrossroadNode) {
         this.adjacentOsmWayId = Long.toString(adjacentOsmWay.getId());
         this.osmLightId = Long.toString(centerCrossroadNode.getId());
         fillLightPositionAndCrossings(adjacentOsmWay);
@@ -46,10 +46,6 @@ public class LightInfo implements IGeoPosition {
         adjacentCrossingOsmId2 = thirdWaypoint != null ? thirdWaypoint.getOsmNodeRef() : null;
     }
 
-    public String getOsmLightId() {
-        return osmLightId;
-    }
-
     @Override
     public double getLat() {
         return position.getLat();
@@ -58,6 +54,10 @@ public class LightInfo implements IGeoPosition {
     @Override
     public double getLng() {
         return position.getLng();
+    }
+
+    public String getOsmLightId() {
+        return osmLightId;
     }
 
     public String getAdjacentOsmWayId() {

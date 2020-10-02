@@ -2,38 +2,29 @@ package smartcity.task;
 
 import agents.BusAgent;
 import agents.LightManagerAgent;
-import agents.PedestrianAgent;
-import agents.VehicleAgent;
 import agents.abstractions.AbstractAgent;
 import agents.abstractions.IAgentsContainer;
-import agents.abstractions.IAgentsFactory;
-import com.google.common.collect.HashBasedTable;
-import com.google.common.collect.Table;
-import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
 import com.google.inject.Inject;
-import events.StartSimulationEvent;
-import events.VehicleAgentCreatedEvent;
+import events.SwitchLightsStartEvent;
+import events.web.StartSimulationEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import routing.IRouteGenerator;
-import routing.RouteNode;
-import routing.RoutingConstants;
-import routing.StationNode;
-import routing.core.IGeoPosition;
+import routing.abstractions.IRoutingHelper;
 import routing.core.IZone;
-import routing.core.Position;
 import smartcity.SimulationState;
 import smartcity.config.ConfigContainer;
-import smartcity.task.runnable.IRunnableFactory;
+import smartcity.lights.core.Light;
+import smartcity.task.abstractions.ITaskManager;
+import smartcity.task.abstractions.ITaskProvider;
+import smartcity.task.runnable.abstractions.IRunnableFactory;
 
-import java.util.List;
+import java.util.Collection;
 import java.util.Optional;
 import java.util.Random;
 import java.util.concurrent.TimeUnit;
+import java.util.function.BooleanSupplier;
 import java.util.function.Consumer;
-import java.util.function.Predicate;
-import java.util.function.Supplier;
 
 public class TaskManager implements ITaskManager {
     private static final Logger logger = LoggerFactory.getLogger(TaskManager.class);
@@ -43,32 +34,28 @@ public class TaskManager implements ITaskManager {
     private static final int BUS_CONTROL_INTERVAL = 2000;
 
     private final IRunnableFactory runnableFactory;
-    private final IAgentsFactory agentsFactory;
     private final IAgentsContainer agentsContainer;
-    private final IRouteGenerator routeGenerator;
-    private final EventBus eventBus;
+    private final IRoutingHelper routingHelper;
+    private final ITaskProvider taskProvider;
     private final IZone zone;
     private final ConfigContainer configContainer;
 
     private final Random random;
-    private final Table<IGeoPosition, IGeoPosition, List<RouteNode>> routeInfoCache;
 
     @Inject
     TaskManager(IRunnableFactory runnableFactory,
-                IAgentsFactory agentsFactory,
                 IAgentsContainer agentsContainer,
-                IRouteGenerator routeGenerator, EventBus eventBus,
+                IRoutingHelper routingHelper,
+                ITaskProvider taskProvider,
                 ConfigContainer configContainer) {
         this.runnableFactory = runnableFactory;
-        this.agentsFactory = agentsFactory;
         this.agentsContainer = agentsContainer;
-        this.routeGenerator = routeGenerator;
-        this.eventBus = eventBus;
+        this.routingHelper = routingHelper;
+        this.taskProvider = taskProvider;
         this.zone = configContainer.getZone();
         this.configContainer = configContainer;
 
         this.random = new Random();
-        this.routeInfoCache = HashBasedTable.create();
     }
 
     @SuppressWarnings("FeatureEnvy")
@@ -81,8 +68,7 @@ public class TaskManager implements ITaskManager {
         if (configContainer.shouldGeneratePedestriansAndBuses()) {
             // TODO: Add pedestrians limit and testPedestrianID
             schedulePedestrianCreation(100_000, e.testCarId);
-            scheduleBusControl(simulationState -> simulationState == SimulationState.RUNNING,
-                    configContainer::getSimulationState);
+            scheduleBusControl(() -> configContainer.getSimulationState() == SimulationState.RUNNING);
         }
 
         configContainer.setSimulationState(SimulationState.RUNNING);
@@ -92,52 +78,28 @@ public class TaskManager implements ITaskManager {
         agentsContainer.forEach(LightManagerAgent.class, AbstractAgent::start);
     }
 
+    @Subscribe
+    public void handle(SwitchLightsStartEvent e) {
+        scheduleSwitchLightTask(e.lights);
+    }
+
     @Override
     public void scheduleCarCreation(int numberOfCars, int testCarId) {
         Consumer<Integer> createCars = (Integer counter) -> {
             var zoneCenter = zone.getCenter();
-            var geoPosInZoneCircle = generateRandomOffset(zone.getRadius());
+            var geoPosInZoneCircle = routingHelper.generateRandomOffset(zone.getRadius());
             var posA = zoneCenter.sum(geoPosInZoneCircle);
             var posB = zoneCenter.diff(geoPosInZoneCircle);
 
-            getCreateCarTask(posA, posB, counter == testCarId).run();
+            taskProvider.getCreateCarTask(posA, posB, counter == testCarId).run();
         };
 
         runNTimes(createCars, numberOfCars, CREATE_CAR_INTERVAL);
     }
 
-    public Runnable getCreateCarTask(IGeoPosition start, IGeoPosition end, boolean testCar) {
-        return () -> {
-            List<RouteNode> info;
-            try {
-                info = routeInfoCache.get(start, end);
-                if (info == null) {
-                    info = routeGenerator.generateRouteInfo(start, end);
-                    routeInfoCache.put(start, end, info);
-                }
-            } catch (Exception e) {
-                logger.warn("Error generating route info", e);
-                return;
-            }
-
-            VehicleAgent agent = agentsFactory.create(info, testCar);
-            if (agentsContainer.tryAdd(agent)) {
-                agent.start();
-                eventBus.post(new VehicleAgentCreatedEvent(agent.getPosition()));
-            }
-        };
-    }
-
-    private IGeoPosition generateRandomOffset(int radius) {
-        double angle = random.nextDouble() * Math.PI * 2;
-        double lat = Math.sin(angle) * radius * RoutingConstants.DEGREES_PER_METER;
-        double lng = Math.cos(angle) * radius * RoutingConstants.DEGREES_PER_METER * Math.cos(lat);
-        return Position.of(lat, lng);
-    }
-
     @Override
     public void schedulePedestrianCreation(int numberOfPedestrians, int testPedestrianId) {
-        Consumer<Integer> createCars = (Integer counter) -> {
+        Consumer<Integer> createPedestrians = (Integer counter) -> {
             var busAgentOpt = getRandomBusAgent();
             if (busAgentOpt.isEmpty()) {
                 logger.error("No buses exist");
@@ -145,46 +107,12 @@ public class TaskManager implements ITaskManager {
             }
             var busAgent = busAgentOpt.get();
             var stations = busAgent.getTwoSubsequentStations(random);
-            // TODO: Move more logic here
 
-            getCreatePedestrianTask(stations.first, stations.second, busAgent.getLine(),
+            // TODO: Move more logic here
+            taskProvider.getCreatePedestrianTask(stations.first, stations.second, busAgent.getLine(),
                     counter == testPedestrianId).run();
         };
-        runNTimes(createCars, numberOfPedestrians, CREATE_PEDESTRIAN_INTERVAL, true);
-    }
-
-    @Override
-    public Runnable getCreatePedestrianTask(StationNode startStation, StationNode endStation,
-                                            String busLine, boolean testPedestrian) {
-        return () -> {
-            try {
-                // TODO: Generating this offset doesn't work!
-                var geoPosInFirstStationCircle = generateRandomOffset(200);
-                IGeoPosition pedestrianStartPoint = startStation.sum(geoPosInFirstStationCircle);
-                IGeoPosition pedestrianFinishPoint = endStation.diff(geoPosInFirstStationCircle);
-
-                // TODO: No null here
-                List<RouteNode> routeToStation = routeGenerator.generateRouteForPedestrians(
-                        pedestrianStartPoint,
-                        startStation,
-                        null,
-                        String.valueOf(startStation.getStationNodeId()));
-                List<RouteNode> routeFromStation = routeGenerator.generateRouteForPedestrians(
-                        endStation,
-                        pedestrianFinishPoint,
-                        String.valueOf(endStation.getStationNodeId()),
-                        null);
-
-                // TODO: Separate fields for testPedestrian and pedestriansLimit
-                PedestrianAgent agent = agentsFactory.create(routeToStation, routeFromStation,
-                        busLine, startStation, endStation, testPedestrian);
-                if (agentsContainer.tryAdd(agent)) {
-                    agent.start();
-                }
-            } catch (Exception e) {
-                logger.warn("Unknown error in pedestrian creation", e);
-            }
-        };
+        runNTimes(createPedestrians, numberOfPedestrians, CREATE_PEDESTRIAN_INTERVAL, true);
     }
 
     private Optional<BusAgent> getRandomBusAgent() {
@@ -192,19 +120,20 @@ public class TaskManager implements ITaskManager {
     }
 
     @Override
-    public void scheduleBusControl(Predicate<SimulationState> testSimulationState, Supplier<SimulationState> getSimulationState) {
-        runWhile(testSimulationState, getSimulationState, getScheduleBusControlTask(), BUS_CONTROL_INTERVAL);
+    public void scheduleBusControl(BooleanSupplier testSimulationState) {
+        runWhile(testSimulationState, taskProvider.getScheduleBusControlTask(), BUS_CONTROL_INTERVAL);
     }
 
     @Override
-    public Runnable getScheduleBusControlTask() {
-        return () -> {
-            try {
-                agentsContainer.removeIf(BusAgent.class, BusAgent::runBasedOnTimetable);
-            } catch (Exception e) {
-                logger.warn("Error in bus control task", e);
-            }
-        };
+    public void scheduleSwitchLightTask(Collection<Light> lights) {
+        var switchLightsTaskWithDelay = taskProvider.getSwitchLightsTask(lights);
+        var runnable = runnableFactory.create(switchLightsTaskWithDelay);
+        runnable.runEndless(0, TIME_UNIT);
+    }
+
+
+    private void runNTimes(Consumer<Integer> runCountConsumer, int runCount, int interval) {
+        runNTimes(runCountConsumer, runCount, interval, false);
     }
 
     private void runNTimes(Consumer<Integer> runCountConsumer, int runCount, int interval, boolean separateThread) {
@@ -212,12 +141,8 @@ public class TaskManager implements ITaskManager {
         runnable.runFixed(interval, TIME_UNIT);
     }
 
-    private void runNTimes(Consumer<Integer> runCountConsumer, int runCount, int interval) {
-        runNTimes(runCountConsumer, runCount, interval, false);
-    }
-
-    private <T> void runWhile(Predicate<T> predicate, Supplier<T> supplier, Runnable action, int interval) {
-        var runnable = runnableFactory.create(predicate, supplier, action);
+    private void runWhile(BooleanSupplier test, Runnable action, int interval) {
+        var runnable = runnableFactory.create(test, action);
         runnable.runFixed(interval, TIME_UNIT);
     }
 }

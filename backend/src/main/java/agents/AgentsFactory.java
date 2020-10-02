@@ -6,11 +6,11 @@ import org.w3c.dom.Node;
 import osmproxy.buses.Timetable;
 import osmproxy.elements.OSMNode;
 import osmproxy.elements.OSMStation;
-import routing.IRouteTransformer;
 import routing.RouteNode;
 import routing.StationNode;
+import routing.abstractions.IRouteTransformer;
 import smartcity.ITimeProvider;
-import smartcity.lights.SimpleCrossroad;
+import smartcity.lights.abstractions.ICrossroadFactory;
 import vehicles.*;
 
 import java.util.List;
@@ -19,14 +19,17 @@ class AgentsFactory implements IAgentsFactory {
     private final IdGenerator idGenerator;
     private final ITimeProvider timeProvider;
     private final IRouteTransformer routeTransformer;
+    private final ICrossroadFactory crossroadFactory;
 
     @Inject
     public AgentsFactory(IdGenerator idGenerator,
                          ITimeProvider timeProvider,
-                         IRouteTransformer routeTransformer) {
+                         IRouteTransformer routeTransformer,
+                         ICrossroadFactory crossroadFactory) {
         this.idGenerator = idGenerator;
         this.timeProvider = timeProvider;
         this.routeTransformer = routeTransformer;
+        this.crossroadFactory = crossroadFactory;
     }
 
     @Override
@@ -61,14 +64,14 @@ class AgentsFactory implements IAgentsFactory {
     @Override
     public LightManagerAgent create(Node crossroadNode) {
         var id = idGenerator.get(LightManagerAgent.class);
-        var crossroad = new SimpleCrossroad(timeProvider, crossroadNode, id);
+        var crossroad = crossroadFactory.create(crossroadNode, id);
         return new LightManagerAgent(id, timeProvider, crossroad);
     }
 
     @Override
     public LightManagerAgent create(OSMNode centerCrossroad) {
         var id = idGenerator.get(LightManagerAgent.class);
-        var crossroad = new SimpleCrossroad(timeProvider, centerCrossroad, id);
+        var crossroad = crossroadFactory.create(centerCrossroad, id);
         return new LightManagerAgent(id, timeProvider, crossroad);
     }
 

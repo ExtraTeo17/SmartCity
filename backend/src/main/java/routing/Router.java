@@ -11,6 +11,8 @@ import osmproxy.elements.OSMNode;
 import osmproxy.elements.OSMWay;
 import osmproxy.elements.OSMWay.RouteOrientation;
 import osmproxy.elements.OSMWaypoint;
+import routing.abstractions.IRouteGenerator;
+import routing.abstractions.IRouteTransformer;
 import routing.core.IGeoPosition;
 import smartcity.MasterAgent;
 

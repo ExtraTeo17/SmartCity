@@ -1,4 +1,4 @@
-package events;
+package events.web;
 
 import routing.core.IZone;
 import routing.core.Zone;
