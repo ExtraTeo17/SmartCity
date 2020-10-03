@@ -1,16 +1,14 @@
 package smartcity;
 
-import java.util.Date;
+import java.time.LocalDateTime;
 
 // TODO: Date will be probably changed to Instant/long
 public interface ITimeProvider {
-    Date getCurrentSimulationTime();
+    LocalDateTime getCurrentSimulationTime();
 
-    Date getCurrentRealTime();
+    void setSimulationStartTime(LocalDateTime simulationTime);
 
-    void setSimulationStartTime(Date simulationTime);
+    LocalDateTime getStartSimulationTime();
 
-    Date getStartSimulationTime();
-
-    Date getStartRealTime();
+    long getNanoStartTime();
 }

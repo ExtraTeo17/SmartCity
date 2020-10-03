@@ -1,27 +1,52 @@
 package vehicles;
 
-import routing.RouteNode;
-import smartcity.MasterAgent;
+import com.google.common.annotations.VisibleForTesting;
+import smartcity.ITimeProvider;
 
-import java.time.Instant;
-import java.util.List;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
 
 public class TestCar extends MovingObjectImpl {
-    public Instant start;
-    public Instant end;
+    private final ITimeProvider timeProvider;
 
-    public TestCar(List<RouteNode> info) {
-        super(info);
+    private LocalDateTime start;
+    private LocalDateTime end;
+
+    public TestCar(MovingObjectImpl movingObject,
+                   ITimeProvider timeProvider) {
+        super(movingObject);
+        this.timeProvider = timeProvider;
+    }
+
+    @VisibleForTesting
+    TestCar(ITimeProvider timeProvider) {
+        super(new ArrayList<>(), new ArrayList<>());
+        this.timeProvider = timeProvider;
     }
 
     @Override
-    public void setState(DrivingState state) {
-        if (getState() == DrivingState.STARTING) {
-            start = MasterAgent.getSimulationTime().toInstant();
+    public void setState(DrivingState newState) {
+        var initialState = getState();
+        if (initialState == DrivingState.STARTING) {
+            start = timeProvider.getCurrentSimulationTime();
         }
-        super.setState(state);
-        if (state == DrivingState.AT_DESTINATION) {
-            end = MasterAgent.getSimulationTime().toInstant();
+        if (newState == DrivingState.AT_DESTINATION) {
+            end = timeProvider.getCurrentSimulationTime();
         }
+
+        super.setState(newState);
+    }
+
+    @Override
+    public String getVehicleType() {
+        return  VehicleType.TEST_CAR.toString();
+    }
+
+    public LocalDateTime getStart() {
+        return start;
+    }
+
+    public LocalDateTime getEnd() {
+        return end;
     }
 }

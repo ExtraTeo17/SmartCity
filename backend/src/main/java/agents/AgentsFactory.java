@@ -8,7 +8,9 @@ import osmproxy.elements.OSMNode;
 import osmproxy.elements.OSMStation;
 import routing.RouteNode;
 import routing.StationNode;
+import routing.abstractions.IRouteTransformer;
 import smartcity.ITimeProvider;
+import smartcity.lights.abstractions.ICrossroadFactory;
 import vehicles.*;
 
 import java.util.List;
@@ -16,17 +18,29 @@ import java.util.List;
 class AgentsFactory implements IAgentsFactory {
     private final IdGenerator idGenerator;
     private final ITimeProvider timeProvider;
+    private final IRouteTransformer routeTransformer;
+    private final ICrossroadFactory crossroadFactory;
 
     @Inject
-    public AgentsFactory(IdGenerator idGenerator, ITimeProvider timeProvider) {
+    public AgentsFactory(IdGenerator idGenerator,
+                         ITimeProvider timeProvider,
+                         IRouteTransformer routeTransformer,
+                         ICrossroadFactory crossroadFactory) {
         this.idGenerator = idGenerator;
         this.timeProvider = timeProvider;
+        this.routeTransformer = routeTransformer;
+        this.crossroadFactory = crossroadFactory;
     }
 
     @Override
     public VehicleAgent create(List<RouteNode> route, boolean testCar) {
-        MovingObjectImpl car = testCar ? new TestCar(route) : new MovingObjectImpl(route);
-        return new VehicleAgent(idGenerator.get(VehicleAgent.class), car);
+        var uniformRoute = routeTransformer.uniformRoute(route);
+        var car = new MovingObjectImpl(route, uniformRoute);
+        if (testCar) {
+            car = new TestCar(car, timeProvider);
+        }
+
+        return new VehicleAgent(idGenerator.get(VehicleAgent.class), car, timeProvider);
     }
 
     @Override
@@ -36,34 +50,47 @@ class AgentsFactory implements IAgentsFactory {
 
     @Override
     public StationAgent create(OSMStation osmStation) {
-        return new StationAgent(idGenerator.get(StationAgent.class), osmStation);
+        return new StationAgent(idGenerator.get(StationAgent.class), timeProvider, osmStation);
     }
 
     @Override
     public BusAgent create(List<RouteNode> route, Timetable timetable, String busLine, String brigadeNr) {
-        var bus = new Bus(timeProvider,
-                route, timetable, busLine, brigadeNr);
+        var uniformRoute = routeTransformer.uniformRoute(route);
+        var bus = new Bus(timeProvider, route, uniformRoute,
+                timetable, busLine, brigadeNr);
         return new BusAgent(idGenerator.get(BusAgent.class), timeProvider, bus);
     }
 
     @Override
-    public LightManagerAgent create(Node crossroad) {
-        return new LightManagerAgent(idGenerator.get(LightManagerAgent.class), crossroad);
+    public LightManagerAgent create(Node crossroadNode) {
+        var id = idGenerator.get(LightManagerAgent.class);
+        var crossroad = crossroadFactory.create(crossroadNode, id);
+        return new LightManagerAgent(id, timeProvider, crossroad);
     }
 
     @Override
     public LightManagerAgent create(OSMNode centerCrossroad) {
-        return new LightManagerAgent(idGenerator.get(LightManagerAgent.class), centerCrossroad);
+        var id = idGenerator.get(LightManagerAgent.class);
+        var crossroad = crossroadFactory.create(centerCrossroad, id);
+        return new LightManagerAgent(id, timeProvider, crossroad);
     }
 
     // TODO: Simplify to avoid 6 arguments
     @Override
     public PedestrianAgent create(List<RouteNode> routeToStation, List<RouteNode> routeFromStation, String preferredBusLine,
-                                  StationNode startStation, StationNode finishStation, boolean testPedestrian) {
-        var pedestrian = testPedestrian ?
-                new TestPedestrian(routeToStation, routeFromStation, preferredBusLine, startStation, finishStation) :
-                new Pedestrian(routeToStation, routeFromStation, preferredBusLine, startStation, finishStation);
-        return new PedestrianAgent(idGenerator.get(PedestrianAgent.class), pedestrian);
+                                  StationNode startStation, StationNode finishStation,
+                                  boolean testPedestrian) {
+        var uniformRouteToStation = routeTransformer.uniformRoute(routeToStation);
+        var uniformRouteFromStation = routeTransformer.uniformRoute(routeFromStation);
+        var pedestrian = new Pedestrian(routeToStation, uniformRouteToStation,
+                routeFromStation, uniformRouteFromStation,
+                preferredBusLine,
+                startStation, finishStation);
+        if (testPedestrian) {
+            pedestrian = new TestPedestrian(pedestrian, timeProvider);
+        }
+
+        return new PedestrianAgent(idGenerator.get(PedestrianAgent.class), timeProvider, pedestrian);
     }
 
     @Override

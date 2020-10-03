@@ -5,9 +5,9 @@ import agents.abstractions.IAgentsContainer;
 import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
 import com.google.inject.Inject;
-import events.PrepareSimulationEvent;
-import events.SimulationReadyEvent;
-import events.StartSimulationEvent;
+import events.web.PrepareSimulationEvent;
+import events.web.SimulationReadyEvent;
+import events.web.StartSimulationEvent;
 import org.jxmapviewer.JXMapViewer;
 import org.jxmapviewer.OSMTileFactoryInfo;
 import org.jxmapviewer.input.MapClickListener;
@@ -23,8 +23,7 @@ import routing.core.Position;
 import smartcity.ITimeProvider;
 import smartcity.SimulationState;
 import smartcity.config.ConfigContainer;
-import smartcity.lights.SimpleCrossroad;
-import smartcity.task.ITaskManager;
+import smartcity.task.abstractions.ITaskProvider;
 import vehicles.Bus;
 import vehicles.TestCar;
 import vehicles.TestPedestrian;
@@ -35,6 +34,7 @@ import javax.swing.event.MouseInputListener;
 import java.awt.*;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.time.ZoneId;
 import java.util.List;
 import java.util.Timer;
 import java.util.*;
@@ -46,7 +46,7 @@ public class MapWindow {
     private final EventBus eventBus;
     private final IAgentsContainer agentsContainer;
     private final ConfigContainer configContainer;
-    private final ITaskManager taskManager;
+    private final ITaskProvider taskProvider;
     private final ITimeProvider timeProvider;
 
     public JPanel MainPanel;
@@ -91,13 +91,13 @@ public class MapWindow {
     public MapWindow(EventBus eventBus,
                      IAgentsContainer agentsContainer,
                      ConfigContainer configContainer,
-                     ITaskManager taskManager,
+                     ITaskProvider taskProvider,
                      ITimeProvider timeProvider) {
         this.eventBus = eventBus;
         this.agentsContainer = agentsContainer;
         this.configContainer = configContainer;
         this.zone = configContainer.getZone();
-        this.taskManager = taskManager;
+        this.taskProvider = taskProvider;
         this.timeProvider = timeProvider;
 
         MapViewer = new JXMapViewer();
@@ -122,7 +122,7 @@ public class MapWindow {
             configContainer.setCarsNumber(value);
         });
 
-        UseStrategyCheckBox.addItemListener(e -> SimpleCrossroad.STRATEGY_ACTIVE = UseStrategyCheckBox.isSelected());
+        UseStrategyCheckBox.addItemListener(e -> configContainer.setLightStrategyActive(UseStrategyCheckBox.isSelected()));
 
         seedSpinner.setModel(new SpinnerNumberModel(69, 0, 999999, 1));
         latSpinner.setModel(new SpinnerNumberModel(52.23682, -90, 90, 1));
@@ -190,7 +190,7 @@ public class MapWindow {
                             break;
                         }
                         pointB = Position.of(lat, lng);
-                        taskManager.getCreateCarTask(pointA, pointB, false).run();
+                        taskProvider.getCreateCarTask(pointA, pointB, false).run();
                         logger.info("Vehicles: " + agentsContainer.size(VehicleAgent.class));
                         logger.info("Lights: " + agentsContainer.size(LightManagerAgent.class));
                         pointA = pointB = null;
@@ -244,7 +244,10 @@ public class MapWindow {
         ResultTimeLabel.setVisible(true);
         ResultTimeTitle.setVisible(true);
         random.setSeed(getSeed());
-        timeProvider.setSimulationStartTime((Date) setTimeSpinner.getValue());
+
+        var simulationTime = ((Date) setTimeSpinner.getValue()).toInstant().atZone(ZoneId.systemDefault())
+                .toLocalDateTime();
+        timeProvider.setSimulationStartTime(simulationTime);
     }
 
     private int getZoneRadius() {
@@ -333,7 +336,7 @@ public class MapWindow {
 
     private void createCars(IGeoPosition start, IGeoPosition end) {
         try {
-            var createCar = taskManager.getCreateCarTask(start, end, false);
+            var createCar = taskProvider.getCreateCarTask(start, end, false);
             for (int i = 0; i < 5; ++i) {
                 createCar.run();
             }
@@ -388,7 +391,10 @@ public class MapWindow {
     }
 
     private void refreshTime() {
-        currentTimeLabel.setText(dateFormat.format(timeProvider.getCurrentSimulationTime()));
+        var simulationTime = timeProvider.getCurrentSimulationTime();
+        var instant = simulationTime.atZone(ZoneId.systemDefault()).toInstant();
+        var date = Date.from(instant);
+        currentTimeLabel.setText(dateFormat.format(date));
     }
 
     private void drawLights(List<Painter<JXMapViewer>> painters) {

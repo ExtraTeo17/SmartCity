@@ -1,20 +1,21 @@
 package routing;
 
 public class StationNode extends RouteNode {
-    private final int stationAgentId;
-    private final String osmStationId;
+    private final int agentId;
+    private final long id;
 
-    public StationNode(double lat, double lon, String osmStationId, int stationAgentId) {
+    public StationNode(double lat, double lon,
+                       long id, int agentId) {
         super(lat, lon);
-        this.stationAgentId = stationAgentId;
-        this.osmStationId = osmStationId;
+        this.id = id;
+        this.agentId = agentId;
     }
 
-    public int getStationAgentId() {
-        return stationAgentId;
+    public int getAgentId() {
+        return agentId;
     }
 
-    public String getOsmStationId() {
-        return osmStationId;
+    public long getStationNodeId() {
+        return id;
     }
 }

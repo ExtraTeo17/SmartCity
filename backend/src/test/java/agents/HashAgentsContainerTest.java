@@ -5,20 +5,20 @@ import agents.abstractions.IAgentsContainer;
 import jade.wrapper.ContainerController;
 import jade.wrapper.StaleProxyException;
 import mocks.ContainerControllerMock;
-import org.junit.Assert;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mockito;
 import org.mockito.junit.MockitoJUnitRunner;
-import osmproxy.elements.OSMNode;
+import smartcity.lights.abstractions.ICrossroad;
 import vehicles.MovingObject;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Random;
+
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @RunWith(MockitoJUnitRunner.class)
 class HashAgentsContainerTest {
@@ -44,18 +44,17 @@ class HashAgentsContainerTest {
         int agentsPerTypeCount = 10;
         List<AbstractAgent> agents = new ArrayList<>(agentsPerTypeCount);
 
-        var mockNode = Mockito.mock(OSMNode.class);
-        Mockito.when(mockNode.iterator()).thenReturn(Collections.emptyIterator());
+        var mockCrossroad = Mockito.mock(ICrossroad.class);
         var mockVehicle = Mockito.mock(MovingObject.class);
         Mockito.when(mockVehicle.getVehicleType()).thenReturn("car");
 
         for (int i = 0; i < agentsPerTypeCount; ++i) {
             // TODO: Mocks, not null
-            agents.add(new PedestrianAgent(idGenerator.get(PedestrianAgent.class), null));
+            agents.add(new PedestrianAgent(idGenerator.get(PedestrianAgent.class), null, null));
             agents.add(new BusAgent(idGenerator.get(BusAgent.class), null, null));
-            agents.add(new StationAgent(idGenerator.get(StationAgent.class), null));
-            agents.add(new VehicleAgent(idGenerator.get(VehicleAgent.class), mockVehicle));
-            agents.add(new LightManagerAgent(idGenerator.get(LightManagerAgent.class), mockNode));
+            agents.add(new StationAgent(idGenerator.get(StationAgent.class), null, null));
+            agents.add(new VehicleAgent(idGenerator.get(VehicleAgent.class), mockVehicle, null));
+            agents.add(new LightManagerAgent(idGenerator.get(LightManagerAgent.class), null, mockCrossroad));
         }
         int agentTypes = agents.size() / agentsPerTypeCount;
 
@@ -66,7 +65,8 @@ class HashAgentsContainerTest {
 
             // Helps to randomize order of adding agents
             do {
-                Assert.assertTrue(agentsContainer.tryAdd(agents.get(currIndex)));
+                var agent = agents.get(currIndex);
+                assertTrue(agentsContainer.tryAdd(agent), "Should add agent: " + agent.getPredictedName());
                 currIndex = rotateIndex(currIndex, i, i + agentTypes);
             } while (currIndex != begIndex);
         }

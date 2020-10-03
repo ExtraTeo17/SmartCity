@@ -16,7 +16,7 @@ public class MessageParameter {
     public static final String BUS_AGENT_NAME = "bus_id";
     public static final String STATION_ID = "station_id";
     public static final String SCHEDULE_ARRIVAL = "schedule_arrival";
-    public static final String DESIRED_BUS = "desired_bus";
+    public static final String DESIRED_BUS_LINE = "desired_bus";
     public static final String BUS_LINE = "bus_line";
 
     public static String getTypeByMovingObject(MovingObject movingObject) {

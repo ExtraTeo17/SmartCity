@@ -7,7 +7,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import osmproxy.buses.abstractions.IApiSerializer;
 import osmproxy.buses.models.ApiResult;
-import osmproxy.buses.models.SingleTimetable;
+import osmproxy.buses.models.TimetableRecord;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -20,12 +20,13 @@ public class WarszawskieApiSerializer implements IApiSerializer {
     private final ObjectMapper objectMapper;
 
     @Inject
-    WarszawskieApiSerializer(ObjectMapper objectMapper) {
+    @VisibleForTesting
+    public WarszawskieApiSerializer(ObjectMapper objectMapper) {
         this.objectMapper = objectMapper;
     }
 
     @Override
-    public List<SingleTimetable> serializeTimetables(String jsonString) {
+    public List<TimetableRecord> serializeTimetables(String jsonString) {
         var apiResult = serializeJsonString(jsonString);
         if (apiResult.isEmpty()) {
             return new ArrayList<>();
@@ -48,12 +49,12 @@ public class WarszawskieApiSerializer implements IApiSerializer {
     }
 
     @VisibleForTesting
-    List<SingleTimetable> serializeApiResult(ApiResult result) {
-        var timetables = new ArrayList<SingleTimetable>();
+    List<TimetableRecord> serializeApiResult(ApiResult result) {
+        var timetables = new ArrayList<TimetableRecord>();
         for (var apiValue : result) {
             var valuesMap = apiValue.values.stream()
                     .collect(Collectors.toMap(keyValue -> keyValue.key, keyValue -> keyValue.value));
-            var record = objectMapper.convertValue(valuesMap, SingleTimetable.class);
+            var record = objectMapper.convertValue(valuesMap, TimetableRecord.class);
             timetables.add(record);
         }
 

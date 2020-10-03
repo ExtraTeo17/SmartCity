@@ -11,7 +11,7 @@ import jade.util.leap.Properties;
 import jade.wrapper.AgentState;
 import routing.LightManagerNode;
 import routing.RouteNode;
-import routing.Router;
+import routing.RoutingConstants;
 import routing.StationNode;
 import smartcity.ITimeProvider;
 import smartcity.MasterAgent;
@@ -20,19 +20,19 @@ import utilities.Siblings;
 import vehicles.Bus;
 import vehicles.DrivingState;
 
-import java.time.Instant;
 import java.util.List;
 import java.util.Random;
 
 @SuppressWarnings("serial")
 public class BusAgent extends AbstractAgent {
+    public static final String name = BusAgent.class.getSimpleName().replace("Agent", "");
     private final ITimeProvider timeProvider;
     private final Bus bus;
 
     BusAgent(int busId,
              ITimeProvider timeProvider,
              Bus bus) {
-        super(busId, "Bus");
+        super(busId, name, timeProvider);
         this.timeProvider = timeProvider;
         this.bus = bus;
     }
@@ -41,12 +41,12 @@ public class BusAgent extends AbstractAgent {
     protected void setup() {
         informNextStation();
         StationNode station = bus.getCurrentStationNode();
-        print("Started at station " + station.getStationAgentId() + ".");
+        print("Started at station " + station.getAgentId() + ".");
         bus.setState(DrivingState.MOVING);
 
         // TODO: Executed each x = 3600 / bus.getSpeed() = 3600m / (40 * TIME_SCALE) = 3600 / 400 = 9ms
         //   Maybe decrease the interval? - I don't think processor can keep up with all of this.
-        Behaviour move = new TickerBehaviour(this, Router.STEP_CONSTANT / bus.getSpeed()) {
+        Behaviour move = new TickerBehaviour(this, RoutingConstants.STEP_CONSTANT / bus.getSpeed()) {
             @Override
             public void onTick() {
                 if (bus.isAtTrafficLights()) {
@@ -57,7 +57,7 @@ public class BusAgent extends AbstractAgent {
                             ACLMessage msg = createMessage(ACLMessage.REQUEST_WHEN, LightManagerAgent.name,
                                     light.getLightManagerId());
                             // TODO: Should it be Vehicle?
-                            Properties properties =  createProperties(MessageParameter.VEHICLE);
+                            Properties properties = createProperties(MessageParameter.VEHICLE);
                             properties.setProperty(MessageParameter.ADJACENT_OSM_WAY_ID, Long.toString(bus.getAdjacentOsmWayId()));
                             msg.setAllUserDefinedParameters(properties);
                             send(msg);
@@ -90,30 +90,30 @@ public class BusAgent extends AbstractAgent {
                     switch (bus.getState()) {
                         case MOVING:
                             StationNode station = bus.getCurrentStationNode();
-                            List<String> passengerNames = bus.getPassengers(station.getStationAgentId());
+                            List<String> passengerNames = bus.getPassengers(station.getAgentId());
 
                             if (passengerNames.size() > 0) {
                                 ACLMessage leave = createMessage(ACLMessage.REQUEST, passengerNames);
-                                Properties properties =  createProperties(MessageParameter.BUS);
-                                properties.setProperty(MessageParameter.STATION_ID, String.valueOf(station.getStationAgentId()));
+                                Properties properties = createProperties(MessageParameter.BUS);
+                                properties.setProperty(MessageParameter.STATION_ID, String.valueOf(station.getAgentId()));
                                 leave.setAllUserDefinedParameters(properties);
                                 send(leave);
                             }
 
 
-                            ACLMessage msg = createMessage(ACLMessage.REQUEST_WHEN, StationAgent.name, station.getStationAgentId());
-                            Properties properties =  createProperties(MessageParameter.BUS);
+                            ACLMessage msg = createMessage(ACLMessage.REQUEST_WHEN, StationAgent.name, station.getAgentId());
+                            Properties properties = createProperties(MessageParameter.BUS);
 
-                            var timeOnStation = bus.getTimeOnStation(station.getOsmStationId());
-                            timeOnStation.ifPresent(time -> properties.setProperty(MessageParameter.SCHEDULE_ARRIVAL,
-                                    time.toInstant().toString()));
-                            properties.setProperty(MessageParameter.ARRIVAL_TIME, "" + timeProvider.getCurrentSimulationTime()
-                                    .toInstant());
+                            var timeOnStation = bus.getTimeOnStation(station.getStationNodeId());
+                            timeOnStation.ifPresent(time -> properties.setProperty(MessageParameter.SCHEDULE_ARRIVAL, time
+                                    .toString()));
+                            properties.setProperty(MessageParameter.ARRIVAL_TIME, timeProvider.getCurrentSimulationTime()
+                                    .toString());
                             msg.setAllUserDefinedParameters(properties);
                             print("Send REQUEST_WHEN to station");
                             send(msg);
 
-                            print("Arrived at station " + station.getStationAgentId() + ".");
+                            print("Arrived at station " + station.getAgentId() + ".");
                             bus.setState(DrivingState.WAITING_AT_STATION);
                             break;
                         case WAITING_AT_STATION:
@@ -226,19 +226,18 @@ public class BusAgent extends AbstractAgent {
         var stationOpt = bus.findNextStation();
         if (stationOpt.isPresent()) {
             var station = stationOpt.get();
-            var stationId = station.getStationAgentId();
+            var stationId = station.getAgentId();
             ACLMessage msg = createMessage(ACLMessage.INFORM, StationAgent.name, stationId);
-
-            Properties properties = createProperties(MessageParameter.BUS);
-            Instant currentTime = timeProvider.getCurrentSimulationTime().toInstant();
-            Instant time = currentTime.plusMillis(bus.getMillisecondsToNextStation());
-            properties.setProperty(MessageParameter.ARRIVAL_TIME, time.toString());
+            var properties = createProperties(MessageParameter.BUS);
+            var currentTime = timeProvider.getCurrentSimulationTime();
+            var predictedTime = currentTime.plusNanos(bus.getMillisecondsToNextStation() * 1_000_000);
+            properties.setProperty(MessageParameter.ARRIVAL_TIME, predictedTime.toString());
             properties.setProperty(MessageParameter.BUS_LINE, bus.getLine());
 
-            var osmId = station.getOsmStationId();
+            var osmId = station.getStationNodeId();
             var timeOnStation = bus.getTimeOnStation(osmId);
             if (timeOnStation.isPresent()) {
-                properties.setProperty(MessageParameter.SCHEDULE_ARRIVAL, timeOnStation.get().toInstant().toString());
+                properties.setProperty(MessageParameter.SCHEDULE_ARRIVAL, timeOnStation.get().toString());
             }
             else {
                 print("Could not retrieve time for " + stationId, LoggerLevel.ERROR);
@@ -246,9 +245,8 @@ public class BusAgent extends AbstractAgent {
             }
 
             msg.setAllUserDefinedParameters(properties);
-
-            send(msg);
             print("Sending INFORM to Station" + stationId);
+            send(msg);
         }
     }
 
@@ -257,8 +255,8 @@ public class BusAgent extends AbstractAgent {
         var stations = bus.getStationNodesOnRoute();
         for (int i = 0; i < stations.size(); ++i) {
             var station = stations.get(i);
-            var osmId = station.getOsmStationId();
-            var stationId = station.getStationAgentId();
+            var osmId = station.getStationNodeId();
+            var stationId = station.getAgentId();
             var timeOnStation = bus.getTimeOnStation(osmId);
             var timeString = timeOnStation.isPresent() ? timeOnStation.get().toString() : "";
             print(i + ": [" + osmId + "][" + stationId + "] on '" + timeString + "'", LoggerLevel.DEBUG);
@@ -281,8 +279,6 @@ public class BusAgent extends AbstractAgent {
         return Siblings.of(stationsOnRoute.get(random.nextInt(halfIndex)),
                 stationsOnRoute.get(halfIndex + random.nextInt(halfIndex)));
     }
-
-    // TODO: New bus was created each time - check if nothing was broken?
 
     /**
      * @return If busAgent finished execution

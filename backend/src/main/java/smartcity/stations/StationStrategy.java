@@ -1,6 +1,5 @@
 package smartcity.stations;
 
-import org.javatuples.Pair;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import osmproxy.elements.OSMStation;
@@ -8,20 +7,26 @@ import routing.StationNode;
 import smartcity.MasterAgent;
 import smartcity.lights.OptimizationResult;
 
-import java.time.Instant;
-import java.util.*;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
+@SuppressWarnings("UnusedReturnValue")
 public class StationStrategy {
     private static final Logger logger = LoggerFactory.getLogger(StationStrategy.class);
-    final private static boolean SHOULD_USE_STRATEGY = true;
+    private final static boolean SHOULD_USE_STRATEGY = true;
+    private final static int WAIT_PERIOD_SECONDS = 60;
 
-    final private static int WAIT_PERIOD = 60;
     // AgentName - Schedule Arrival Time / Arrival Time
-    final private Map<String, Pair<Instant, Instant>> farAwayBusMap = new HashMap<>();
-    final private Map<String, Pair<Instant, Instant>> busOnStationMap = new HashMap<>();
-    final private Map<String, String> busAgentNameToBusNumberMap = new HashMap<>();
-    final private Map<String, PedestrianArrivalInfo> farAwayPedestrianMap = new HashMap<>();
-    final private Map<String, PedestrianArrivalInfo> pedestrianOnStationMap = new HashMap<>();
+    private final Map<String, String> busAgentNameToLine = new HashMap<>();
+    private final Map<String, ScheduledArrivalTime> busAgentOnStationToArrivalTime = new HashMap<>();
+    private final Map<String, ScheduledArrivalTime> farAwayBusAgentNameToArrivalTime = new HashMap<>();
+
+    private final Map<String, List<ArrivalInfo>> busLineToFarAwayPedestrians = new HashMap<>();
+    private final Map<String, List<ArrivalInfo>> busLineToPedestriansOnStation = new HashMap<>();
 
     public StationStrategy(OSMStation station, int agentId) {
         // Temporary workaround, because of static container in MasterAgent
@@ -31,134 +36,124 @@ public class StationStrategy {
 
         var id = station.getId();
         MasterAgent.osmStationIdToStationNode.put(id,
-                new StationNode(station.getLat(), station.getLng(),
-                        Long.toString(id), agentId));
+                new StationNode(station.getLat(), station.getLng(), id, agentId));
     }
 
-    public void addBusToFarAwayQueue(String agentBusName, Instant arrivalTime, Instant scheduleArrivalTime) {
-        farAwayBusMap.put(agentBusName, Pair.with(scheduleArrivalTime, arrivalTime));
+    public boolean addBusAgentWithLine(String agentName, String busLine) {
+        return busAgentNameToLine.put(agentName, busLine) == null;
     }
 
-    public void addMappingOfBusAndTheirAgent(String agentBusName, String busNumber) {
-        busAgentNameToBusNumberMap.put(agentBusName, busNumber);
+    public boolean addBusToFarAwayQueue(String agentName, LocalDateTime scheduled, LocalDateTime actual) {
+        return farAwayBusAgentNameToArrivalTime.put(agentName, ScheduledArrivalTime.of(scheduled, actual)) == null;
     }
 
-    public void addBusToQueue(String agentBusName, Instant arrivalTime, Instant scheduleArrivalTime) {
-        busOnStationMap.put(agentBusName, Pair.with(scheduleArrivalTime, arrivalTime));
+    public boolean removeBusFromFarAwayQueue(String agentName) {
+        return farAwayBusAgentNameToArrivalTime.remove(agentName) != null;
     }
 
-    public void removeBusFromFarAwayQueue(String agentName) {
-        farAwayBusMap.remove(agentName);
+    public boolean addBusToQueue(String agentName, LocalDateTime scheduled, LocalDateTime actual) {
+        return busAgentOnStationToArrivalTime.put(agentName, ScheduledArrivalTime.of(scheduled, actual)) == null;
     }
 
-    public void removeBusFromBusOnStationQueue(String agentName) {
-        busOnStationMap.remove(agentName);
+    public boolean removeBusFromQueue(String agentName) {
+        return busAgentOnStationToArrivalTime.remove(agentName) != null;
     }
 
+    public void addPedestrianToFarAwayQueue(String agentName, String desiredBusLine, LocalDateTime arrivalTime) {
+        var farAwayPedestriansForLine = busLineToFarAwayPedestrians
+                .computeIfAbsent(desiredBusLine, key -> new ArrayList<>());
+        var arrivalInfo = new ArrivalInfo(agentName, arrivalTime);
+        farAwayPedestriansForLine.add(arrivalInfo);
+    }
 
-    public void addPedestrianToFarAwayQueue(String agentName, String desiredBus, Instant arrivalTime) {
-        if (!farAwayPedestrianMap.containsKey(desiredBus)) {
-
-            farAwayPedestrianMap.put(desiredBus, new PedestrianArrivalInfo());
+    public boolean removePedestrianFromFarAwayQueue(String agentName, String busLine) {
+        var arrivalInfos = busLineToFarAwayPedestrians.get(busLine);
+        if (arrivalInfos == null) {
+            logger.warn("Tried to remove pedestrian from non-existing far-away-queue for " + busLine);
+            return false;
         }
-        farAwayPedestrianMap.get(desiredBus).putPedestrianOnList(new Pair<>(agentName, arrivalTime));
+
+        return arrivalInfos.removeIf(arrivalInfo -> arrivalInfo.agentName.equals(agentName));
     }
 
-    public void addPedestrianToQueue(String agentName, String desiredBus, Instant arrivalTime) {
-        if (!pedestrianOnStationMap.containsKey(desiredBus)) {
+    public void addPedestrianToQueue(String agentName, String desiredBusLine, LocalDateTime arrivalTime) {
+        var pedestriansOnStation = busLineToPedestriansOnStation
+                .computeIfAbsent(desiredBusLine, key -> new ArrayList<>());
+        var arrivalInfo = new ArrivalInfo(agentName, arrivalTime);
+        pedestriansOnStation.add(arrivalInfo);
+    }
 
-            pedestrianOnStationMap.put(desiredBus, new PedestrianArrivalInfo());
+    public boolean removePedestrianFromQueue(String agentName, String busLine) {
+        var arrivalInfos = busLineToPedestriansOnStation.get(busLine);
+        if (arrivalInfos == null) {
+            logger.warn("Tried to remove pedestrian from non-existing queue for " + busLine);
+            return false;
         }
-        pedestrianOnStationMap.get(desiredBus).putPedestrianOnList(new Pair<>(agentName, arrivalTime));
 
-    }
-
-    public void removePedestrianFromFarAwayQueue(String agentName, String bus) {
-        farAwayPedestrianMap.get(bus).agentNamesAndArrivalTimes.removeIf(x -> x.getValue0().equals(agentName));
-    }
-
-    public void removePedestrianFromBusOnStationQueue(String agentName, String bus) {
-        try {
-            pedestrianOnStationMap.get(bus).agentNamesAndArrivalTimes.removeIf(x -> x.getValue0().equals(agentName));
-        } catch (Exception e) {
-            removePedestrianFromFarAwayQueue(agentName, bus);
-        }
+        return arrivalInfos.removeIf(arrivalInfo -> arrivalInfo.agentName.equals(agentName));
     }
 
 
     public OptimizationResult requestBusesAndPeopleFreeToGo() {
-        OptimizationResult result = new OptimizationResult();
-        for (String bus : busOnStationMap.keySet()) {
-            Pair<Instant, Instant> scheduleAndArrivalTime = busOnStationMap.get(bus);
-            Date scheduleTime = Date.from(scheduleAndArrivalTime.getValue0());
-            Date arrivalTime = Date.from(scheduleAndArrivalTime.getValue1());
+        var result = new OptimizationResult();
+        for (var entry : busAgentOnStationToArrivalTime.entrySet()) {
+            var busLine = entry.getKey();
+            var scheduledArrival = entry.getValue();
 
-            Calendar arrivalCalendar = Calendar.getInstance();
-            arrivalCalendar.setTime(arrivalTime);
+            var scheduledTime = scheduledArrival.scheduled;
+            var scheduledTimePlusWait = scheduledTime.plusSeconds(WAIT_PERIOD_SECONDS);
+            var scheduledTimeMinusWait = scheduledTime.minusSeconds(WAIT_PERIOD_SECONDS);
+            var actualTime = scheduledArrival.actual;
 
-            Calendar scheduleCalendar = Calendar.getInstance();
-            scheduleCalendar.set(arrivalCalendar.get(Calendar.YEAR), arrivalCalendar.get(Calendar.MONTH), arrivalCalendar.get(Calendar.DAY_OF_MONTH), scheduleTime.getHours(), scheduleTime.getMinutes());
-
-            scheduleAndArrivalTime = new Pair<>(scheduleCalendar.toInstant(), arrivalTime.toInstant());
-
-            if (scheduleAndArrivalTime.getValue1().isAfter(scheduleAndArrivalTime.getValue0().plusSeconds(StationStrategy.WAIT_PERIOD))) {
-
+            if (actualTime.isAfter(scheduledTimePlusWait)) {
                 logger.info("------------------BUS WAS LATE-----------------------");
-                List<String> passengersThatCanLeave = checkPassengersWhoAreReadyToGo(bus);
-                result.addBusAndPedestrianGrantedPassthrough(bus, passengersThatCanLeave);
+                List<String> passengersThatCanLeave = getPassengersWhoAreReadyToGo(busLine);
+                result.addBusAndPedestrianGrantedPassthrough(busLine, passengersThatCanLeave);
             }
-            else if ((scheduleAndArrivalTime.getValue1().isAfter((scheduleAndArrivalTime.getValue0().minusSeconds(StationStrategy.WAIT_PERIOD))) &&
-                    scheduleAndArrivalTime.getValue1().isBefore((scheduleAndArrivalTime.getValue0().plusSeconds(StationStrategy.WAIT_PERIOD))))) {
+            else if (actualTime.isAfter(scheduledTimeMinusWait) &&
+                    actualTime.isBefore(scheduledTimePlusWait)) {
                 logger.info("------------------BUS WAS ON TIME-----------------------");
-                List<String> passengersThatCanLeave = checkPassengersWhoAreReadyToGo(bus);
-                List<String> farPassengers = new ArrayList<>();
-                if (StationStrategy.SHOULD_USE_STRATEGY) {
-                    farPassengers = checkPassengersWhoAreFar(bus, scheduleAndArrivalTime.getValue0().plusSeconds(StationStrategy.WAIT_PERIOD));
+                List<String> passengersThatCanLeave = getPassengersWhoAreReadyToGo(busLine);
+                if (SHOULD_USE_STRATEGY) {
+                    var farPassengers = getPassengersWhoAreFar(busLine, scheduledTime.plusSeconds(WAIT_PERIOD_SECONDS));
+                    passengersThatCanLeave.addAll(farPassengers);
+                    logger.info("-----------------WAITING FOR: " + farPassengers.size() + " PASSENGERS------------------");
                 }
-                passengersThatCanLeave.addAll(farPassengers);
-                result.addBusAndPedestrianGrantedPassthrough(bus, passengersThatCanLeave);
-                logger.info("-----------------WAITING FOR: " + farPassengers.size() + " PASSENGERS------------------");
+
+                result.addBusAndPedestrianGrantedPassthrough(busLine, passengersThatCanLeave);
             }
-            else if (scheduleAndArrivalTime.getValue1().isBefore((scheduleAndArrivalTime.getValue0()
-                    .minusSeconds(StationStrategy.WAIT_PERIOD)))) {
-                logger.info("------------------BUS TOO EARLY-----------------------");
+            else if (actualTime.isBefore(scheduledTimeMinusWait)) {
+                logger.trace("------------------BUS TOO EARLY-----------------------");
             }
             else {
-                logger.info("------------------SOMETHING HAPPENED-----------------------");
+                logger.warn("Undetermined situation for line " + busLine + ", scheduledTime" + scheduledTime +
+                        ", actualTime" + actualTime);
             }
         }
+
         return result;
     }
 
-    private List<String> checkPassengersWhoAreReadyToGo(String busAgentName) {
-        String bus = busAgentNameToBusNumberMap.get(busAgentName);
-        List<String> passengersThatCanLeave = new ArrayList<>();
-        if (pedestrianOnStationMap.containsKey(bus)) {
-            PedestrianArrivalInfo arrivalTime = pedestrianOnStationMap.get(bus);
-            for (Pair<String, Instant> pedestrian : arrivalTime.agentNamesAndArrivalTimes) {
-                passengersThatCanLeave.add(pedestrian.getValue0());
-            }
-
-            return passengersThatCanLeave;
+    private List<String> getPassengersWhoAreReadyToGo(String busAgentName) {
+        String busLine = busAgentNameToLine.get(busAgentName);
+        var arrivalInfos = busLineToPedestriansOnStation.get(busLine);
+        if (arrivalInfos == null) {
+            return new ArrayList<>();
         }
-        return new ArrayList<>();
+
+        return arrivalInfos.stream().map(info -> info.agentName).collect(Collectors.toList());
     }
 
-    private List<String> checkPassengersWhoAreFar(String busAgentName, Instant deadline) {
-
-        String bus = busAgentNameToBusNumberMap.get(busAgentName);
-        List<String> passengersThatCanLeave = new ArrayList<>();
-        if (farAwayPedestrianMap.containsKey(bus)) {
-            PedestrianArrivalInfo arrivalTime = farAwayPedestrianMap.get(bus);
-            for (Pair<String, Instant> pedestrian : arrivalTime.agentNamesAndArrivalTimes) {
-                if (pedestrian.getValue1().isBefore(deadline)) {
-                    StationStrategy.logger.info("--------Passenger too wait---------");
-                    passengersThatCanLeave.add(pedestrian.getValue0());
-                }
-            }
-            return passengersThatCanLeave;
+    private List<String> getPassengersWhoAreFar(String busAgentName, LocalDateTime deadline) {
+        String busLine = busAgentNameToLine.get(busAgentName);
+        var arrivalInfos = busLineToFarAwayPedestrians.get(busLine);
+        if (arrivalInfos == null) {
+            return new ArrayList<>();
         }
-        return new ArrayList<>();
 
+        return arrivalInfos.stream()
+                .filter(info -> info.arrivalTime.isBefore(deadline))
+                .map(info -> info.agentName)
+                .collect(Collectors.toList());
     }
 }

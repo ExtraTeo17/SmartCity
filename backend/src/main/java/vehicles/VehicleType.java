@@ -2,8 +2,10 @@ package vehicles;
 
 public enum VehicleType {
     REGULAR_CAR("RegularCar"),
+    TEST_CAR("TestCar"),
     BUS("Bus"),
-    PEDESTRIAN("Pedestrian");
+    PEDESTRIAN("Pedestrian"),
+    TEST_PEDESTRIAN("TestPedestrian");
 
     private final String name;
 

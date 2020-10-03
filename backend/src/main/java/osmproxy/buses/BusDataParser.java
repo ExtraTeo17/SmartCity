@@ -1,5 +1,6 @@
 package osmproxy.buses;
 
+import com.google.common.base.Joiner;
 import com.google.inject.Inject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -13,15 +14,18 @@ import osmproxy.buses.abstractions.IBusDataParser;
 import osmproxy.buses.abstractions.IDataMerger;
 import osmproxy.buses.data.BusInfoData;
 import osmproxy.buses.data.BusPreparationData;
+import osmproxy.buses.models.TimetableRecord;
 import osmproxy.elements.OSMStation;
 import osmproxy.elements.OSMWay;
 import routing.core.IZone;
 import routing.core.Position;
+import utilities.ConditionalExecutor;
 import utilities.IterableNodeList;
 import utilities.Siblings;
 
 import java.util.*;
 import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
 public class BusDataParser implements IBusDataParser {
     private static final Logger logger = LoggerFactory.getLogger(BusDataParser.class);
@@ -69,6 +73,10 @@ public class BusDataParser implements IBusDataParser {
         }
 
         var busInfos = busDataMerger.getBusInfosWithStops(busInfoDataSet, busStopsMap);
+        for (var busInfo : busInfos) {
+            var brigadeInfos = generateBrigadeInfos(busInfo.busLine, busInfo.stops);
+            busInfo.addBrigades(brigadeInfos);
+        }
 
         return new BusPreparationData(busInfos, busStopsMap);
     }
@@ -76,7 +84,7 @@ public class BusDataParser implements IBusDataParser {
     private Optional<BusInfoData> parseRelation(Node relation) {
         List<Long> stationIds = new ArrayList<>();
         String busLine = "";
-        List<Long> wayIds = new ArrayList<>();
+        List<Long> waysIds = new ArrayList<>();
         for (var node : IterableNodeList.of(relation.getChildNodes())) {
             if (node.getNodeName().equals("member")) {
                 NamedNodeMap attributes = node.getAttributes();
@@ -87,7 +95,7 @@ public class BusDataParser implements IBusDataParser {
                 }
                 else if (attributes.getNamedItem("role").getNodeValue().length() == 0 &&
                         attributes.getNamedItem("type").getNodeValue().equals("way")) {
-                    wayIds.add(id);
+                    waysIds.add(id);
                 }
             }
             else if (node.getNodeName().equals("tag")) {
@@ -100,10 +108,11 @@ public class BusDataParser implements IBusDataParser {
             }
         }
 
-        var waysDoc = busApiManager.getBusWays(wayIds);
+        var waysDoc = busApiManager.getBusWays(waysIds);
         if (waysDoc.isEmpty()) {
             return Optional.empty();
         }
+        logger.debug("Started parsing ways: " + waysIds.get(0) + "_" + waysIds.get(waysIds.size() - 1));
         List<OSMWay> ways = parseOsmWays(waysDoc.get());
 
         return Optional.of(new BusInfoData(new BusInfo(busLine, ways), stationIds));
@@ -129,16 +138,21 @@ public class BusDataParser implements IBusDataParser {
         route.add(firstWay);
         route.add(secondWay);
         String adjacentNodeRef = firstWay.orientateWith(secondWay);
+        boolean failedToMatchPreviously = false;
         while (nodesIter.hasNext()) {
             Node item = nodesIter.next();
             if (item.getNodeName().equals("way")) {
-                OSMWay way = new OSMWay(item);
+                var way = new OSMWay(item);
                 // TODO: CORRECT POTENTIAL BUGS CAUSING ROUTE TO BE CUT INTO PIECES BECAUSE OF RZĄŻEWSKI CASE
                 if (way.startsInZone(zone)) {
                     var referenceOpt = way.reverseTowardsNode(adjacentNodeRef);
                     if (referenceOpt.isEmpty()) {
-                        logger.warn("Failed to match way:\n" + way + " with " + adjacentNodeRef);
+                        logger.debug("Failed to match way: " + way + " with " + adjacentNodeRef);
+                        failedToMatchPreviously = true;
                         continue;
+                    }
+                    else if (failedToMatchPreviously) {
+                        logger.info("Reconnected to way: " + way + " after failed match with " + adjacentNodeRef);
                     }
 
                     adjacentNodeRef = referenceOpt.get();
@@ -183,10 +197,12 @@ public class BusDataParser implements IBusDataParser {
 
         boolean isPresentVal = isPresent.test(osmId);
         if (!isPresentVal && zone.contains(Position.of(lat, lon))) {
-            var stationNumber = searchForStationNumber(node.getChildNodes());
-            if (stationNumber.isPresent()) {
-                logger.debug("Parsing station with number: " + stationNumber.get());
-                return Optional.of(new OSMStation(osmId, lat, lon, stationNumber.get()));
+            var stationNumberOpt = searchForStationNumber(node.getChildNodes());
+            if (stationNumberOpt.isPresent()) {
+                var stationNumber = stationNumberOpt.get();
+
+                logger.debug("Parsing station with number: " + stationNumber);
+                return Optional.of(new OSMStation(osmId, lat, lon, stationNumber));
             }
         }
 
@@ -204,5 +220,47 @@ public class BusDataParser implements IBusDataParser {
                 .filter(attr -> attr.getNamedItem("k").getNodeValue().equals("ref"))
                 .findFirst()
                 .map(attr -> attr.getNamedItem("v").getNodeValue());
+    }
+
+    private Collection<BrigadeInfo> generateBrigadeInfos(String busLine, Collection<OSMStation> osmStations) {
+        Map<String, BrigadeInfo> brigadeInfoMap = new LinkedHashMap<>();
+        for (OSMStation station : osmStations) {
+            var jsonStringOpt = busApiManager.getBusTimetablesViaWarszawskieAPI(station.getBusStopId(),
+                    station.getBusStopNr(), busLine);
+            if (jsonStringOpt.isEmpty()) {
+                continue;
+            }
+
+            var jsonString = jsonStringOpt.get();
+            var timetableRecords = apiSerializer.serializeTimetables(jsonString);
+            var brigadeIdToRecords = timetableRecords.stream()
+                    .collect(Collectors.groupingBy(record -> record.brigadeId));
+            var stationId = station.getId();
+            for (var entry : brigadeIdToRecords.entrySet()) {
+                var brigadeId = entry.getKey();
+                var brigadeTimeRecords = entry.getValue();
+                var brigadeInfo = brigadeInfoMap.get(brigadeId);
+                if (brigadeInfo == null) {
+                    brigadeInfoMap.put(brigadeId, new BrigadeInfo(brigadeId, stationId, brigadeTimeRecords));
+                }
+                else {
+                    brigadeInfo.addTimetableRecords(stationId, brigadeTimeRecords);
+                }
+
+                ConditionalExecutor.trace(() -> logBrigadeData(brigadeTimeRecords, station, busLine));
+            }
+        }
+
+        return brigadeInfoMap.values();
+    }
+
+    private void logBrigadeData(List<TimetableRecord> timetableRecords, OSMStation station, String busLine) {
+        var recordsString = Joiner.on(" \n").join(timetableRecords);
+        logger.info("Printing data for brigade " + timetableRecords.get(0).brigadeId + " :\n" +
+                "  times:\n" + recordsString + "\n" +
+                "  stationId: " + station.getId() + "\n" +
+                "  busStopId: " + station.getBusStopId() + "\n" +
+                "  busStopNr: " + station.getBusStopNr() + "\n" +
+                "  busLine: " + busLine + "\n");
     }
 }

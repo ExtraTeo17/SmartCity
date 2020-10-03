@@ -6,8 +6,8 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
 import com.google.inject.Inject;
-import events.LightManagersReadyEvent;
-import events.PrepareSimulationEvent;
+import events.web.LightManagersReadyEvent;
+import events.web.PrepareSimulationEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import osmproxy.abstractions.ILightAccessManager;
@@ -15,11 +15,13 @@ import osmproxy.abstractions.IMapAccessManager;
 import osmproxy.buses.Timetable;
 import osmproxy.buses.abstractions.IBusLinesManager;
 import osmproxy.elements.OSMNode;
-import routing.IRouteGenerator;
+import routing.abstractions.IRouteGenerator;
 import smartcity.SimulationState;
 import smartcity.TimeProvider;
 import smartcity.config.ConfigContainer;
 import smartcity.config.StaticConfig;
+
+import java.time.LocalDateTime;
 
 public class AgentsCreator {
     private static final Logger logger = LoggerFactory.getLogger(AgentsCreator.class);
@@ -107,7 +109,10 @@ public class AgentsCreator {
 
         logger.info("Buses creation started.");
         time = System.nanoTime();
+
         int busCount = 0;
+        var closestTime = LocalDateTime.now().plusDays(1);
+        var currTime = LocalDateTime.now();
         for (var busInfo : busData.busInfos) {
             var timeNow = System.nanoTime();
             var routeInfo = routeGenerator.generateRouteInfoForBuses(
@@ -116,7 +121,7 @@ public class AgentsCreator {
 
             var busLine = busInfo.busLine;
             for (var brigade : busInfo) {
-                var brigadeNr = brigade.getBrigadeNr();
+                var brigadeNr = brigade.brigadeId;
                 for (Timetable timetable : brigade) {
                     var agent = factory.create(routeInfo, timetable, busLine, brigadeNr);
                     boolean result = agentsContainer.tryAdd(agent);
@@ -126,6 +131,9 @@ public class AgentsCreator {
                     else {
                         logger.warn("Bus agent could not be added");
                     }
+
+                    var startTime = timetable.getBoardingTime();
+                    closestTime = TimeProvider.getCloser(currTime, closestTime, startTime);
                 }
             }
         }
@@ -137,6 +145,8 @@ public class AgentsCreator {
 
         logger.info("Buses are created! Took: " + TimeProvider.getTimeInMs(time) + "ms");
         logger.info("NUMBER OF BUS AGENTS: " + busCount);
+        logger.info("Closest startTime: " + closestTime.toLocalTime());
+
         return true;
     }
 

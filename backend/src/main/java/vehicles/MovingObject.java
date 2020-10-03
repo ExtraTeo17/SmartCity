@@ -11,7 +11,7 @@ import java.util.List;
 // TODO: Interface or move some functionality here
 // TODO: Change name to IVehicle/AbstractVehicle
 public abstract class MovingObject {
-    private final int speed;
+    protected final int speed;
 
     MovingObject(int speed) {this.speed = speed;}
 

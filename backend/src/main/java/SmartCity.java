@@ -12,6 +12,7 @@ import osmproxy.buses.BusModule;
 import routing.RoutingModule;
 import smartcity.MasterAgent;
 import smartcity.SmartCityModule;
+import smartcity.lights.core.LightsModule;
 import web.WebModule;
 import web.serialization.SerializationModule;
 
@@ -22,6 +23,7 @@ public class SmartCity {
         var injector = Guice.createInjector(
                 new MainModule(args),
                 new SharedModule(),
+                new LightsModule(),
                 new AgentsModule(),
                 new GuiModule(),
                 new WebModule(),

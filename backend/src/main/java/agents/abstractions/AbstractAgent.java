@@ -11,21 +11,24 @@ import jade.wrapper.ControllerException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import routing.LightManagerNode;
-import smartcity.MasterAgent;
+import smartcity.ITimeProvider;
 import vehicles.MovingObject;
 
-import java.time.Instant;
+import java.time.LocalDateTime;
 import java.util.List;
 
 public abstract class AbstractAgent extends Agent {
     private final int id;
     private final String namePrefix;
+
     protected final Logger logger;
+    protected final ITimeProvider timeProvider;
 
-
-    public AbstractAgent(int id, String namePrefix) {
+    public AbstractAgent(int id, String namePrefix,
+                         ITimeProvider timeProvider) {
         this.id = id;
         this.namePrefix = namePrefix;
+        this.timeProvider = timeProvider;
         this.logger = LoggerFactory.getLogger(this.getPredictedName());
     }
 
@@ -49,7 +52,7 @@ public abstract class AbstractAgent extends Agent {
         }
     }
 
-    public void print(String message, LoggerLevel level) {
+    protected void print(String message, LoggerLevel level) {
         switch (level) {
             case TRACE -> logger.trace(message);
             case DEBUG -> logger.debug(message);
@@ -59,8 +62,7 @@ public abstract class AbstractAgent extends Agent {
         }
     }
 
-    // TODO: Protected
-    public void print(String message) {
+    protected void print(String message) {
         print(message, LoggerLevel.INFO);
     }
 
@@ -78,11 +80,11 @@ public abstract class AbstractAgent extends Agent {
     private ACLMessage prepareMessageForManager(LightManagerNode managerNode, MovingObject movingObject) {
         ACLMessage msg = createMessage(ACLMessage.INFORM, LightManagerAgent.name, managerNode.getLightManagerId());
 
-        Properties properties = new Properties();
         var agentType = MessageParameter.getTypeByMovingObject(movingObject);
-        properties.setProperty(MessageParameter.TYPE, agentType);
-        Instant time = MasterAgent.getSimulationTime().toInstant().plusMillis(movingObject.getMillisecondsToNextLight());
-        properties.setProperty(MessageParameter.ARRIVAL_TIME, "" + time);
+        Properties properties = createProperties(agentType);
+        var predictedTime = timeProvider.getCurrentSimulationTime().plusNanos(
+                movingObject.getMillisecondsToNextLight() * 1_000_000);
+        properties.setProperty(MessageParameter.ARRIVAL_TIME, "" + predictedTime);
         properties.setProperty(MessageParameter.ADJACENT_OSM_WAY_ID, "" + managerNode.getOsmWayId());
         msg.setAllUserDefinedParameters(properties);
 
@@ -114,9 +116,33 @@ public abstract class AbstractAgent extends Agent {
         return msg;
     }
 
-    protected Properties createProperties(String senderType){
+    protected Properties createProperties(String senderType) {
         var result = new Properties();
         result.setProperty(MessageParameter.TYPE, senderType);
         return result;
+    }
+
+    protected String getSender(ACLMessage rcv) {
+        return rcv.getSender().getLocalName();
+    }
+
+    protected LocalDateTime getDateParameter(ACLMessage rcv, String param) {
+        var paramValue = rcv.getUserDefinedParameter(param);
+        if (paramValue == null) {
+            print("Did not receive " + param + " from " + rcv.getSender(), LoggerLevel.ERROR);
+            return timeProvider.getCurrentSimulationTime();
+        }
+
+        return LocalDateTime.parse(paramValue);
+    }
+
+    protected int getIntParameter(ACLMessage rcv, String param) {
+        var paramValue = rcv.getUserDefinedParameter(param);
+        if (paramValue == null) {
+            print("Did not receive " + param + " from " + rcv.getSender(), LoggerLevel.ERROR);
+            return 0;
+        }
+
+        return Integer.parseInt(rcv.getUserDefinedParameter(param));
     }
 }

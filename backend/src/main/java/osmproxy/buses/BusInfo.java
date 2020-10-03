@@ -3,8 +3,6 @@ package osmproxy.buses;
 import org.jetbrains.annotations.NotNull;
 import osmproxy.elements.OSMStation;
 import osmproxy.elements.OSMWay;
-import routing.RouteNode;
-import routing.Router;
 
 import java.util.ArrayList;
 import java.util.Collection;

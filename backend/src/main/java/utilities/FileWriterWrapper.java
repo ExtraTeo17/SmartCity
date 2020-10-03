@@ -43,16 +43,16 @@ public class FileWriterWrapper {
         }
     }
 
-    public static void write(JSONObject jsonObj) {
+    public static void write(String jsonObj) {
         write(jsonObj, DEFAULT_OUTPUT_PATH_JSON);
     }
 
-    public static void write(JSONObject jsonObj, String path) {
+    public static void write(String jsonString, String path) {
         try {
             File file = new File(path);
             if (file.exists() || file.createNewFile()) {
                 var writer = new OutputStreamWriter(new FileOutputStream(file), StandardCharsets.UTF_8);
-                mapper.writerWithDefaultPrettyPrinter().writeValue(writer, jsonObj);
+                mapper.writerWithDefaultPrettyPrinter().writeValue(writer, jsonString);
             }
         } catch (Exception e) {
             logger.warn("Could not write to file", e);

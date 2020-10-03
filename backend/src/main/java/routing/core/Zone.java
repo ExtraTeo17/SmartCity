@@ -1,8 +1,7 @@
 package routing.core;
 
-import routing.Router;
+import routing.RoutingConstants;
 import smartcity.config.ConfigMutator;
-import utilities.NumericHelper;
 
 import java.util.Objects;
 
@@ -50,7 +49,7 @@ public class Zone implements IZone {
         var haversine = Math.sin(dLat) * Math.sin(dLat) +
                 Math.cos(Math.toRadians(latPos)) * Math.cos(Math.toRadians(latCenter)) * Math.sin(dLng) * Math.sin(dLng);
         var dist = 2 * Math.atan2(Math.sqrt(haversine), Math.sqrt(1 - haversine));
-        var distMeters = Router.EARTH_RADIUS_METERS * dist;
+        var distMeters = RoutingConstants.EARTH_RADIUS_METERS * dist;
 
         return distMeters <= radius;
     }

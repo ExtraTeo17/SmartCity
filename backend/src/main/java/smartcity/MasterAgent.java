@@ -19,8 +19,7 @@ import vehicles.TestCar;
 import vehicles.TestPedestrian;
 
 import java.time.Duration;
-import java.time.Instant;
-import java.util.Date;
+import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -32,7 +31,6 @@ public class MasterAgent extends Agent {
 
     private final MapWindow window;
     private final IAgentsContainer agentsContainer;
-    private static ITimeProvider timeProvider;
 
     // TODO: Delete this
     @Deprecated(forRemoval = true, since = "Always - Eldritch Abomination")
@@ -44,19 +42,14 @@ public class MasterAgent extends Agent {
 
     @Inject
     public MasterAgent(IAgentsContainer agentsContainer,
-                       ITimeProvider timeProvider,
                        MapWindow window) {
         this.agentsContainer = agentsContainer;
         this.window = window;
-
-        // TODO: Delete this abomination
-        this.timeProvider = timeProvider;
     }
 
     @Override
     protected void setup() {
         window.display();
-
         addBehaviour(getReceiveMessageBehaviour());
     }
 
@@ -90,14 +83,14 @@ public class MasterAgent extends Agent {
             var pedestrian = agent.getPedestrian();
             if (pedestrian instanceof TestPedestrian) {
                 var testPedestrian = (TestPedestrian) pedestrian;
-                setResultTime(testPedestrian.start, testPedestrian.end);
+                setResultTime(testPedestrian.getStart(), testPedestrian.getEnd());
             }
 
             agentsContainer.remove(agent);
         }
     }
 
-    private void setResultTime(Instant start, Instant end) {
+    private void setResultTime(LocalDateTime start, LocalDateTime end) {
         long seconds = Duration.between(start, end).getSeconds();
         String time = String.format(
                 "%d:%02d:%02d",
@@ -116,7 +109,7 @@ public class MasterAgent extends Agent {
             var vehicle = agent.getVehicle();
             if (vehicle instanceof TestCar) {
                 var testVehicle = (TestCar) vehicle;
-                setResultTime(testVehicle.start, testVehicle.end);
+                setResultTime(testVehicle.getStart(), testVehicle.getEnd());
             }
 
             agentsContainer.remove(agent);
@@ -126,11 +119,5 @@ public class MasterAgent extends Agent {
     private void onReceiveBus(ACLMessage rcv) {
         agentsContainer.removeIf(BusAgent.class,
                 v -> v.getLocalName().equals(rcv.getSender().getLocalName()));
-    }
-
-
-    @Deprecated(forRemoval = true, since = "When all users have TimeManager service")
-    public static Date getSimulationTime() {
-        return timeProvider.getCurrentSimulationTime();
     }
 }

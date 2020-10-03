@@ -1,29 +1,50 @@
 package vehicles;
 
-import routing.RouteNode;
-import routing.StationNode;
-import smartcity.MasterAgent;
+import com.google.common.annotations.VisibleForTesting;
+import smartcity.ITimeProvider;
 
-import java.time.Instant;
-import java.util.List;
+import java.time.LocalDateTime;
 
 public class TestPedestrian extends Pedestrian {
-    public Instant start;
-    public Instant end;
+    private final ITimeProvider timeProvider;
 
-    public TestPedestrian(List<RouteNode> routeToStation, List<RouteNode> routeFromStation, String preferredBusLine,
-                          StationNode startStation, StationNode finishStation) {
-        super(routeToStation, routeFromStation, preferredBusLine, startStation, finishStation);
+    private LocalDateTime start;
+    private LocalDateTime end;
+
+    @VisibleForTesting
+    TestPedestrian(ITimeProvider timeProvider) {
+        this.timeProvider = timeProvider;
+    }
+
+    public TestPedestrian(Pedestrian pedestrian, ITimeProvider timeProvider) {
+        super(pedestrian);
+        this.timeProvider = timeProvider;
     }
 
     @Override
-    public void setState(DrivingState state) {
-        if (getState() == DrivingState.STARTING) {
-            start = MasterAgent.getSimulationTime().toInstant();
+    public void setState(DrivingState newState) {
+        var initialState = getState();
+        if (initialState == DrivingState.STARTING) {
+            start = timeProvider.getCurrentSimulationTime();
         }
-        super.setState(state);
-        if (state == DrivingState.AT_DESTINATION) {
-            end = MasterAgent.getSimulationTime().toInstant();
+        if (newState == DrivingState.AT_DESTINATION) {
+            end = timeProvider.getCurrentSimulationTime();
+            ;
         }
+
+        super.setState(newState);
+    }
+
+    @Override
+    public String getVehicleType() {
+        return VehicleType.TEST_PEDESTRIAN.toString();
+    }
+
+    public LocalDateTime getStart() {
+        return start;
+    }
+
+    public LocalDateTime getEnd() {
+        return end;
     }
 }

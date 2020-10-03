@@ -1,44 +1,41 @@
 package osmproxy.buses;
 
 import org.jetbrains.annotations.NotNull;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import osmproxy.buses.models.TimetableRecord;
 
-import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class BrigadeInfo implements Iterable<Timetable> {
-    private final String brigadeNr;
-    private final List<Timetable> timetables = new ArrayList<>();
+    private final static Logger logger = LoggerFactory.getLogger(BrigadeInfo.class);
 
-    private int timetablesCounter;
-    private long currentlyConsideredStation = -1;
+    public final String brigadeId;
+    private final List<Timetable> timetables;
 
-    BrigadeInfo(final String brigadeNr) {
-        this.brigadeNr = brigadeNr;
+    BrigadeInfo(String brigadeId,
+                long initialStopId,
+                List<TimetableRecord> initialStopTimestamps) {
+        this.brigadeId = brigadeId;
+        this.timetables = initialStopTimestamps.stream()
+                .map(record -> new Timetable(initialStopId, record.timeOnStop))
+                .collect(Collectors.toList());
     }
 
-    public String getBrigadeNr() {
-        return brigadeNr;
-    }
-
-    // TODO: Is shouldReset executed only at first or may be more than one time?
-    public void addToTimetable(long stationId, String time) {
-        if (shouldReset(stationId)) {
-            timetablesCounter = 0;
-            currentlyConsideredStation = stationId;
-        }
-        else {
-            ++timetablesCounter;
+    public void addTimetableRecords(long stationId, List<TimetableRecord> timetableRecords) {
+        if (timetables.size() != timetableRecords.size()) {
+            logger.error("Initial timetables size different than current:\n" +
+                    " initial: '" + timetables.size() +
+                    " current: " + timetableRecords.size());
         }
 
-        if (timetablesCounter == timetables.size()) {
-            timetables.add(new Timetable());
+        for (int i = 0; i < timetables.size(); ++i) {
+            var timetable = timetables.get(i);
+            var record = timetableRecords.get(i);
+            timetable.addTimeRecord(stationId, record.timeOnStop);
         }
-        timetables.get(timetablesCounter).addEntryToTimetable(stationId, time);
-    }
-
-    private boolean shouldReset(final long stationOsmId) {
-        return stationOsmId != currentlyConsideredStation;
     }
 
     @NotNull

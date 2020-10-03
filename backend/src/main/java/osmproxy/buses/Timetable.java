@@ -1,51 +1,39 @@
 package osmproxy.buses;
 
+import com.google.common.collect.TreeMultiset;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.*;
+import java.time.LocalDateTime;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Optional;
 
 public class Timetable {
     private static final Logger logger = LoggerFactory.getLogger(Timetable.class);
-    private final Map<Long, Date> stationOsmIdToTime = new HashMap<>();
-    private final List<Date> timeOnStationChronological = new LinkedList<>();
 
-    Timetable() { }
+    private final Map<Long, LocalDateTime> stopIdToTime;
+    private final TreeMultiset<LocalDateTime> stopTimesChronological;
 
-    public Optional<Date> getTimeOnStation(final long stationId) {
-        var time = stationOsmIdToTime.get(stationId);
+    Timetable(long startStopId, LocalDateTime startDate) {
+        this.stopIdToTime = new HashMap<>();
+        this.stopIdToTime.put(startStopId, startDate);
+
+        this.stopTimesChronological = TreeMultiset.create();
+        this.stopTimesChronological.add(startDate);
+    }
+
+    public LocalDateTime getBoardingTime() {
+        return stopTimesChronological.firstEntry().getElement();
+    }
+
+    public Optional<LocalDateTime> getTimeOnStation(final long stationId) {
+        var time = stopIdToTime.get(stationId);
         return Optional.ofNullable(time);
     }
 
-    public Date getBoardingTime() {
-        return timeOnStationChronological.get(0);
-    }
-
-    void addEntryToTimetable(long stationId, String time) {
-        Date timeOnStation;
-        try {
-            timeOnStation = new SimpleDateFormat("HH:mm:ss").parse(time);
-        } catch (ParseException e) {
-            logger.warn("Error parsing new entry", e);
-            return;
-        }
-
-        var lastEntry = getLastChronologicalEntry();
-        if (lastEntry.isEmpty() || !timeOnStation.before(lastEntry.get())) {
-            stationOsmIdToTime.put(stationId, timeOnStation);
-            timeOnStationChronological.add(timeOnStation);
-        }
-        else {
-            logger.debug("Did not put '" + time + "' for '" + stationId + "'\n"
-                    + "lastEntry: '" + lastEntry.orElse(null) + "'");
-        }
-    }
-
-    private Optional<Date> getLastChronologicalEntry() {
-        return timeOnStationChronological.size() != 0 ?
-                Optional.of(timeOnStationChronological.get(timeOnStationChronological.size() - 1)) :
-                Optional.empty();
+    void addTimeRecord(long stationId, LocalDateTime time) {
+        stopIdToTime.put(stationId, time);
+        stopTimesChronological.add(time);
     }
 }
