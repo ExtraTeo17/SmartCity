@@ -17,7 +17,7 @@ import utilities.Siblings;
 import java.util.ArrayList;
 import java.util.List;
 
-class CrossroadParser {
+public class CrossroadParser {
     private static final Logger logger = LoggerFactory.getLogger(CrossroadParser.class);
     private static final double COSINE_OF_135_DEGREES = -0.7071;
     private static final double DISTANCE_THRESHOLD = 10 * RoutingConstants.DEGREES_PER_METER;

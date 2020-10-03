@@ -2,6 +2,7 @@ package agents;
 
 import agents.abstractions.IAgentsContainer;
 import agents.abstractions.IAgentsFactory;
+import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.ImmutableList;
 import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
@@ -172,7 +173,8 @@ public class AgentsCreator {
         return result;
     }
 
-    private boolean tryConstructLightManagers() {
+    @VisibleForTesting
+    boolean tryConstructLightManagers() {
         try {
             if (StaticConfig.USE_DEPRECATED_XML_FOR_LIGHT_MANAGERS) {
                 var nodes = mapAccessManager.getLightManagersNodes(configContainer.getZone());
