@@ -22,8 +22,8 @@ public class MovingObjectImpl extends MovingObject {
         this.route = uniformRoute;
     }
 
-    protected MovingObjectImpl(MovingObjectImpl movingObject) {
-        super(movingObject.getSpeed());
+    MovingObjectImpl(MovingObjectImpl movingObject) {
+        super(movingObject.speed);
         this.displayRoute = movingObject.displayRoute;
         this.route = movingObject.route;
     }

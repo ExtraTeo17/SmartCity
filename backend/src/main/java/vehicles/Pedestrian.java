@@ -53,7 +53,7 @@ public class Pedestrian extends MovingObject {
     }
 
     Pedestrian(Pedestrian ped) {
-        super(ped.getSpeed());
+        super(ped.speed);
         this.displayRouteBeforeBus = ped.displayRouteBeforeBus;
         this.routeBeforeBus = ped.routeBeforeBus;
 
