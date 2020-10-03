@@ -231,6 +231,7 @@ public class MapAccessManager implements IMapAccessManager {
     }
 
     @Override
+    @Deprecated
     public List<Node> getLightManagersNodes(IZone zone) {
         var lightManagersNodes = new ArrayList<Node>();
         Document xmlDocument = getXmlDocument(CROSSROADS_LOCATIONS_PATH);

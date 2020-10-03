@@ -1,19 +1,12 @@
 package smartcity.task;
 
 import agents.BusAgent;
-import agents.LightManagerAgent;
-import agents.abstractions.AbstractAgent;
 import agents.abstractions.IAgentsContainer;
-import com.google.common.eventbus.Subscribe;
 import com.google.inject.Inject;
-import events.SwitchLightsStartEvent;
-import events.web.StartSimulationEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import routing.abstractions.IRoutingHelper;
 import routing.core.IZone;
-import smartcity.SimulationState;
-import smartcity.config.ConfigContainer;
 import smartcity.lights.core.Light;
 import smartcity.task.abstractions.ITaskManager;
 import smartcity.task.abstractions.ITaskProvider;
@@ -38,7 +31,6 @@ public class TaskManager implements ITaskManager {
     private final IRoutingHelper routingHelper;
     private final ITaskProvider taskProvider;
     private final IZone zone;
-    private final ConfigContainer configContainer;
 
     private final Random random;
 
@@ -47,40 +39,14 @@ public class TaskManager implements ITaskManager {
                 IAgentsContainer agentsContainer,
                 IRoutingHelper routingHelper,
                 ITaskProvider taskProvider,
-                ConfigContainer configContainer) {
+                IZone zone) {
         this.runnableFactory = runnableFactory;
         this.agentsContainer = agentsContainer;
         this.routingHelper = routingHelper;
         this.taskProvider = taskProvider;
-        this.zone = configContainer.getZone();
-        this.configContainer = configContainer;
+        this.zone = zone;
 
         this.random = new Random();
-    }
-
-    @SuppressWarnings("FeatureEnvy")
-    @Subscribe
-    public void handle(StartSimulationEvent e) {
-        activateLightManagerAgents();
-        if (configContainer.shouldGenerateCars()) {
-            scheduleCarCreation(e.carsNum, e.testCarId);
-        }
-        if (configContainer.shouldGeneratePedestriansAndBuses()) {
-            // TODO: Add pedestrians limit and testPedestrianID
-            schedulePedestrianCreation(100_000, e.testCarId);
-            scheduleBusControl(() -> configContainer.getSimulationState() == SimulationState.RUNNING);
-        }
-
-        configContainer.setSimulationState(SimulationState.RUNNING);
-    }
-
-    private void activateLightManagerAgents() {
-        agentsContainer.forEach(LightManagerAgent.class, AbstractAgent::start);
-    }
-
-    @Subscribe
-    public void handle(SwitchLightsStartEvent e) {
-        scheduleSwitchLightTask(e.lights);
     }
 
     @Override

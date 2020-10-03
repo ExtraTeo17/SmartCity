@@ -24,10 +24,10 @@ class LightSwitcher implements Function<ISwitchLightsContext, Integer> {
     private final Collection<Light> lights;
 
     @Inject
-    public LightSwitcher(ITimeProvider timeProvider,
-                         ConfigContainer configContainer,
-                         @Assisted int extendTimeSeconds,
-                         @Assisted Collection<Light> lights) {
+    LightSwitcher(ITimeProvider timeProvider,
+                  ConfigContainer configContainer,
+                  @Assisted int extendTimeSeconds,
+                  @Assisted Collection<Light> lights) {
         this.timeProvider = timeProvider;
         this.configContainer = configContainer;
         this.extendTimeSeconds = extendTimeSeconds;
@@ -59,7 +59,7 @@ class LightSwitcher implements Function<ISwitchLightsContext, Integer> {
         return defaultExecutionDelay;
     }
 
-    boolean shouldExtendGreenLightBecauseOfCarsOnLight() {
+    private boolean shouldExtendGreenLightBecauseOfCarsOnLight() {
         int greenGroupCars = 0;
         int redGroupCars = 0;
         for (Light light : lights) {
@@ -75,7 +75,7 @@ class LightSwitcher implements Function<ISwitchLightsContext, Integer> {
         return greenGroupCars > redGroupCars;
     }
 
-    boolean shouldExtendBecauseOfFarAwayQueue() {
+    private boolean shouldExtendBecauseOfFarAwayQueue() {
         for (Light light : lights) {
             var currentTime = timeProvider.getCurrentSimulationTime();
             var currentTimePlusExtend = currentTime.plusSeconds(extendTimeSeconds);
@@ -91,6 +91,4 @@ class LightSwitcher implements Function<ISwitchLightsContext, Integer> {
 
         return false;
     }
-
-    ;
 }

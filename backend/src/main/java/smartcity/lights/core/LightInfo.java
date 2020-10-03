@@ -1,74 +1,24 @@
 package smartcity.lights.core;
 
 
-import osmproxy.elements.OSMNode;
-import osmproxy.elements.OSMWay;
-import osmproxy.elements.OSMWaypoint;
-import routing.RoutingConstants;
 import routing.core.IGeoPosition;
 
-class LightInfo implements IGeoPosition {
-    private static final double DISTANCE_THRESHOLD = 10 * RoutingConstants.DEGREES_PER_METER;
-    private final String osmLightId;
-    private final String adjacentOsmWayId;
-    private IGeoPosition position;
-    private String adjacentCrossingOsmId1;
-    private String adjacentCrossingOsmId2;
+public class LightInfo {
+    final long osmLightId;
+    final long adjacentOsmWayId;
+    final IGeoPosition position;
+    final String adjacentCrossingOsmId1;
+    final String adjacentCrossingOsmId2;
 
-    LightInfo(OSMWay adjacentOsmWay, OSMNode centerCrossroadNode) {
-        this.adjacentOsmWayId = Long.toString(adjacentOsmWay.getId());
-        this.osmLightId = Long.toString(centerCrossroadNode.getId());
-        fillLightPositionAndCrossings(adjacentOsmWay);
-
-        var distToCrossroad = adjacentOsmWay.getLightNeighborPos().distance(centerCrossroadNode);
-        if (distToCrossroad > DISTANCE_THRESHOLD) {
-            position = position.midpoint(centerCrossroadNode);
-            position = position.midpoint(centerCrossroadNode);
-        }
-    }
-
-    private void fillLightPositionAndCrossings(OSMWay adjacentOsmWay) {
-        OSMWaypoint secondWaypoint = null;
-        OSMWaypoint thirdWaypoint = null;
-        switch (adjacentOsmWay.getLightOrientation()) {
-            case LIGHT_AT_ENTRY -> {
-                secondWaypoint = adjacentOsmWay.getWaypoint(1);
-                thirdWaypoint = adjacentOsmWay.getWaypointCount() > 2 ? adjacentOsmWay.getWaypoint(2) : null;
-            }
-            case LIGHT_AT_EXIT -> {
-                secondWaypoint = adjacentOsmWay.getWaypoint(adjacentOsmWay.getWaypointCount() - 2);
-                thirdWaypoint = adjacentOsmWay.getWaypointCount() > 2 ?
-                        adjacentOsmWay.getWaypoint(adjacentOsmWay.getWaypointCount() - 3) : null;
-            }
-        }
-        position = secondWaypoint;
-        adjacentCrossingOsmId1 = secondWaypoint.getOsmNodeRef();
-        adjacentCrossingOsmId2 = thirdWaypoint != null ? thirdWaypoint.getOsmNodeRef() : null;
-    }
-
-    @Override
-    public double getLat() {
-        return position.getLat();
-    }
-
-    @Override
-    public double getLng() {
-        return position.getLng();
-    }
-
-    public String getOsmLightId() {
-        return osmLightId;
-    }
-
-    public String getAdjacentOsmWayId() {
-        return adjacentOsmWayId;
-    }
-
-    String getAdjacentCrossingOsmId1() {
-        return adjacentCrossingOsmId1;
-    }
-
-    public String getAdjacentCrossingOsmId2() {
-        return adjacentCrossingOsmId2;
+    public LightInfo(long osmLightId,
+                     long adjacentOsmWayId,
+                     IGeoPosition position,
+                     String adjacentCrossingOsmId1,
+                     String adjacentCrossingOsmId2) {
+        this.osmLightId = osmLightId;
+        this.adjacentOsmWayId = adjacentOsmWayId;
+        this.position = position;
+        this.adjacentCrossingOsmId1 = adjacentCrossingOsmId1;
+        this.adjacentCrossingOsmId2 = adjacentCrossingOsmId2;
     }
 }

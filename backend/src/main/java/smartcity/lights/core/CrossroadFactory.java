@@ -9,16 +9,17 @@ import smartcity.lights.abstractions.ICrossroad;
 import smartcity.lights.abstractions.ICrossroadFactory;
 import utilities.Siblings;
 
+import java.util.List;
+
 public class CrossroadFactory implements ICrossroadFactory {
     private final EventBus eventBus;
+    private final CrossroadParser crossroadParser;
 
     @Inject
-    public CrossroadFactory(EventBus eventBus) {
+    public CrossroadFactory(EventBus eventBus,
+                            CrossroadParser crossroadParser) {
         this.eventBus = eventBus;
-    }
-
-    public ICrossroad create(Siblings<SimpleLightGroup> lightGroups) {
-        return new SimpleCrossroad(eventBus, lightGroups);
+        this.crossroadParser = crossroadParser;
     }
 
     @Override
@@ -33,19 +34,24 @@ public class CrossroadFactory implements ICrossroadFactory {
         return create(lightGroups);
     }
 
-    private static Siblings<SimpleLightGroup> getLightGroups(Node crossroad, int managerId) {
-        var crossroadChildren = crossroad.getChildNodes();
-        var lightGroupA = new SimpleLightGroup(crossroadChildren.item(1), LightColor.RED, managerId);
-        var lightGroupB = new SimpleLightGroup(crossroadChildren.item(3), LightColor.GREEN, managerId);
+    private ICrossroad create(Siblings<SimpleLightGroup> lightGroups) {
+        return new SimpleCrossroad(eventBus, lightGroups);
+    }
+
+    private Siblings<SimpleLightGroup> getLightGroups(Node crossroad, int managerId) {
+        var lightGroups = crossroadParser.getLightGroups(crossroad);
+        return getLightGroups(lightGroups.first, lightGroups.second, managerId);
+    }
+
+    private Siblings<SimpleLightGroup> getLightGroups(List<LightInfo> groupA, List<LightInfo> groupB, int managerId){
+        var lightGroupA = new SimpleLightGroup(groupA, LightColor.RED, managerId);
+        var lightGroupB = new SimpleLightGroup(groupA, LightColor.GREEN, managerId);
 
         return Siblings.of(lightGroupA, lightGroupB);
     }
 
-    private static Siblings<SimpleLightGroup> getLightGroups(OSMNode centerCrossroadNode, int managerId) {
-        var info = new CrossroadInfo(centerCrossroadNode);
-        var lightGroupA = new SimpleLightGroup(info.getFirstLightGroupInfo(), LightColor.RED, managerId);
-        var lightGroupB = new SimpleLightGroup(info.getSecondLightGroupInfo(), LightColor.GREEN, managerId);
-
-        return Siblings.of(lightGroupA, lightGroupB);
+    private Siblings<SimpleLightGroup> getLightGroups(OSMNode centerCrossroadNode, int managerId) {
+        var lightGroups = crossroadParser.getLightGroups(centerCrossroadNode);
+        return getLightGroups(lightGroups.first, lightGroups.second, managerId);
     }
 }

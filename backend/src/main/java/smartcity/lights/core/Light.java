@@ -6,7 +6,6 @@ import org.javatuples.Pair;
 import org.jxmapviewer.viewer.DefaultWaypoint;
 import org.jxmapviewer.viewer.Waypoint;
 import org.jxmapviewer.viewer.WaypointPainter;
-import org.w3c.dom.Node;
 import routing.LightManagerNode;
 import routing.core.IGeoPosition;
 import smartcity.MasterAgent;
@@ -16,43 +15,27 @@ import java.time.LocalDateTime;
 import java.util.*;
 
 public class Light implements IGeoPosition {
-    private static final String OSM_LIGHT_ID = "light";
-    private static final String WAY_ID = "way";
-    private static final String LAT = "lat";
-    private static final String LON = "lon";
-
     private final double lat;
     private final double lng;
+    private LightColor carLightColor;
+    private final long adjacentOsmWayId;
+    private final String adjacentCrossingOsmId1;
+    private final String adjacentCrossingOsmId2;
+    private final long osmId;
 
-    final Map<String, LocalDateTime> farAwayCarMap = new HashMap<>();
-    final Map<String, LocalDateTime> farAwayPedestrianMap = new HashMap<>();
+    private final Map<String, LocalDateTime> farAwayCarMap = new HashMap<>();
+    private final Map<String, LocalDateTime> farAwayPedestrianMap = new HashMap<>();
     final Queue<String> carQueue = new LinkedList<>();
     final Queue<String> pedestrianQueue = new LinkedList<>();
 
-    private LightColor carLightColor;
-    private final long adjacentOsmWayId;
-    private String adjacentCrossingOsmId1;
-    private String adjacentCrossingOsmId2;
-    private final long osmId;
-
-    Light(Node node, LightColor color, int managerId) {
+    public Light(LightInfo info, LightColor color, int managerId) {
+        this.osmId = info.osmLightId;
+        this.lat = info.position.getLat();
+        this.lng = info.position.getLng();
+        this.adjacentOsmWayId = info.adjacentOsmWayId;
+        this.adjacentCrossingOsmId1 = info.adjacentCrossingOsmId1;
+        this.adjacentCrossingOsmId2 = info.adjacentCrossingOsmId2;
         this.carLightColor = color;
-        osmId = Long.parseLong(node.getAttributes().getNamedItem(OSM_LIGHT_ID).getNodeValue());
-        lat = Double.parseDouble((node.getAttributes().getNamedItem(LAT).getNodeValue()));
-        lng = Double.parseDouble((node.getAttributes().getNamedItem(LON).getNodeValue()));
-        // TODO: Retrieve crossings!
-        adjacentOsmWayId = Long.parseLong((node.getAttributes().getNamedItem(WAY_ID).getNodeValue()));
-        addHashMapsEntries(managerId);
-    }
-
-    Light(LightInfo info, LightColor color, int managerId) {
-        this.carLightColor = color;
-        this.osmId = Long.parseLong(info.getOsmLightId());
-        this.lat = info.getLat();
-        this.lng = info.getLng();
-        adjacentOsmWayId = Long.parseLong(info.getAdjacentOsmWayId());
-        adjacentCrossingOsmId1 = info.getAdjacentCrossingOsmId1();
-        adjacentCrossingOsmId2 = info.getAdjacentCrossingOsmId2();
         addHashMapsEntries(managerId);
     }
 
@@ -66,7 +49,7 @@ public class Light implements IGeoPosition {
         return lng;
     }
 
-    public long getAdjacentWayId() {
+    long getAdjacentWayId() {
         return adjacentOsmWayId;
     }
 

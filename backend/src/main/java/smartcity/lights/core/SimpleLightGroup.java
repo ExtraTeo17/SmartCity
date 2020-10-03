@@ -3,23 +3,11 @@ package smartcity.lights.core;
 import agents.utilities.LightColor;
 import org.jxmapviewer.viewer.Waypoint;
 import org.jxmapviewer.viewer.WaypointPainter;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
 
 import java.util.*;
 
 class SimpleLightGroup {
     private final Set<Light> lights;
-
-    SimpleLightGroup(Node crossroadGroup, LightColor color, int managerId) {
-        lights = new HashSet<>();
-        NodeList lightsInGroup = crossroadGroup.getChildNodes();
-        for (int i = 0; i < lightsInGroup.getLength(); ++i) {
-            if (lightsInGroup.item(i).getNodeName().equals("light")) {
-                lights.add(new Light(lightsInGroup.item(i), color, managerId));
-            }
-        }
-    }
 
     SimpleLightGroup(List<LightInfo> infoList, LightColor color, int managerId) {
         lights = new HashSet<>();

@@ -1,6 +1,7 @@
 package smartcity.task;
 
 import com.google.inject.Binder;
+import com.google.inject.PrivateModule;
 import com.google.inject.Singleton;
 import genesis.AbstractModule;
 import smartcity.task.abstractions.ITaskManager;
@@ -14,7 +15,17 @@ public class TaskModule extends AbstractModule {
         super.configure(binder);
         binder.install(new RunnableModule());
         binder.install(new FunctionalModule());
-        binder.bind(ITaskProvider.class).to(TaskProvider.class).in(Singleton.class);
-        binder.bind(ITaskManager.class).to(TaskManager.class).asEagerSingleton();
+        binder.install(new PrivateModule() {
+            @Override
+            protected void configure() {
+                bind(ITaskProvider.class).to(TaskProvider.class).in(Singleton.class);
+                bind(ITaskManager.class).to(TaskManager.class).in(Singleton.class);
+                bind(Scheduler.class).asEagerSingleton();
+                
+                // TODO: Delete it - used only by mapGui
+                expose(ITaskProvider.class);
+            }
+        });
+
     }
 }

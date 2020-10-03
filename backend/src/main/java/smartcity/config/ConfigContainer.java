@@ -10,8 +10,8 @@ import routing.core.Zone;
 import smartcity.SimulationState;
 
 
-public final class ConfigContainer extends ConfigMutator
-        implements IZoneMutator {
+public class ConfigContainer extends ConfigMutator
+        implements IZoneMutator, ILightConfigContainer {
     private final EventBus eventBus;
     private SimulationState simulationState = SimulationState.INITIAL;
     private boolean shouldGeneratePedestriansAndBuses = true;
@@ -50,6 +50,7 @@ public final class ConfigContainer extends ConfigMutator
         this.shouldGeneratePedestriansAndBuses = value;
     }
 
+    @Override
     public synchronized boolean tryLockLightManagers() {
         if (lightManagersLock) {
             return false;
@@ -59,6 +60,7 @@ public final class ConfigContainer extends ConfigMutator
         return true;
     }
 
+    @Override
     public synchronized void unlockLightManagers() {
         lightManagersLock = false;
     }
@@ -101,10 +103,12 @@ public final class ConfigContainer extends ConfigMutator
         carsConfig.setNumber(mutation, num);
     }
 
+    @Override
     public boolean isLightStrategyActive() {
         return isLightStrategyActive;
     }
 
+    @Override
     public void setLightStrategyActive(boolean lightStrategyActive) {
         isLightStrategyActive = lightStrategyActive;
     }

@@ -70,6 +70,7 @@ public class OSMNode extends OSMElement
         parentWays.get(parentWayIndex).addChildNodeId(id);
     }
 
+    // TODO: Change name to define the purpose, not the implementation - isLightOriented?
     public final boolean determineParentOrientationsTowardsCrossroad() {
         for (final OSMWay way : parentWays) {
             way.determineLightOrientationTowardsCrossroad(Long.toString(id));

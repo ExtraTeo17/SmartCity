@@ -8,8 +8,6 @@ import jade.lang.acl.ACLMessage;
 import jade.util.leap.Properties;
 import org.jxmapviewer.JXMapViewer;
 import org.jxmapviewer.painter.Painter;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import routing.core.IGeoPosition;
 import smartcity.ITimeProvider;
 import smartcity.TimeProvider;
@@ -21,7 +19,6 @@ import java.util.List;
 
 public class LightManagerAgent extends AbstractAgent {
     public static final String name = LightManagerAgent.class.getSimpleName().replace("Agent", "");
-    private static final Logger logger = LoggerFactory.getLogger(LightManagerAgent.class);
 
     private final ICrossroad crossroad;
 
