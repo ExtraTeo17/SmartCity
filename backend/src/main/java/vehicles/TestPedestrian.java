@@ -37,7 +37,7 @@ public class TestPedestrian extends Pedestrian {
 
     @Override
     public String getVehicleType() {
-        return "TestPedestrian";
+        return VehicleType.TEST_PEDESTRIAN.toString();
     }
 
     public LocalDateTime getStart() {

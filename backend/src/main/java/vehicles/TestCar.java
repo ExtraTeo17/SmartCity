@@ -39,7 +39,7 @@ public class TestCar extends MovingObjectImpl {
 
     @Override
     public String getVehicleType() {
-        return "TestCar";
+        return  VehicleType.TEST_CAR.toString();
     }
 
     public LocalDateTime getStart() {
