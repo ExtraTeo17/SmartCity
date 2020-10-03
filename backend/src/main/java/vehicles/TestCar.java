@@ -32,10 +32,14 @@ public class TestCar extends MovingObjectImpl {
         }
         if (newState == DrivingState.AT_DESTINATION) {
             end = timeProvider.getCurrentSimulationTime();
-            ;
         }
 
         super.setState(newState);
+    }
+
+    @Override
+    public String getVehicleType() {
+        return "TestCar";
     }
 
     public LocalDateTime getStart() {

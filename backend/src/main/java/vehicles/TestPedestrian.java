@@ -35,6 +35,11 @@ public class TestPedestrian extends Pedestrian {
         super.setState(newState);
     }
 
+    @Override
+    public String getVehicleType() {
+        return "TestPedestrian";
+    }
+
     public LocalDateTime getStart() {
         return start;
     }
