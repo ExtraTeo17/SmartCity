@@ -8,6 +8,7 @@ import java.time.LocalTime;
 import java.time.temporal.ChronoUnit;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static testutils.ThreadHelper.trySleep;
 
 class TimeProviderTests {
 
@@ -32,13 +33,5 @@ class TimeProviderTests {
         assertTrue(resultTimeDiff >= min &&
                         resultTimeDiff <= max,
                 "Should be: [" + min + ", " + max + "], but is: " + resultTimeDiff + "[ms]");
-    }
-
-    private void trySleep(int ms) {
-        try {
-            Thread.sleep(ms);
-        } catch (InterruptedException e) {
-            throw new RuntimeException(e);
-        }
     }
 }

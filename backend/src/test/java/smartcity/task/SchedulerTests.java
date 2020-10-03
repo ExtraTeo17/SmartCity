@@ -13,12 +13,13 @@ import smartcity.task.abstractions.ITaskManager;
 import java.util.Arrays;
 import java.util.concurrent.atomic.AtomicBoolean;
 
+import static mocks.TestInstanceCreator.createLight;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.mock;
 
-class SchedulerTest {
+class SchedulerTests {
 
     @Test
     void handle_switchLightsStartEvent_shouldRunTask() {
@@ -45,12 +46,5 @@ class SchedulerTest {
         var agentsContainer = mock(IAgentsContainer.class);
 
         return new Scheduler(taskManager, configContainer, agentsContainer);
-    }
-
-
-    private Light createLight() {
-        var info = new LightInfo(1, 1, Position.of(1, 1), "1", "2");
-        var result = new Light(info, LightColor.RED, 1);
-        return result;
     }
 }

@@ -1,5 +1,6 @@
 package smartcity.task.runnable;
 
+import smartcity.task.runnable.abstractions.ICompletableRunnable;
 import smartcity.task.runnable.abstractions.IFixedExecutionRunnable;
 
 import java.util.concurrent.ScheduledExecutorService;
@@ -7,7 +8,7 @@ import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 
 // source: https://stackoverflow.com/a/7299823/6841224
-abstract class AbstractFixedExecutionRunnable implements IFixedExecutionRunnable {
+abstract class AbstractFixedExecutionRunnable implements IFixedExecutionRunnable, ICompletableRunnable {
     private final ScheduledExecutorService executor;
     private volatile ScheduledFuture<?> self;
 
@@ -15,24 +16,9 @@ abstract class AbstractFixedExecutionRunnable implements IFixedExecutionRunnable
         this.executor = executor;
     }
 
-    void onComplete() {
-        boolean interrupted = false;
-        try {
-            while (self == null) {
-                //noinspection NestedTryStatement
-                try {
-                    //noinspection BusyWait
-                    Thread.sleep(1);
-                } catch (InterruptedException e) {
-                    interrupted = true;
-                }
-            }
-            self.cancel(false);
-        } finally {
-            if (interrupted) {
-                Thread.currentThread().interrupt();
-            }
-        }
+    @Override
+    public ScheduledFuture<?> getSelf() {
+        return self;
     }
 
     @Override
