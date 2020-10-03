@@ -51,7 +51,7 @@ import java.util.stream.Collectors;
 
 public class MapAccessManager implements IMapAccessManager {
     private static final Logger logger = LoggerFactory.getLogger(MapAccessManager.class);
-    private static final String OVERPASS_API = "https://lz4.overpass-api.de/api/interpreter";
+    private static final String OVERPASS_API = "https://overpass-api.de/api/interpreter";
     private static final String CROSSROADS_LOCATIONS_PATH = "config/crossroads.xml";
 
     private final DocumentBuilderFactory xmlBuilderFactory;
