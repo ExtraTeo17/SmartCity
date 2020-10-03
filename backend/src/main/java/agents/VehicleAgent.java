@@ -8,12 +8,13 @@ import jade.core.behaviours.TickerBehaviour;
 import jade.lang.acl.ACLMessage;
 import jade.util.leap.Properties;
 import routing.LightManagerNode;
-import routing.RoutingConstants;
 import routing.core.IGeoPosition;
 import smartcity.ITimeProvider;
 import smartcity.MasterAgent;
 import vehicles.DrivingState;
 import vehicles.MovingObject;
+
+import static routing.RoutingConstants.STEP_CONSTANT;
 
 @SuppressWarnings("serial")
 // TODO: Maybe rename to CarAgent? Bus is also a Vehicle
@@ -31,7 +32,12 @@ public class VehicleAgent extends AbstractAgent {
         vehicle.setState(DrivingState.MOVING);
 
         int speed = vehicle.getSpeed();
-        Behaviour move = new TickerBehaviour(this, RoutingConstants.STEP_CONSTANT / speed) {
+        if (speed > STEP_CONSTANT) {
+            print("Invalid speed: " + speed + "\n   Terminating!!!   \n");
+            doDelete();
+            return;
+        }
+        Behaviour move = new TickerBehaviour(this, STEP_CONSTANT / speed) {
             @Override
             public void onTick() {
                 if (vehicle.isAtTrafficLights()) {

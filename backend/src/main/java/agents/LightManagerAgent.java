@@ -162,10 +162,6 @@ public class LightManagerAgent extends AbstractAgent {
         return crossroad.getLightsPositions();
     }
 
-    public void print(String message) {
-        logger.info(getLocalName() + ": " + message);
-    }
-
     public void draw(List<Painter<JXMapViewer>> waypointPainter) {
         crossroad.draw(waypointPainter);
     }

@@ -28,8 +28,8 @@ class SimpleCrossroad implements ICrossroad {
     @SuppressWarnings("MismatchedQueryAndUpdateOfCollection")
     private final Map<Long, Light> wayIdToLightMap;
 
-    public SimpleCrossroad(EventBus eventBus,
-                           Siblings<SimpleLightGroup> lightGroups) {
+    SimpleCrossroad(EventBus eventBus,
+                    Siblings<SimpleLightGroup> lightGroups) {
         this.wayIdToLightMap = new HashMap<>() {{
             putAll(lightGroups.first.prepareMap());
             putAll(lightGroups.second.prepareMap());

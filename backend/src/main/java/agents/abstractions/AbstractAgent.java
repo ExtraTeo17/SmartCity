@@ -52,7 +52,7 @@ public abstract class AbstractAgent extends Agent {
         }
     }
 
-    public void print(String message, LoggerLevel level) {
+    protected void print(String message, LoggerLevel level) {
         switch (level) {
             case TRACE -> logger.trace(message);
             case DEBUG -> logger.debug(message);
@@ -62,8 +62,7 @@ public abstract class AbstractAgent extends Agent {
         }
     }
 
-    // TODO: Protected
-    public void print(String message) {
+    protected void print(String message) {
         print(message, LoggerLevel.INFO);
     }
 

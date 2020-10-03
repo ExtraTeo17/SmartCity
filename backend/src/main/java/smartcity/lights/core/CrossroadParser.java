@@ -70,16 +70,16 @@ class CrossroadParser {
     private Siblings<OSMWaypoint> getNextWaypoints(OSMWay way) {
         OSMWaypoint secondWaypoint = null;
         OSMWaypoint thirdWaypoint = null;
-        boolean isWayLongerThan2 = way.getWaypointCount() > 2;
+        int waypointsCount = way.getWaypointCount();
+        boolean isWayLongerThan2 = waypointsCount > 2;
         switch (way.getLightOrientation()) {
             case LIGHT_AT_ENTRY -> {
                 secondWaypoint = way.getWaypoint(1);
                 thirdWaypoint = isWayLongerThan2 ? way.getWaypoint(2) : null;
             }
             case LIGHT_AT_EXIT -> {
-                secondWaypoint = way.getWaypoint(way.getWaypointCount() - 2);
-                thirdWaypoint = isWayLongerThan2 ?
-                        way.getWaypoint(way.getWaypointCount() - 3) : null;
+                secondWaypoint = way.getWaypoint(waypointsCount - 2);
+                thirdWaypoint = isWayLongerThan2 ? way.getWaypoint(waypointsCount - 3) : null;
             }
         }
 
@@ -104,7 +104,7 @@ class CrossroadParser {
         var childrenANode = crossroadChildren.item(1);
         var childrenBNode = crossroadChildren.item(3);
 
-        var  lightGroupA = parseInfosList(childrenANode.getChildNodes());
+        var lightGroupA = parseInfosList(childrenANode.getChildNodes());
         var lightGroupB = parseInfosList(childrenBNode.getChildNodes());
 
         return new Siblings<>(lightGroupA, lightGroupB);
@@ -122,12 +122,12 @@ class CrossroadParser {
         return lightInfos;
     }
 
-    private LightInfo parseLightInfo(NamedNodeMap attributes){
+    private LightInfo parseLightInfo(NamedNodeMap attributes) {
         var osmId = Long.parseLong(attributes.getNamedItem("light").getNodeValue());
         var lat = Double.parseDouble((attributes.getNamedItem("lat").getNodeValue()));
         var lng = Double.parseDouble((attributes.getNamedItem("lon").getNodeValue()));
         var adjacentOsmWayId = Long.parseLong((attributes.getNamedItem("way").getNodeValue()));
         // TODO: Retrieve crossings!
-        return new LightInfo(osmId, adjacentOsmWayId, Position.of(lat, lng),null, null);
+        return new LightInfo(osmId, adjacentOsmWayId, Position.of(lat, lng), null, null);
     }
 }
