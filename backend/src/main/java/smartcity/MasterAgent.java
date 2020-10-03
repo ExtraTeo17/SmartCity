@@ -37,8 +37,6 @@ public class MasterAgent extends Agent {
     public static Map<Pair<Long, Long>, LightManagerNode> wayIdLightIdToLightManagerNode = new HashMap<>();
     @Deprecated(forRemoval = true, since = "Always - Eldritch Abomination")
     public static Map<Long, LightManagerNode> crossingOsmIdToLightManagerNode = new HashMap<>();
-    @Deprecated(forRemoval = true, since = "Always - Eldritch Abomination")
-    public static Map<Long, StationNode> osmStationIdToStationNode = new HashMap<>();
 
     @Inject
     public MasterAgent(IAgentsContainer agentsContainer,

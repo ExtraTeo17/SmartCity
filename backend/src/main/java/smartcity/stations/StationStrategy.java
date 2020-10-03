@@ -28,17 +28,6 @@ public class StationStrategy {
     private final Map<String, List<ArrivalInfo>> busLineToFarAwayPedestrians = new HashMap<>();
     private final Map<String, List<ArrivalInfo>> busLineToPedestriansOnStation = new HashMap<>();
 
-    public StationStrategy(OSMStation station, int agentId) {
-        // Temporary workaround, because of static container in MasterAgent
-        if (station == null) {
-            return;
-        }
-
-        var id = station.getId();
-        MasterAgent.osmStationIdToStationNode.put(id,
-                new StationNode(station.getLat(), station.getLng(), id, agentId));
-    }
-
     public boolean addBusAgentWithLine(String agentName, String busLine) {
         return busAgentNameToLine.put(agentName, busLine) == null;
     }

@@ -571,7 +571,7 @@ public class MapWindow {
     private void drawStations(List<Painter<JXMapViewer>> painters) {
         Set<Waypoint> set = new HashSet<>();
         agentsContainer.forEach(StationAgent.class, ag -> {
-            set.add(new DefaultWaypoint(ag.getStation().toMapGeoPosition()));
+            set.add(new DefaultWaypoint(ag.getPosition().toMapGeoPosition()));
         });
         WaypointPainter<Waypoint> waypointPainter = new WaypointPainter<>();
         waypointPainter.setWaypoints(set);

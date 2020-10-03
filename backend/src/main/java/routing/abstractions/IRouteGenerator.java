@@ -19,5 +19,5 @@ public interface IRouteGenerator {
     List<RouteNode> generateRouteForPedestrians(IGeoPosition pointA, IGeoPosition pointB,
                                                 String startingOsmNodeRef, String finishingOsmNodeRef);
 
-    List<RouteNode> generateRouteInfoForBuses(List<OSMWay> route, List<? extends OSMNode> osmStations);
+    List<RouteNode> generateRouteInfoForBuses(List<OSMWay> route, List<? extends IGeoPosition> osmStations);
 }

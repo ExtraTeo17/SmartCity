@@ -1,5 +1,7 @@
 package routing;
 
+import routing.core.IGeoPosition;
+
 public class StationNode extends RouteNode {
     private final int agentId;
     private final long id;
@@ -9,6 +11,10 @@ public class StationNode extends RouteNode {
         super(lat, lon);
         this.id = id;
         this.agentId = agentId;
+    }
+
+    public StationNode(IGeoPosition pos, long id, int agentId){
+       this(pos.getLat(), pos.getLng(), id, agentId);
     }
 
     public int getAgentId() {

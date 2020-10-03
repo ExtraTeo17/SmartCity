@@ -9,8 +9,10 @@ import osmproxy.elements.OSMStation;
 import routing.RouteNode;
 import routing.StationNode;
 import routing.abstractions.IRouteTransformer;
+import routing.core.IGeoPosition;
 import smartcity.ITimeProvider;
 import smartcity.lights.abstractions.ICrossroadFactory;
+import smartcity.stations.StationStrategy;
 import vehicles.*;
 
 import java.util.List;
@@ -49,8 +51,9 @@ class AgentsFactory implements IAgentsFactory {
     }
 
     @Override
-    public StationAgent create(OSMStation osmStation) {
-        return new StationAgent(idGenerator.get(StationAgent.class), timeProvider, osmStation);
+    public StationAgent create(IGeoPosition position) {
+        var stationStrategy = new StationStrategy();
+        return new StationAgent(idGenerator.get(StationAgent.class), position, stationStrategy, timeProvider);
     }
 
     @Override

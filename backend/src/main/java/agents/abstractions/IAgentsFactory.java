@@ -7,6 +7,7 @@ import osmproxy.elements.OSMNode;
 import osmproxy.elements.OSMStation;
 import routing.RouteNode;
 import routing.StationNode;
+import routing.core.IGeoPosition;
 
 import java.util.List;
 
@@ -15,7 +16,7 @@ public interface IAgentsFactory {
 
     VehicleAgent create(List<RouteNode> route);
 
-    StationAgent create(OSMStation osmStation);
+    StationAgent create(IGeoPosition position);
 
     BusAgent create(List<RouteNode> route, Timetable timetable, String busLine,
                     String brigadeNr);

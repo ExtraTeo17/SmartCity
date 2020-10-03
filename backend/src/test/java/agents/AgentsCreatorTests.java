@@ -9,6 +9,7 @@ import osmproxy.LightAccessManager;
 import osmproxy.abstractions.ILightAccessManager;
 import osmproxy.abstractions.IMapAccessManager;
 import osmproxy.buses.BusLinesManager;
+import osmproxy.elements.OSMContainer;
 import routing.RoutingConstants;
 import routing.abstractions.IRouteGenerator;
 import routing.abstractions.IRouteTransformer;
@@ -86,9 +87,10 @@ class AgentsCreatorTests {
         var eventBus = new EventBus();
         var mapAccessManager = mock(IMapAccessManager.class);
         var routeGenerator = mock(IRouteGenerator.class);
+        var osmContainer = mock(OSMContainer.class);
 
         return new AgentsCreator(agentsContainer, configContainer, busLinesManager, agentsFactory,
-                eventBus, lightAccessManager, mapAccessManager, routeGenerator);
+                eventBus, lightAccessManager, mapAccessManager, routeGenerator, osmContainer);
     }
 
     private ILightAccessManager setupLightAccessManager() {

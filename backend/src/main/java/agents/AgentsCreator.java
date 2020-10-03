@@ -15,14 +15,19 @@ import osmproxy.abstractions.ILightAccessManager;
 import osmproxy.abstractions.IMapAccessManager;
 import osmproxy.buses.Timetable;
 import osmproxy.buses.abstractions.IBusLinesManager;
+import osmproxy.buses.data.BusPreparationData;
+import osmproxy.elements.OSMContainer;
 import osmproxy.elements.OSMNode;
+import osmproxy.elements.OSMStation;
 import routing.abstractions.IRouteGenerator;
+import routing.core.IGeoPosition;
 import smartcity.SimulationState;
 import smartcity.TimeProvider;
 import smartcity.config.ConfigContainer;
 import smartcity.config.StaticConfig;
 
 import java.time.LocalDateTime;
+import java.util.Collection;
 
 public class AgentsCreator {
     private static final Logger logger = LoggerFactory.getLogger(AgentsCreator.class);
@@ -34,6 +39,7 @@ public class AgentsCreator {
     private final ILightAccessManager lightAccessManager;
     private final IMapAccessManager mapAccessManager;
     private final IRouteGenerator routeGenerator;
+    private final OSMContainer osmContainer;
 
     @Inject
     public AgentsCreator(IAgentsContainer agentsContainer,
@@ -43,7 +49,8 @@ public class AgentsCreator {
                          EventBus eventBus,
                          ILightAccessManager lightAccessManager,
                          IMapAccessManager mapAccessManager,
-                         IRouteGenerator routeGenerator) {
+                         IRouteGenerator routeGenerator,
+                         OSMContainer osmContainer) {
         this.agentsContainer = agentsContainer;
         this.configContainer = configContainer;
         this.busLinesManager = busLinesManager;
@@ -52,6 +59,7 @@ public class AgentsCreator {
         this.lightAccessManager = lightAccessManager;
         this.mapAccessManager = mapAccessManager;
         this.routeGenerator = routeGenerator;
+        this.osmContainer = osmContainer;
     }
 
 
@@ -87,30 +95,22 @@ public class AgentsCreator {
 
         logger.info("Stations creation started.");
         time = System.nanoTime();
-        int stationsCount = 0;
-        for (var station : busData.stations.values()) {
-            var agent = factory.create(station);
-            boolean result = agentsContainer.tryAdd(agent);
-            if (result) {
-                ++stationsCount;
-                agent.start();
-            }
-            else {
-                logger.info("Station agent could not be added");
-            }
-        }
-
-        if (stationsCount == 0) {
-            logger.error("No stations were created");
+        if (!prepareStations(busData.stations.values())) {
             return false;
         }
-
         logger.info("Stations are created! Took: " + TimeProvider.getTimeInMs(time) + "ms");
-        logger.info("NUMBER OF STATION AGENTS: " + stationsCount);
 
         logger.info("Buses creation started.");
         time = System.nanoTime();
+        if (!preparesBuses(busData)) {
+            return false;
+        }
+        logger.info("Buses are created! Took: " + TimeProvider.getTimeInMs(time) + "ms");
 
+        return true;
+    }
+
+    private boolean preparesBuses(BusPreparationData busData) {
         int busCount = 0;
         var closestTime = LocalDateTime.now().plusDays(1);
         var currTime = LocalDateTime.now();
@@ -124,7 +124,7 @@ public class AgentsCreator {
             for (var brigade : busInfo) {
                 var brigadeNr = brigade.brigadeId;
                 for (Timetable timetable : brigade) {
-                    var agent = factory.create(routeInfo, timetable, busLine, brigadeNr);
+                    BusAgent agent = factory.create(routeInfo, timetable, busLine, brigadeNr);
                     boolean result = agentsContainer.tryAdd(agent);
                     if (result) {
                         ++busCount;
@@ -143,11 +143,31 @@ public class AgentsCreator {
             logger.error("No buses were created");
             return false;
         }
-
-        logger.info("Buses are created! Took: " + TimeProvider.getTimeInMs(time) + "ms");
-        logger.info("NUMBER OF BUS AGENTS: " + busCount);
         logger.info("Closest startTime: " + closestTime.toLocalTime());
+        logger.info("NUMBER OF BUS AGENTS: " + busCount);
+        return true;
+    }
 
+    private boolean prepareStations(Collection<? extends IGeoPosition> stationPositions) {
+        int stationsCount = 0;
+        for (var stationPos : stationPositions) {
+            StationAgent agent = factory.create(stationPos);
+            boolean result = agentsContainer.tryAdd(agent);
+            if (result) {
+                ++stationsCount;
+                agent.start();
+            }
+            else {
+                logger.info("Station agent could not be added");
+            }
+        }
+
+        if (stationsCount == 0) {
+            logger.error("No stations were created");
+            return false;
+        }
+
+        logger.info("NUMBER OF STATION AGENTS: " + stationsCount);
         return true;
     }
 

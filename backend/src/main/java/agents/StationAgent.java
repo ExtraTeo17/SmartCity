@@ -9,7 +9,7 @@ import jade.core.behaviours.TickerBehaviour;
 import jade.lang.acl.ACLMessage;
 import jade.util.leap.Properties;
 import org.javatuples.Pair;
-import osmproxy.elements.OSMStation;
+import routing.core.IGeoPosition;
 import smartcity.ITimeProvider;
 import smartcity.lights.OptimizationResult;
 import smartcity.stations.StationStrategy;
@@ -19,16 +19,16 @@ import java.util.List;
 public class StationAgent extends AbstractAgent {
     public static final String name = StationAgent.class.getSimpleName().replace("Agent", "");
 
-    private final OSMStation station;
+    private final IGeoPosition position;
     private final StationStrategy stationStrategy;
 
     StationAgent(int id,
-                 ITimeProvider timeProvider,
-                 OSMStation station) { // REMEMBER TO PRUNE BEYOND CIRCLE
+                 IGeoPosition position,
+                 StationStrategy stationStrategy,
+                 ITimeProvider timeProvider) { // REMEMBER TO PRUNE BEYOND CIRCLE
         super(id, name, timeProvider);
-
-        this.station = station;
-        this.stationStrategy = new StationStrategy(station, id);
+        this.position = position;
+        this.stationStrategy = stationStrategy;
 
         Behaviour communication = new CyclicBehaviour() {
             @Override
@@ -155,7 +155,7 @@ public class StationAgent extends AbstractAgent {
         addBehaviour(checkState);
     }
 
-    public OSMStation getStation() {
-        return station;
+    public IGeoPosition getPosition() {
+        return position;
     }
 }

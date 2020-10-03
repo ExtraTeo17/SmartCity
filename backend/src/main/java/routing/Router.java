@@ -3,14 +3,12 @@ package routing;
 import com.google.common.annotations.Beta;
 import com.google.inject.Inject;
 import org.javatuples.Pair;
+import org.modelmapper.ModelMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import osmproxy.abstractions.IMapAccessManager;
-import osmproxy.elements.OSMLight;
-import osmproxy.elements.OSMNode;
-import osmproxy.elements.OSMWay;
+import osmproxy.elements.*;
 import osmproxy.elements.OSMWay.RouteOrientation;
-import osmproxy.elements.OSMWaypoint;
 import routing.abstractions.IRouteGenerator;
 import routing.abstractions.IRouteTransformer;
 import routing.core.IGeoPosition;
@@ -80,11 +78,13 @@ final class Router implements
     }
 
     @Override
-    public List<RouteNode> generateRouteInfoForBuses(List<OSMWay> route, List<? extends OSMNode> osmStations) {
+    public List<RouteNode> generateRouteInfoForBuses(List<OSMWay> route, List<? extends IGeoPosition> stationsPositions) {
         var busRouteData = generateBusRoute(route);
         List<OSMLight> lightsOnRoute = mapAccessManager.getOsmLights(busRouteData.waysIds);
         List<RouteNode> managers = getManagersForLights(lightsOnRoute);
-        List<RouteNode> stationNodes = getAgentStationsForRoute(osmStations);
+        List<RouteNode> stationNodes = stationsPositions.stream()
+                .map(s -> new RouteNode(s.getLat(), s.getLng()))
+                .collect(Collectors.toList());
         managers.addAll(stationNodes);
         return getRouteWithAdditionalNodes(busRouteData.route, managers);
     }
@@ -237,12 +237,5 @@ final class Router implements
         }
     }
 
-    private static List<RouteNode> getAgentStationsForRoute(List<? extends OSMNode> stations) {
-        List<RouteNode> managers = new ArrayList<>();
-        for (OSMNode station : stations) {
-            RouteNode nodeToAdd = MasterAgent.osmStationIdToStationNode.get(station.getId());
-            managers.add(nodeToAdd);
-        }
-        return managers;
-    }
+
 }
