@@ -83,7 +83,7 @@ class LightSwitcher implements Function<ISwitchLightsContext, Integer> {
             var timeCollection = light.getFarAwayTimeCollection();
             for (var time : timeCollection) {
                 if (currentTimePlusExtend.isAfter(time)) {
-                    logger.info("Extending, time=" + time + ", currentTime=" + currentTime);
+                    logger.info("Extending, time=" + time.toLocalTime() + ", currentTime=" + currentTime.toLocalTime());
                     return true;
                 }
             }

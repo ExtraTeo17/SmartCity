@@ -20,7 +20,8 @@ public class WarszawskieApiSerializer implements IApiSerializer {
     private final ObjectMapper objectMapper;
 
     @Inject
-    WarszawskieApiSerializer(ObjectMapper objectMapper) {
+    @VisibleForTesting
+    public WarszawskieApiSerializer(ObjectMapper objectMapper) {
         this.objectMapper = objectMapper;
     }
 
