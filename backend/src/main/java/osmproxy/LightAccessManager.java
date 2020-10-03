@@ -12,6 +12,8 @@ import osmproxy.abstractions.IMapAccessManager;
 import osmproxy.elements.OSMNode;
 import osmproxy.elements.OSMWay;
 import routing.core.IZone;
+import utilities.ConditionalExecutor;
+import utilities.FileWriterWrapper;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -59,7 +61,17 @@ public class LightAccessManager implements ILightAccessManager {
             return new ArrayList<>();
         }
 
-        return parseLightNodesDocument(documentOpt.get());
+        var document = documentOpt.get();
+        ConditionalExecutor.debug(() -> {
+            String path = "target/lights_" +
+                    lightsAround.get(0).getId() + "_" +
+                    lightsAround.get(lightsAround.size() - 1).getId() +
+                    ".xml";
+            logger.info("Writing lightNodes document to file: " + path);
+            FileWriterWrapper.write(document, path);
+        });
+
+        return parseLightNodesDocument(document);
     }
 
     private List<OSMNode> parseLightNodesDocument(Document nodesViaOverpass) {

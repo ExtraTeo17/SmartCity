@@ -37,7 +37,8 @@ class CrossroadParser {
         firstLightGroupInfo.add(lightInfo);
 
         var firstWayNeighborPos = firstWay.getLightNeighborPos();
-        for (OSMWay parentWay = waysIter.next(); waysIter.hasNext(); parentWay = waysIter.next()) {
+        while (waysIter.hasNext()) {
+            OSMWay parentWay = waysIter.next();
             var nextWayLightNeighborPos = parentWay.getLightNeighborPos();
             double cosineCenterNodeNextWay = firstWayNeighborPos.cosineAngle(crossroadCenter, nextWayLightNeighborPos);
             lightInfo = parseLightInfo(parentWay, crossroadCenter);
