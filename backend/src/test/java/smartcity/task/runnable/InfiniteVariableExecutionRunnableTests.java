@@ -67,8 +67,8 @@ class InfiniteVariableExecutionRunnableTests {
     void runEndless_shouldNotTerminateWithoutExplicitOrder() {
         // Arrange
         var executor = Executors.newSingleThreadScheduledExecutor();
-        var initialDelay = 0;
-        var delay = 50;
+        var initialDelay = 10;
+        var delay = 100;
         var counter = new AtomicInteger();
         Supplier<Integer> task = () -> {
             counter.getAndIncrement();

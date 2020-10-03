@@ -79,7 +79,6 @@ public abstract class AbstractAgent extends Agent {
 
     private ACLMessage prepareMessageForManager(LightManagerNode managerNode, MovingObject movingObject) {
         ACLMessage msg = createMessage(ACLMessage.INFORM, LightManagerAgent.name, managerNode.getLightManagerId());
-
         var agentType = MessageParameter.getTypeByMovingObject(movingObject);
         Properties properties = createProperties(agentType);
         var predictedTime = timeProvider.getCurrentSimulationTime().plusNanos(
