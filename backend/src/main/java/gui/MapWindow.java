@@ -838,13 +838,13 @@ public class MapWindow {
                     drawZones(painters);
                 }
                 if (configContainer.getSimulationState() != SimulationState.INITIAL) {
-                    if (renderBusRoutes) {
+                    if (renderBusRoutes && configContainer.shouldGeneratePedestriansAndBuses()) {
                         drawBusRoutes(painters);
                     }
-                    if (renderCarRoutes) {
+                    if (renderCarRoutes && configContainer.shouldGenerateCars()) {
                         drawRoutes(painters);
                     }
-                    if (renderPedestrianRoutes) {
+                    if (renderPedestrianRoutes && configContainer.shouldGeneratePedestriansAndBuses()) {
                         drawPedestrianRoutes(painters);
                     }
                     if (renderStations) {
@@ -853,13 +853,13 @@ public class MapWindow {
                     if (renderLights) {
                         drawLights(painters);
                     }
-                    if (renderCars) {
+                    if (renderCars && configContainer.shouldGenerateCars()) {
                         drawVehicles(painters);
                     }
-                    if (renderBuses) {
+                    if (renderBuses && configContainer.shouldGeneratePedestriansAndBuses()) {
                         drawBuses(painters);
                     }
-                    if (renderPedestrians) {
+                    if (renderPedestrians && configContainer.shouldGeneratePedestriansAndBuses()) {
                         drawPedestrians(painters);
                     }
                 }
