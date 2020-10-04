@@ -19,7 +19,7 @@ class TimeProviderTests {
                 LocalTime.of(10, 10, 10));
         var timeProvider = new TimeProvider();
         int waitTimeMillis = 200;
-        int accuracyMillis = 10;
+        int accuracyMillis = 15;
 
         // Act
         timeProvider.setSimulationStartTime(startTime);
