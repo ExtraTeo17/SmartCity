@@ -5,7 +5,6 @@ import com.google.inject.Inject;
 import org.w3c.dom.Node;
 import osmproxy.buses.Timetable;
 import osmproxy.elements.OSMNode;
-import osmproxy.elements.OSMStation;
 import routing.RouteNode;
 import routing.StationNode;
 import routing.abstractions.IRouteTransformer;
@@ -67,14 +66,14 @@ class AgentsFactory implements IAgentsFactory {
     @Override
     public LightManagerAgent create(Node crossroadNode) {
         var id = idGenerator.get(LightManagerAgent.class);
-        var crossroad = crossroadFactory.create(crossroadNode, id);
+        var crossroad = crossroadFactory.create(crossroadNode);
         return new LightManagerAgent(id, timeProvider, crossroad);
     }
 
     @Override
     public LightManagerAgent create(OSMNode centerCrossroad) {
         var id = idGenerator.get(LightManagerAgent.class);
-        var crossroad = crossroadFactory.create(centerCrossroad, id);
+        var crossroad = crossroadFactory.create(centerCrossroad);
         return new LightManagerAgent(id, timeProvider, crossroad);
     }
 

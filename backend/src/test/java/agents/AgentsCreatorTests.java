@@ -9,7 +9,7 @@ import osmproxy.LightAccessManager;
 import osmproxy.abstractions.ILightAccessManager;
 import osmproxy.abstractions.IMapAccessManager;
 import osmproxy.buses.BusLinesManager;
-import osmproxy.elements.OSMContainer;
+import routing.NodesContainer;
 import routing.RoutingConstants;
 import routing.abstractions.IRouteGenerator;
 import routing.abstractions.IRouteTransformer;
@@ -59,8 +59,7 @@ class AgentsCreatorTests {
             private final List<IGeoPosition> allPositions = new ArrayList<>();
         };
         agentsContainer.forEach(LightManagerAgent.class, manager -> {
-            var crossroad = manager.getCrossroad();
-            var positions = crossroad.getLightsPositions();
+            var positions = manager.getLights();
             assertTrue(positions.size() > 2);
             context.allPositions.addAll(positions);
         });
@@ -87,7 +86,7 @@ class AgentsCreatorTests {
         var eventBus = new EventBus();
         var mapAccessManager = mock(IMapAccessManager.class);
         var routeGenerator = mock(IRouteGenerator.class);
-        var osmContainer = mock(OSMContainer.class);
+        var osmContainer = mock(NodesContainer.class);
 
         return new AgentsCreator(agentsContainer, configContainer, busLinesManager, agentsFactory,
                 eventBus, lightAccessManager, mapAccessManager, routeGenerator, osmContainer);

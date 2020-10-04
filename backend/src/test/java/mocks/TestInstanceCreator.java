@@ -9,6 +9,6 @@ public class TestInstanceCreator {
 
     public static Light createLight() {
         var info = new LightInfo(1, 1, Position.of(1, 1), "1", "2");
-        return new Light(info, LightColor.RED, 1);
+        return new Light(info, LightColor.RED);
     }
 }

@@ -4,6 +4,7 @@ import org.jxmapviewer.JXMapViewer;
 import org.jxmapviewer.painter.Painter;
 import routing.core.IGeoPosition;
 import smartcity.lights.OptimizationResult;
+import smartcity.lights.core.Light;
 import smartcity.stations.ArrivalInfo;
 
 import java.util.List;
@@ -11,7 +12,7 @@ import java.util.List;
 // TODO: Interface is too big and too specific, make it more general and move some methods to different interface
 @SuppressWarnings("UnusedReturnValue")
 public interface ICrossroad {
-    List<IGeoPosition> getLightsPositions();
+    List<Light> getLights();
 
     boolean addCarToQueue(long adjacentWayId, String agentName);
 

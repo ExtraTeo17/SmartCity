@@ -24,7 +24,7 @@ class WebService implements IWebService {
         webConnector.start();
     }
 
-    public void prepareSimulation(List<IGeoPosition> positions) {
+    public void prepareSimulation(List<? extends IGeoPosition> positions) {
         var locations = positions.stream().map(Converter::convert)
                 .toArray(Location[]::new);
         var payload = new PrepareResponse(locations);

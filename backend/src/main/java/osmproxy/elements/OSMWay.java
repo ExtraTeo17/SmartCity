@@ -120,7 +120,6 @@ public class OSMWay extends OSMElement {
         return routeOrientation;
     }
 
-
     void determineLightOrientationTowardsCrossroad(final String osmLightId) {
         if (waypoints.get(0).getOsmNodeRef().equals(osmLightId)) {
             lightOrientation = LightOrientation.LIGHT_AT_ENTRY;
@@ -177,7 +176,7 @@ public class OSMWay extends OSMElement {
         }
         else { // startIsConnectedTo(second)
             nodeRef = reverseTowardsNode(end);
-            if(nodeRef.isPresent()) {
+            if (nodeRef.isPresent()) {
                 nodeRef = other.reverseTowardsNode(nodeRef.get());
             }
         }

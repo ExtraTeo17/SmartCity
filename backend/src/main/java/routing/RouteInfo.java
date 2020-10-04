@@ -16,17 +16,12 @@ public class RouteInfo implements Iterable<OSMWay> {
         ways.add(way);
     }
 
-    boolean remove(final String lightOsmIdString) {
-        final long lightOsmId = Long.parseLong(lightOsmIdString);
-        if (lightOsmIds.contains(lightOsmId)) {
-            lightOsmIds.remove(lightOsmId);
-            return true;
-        }
-        return false;
+    boolean remove(long lightOsmId) {
+        return lightOsmIds.remove(lightOsmId);
     }
 
-    public final void add(final String lightOsmId) {
-        lightOsmIds.add(Long.parseLong(lightOsmId));
+    public final void add(long lightOsmId) {
+        lightOsmIds.add(lightOsmId);
     }
 
     // TODO: ways.size() == 1?

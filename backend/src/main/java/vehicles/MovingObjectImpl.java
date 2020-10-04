@@ -34,7 +34,7 @@ public class MovingObjectImpl extends MovingObject {
         while (!(route.get(index) instanceof LightManagerNode)) {
             --index;
         }
-        return ((LightManagerNode) route.get(index)).getOsmWayId();
+        return ((LightManagerNode) route.get(index)).getAdjacentWayId();
     }
 
     @Override

@@ -12,7 +12,6 @@ public interface IRouteGenerator {
     List<RouteNode> generateRouteInfo(IGeoPosition pointA, IGeoPosition pointB);
 
     // TODO: Merge with function for cars if testing proves they are identical
-    @Deprecated
     List<RouteNode> generateRouteForPedestrians(IGeoPosition pointA, IGeoPosition pointB);
 
     @Beta

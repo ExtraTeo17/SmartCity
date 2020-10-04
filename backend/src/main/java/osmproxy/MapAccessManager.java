@@ -222,7 +222,8 @@ public class MapAccessManager implements IMapAccessManager {
                     if (nodeChild.getNodeName().equals("tag") &&
                             nodeChild.getAttributes().getNamedItem("k").getNodeValue().equals("crossing") &&
                             nodeChild.getAttributes().getNamedItem("v").getNodeValue().equals("traffic_signals")) {
-                        info.add(item.getAttributes().getNamedItem("id").getNodeValue());
+                        var id = Long.parseLong(item.getAttributes().getNamedItem("id").getNodeValue());
+                        info.add(id);
                     }
                 }
             }

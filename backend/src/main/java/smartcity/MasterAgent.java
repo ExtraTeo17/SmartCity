@@ -10,21 +10,14 @@ import gui.MapWindow;
 import jade.core.Agent;
 import jade.core.behaviours.CyclicBehaviour;
 import jade.lang.acl.ACLMessage;
-import org.javatuples.Pair;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import routing.LightManagerNode;
-import routing.StationNode;
 import vehicles.TestCar;
 import vehicles.TestPedestrian;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
-import java.util.HashMap;
-import java.util.Map;
 
-// TODO: This class should have no more than 10 fields.
-// TODO: This class should be package private
 public class MasterAgent extends Agent {
     public static final String name = MasterAgent.class.getName().replace("Agent", "");
     private static final Logger logger = LoggerFactory.getLogger(MasterAgent.class);
@@ -32,15 +25,9 @@ public class MasterAgent extends Agent {
     private final MapWindow window;
     private final IAgentsContainer agentsContainer;
 
-    // TODO: Delete this
-    @Deprecated(forRemoval = true, since = "Always - Eldritch Abomination")
-    public static Map<Pair<Long, Long>, LightManagerNode> wayIdLightIdToLightManagerNode = new HashMap<>();
-    @Deprecated(forRemoval = true, since = "Always - Eldritch Abomination")
-    public static Map<Long, LightManagerNode> crossingOsmIdToLightManagerNode = new HashMap<>();
-
     @Inject
-    public MasterAgent(IAgentsContainer agentsContainer,
-                       MapWindow window) {
+    MasterAgent(IAgentsContainer agentsContainer,
+                MapWindow window) {
         this.agentsContainer = agentsContainer;
         this.window = window;
     }

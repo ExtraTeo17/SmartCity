@@ -108,7 +108,7 @@ public class Bus extends MovingObject {
 
     @Override
     public long getAdjacentOsmWayId() {
-        return ((LightManagerNode) route.get(moveIndex)).getOsmWayId();
+        return ((LightManagerNode) route.get(moveIndex)).getAdjacentWayId();
     }
 
     @Override

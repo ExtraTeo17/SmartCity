@@ -23,11 +23,10 @@ class Communicator {
     public void handle(LightManagersReadyEvent e) {
         onHandle(e);
         var positions = e.lightManagers.stream()
-                .flatMap(man -> man.getLightsPositions().stream())
+                .flatMap(man -> man.getLights().stream())
                 .collect(Collectors.toList());
         webService.prepareSimulation(positions);
     }
-
 
     @Subscribe
     public void handle(VehicleAgentCreatedEvent e) {

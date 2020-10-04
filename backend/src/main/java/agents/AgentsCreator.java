@@ -16,9 +16,8 @@ import osmproxy.abstractions.IMapAccessManager;
 import osmproxy.buses.Timetable;
 import osmproxy.buses.abstractions.IBusLinesManager;
 import osmproxy.buses.data.BusPreparationData;
-import osmproxy.elements.OSMContainer;
 import osmproxy.elements.OSMNode;
-import osmproxy.elements.OSMStation;
+import routing.NodesContainer;
 import routing.abstractions.IRouteGenerator;
 import routing.core.IGeoPosition;
 import smartcity.SimulationState;
@@ -39,7 +38,7 @@ public class AgentsCreator {
     private final ILightAccessManager lightAccessManager;
     private final IMapAccessManager mapAccessManager;
     private final IRouteGenerator routeGenerator;
-    private final OSMContainer osmContainer;
+    private final NodesContainer osmContainer;
 
     @Inject
     public AgentsCreator(IAgentsContainer agentsContainer,
@@ -50,7 +49,7 @@ public class AgentsCreator {
                          ILightAccessManager lightAccessManager,
                          IMapAccessManager mapAccessManager,
                          IRouteGenerator routeGenerator,
-                         OSMContainer osmContainer) {
+                         NodesContainer osmContainer) {
         this.agentsContainer = agentsContainer;
         this.configContainer = configContainer;
         this.busLinesManager = busLinesManager;
@@ -195,13 +194,14 @@ public class AgentsCreator {
 
     @VisibleForTesting
     boolean tryConstructLightManagers() {
+        int managersCounter = 0;
         try {
             if (StaticConfig.USE_DEPRECATED_XML_FOR_LIGHT_MANAGERS) {
                 var nodes = mapAccessManager.getLightManagersNodes(configContainer.getZone());
                 for (var node : nodes) {
                     var manager = factory.create(node);
-                    if (!agentsContainer.tryAdd(manager)) {
-                        return false;
+                    if (agentsContainer.tryAdd(manager)) {
+                        ++managersCounter;
                     }
                 }
             }
@@ -210,14 +210,19 @@ public class AgentsCreator {
                 for (final OSMNode centerCrossroad : lights) {
                     if (centerCrossroad.determineParentOrientationsTowardsCrossroad()) {
                         var manager = factory.create(centerCrossroad);
-                        if (!agentsContainer.tryAdd(manager)) {
-                            return false;
+                        if (agentsContainer.tryAdd(manager)) {
+                            ++managersCounter;
                         }
                     }
                 }
             }
         } catch (Exception e) {
             logger.error("Error preparing light managers", e);
+            return false;
+        }
+
+        if (managersCounter == 0) {
+            logger.error("No managers were created");
             return false;
         }
 

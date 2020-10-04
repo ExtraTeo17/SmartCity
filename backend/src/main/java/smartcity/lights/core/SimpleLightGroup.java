@@ -9,10 +9,10 @@ import java.util.*;
 class SimpleLightGroup {
     private final Set<Light> lights;
 
-    SimpleLightGroup(List<LightInfo> infoList, LightColor color, int managerId) {
+    SimpleLightGroup(List<LightInfo> infoList, LightColor color) {
         lights = new HashSet<>();
         for (LightInfo info : infoList) {
-            lights.add(new Light(info, color, managerId));
+            lights.add(new Light(info, color));
         }
     }
 

@@ -84,7 +84,7 @@ public abstract class AbstractAgent extends Agent {
         var predictedTime = timeProvider.getCurrentSimulationTime().plusNanos(
                 movingObject.getMillisecondsToNextLight() * 1_000_000);
         properties.setProperty(MessageParameter.ARRIVAL_TIME, "" + predictedTime);
-        properties.setProperty(MessageParameter.ADJACENT_OSM_WAY_ID, "" + managerNode.getOsmWayId());
+        properties.setProperty(MessageParameter.ADJACENT_OSM_WAY_ID, "" + managerNode.getAdjacentWayId());
         msg.setAllUserDefinedParameters(properties);
 
         return msg;

@@ -1,5 +1,6 @@
 package smartcity.lights.core;
 
+import com.google.inject.Inject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.NamedNodeMap;
@@ -8,6 +9,7 @@ import org.w3c.dom.NodeList;
 import osmproxy.elements.OSMNode;
 import osmproxy.elements.OSMWay;
 import osmproxy.elements.OSMWaypoint;
+import routing.NodesContainer;
 import routing.RoutingConstants;
 import routing.core.IGeoPosition;
 import routing.core.Position;
@@ -55,13 +57,13 @@ public class CrossroadParser {
 
     private LightInfo parseLightInfo(OSMWay adjacentOsmWay,
                                      OSMNode centerCrossroadNode) {
-        var waypoints = getNextWaypoints(adjacentOsmWay);
-
-        var adjacentCrossingOsmId1 = waypoints.first.getOsmNodeRef();
-        var adjacentCrossingOsmId2 = waypoints.isSecondPresent() ? waypoints.second.getOsmNodeRef() : null;
+        var waypointsPair = getNextWaypoints(adjacentOsmWay);
+        var adjacentCrossingOsmId1 = waypointsPair.first.getOsmNodeRef();
+        var adjacentCrossingOsmId2 = waypointsPair.isSecondPresent() ? waypointsPair.second.getOsmNodeRef() : null;
         var adjacentOsmWayId = adjacentOsmWay.getId();
+
         var osmLightId = centerCrossroadNode.getId();
-        var position = getLightPosition(waypoints.first,
+        var position = getLightPosition(waypointsPair.first,
                 adjacentOsmWay.getLightNeighborPos(),
                 centerCrossroadNode);
 
