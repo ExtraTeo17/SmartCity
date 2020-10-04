@@ -52,6 +52,7 @@ import java.util.stream.Collectors;
 public class MapAccessManager implements IMapAccessManager {
     private static final Logger logger = LoggerFactory.getLogger(MapAccessManager.class);
     private static final String OVERPASS_API = "https://overpass-api.de/api/interpreter";
+    private static final String ALTERNATE_OVERPASS_API = "http://overpass.openstreetmap.fr/api/interpreter";
     private static final String CROSSROADS_LOCATIONS_PATH = "config/crossroads.xml";
 
     private final DocumentBuilderFactory xmlBuilderFactory;
@@ -97,18 +98,15 @@ public class MapAccessManager implements IMapAccessManager {
      */
     @Override
     public Optional<Document> getNodesDocument(String query) {
-        HttpURLConnection connection = getConnection();
-        connection.setDoInput(true);
-        connection.setDoOutput(true);
-        connection.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");
-
+        var connection = sendRequest(query);
         try {
-            DataOutputStream printout = new DataOutputStream(connection.getOutputStream());
-            printout.writeBytes("data=" + URLEncoder.encode(query, StandardCharsets.UTF_8));
-            printout.flush();
-            printout.close();
+            var responseCode = connection.getResponseCode();
+            if (responseCode == 429) {
+                logger.warn("Current API: " + OVERPASS_API + " is overloaded with our requests.");
+                connection = sendRequest(ALTERNATE_OVERPASS_API, query);
+            }
         } catch (IOException e) {
-            logger.error("Error getting data from connection", e);
+            logger.error("Error getting response code from connection", e);
             return Optional.empty();
         }
 
@@ -125,7 +123,34 @@ public class MapAccessManager implements IMapAccessManager {
         return Optional.of(result);
     }
 
+    private static HttpURLConnection sendRequest(String query) {
+        return sendRequest(OVERPASS_API, query);
+    }
+
+    private static HttpURLConnection sendRequest(String apiAddress, String query) {
+        HttpURLConnection connection = getConnection(apiAddress);
+        connection.setDoInput(true);
+        connection.setDoOutput(true);
+        connection.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");
+
+        try {
+            DataOutputStream printout = new DataOutputStream(connection.getOutputStream());
+            printout.writeBytes("data=" + URLEncoder.encode(query, StandardCharsets.UTF_8));
+            printout.flush();
+            printout.close();
+        } catch (IOException e) {
+            logger.error("Error sending data to connection", e);
+            throw new RuntimeException(e);
+        }
+
+        return connection;
+    }
+
     private static HttpURLConnection getConnection() {
+        return getConnection(OVERPASS_API);
+    }
+
+    private static HttpURLConnection getConnection(String apiAddress) {
         URL url;
         try {
             url = new URL(OVERPASS_API);
