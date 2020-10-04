@@ -69,7 +69,7 @@ public class LightAccessManager implements ILightAccessManager {
                     ".xml";
             logger.info("Writing lightNodes document to file: " + path);
             FileWriterWrapper.write(document, path);
-        });
+        }, lightsAround.size() > 0);
 
         return parseLightNodesDocument(document);
     }

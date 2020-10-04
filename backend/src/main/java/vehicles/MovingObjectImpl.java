@@ -3,38 +3,33 @@ package vehicles;
 import routing.LightManagerNode;
 import routing.RouteNode;
 import routing.RoutingConstants;
-import routing.core.Position;
 
 import java.util.List;
 
 // TODO: Maybe rename to Car - more descriptive?
 public class MovingObjectImpl extends MovingObject {
     private final List<RouteNode> displayRoute;
-    private final List<RouteNode> route;
 
     private transient DrivingState state = DrivingState.STARTING;
-    private transient int index = 0;
     private transient int closestLightIndex = Integer.MAX_VALUE;
 
     public MovingObjectImpl(List<RouteNode> displayRoute, List<RouteNode> uniformRoute) {
-        super(50);
+        super(50, uniformRoute);
         this.displayRoute = displayRoute;
-        this.route = uniformRoute;
     }
 
     MovingObjectImpl(MovingObjectImpl movingObject) {
-        super(movingObject.speed);
+        super(movingObject.speed, movingObject.route);
         this.displayRoute = movingObject.displayRoute;
-        this.route = movingObject.route;
     }
 
     // TODO: Why car is moving backwards here? Change name of the function to describe behaviour
     @Override
     public long getAdjacentOsmWayId() {
-        while (!(route.get(index) instanceof LightManagerNode)) {
-            --index;
+        while (!(route.get(moveIndex) instanceof LightManagerNode)) {
+            --moveIndex;
         }
-        return ((LightManagerNode) route.get(index)).getOsmWayId();
+        return ((LightManagerNode) route.get(moveIndex)).getAdjacentWayId();
     }
 
     @Override
@@ -46,11 +41,11 @@ public class MovingObjectImpl extends MovingObject {
     // TODO: Check if behaviour is correct and add test
     @Override
     public LightManagerNode getNextTrafficLight() {
-        if (closestLightIndex < route.size() && index <= closestLightIndex) {
+        if (closestLightIndex < route.size() && moveIndex <= closestLightIndex) {
             return (LightManagerNode) route.get(closestLightIndex);
         }
 
-        for (int i = index + 1; i < route.size(); ++i) {
+        for (int i = moveIndex + 1; i < route.size(); ++i) {
             var node = route.get(i);
             if (node instanceof LightManagerNode) {
                 closestLightIndex = i;
@@ -60,11 +55,6 @@ public class MovingObjectImpl extends MovingObject {
 
         closestLightIndex = Integer.MAX_VALUE;
         return null;
-    }
-
-    @Override
-    public Position getPosition() {
-        return route.get(index);
     }
 
     // TODO: Delete this function - replaced with getNextTrafficLight
@@ -84,20 +74,12 @@ public class MovingObjectImpl extends MovingObject {
             return false;
         }
 
-        return closestLightIndex == index;
+        return closestLightIndex == moveIndex;
     }
 
     @Override
     public boolean isAtDestination() {
-        return index == route.size();
-    }
-
-    @Override
-    public void move() {
-        ++index;
-        if (index > route.size()) {
-            throw new ArrayIndexOutOfBoundsException("MovingObject exceeded its route: " + index + "/" + route.size());
-        }
+        return moveIndex == route.size();
     }
 
     @Override
@@ -107,7 +89,7 @@ public class MovingObjectImpl extends MovingObject {
 
     @Override
     public int getMillisecondsToNextLight() {
-        return ((closestLightIndex - index) * RoutingConstants.STEP_CONSTANT) / getSpeed();
+        return ((closestLightIndex - moveIndex) * RoutingConstants.STEP_CONSTANT) / getSpeed();
     }
 
     @Override

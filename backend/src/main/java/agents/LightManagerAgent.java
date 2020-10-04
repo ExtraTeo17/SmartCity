@@ -8,11 +8,11 @@ import jade.lang.acl.ACLMessage;
 import jade.util.leap.Properties;
 import org.jxmapviewer.JXMapViewer;
 import org.jxmapviewer.painter.Painter;
-import routing.core.IGeoPosition;
 import smartcity.ITimeProvider;
 import smartcity.TimeProvider;
 import smartcity.lights.OptimizationResult;
 import smartcity.lights.abstractions.ICrossroad;
+import smartcity.lights.core.Light;
 import smartcity.stations.ArrivalInfo;
 
 import java.util.List;
@@ -22,7 +22,7 @@ public class LightManagerAgent extends AbstractAgent {
 
     private final ICrossroad crossroad;
 
-    public LightManagerAgent(int id, ITimeProvider timeProvider, ICrossroad crossroad) {
+    LightManagerAgent(int id, ITimeProvider timeProvider, ICrossroad crossroad) {
         super(id, name, timeProvider);
         this.crossroad = crossroad;
     }
@@ -43,7 +43,6 @@ public class LightManagerAgent extends AbstractAgent {
                 // if queue is empty
                 // apply strategy
                 //for elements in queue (if there are elements in queue, make green)
-                var crossroad = getCrossroad();
                 OptimizationResult result = crossroad.requestOptimizations();
                 handleOptimizationResult(result);
             }
@@ -78,8 +77,12 @@ public class LightManagerAgent extends AbstractAgent {
             }
 
             private void handleMessageFromRecipient(ACLMessage rcv) {
-                String recipientType = rcv.getUserDefinedParameter(MessageParameter.TYPE);
-                switch (recipientType) {
+                String type = rcv.getUserDefinedParameter(MessageParameter.TYPE);
+                if (type == null) {
+                    logTypeError(rcv);
+                    return;
+                }
+                switch (type) {
                     case MessageParameter.VEHICLE -> handleMessageFromVehicle(rcv);
                     case MessageParameter.PEDESTRIAN -> handleMessageFromPedestrian(rcv);
                 }
@@ -87,7 +90,6 @@ public class LightManagerAgent extends AbstractAgent {
 
             private void handleMessageFromVehicle(ACLMessage rcv) {
                 // TODO: Should be refactored - too much usage of crossroad methods.
-                var crossroad = getCrossroad();
                 var agentName = getSender(rcv);
                 switch (rcv.getPerformative()) {
                     case ACLMessage.INFORM -> {
@@ -118,7 +120,6 @@ public class LightManagerAgent extends AbstractAgent {
 
             private void handleMessageFromPedestrian(ACLMessage rcv) {
                 // TODO: Should be refactored - too much usage of crossroad methods.
-                var crossroad = getCrossroad();
                 var agentName = getSender(rcv);
                 switch (rcv.getPerformative()) {
                     case ACLMessage.INFORM -> {
@@ -133,8 +134,7 @@ public class LightManagerAgent extends AbstractAgent {
                                 MessageParameter.ADJACENT_OSM_WAY_ID) + ".");
                         crossroad.removePedestrianFromFarAwayQueue(getIntParameter(rcv, MessageParameter.ADJACENT_OSM_WAY_ID),
                                 agentName);
-                        ACLMessage agree = new ACLMessage(ACLMessage.AGREE);
-                        agree.addReceiver(rcv.getSender());
+                        ACLMessage agree = createMessage(ACLMessage.AGREE, rcv.getSender());
                         Properties properties = createProperties(MessageParameter.LIGHT);
                         agree.setAllUserDefinedParameters(properties);
                         send(agree);
@@ -154,12 +154,8 @@ public class LightManagerAgent extends AbstractAgent {
         addBehaviour(communicate);
     }
 
-    public ICrossroad getCrossroad() {
-        return crossroad;
-    }
-
-    public List<IGeoPosition> getLightsPositions() {
-        return crossroad.getLightsPositions();
+    public List<Light> getLights() {
+        return crossroad.getLights();
     }
 
     public void draw(List<Painter<JXMapViewer>> waypointPainter) {

@@ -18,7 +18,7 @@ public class SmartCityModule extends AbstractModule {
         binder.bind(ConfigContainer.class).asEagerSingleton();
 
         binder.install(new TaskModule());
-        binder.bind(MasterAgent.class).in(Singleton.class);
+        binder.bind(SmartCityAgent.class).in(Singleton.class);
     }
 
     @Provides

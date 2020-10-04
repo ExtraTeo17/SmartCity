@@ -12,6 +12,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import routing.LightManagerNode;
 import smartcity.ITimeProvider;
+import utilities.ConditionalExecutor;
 import vehicles.MovingObject;
 
 import java.time.LocalDateTime;
@@ -24,8 +25,8 @@ public abstract class AbstractAgent extends Agent {
     protected final Logger logger;
     protected final ITimeProvider timeProvider;
 
-    public AbstractAgent(int id, String namePrefix,
-                         ITimeProvider timeProvider) {
+    protected AbstractAgent(int id, String namePrefix,
+                            ITimeProvider timeProvider) {
         this.id = id;
         this.namePrefix = namePrefix;
         this.timeProvider = timeProvider;
@@ -79,13 +80,12 @@ public abstract class AbstractAgent extends Agent {
 
     private ACLMessage prepareMessageForManager(LightManagerNode managerNode, MovingObject movingObject) {
         ACLMessage msg = createMessage(ACLMessage.INFORM, LightManagerAgent.name, managerNode.getLightManagerId());
-
         var agentType = MessageParameter.getTypeByMovingObject(movingObject);
         Properties properties = createProperties(agentType);
         var predictedTime = timeProvider.getCurrentSimulationTime().plusNanos(
                 movingObject.getMillisecondsToNextLight() * 1_000_000);
         properties.setProperty(MessageParameter.ARRIVAL_TIME, "" + predictedTime);
-        properties.setProperty(MessageParameter.ADJACENT_OSM_WAY_ID, "" + managerNode.getOsmWayId());
+        properties.setProperty(MessageParameter.ADJACENT_OSM_WAY_ID, "" + managerNode.getAdjacentWayId());
         msg.setAllUserDefinedParameters(properties);
 
         return msg;
@@ -144,5 +144,11 @@ public abstract class AbstractAgent extends Agent {
         }
 
         return Integer.parseInt(rcv.getUserDefinedParameter(param));
+    }
+
+    protected void logTypeError(ACLMessage rcv) {
+        ConditionalExecutor.debug(() ->
+                print("Received message from" + rcv.getSender() + " without type:" + rcv, LoggerLevel.WARN)
+        );
     }
 }

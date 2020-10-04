@@ -14,10 +14,7 @@ import smartcity.lights.abstractions.ICrossroad;
 import smartcity.stations.ArrivalInfo;
 import utilities.Siblings;
 
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
@@ -77,8 +74,8 @@ class SimpleCrossroad implements ICrossroad {
     }
 
     @Override
-    public List<IGeoPosition> getLightsPositions() {
-        return wayIdToLightMap.values().stream().map(light -> (IGeoPosition) light).collect(Collectors.toList());
+    public List<Light> getLights() {
+        return new ArrayList<>(wayIdToLightMap.values());
     }
 
     private boolean tryConsume(long adjacentWayId, Consumer<Light> consumer) {

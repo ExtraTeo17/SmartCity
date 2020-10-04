@@ -2,7 +2,6 @@ package agents;
 
 import agents.abstractions.AbstractAgent;
 import agents.utilities.LightColor;
-import jade.core.AID;
 import jade.core.behaviours.CyclicBehaviour;
 import jade.core.behaviours.TickerBehaviour;
 import jade.lang.acl.ACLMessage;
@@ -16,7 +15,6 @@ import java.util.List;
 public class TrafficLightAgent extends AbstractAgent {
     public static final String name = StationAgent.class.getSimpleName().replace("Agent", "");
 
-    // TODO: Inject as dependency
     private final IGeoPosition position;
     private LightColor lightColor;
     private final List<String> agentsQueue;
@@ -41,20 +39,16 @@ public class TrafficLightAgent extends AbstractAgent {
                 setLightColor(lightColor.next());
                 if (lightColor == LightColor.RED) {
                     for (String name : getWaitingAgents()) {
-                        AID dest = new AID(name, AID.ISLOCALNAME);
-                        ACLMessage msg = new ACLMessage(ACLMessage.INFORM);
+                        ACLMessage msg = createMessage(ACLMessage.INFORM, name);
                         msg.setContent("Red");
-                        msg.addReceiver(dest);
                         send(msg);
                     }
                     print("Red light.");
                 }
                 else {
                     for (String name : getWaitingAgents()) {
-                        AID dest = new AID(name, AID.ISLOCALNAME);
-                        ACLMessage msg = new ACLMessage(ACLMessage.INFORM);
+                        ACLMessage msg = createMessage(ACLMessage.INFORM, name);
                         msg.setContent("Green");
-                        msg.addReceiver(dest);
                         send(msg);
                     }
                     print("Green light.");

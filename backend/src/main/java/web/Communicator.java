@@ -2,7 +2,7 @@ package web;
 
 import com.google.common.eventbus.Subscribe;
 import com.google.inject.Inject;
-import events.web.LightManagersReadyEvent;
+import events.LightManagersReadyEvent;
 import events.web.VehicleAgentCreatedEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -23,11 +23,10 @@ class Communicator {
     public void handle(LightManagersReadyEvent e) {
         onHandle(e);
         var positions = e.lightManagers.stream()
-                .flatMap(man -> man.getLightsPositions().stream())
+                .flatMap(man -> man.getLights().stream())
                 .collect(Collectors.toList());
         webService.prepareSimulation(positions);
     }
-
 
     @Subscribe
     public void handle(VehicleAgentCreatedEvent e) {

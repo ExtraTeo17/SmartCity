@@ -52,7 +52,7 @@ class HashAgentsContainerTest {
             // TODO: Mocks, not null
             agents.add(new PedestrianAgent(idGenerator.get(PedestrianAgent.class), null, null));
             agents.add(new BusAgent(idGenerator.get(BusAgent.class), null, null));
-            agents.add(new StationAgent(idGenerator.get(StationAgent.class), null, null));
+            agents.add(new StationAgent(idGenerator.get(StationAgent.class), null, null, null));
             agents.add(new VehicleAgent(idGenerator.get(VehicleAgent.class), mockVehicle, null));
             agents.add(new LightManagerAgent(idGenerator.get(LightManagerAgent.class), null, mockCrossroad));
         }

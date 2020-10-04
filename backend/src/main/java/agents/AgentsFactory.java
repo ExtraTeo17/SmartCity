@@ -11,6 +11,7 @@ import routing.StationNode;
 import routing.abstractions.IRouteTransformer;
 import smartcity.ITimeProvider;
 import smartcity.lights.abstractions.ICrossroadFactory;
+import smartcity.stations.StationStrategy;
 import vehicles.*;
 
 import java.util.List;
@@ -49,8 +50,10 @@ class AgentsFactory implements IAgentsFactory {
     }
 
     @Override
-    public StationAgent create(OSMStation osmStation) {
-        return new StationAgent(idGenerator.get(StationAgent.class), timeProvider, osmStation);
+    public StationAgent create(OSMStation station) {
+        var id = idGenerator.get(StationAgent.class);
+        var stationStrategy = new StationStrategy(id);
+        return new StationAgent(id, station, stationStrategy, timeProvider);
     }
 
     @Override
@@ -64,14 +67,14 @@ class AgentsFactory implements IAgentsFactory {
     @Override
     public LightManagerAgent create(Node crossroadNode) {
         var id = idGenerator.get(LightManagerAgent.class);
-        var crossroad = crossroadFactory.create(crossroadNode, id);
+        var crossroad = crossroadFactory.create(crossroadNode);
         return new LightManagerAgent(id, timeProvider, crossroad);
     }
 
     @Override
     public LightManagerAgent create(OSMNode centerCrossroad) {
         var id = idGenerator.get(LightManagerAgent.class);
-        var crossroad = crossroadFactory.create(centerCrossroad, id);
+        var crossroad = crossroadFactory.create(centerCrossroad);
         return new LightManagerAgent(id, timeProvider, crossroad);
     }
 

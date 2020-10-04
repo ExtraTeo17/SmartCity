@@ -15,7 +15,7 @@ public interface IAgentsFactory {
 
     VehicleAgent create(List<RouteNode> route);
 
-    StationAgent create(OSMStation osmStation);
+    StationAgent create(OSMStation station);
 
     BusAgent create(List<RouteNode> route, Timetable timetable, String busLine,
                     String brigadeNr);

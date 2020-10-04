@@ -2,9 +2,6 @@ package smartcity.stations;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import osmproxy.elements.OSMStation;
-import routing.StationNode;
-import smartcity.MasterAgent;
 import smartcity.lights.OptimizationResult;
 
 import java.time.LocalDateTime;
@@ -16,9 +13,13 @@ import java.util.stream.Collectors;
 
 @SuppressWarnings("UnusedReturnValue")
 public class StationStrategy {
-    private static final Logger logger = LoggerFactory.getLogger(StationStrategy.class);
     private final static boolean SHOULD_USE_STRATEGY = true;
     private final static int WAIT_PERIOD_SECONDS = 60;
+    private final Logger logger;
+
+    public StationStrategy(int managerId) {
+        this.logger = LoggerFactory.getLogger(this.getClass().getSimpleName() + managerId);
+    }
 
     // AgentName - Schedule Arrival Time / Arrival Time
     private final Map<String, String> busAgentNameToLine = new HashMap<>();
@@ -28,21 +29,10 @@ public class StationStrategy {
     private final Map<String, List<ArrivalInfo>> busLineToFarAwayPedestrians = new HashMap<>();
     private final Map<String, List<ArrivalInfo>> busLineToPedestriansOnStation = new HashMap<>();
 
-    public StationStrategy(OSMStation station, int agentId) {
-        // Temporary workaround, because of static container in MasterAgent
-        if (station == null) {
-            return;
-        }
-
-        var id = station.getId();
-        MasterAgent.osmStationIdToStationNode.put(id,
-                new StationNode(station.getLat(), station.getLng(), id, agentId));
-    }
-
     public boolean addBusAgentWithLine(String agentName, String busLine) {
         return busAgentNameToLine.put(agentName, busLine) == null;
     }
-
+    
     public boolean addBusToFarAwayQueue(String agentName, LocalDateTime scheduled, LocalDateTime actual) {
         return farAwayBusAgentNameToArrivalTime.put(agentName, ScheduledArrivalTime.of(scheduled, actual)) == null;
     }
@@ -69,7 +59,7 @@ public class StationStrategy {
     public boolean removePedestrianFromFarAwayQueue(String agentName, String busLine) {
         var arrivalInfos = busLineToFarAwayPedestrians.get(busLine);
         if (arrivalInfos == null) {
-            logger.warn("Tried to remove pedestrian from non-existing far-away-queue for " + busLine);
+            logger.warn("Tried to remove pedestrian: " + agentName + " from non-existing far-away-queue for " + busLine);
             return false;
         }
 
@@ -86,7 +76,7 @@ public class StationStrategy {
     public boolean removePedestrianFromQueue(String agentName, String busLine) {
         var arrivalInfos = busLineToPedestriansOnStation.get(busLine);
         if (arrivalInfos == null) {
-            logger.warn("Tried to remove pedestrian from non-existing queue for " + busLine);
+            logger.warn("Tried to remove pedestrian" + agentName + " from non-existing queue for " + busLine);
             return false;
         }
 
@@ -106,7 +96,7 @@ public class StationStrategy {
             var actualTime = scheduledArrival.actual;
 
             if (actualTime.isAfter(scheduledTimePlusWait)) {
-                logger.info("------------------BUS WAS LATE-----------------------");
+                logger.debug("------------------BUS WAS LATE-----------------------");
                 List<String> passengersThatCanLeave = getPassengersWhoAreReadyToGo(busLine);
                 result.addBusAndPedestrianGrantedPassthrough(busLine, passengersThatCanLeave);
             }
@@ -123,7 +113,7 @@ public class StationStrategy {
                 result.addBusAndPedestrianGrantedPassthrough(busLine, passengersThatCanLeave);
             }
             else if (actualTime.isBefore(scheduledTimeMinusWait)) {
-                logger.trace("------------------BUS TOO EARLY-----------------------");
+                logger.debug("------------------BUS TOO EARLY-----------------------");
             }
             else {
                 logger.warn("Undetermined situation for line " + busLine + ", scheduledTime" + scheduledTime +

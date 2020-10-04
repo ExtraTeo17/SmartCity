@@ -24,8 +24,8 @@ public class MessageParameter {
         var value = VehicleType.getValue(type);
         return switch (value) {
             case BUS -> BUS;
-            case PEDESTRIAN -> PEDESTRIAN;
-            case REGULAR_CAR -> VEHICLE;
+            case PEDESTRIAN, TEST_PEDESTRIAN -> PEDESTRIAN;
+            case REGULAR_CAR, TEST_CAR -> VEHICLE;
         };
     }
 }

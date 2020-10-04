@@ -75,7 +75,9 @@ class BusDataParserTests {
                 assertEquals(5, brigadesCounter);
                 assertTrue(timetablesCounter > 0);
             }
+            assertEquals(3, stops.size());
         }
+        assertEquals(1, result.busInfos.size());
     }
 
     private IBusApiManager setupApiManager() {

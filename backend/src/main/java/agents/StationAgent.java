@@ -20,15 +20,13 @@ public class StationAgent extends AbstractAgent {
     public static final String name = StationAgent.class.getSimpleName().replace("Agent", "");
 
     private final OSMStation station;
-    private final StationStrategy stationStrategy;
 
     StationAgent(int id,
-                 ITimeProvider timeProvider,
-                 OSMStation station) { // REMEMBER TO PRUNE BEYOND CIRCLE
+                 OSMStation station,
+                 StationStrategy stationStrategy,
+                 ITimeProvider timeProvider) { // REMEMBER TO PRUNE BEYOND CIRCLE
         super(id, name, timeProvider);
-
         this.station = station;
-        this.stationStrategy = new StationStrategy(station, id);
 
         Behaviour communication = new CyclicBehaviour() {
             @Override
@@ -37,12 +35,13 @@ public class StationAgent extends AbstractAgent {
                 ACLMessage rcv = receive();
                 if (rcv != null) {
                     String type = rcv.getUserDefinedParameter(MessageParameter.TYPE);
-                    if (type.equals(MessageParameter.BUS)) {
-                        handleMessageFromBus(rcv);
+                    if (type == null) {
+                        logTypeError(rcv);
+                        return;
                     }
-                    else if (type.equals(MessageParameter.PEDESTRIAN)) {
-                        handleMessageFromPedestrian(rcv);
-
+                    switch (type) {
+                        case MessageParameter.BUS -> handleMessageFromBus(rcv);
+                        case MessageParameter.PEDESTRIAN -> handleMessageFromPedestrian(rcv);
                     }
                 }
                 block(100);
@@ -53,6 +52,7 @@ public class StationAgent extends AbstractAgent {
                 var messageKind = rcv.getPerformative();
                 String agentName = rcv.getSender().getLocalName();
                 if (messageKind == ACLMessage.INFORM) {
+                    print("Got INFORM from " + agentName);
                     String busLine = rcv.getUserDefinedParameter(MessageParameter.BUS_LINE);
                     stationStrategy.addBusAgentWithLine(agentName, busLine);
 
@@ -60,10 +60,10 @@ public class StationAgent extends AbstractAgent {
                     var actual = getDateParameter(rcv, MessageParameter.ARRIVAL_TIME);
                     stationStrategy.addBusToFarAwayQueue(agentName, scheduled, actual);
 
-                    print("Got INFORM from " + agentName);
                     // TODO: SEND MESSAGE ABOUT PASSENGERS
                 }
                 else if (messageKind == ACLMessage.REQUEST_WHEN) {
+                    print("Got REQUEST_WHEN from " + agentName);
                     stationStrategy.removeBusFromFarAwayQueue(agentName);
 
                     var scheduled = getDateParameter(rcv, MessageParameter.SCHEDULE_ARRIVAL);
@@ -71,7 +71,9 @@ public class StationAgent extends AbstractAgent {
                     stationStrategy.addBusToQueue(agentName, scheduled, actual);
 
                     var msg = createMessage(ACLMessage.AGREE, rcv.getSender());
-                    print("Got REQUEST_WHEN from " + agentName);
+                    // TODO: This is send to busAgent without type - won't be handled
+                    //  I am not sure if needed
+                    // msg.setAllUserDefinedParameters(createProperties(MessageParameter.STATION));
                     send(msg);
                 }
                 else if (messageKind == ACLMessage.AGREE) {
@@ -93,14 +95,18 @@ public class StationAgent extends AbstractAgent {
                             getDateParameter(rcv, MessageParameter.ARRIVAL_TIME));
                 }
                 else if (messageKind == ACLMessage.REQUEST_WHEN) {
-                    print("GET MESSAGE FROM PEDESTRIAN REQUEST_WHEN", LoggerLevel.DEBUG);
-                    stationStrategy.removePedestrianFromFarAwayQueue(agentName,
-                            rcv.getUserDefinedParameter(MessageParameter.DESIRED_BUS_LINE));
-                    stationStrategy.addPedestrianToQueue(agentName,
-                            rcv.getUserDefinedParameter(MessageParameter.DESIRED_BUS_LINE),
+                    print("GOT MESSAGE FROM PEDESTRIAN REQUEST_WHEN", LoggerLevel.DEBUG);
+                    var desiredBusLine = rcv.getUserDefinedParameter(MessageParameter.DESIRED_BUS_LINE);
+                    stationStrategy.removePedestrianFromFarAwayQueue(agentName, desiredBusLine);
+                    stationStrategy.addPedestrianToQueue(agentName, desiredBusLine,
                             getDateParameter(rcv, MessageParameter.ARRIVAL_TIME));
 
                     var msg = createMessage(ACLMessage.REQUEST, rcv.getSender());
+                    // TODO: This is send to pedestrian without type - won't be handled
+                    //  But also needs busAgent name parameter or Pedestrian will die
+                    //  I am not sure if needed
+                    // var properties = createProperties(MessageParameter.STATION);
+                    // msg.setAllUserDefinedParameters(createProperties(MessageParameter.STATION));
                     send(msg);
                 }
                 else if (messageKind == ACLMessage.AGREE) {
@@ -140,7 +146,6 @@ public class StationAgent extends AbstractAgent {
                     msg.setAllUserDefinedParameters(properties);
                     send(msg);
                 }
-
             }
 
             private void answerBusCanProceed(String busAgentName) {

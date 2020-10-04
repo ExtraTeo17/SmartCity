@@ -20,8 +20,8 @@ public class SharedModule extends AbstractModule {
     @Provides
     @Singleton
     ObjectMapper getObjectMapper() {
-        JavaTimeModule timeModule = new JavaTimeModule();
         var mapper = new ObjectMapper();
+        var timeModule = new JavaTimeModule();
         mapper.registerModule(timeModule);
         mapper.configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false);
         mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);

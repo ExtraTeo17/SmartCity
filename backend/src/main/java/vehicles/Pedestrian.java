@@ -5,7 +5,6 @@ import routing.LightManagerNode;
 import routing.RouteNode;
 import routing.RoutingConstants;
 import routing.StationNode;
-import routing.core.IGeoPosition;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -19,10 +18,8 @@ public class Pedestrian extends MovingObject {
     private final List<RouteNode> routeBeforeBus;
     private final StationNode stationStart;
     private final StationNode stationFinish;
-    private final List<RouteNode> route;
 
     private transient DrivingState state = DrivingState.STARTING;
-    private transient int index = 0;
     private transient int closestLightIndex = 0;
     private transient int stationIndex = 0;
 
@@ -33,18 +30,12 @@ public class Pedestrian extends MovingObject {
                       String preferredBusLine,
                       StationNode startStation,
                       StationNode finishStation) {
-        super(10);
+        super(10, createRoute(startStation,uniformRouteToStation, finishStation, uniformRouteFromStation));
         this.displayRouteBeforeBus = routeToStation;
         this.routeBeforeBus = uniformRouteToStation;
         this.routeBeforeBus.add(startStation);
 
         this.displayRouteAfterBus = routeFromStation;
-
-        this.route = new ArrayList<>();
-        this.route.addAll(routeBeforeBus);
-        this.route.add(finishStation);
-        this.route.addAll(uniformRouteFromStation);
-
         this.stationIndex = routeBeforeBus.size() - 1;
         this.preferredBusLine = preferredBusLine;
 
@@ -52,13 +43,24 @@ public class Pedestrian extends MovingObject {
         this.stationFinish = finishStation;
     }
 
+    private static List<RouteNode> createRoute(StationNode startStation,
+                                               List<RouteNode> uniformRouteToStation,
+                                               StationNode finishStation,
+                                               List<RouteNode> uniformRouteFromStation) {
+        var route = new ArrayList<RouteNode>(uniformRouteToStation);
+        route.add(startStation);
+        route.add(finishStation);
+        route.addAll(uniformRouteFromStation);
+
+        return route;
+    }
+
     Pedestrian(Pedestrian ped) {
-        super(ped.speed);
+        super(ped.speed, ped.route);
         this.displayRouteBeforeBus = ped.displayRouteBeforeBus;
         this.routeBeforeBus = ped.routeBeforeBus;
 
         this.displayRouteAfterBus = ped.displayRouteAfterBus;
-        this.route = ped.route;
         this.stationIndex = ped.stationIndex;
         this.preferredBusLine = ped.preferredBusLine;
 
@@ -68,12 +70,11 @@ public class Pedestrian extends MovingObject {
 
     @VisibleForTesting
     Pedestrian() {
-        super(10);
+        super(10, new ArrayList<>());
         preferredBusLine = "";
         displayRouteBeforeBus = new ArrayList<>();
         displayRouteAfterBus = new ArrayList<>();
         routeBeforeBus = new ArrayList<>();
-        route = new ArrayList<>();
         stationStart = new StationNode(5, 5, 1L, 1);
         stationFinish = new StationNode(5, 10, 2L, 2);
     }
@@ -92,7 +93,7 @@ public class Pedestrian extends MovingObject {
 
     @Override
     public long getAdjacentOsmWayId() {
-        return ((LightManagerNode) route.get(index)).getCrossingOsmId1();
+        return ((LightManagerNode) route.get(moveIndex)).getCrossingOsmId1();
     }
 
     @Override
@@ -102,7 +103,7 @@ public class Pedestrian extends MovingObject {
 
     @Override
     public LightManagerNode getNextTrafficLight() {
-        for (int i = index + 1; i < route.size(); i++) {
+        for (int i = moveIndex + 1; i < route.size(); i++) {
             if (route.get(i) instanceof LightManagerNode) {
                 closestLightIndex = i;
                 return getCurrentTrafficLightNode();
@@ -113,7 +114,7 @@ public class Pedestrian extends MovingObject {
     }
 
     public RouteNode findNextStop() {
-        for (int i = index + 1; i < route.size(); i++) {
+        for (int i = moveIndex + 1; i < route.size(); i++) {
             if (route.get(i) instanceof StationNode) {
                 return (StationNode) route.get(i);
             }
@@ -122,16 +123,6 @@ public class Pedestrian extends MovingObject {
             }
         }
         return null;
-    }
-
-    @Override
-    public IGeoPosition getPosition() {
-        // TODO: Should not happen - prevent it
-        if (index >= route.size()) {
-            return route.get(route.size() - 1);
-        }
-
-        return route.get(index);
     }
 
     @Override
@@ -144,27 +135,22 @@ public class Pedestrian extends MovingObject {
 
     @Override
     public boolean isAtTrafficLights() {
-        if (index == route.size()) {
+        if (moveIndex == route.size()) {
             return false;
         }
-        return route.get(index) instanceof LightManagerNode;
+        return route.get(moveIndex) instanceof LightManagerNode;
     }
 
     public boolean isAtStation() {
-        if (index == route.size()) {
+        if (moveIndex == route.size()) {
             return false;
         }
-        return route.get(index) instanceof StationNode;
+        return route.get(moveIndex) instanceof StationNode;
     }
 
     @Override
     public boolean isAtDestination() {
-        return index == route.size();
-    }
-
-    @Override
-    public void move() {
-        index++;
+        return moveIndex == route.size();
     }
 
     @Override
@@ -174,7 +160,7 @@ public class Pedestrian extends MovingObject {
 
     @Override
     public int getMillisecondsToNextLight() {
-        return ((closestLightIndex - index) * RoutingConstants.STEP_CONSTANT) / getSpeed();
+        return ((closestLightIndex - moveIndex) * RoutingConstants.STEP_CONSTANT) / getSpeed();
     }
 
     @Override
@@ -196,7 +182,7 @@ public class Pedestrian extends MovingObject {
     }
 
     public long getMillisecondsToNextStation() {
-        return ((routeBeforeBus.size() - 1 - index) * RoutingConstants.STEP_CONSTANT) / getSpeed();
+        return ((routeBeforeBus.size() - 1 - moveIndex) * RoutingConstants.STEP_CONSTANT) / getSpeed();
 
     }
 

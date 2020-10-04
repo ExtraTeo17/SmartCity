@@ -10,7 +10,7 @@ import jade.util.leap.Properties;
 import routing.LightManagerNode;
 import routing.core.IGeoPosition;
 import smartcity.ITimeProvider;
-import smartcity.MasterAgent;
+import smartcity.SmartCityAgent;
 import vehicles.DrivingState;
 import vehicles.MovingObject;
 
@@ -67,9 +67,8 @@ public class VehicleAgent extends AbstractAgent {
                     vehicle.setState(DrivingState.AT_DESTINATION);
                     print("Reached destination.");
 
-                    ACLMessage msg = createMessage(ACLMessage.INFORM, MasterAgent.name);
-                    Properties prop = new Properties();
-                    prop.setProperty(MessageParameter.TYPE, MessageParameter.VEHICLE);
+                    ACLMessage msg = createMessage(ACLMessage.INFORM, SmartCityAgent.name);
+                    var prop = createProperties(MessageParameter.VEHICLE);
                     prop.setProperty(MessageParameter.AT_DESTINATION, String.valueOf(Boolean.TRUE));
                     msg.setAllUserDefinedParameters(prop);
                     send(msg);
@@ -89,9 +88,9 @@ public class VehicleAgent extends AbstractAgent {
                     switch (rcv.getPerformative()) {
                         case ACLMessage.REQUEST -> {
                             ACLMessage response = createMessage(ACLMessage.AGREE, rcv.getSender());
-                            Properties properties = new Properties();
-                            properties.setProperty(MessageParameter.TYPE, MessageParameter.VEHICLE);
-                            properties.setProperty(MessageParameter.ADJACENT_OSM_WAY_ID, Long.toString(vehicle.getAdjacentOsmWayId()));
+                            Properties properties = createProperties(MessageParameter.VEHICLE);
+                            properties.setProperty(MessageParameter.ADJACENT_OSM_WAY_ID,
+                                    Long.toString(vehicle.getAdjacentOsmWayId()));
                             response.setAllUserDefinedParameters(properties);
                             send(response);
 

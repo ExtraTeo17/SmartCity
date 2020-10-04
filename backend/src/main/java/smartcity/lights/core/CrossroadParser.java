@@ -17,12 +17,13 @@ import utilities.Siblings;
 import java.util.ArrayList;
 import java.util.List;
 
-class CrossroadParser {
+public class CrossroadParser implements ICrossroadParser {
     private static final Logger logger = LoggerFactory.getLogger(CrossroadParser.class);
     private static final double COSINE_OF_135_DEGREES = -0.7071;
     private static final double DISTANCE_THRESHOLD = 10 * RoutingConstants.DEGREES_PER_METER;
 
-    Siblings<List<LightInfo>> getLightGroups(OSMNode crossroadCenter) {
+    @Override
+    public Siblings<List<LightInfo>> getLightGroups(OSMNode crossroadCenter) {
         var firstLightGroupInfo = new ArrayList<LightInfo>();
         var secondLightGroupInfo = new ArrayList<LightInfo>();
 
@@ -55,13 +56,13 @@ class CrossroadParser {
 
     private LightInfo parseLightInfo(OSMWay adjacentOsmWay,
                                      OSMNode centerCrossroadNode) {
-        var waypoints = getNextWaypoints(adjacentOsmWay);
-
-        var adjacentCrossingOsmId1 = waypoints.first.getOsmNodeRef();
-        var adjacentCrossingOsmId2 = waypoints.isSecondPresent() ? waypoints.second.getOsmNodeRef() : null;
+        var waypointsPair = getNextWaypoints(adjacentOsmWay);
+        var adjacentCrossingOsmId1 = waypointsPair.first.getOsmNodeRef();
+        var adjacentCrossingOsmId2 = waypointsPair.isSecondPresent() ? waypointsPair.second.getOsmNodeRef() : null;
         var adjacentOsmWayId = adjacentOsmWay.getId();
+
         var osmLightId = centerCrossroadNode.getId();
-        var position = getLightPosition(waypoints.first,
+        var position = getLightPosition(waypointsPair.first,
                 adjacentOsmWay.getLightNeighborPos(),
                 centerCrossroadNode);
 
@@ -100,7 +101,8 @@ class CrossroadParser {
         return finalPosition;
     }
 
-    Siblings<List<LightInfo>> getLightGroups(Node crossroad) {
+    @Override
+    public Siblings<List<LightInfo>> getLightGroups(Node crossroad) {
         var crossroadChildren = crossroad.getChildNodes();
         var childrenANode = crossroadChildren.item(1);
         var childrenBNode = crossroadChildren.item(3);

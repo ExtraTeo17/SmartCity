@@ -10,11 +10,10 @@ import org.slf4j.LoggerFactory;
 import osmproxy.OsmModule;
 import osmproxy.buses.BusModule;
 import routing.RoutingModule;
-import smartcity.MasterAgent;
+import smartcity.SmartCityAgent;
 import smartcity.SmartCityModule;
 import smartcity.lights.core.LightsModule;
 import web.WebModule;
-import web.serialization.SerializationModule;
 
 public class SmartCity {
     private static final Logger logger = LoggerFactory.getLogger(SmartCity.class);
@@ -34,9 +33,9 @@ public class SmartCity {
         );
 
         var controller = injector.getInstance(ContainerController.class);
-        var mainAgent = injector.getInstance(MasterAgent.class);
+        var mainAgent = injector.getInstance(SmartCityAgent.class);
         try {
-            var agentController = controller.acceptNewAgent(MasterAgent.name, mainAgent);
+            var agentController = controller.acceptNewAgent(SmartCityAgent.name, mainAgent);
             agentController.activate();
             agentController.start();
         } catch (StaleProxyException e) {
