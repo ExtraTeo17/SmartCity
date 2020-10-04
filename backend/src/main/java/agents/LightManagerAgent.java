@@ -22,7 +22,7 @@ public class LightManagerAgent extends AbstractAgent {
 
     private final ICrossroad crossroad;
 
-    public LightManagerAgent(int id, ITimeProvider timeProvider, ICrossroad crossroad) {
+    LightManagerAgent(int id, ITimeProvider timeProvider, ICrossroad crossroad) {
         super(id, name, timeProvider);
         this.crossroad = crossroad;
     }
@@ -77,8 +77,12 @@ public class LightManagerAgent extends AbstractAgent {
             }
 
             private void handleMessageFromRecipient(ACLMessage rcv) {
-                String recipientType = rcv.getUserDefinedParameter(MessageParameter.TYPE);
-                switch (recipientType) {
+                String type = rcv.getUserDefinedParameter(MessageParameter.TYPE);
+                if (type == null) {
+                    logTypeError(rcv);
+                    return;
+                }
+                switch (type) {
                     case MessageParameter.VEHICLE -> handleMessageFromVehicle(rcv);
                     case MessageParameter.PEDESTRIAN -> handleMessageFromPedestrian(rcv);
                 }
@@ -130,8 +134,7 @@ public class LightManagerAgent extends AbstractAgent {
                                 MessageParameter.ADJACENT_OSM_WAY_ID) + ".");
                         crossroad.removePedestrianFromFarAwayQueue(getIntParameter(rcv, MessageParameter.ADJACENT_OSM_WAY_ID),
                                 agentName);
-                        ACLMessage agree = new ACLMessage(ACLMessage.AGREE);
-                        agree.addReceiver(rcv.getSender());
+                        ACLMessage agree = createMessage(ACLMessage.AGREE, rcv.getSender());
                         Properties properties = createProperties(MessageParameter.LIGHT);
                         agree.setAllUserDefinedParameters(properties);
                         send(agree);

@@ -5,10 +5,10 @@ import com.google.inject.Inject;
 import org.w3c.dom.Node;
 import osmproxy.buses.Timetable;
 import osmproxy.elements.OSMNode;
+import osmproxy.elements.OSMStation;
 import routing.RouteNode;
 import routing.StationNode;
 import routing.abstractions.IRouteTransformer;
-import routing.core.IGeoPosition;
 import smartcity.ITimeProvider;
 import smartcity.lights.abstractions.ICrossroadFactory;
 import smartcity.stations.StationStrategy;
@@ -50,9 +50,10 @@ class AgentsFactory implements IAgentsFactory {
     }
 
     @Override
-    public StationAgent create(IGeoPosition position) {
-        var stationStrategy = new StationStrategy();
-        return new StationAgent(idGenerator.get(StationAgent.class), position, stationStrategy, timeProvider);
+    public StationAgent create(OSMStation station) {
+        var id = idGenerator.get(StationAgent.class);
+        var stationStrategy = new StationStrategy(id);
+        return new StationAgent(id, station, stationStrategy, timeProvider);
     }
 
     @Override

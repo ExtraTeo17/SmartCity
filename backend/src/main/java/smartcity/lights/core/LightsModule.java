@@ -10,6 +10,7 @@ public class LightsModule extends AbstractModule {
     @Override
     public void configure(Binder binder) {
         super.configure(binder);
+        binder.bind(ICrossroadParser.class).to(CrossroadParser.class).in(Singleton.class);
         binder.bind(ICrossroadFactory.class).to(CrossroadFactory.class).in(Singleton.class);
     }
 }

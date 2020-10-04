@@ -7,7 +7,6 @@ import routing.LightManagerNode;
 import routing.RouteNode;
 import routing.RoutingConstants;
 import routing.StationNode;
-import routing.core.IGeoPosition;
 import smartcity.ITimeProvider;
 
 import java.time.LocalDateTime;
@@ -26,11 +25,9 @@ public class Bus extends MovingObject {
     private final List<StationNode> stationNodesOnRoute;
     private final String busLine;
     private final List<RouteNode> displayRoute;
-    private final List<RouteNode> route;
     private final ITimeProvider timeProvider;
 
     private DrivingState state = DrivingState.STARTING;
-    private int moveIndex = 0;
     private int closestLightIndex = -1;
     private int closestStationIndex = -1;
     private int passengersCount = 0;
@@ -42,14 +39,13 @@ public class Bus extends MovingObject {
                Timetable timetable,
                String busLine,
                String brigadeNr) {
-        super(40);
+        super(40, uniformRoute);
         this.timeProvider = timeProvider;
         this.displayRoute = route;
         this.timetable = timetable;
         this.busLine = busLine;
         this.logger = LoggerFactory.getLogger(Bus.class.getName() + " (l_" + busLine + ") (br_" + brigadeNr + ")");
 
-        this.route = uniformRoute;
         this.stationsForPassengers = new HashMap<>();
         this.stationNodesOnRoute = new ArrayList<>();
         for (RouteNode node : route) {
@@ -165,11 +161,6 @@ public class Bus extends MovingObject {
     }
 
     @Override
-    public IGeoPosition getPosition() {
-        return route.get(moveIndex);
-    }
-
-    @Override
     public LightManagerNode getCurrentTrafficLightNode() {
         if (closestLightIndex == -1) {
             return null;
@@ -187,16 +178,16 @@ public class Bus extends MovingObject {
 
     public boolean isAtStation() {
         if (moveIndex == route.size()) {
-            return true;
+            return false;
         }
         return route.get(moveIndex) instanceof StationNode;
     }
 
-    public StationNode getCurrentStationNode() {
+    public Optional<StationNode> getCurrentStationNode() {
         if (closestStationIndex == -1) {
-            return null;
+            return Optional.empty();
         }
-        return (StationNode) (route.get(closestStationIndex));
+        return Optional.of((StationNode) (route.get(closestStationIndex)));
     }
 
     @Override
@@ -207,6 +198,7 @@ public class Bus extends MovingObject {
     @Override
     public void move() {
         if (isAtDestination()) {
+            // TODO: why?
             moveIndex = 0;
         }
         else {

@@ -1,4 +1,4 @@
-package events.web;
+package events;
 
 import agents.LightManagerAgent;
 

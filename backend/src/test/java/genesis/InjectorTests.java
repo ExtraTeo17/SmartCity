@@ -6,6 +6,7 @@ import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
+import events.LightManagersReadyEvent;
 import events.SwitchLightsStartEvent;
 import events.web.*;
 import org.junit.jupiter.api.Test;

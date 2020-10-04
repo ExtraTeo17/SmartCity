@@ -1,27 +1,27 @@
 package routing;
 
-import routing.core.IGeoPosition;
+import osmproxy.elements.OSMStation;
 
 public class StationNode extends RouteNode {
     private final int agentId;
-    private final long id;
+    private final long osmId;
 
     public StationNode(double lat, double lon,
-                       long id, int agentId) {
+                       long osmId, int agentId) {
         super(lat, lon);
-        this.id = id;
+        this.osmId = osmId;
         this.agentId = agentId;
     }
 
-    public StationNode(IGeoPosition pos, long id, int agentId){
-       this(pos.getLat(), pos.getLng(), id, agentId);
+    public StationNode(OSMStation station, int agentId) {
+        this(station.getLat(), station.getLng(), station.getId(), agentId);
     }
 
     public int getAgentId() {
         return agentId;
     }
 
-    public long getStationNodeId() {
-        return id;
+    public long getOsmId() {
+        return osmId;
     }
 }

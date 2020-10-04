@@ -92,11 +92,11 @@ public class TaskProvider implements ITaskProvider {
                         pedestrianStartPoint,
                         startStation,
                         null,
-                        String.valueOf(startStation.getStationNodeId()));
+                        String.valueOf(startStation.getOsmId()));
                 List<RouteNode> routeFromStation = routeGenerator.generateRouteForPedestrians(
                         endStation,
                         pedestrianFinishPoint,
-                        String.valueOf(endStation.getStationNodeId()),
+                        String.valueOf(endStation.getOsmId()),
                         null);
 
                 // TODO: Separate fields for testPedestrian and pedestriansLimit

@@ -89,7 +89,7 @@ class AgentsCreatorTests {
         var osmContainer = mock(NodesContainer.class);
 
         return new AgentsCreator(agentsContainer, configContainer, busLinesManager, agentsFactory,
-                eventBus, lightAccessManager, mapAccessManager, routeGenerator, osmContainer);
+                eventBus, lightAccessManager, mapAccessManager, routeGenerator);
     }
 
     private ILightAccessManager setupLightAccessManager() {

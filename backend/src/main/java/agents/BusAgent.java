@@ -14,12 +14,13 @@ import routing.RouteNode;
 import routing.RoutingConstants;
 import routing.StationNode;
 import smartcity.ITimeProvider;
-import smartcity.MasterAgent;
+import smartcity.SmartCityAgent;
 import utilities.ConditionalExecutor;
 import utilities.Siblings;
 import vehicles.Bus;
 import vehicles.DrivingState;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Random;
 
@@ -40,8 +41,14 @@ public class BusAgent extends AbstractAgent {
     @Override
     protected void setup() {
         informNextStation();
-        StationNode station = bus.getCurrentStationNode();
-        print("Started at station " + station.getAgentId() + ".");
+        var firstStationOpt = bus.getCurrentStationNode();
+        if (firstStationOpt.isEmpty()) {
+            print("No stations on route!", LoggerLevel.ERROR);
+            return;
+        }
+
+        var firstStation = firstStationOpt.get();
+        print("Started at station " + firstStation.getAgentId() + ".");
         bus.setState(DrivingState.MOVING);
 
         // TODO: Executed each x = 3600 / bus.getSpeed() = 3600m / (40 * TIME_SCALE) = 3600 / 400 = 9ms
@@ -75,21 +82,15 @@ public class BusAgent extends AbstractAgent {
                             break;
                     }
                 }
-                else if (bus.isAtDestination()) {
-                    bus.setState(DrivingState.AT_DESTINATION);
-                    print("Reached destination.");
-
-                    ACLMessage msg = createMessage(ACLMessage.INFORM, MasterAgent.name);
-                    Properties prop = createProperties(MessageParameter.BUS);
-                    prop.setProperty(MessageParameter.AT_DESTINATION, String.valueOf(Boolean.TRUE));
-                    msg.setAllUserDefinedParameters(prop);
-                    send(msg);
-                    doDelete();
-                }
                 else if (bus.isAtStation()) {
                     switch (bus.getState()) {
                         case MOVING:
-                            StationNode station = bus.getCurrentStationNode();
+                            var stationOpt = bus.getCurrentStationNode();
+                            if (stationOpt.isEmpty()) {
+                                logger.error("Bus in not at station, but function returned that it is.");
+                                return;
+                            }
+                            var station = stationOpt.get();
                             List<String> passengerNames = bus.getPassengers(station.getAgentId());
 
                             if (passengerNames.size() > 0) {
@@ -100,11 +101,10 @@ public class BusAgent extends AbstractAgent {
                                 send(leave);
                             }
 
-
                             ACLMessage msg = createMessage(ACLMessage.REQUEST_WHEN, StationAgent.name, station.getAgentId());
                             Properties properties = createProperties(MessageParameter.BUS);
 
-                            var timeOnStation = bus.getTimeOnStation(station.getStationNodeId());
+                            var timeOnStation = bus.getTimeOnStation(station.getOsmId());
                             timeOnStation.ifPresent(time -> properties.setProperty(MessageParameter.SCHEDULE_ARRIVAL, time
                                     .toString()));
                             properties.setProperty(MessageParameter.ARRIVAL_TIME, timeProvider.getCurrentSimulationTime()
@@ -134,6 +134,17 @@ public class BusAgent extends AbstractAgent {
                             break;
                     }
                 }
+                else if (bus.isAtDestination()) {
+                    bus.setState(DrivingState.AT_DESTINATION);
+                    print("Reached destination.");
+
+                    ACLMessage msg = createMessage(ACLMessage.INFORM, SmartCityAgent.name);
+                    Properties prop = createProperties(MessageParameter.BUS);
+                    prop.setProperty(MessageParameter.AT_DESTINATION, String.valueOf(Boolean.TRUE));
+                    msg.setAllUserDefinedParameters(prop);
+                    send(msg);
+                    doDelete();
+                }
                 else {
                     bus.move();
                 }
@@ -150,6 +161,7 @@ public class BusAgent extends AbstractAgent {
 
                 String type = rcv.getUserDefinedParameter(MessageParameter.TYPE);
                 if (type == null) {
+                    logTypeError(rcv);
                     return;
                 }
 
@@ -234,7 +246,7 @@ public class BusAgent extends AbstractAgent {
             properties.setProperty(MessageParameter.ARRIVAL_TIME, predictedTime.toString());
             properties.setProperty(MessageParameter.BUS_LINE, bus.getLine());
 
-            var osmId = station.getStationNodeId();
+            var osmId = station.getOsmId();
             var timeOnStation = bus.getTimeOnStation(osmId);
             if (timeOnStation.isPresent()) {
                 properties.setProperty(MessageParameter.SCHEDULE_ARRIVAL, timeOnStation.get().toString());
@@ -255,10 +267,10 @@ public class BusAgent extends AbstractAgent {
         var stations = bus.getStationNodesOnRoute();
         for (int i = 0; i < stations.size(); ++i) {
             var station = stations.get(i);
-            var osmId = station.getStationNodeId();
+            var osmId = station.getOsmId();
             var stationId = station.getAgentId();
             var timeOnStation = bus.getTimeOnStation(osmId);
-            var timeString = timeOnStation.isPresent() ? timeOnStation.get().toString() : "";
+            var timeString = timeOnStation.map(LocalDateTime::toString).orElse("");
             print(i + ": [" + osmId + "][" + stationId + "] on '" + timeString + "'", LoggerLevel.DEBUG);
         }
         print("Printing station nodes finished.", LoggerLevel.DEBUG);

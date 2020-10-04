@@ -25,12 +25,12 @@ final class Router implements
     private static final Logger logger = LoggerFactory.getLogger(Router.class);
 
     private final IMapAccessManager mapAccessManager;
-    private final NodesContainer nodesContainer;
+    private final INodesContainer INodesContainer;
 
     @Inject
-    public Router(IMapAccessManager mapAccessManager, NodesContainer nodesContainer) {
+    public Router(IMapAccessManager mapAccessManager, INodesContainer INodesContainer) {
         this.mapAccessManager = mapAccessManager;
-        this.nodesContainer = nodesContainer;
+        this.INodesContainer = INodesContainer;
     }
 
     @Override
@@ -43,19 +43,19 @@ final class Router implements
         }
 
         List<OSMLight> lightInfo = mapAccessManager.getOsmLights(wayIds);
-        var managers = getManagersNodesForLights(lightInfo);
+        var managersNodes = getManagersNodesForLights(lightInfo);
         var points = osmWayIdsAndPointList.getValue1();
 
-        return getRouteWithAdditionalNodes(points, managers);
+        return getRouteWithAdditionalNodes(points, managersNodes);
     }
 
     // TODO: Merge with function for cars if testing proves they are identical
     @Override
     public List<RouteNode> generateRouteForPedestrians(IGeoPosition pointA, IGeoPosition pointB) {
         Pair<List<Long>, List<RouteNode>> osmWayIdsAndPointList = Router.findRoute(pointA, pointB, true);
-        final List<OSMLight> lightInfo = mapAccessManager.getOsmLights(osmWayIdsAndPointList.getValue0());
-        List<RouteNode> managers = getManagersNodesForLights(lightInfo);
-        return getRouteWithAdditionalNodes(osmWayIdsAndPointList.getValue1(), managers);
+        List<OSMLight> lightInfo = mapAccessManager.getOsmLights(osmWayIdsAndPointList.getValue0());
+        List<RouteNode> managersNodes = getManagersNodesForLights(lightInfo);
+        return getRouteWithAdditionalNodes(osmWayIdsAndPointList.getValue1(), managersNodes);
     }
 
     // TODO: Improve routing to consider random OSM nodes as start/end points instead of random lat/lng
@@ -103,22 +103,20 @@ final class Router implements
         long nodeRefId = Long.parseLong(waypoint.getOsmNodeRef());
         // TODO: Is it needed?
         if (routeInfo.remove(nodeRefId)) {
-            return nodesContainer.getNode(nodeRefId);
+            return INodesContainer.getLightManagerNode(nodeRefId);
         }
 
         return new RouteNode(waypoint.getLat(), waypoint.getLng());
     }
 
     @Override
-    public List<RouteNode> generateRouteInfoForBuses(List<OSMWay> route, List<? extends IGeoPosition> stationsPositions) {
+    public List<RouteNode> generateRouteInfoForBuses(List<OSMWay> route,
+                                                     List<StationNode> stationNodes) {
         var busRouteData = generateBusRoute(route);
         List<OSMLight> lightsOnRoute = mapAccessManager.getOsmLights(busRouteData.waysIds);
-        List<RouteNode> managers = getManagersNodesForLights(lightsOnRoute);
-        List<RouteNode> stationNodes = stationsPositions.stream()
-                .map(s -> new RouteNode(s.getLat(), s.getLng()))
-                .collect(Collectors.toList());
-        managers.addAll(stationNodes);
-        return getRouteWithAdditionalNodes(busRouteData.route, managers);
+        List<RouteNode> managersNodes = getManagersNodesForLights(lightsOnRoute);
+        managersNodes.addAll(stationNodes);
+        return getRouteWithAdditionalNodes(busRouteData.route, managersNodes);
     }
 
     // TODO: In some cases distance is 0 -> dx|dy is NaN -> same nodes?
@@ -172,7 +170,7 @@ final class Router implements
         List<RouteNode> nodes = new ArrayList<>();
         long lastMangerId = -1;
         for (OSMLight light : lights) {
-            LightManagerNode nodeToAdd = nodesContainer.getNode(light.getAdherentWayId(), light.getId());
+            var nodeToAdd = INodesContainer.getLightManagerNode(light.getAdherentWayId(), light.getId());
             if (nodeToAdd != null) {
                 var nodeManagerId = nodeToAdd.getLightManagerId();
                 if (nodeManagerId != lastMangerId) {

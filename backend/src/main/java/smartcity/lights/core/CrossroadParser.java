@@ -1,6 +1,5 @@
 package smartcity.lights.core;
 
-import com.google.inject.Inject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.NamedNodeMap;
@@ -9,7 +8,6 @@ import org.w3c.dom.NodeList;
 import osmproxy.elements.OSMNode;
 import osmproxy.elements.OSMWay;
 import osmproxy.elements.OSMWaypoint;
-import routing.NodesContainer;
 import routing.RoutingConstants;
 import routing.core.IGeoPosition;
 import routing.core.Position;
@@ -19,12 +17,13 @@ import utilities.Siblings;
 import java.util.ArrayList;
 import java.util.List;
 
-public class CrossroadParser {
+public class CrossroadParser implements ICrossroadParser {
     private static final Logger logger = LoggerFactory.getLogger(CrossroadParser.class);
     private static final double COSINE_OF_135_DEGREES = -0.7071;
     private static final double DISTANCE_THRESHOLD = 10 * RoutingConstants.DEGREES_PER_METER;
 
-    Siblings<List<LightInfo>> getLightGroups(OSMNode crossroadCenter) {
+    @Override
+    public Siblings<List<LightInfo>> getLightGroups(OSMNode crossroadCenter) {
         var firstLightGroupInfo = new ArrayList<LightInfo>();
         var secondLightGroupInfo = new ArrayList<LightInfo>();
 
@@ -102,7 +101,8 @@ public class CrossroadParser {
         return finalPosition;
     }
 
-    Siblings<List<LightInfo>> getLightGroups(Node crossroad) {
+    @Override
+    public Siblings<List<LightInfo>> getLightGroups(Node crossroad) {
         var crossroadChildren = crossroad.getChildNodes();
         var childrenANode = crossroadChildren.item(1);
         var childrenBNode = crossroadChildren.item(3);

@@ -18,16 +18,16 @@ import vehicles.TestPedestrian;
 import java.time.Duration;
 import java.time.LocalDateTime;
 
-public class MasterAgent extends Agent {
-    public static final String name = MasterAgent.class.getName().replace("Agent", "");
-    private static final Logger logger = LoggerFactory.getLogger(MasterAgent.class);
+public class SmartCityAgent extends Agent {
+    public static final String name = SmartCityAgent.class.getName().replace("Agent", "");
+    private static final Logger logger = LoggerFactory.getLogger(SmartCityAgent.class);
 
     private final MapWindow window;
     private final IAgentsContainer agentsContainer;
 
     @Inject
-    MasterAgent(IAgentsContainer agentsContainer,
-                MapWindow window) {
+    SmartCityAgent(IAgentsContainer agentsContainer,
+                   MapWindow window) {
         this.agentsContainer = agentsContainer;
         this.window = window;
     }
@@ -45,9 +45,12 @@ public class MasterAgent extends Agent {
             public void action() {
                 ACLMessage rcv = receive();
                 if (rcv != null) {
-                    // TODO: Does it work?? (can't see it in the logs)
-                    logger.info("SmartCity: " + rcv.getSender().getLocalName() + " arrived at destination.");
+                    logger.info(rcv.getSender().getLocalName() + " arrived at destination.");
                     String type = rcv.getUserDefinedParameter(MessageParameter.TYPE);
+                    if (type == null) {
+                        logger.warn("Received message from" + rcv.getSender() + " without type:" + rcv);
+                        return;
+                    }
                     switch (type) {
                         case MessageParameter.VEHICLE -> onReceiveVehicle(rcv);
                         case MessageParameter.PEDESTRIAN -> onReceivePedestrian(rcv);

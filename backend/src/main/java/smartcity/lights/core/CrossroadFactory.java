@@ -13,13 +13,13 @@ import java.util.List;
 
 public class CrossroadFactory implements ICrossroadFactory {
     private final EventBus eventBus;
-    private final CrossroadParser crossroadParser;
+    private final ICrossroadParser ICrossroadParser;
 
     @Inject
     public CrossroadFactory(EventBus eventBus,
-                            CrossroadParser crossroadParser) {
+                            ICrossroadParser ICrossroadParser) {
         this.eventBus = eventBus;
-        this.crossroadParser = crossroadParser;
+        this.ICrossroadParser = ICrossroadParser;
     }
 
     @Override
@@ -39,11 +39,11 @@ public class CrossroadFactory implements ICrossroadFactory {
     }
 
     private Siblings<SimpleLightGroup> getLightGroups(Node crossroad) {
-        var lightGroups = crossroadParser.getLightGroups(crossroad);
+        var lightGroups = ICrossroadParser.getLightGroups(crossroad);
         return getLightGroups(lightGroups.first, lightGroups.second);
     }
 
-    private Siblings<SimpleLightGroup> getLightGroups(List<LightInfo> groupA, List<LightInfo> groupB){
+    private Siblings<SimpleLightGroup> getLightGroups(List<LightInfo> groupA, List<LightInfo> groupB) {
         var lightGroupA = new SimpleLightGroup(groupA, LightColor.RED);
         var lightGroupB = new SimpleLightGroup(groupB, LightColor.GREEN);
 
@@ -51,7 +51,7 @@ public class CrossroadFactory implements ICrossroadFactory {
     }
 
     private Siblings<SimpleLightGroup> getLightGroups(OSMNode centerCrossroadNode) {
-        var lightGroups = crossroadParser.getLightGroups(centerCrossroadNode);
+        var lightGroups = ICrossroadParser.getLightGroups(centerCrossroadNode);
         return getLightGroups(lightGroups.first, lightGroups.second);
     }
 }

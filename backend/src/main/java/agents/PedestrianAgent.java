@@ -11,7 +11,7 @@ import routing.LightManagerNode;
 import routing.RoutingConstants;
 import routing.StationNode;
 import smartcity.ITimeProvider;
-import smartcity.MasterAgent;
+import smartcity.SmartCityAgent;
 import vehicles.DrivingState;
 import vehicles.Pedestrian;
 
@@ -20,9 +20,9 @@ public class PedestrianAgent extends AbstractAgent {
 
     private final Pedestrian pedestrian;
 
-    public PedestrianAgent(int agentId,
-                           ITimeProvider timeProvider,
-                           Pedestrian pedestrian) {
+    PedestrianAgent(int agentId,
+                    ITimeProvider timeProvider,
+                    Pedestrian pedestrian) {
         super(agentId, name, timeProvider);
         this.pedestrian = pedestrian;
     }
@@ -66,7 +66,6 @@ public class PedestrianAgent extends AbstractAgent {
                         case MOVING:
                             StationNode station = pedestrian.getStartingStation();
                             ACLMessage msg = createMessage(ACLMessage.REQUEST_WHEN, StationAgent.name, station.getAgentId());
-
                             Properties properties = createProperties(MessageParameter.PEDESTRIAN);
                             properties.setProperty(MessageParameter.DESIRED_BUS_LINE, pedestrian.getPreferredBusLine());
                             properties.setProperty(MessageParameter.ARRIVAL_TIME, timeProvider.getCurrentSimulationTime()
@@ -95,7 +94,7 @@ public class PedestrianAgent extends AbstractAgent {
                     pedestrian.setState(DrivingState.AT_DESTINATION);
                     print("Reached destination.");
 
-                    ACLMessage msg = createMessage(ACLMessage.INFORM, MasterAgent.name);
+                    ACLMessage msg = createMessage(ACLMessage.INFORM, SmartCityAgent.name);
                     Properties prop = createProperties(MessageParameter.PEDESTRIAN);
                     prop.setProperty(MessageParameter.AT_DESTINATION, String.valueOf(Boolean.TRUE));
                     msg.setAllUserDefinedParameters(prop);
@@ -118,73 +117,66 @@ public class PedestrianAgent extends AbstractAgent {
 
                 String type = rcv.getUserDefinedParameter(MessageParameter.TYPE);
                 if (type == null) {
+                    logTypeError(rcv);
                     return;
                 }
 
                 switch (type) {
                     case MessageParameter.LIGHT:
-                        switch (rcv.getPerformative()) {
-                            case ACLMessage.REQUEST:
-                                if (pedestrian.getState() == DrivingState.WAITING_AT_LIGHT) {
-                                    ACLMessage response = createMessage(ACLMessage.AGREE, rcv.getSender());
-                                    Properties properties = createProperties(MessageParameter.PEDESTRIAN);
-                                    properties.setProperty(MessageParameter.ADJACENT_OSM_WAY_ID,
-                                            Long.toString(pedestrian.getAdjacentOsmWayId()));
-                                    response.setAllUserDefinedParameters(properties);
-                                    send(response);
-
-                                    if (pedestrian.findNextStop() instanceof LightManagerNode) {
-                                        informLightManager(pedestrian);
-                                    }
-                                    pedestrian.setState(DrivingState.PASSING_LIGHT);
-                                }
-                                break;
-                        }
-                        break;
-
-                    case MessageParameter.STATION:
-                        switch (rcv.getPerformative()) {
-                            case ACLMessage.REQUEST:
+                        if (rcv.getPerformative() == ACLMessage.REQUEST) {
+                            if (pedestrian.getState() == DrivingState.WAITING_AT_LIGHT) {
                                 ACLMessage response = createMessage(ACLMessage.AGREE, rcv.getSender());
-
-                                var properties = createProperties(MessageParameter.PEDESTRIAN);
-                                properties.setProperty(MessageParameter.DESIRED_BUS_LINE, pedestrian.getPreferredBusLine());
+                                Properties properties = createProperties(MessageParameter.PEDESTRIAN);
+                                properties.setProperty(MessageParameter.ADJACENT_OSM_WAY_ID,
+                                        Long.toString(pedestrian.getAdjacentOsmWayId()));
                                 response.setAllUserDefinedParameters(properties);
                                 send(response);
 
-                                ACLMessage msg = createMessage(ACLMessage.REQUEST_WHEN,
-                                        rcv.getUserDefinedParameter(MessageParameter.BUS_AGENT_NAME));
-                                properties = createProperties(MessageParameter.PEDESTRIAN);
-                                properties.setProperty(MessageParameter.STATION_ID, String.valueOf(pedestrian.getTargetStation()
-                                        .getAgentId()));
-                                msg.setAllUserDefinedParameters(properties);
-                                pedestrian.setState(DrivingState.IN_BUS);
-                                send(msg);
-
-                                // TODO: What's happening here? Why does he use teleportation?
-                                while (!pedestrian.isAtStation() && !pedestrian.isAtDestination()) {
-                                    pedestrian.move();
+                                if (pedestrian.findNextStop() instanceof LightManagerNode) {
+                                    informLightManager(pedestrian);
                                 }
-                                break;
+                                pedestrian.setState(DrivingState.PASSING_LIGHT);
+                            }
+                        }
+                        break;
+                    case MessageParameter.STATION:
+                        if (rcv.getPerformative() == ACLMessage.REQUEST) {
+                            ACLMessage response = createMessage(ACLMessage.AGREE, rcv.getSender());
+                            var properties = createProperties(MessageParameter.PEDESTRIAN);
+                            properties.setProperty(MessageParameter.DESIRED_BUS_LINE, pedestrian.getPreferredBusLine());
+                            response.setAllUserDefinedParameters(properties);
+                            send(response);
+
+                            ACLMessage msg = createMessage(ACLMessage.REQUEST_WHEN,
+                                    rcv.getUserDefinedParameter(MessageParameter.BUS_AGENT_NAME));
+                            properties = createProperties(MessageParameter.PEDESTRIAN);
+                            properties.setProperty(MessageParameter.STATION_ID, String.valueOf(pedestrian.getTargetStation()
+                                    .getAgentId()));
+                            msg.setAllUserDefinedParameters(properties);
+                            pedestrian.setState(DrivingState.IN_BUS);
+                            send(msg);
+
+                            // TODO: What's happening here? Why does he use teleportation?
+                            while (!pedestrian.isAtStation() && !pedestrian.isAtDestination()) {
+                                pedestrian.move();
+                            }
                         }
                         break;
                     case MessageParameter.BUS:
-                        switch (rcv.getPerformative()) {
-                            case ACLMessage.REQUEST:
-                                ACLMessage response = createMessage(ACLMessage.AGREE, rcv.getSender());
+                        if (rcv.getPerformative() == ACLMessage.REQUEST) {
+                            ACLMessage response = createMessage(ACLMessage.AGREE, rcv.getSender());
 
-                                Properties properties = createProperties(MessageParameter.PEDESTRIAN);
-                                properties.setProperty(MessageParameter.STATION_ID, String.valueOf(pedestrian.getTargetStation()
-                                        .getAgentId()));
-                                response.setAllUserDefinedParameters(properties);
-                                send(response);
+                            Properties properties = createProperties(MessageParameter.PEDESTRIAN);
+                            properties.setProperty(MessageParameter.STATION_ID, String.valueOf(pedestrian.getTargetStation()
+                                    .getAgentId()));
+                            response.setAllUserDefinedParameters(properties);
+                            send(response);
 
-                                if (!pedestrian.isAtDestination()) {
-                                    pedestrian.move();
-                                    pedestrian.setState(DrivingState.PASSING_STATION);
-                                }
-                                informLightManager(pedestrian);
-                                break;
+                            if (!pedestrian.isAtDestination()) {
+                                pedestrian.move();
+                                pedestrian.setState(DrivingState.PASSING_STATION);
+                            }
+                            informLightManager(pedestrian);
                         }
                         break;
                 }
@@ -201,7 +193,6 @@ public class PedestrianAgent extends AbstractAgent {
         pedestrian.setState(DrivingState.MOVING);
         if (nextStation != null) {
             ACLMessage msg = createMessage(ACLMessage.INFORM, StationAgent.name, nextStation.getAgentId());
-
             Properties properties = createProperties(MessageParameter.PEDESTRIAN);
             var currentTime = timeProvider.getCurrentSimulationTime();
             var predictedTime = currentTime.plusNanos(pedestrian.getMillisecondsToNextStation() * 1_000_000);
