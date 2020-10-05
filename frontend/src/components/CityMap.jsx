@@ -43,8 +43,8 @@ const CityMap = props => {
         <Marker position={{ lat, lng }} interactive={true}>
           <Popup>Zone center</Popup>
         </Marker>
-        {lightMarkers}
         {carMarkers}
+        {lightMarkers}
       </Circle>
     </Map>
   );

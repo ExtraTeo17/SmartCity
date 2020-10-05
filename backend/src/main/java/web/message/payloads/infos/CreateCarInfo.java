@@ -9,10 +9,14 @@ public class CreateCarInfo extends AbstractPayload {
     private final int id;
     @JsonProperty("location")
     private final Location location;
+    @JsonProperty("isTestCar")
+    private final boolean isTestCar;
 
     public CreateCarInfo(int id,
-                         Location location) {
+                         Location location,
+                         boolean isTestCar) {
         this.id = id;
         this.location = location;
+        this.isTestCar = isTestCar;
     }
 }

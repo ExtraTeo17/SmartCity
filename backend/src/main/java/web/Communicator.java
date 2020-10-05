@@ -31,7 +31,7 @@ class Communicator {
     @Subscribe
     public void handle(VehicleAgentCreatedEvent e) {
         onHandle(e);
-        webService.createCar(e.agentId, e.agentPosition);
+        webService.createCar(e.agentId, e.agentPosition, e.isTestCar);
     }
 
     private void onHandle(Object obj) {
