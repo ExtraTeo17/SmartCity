@@ -3,7 +3,7 @@ package web;
 import com.google.inject.*;
 import com.google.inject.name.Names;
 import genesis.AbstractModule;
-import smartcity.config.StaticConfig;
+import smartcity.config.ConfigProperties;
 import web.abstractions.IWebConnector;
 import web.abstractions.IWebService;
 import web.serialization.SerializationModule;
@@ -13,7 +13,7 @@ public class WebModule extends AbstractModule {
     private final Integer port;
 
     public WebModule() {
-        this(StaticConfig.WEB_PORT);
+        this(ConfigProperties.WEB_PORT);
     }
 
     public WebModule(int port) {

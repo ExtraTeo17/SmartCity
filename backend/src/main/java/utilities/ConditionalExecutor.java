@@ -2,9 +2,9 @@ package utilities;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import smartcity.config.StaticConfig;
 
-import java.util.function.BooleanSupplier;
+import static smartcity.config.StaticConfig.DEBUG;
+import static smartcity.config.StaticConfig.TRACE;
 
 public class ConditionalExecutor {
     private final static Logger logger = LoggerFactory.getLogger(ConditionalExecutor.class);
@@ -14,7 +14,7 @@ public class ConditionalExecutor {
     }
 
     public static void debug(Runnable action, boolean necessaryCondition) {
-        if ((StaticConfig.DEBUG || StaticConfig.TRACE) && necessaryCondition) {
+        if ((DEBUG || TRACE) && necessaryCondition) {
             try {
                 action.run();
             } catch (Exception e) {
@@ -24,11 +24,10 @@ public class ConditionalExecutor {
     }
 
     public static void trace(Runnable action) {
-        if (StaticConfig.TRACE) {
+        if (TRACE) {
             try {
                 action.run();
-            }
-            catch (Exception e){
+            } catch (Exception e) {
                 logger.info("Error running trace action: ", e);
             }
         }
