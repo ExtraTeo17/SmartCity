@@ -22,6 +22,7 @@ import smartcity.config.StaticConfig;
 import smartcity.lights.abstractions.ICrossroadFactory;
 import smartcity.lights.core.CrossroadFactory;
 import smartcity.lights.core.CrossroadParser;
+import smartcity.lights.core.Light;
 import testutils.FileLoader;
 
 import java.util.ArrayList;
@@ -59,9 +60,12 @@ class AgentsCreatorTests {
             private final List<IGeoPosition> allPositions = new ArrayList<>();
         };
         agentsContainer.forEach(LightManagerAgent.class, manager -> {
-            var positions = manager.getLights();
-            assertTrue(positions.size() > 2);
-            context.allPositions.addAll(positions);
+            var lights = manager.getLights();
+            assertTrue(lights.size() > 2);
+            assertAll("At least one light should be green and at least one light should be red!",
+                    () -> assertTrue(lights.stream().anyMatch(Light::isGreen)),
+                    () -> assertTrue(lights.stream().anyMatch(l -> !l.isGreen())));
+            context.allPositions.addAll(lights);
         });
 
         var allPositions = context.allPositions;
