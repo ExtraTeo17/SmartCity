@@ -18,7 +18,7 @@ const CityMap = props => {
   useEffect(() => {});
 
   const lightMarkers = lights.map((light, ind) => (
-    <Marker key={ind} position={light} opacity={0.95} icon={greenLightIcon}>
+    <Marker key={ind} position={light} opacity={0.95} icon={greenLightIcon} zIndexOffset={10}>
       <Popup>I am a light!</Popup>
     </Marker>
   ));
