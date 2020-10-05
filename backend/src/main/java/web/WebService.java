@@ -32,9 +32,9 @@ class WebService implements IWebService {
     }
 
     @Override
-    public void createCar(IGeoPosition position) {
+    public void createCar(int id, IGeoPosition position) {
         var location = Converter.convert(position);
-        var payload = new CreateCarInfo(location);
+        var payload = new CreateCarInfo(id, location);
         webConnector.broadcastMessage(MessageType.CREATE_CAR_INFO, payload);
     }
 }

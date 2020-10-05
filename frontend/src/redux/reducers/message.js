@@ -13,8 +13,8 @@ const message = (state = initialState, action) => {
       return { ...state, lightLocations: lightLocations };
     }
     case CAR_CREATED: {
-      const { location } = action.payload;
-      return { ...state, cars: [...state.cars, { location }] };
+      const { car } = action.payload;
+      return { ...state, cars: [...state.cars, car] };
     }
 
     default:

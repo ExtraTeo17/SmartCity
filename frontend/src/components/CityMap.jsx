@@ -23,7 +23,7 @@ const CityMap = props => {
     </Marker>
   ));
 
-  const carMarkers = cars.map((car, ind) => <Car location={car.location}></Car>);
+  const carMarkers = cars.map((car, ind) => <Car car={car}></Car>);
 
   return (
     <Map

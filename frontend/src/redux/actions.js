@@ -30,11 +30,11 @@ const lightLocationsUpdated = lightLocations => {
 /**
  * @param {{lat:number; lng:number}} location
  */
-export const carCreated = location => {
+export const carCreated = car => {
   return {
     type: CAR_CREATED,
     payload: {
-      location,
+      car,
     },
   };
 };

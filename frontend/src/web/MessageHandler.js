@@ -12,8 +12,8 @@ export default {
         break;
 
       case CREATE_CAR_INFO:
-        const location = payload.location;
-        dispatch(carCreated(location));
+        const car = payload;
+        dispatch(carCreated(car));
         break;
 
       default:

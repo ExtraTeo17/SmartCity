@@ -3,9 +3,11 @@ package events.web;
 import routing.core.IGeoPosition;
 
 public class VehicleAgentCreatedEvent {
+    public final int agentId;
     public final IGeoPosition agentPosition;
 
-    public VehicleAgentCreatedEvent(IGeoPosition agentPosition) {
+    public VehicleAgentCreatedEvent(int agentId, IGeoPosition agentPosition) {
+        this.agentId = agentId;
         this.agentPosition = agentPosition;
     }
 }

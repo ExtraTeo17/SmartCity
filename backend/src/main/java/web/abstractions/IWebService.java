@@ -8,5 +8,5 @@ import java.util.List;
 public interface IWebService extends IStartable {
     void prepareSimulation(List<? extends IGeoPosition> positions);
 
-    void createCar(IGeoPosition position);
+    void createCar(int id, IGeoPosition position);
 }
