@@ -3,6 +3,7 @@ import { Map, Marker, Popup, TileLayer, Circle, CircleMarker } from "react-leafl
 import "../styles/CityMap.css";
 import { connect } from "react-redux";
 import { carIcon, greenLightIcon } from "../styles/icons";
+import Car from "./Markers/Car";
 
 const DEFAULT_ZOOM = 15;
 const MAX_ZOOM = 20;
@@ -22,11 +23,7 @@ const CityMap = props => {
     </Marker>
   ));
 
-  const carMarkers = cars.map((car, ind) => (
-    <Marker key={ind} position={car.location} opacity={0.95} icon={carIcon}>
-      <Popup>I am a car!</Popup>
-    </Marker>
-  ));
+  const carMarkers = cars.map((car, ind) => <Car location={car.location}></Car>);
 
   return (
     <Map
