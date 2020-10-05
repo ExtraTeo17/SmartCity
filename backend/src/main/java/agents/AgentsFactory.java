@@ -1,6 +1,7 @@
 package agents;
 
 import agents.abstractions.IAgentsFactory;
+import com.google.common.eventbus.EventBus;
 import com.google.inject.Inject;
 import org.w3c.dom.Node;
 import osmproxy.buses.Timetable;
@@ -21,16 +22,19 @@ class AgentsFactory implements IAgentsFactory {
     private final ITimeProvider timeProvider;
     private final IRouteTransformer routeTransformer;
     private final ICrossroadFactory crossroadFactory;
+    private final EventBus eventBus;
 
     @Inject
     public AgentsFactory(IdGenerator idGenerator,
                          ITimeProvider timeProvider,
                          IRouteTransformer routeTransformer,
-                         ICrossroadFactory crossroadFactory) {
+                         ICrossroadFactory crossroadFactory,
+                         EventBus eventBus) {
         this.idGenerator = idGenerator;
         this.timeProvider = timeProvider;
         this.routeTransformer = routeTransformer;
         this.crossroadFactory = crossroadFactory;
+        this.eventBus = eventBus;
     }
 
     @Override
@@ -41,7 +45,7 @@ class AgentsFactory implements IAgentsFactory {
             car = new TestCar(car, timeProvider);
         }
 
-        return new VehicleAgent(idGenerator.get(VehicleAgent.class), car, timeProvider);
+        return new VehicleAgent(idGenerator.get(VehicleAgent.class), car, timeProvider, eventBus);
     }
 
     @Override
@@ -53,7 +57,7 @@ class AgentsFactory implements IAgentsFactory {
     public StationAgent create(OSMStation station) {
         var id = idGenerator.get(StationAgent.class);
         var stationStrategy = new StationStrategy(id);
-        return new StationAgent(id, station, stationStrategy, timeProvider);
+        return new StationAgent(id, station, stationStrategy, timeProvider, eventBus);
     }
 
     @Override
@@ -61,21 +65,21 @@ class AgentsFactory implements IAgentsFactory {
         var uniformRoute = routeTransformer.uniformRoute(route);
         var bus = new Bus(timeProvider, route, uniformRoute,
                 timetable, busLine, brigadeNr);
-        return new BusAgent(idGenerator.get(BusAgent.class), timeProvider, bus);
+        return new BusAgent(idGenerator.get(BusAgent.class), bus, timeProvider, eventBus);
     }
 
     @Override
     public LightManagerAgent create(Node crossroadNode) {
         var id = idGenerator.get(LightManagerAgent.class);
         var crossroad = crossroadFactory.create(crossroadNode);
-        return new LightManagerAgent(id, timeProvider, crossroad);
+        return new LightManagerAgent(id, crossroad, timeProvider, eventBus);
     }
 
     @Override
     public LightManagerAgent create(OSMNode centerCrossroad) {
         var id = idGenerator.get(LightManagerAgent.class);
         var crossroad = crossroadFactory.create(centerCrossroad);
-        return new LightManagerAgent(id, timeProvider, crossroad);
+        return new LightManagerAgent(id, crossroad, timeProvider, eventBus);
     }
 
     // TODO: Simplify to avoid 6 arguments
@@ -93,7 +97,7 @@ class AgentsFactory implements IAgentsFactory {
             pedestrian = new TestPedestrian(pedestrian, timeProvider);
         }
 
-        return new PedestrianAgent(idGenerator.get(PedestrianAgent.class), timeProvider, pedestrian);
+        return new PedestrianAgent(idGenerator.get(PedestrianAgent.class), pedestrian, timeProvider, eventBus);
     }
 
     @Override

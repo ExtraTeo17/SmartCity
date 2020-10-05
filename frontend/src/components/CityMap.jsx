@@ -17,9 +17,9 @@ const CityMap = props => {
   // Similar to componentDidMount and componentDidUpdate:
   useEffect(() => {});
 
-  const lightMarkers = lights.map((light, ind) => <Light location={light} />);
+  const lightMarkers = lights.map((light, ind) => <Light key={ind} location={light} />);
 
-  const carMarkers = cars.map((car, ind) => <Car car={car}></Car>);
+  const carMarkers = cars.map((car, ind) => <Car key={ind} car={car}></Car>);
 
   return (
     <Map

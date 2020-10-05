@@ -2,6 +2,8 @@ package agents;
 
 import agents.abstractions.AbstractAgent;
 import agents.utilities.MessageParameter;
+import com.google.common.eventbus.EventBus;
+import events.web.VehicleAgentUpdatedEvent;
 import jade.core.behaviours.Behaviour;
 import jade.core.behaviours.CyclicBehaviour;
 import jade.core.behaviours.TickerBehaviour;
@@ -21,8 +23,8 @@ import static routing.RoutingConstants.STEP_CONSTANT;
 public class VehicleAgent extends AbstractAgent {
     private final MovingObject vehicle;
 
-    VehicleAgent(int id, MovingObject vehicle, ITimeProvider timeProvider) {
-        super(id, vehicle.getVehicleType(), timeProvider);
+    VehicleAgent(int id, MovingObject vehicle, ITimeProvider timeProvider, EventBus eventBus) {
+        super(id, vehicle.getVehicleType(), timeProvider, eventBus);
         this.vehicle = vehicle;
     }
 
@@ -58,7 +60,7 @@ public class VehicleAgent extends AbstractAgent {
                             break;
                         case PASSING_LIGHT:
                             print("Passing");
-                            vehicle.move();
+                            move();
                             vehicle.setState(DrivingState.MOVING);
                             break;
                     }
@@ -75,7 +77,7 @@ public class VehicleAgent extends AbstractAgent {
                     doDelete();
                 }
                 else {
-                    vehicle.move();
+                    move();
                 }
             }
         };
@@ -112,5 +114,12 @@ public class VehicleAgent extends AbstractAgent {
         return vehicle;
     }
 
-    public IGeoPosition getPosition() {return vehicle.getPosition();}
+    public void move() {
+        vehicle.move();
+        eventBus.post(new VehicleAgentUpdatedEvent(this.getId(), vehicle.getPosition()));
+    }
+
+    public IGeoPosition getPosition() {
+        return vehicle.getPosition();
+    }
 }

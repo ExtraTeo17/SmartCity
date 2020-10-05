@@ -1,6 +1,6 @@
-import { PREPARE_SIMULATION_RESPONSE, CREATE_CAR_INFO } from "./MessageType";
+import { PREPARE_SIMULATION_RESPONSE, CREATE_CAR_INFO, UPDATE_CAR_INFO } from "./MessageType";
 import { dispatch } from "../redux/store";
-import { carCreated, lightLocationsUpdated } from "../redux/actions";
+import { carUpdated, carCreated, lightLocationsUpdated } from "../redux/actions";
 
 export default {
   handle(msg) {
@@ -11,10 +11,17 @@ export default {
         dispatch(lightLocationsUpdated(locations));
         break;
 
-      case CREATE_CAR_INFO:
+      case CREATE_CAR_INFO: {
         const car = payload;
         dispatch(carCreated(car));
         break;
+      }
+
+      case UPDATE_CAR_INFO: {
+        const car = payload;
+        dispatch(carUpdated(car));
+        break;
+      }
 
       default:
         console.warn("Unrecognized message type");

@@ -3,6 +3,7 @@ package agents;
 import agents.abstractions.IAgentsContainer;
 import agents.abstractions.IAgentsFactory;
 import com.google.common.eventbus.EventBus;
+import jdk.jfr.Event;
 import mocks.ContainerControllerMock;
 import org.junit.jupiter.api.Test;
 import osmproxy.LightAccessManager;
@@ -105,8 +106,9 @@ class AgentsCreatorTests {
         var timeProvider = mock(ITimeProvider.class);
         var routeTransformer = mock(IRouteTransformer.class);
         var crossroadFactory = setupCrossroadFactory();
+        var eventBus = new EventBus();
 
-        return new AgentsFactory(idGenerator, timeProvider, routeTransformer, crossroadFactory);
+        return new AgentsFactory(idGenerator, timeProvider, routeTransformer, crossroadFactory, eventBus);
     }
 
     private ICrossroadFactory setupCrossroadFactory() {

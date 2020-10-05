@@ -4,6 +4,7 @@ import com.google.common.eventbus.Subscribe;
 import com.google.inject.Inject;
 import events.LightManagersReadyEvent;
 import events.web.VehicleAgentCreatedEvent;
+import events.web.VehicleAgentUpdatedEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import web.abstractions.IWebService;
@@ -32,6 +33,11 @@ class Communicator {
     public void handle(VehicleAgentCreatedEvent e) {
         onHandle(e);
         webService.createCar(e.agentId, e.agentPosition, e.isTestCar);
+    }
+
+    @Subscribe
+    public void handle(VehicleAgentUpdatedEvent e) {
+        webService.updateCar(e.agentId, e.agentPosition);
     }
 
     private void onHandle(Object obj) {

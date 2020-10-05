@@ -9,4 +9,6 @@ public interface IWebService extends IStartable {
     void prepareSimulation(List<? extends IGeoPosition> positions);
 
     void createCar(int id, IGeoPosition position, boolean isTestCar);
+
+    void updateCar(int id, IGeoPosition position);
 }

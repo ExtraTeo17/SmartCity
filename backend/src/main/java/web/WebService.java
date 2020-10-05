@@ -5,6 +5,7 @@ import routing.core.IGeoPosition;
 import web.abstractions.IWebService;
 import web.message.MessageType;
 import web.message.payloads.infos.CreateCarInfo;
+import web.message.payloads.infos.UpdateCarInfo;
 import web.message.payloads.models.Location;
 import web.message.payloads.responses.PrepareResponse;
 import web.serialization.Converter;
@@ -36,5 +37,12 @@ class WebService implements IWebService {
         var location = Converter.convert(position);
         var payload = new CreateCarInfo(id, location, isTestCar);
         webConnector.broadcastMessage(MessageType.CREATE_CAR_INFO, payload);
+    }
+
+    @Override
+    public void updateCar(int id, IGeoPosition position) {
+        var location = Converter.convert(position);
+        var payload = new UpdateCarInfo(id, location);
+        webConnector.broadcastMessage(MessageType.UPDATE_CAR_INFO, payload);
     }
 }
