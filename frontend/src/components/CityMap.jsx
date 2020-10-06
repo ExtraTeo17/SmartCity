@@ -25,6 +25,7 @@ const CityMap = props => {
     <Map
       center={{ lat, lng }}
       zoom={zoom}
+      preferCanvas={true}
       onzoomanim={e => {
         setZoom(e.zoom);
       }}
