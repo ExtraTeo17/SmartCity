@@ -26,7 +26,6 @@ export default {
 
         timeScale = msg.payload.timeScale;
         timer = setInterval(() => {
-          console.log("Pushing: " + carUpdateQueue.length + " updates");
           batch(() => {
             carUpdateQueue.forEach(action => dispatch(action));
           });
