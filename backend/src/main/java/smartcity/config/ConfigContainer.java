@@ -2,7 +2,7 @@ package smartcity.config;
 
 import com.google.common.eventbus.EventBus;
 import com.google.inject.Inject;
-import events.web.SimulationStartedEvent;
+import events.web.SimulationPreparedEvent;
 import routing.core.IGeoPosition;
 import routing.core.IZone;
 import routing.core.Position;
@@ -81,9 +81,6 @@ public class ConfigContainer extends ConfigMutator
     public void setSimulationState(SimulationState simulationState) {
         if (this.simulationState != simulationState) {
             this.simulationState = simulationState;
-            if (simulationState == SimulationState.READY_TO_RUN) {
-                eventBus.post(new SimulationStartedEvent());
-            }
         }
     }
 

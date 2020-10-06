@@ -6,7 +6,7 @@ import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
 import com.google.inject.Inject;
 import events.web.PrepareSimulationEvent;
-import events.web.SimulationStartedEvent;
+import events.web.SimulationPreparedEvent;
 import events.web.StartSimulationEvent;
 import org.jxmapviewer.JXMapViewer;
 import org.jxmapviewer.OSMTileFactoryInfo;
@@ -215,10 +215,10 @@ public class MapWindow {
     }
 
     @Subscribe
-    public void handle(SimulationStartedEvent e) {
+    public void handle(SimulationPreparedEvent e) {
         refreshTimer.cancel();
-        refreshTimer = new Timer();
-        refreshTimer.scheduleAtFixedRate(new RefreshTask(), 0, REFRESH_MAP_INTERVAL_MILLISECONDS);
+        refreshTimer = new Timer(true);
+        refreshTimer.scheduleAtFixedRate(new RefreshTask(), 10, REFRESH_MAP_INTERVAL_MILLISECONDS);
         simulationReadyCallback.run();
     }
 

@@ -1,5 +1,4 @@
 package web;
-
 import com.google.common.eventbus.Subscribe;
 import com.google.inject.Inject;
 import events.LightManagersReadyEvent;
@@ -27,6 +26,8 @@ class Communicator {
         this.timeProvider = timeProvider;
     }
 
+
+    // TODO: Should probably be changed to SimulationPreparedEvent
     @Subscribe
     public void handle(LightManagersReadyEvent e) {
         onHandle(e);
