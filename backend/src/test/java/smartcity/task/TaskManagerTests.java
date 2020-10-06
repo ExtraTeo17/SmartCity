@@ -2,6 +2,7 @@ package smartcity.task;
 
 import agents.abstractions.IAgentsContainer;
 import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentMatchers;
 import routing.abstractions.IRoutingHelper;
 import routing.core.IZone;
 import routing.core.Position;
@@ -36,7 +37,7 @@ class TaskManagerTests {
             boolean ranOnce = false;
             boolean ranEndless = false;
         };
-        when(runnableFactory.create(any())).thenReturn(new IVariableExecutionRunnable() {
+        when(runnableFactory.create(ArgumentMatchers.<Supplier<Integer>>any(), any(boolean.class))).thenReturn(new IVariableExecutionRunnable() {
             @Override
             public void runOnce(int initialDelay, TimeUnit timeUnit) {
                 runContext.ranOnce = true;
