@@ -8,7 +8,6 @@ import org.jxmapviewer.viewer.Waypoint;
 import org.jxmapviewer.viewer.WaypointPainter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import routing.core.IGeoPosition;
 import smartcity.lights.OptimizationResult;
 import smartcity.lights.abstractions.ICrossroad;
 import smartcity.stations.ArrivalInfo;
@@ -16,7 +15,6 @@ import utilities.Siblings;
 
 import java.util.*;
 import java.util.function.Consumer;
-import java.util.stream.Collectors;
 
 class SimpleCrossroad implements ICrossroad {
     private static final Logger logger = LoggerFactory.getLogger(SimpleCrossroad.class);
@@ -64,13 +62,21 @@ class SimpleCrossroad implements ICrossroad {
 
     @Override
     public void draw(List<Painter<JXMapViewer>> painters) {
+        var lights = wayIdToLightMap.values();
+        painters.add(getPainterByColor(lights, true));
+        painters.add(getPainterByColor(lights, false));
+    }
+
+    private Painter<JXMapViewer> getPainterByColor(Collection<Light> lights, boolean isGreen) {
         WaypointPainter<Waypoint> painter = new WaypointPainter<>();
         var waypointsSet = new HashSet<Waypoint>();
-        for (Light light : wayIdToLightMap.values()) {
-            light.draw(waypointsSet, painter);
-        }
+        lights.forEach(l -> {
+            if (l.isGreen() == isGreen) {
+                l.draw(waypointsSet, painter);
+            }
+        });
         painter.setWaypoints(waypointsSet);
-        painters.add(painter);
+        return painter;
     }
 
     @Override
