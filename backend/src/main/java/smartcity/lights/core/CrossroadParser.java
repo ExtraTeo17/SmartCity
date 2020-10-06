@@ -41,7 +41,7 @@ public class CrossroadParser implements ICrossroadParser {
         while (waysIter.hasNext()) {
             OSMWay parentWay = waysIter.next();
             var nextWayLightNeighborPos = parentWay.getLightNeighborPos();
-            double cosineCenterNodeNextWay = firstWayNeighborPos.cosineAngle(crossroadCenter, nextWayLightNeighborPos);
+            double cosineCenterNodeNextWay = crossroadCenter.cosineAngle(firstWayNeighborPos, nextWayLightNeighborPos);
             lightInfo = parseLightInfo(parentWay, crossroadCenter);
             if (cosineCenterNodeNextWay < COSINE_OF_135_DEGREES) {
                 firstLightGroupInfo.add(lightInfo);
