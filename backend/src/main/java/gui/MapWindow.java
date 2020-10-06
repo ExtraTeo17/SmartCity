@@ -6,7 +6,7 @@ import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
 import com.google.inject.Inject;
 import events.web.PrepareSimulationEvent;
-import events.web.SimulationReadyEvent;
+import events.web.SimulationStartedEvent;
 import events.web.StartSimulationEvent;
 import org.jxmapviewer.JXMapViewer;
 import org.jxmapviewer.OSMTileFactoryInfo;
@@ -51,15 +51,15 @@ public class MapWindow {
 
     public JPanel MainPanel;
     private final JXMapViewer MapViewer;
-    private boolean renderPedestrians = true;
-    private boolean renderPedestrianRoutes = true;
-    private boolean renderCars = true;
-    private boolean renderCarRoutes = true;
-    private boolean renderBuses = true;
-    private boolean renderBusRoutes = true;
-    private boolean renderZone = true;
-    private boolean renderLights = true;
-    private boolean renderStations = true;
+    private boolean renderPedestrians = false;
+    private boolean renderPedestrianRoutes = false;
+    private boolean renderCars = false;
+    private boolean renderCarRoutes = false;
+    private boolean renderBuses = false;
+    private boolean renderBusRoutes = false;
+    private boolean renderZone = false;
+    private boolean renderLights = false;
+    private boolean renderStations = false;
     private JPanel MapPanel;
     private JPanel SidePanel;
     private JButton StartRouteButton;
@@ -215,7 +215,7 @@ public class MapWindow {
     }
 
     @Subscribe
-    public void handle(SimulationReadyEvent e) {
+    public void handle(SimulationStartedEvent e) {
         refreshTimer.cancel();
         refreshTimer = new Timer();
         refreshTimer.scheduleAtFixedRate(new RefreshTask(), 0, REFRESH_MAP_INTERVAL_MILLISECONDS);
@@ -245,6 +245,7 @@ public class MapWindow {
         ResultTimeTitle.setVisible(true);
         random.setSeed(getSeed());
 
+        // TODO: This time will be received from web-gui and set via event
         var simulationTime = ((Date) setTimeSpinner.getValue()).toInstant().atZone(ZoneId.systemDefault())
                 .toLocalDateTime();
         timeProvider.setSimulationStartTime(simulationTime);
@@ -256,7 +257,7 @@ public class MapWindow {
 
     public void display() {
         var mapViewer = this.MapViewer;
-        JFrame frame = new JFrame("Smart City by Katherine & Dominic & Robert");
+        JFrame frame = new JFrame("Smart City by Katherine & Przemyslaw & Robert");
         frame.getContentPane().add(this.MainPanel);
         JMenuBar menuBar = new JMenuBar();
         JMenu view = new JMenu("View");
