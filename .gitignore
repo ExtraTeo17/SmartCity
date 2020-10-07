@@ -42,3 +42,8 @@ MTPs-Main-Container.txt
 .idea/modules
 *.iml
 *.ipr
+
+# Eclipse
+smartCity.eml
+.settings/
+.classpath

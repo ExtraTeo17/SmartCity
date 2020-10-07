@@ -1,8 +1,8 @@
 <component name="ProjectRunConfigurationManager">
   <configuration default="false" name="Boot w/ SmartCity" type="Application" factoryName="Application">
     <option name="MAIN_CLASS_NAME" value="jade.Boot" />
-    <module name="SmartCity" />
-    <option name="PROGRAM_PARAMETERS" value="-gui -agents SmartCityAgent:SmartCity.SmartCityAgent" />
+    <module name="smartCity" />
+    <option name="PROGRAM_PARAMETERS" value="-gui -agents SmartCityAgent:smartcity.SmartCityAgent" />
     <method v="2">
       <option name="MakeProject" enabled="true" />
     </method>
