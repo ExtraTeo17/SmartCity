@@ -8,7 +8,6 @@ import org.java_websocket.handshake.ClientHandshake;
 import org.java_websocket.server.WebSocketServer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import smartcity.config.StaticConfig;
 
 import java.net.InetSocketAddress;
 import java.util.HashSet;

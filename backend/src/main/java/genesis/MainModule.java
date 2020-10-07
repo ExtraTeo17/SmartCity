@@ -12,12 +12,12 @@ import jade.util.leap.Properties;
 import jade.wrapper.ContainerController;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import smartcity.config.ConfigProperties;
 import utilities.ExtendedProperties;
 
 import java.io.InputStream;
 import java.net.URL;
 
-import static smartcity.config.StaticConfig.JADE_PORT;
 
 public class MainModule extends AbstractModule {
     private static final Logger logger = LoggerFactory.getLogger(MainModule.class);
@@ -26,10 +26,10 @@ public class MainModule extends AbstractModule {
     private final String[] args;
 
     public MainModule(String... args) {
-        this(JADE_PORT, args);
+        this(ConfigProperties.JADE_PORT, args);
     }
 
-    public MainModule(Integer port, String... args) {
+    MainModule(Integer port, String... args) {
         this.port = port;
         this.args = args;
     }
