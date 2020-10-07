@@ -3,8 +3,8 @@ package utilities;
 import java.util.Properties;
 
 public class ExtendedProperties extends Properties {
-    @SuppressWarnings("unchecked")
     public <T> T getOrDefault(String key, T defaultValue) {
+        //noinspection unchecked
         return (T) super.getOrDefault(key, defaultValue);
     }
 

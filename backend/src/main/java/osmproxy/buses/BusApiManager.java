@@ -75,13 +75,13 @@ public class BusApiManager implements IBusApiManager {
         var resultOpt = mapAccessManager.getNodesDocument(query);
 
         ConditionalExecutor.debug(() -> {
-            //noinspection OptionalGetWithoutIsPresent
-            var result = resultOpt.get();
-            String path = "busWays_" + waysIds.get(0) + "_" +
-                    waysIds.get(waysIds.size() - 1) + ".xml";
-            logger.info("Writing bus-ways to: " + path);
-            FileWriterWrapper.write(result, path);
-        }, resultOpt.isPresent());
+            resultOpt.ifPresent(result -> {
+                String path = "target/busWays_" + waysIds.get(0) + "_" +
+                        waysIds.get(waysIds.size() - 1) + ".xml";
+                logger.info("Writing bus-ways to: " + path);
+                FileWriterWrapper.write(result, path);
+            });
+        });
 
         return resultOpt;
     }

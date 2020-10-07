@@ -1,7 +1,7 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
-    <groupId>agent.systems</groupId>
+    <groupId>agentSystems</groupId>
     <artifactId>smartCity</artifactId>
     <version>0.0.1-SNAPSHOT</version>
     <repositories>
@@ -13,58 +13,24 @@
     </repositories>
     <name>smartCity</name>
 
-    <description>Smart City simulation</description>
+    <description>Best project ever</description>
     <packaging>jar</packaging>
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <slf4j.version>1.7.21</slf4j.version>
         <java.version>14</java.version>
-        <resourceFolder>src/main/resources/</resourceFolder>
     </properties>
     <build>
         <plugins>
-            <!-- For build -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
-                <version>3.8.1</version>
                 <configuration>
                     <source>${java.version}</source>
                     <target>${java.version}</target>
                     <encoding>UTF-8</encoding>
                 </configuration>
-            </plugin>
-            <!-- For copying dependencies -->
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-dependency-plugin</artifactId>
-                <version>2.4</version>
-                <executions>
-                    <execution>
-                        <phase>package</phase>
-                        <goals>
-                            <goal>copy-dependencies</goal>
-                        </goals>
-                        <configuration>
-                            <outputDirectory>${project.build.directory}/lib</outputDirectory>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
-            <!-- For executable JAR -->
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-jar-plugin</artifactId>
-                <version>3.1.2</version>
-                <configuration>
-                    <archive>
-                        <manifest>
-                            <addClasspath>true</addClasspath>
-                            <classpathPrefix>lib/</classpathPrefix>
-                            <mainClass>SmartCity</mainClass>
-                        </manifest>
-                    </archive>
-                </configuration>
+                <version>3.8.1</version>
             </plugin>
             <!-- JUnit 5 requires Surefire version 2.22.0 or higher -->
             <plugin>
@@ -72,6 +38,7 @@
                 <artifactId>maven-surefire-plugin</artifactId>
                 <version>2.22.2</version>
             </plugin>
+
         </plugins>
     </build>
 

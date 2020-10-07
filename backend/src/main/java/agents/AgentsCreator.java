@@ -26,13 +26,12 @@ import routing.abstractions.IRouteGenerator;
 import smartcity.SimulationState;
 import smartcity.TimeProvider;
 import smartcity.config.ConfigContainer;
+import smartcity.config.StaticConfig;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-
-import static smartcity.config.StaticConfig.USE_DEPRECATED_XML_FOR_LIGHT_MANAGERS;
 
 public class AgentsCreator {
     private static final Logger logger = LoggerFactory.getLogger(AgentsCreator.class);
@@ -221,7 +220,7 @@ public class AgentsCreator {
     boolean tryConstructLightManagers() {
         int managersCounter = 0;
         try {
-            if (USE_DEPRECATED_XML_FOR_LIGHT_MANAGERS) {
+            if (StaticConfig.USE_DEPRECATED_XML_FOR_LIGHT_MANAGERS) {
                 var nodes = mapAccessManager.getLightManagersNodes(configContainer.getZone());
                 for (var node : nodes) {
                     var manager = factory.create(node);
