@@ -1,8 +1,8 @@
-import React, { useState } from "react";
 import ApiManager from "../web/ApiManager";
-import { connect } from "react-redux";
 import { centerUpdated } from "../redux/actions";
 import { dispatch } from "../redux/store";
+import { connect } from "react-redux";
+import React, { useState } from "react";
 import "../styles/Menu.css";
 
 const DEFAULT_CARS_NUM = 4;

@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Circle, CircleMarker, Map, Marker, Popup, TileLayer } from "react-leaflet";
+import { Circle, Map, Marker, Popup, TileLayer } from "react-leaflet";
 import { connect } from "react-redux";
 import "../styles/CityMap.css";
 import Car from "./Markers/Car";
