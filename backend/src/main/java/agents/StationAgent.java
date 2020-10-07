@@ -3,6 +3,7 @@ package agents;
 import agents.abstractions.AbstractAgent;
 import agents.utilities.LoggerLevel;
 import agents.utilities.MessageParameter;
+import com.google.common.eventbus.EventBus;
 import jade.core.behaviours.Behaviour;
 import jade.core.behaviours.CyclicBehaviour;
 import jade.core.behaviours.TickerBehaviour;
@@ -24,8 +25,9 @@ public class StationAgent extends AbstractAgent {
     StationAgent(int id,
                  OSMStation station,
                  StationStrategy stationStrategy,
-                 ITimeProvider timeProvider) { // REMEMBER TO PRUNE BEYOND CIRCLE
-        super(id, name, timeProvider);
+                 ITimeProvider timeProvider,
+                 EventBus eventBus) { // REMEMBER TO PRUNE BEYOND CIRCLE
+        super(id, name, timeProvider, eventBus);
         this.station = station;
 
         Behaviour communication = new CyclicBehaviour() {

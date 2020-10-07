@@ -11,14 +11,21 @@ import org.junit.jupiter.api.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mockito;
 import org.mockito.junit.MockitoJUnitRunner;
+import osmproxy.elements.OSMStation;
 import smartcity.lights.abstractions.ICrossroad;
+import smartcity.stations.StationStrategy;
+import vehicles.Bus;
 import vehicles.MovingObject;
+import vehicles.Pedestrian;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
+import static mocks.TestInstanceCreator.createEventBus;
+import static mocks.TestInstanceCreator.createTimeProvider;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.Mockito.mock;
 
 @RunWith(MockitoJUnitRunner.class)
 class HashAgentsContainerTest {
@@ -44,17 +51,16 @@ class HashAgentsContainerTest {
         int agentsPerTypeCount = 10;
         List<AbstractAgent> agents = new ArrayList<>(agentsPerTypeCount);
 
-        var mockCrossroad = Mockito.mock(ICrossroad.class);
-        var mockVehicle = Mockito.mock(MovingObject.class);
+        var mockCrossroad = mock(ICrossroad.class);
+        var mockVehicle = mock(MovingObject.class);
         Mockito.when(mockVehicle.getVehicleType()).thenReturn("car");
 
         for (int i = 0; i < agentsPerTypeCount; ++i) {
-            // TODO: Mocks, not null
-            agents.add(new PedestrianAgent(idGenerator.get(PedestrianAgent.class), null, null));
-            agents.add(new BusAgent(idGenerator.get(BusAgent.class), null, null));
-            agents.add(new StationAgent(idGenerator.get(StationAgent.class), null, null, null));
-            agents.add(new VehicleAgent(idGenerator.get(VehicleAgent.class), mockVehicle, null));
-            agents.add(new LightManagerAgent(idGenerator.get(LightManagerAgent.class), null, mockCrossroad));
+            agents.add(getPedestrianAgent());
+            agents.add(getBusAgent());
+            agents.add(getStationAgent());
+            agents.add(getVehicleAgent());
+            agents.add(getLightManagerAgent());
         }
         int agentTypes = agents.size() / agentsPerTypeCount;
 
@@ -71,6 +77,32 @@ class HashAgentsContainerTest {
             } while (currIndex != begIndex);
         }
     }
+
+    PedestrianAgent getPedestrianAgent() {
+        return new PedestrianAgent(idGenerator.get(PedestrianAgent.class), mock(Pedestrian.class),
+                createTimeProvider(), createEventBus());
+    }
+
+    VehicleAgent getVehicleAgent() {
+        return new VehicleAgent(idGenerator.get(VehicleAgent.class), mock(MovingObject.class),
+                createTimeProvider(), createEventBus());
+    }
+
+    StationAgent getStationAgent() {
+        return new StationAgent(idGenerator.get(StationAgent.class), mock(OSMStation.class),
+                mock(StationStrategy.class), createTimeProvider(), createEventBus());
+    }
+
+    LightManagerAgent getLightManagerAgent() {
+        return new LightManagerAgent(idGenerator.get(LightManagerAgent.class), mock(ICrossroad.class),
+                createTimeProvider(), createEventBus());
+    }
+
+    BusAgent getBusAgent() {
+        return new BusAgent(idGenerator.get(BusAgent.class), mock(Bus.class),
+                createTimeProvider(), createEventBus());
+    }
+
 
     private int rotateIndex(int index, int start, int exclusiveEnd) {
         ++index;

@@ -1,4 +1,4 @@
-import { CAR_CREATED, CENTER_UPDATED, LIGHT_LOCATIONS_UPDATED } from "./constants";
+import { CAR_UPDATED, CAR_CREATED, CENTER_UPDATED, LIGHT_LOCATIONS_UPDATED } from "./constants";
 
 export /**
  * @param {} center
@@ -28,11 +28,23 @@ const lightLocationsUpdated = lightLocations => {
 };
 
 /**
- * @param {{lat:number; lng:number}} location
+ * @param {{id:number; location:{lat:number; lng:number;}; isTestCar:boolean; }} car
  */
 export const carCreated = car => {
   return {
     type: CAR_CREATED,
+    payload: {
+      car,
+    },
+  };
+};
+
+/**
+ * @param {{id:number; location:{lat:number; lng:number;}; }} car
+ */
+export const carUpdated = car => {
+  return {
+    type: CAR_UPDATED,
     payload: {
       car,
     },

@@ -3,6 +3,7 @@ package agents;
 import agents.abstractions.AbstractAgent;
 import agents.utilities.LoggerLevel;
 import agents.utilities.MessageParameter;
+import com.google.common.eventbus.EventBus;
 import jade.core.behaviours.Behaviour;
 import jade.core.behaviours.CyclicBehaviour;
 import jade.core.behaviours.TickerBehaviour;
@@ -30,10 +31,10 @@ public class BusAgent extends AbstractAgent {
     private final ITimeProvider timeProvider;
     private final Bus bus;
 
-    BusAgent(int busId,
+    BusAgent(int busId, Bus bus,
              ITimeProvider timeProvider,
-             Bus bus) {
-        super(busId, name, timeProvider);
+             EventBus eventBus) {
+        super(busId, name, timeProvider, eventBus);
         this.timeProvider = timeProvider;
         this.bus = bus;
     }

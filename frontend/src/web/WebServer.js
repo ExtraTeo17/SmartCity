@@ -18,14 +18,14 @@ const createSocket = () => {
    * @param {{ data: object; }} e
    */
   socket.onmessage = e => {
-    console.groupCollapsed("OnMessage");
+    // console.groupCollapsed("OnMessage");
 
-    console.log("Message received:" + e.data);
+    // console.log("Message received:" + e.data);
     let msgDto = JSON.parse(e.data);
     let msg = { type: msgDto.type, payload: JSON.parse(msgDto.payload) };
     MessageHandler.handle(msg);
 
-    console.groupEnd();
+    // console.groupEnd();
   };
 
   socket.onerror = err => {

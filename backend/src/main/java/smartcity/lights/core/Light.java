@@ -74,7 +74,7 @@ public class Light extends Position {
         return farAwayPedestrianMap.values();
     }
 
-    boolean isGreen() {
+    public boolean isGreen() {
         return carLightColor == LightColor.GREEN;
     }
 

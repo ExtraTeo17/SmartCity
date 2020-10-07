@@ -9,6 +9,7 @@ import com.google.common.eventbus.Subscribe;
 import com.google.inject.Inject;
 import events.LightManagersReadyEvent;
 import events.web.PrepareSimulationEvent;
+import events.web.SimulationPreparedEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import osmproxy.abstractions.ILightAccessManager;
@@ -75,6 +76,7 @@ public class AgentsCreator {
 
         if (prepareAgents()) {
             configContainer.setSimulationState(SimulationState.READY_TO_RUN);
+            eventBus.post(new SimulationPreparedEvent());
         }
     }
 

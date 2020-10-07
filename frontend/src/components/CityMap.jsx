@@ -2,8 +2,8 @@ import React, { useState, useEffect } from "react";
 import { Map, Marker, Popup, TileLayer, Circle, CircleMarker } from "react-leaflet";
 import "../styles/CityMap.css";
 import { connect } from "react-redux";
-import { carIcon, greenLightIcon } from "../styles/icons";
 import Car from "./Markers/Car";
+import Light from "./Markers/Light";
 
 const DEFAULT_ZOOM = 15;
 const MAX_ZOOM = 20;
@@ -17,18 +17,15 @@ const CityMap = props => {
   // Similar to componentDidMount and componentDidUpdate:
   useEffect(() => {});
 
-  const lightMarkers = lights.map((light, ind) => (
-    <Marker key={ind} position={light} opacity={0.95} icon={greenLightIcon} zIndexOffset={10}>
-      <Popup>I am a light!</Popup>
-    </Marker>
-  ));
+  const lightMarkers = lights.map((light, ind) => <Light key={ind} location={light} />);
 
-  const carMarkers = cars.map((car, ind) => <Car car={car}></Car>);
+  const carMarkers = cars.map((car, ind) => <Car key={ind} car={car}></Car>);
 
   return (
     <Map
       center={{ lat, lng }}
       zoom={zoom}
+      preferCanvas={true}
       onzoomanim={e => {
         setZoom(e.zoom);
       }}
