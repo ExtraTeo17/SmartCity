@@ -45,7 +45,7 @@ class LightSwitcher implements Function<ISwitchLightsContext, Integer> {
                     return defaultExecutionDelay;
                 }
                 else if (shouldExtendBecauseOfFarAwayQueue()) {
-                    logger.info("-------------------------------------shouldExtendBecauseOfFarAwayQueue--------------");
+                    logger.debug("-------------------------------------shouldExtendBecauseOfFarAwayQueue--------------");
                     context.setExtendedGreen(true);
                     return defaultExecutionDelay;
                 }
@@ -83,7 +83,7 @@ class LightSwitcher implements Function<ISwitchLightsContext, Integer> {
             var timeCollection = light.getFarAwayTimeCollection();
             for (var time : timeCollection) {
                 if (currentTimePlusExtend.isAfter(time)) {
-                    logger.info("Extending, time=" + time.toLocalTime() + ", currentTime=" + currentTime.toLocalTime());
+                    logger.debug("Extending, time=" + time.toLocalTime() + ", currentTime=" + currentTime.toLocalTime());
                     return true;
                 }
             }

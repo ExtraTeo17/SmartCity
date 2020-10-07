@@ -9,6 +9,7 @@ import com.google.common.eventbus.Subscribe;
 import com.google.inject.Inject;
 import events.LightManagersReadyEvent;
 import events.web.PrepareSimulationEvent;
+import events.web.SimulationPreparedEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import osmproxy.abstractions.ILightAccessManager;
@@ -25,12 +26,13 @@ import routing.abstractions.IRouteGenerator;
 import smartcity.SimulationState;
 import smartcity.TimeProvider;
 import smartcity.config.ConfigContainer;
-import smartcity.config.StaticConfig;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+
+import static smartcity.config.StaticConfig.USE_DEPRECATED_XML_FOR_LIGHT_MANAGERS;
 
 public class AgentsCreator {
     private static final Logger logger = LoggerFactory.getLogger(AgentsCreator.class);
@@ -75,6 +77,7 @@ public class AgentsCreator {
 
         if (prepareAgents()) {
             configContainer.setSimulationState(SimulationState.READY_TO_RUN);
+            eventBus.post(new SimulationPreparedEvent());
         }
     }
 
@@ -218,7 +221,7 @@ public class AgentsCreator {
     boolean tryConstructLightManagers() {
         int managersCounter = 0;
         try {
-            if (StaticConfig.USE_DEPRECATED_XML_FOR_LIGHT_MANAGERS) {
+            if (USE_DEPRECATED_XML_FOR_LIGHT_MANAGERS) {
                 var nodes = mapAccessManager.getLightManagersNodes(configContainer.getZone());
                 for (var node : nodes) {
                     var manager = factory.create(node);

@@ -6,7 +6,7 @@ import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
 import com.google.inject.Inject;
 import events.web.PrepareSimulationEvent;
-import events.web.SimulationReadyEvent;
+import events.web.SimulationPreparedEvent;
 import events.web.StartSimulationEvent;
 import org.jxmapviewer.JXMapViewer;
 import org.jxmapviewer.OSMTileFactoryInfo;
@@ -215,10 +215,10 @@ public class MapWindow {
     }
 
     @Subscribe
-    public void handle(SimulationReadyEvent e) {
+    public void handle(SimulationPreparedEvent e) {
         refreshTimer.cancel();
-        refreshTimer = new Timer();
-        refreshTimer.scheduleAtFixedRate(new RefreshTask(), 0, REFRESH_MAP_INTERVAL_MILLISECONDS);
+        refreshTimer = new Timer(true);
+        refreshTimer.scheduleAtFixedRate(new RefreshTask(), 10, REFRESH_MAP_INTERVAL_MILLISECONDS);
         simulationReadyCallback.run();
     }
 
@@ -245,6 +245,7 @@ public class MapWindow {
         ResultTimeTitle.setVisible(true);
         random.setSeed(getSeed());
 
+        // TODO: This time will be received from web-gui and set via event
         var simulationTime = ((Date) setTimeSpinner.getValue()).toInstant().atZone(ZoneId.systemDefault())
                 .toLocalDateTime();
         timeProvider.setSimulationStartTime(simulationTime);
@@ -256,7 +257,7 @@ public class MapWindow {
 
     public void display() {
         var mapViewer = this.MapViewer;
-        JFrame frame = new JFrame("Smart City by Katherine & Dominic & Robert");
+        JFrame frame = new JFrame("Smart City by Katherine & Przemyslaw & Robert");
         frame.getContentPane().add(this.MainPanel);
         JMenuBar menuBar = new JMenuBar();
         JMenu view = new JMenu("View");

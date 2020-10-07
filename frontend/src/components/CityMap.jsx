@@ -2,7 +2,8 @@ import React, { useState, useEffect } from "react";
 import { Map, Marker, Popup, TileLayer, Circle, CircleMarker } from "react-leaflet";
 import "../styles/CityMap.css";
 import { connect } from "react-redux";
-import { greenLightIcon } from "../styles/icons";
+import Car from "./Markers/Car";
+import Light from "./Markers/Light";
 
 const DEFAULT_ZOOM = 15;
 const MAX_ZOOM = 20;
@@ -11,21 +12,20 @@ const MAX_NATIVE_ZOOM = 19;
 const CityMap = props => {
   const [zoom, setZoom] = useState(DEFAULT_ZOOM);
   const { lat, lng, rad } = props.center;
-  const { lights } = props;
+  const { lights, cars } = props;
 
   // Similar to componentDidMount and componentDidUpdate:
   useEffect(() => {});
 
-  const lightMarkers = lights.map((light, ind) => (
-    <Marker key={ind} position={light} opacity={0.95} icon={greenLightIcon}>
-      <Popup>I am a light!</Popup>
-    </Marker>
-  ));
+  const lightMarkers = lights.map((light, ind) => <Light key={ind} location={light} />);
+
+  const carMarkers = cars.map((car, ind) => <Car key={ind} car={car}></Car>);
 
   return (
     <Map
       center={{ lat, lng }}
       zoom={zoom}
+      preferCanvas={true}
       onzoomanim={e => {
         setZoom(e.zoom);
       }}
@@ -38,10 +38,9 @@ const CityMap = props => {
       />
       <Circle center={{ lat, lng }} radius={rad}>
         <Marker position={{ lat, lng }} interactive={true}>
-          <Popup>
-            A pretty CSS3 popup. <br /> Easily customizable.
-          </Popup>
+          <Popup>Zone center</Popup>
         </Marker>
+        {carMarkers}
         {lightMarkers}
       </Circle>
     </Map>
@@ -52,7 +51,8 @@ const mapStateToProps = (state /* , ownProps */) => {
   const { interaction, message } = state;
   return {
     center: interaction.center,
-    lights: message.lightLocations.slice(),
+    lights: message.lightLocations,
+    cars: message.cars.slice(),
   };
 };
 

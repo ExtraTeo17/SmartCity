@@ -5,7 +5,7 @@
     <appender name="fileAppender" class="org.apache.log4j.rolling.RollingFileAppender">
         <param name="append" value="true"/>
         <param name="threshold" value="DEBUG"/>
-        <param name="immediateFlush" value="false"/>
+        <param name="immediateFlush" value="true"/>
         <rollingPolicy class="org.apache.log4j.rolling.FixedWindowRollingPolicy">
             <param name="ActiveFileName" value="/SmartCity_logs/smart-city.log"/>
             <param name="FileNamePattern" value="/SmartCity_logs/smart-city-%i.log"/>
@@ -16,7 +16,7 @@
             <param name="MaxFileSize" value="10485760"/>
         </triggeringPolicy>
         <layout class="org.apache.log4j.PatternLayout">
-            <param name="ConversionPattern" value="(%d{HH:mm:ss.SSS}) [%t] [%-p] [%c] - %m%n"/>
+            <param name="ConversionPattern" value="(%d{dd.MM HH:mm:ss.SSS}) [%t] [%-p] [%c] - %m%n"/>
         </layout>
     </appender>
 

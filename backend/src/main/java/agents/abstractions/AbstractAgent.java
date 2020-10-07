@@ -3,6 +3,7 @@ package agents.abstractions;
 import agents.LightManagerAgent;
 import agents.utilities.LoggerLevel;
 import agents.utilities.MessageParameter;
+import com.google.common.eventbus.EventBus;
 import jade.core.AID;
 import jade.core.Agent;
 import jade.lang.acl.ACLMessage;
@@ -24,12 +25,16 @@ public abstract class AbstractAgent extends Agent {
 
     protected final Logger logger;
     protected final ITimeProvider timeProvider;
+    protected final EventBus eventBus;
 
-    protected AbstractAgent(int id, String namePrefix,
-                            ITimeProvider timeProvider) {
+    protected AbstractAgent(int id,
+                            String namePrefix,
+                            ITimeProvider timeProvider,
+                            EventBus eventBus) {
         this.id = id;
         this.namePrefix = namePrefix;
         this.timeProvider = timeProvider;
+        this.eventBus = eventBus;
         this.logger = LoggerFactory.getLogger(this.getPredictedName());
     }
 

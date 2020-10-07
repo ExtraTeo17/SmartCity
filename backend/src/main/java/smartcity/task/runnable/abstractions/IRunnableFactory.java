@@ -11,9 +11,17 @@ public interface IRunnableFactory {
 
     <T> IFixedExecutionRunnable create(BooleanSupplier test, Runnable runnable);
 
-    IVariableExecutionRunnable create(Supplier<Integer> delayRunnable, int initialDelay);
+    IVariableExecutionRunnable create(Supplier<Integer> delayRunnable, int initialDelay, boolean separateThread);
+
+    default IVariableExecutionRunnable create(Supplier<Integer> delayRunnable, boolean separateThread) {
+        return create(delayRunnable, 0, separateThread);
+    }
+
+    default IVariableExecutionRunnable create(Supplier<Integer> delayRunnable, int initialDelay) {
+        return create(delayRunnable, initialDelay, false);
+    }
 
     default IVariableExecutionRunnable create(Supplier<Integer> delayRunnable) {
-        return create(delayRunnable, 0);
+        return create(delayRunnable, 0, false);
     }
 }

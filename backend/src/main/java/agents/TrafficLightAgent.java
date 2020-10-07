@@ -2,6 +2,7 @@ package agents;
 
 import agents.abstractions.AbstractAgent;
 import agents.utilities.LightColor;
+import com.google.common.eventbus.EventBus;
 import jade.core.behaviours.CyclicBehaviour;
 import jade.core.behaviours.TickerBehaviour;
 import jade.lang.acl.ACLMessage;
@@ -20,8 +21,8 @@ public class TrafficLightAgent extends AbstractAgent {
     private final List<String> agentsQueue;
 
     public TrafficLightAgent(int id, ITimeProvider timeProvider,
-                             IGeoPosition position) {
-        super(id, name, timeProvider);
+                             IGeoPosition position, EventBus eventBus) {
+        super(id, name, timeProvider, eventBus);
         this.position = position;
         this.lightColor = LightColor.RED;
         this.agentsQueue = new ArrayList<>();
