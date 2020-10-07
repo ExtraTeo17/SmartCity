@@ -1,7 +1,7 @@
 import { PREPARE_SIMULATION_RESPONSE, CREATE_CAR_INFO, UPDATE_CAR_INFO, START_SIMULATION_RESPONSE } from "./MessageType";
 import { NOTIFY_SHOW_SEC } from "../utils/constants";
 import { dispatch } from "../redux/store";
-import { carUpdated, carCreated, lightLocationsUpdated } from "../redux/actions";
+import { carUpdated, carCreated, lightsCreated } from "../redux/actions";
 import { batch } from "react-redux";
 import { notify } from "react-notify-toast";
 
@@ -17,8 +17,8 @@ export default {
       case PREPARE_SIMULATION_RESPONSE:
         notify.show("Simulation prepared!", "success", NOTIFY_SHOW_SEC * 1000);
 
-        const locations = payload.locations;
-        dispatch(lightLocationsUpdated(locations));
+        const lights = payload.lights;
+        dispatch(lightsCreated(lights));
         break;
 
       case START_SIMULATION_RESPONSE:

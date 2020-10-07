@@ -18,7 +18,7 @@ const centerUpdated = center => {
 export /**
  * @param {Array<{{lat: number, lng:number}}>} lightLocations
  */
-const lightLocationsUpdated = lightLocations => {
+const lightsCreated = lightLocations => {
   return {
     type: LIGHT_LOCATIONS_UPDATED,
     payload: {

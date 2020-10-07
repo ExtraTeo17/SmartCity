@@ -31,6 +31,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import static smartcity.config.StaticConfig.USE_DEPRECATED_XML_FOR_LIGHT_MANAGERS;
 
@@ -77,7 +78,10 @@ public class AgentsCreator {
 
         if (prepareAgents()) {
             configContainer.setSimulationState(SimulationState.READY_TO_RUN);
-            eventBus.post(new SimulationPreparedEvent());
+            var lights = agentsContainer.stream(LightManagerAgent.class)
+                    .flatMap(man -> man.getLights().stream())
+                    .collect(Collectors.toList());
+            eventBus.post(new SimulationPreparedEvent(lights));
         }
     }
 

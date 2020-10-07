@@ -2,6 +2,7 @@ package web;
 import com.google.common.eventbus.Subscribe;
 import com.google.inject.Inject;
 import events.LightManagersReadyEvent;
+import events.web.SimulationPreparedEvent;
 import events.web.SimulationStartedEvent;
 import events.web.VehicleAgentCreatedEvent;
 import events.web.VehicleAgentUpdatedEvent;
@@ -29,12 +30,10 @@ class Communicator {
 
     // TODO: Should probably be changed to SimulationPreparedEvent
     @Subscribe
-    public void handle(LightManagersReadyEvent e) {
+    public void handle(SimulationPreparedEvent e) {
         onHandle(e);
-        var positions = e.lightManagers.stream()
-                .flatMap(man -> man.getLights().stream())
-                .collect(Collectors.toList());
-        webService.prepareSimulation(positions);
+        var lights = e.lights;
+        webService.prepareSimulation(lights);
     }
 
     @Subscribe
