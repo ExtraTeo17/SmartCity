@@ -1,17 +1,22 @@
-import React, { useState } from "react";
 import ApiManager from "../web/ApiManager";
-import { connect } from "react-redux";
 import { centerUpdated } from "../redux/actions";
+import { dispatch } from "../redux/store";
+import { connect } from "react-redux";
+import React, { useState } from "react";
 import "../styles/Menu.css";
 
 const DEFAULT_CARS_NUM = 4;
 const DEFAULT_TEST_CAR = 2;
 
+const DECIMAL_PLACES = 5;
+
 const Menu = props => {
-  const { lat, lng, rad } = props.center;
+  let { lat, lng, rad } = props.center;
+  lat = lat.toFixed(DECIMAL_PLACES);
+  lng = lng.toFixed(DECIMAL_PLACES);
+
   const [carsNum, setCarsNum] = useState(DEFAULT_CARS_NUM);
   const [testCarNum, setTestCarNum] = useState(DEFAULT_TEST_CAR);
-  const dispatch = props.dispatch;
 
   const latMin = -90,
     latMax = 90;
@@ -59,7 +64,7 @@ const Menu = props => {
           <label htmlFor="lat">Latitude</label>
           <input
             type="number"
-            defaultValue={lat}
+            value={lat}
             className="form-control"
             id="lat"
             step="0.0001"
@@ -73,7 +78,7 @@ const Menu = props => {
           <label htmlFor="lng">Longitude</label>
           <input
             type="number"
-            defaultValue={lng}
+            value={lng}
             className="form-control"
             id="lng"
             step="0.0001"
@@ -87,7 +92,7 @@ const Menu = props => {
           <label htmlFor="rad">Radius</label>
           <input
             type="number"
-            defaultValue={rad}
+            value={rad}
             className="form-control"
             id="rad"
             step="10"
