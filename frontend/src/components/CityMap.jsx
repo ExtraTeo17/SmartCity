@@ -35,7 +35,7 @@ const CityMap = props => {
       onzoomanim={e => {
         setZoom(e.zoom);
       }}
-      onclick={e => setCenter(e.latlng)}
+      oncontextmenu={e => setCenter(e.latlng)}
     >
       <TileLayer
         attribution='&amp;copy <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
