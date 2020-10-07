@@ -8,7 +8,10 @@ import com.google.inject.Guice;
 import com.google.inject.Injector;
 import events.LightManagersReadyEvent;
 import events.SwitchLightsStartEvent;
-import events.web.*;
+import events.web.PrepareSimulationEvent;
+import events.web.SimulationReadyEvent;
+import events.web.StartSimulationEvent;
+import events.web.VehicleAgentCreatedEvent;
 import org.junit.jupiter.api.Test;
 import osmproxy.OsmModule;
 import osmproxy.buses.BusModule;
@@ -75,7 +78,7 @@ class InjectorTests {
         eventBus.post(new SimulationReadyEvent());
         eventBus.post("Test"); // Dead event
         eventBus.post(new StartSimulationEvent(0, 0));
-        eventBus.post(new VehicleAgentCreatedEvent(null));
+        eventBus.post(new VehicleAgentCreatedEvent(1, null, false));
         eventBus.post(new SwitchLightsStartEvent(null));
         eventBus.post("Test"); // Dead event
 

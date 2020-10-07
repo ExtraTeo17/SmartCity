@@ -11,7 +11,6 @@ const createSocket = () => {
   socket.onopen = () => {
     console.info("Connected !!!");
 
-    notify.hide();
     notify.show("Sucessfully connected", "success", NOTIFY_SHOW_SEC * 1000);
   };
 

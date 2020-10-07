@@ -1,6 +1,6 @@
-import { PREPARE_SIMULATION_RESPONSE } from "./MessageType";
+import { PREPARE_SIMULATION_RESPONSE, CREATE_CAR_INFO } from "./MessageType";
 import { dispatch } from "../redux/store";
-import { lightLocationsUpdated } from "../redux/actions";
+import { carCreated, lightLocationsUpdated } from "../redux/actions";
 
 export default {
   handle(msg) {
@@ -9,6 +9,11 @@ export default {
       case PREPARE_SIMULATION_RESPONSE:
         const locations = payload.locations;
         dispatch(lightLocationsUpdated(locations));
+        break;
+
+      case CREATE_CAR_INFO:
+        const car = payload;
+        dispatch(carCreated(car));
         break;
 
       default:
