@@ -3,9 +3,11 @@ package smartcity.task;
 import agents.LightManagerAgent;
 import agents.abstractions.AbstractAgent;
 import agents.abstractions.IAgentsContainer;
+import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
 import com.google.inject.Inject;
 import events.SwitchLightsStartEvent;
+import events.web.SimulationStartedEvent;
 import events.web.StartSimulationEvent;
 import smartcity.SimulationState;
 import smartcity.config.ConfigContainer;
@@ -15,14 +17,17 @@ public class Scheduler {
     private final ITaskManager taskManager;
     private final ConfigContainer configContainer;
     private final IAgentsContainer agentsContainer;
+    private final EventBus eventBus;
 
     @Inject
     public Scheduler(ITaskManager taskManager,
                      ConfigContainer configContainer,
-                     IAgentsContainer agentsContainer) {
+                     IAgentsContainer agentsContainer,
+                     EventBus eventBus) {
         this.taskManager = taskManager;
         this.configContainer = configContainer;
         this.agentsContainer = agentsContainer;
+        this.eventBus = eventBus;
     }
 
     @SuppressWarnings("FeatureEnvy")
@@ -39,6 +44,7 @@ public class Scheduler {
         }
 
         configContainer.setSimulationState(SimulationState.RUNNING);
+        eventBus.post(new SimulationStartedEvent());
     }
 
     private void activateLightManagerAgents() {

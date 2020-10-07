@@ -72,7 +72,7 @@ public class TaskProvider implements ITaskProvider {
             VehicleAgent agent = agentsFactory.create(info, testCar);
             if (agentsContainer.tryAdd(agent)) {
                 agent.start();
-                eventBus.post(new VehicleAgentCreatedEvent(agent.getPosition()));
+                eventBus.post(new VehicleAgentCreatedEvent(agent.getId(), agent.getPosition(), testCar));
             }
         };
     }
@@ -124,7 +124,7 @@ public class TaskProvider implements ITaskProvider {
 
     @Override
     public Supplier<Integer> getSwitchLightsTask(Collection<Light> lights) {
-        int extendTimeSeconds = 30;
+        int extendTimeSeconds = 20;
         var switchLights = functionalTaskFactory.createLightSwitcher(extendTimeSeconds, lights);
         // Can be moved somewhere else if needed and passed as parameter
         var switchLightsContext = new ISwitchLightsContext() {

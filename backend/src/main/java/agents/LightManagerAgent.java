@@ -2,6 +2,7 @@ package agents;
 
 import agents.abstractions.AbstractAgent;
 import agents.utilities.MessageParameter;
+import com.google.common.eventbus.EventBus;
 import jade.core.behaviours.CyclicBehaviour;
 import jade.core.behaviours.TickerBehaviour;
 import jade.lang.acl.ACLMessage;
@@ -22,8 +23,10 @@ public class LightManagerAgent extends AbstractAgent {
 
     private final ICrossroad crossroad;
 
-    LightManagerAgent(int id, ITimeProvider timeProvider, ICrossroad crossroad) {
-        super(id, name, timeProvider);
+    LightManagerAgent(int id, ICrossroad crossroad,
+                      ITimeProvider timeProvider,
+                      EventBus eventBus) {
+        super(id, name, timeProvider, eventBus);
         this.crossroad = crossroad;
     }
 

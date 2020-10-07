@@ -60,7 +60,7 @@ public class TaskManager implements ITaskManager {
             taskProvider.getCreateCarTask(posA, posB, counter == testCarId).run();
         };
 
-        runNTimes(createCars, numberOfCars, CREATE_CAR_INTERVAL);
+        runNTimes(createCars, numberOfCars, CREATE_CAR_INTERVAL, true);
     }
 
     @Override
@@ -93,7 +93,7 @@ public class TaskManager implements ITaskManager {
     @Override
     public void scheduleSwitchLightTask(Collection<Light> lights) {
         var switchLightsTaskWithDelay = taskProvider.getSwitchLightsTask(lights);
-        var runnable = runnableFactory.create(switchLightsTaskWithDelay);
+        var runnable = runnableFactory.create(switchLightsTaskWithDelay, true);
         runnable.runEndless(0, TIME_UNIT);
     }
 

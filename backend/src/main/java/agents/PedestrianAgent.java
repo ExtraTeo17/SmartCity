@@ -2,6 +2,7 @@ package agents;
 
 import agents.abstractions.AbstractAgent;
 import agents.utilities.MessageParameter;
+import com.google.common.eventbus.EventBus;
 import jade.core.behaviours.Behaviour;
 import jade.core.behaviours.CyclicBehaviour;
 import jade.core.behaviours.TickerBehaviour;
@@ -21,9 +22,10 @@ public class PedestrianAgent extends AbstractAgent {
     private final Pedestrian pedestrian;
 
     PedestrianAgent(int agentId,
+                    Pedestrian pedestrian,
                     ITimeProvider timeProvider,
-                    Pedestrian pedestrian) {
-        super(agentId, name, timeProvider);
+                    EventBus eventBus) {
+        super(agentId, name, timeProvider, eventBus);
         this.pedestrian = pedestrian;
     }
 

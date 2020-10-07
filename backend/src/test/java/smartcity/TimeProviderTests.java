@@ -18,7 +18,7 @@ class TimeProviderTests {
         var startTime = LocalDateTime.of(LocalDate.now().minusDays(1),
                 LocalTime.of(10, 10, 10));
         var timeProvider = new TimeProvider();
-        int waitTimeMillis = 200;
+        int waitTimeMillis = 300;
         int accuracyMillis = waitTimeMillis / 10;
 
         // Act

@@ -12,6 +12,7 @@ const initialState = {
   },
   message: {
     lightLocations: [],
+    cars: [],
   },
 };
 

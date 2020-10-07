@@ -4,6 +4,7 @@ import smartcity.task.runnable.abstractions.IFixedExecutionRunnable;
 import smartcity.task.runnable.abstractions.IRunnableFactory;
 import smartcity.task.runnable.abstractions.IVariableExecutionRunnable;
 
+import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.function.BooleanSupplier;
@@ -25,8 +26,7 @@ class RunnableFactory implements IRunnableFactory {
     @Override
     public IFixedExecutionRunnable create(Consumer<Integer> action, int maxRunCount, boolean separateThread) {
         if (separateThread) {
-            // TODO: Not sure if performance wise
-            return new CounterRunnable(Executors.newSingleThreadScheduledExecutor(), action, maxRunCount);
+            return new CounterRunnable(getNewThreadExecutor(), action, maxRunCount);
         }
 
         return new CounterRunnable(executor, action, maxRunCount);
@@ -38,7 +38,15 @@ class RunnableFactory implements IRunnableFactory {
     }
 
     @Override
-    public IVariableExecutionRunnable create(Supplier<Integer> delayRunnable, int initialDelay) {
+    public IVariableExecutionRunnable create(Supplier<Integer> delayRunnable, int initialDelay, boolean separateThread) {
+        if(separateThread){
+            return new InfiniteVariableExecutionRunnable(getNewThreadExecutor(), delayRunnable);
+        }
         return new InfiniteVariableExecutionRunnable(executor, delayRunnable);
+    }
+
+    private static ScheduledExecutorService getNewThreadExecutor(){
+        // TODO: Not sure if performance wise
+       return Executors.newSingleThreadScheduledExecutor();
     }
 }

@@ -1,5 +1,6 @@
 import { CENTER_UPDATED } from "../constants";
 
+// Just for reference - defined in store.js
 const initialState = {
   center: { lat: 0, lng: 0, rad: 0 },
 };
