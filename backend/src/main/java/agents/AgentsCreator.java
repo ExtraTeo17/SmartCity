@@ -71,7 +71,7 @@ public class AgentsCreator {
     public void handle(PrepareSimulationEvent e) {
         logger.info("Set zone event occurred: " + e.toString());
         if (configContainer.getSimulationState() == SimulationState.READY_TO_RUN) {
-            agentsContainer.clearAll();
+            clear();
         }
         configContainer.setZone(e.zone);
         configContainer.setSimulationState(SimulationState.IN_PREPARATION);
@@ -83,6 +83,11 @@ public class AgentsCreator {
                     .collect(Collectors.toList());
             eventBus.post(new SimulationPreparedEvent(lights));
         }
+    }
+
+    // TODO: Send clearSimulationEvent and handle simulationClearedEvent to continue - tasks should be cancelled
+    private void clear() {
+        agentsContainer.clearAll();
     }
 
     private boolean prepareAgents() {

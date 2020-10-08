@@ -1,4 +1,5 @@
-import { CAR_UPDATED, CAR_CREATED, CENTER_UPDATED, LIGHTS_CREATED } from "./constants";
+import { CAR_UPDATED, CAR_CREATED, CENTER_UPDATED, LIGHTS_CREATED, LIGHTS_SWITCHED } from "./constants";
+import { createAction } from "redux-actions";
 
 export /**
  * @param {} center
@@ -50,3 +51,5 @@ export const carUpdated = car => {
     },
   };
 };
+
+export const lightsSwitched = createAction(LIGHTS_SWITCHED);

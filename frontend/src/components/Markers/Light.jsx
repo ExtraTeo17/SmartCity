@@ -5,7 +5,6 @@ import { LightColor } from "../Models/LightColor";
 
 const Light = props => {
   const { light } = props;
-  console.log(light.color);
 
   return (
     <Marker

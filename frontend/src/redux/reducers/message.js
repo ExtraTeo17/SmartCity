@@ -1,4 +1,5 @@
-import { CAR_CREATED, CAR_UPDATED, LIGHTS_CREATED } from "../constants";
+import { LightColor } from "../../components/Models/LightColor";
+import { CAR_CREATED, CAR_UPDATED, LIGHTS_CREATED, LIGHTS_SWITCHED } from "../constants";
 
 // Just for reference - defined in store.js
 const initialState = {
@@ -20,7 +21,22 @@ const message = (state = initialState, action) => {
 
     case CAR_UPDATED: {
       const { car } = action.payload;
-      return { ...state, cars: state.cars.map((oldCar, i) => (i === car.id ? { ...oldCar, location: car.location } : oldCar)) };
+      return {
+        ...state,
+        cars: state.cars.map(oldCar => (oldCar.id === car.id ? { ...oldCar, location: car.location } : oldCar)),
+      };
+    }
+
+    case LIGHTS_SWITCHED: {
+      const id = action.payload;
+      return {
+        ...state,
+        lights: state.lights.map(oldLight =>
+          oldLight.groupId === id
+            ? { ...oldLight, color: oldLight.color === LightColor.GREEN ? LightColor.RED : LightColor.GREEN }
+            : oldLight
+        ),
+      };
     }
 
     default:

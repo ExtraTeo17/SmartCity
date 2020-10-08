@@ -1,7 +1,13 @@
-import { PREPARE_SIMULATION_RESPONSE, CREATE_CAR_INFO, UPDATE_CAR_INFO, START_SIMULATION_RESPONSE } from "./MessageType";
+import {
+  PREPARE_SIMULATION_RESPONSE,
+  CREATE_CAR_INFO,
+  UPDATE_CAR_INFO,
+  START_SIMULATION_RESPONSE,
+  SWITCH_LIGHTS_INFO,
+} from "./MessageType";
 import { NOTIFY_SHOW_SEC } from "../utils/constants";
 import { dispatch } from "../redux/store";
-import { carUpdated, carCreated, lightsCreated } from "../redux/actions";
+import { carUpdated, carCreated, lightsCreated, lightsSwitched } from "../redux/actions";
 import { batch } from "react-redux";
 import { notify } from "react-notify-toast";
 
@@ -9,6 +15,7 @@ const fps = 20;
 let timeScale = 1;
 let timer;
 let carUpdateQueue = [];
+let switchLightsQueue = [];
 
 export default {
   handle(msg) {
@@ -29,8 +36,10 @@ export default {
         timer = setInterval(() => {
           batch(() => {
             carUpdateQueue.forEach(action => dispatch(action));
+            switchLightsQueue.forEach(action => dispatch(action));
           });
           carUpdateQueue = [];
+          switchLightsQueue = [];
         }, 1000 / fps);
         break;
 
@@ -43,6 +52,12 @@ export default {
       case UPDATE_CAR_INFO: {
         const car = payload;
         carUpdateQueue.push(carUpdated(car));
+        break;
+      }
+
+      case SWITCH_LIGHTS_INFO: {
+        const id = payload.lightGroupId;
+        switchLightsQueue.push(lightsSwitched(id));
         break;
       }
 

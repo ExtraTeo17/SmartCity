@@ -25,9 +25,9 @@ const createSocket = () => {
   };
 
   function logMessage(e) {
-    console.groupEnd();
     console.groupCollapsed("OnMessage");
     console.log("Message received:" + e.data);
+    console.groupEnd();
   }
 
   socket.onerror = err => {
