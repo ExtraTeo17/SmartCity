@@ -60,7 +60,7 @@ public class LightManagerNode extends RouteNode {
 
         // Intended - first crossingId should never be null - method annotated
         var id1 = Long.parseLong(crossingOsmId1);
-        var id2 = Longs.tryParse(crossingOsmId2);
+        var id2 = crossingOsmId2 != null ? Longs.tryParse(crossingOsmId2) : null;
 
         return new LightManagerNode((IGeoPosition) light, light.getAdjacentWayId(), id1, id2, managerId,
                 light.getOsmLightId());
