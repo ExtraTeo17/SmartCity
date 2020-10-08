@@ -9,9 +9,12 @@ import java.util.List;
 public interface IWebService extends IStartable {
     void prepareSimulation(List<? extends Light> positions);
 
+    void startSimulation(int timeScale);
+
     void createCar(int id, IGeoPosition position, boolean isTestCar);
 
     void updateCar(int id, IGeoPosition position);
 
-    void startSimulation(int timeScale);
+
+    void updateLights(long lightGroupId);
 }

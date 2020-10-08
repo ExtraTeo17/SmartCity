@@ -6,6 +6,7 @@ import smartcity.lights.core.Light;
 import web.abstractions.IWebService;
 import web.message.MessageType;
 import web.message.payloads.infos.CreateCarInfo;
+import web.message.payloads.infos.SwitchLightsInfo;
 import web.message.payloads.infos.UpdateCarInfo;
 import web.message.payloads.models.LightDto;
 import web.message.payloads.responses.PrepareResponse;
@@ -36,6 +37,12 @@ class WebService implements IWebService {
     }
 
     @Override
+    public void startSimulation(int timeScale) {
+        var payload = new StartResponse(timeScale);
+        webConnector.broadcastMessage(MessageType.START_SIMULATION_RESPONSE, payload);
+    }
+
+    @Override
     public void createCar(int id, IGeoPosition position, boolean isTestCar) {
         var location = Converter.convert(position);
         var payload = new CreateCarInfo(id, location, isTestCar);
@@ -50,8 +57,8 @@ class WebService implements IWebService {
     }
 
     @Override
-    public void startSimulation(int timeScale) {
-        var payload = new StartResponse(timeScale);
-        webConnector.broadcastMessage(MessageType.START_SIMULATION_RESPONSE, payload);
+    public void updateLights(long lightGroupId) {
+        var payload = new SwitchLightsInfo(lightGroupId);
+        webConnector.broadcastMessage(MessageType.SWITCH_LIGHTS_INFO, payload);
     }
 }

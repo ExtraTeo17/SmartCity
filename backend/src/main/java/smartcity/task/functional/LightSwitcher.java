@@ -65,6 +65,7 @@ class LightSwitcher implements Function<ISwitchLightsContext, Integer> {
             }
         }
 
+        // TODO: Can include yellow somehow?
         lights.forEach(Light::switchLight);
         lightsOsmIds.forEach(id -> eventBus.post(new SwitchLightsEvent(id)));
 

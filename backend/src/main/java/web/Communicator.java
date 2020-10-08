@@ -47,7 +47,7 @@ class Communicator {
 
     @Subscribe
     public void handle(SwitchLightsEvent e) {
-        
+        webService.updateLights(e.osmLightId);
     }
 
 

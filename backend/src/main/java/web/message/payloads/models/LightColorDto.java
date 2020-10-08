@@ -1,29 +1,24 @@
-package web.message;
+package web.message.payloads.models;
 
+import agents.utilities.LightColor;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
+import web.message.MessageType;
 
-public enum MessageType {
-    PREPARE_SIMULATION_REQUEST(1),
-    PREPARE_SIMULATION_RESPONSE(2),
-
-    START_SIMULATION_REQUEST(3),
-    START_SIMULATION_RESPONSE(4),
-
-    CREATE_CAR_INFO(5),
-    UPDATE_CAR_INFO(6),
-
-    SWITCH_LIGHTS_INFO(7);
+public  enum LightColorDto {
+    GREEN(0),
+    YELLOW(1),
+    RED(2);
 
     private final int code;
 
-    MessageType(int code) {
+    LightColorDto(int code) {
         this.code = code;
     }
 
     @JsonCreator
-    public static MessageType create(int code) {
-        for (var value : MessageType.values()) {
+    public static LightColorDto create(int code) {
+        for (var value : LightColorDto.values()) {
             if (value.code == code) {
                 return value;
             }

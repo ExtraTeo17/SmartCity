@@ -7,9 +7,14 @@ public class LightDto {
     public final long lightGroupId;
     @JsonProperty("location")
     public final Location location;
+    @JsonProperty("lightColor")
+    public final LightColorDto lightColor;
 
-    public LightDto(long lightGroupId, Location location) {
+    public LightDto(long lightGroupId,
+                    Location location,
+                    LightColorDto lightColor) {
         this.lightGroupId = lightGroupId;
         this.location = location;
+        this.lightColor = lightColor;
     }
 }
