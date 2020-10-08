@@ -14,12 +14,13 @@ export default {
   handle(msg) {
     const payload = msg.payload;
     switch (msg.type) {
-      case PREPARE_SIMULATION_RESPONSE:
+      case PREPARE_SIMULATION_RESPONSE: {
         notify.show("Simulation prepared!", "success", NOTIFY_SHOW_SEC * 1000);
 
         const lights = payload.lights;
         dispatch(lightsCreated(lights));
         break;
+      }
 
       case START_SIMULATION_RESPONSE:
         notify.show("Simulation started!", "success", NOTIFY_SHOW_SEC * 1000);

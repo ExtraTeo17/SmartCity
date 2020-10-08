@@ -51,7 +51,7 @@ const mapStateToProps = (state /* , ownProps */) => {
   const { interaction, message } = state;
   return {
     center: interaction.center,
-    lights: message.lightLocations,
+    lights: message.lights,
     cars: message.cars.slice(),
   };
 };

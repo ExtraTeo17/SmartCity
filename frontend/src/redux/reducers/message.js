@@ -1,16 +1,16 @@
-import { CAR_CREATED, CAR_UPDATED, LIGHT_LOCATIONS_UPDATED } from "../constants";
+import { CAR_CREATED, CAR_UPDATED, LIGHTS_CREATED } from "../constants";
 
 // Just for reference - defined in store.js
 const initialState = {
-  lightLocations: [],
+  lights: [],
   cars: [],
 };
 
 const message = (state = initialState, action) => {
   switch (action.type) {
-    case LIGHT_LOCATIONS_UPDATED: {
-      const { lightLocations } = action.payload;
-      return { ...state, lightLocations: lightLocations };
+    case LIGHTS_CREATED: {
+      const { lights } = action.payload;
+      return { ...state, lights: lights };
     }
 
     case CAR_CREATED: {
