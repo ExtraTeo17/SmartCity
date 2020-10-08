@@ -3,18 +3,18 @@ package web.message.payloads.models;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class LightDto {
-    @JsonProperty("lightGroupId")
-    public final long lightGroupId;
+    @JsonProperty("groupId")
+    private final long groupId;
     @JsonProperty("location")
-    public final Location location;
-    @JsonProperty("lightColor")
-    public final LightColorDto lightColor;
+    private final Location location;
+    @JsonProperty("color")
+    private final LightColorDto color;
 
-    public LightDto(long lightGroupId,
+    public LightDto(long groupId,
                     Location location,
-                    LightColorDto lightColor) {
-        this.lightGroupId = lightGroupId;
+                    LightColorDto color) {
+        this.groupId = groupId;
         this.location = location;
-        this.lightColor = lightColor;
+        this.color = color;
     }
 }

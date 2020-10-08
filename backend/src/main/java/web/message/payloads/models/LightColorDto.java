@@ -1,9 +1,7 @@
 package web.message.payloads.models;
 
-import agents.utilities.LightColor;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
-import web.message.MessageType;
 
 public  enum LightColorDto {
     GREEN(0),
