@@ -1,9 +1,11 @@
-import React, { useState, useEffect } from "react";
-import { Map, Marker, Popup, TileLayer, Circle, CircleMarker } from "react-leaflet";
-import "../styles/CityMap.css";
+import React, { useEffect, useState } from "react";
+import { Circle, Map, Marker, Popup, TileLayer } from "react-leaflet";
 import { connect } from "react-redux";
+import "../styles/CityMap.css";
 import Car from "./Markers/Car";
 import Light from "./Markers/Light";
+import { dispatch } from "../redux/store";
+import { centerUpdated } from "../redux/actions";
 
 const DEFAULT_ZOOM = 15;
 const MAX_ZOOM = 20;
@@ -17,6 +19,11 @@ const CityMap = props => {
   // Similar to componentDidMount and componentDidUpdate:
   useEffect(() => {});
 
+  function setCenter(latlng) {
+    const { lat, lng } = latlng;
+    dispatch(centerUpdated({ lat, lng, rad }));
+  }
+
   const lightMarkers = lights.map((light, ind) => <Light key={ind} light={light} />);
 
   const carMarkers = cars.map((car, ind) => <Car key={ind} car={car}></Car>);
@@ -29,6 +36,7 @@ const CityMap = props => {
       onzoomanim={e => {
         setZoom(e.zoom);
       }}
+      oncontextmenu={e => setCenter(e.latlng)}
     >
       <TileLayer
         attribution='&amp;copy <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
@@ -40,9 +48,10 @@ const CityMap = props => {
         <Marker position={{ lat, lng }} interactive={true}>
           <Popup>Zone center</Popup>
         </Marker>
-        {carMarkers}
-        {lightMarkers}
       </Circle>
+
+      {carMarkers}
+      {lightMarkers}
     </Map>
   );
 };
@@ -52,7 +61,7 @@ const mapStateToProps = (state /* , ownProps */) => {
   return {
     center: interaction.center,
     lights: message.lights,
-    cars: message.cars.slice(),
+    cars: message.cars,
   };
 };
 
