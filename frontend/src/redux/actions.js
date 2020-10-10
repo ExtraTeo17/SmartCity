@@ -28,7 +28,7 @@ const lightLocationsUpdated = lightLocations => {
 };
 
 /**
- * @param {{id:number; location:{lat:number; lng:number;}; isTestCar:boolean; }} car
+ * @param {{id:number; location:{lat:number; lng:number;}; route:Array<> isTestCar:boolean; }} car
  */
 export const carCreated = car => {
   return {
