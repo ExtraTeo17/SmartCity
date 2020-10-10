@@ -10,13 +10,13 @@ public class CreateCarInfo extends AbstractPayload {
     @JsonProperty("location")
     private final Location location;
     @JsonProperty("route")
-    private final double[][] route;
+    private final Location[] route;
     @JsonProperty("isTestCar")
     private final boolean isTestCar;
 
     public CreateCarInfo(int id,
                          Location location,
-                         double[][] route,
+                         Location[] route,
                          boolean isTestCar) {
         this.id = id;
         this.location = location;

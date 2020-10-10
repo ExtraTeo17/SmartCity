@@ -1,7 +1,6 @@
 package web;
 
 import com.google.inject.Inject;
-import routing.RouteNode;
 import routing.core.IGeoPosition;
 import web.abstractions.IWebService;
 import web.message.MessageType;
@@ -37,7 +36,7 @@ class WebService implements IWebService {
     @Override
     public void createCar(int id, IGeoPosition position, List<? extends IGeoPosition> route, boolean isTestCar) {
         var location = Converter.convert(position);
-        var routeLocations = route.stream().map(pos -> new double[]{pos.getLat(), pos.getLng()}).toArray(double[][]::new);
+        var routeLocations = route.stream().map(Converter::convert).toArray(Location[]::new);
         var payload = new CreateCarInfo(id, location, routeLocations, isTestCar);
         webConnector.broadcastMessage(MessageType.CREATE_CAR_INFO, payload);
     }
