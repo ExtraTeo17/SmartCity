@@ -1,16 +1,17 @@
-import { CAR_KILLED, CAR_CREATED, CAR_UPDATED, LIGHT_LOCATIONS_UPDATED } from "../constants";
+import { LightColor } from "../../components/Models/LightColor";
+import { CAR_KILLED, CAR_CREATED, CAR_UPDATED, LIGHTS_CREATED, LIGHTS_SWITCHED } from "../constants";
 
 // Just for reference - defined in store.js
 const initialState = {
-  lightLocations: [],
+  lights: [],
   cars: [],
 };
 
 const message = (state = initialState, action) => {
   switch (action.type) {
-    case LIGHT_LOCATIONS_UPDATED: {
-      const { lightLocations } = action.payload;
-      return { ...state, lightLocations: lightLocations };
+    case LIGHTS_CREATED: {
+      const { lights } = action.payload;
+      return { ...state, lights: lights };
     }
 
     case CAR_CREATED: {
@@ -20,7 +21,15 @@ const message = (state = initialState, action) => {
 
     case CAR_UPDATED: {
       const { car } = action.payload;
-      return { ...state, cars: state.cars.map((oldCar, i) => (i === car.id ? { ...oldCar, location: car.location } : oldCar)) };
+
+      var newCars = state.cars.map(c => {
+        if (c.id == car.id && !c.isDeleted) {
+          return { ...c, location: car.location };
+        }
+        return c;
+      });
+
+      return { ...state, cars: newCars };
     }
 
     case CAR_KILLED: {
@@ -31,6 +40,19 @@ const message = (state = initialState, action) => {
       });
 
       return { ...state, cars: newCars };
+    }
+
+    case LIGHTS_SWITCHED: {
+      const id = action.payload;
+
+      return {
+        ...state,
+        lights: state.lights.map(oldLight =>
+          oldLight.groupId === id
+            ? { ...oldLight, color: oldLight.color === LightColor.GREEN ? LightColor.RED : LightColor.GREEN }
+            : oldLight
+        ),
+      };
     }
 
     default:

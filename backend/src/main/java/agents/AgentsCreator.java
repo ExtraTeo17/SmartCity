@@ -31,6 +31,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import static smartcity.config.StaticConfig.USE_DEPRECATED_XML_FOR_LIGHT_MANAGERS;
 
@@ -70,15 +71,23 @@ public class AgentsCreator {
     public void handle(PrepareSimulationEvent e) {
         logger.info("Set zone event occurred: " + e.toString());
         if (configContainer.getSimulationState() == SimulationState.READY_TO_RUN) {
-            agentsContainer.clearAll();
+            clear();
         }
         configContainer.setZone(e.zone);
         configContainer.setSimulationState(SimulationState.IN_PREPARATION);
 
         if (prepareAgents()) {
             configContainer.setSimulationState(SimulationState.READY_TO_RUN);
-            eventBus.post(new SimulationPreparedEvent());
+            var lights = agentsContainer.stream(LightManagerAgent.class)
+                    .flatMap(man -> man.getLights().stream())
+                    .collect(Collectors.toList());
+            eventBus.post(new SimulationPreparedEvent(lights));
         }
+    }
+
+    // TODO: Send clearSimulationEvent and handle simulationClearedEvent to continue - tasks should be cancelled
+    private void clear() {
+        agentsContainer.clearAll();
     }
 
     private boolean prepareAgents() {

@@ -37,7 +37,7 @@ const CityMap = props => {
     dispatch(centerUpdated({ lat, lng, rad }));
   }
 
-  const lightMarkers = lights.map((light, ind) => <Light key={ind} location={light} />);
+  const lightMarkers = lights.map((light, ind) => <Light key={ind} light={light} />);
   const carMarkers = cars.map(car => (car.isDeleted ? null : <Car key={car.id} car={car} />));
   const carRoutes = cars.map((car, ind) =>
     car.isDeleted ? null : (
@@ -82,7 +82,7 @@ const mapStateToProps = (state /* , ownProps */) => {
   const { interaction, message } = state;
   return {
     center: interaction.center,
-    lights: message.lightLocations,
+    lights: message.lights,
     cars: message.cars,
   };
 };

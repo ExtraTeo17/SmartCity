@@ -4,6 +4,7 @@ import {
   UPDATE_CAR_INFO,
   START_SIMULATION_RESPONSE,
   KILL_CAR_INFO,
+  SWITCH_LIGHTS_INFO,
 } from "./MessageType";
 import { NOTIFY_SHOW_SEC } from "../utils/constants";
 import { notify } from "react-notify-toast";
@@ -13,11 +14,12 @@ export default {
   handle(msg) {
     const payload = msg.payload;
     switch (msg.type) {
-      case PREPARE_SIMULATION_RESPONSE:
+      case PREPARE_SIMULATION_RESPONSE: {
         notify.show("Simulation prepared!", "success", NOTIFY_SHOW_SEC * 1000);
 
-        Dispatcher.prepareSimulation(payload.locations);
+        Dispatcher.prepareSimulation(payload.lights);
         break;
+      }
 
       case START_SIMULATION_RESPONSE:
         notify.show("Simulation started!", "success", NOTIFY_SHOW_SEC * 1000);
@@ -36,6 +38,11 @@ export default {
       case KILL_CAR_INFO:
         Dispatcher.killCar(payload.id);
         break;
+
+      case SWITCH_LIGHTS_INFO: {
+        Dispatcher.switchLights(payload.lightGroupId);
+        break;
+      }
 
       default:
         console.warn("Unrecognized message type");

@@ -2,11 +2,14 @@ package web;
 
 import com.google.inject.Inject;
 import routing.core.IGeoPosition;
+import smartcity.lights.core.Light;
 import web.abstractions.IWebService;
 import web.message.MessageType;
 import web.message.payloads.infos.CreateCarInfo;
 import web.message.payloads.infos.KillCarInfo;
+import web.message.payloads.infos.SwitchLightsInfo;
 import web.message.payloads.infos.UpdateCarInfo;
+import web.message.payloads.models.LightDto;
 import web.message.payloads.models.Location;
 import web.message.payloads.responses.PrepareResponse;
 import web.message.payloads.responses.StartResponse;
@@ -28,11 +31,16 @@ class WebService implements IWebService {
     }
 
     @Override
-    public void prepareSimulation(List<? extends IGeoPosition> positions) {
-        var locations = positions.stream().map(Converter::convert)
-                .toArray(Location[]::new);
-        var payload = new PrepareResponse(locations);
+    public void prepareSimulation(List<? extends Light> positions) {
+        var lights = positions.stream().map(Converter::convert)
+                .toArray(LightDto[]::new);
+        var payload = new PrepareResponse(lights);
         webConnector.broadcastMessage(MessageType.PREPARE_SIMULATION_RESPONSE, payload);
+    }
+
+    public void startSimulation(int timeScale) {
+        var payload = new StartResponse(timeScale);
+        webConnector.broadcastMessage(MessageType.START_SIMULATION_RESPONSE, payload);
     }
 
     @Override
@@ -51,9 +59,9 @@ class WebService implements IWebService {
     }
 
     @Override
-    public void startSimulation(int timeScale) {
-        var payload = new StartResponse(timeScale);
-        webConnector.broadcastMessage(MessageType.START_SIMULATION_RESPONSE, payload);
+    public void updateLights(long lightGroupId) {
+        var payload = new SwitchLightsInfo(lightGroupId);
+        webConnector.broadcastMessage(MessageType.SWITCH_LIGHTS_INFO, payload);
     }
 
     @Override
