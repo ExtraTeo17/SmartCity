@@ -1,50 +1,31 @@
 import { PREPARE_SIMULATION_RESPONSE, CREATE_CAR_INFO, UPDATE_CAR_INFO, START_SIMULATION_RESPONSE } from "./MessageType";
 import { NOTIFY_SHOW_SEC } from "../utils/constants";
-import { dispatch } from "../redux/store";
-import { carUpdated, carCreated, lightLocationsUpdated } from "../redux/actions";
-import { batch } from "react-redux";
 import { notify } from "react-notify-toast";
-
-const fps = 15;
-let timeScale = 1;
-let timer;
-let carUpdateQueue = [];
+import Dispatcher from "../redux/Dispatcher";
 
 export default {
   handle(msg) {
     const payload = msg.payload;
     switch (msg.type) {
-      case PREPARE_SIMULATION_RESPONSE: {
+      case PREPARE_SIMULATION_RESPONSE:
         notify.show("Simulation prepared!", "success", NOTIFY_SHOW_SEC * 1000);
 
-        const locations = payload.locations;
-        dispatch(lightLocationsUpdated(locations));
+        Dispatcher.prepareSimulation(payload.locations);
         break;
-      }
 
       case START_SIMULATION_RESPONSE:
         notify.show("Simulation started!", "success", NOTIFY_SHOW_SEC * 1000);
 
-        timeScale = msg.payload.timeScale;
-        timer = setInterval(() => {
-          batch(() => {
-            carUpdateQueue.forEach(action => dispatch(action));
-          });
-          carUpdateQueue = [];
-        }, 1000 / fps);
+        Dispatcher.startSimulation(msg.payload.timeScale);
         break;
 
-      case CREATE_CAR_INFO: {
-        const car = payload;
-        dispatch(carCreated(car));
+      case CREATE_CAR_INFO:
+        Dispatcher.createCar(payload);
         break;
-      }
 
-      case UPDATE_CAR_INFO: {
-        const car = payload;
-        carUpdateQueue.push(carUpdated(car));
+      case UPDATE_CAR_INFO:
+        Dispatcher.updateCar(payload);
         break;
-      }
 
       default:
         console.warn("Unrecognized message type");
