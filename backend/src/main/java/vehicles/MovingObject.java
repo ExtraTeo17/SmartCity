@@ -13,11 +13,14 @@ public abstract class MovingObject {
     final int speed;
     final List<RouteNode> route;
     int moveIndex;
+    int closestLightIndex;
+    DrivingState state = DrivingState.STARTING;
 
     MovingObject(int speed, List<RouteNode> route) {
         this.speed = speed;
         this.route = route;
         this.moveIndex = 0;
+        this.closestLightIndex = Integer.MAX_VALUE;
     }
 
     public IGeoPosition getPosition() {
@@ -44,21 +47,46 @@ public abstract class MovingObject {
 
     public abstract String getVehicleType();
 
-    public abstract LightManagerNode getNextTrafficLight();
+    public LightManagerNode getNextTrafficLight() {
+        if (closestLightIndex < route.size() && moveIndex <= closestLightIndex) {
+            return (LightManagerNode) route.get(closestLightIndex);
+        }
 
-    public abstract LightManagerNode getCurrentTrafficLightNode();
+        for (int i = moveIndex + 1; i < route.size(); ++i) {
+            var node = route.get(i);
+            if (node instanceof LightManagerNode) {
+                closestLightIndex = i;
+                return (LightManagerNode) node;
+            }
+        }
 
-    public abstract boolean isAtTrafficLights();
+        closestLightIndex = Integer.MAX_VALUE;
+        return null;
+    }
 
-    public abstract boolean isAtDestination();
+    public boolean isAtTrafficLights() {
+        if (isAtDestination()) {
+            return false;
+        }
+
+        return closestLightIndex == moveIndex;
+    }
+
+    public boolean isAtDestination() {
+        return moveIndex == route.size();
+    }
+
+    public DrivingState getState() {
+        return state;
+    }
+
+    public void setState(DrivingState state) {
+        this.state = state;
+    }
 
     public abstract List<RouteNode> getDisplayRoute();
 
     public abstract long getAdjacentOsmWayId();
 
     public abstract int getMillisecondsToNextLight();
-
-    public abstract DrivingState getState();
-
-    public abstract void setState(DrivingState state);
 }

@@ -42,7 +42,7 @@ public class PedestrianAgent extends AbstractAgent {
                 if (pedestrian.isAtTrafficLights()) {
                     switch (pedestrian.getState()) {
                         case MOVING:
-                            LightManagerNode light = pedestrian.getCurrentTrafficLightNode();
+                            LightManagerNode light = pedestrian.getNextTrafficLight();
                             ACLMessage msg = createMessage(ACLMessage.REQUEST_WHEN, LightManagerAgent.name,
                                     light.getLightManagerId());
                             Properties properties = createProperties(MessageParameter.PEDESTRIAN);
