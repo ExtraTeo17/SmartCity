@@ -23,9 +23,11 @@ import osmproxy.elements.OSMWay;
 import routing.RouteNode;
 import routing.StationNode;
 import routing.abstractions.IRouteGenerator;
+import routing.core.IZone;
 import smartcity.SimulationState;
 import smartcity.TimeProvider;
 import smartcity.config.ConfigContainer;
+import utilities.FileWriterWrapper;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -102,10 +104,21 @@ public class AgentsCreator {
     }
 
     private boolean prepareStationsAndBuses() {
-        logger.info("Starting bus data preparation.");
+        BusPreparationData busData;
         long time = System.nanoTime();
-        var busData = busLinesManager.getBusData();
-        logger.info("Bus data preparation finished! Took: " + TimeProvider.getTimeInMs(time) + "ms\n");
+        var cachedData = FileWriterWrapper.<BusPreparationData>getFromCache(getBusDataPath(configContainer.getZone()));
+        if (cachedData != null) {
+            logger.info("Successfully retrieved bus data from cache. Took: " + TimeProvider.getTimeInMs(time) + "ms\n");
+            busData = cachedData;
+        }
+        else {
+            logger.info("Starting bus data preparation.");
+            time = System.nanoTime();
+            busData = busLinesManager.getBusData();
+            logger.info("Bus data preparation finished! Took: " + TimeProvider.getTimeInMs(time) + "ms\n");
+            cacheData(busData);
+        }
+
 
         logger.info("Stations creation started.");
         time = System.nanoTime();
@@ -123,6 +136,17 @@ public class AgentsCreator {
         logger.info("Buses are created! Took: " + TimeProvider.getTimeInMs(time) + "ms\n");
 
         return true;
+    }
+
+    private static String getBusDataPath(IZone zone) {
+        var center = zone.getCenter();
+        return "zone_" + zone.getRadius() + "_" + center.getLng() + "_" + center.getLat();
+    }
+
+    private void cacheData(BusPreparationData data) {
+        var zone = configContainer.getZone();
+        String path = getBusDataPath(zone);
+        FileWriterWrapper.cacheToFile(data, path);
     }
 
     private List<StationNode> prepareStations(Collection<OSMStation> stationPositions) {

@@ -8,8 +8,8 @@ import java.util.*;
 
 public class DataMerger implements IDataMerger {
     @Override
-    public Set<BusInfo> getBusInfosWithStops(Collection<BusInfoData> busInfoDataSet,
-                                             Map<Long, OSMStation> busStops) {
+    public LinkedHashSet<BusInfo> getBusInfosWithStops(Collection<BusInfoData> busInfoDataSet,
+                                                       Map<Long, OSMStation> busStops) {
         var busInfos = new LinkedHashSet<BusInfo>();
         for (var busInfoData : busInfoDataSet) {
             List<OSMStation> validBusStops = new ArrayList<>(busInfoData.busStopIds.size());

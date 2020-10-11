@@ -1,12 +1,20 @@
 package routing.core;
 
 import org.jxmapviewer.viewer.GeoPosition;
+import utilities.ForSerialization;
 
+import java.io.Serializable;
 import java.util.Objects;
 
-public class Position implements IGeoPosition {
+public class Position implements IGeoPosition, Serializable {
     private final double lat;
     private final double lng;
+
+    @ForSerialization
+    protected Position() {
+        lat = 0;
+        lng = 0;
+    }
 
     protected Position(double lat, double lng) {
         this.lat = lat;
@@ -36,7 +44,7 @@ public class Position implements IGeoPosition {
         if (o == null || getClass() != o.getClass()) {
             return false;
         }
-        
+
         Position position = (Position) o;
         return Double.compare(position.lat, lat) == 0 &&
                 Double.compare(position.lng, lng) == 0;
