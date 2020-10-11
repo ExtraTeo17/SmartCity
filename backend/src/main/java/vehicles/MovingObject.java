@@ -20,7 +20,7 @@ public abstract class MovingObject {
         this.speed = speed;
         this.route = route;
         this.moveIndex = 0;
-        this.closestLightIndex = Integer.MAX_VALUE;
+        this.closestLightIndex = -1;
     }
 
     public IGeoPosition getPosition() {
@@ -52,7 +52,7 @@ public abstract class MovingObject {
             return (LightManagerNode) route.get(closestLightIndex);
         }
 
-        for (int i = moveIndex + 1; i < route.size(); ++i) {
+        for (int i = moveIndex; i < route.size(); ++i) {
             var node = route.get(i);
             if (node instanceof LightManagerNode) {
                 closestLightIndex = i;
