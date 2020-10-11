@@ -2,11 +2,13 @@ package web.serialization;
 
 
 import agents.utilities.LightColor;
+import osmproxy.elements.OSMNode;
 import routing.core.IGeoPosition;
 import smartcity.lights.core.Light;
 import web.message.payloads.models.LightColorDto;
 import web.message.payloads.models.LightDto;
 import web.message.payloads.models.Location;
+import web.message.payloads.models.StationDto;
 
 public class Converter {
     public static Location convert(IGeoPosition geoPosition) {
@@ -27,5 +29,12 @@ public class Converter {
             case YELLOW -> LightColorDto.YELLOW;
             case RED -> LightColorDto.RED;
         };
+    }
+
+    public static StationDto convert(OSMNode station) {
+        var id = station.getId();
+        var location = convert((IGeoPosition) station);
+
+        return new StationDto(id, location);
     }
 }

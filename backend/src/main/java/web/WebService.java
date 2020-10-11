@@ -1,6 +1,7 @@
 package web;
 
 import com.google.inject.Inject;
+import osmproxy.elements.OSMNode;
 import routing.core.IGeoPosition;
 import smartcity.lights.core.Light;
 import web.abstractions.IWebService;
@@ -11,6 +12,7 @@ import web.message.payloads.infos.SwitchLightsInfo;
 import web.message.payloads.infos.UpdateCarInfo;
 import web.message.payloads.models.LightDto;
 import web.message.payloads.models.Location;
+import web.message.payloads.models.StationDto;
 import web.message.payloads.responses.PrepareResponse;
 import web.message.payloads.responses.StartResponse;
 import web.serialization.Converter;
@@ -31,10 +33,12 @@ class WebService implements IWebService {
     }
 
     @Override
-    public void prepareSimulation(List<? extends Light> positions) {
-        var lights = positions.stream().map(Converter::convert)
+    public void prepareSimulation(List<? extends Light> lights, List<? extends OSMNode> stations) {
+        var lightDtos = lights.stream().map(Converter::convert)
                 .toArray(LightDto[]::new);
-        var payload = new PrepareResponse(lights);
+        var stationDtos = stations.stream().map(Converter::convert)
+                .toArray(StationDto[]::new);
+        var payload = new PrepareResponse(lightDtos, stationDtos);
         webConnector.broadcastMessage(MessageType.PREPARE_SIMULATION_RESPONSE, payload);
     }
 

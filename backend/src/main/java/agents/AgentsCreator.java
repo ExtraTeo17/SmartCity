@@ -81,7 +81,9 @@ public class AgentsCreator {
             var lights = agentsContainer.stream(LightManagerAgent.class)
                     .flatMap(man -> man.getLights().stream())
                     .collect(Collectors.toList());
-            eventBus.post(new SimulationPreparedEvent(lights));
+            var stations = agentsContainer.stream(StationAgent.class).map(
+                    StationAgent::getStation).collect(Collectors.toList());
+            eventBus.post(new SimulationPreparedEvent(lights, stations));
         }
     }
 
@@ -257,7 +259,6 @@ public class AgentsCreator {
 
         if (managersCounter == 0) {
             logger.warn("No managers were created");
-            return false;
         }
 
 
