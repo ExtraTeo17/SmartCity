@@ -1,6 +1,6 @@
 export const CENTER_UPDATED = "Center/CENTER_UPDATED";
 
-export const LIGHTS_CREATED = "Lights/CREATED";
+export const SIMULATION_PREPARED = "Simulation/PREPARED";
 export const LIGHTS_SWITCHED = "Lights/LIGHTS_SWITCHED";
 
 export const CAR_CREATED = "Car/CREATED";

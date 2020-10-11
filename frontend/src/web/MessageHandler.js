@@ -16,8 +16,10 @@ export default {
     switch (msg.type) {
       case PREPARE_SIMULATION_RESPONSE: {
         notify.show("Simulation prepared!", "success", NOTIFY_SHOW_SEC * 1000);
-
-        Dispatcher.prepareSimulation(payload.lights);
+        console.groupCollapsed("Prepared");
+        console.log(msg.payload);
+        console.groupEnd();
+        Dispatcher.prepareSimulation(payload.lights, payload.stations);
         break;
       }
 

@@ -13,6 +13,7 @@ const initialState = {
   message: {
     lights: [],
     cars: [],
+    stations: [],
   },
 };
 

@@ -1,17 +1,18 @@
 import { LightColor } from "../../components/Models/LightColor";
-import { CAR_KILLED, CAR_CREATED, CAR_UPDATED, LIGHTS_CREATED, LIGHTS_SWITCHED } from "../constants";
+import { CAR_KILLED, CAR_CREATED, CAR_UPDATED, SIMULATION_PREPARED, LIGHTS_SWITCHED } from "../constants";
 
 // Just for reference - defined in store.js
 const initialState = {
   lights: [],
   cars: [],
+  stations: [],
 };
 
 const message = (state = initialState, action) => {
   switch (action.type) {
-    case LIGHTS_CREATED: {
-      const { lights } = action.payload;
-      return { ...state, lights: lights };
+    case SIMULATION_PREPARED: {
+      const { lights, stations } = action.payload;
+      return { ...state, lights: lights, stations: stations };
     }
 
     case CAR_CREATED: {
@@ -23,7 +24,7 @@ const message = (state = initialState, action) => {
       const car = action.payload;
 
       var newCars = state.cars.map(c => {
-        if (c.id == car.id && !c.isDeleted) {
+        if (c.id === car.id && !c.isDeleted) {
           return { ...c, location: car.location };
         }
         return c;

@@ -1,5 +1,5 @@
 import { dispatch } from "./store";
-import { carUpdated, carCreated, lightsCreated, carKilled, lightsSwitched } from "./actions";
+import { carUpdated, carCreated, simulationPrepared, carKilled, lightsSwitched } from "./actions";
 import { batch } from "react-redux";
 
 const fps = 15;
@@ -9,8 +9,8 @@ let carUpdateQueue = new Map();
 let switchLightsQueue = new Map();
 
 export default {
-  prepareSimulation(lights) {
-    dispatch(lightsCreated(lights));
+  prepareSimulation(lights, stations) {
+    dispatch(simulationPrepared({ lights, stations }));
   },
 
   startSimulation(newTimeScale) {
