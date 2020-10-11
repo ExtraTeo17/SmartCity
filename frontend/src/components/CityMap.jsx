@@ -1,8 +1,9 @@
 import React, { useEffect, useState } from "react";
-import { Circle, Map, Marker, Polyline, Popup, TileLayer } from "react-leaflet";
+import { Circle, Map as LeafletMap, Marker, Polyline, Popup, TileLayer } from "react-leaflet";
 import { connect } from "react-redux";
 import { dispatch } from "../redux/store";
 import { centerUpdated } from "../redux/actions";
+
 import "../styles/CityMap.css";
 import Car from "./Markers/Car";
 import Light from "./Markers/Light";
@@ -11,19 +12,22 @@ import { generateRandomColor } from "../utils/helpers";
 const DEFAULT_ZOOM = 15;
 const MAX_ZOOM = 20;
 const MAX_NATIVE_ZOOM = 19;
-const pathColors = [];
+
+const DEFAULT_WEIGHT = 3;
+
+const pathColors = new Map();
 
 const CityMap = props => {
   const [zoom, setZoom] = useState(DEFAULT_ZOOM);
   const { lat, lng, rad } = props.center;
-  const { lights, cars } = props;
+  const { lights = [], cars = [] } = props;
 
   // Similar to componentDidMount and componentDidUpdate:
   useEffect(() => {
-    if (pathColors.length < cars.length) {
-      const colorsToAdd = cars.length - pathColors.length;
-      for (let i = 0; i < colorsToAdd; ++i) {
-        pathColors.push(generateRandomColor());
+    if (pathColors.size < cars.length) {
+      for (let carsIter = pathColors.size; carsIter < cars.length; ++carsIter) {
+        const colorKey = cars[carsIter].id;
+        pathColors.set(colorKey, generateRandomColor());
       }
     }
   });
@@ -34,13 +38,20 @@ const CityMap = props => {
   }
 
   const lightMarkers = lights.map((light, ind) => <Light key={ind} location={light} />);
-  const carMarkers = cars.map((car, ind) => <Car key={ind} car={car}></Car>);
-  const carRoutes = cars.map((car, ind) => (
-    <Polyline key={ind} weight={car.isTestCar ? 4 : 3} color={pathColors[ind]} positions={car.route} />
-  ));
+  const carMarkers = cars.map(car => (car.isDeleted ? null : <Car key={car.id} car={car} />));
+  const carRoutes = cars.map((car, ind) =>
+    car.isDeleted ? null : (
+      <Polyline
+        key={ind}
+        weight={car.isTestCar ? DEFAULT_WEIGHT + 1 : DEFAULT_WEIGHT}
+        color={pathColors.get(car.id)}
+        positions={car.route}
+      />
+    )
+  );
 
   return (
-    <Map
+    <LeafletMap
       center={{ lat, lng }}
       zoom={zoom}
       preferCanvas={true}
@@ -63,7 +74,7 @@ const CityMap = props => {
         {carRoutes}
         {lightMarkers}
       </Circle>
-    </Map>
+    </LeafletMap>
   );
 };
 

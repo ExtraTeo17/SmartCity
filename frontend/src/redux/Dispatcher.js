@@ -1,5 +1,5 @@
 import { dispatch } from "./store";
-import { carUpdated, carCreated, lightLocationsUpdated } from "./actions";
+import { carUpdated, carCreated, lightLocationsUpdated, carKilled } from "./actions";
 import { batch } from "react-redux";
 
 const fps = 15;
@@ -28,5 +28,9 @@ export default {
 
   updateCar(car) {
     carUpdateQueue.push(carUpdated(car));
+  },
+
+  killCar(id) {
+    dispatch(carKilled(id));
   },
 };

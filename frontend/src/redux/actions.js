@@ -1,4 +1,4 @@
-import { CAR_UPDATED, CAR_CREATED, CENTER_UPDATED, LIGHT_LOCATIONS_UPDATED } from "./constants";
+import { CAR_KILLED, CAR_UPDATED, CAR_CREATED, CENTER_UPDATED, LIGHT_LOCATIONS_UPDATED } from "./constants";
 
 export /**
  * @param {} center
@@ -48,5 +48,12 @@ export const carUpdated = car => {
     payload: {
       car,
     },
+  };
+};
+
+export const carKilled = id => {
+  return {
+    type: CAR_KILLED,
+    payload: id,
   };
 };
