@@ -20,7 +20,7 @@ const message = (state = initialState, action) => {
     }
 
     case CAR_UPDATED: {
-      const { car } = action.payload;
+      const car = action.payload;
 
       var newCars = state.cars.map(c => {
         if (c.id == car.id && !c.isDeleted) {

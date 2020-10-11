@@ -43,14 +43,7 @@ export const carCreated = car => {
 /**
  * @param {{id:number; location:{lat:number; lng:number;}; }} car
  */
-export const carUpdated = car => {
-  return {
-    type: CAR_UPDATED,
-    payload: {
-      car,
-    },
-  };
-};
+export const carUpdated = createAction(CAR_UPDATED);
 
 export const carKilled = createAction(CAR_KILLED);
 
