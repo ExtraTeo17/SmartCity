@@ -76,7 +76,7 @@ class InjectorTests {
         eventBus.post("Test"); // Dead event
         eventBus.post(new StartSimulationEvent(0, 0));
         eventBus.post(new SimulationStartedEvent());
-        eventBus.post(new VehicleAgentCreatedEvent(1, null, false));
+        eventBus.post(new VehicleAgentCreatedEvent(1, null, null, false));
         eventBus.post(new VehicleAgentUpdatedEvent(1, null));
         eventBus.post(new SwitchLightsStartEvent(null));
         eventBus.post("Test"); // Dead event

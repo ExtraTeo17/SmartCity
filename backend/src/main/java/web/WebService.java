@@ -36,9 +36,10 @@ class WebService implements IWebService {
     }
 
     @Override
-    public void createCar(int id, IGeoPosition position, boolean isTestCar) {
+    public void createCar(int id, IGeoPosition position, List<? extends IGeoPosition> route, boolean isTestCar) {
         var location = Converter.convert(position);
-        var payload = new CreateCarInfo(id, location, isTestCar);
+        var routeLocations = route.stream().map(Converter::convert).toArray(Location[]::new);
+        var payload = new CreateCarInfo(id, location, routeLocations, isTestCar);
         webConnector.broadcastMessage(MessageType.CREATE_CAR_INFO, payload);
     }
 
