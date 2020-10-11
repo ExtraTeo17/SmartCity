@@ -5,7 +5,9 @@ import agents.PedestrianAgent;
 import agents.VehicleAgent;
 import agents.abstractions.IAgentsContainer;
 import agents.utilities.MessageParameter;
+import com.google.common.eventbus.EventBus;
 import com.google.inject.Inject;
+import events.web.VehicleAgentDeadEvent;
 import gui.MapWindow;
 import jade.core.Agent;
 import jade.core.behaviours.CyclicBehaviour;
@@ -24,12 +26,15 @@ public class SmartCityAgent extends Agent {
 
     private final MapWindow window;
     private final IAgentsContainer agentsContainer;
+    private final EventBus eventBus;
 
     @Inject
     SmartCityAgent(IAgentsContainer agentsContainer,
-                   MapWindow window) {
+                   MapWindow window,
+                   EventBus eventBus) {
         this.agentsContainer = agentsContainer;
         this.window = window;
+        this.eventBus = eventBus;
     }
 
     @Override
@@ -100,7 +105,9 @@ public class SmartCityAgent extends Agent {
                 setResultTime(testVehicle.getStart(), testVehicle.getEnd());
             }
 
-            agentsContainer.remove(agent);
+            if (agentsContainer.remove(agent)) {
+                eventBus.post(new VehicleAgentDeadEvent(agent.getId()));
+            }
         }
     }
 

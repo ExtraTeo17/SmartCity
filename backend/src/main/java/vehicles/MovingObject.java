@@ -8,7 +8,6 @@ import smartcity.TimeProvider;
 
 import java.util.List;
 
-// TODO: Interface or move some functionality here
 // TODO: Change name to IVehicle/AbstractVehicle
 public abstract class MovingObject {
     final int speed;

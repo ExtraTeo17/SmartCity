@@ -5,6 +5,7 @@ import routing.core.IGeoPosition;
 import web.abstractions.IWebService;
 import web.message.MessageType;
 import web.message.payloads.infos.CreateCarInfo;
+import web.message.payloads.infos.KillCarInfo;
 import web.message.payloads.infos.UpdateCarInfo;
 import web.message.payloads.models.Location;
 import web.message.payloads.responses.PrepareResponse;
@@ -26,6 +27,7 @@ class WebService implements IWebService {
         webConnector.start();
     }
 
+    @Override
     public void prepareSimulation(List<? extends IGeoPosition> positions) {
         var locations = positions.stream().map(Converter::convert)
                 .toArray(Location[]::new);
@@ -51,5 +53,11 @@ class WebService implements IWebService {
     public void startSimulation(int timeScale) {
         var payload = new StartResponse(timeScale);
         webConnector.broadcastMessage(MessageType.START_SIMULATION_RESPONSE, payload);
+    }
+
+    @Override
+    public void killCar(int id) {
+        var payload = new KillCarInfo(id);
+        webConnector.broadcastMessage(MessageType.KILL_CAR_INFO, payload);
     }
 }

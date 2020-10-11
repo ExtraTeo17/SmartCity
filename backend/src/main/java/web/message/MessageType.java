@@ -9,7 +9,8 @@ public enum MessageType {
     START_SIMULATION_REQUEST(3),
     START_SIMULATION_RESPONSE(4),
     CREATE_CAR_INFO(5),
-    UPDATE_CAR_INFO(6);
+    UPDATE_CAR_INFO(6),
+    KILL_CAR_INFO(7);
 
     private final int code;
 

@@ -13,4 +13,6 @@ public interface IWebService extends IStartable {
     void updateCar(int id, IGeoPosition position);
 
     void startSimulation(int timeScale);
+
+    void killCar(int id);
 }
