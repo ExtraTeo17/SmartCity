@@ -1,6 +1,6 @@
 package routing.abstractions;
 
-import routing.RouteNode;
+import routing.nodes.RouteNode;
 
 import java.util.List;
 

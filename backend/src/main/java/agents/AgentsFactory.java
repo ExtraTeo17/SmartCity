@@ -9,9 +9,9 @@ import org.w3c.dom.Node;
 import osmproxy.buses.Timetable;
 import osmproxy.elements.OSMNode;
 import osmproxy.elements.OSMStation;
-import routing.RouteNode;
-import routing.StationNode;
 import routing.abstractions.IRouteTransformer;
+import routing.nodes.RouteNode;
+import routing.nodes.StationNode;
 import smartcity.ITimeProvider;
 import smartcity.lights.abstractions.ICrossroadFactory;
 import smartcity.stations.StationStrategy;
@@ -44,7 +44,7 @@ class AgentsFactory implements IAgentsFactory {
     @Override
     public VehicleAgent create(List<RouteNode> route, boolean testCar) {
         var uniformRoute = routeTransformer.uniformRoute(route);
-        logger.debug("DisplayRoute size: " + route.size() + ", routeSize: " + uniformRoute.size());
+        logger.trace("DisplayRoute size: " + route.size() + ", routeSize: " + uniformRoute.size());
         var car = new Car(route, uniformRoute);
         if (testCar) {
             car = new TestCar(car, timeProvider);
@@ -68,7 +68,7 @@ class AgentsFactory implements IAgentsFactory {
     @Override
     public BusAgent create(List<RouteNode> route, Timetable timetable, String busLine, String brigadeNr) {
         var uniformRoute = routeTransformer.uniformRoute(route);
-        logger.debug("DisplayRoute size: " + route.size() + ", routeSize: " + uniformRoute.size());
+        logger.trace("DisplayRoute size: " + route.size() + ", routeSize: " + uniformRoute.size());
         var bus = new Bus(timeProvider, route, uniformRoute,
                 timetable, busLine, brigadeNr);
         return new BusAgent(idGenerator.get(BusAgent.class), bus, timeProvider, eventBus);

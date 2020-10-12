@@ -1,10 +1,10 @@
 package vehicles;
 
 import com.google.common.annotations.VisibleForTesting;
-import routing.LightManagerNode;
-import routing.RouteNode;
+import routing.nodes.LightManagerNode;
+import routing.nodes.RouteNode;
 import routing.RoutingConstants;
-import routing.StationNode;
+import routing.nodes.StationNode;
 
 import java.util.ArrayList;
 import java.util.List;

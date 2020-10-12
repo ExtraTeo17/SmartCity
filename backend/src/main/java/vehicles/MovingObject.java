@@ -1,8 +1,8 @@
 package vehicles;
 
 
-import routing.LightManagerNode;
-import routing.RouteNode;
+import routing.nodes.LightManagerNode;
+import routing.nodes.RouteNode;
 import routing.core.IGeoPosition;
 import smartcity.TimeProvider;
 

@@ -1,4 +1,4 @@
-package routing;
+package routing.nodes;
 
 import com.google.common.primitives.Longs;
 import routing.core.IGeoPosition;

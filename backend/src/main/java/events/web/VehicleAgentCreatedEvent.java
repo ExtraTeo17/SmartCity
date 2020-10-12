@@ -1,6 +1,6 @@
 package events.web;
 
-import routing.RouteNode;
+import routing.nodes.RouteNode;
 import routing.core.IGeoPosition;
 
 import java.util.List;

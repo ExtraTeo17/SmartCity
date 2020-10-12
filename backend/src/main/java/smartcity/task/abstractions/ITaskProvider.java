@@ -1,6 +1,6 @@
 package smartcity.task.abstractions;
 
-import routing.StationNode;
+import routing.nodes.StationNode;
 import routing.core.IGeoPosition;
 import smartcity.lights.core.Light;
 

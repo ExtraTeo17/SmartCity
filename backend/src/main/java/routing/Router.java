@@ -5,15 +5,18 @@ import com.google.inject.Inject;
 import org.javatuples.Pair;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import osmproxy.abstractions.ICacheWrapper;
 import osmproxy.abstractions.IMapAccessManager;
 import osmproxy.elements.OSMLight;
 import osmproxy.elements.OSMWay;
 import osmproxy.elements.OSMWay.RouteOrientation;
 import osmproxy.elements.OSMWaypoint;
+import routing.abstractions.INodesContainer;
 import routing.abstractions.IRouteGenerator;
 import routing.abstractions.IRouteTransformer;
 import routing.core.IGeoPosition;
-import utilities.FileWrapper;
+import routing.nodes.RouteNode;
+import routing.nodes.StationNode;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -26,12 +29,16 @@ final class Router implements
     private static final Logger logger = LoggerFactory.getLogger(Router.class);
 
     private final IMapAccessManager mapAccessManager;
-    private final INodesContainer INodesContainer;
+    private final INodesContainer nodesContainer;
+    private final ICacheWrapper cacheWrapper;
 
     @Inject
-    public Router(IMapAccessManager mapAccessManager, INodesContainer INodesContainer) {
+    public Router(IMapAccessManager mapAccessManager,
+                  INodesContainer nodesContainer,
+                  ICacheWrapper cacheWrapper) {
         this.mapAccessManager = mapAccessManager;
-        this.INodesContainer = INodesContainer;
+        this.nodesContainer = nodesContainer;
+        this.cacheWrapper = cacheWrapper;
     }
 
     @Override
@@ -104,7 +111,7 @@ final class Router implements
         long nodeRefId = Long.parseLong(waypoint.getOsmNodeRef());
         // TODO: Is it needed?
         if (routeInfo.remove(nodeRefId)) {
-            return INodesContainer.getLightManagerNode(nodeRefId);
+            return nodesContainer.getLightManagerNode(nodeRefId);
         }
 
         return new RouteNode(waypoint.getLat(), waypoint.getLng());
@@ -113,10 +120,8 @@ final class Router implements
     @Override
     public List<RouteNode> generateRouteInfoForBuses(List<OSMWay> route,
                                                      List<StationNode> stationNodes) {
-        String cacheFileName = getRouteFileName(route, stationNodes);
-        var data = FileWrapper.<ArrayList<RouteNode>>getFromCache(cacheFileName);
-        if (data != null) {
-            logger.info("Successfully retrieved bus route data from cache.");
+        var data = cacheWrapper.getBusRoute(route, stationNodes);
+        if (data.size() > 0) {
             return data;
         }
 
@@ -126,27 +131,9 @@ final class Router implements
         managersNodes.addAll(stationNodes);
 
         data = getRouteWithAdditionalNodes(busRouteData.route, managersNodes);
-        FileWrapper.cacheToFile(data, cacheFileName);
+        cacheWrapper.cacheData(route, stationNodes, data);
 
         return data;
-    }
-
-    private static String getRouteFileName(List<OSMWay> route, List<StationNode> stationNodes) {
-        String routeFirst = "";
-        String routeLast = "";
-        if (route.size() > 0) {
-            routeFirst = String.valueOf(route.get(0).getId());
-            routeLast = String.valueOf(route.get(route.size() - 1).getId());
-        }
-
-        String stationFirst = "";
-        String stationLast = "";
-        if (stationNodes.size() > 0) {
-            stationFirst = String.valueOf(stationNodes.get(0).getOsmId());
-            stationLast = String.valueOf(stationNodes.get(stationNodes.size() - 1).getOsmId());
-        }
-
-        return "r_" + routeFirst + "_" + routeLast + "_" + stationFirst + "_" + stationLast;
     }
 
     // TODO: In some cases distance is 0 -> dx|dy is NaN -> same nodes?
@@ -200,7 +187,7 @@ final class Router implements
         List<RouteNode> nodes = new ArrayList<>();
         long lastMangerId = -1;
         for (OSMLight light : lights) {
-            var nodeToAdd = INodesContainer.getLightManagerNode(light.getAdherentWayId(), light.getId());
+            var nodeToAdd = nodesContainer.getLightManagerNode(light.getAdherentWayId(), light.getId());
             if (nodeToAdd != null) {
                 var nodeManagerId = nodeToAdd.getLightManagerId();
                 if (nodeManagerId != lastMangerId) {

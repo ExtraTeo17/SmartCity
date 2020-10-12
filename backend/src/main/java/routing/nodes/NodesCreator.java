@@ -1,10 +1,11 @@
-package routing;
+package routing.nodes;
 
 import com.google.common.eventbus.Subscribe;
 import com.google.inject.Inject;
 import events.LightManagersReadyEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import routing.abstractions.INodesContainer;
 
 public class NodesCreator {
     private final static Logger logger = LoggerFactory.getLogger(NodesCreator.class);

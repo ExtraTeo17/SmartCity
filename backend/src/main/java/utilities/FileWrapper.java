@@ -83,7 +83,7 @@ public class FileWrapper {
                 data = (T) objectStream.readObject();
             }
         } catch (Exception e) {
-            logger.warn("Could not get file from cache: " + path, e);
+            logger.warn("Could not get file from cache: " + path + ", msg: " + e.getMessage());
             if (file != null && file.exists()) {
                 if (file.delete()) {
                     logger.info("Deleted: " + file.getPath());

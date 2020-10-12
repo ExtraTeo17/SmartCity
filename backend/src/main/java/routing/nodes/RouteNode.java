@@ -1,4 +1,4 @@
-package routing;
+package routing.nodes;
 
 
 import routing.core.IGeoPosition;

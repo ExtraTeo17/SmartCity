@@ -34,11 +34,10 @@ public class BusApiManager implements IBusApiManager {
         var overpassInfo = mapAccessManager.getNodesDocument(query);
 
         ConditionalExecutor.debug(() -> {
-            overpassInfo.ifPresent(info -> {
-                logger.info("Writing bus-data to: " + FileWrapper.DEFAULT_OUTPUT_PATH_XML);
-                FileWrapper.write(info);
-            });
-        });
+            logger.info("Writing bus-data to: " + FileWrapper.DEFAULT_OUTPUT_PATH_XML);
+            //noinspection OptionalGetWithoutIsPresent
+            FileWrapper.write(overpassInfo.get());
+        }, overpassInfo.isPresent());
 
         return overpassInfo;
     }
