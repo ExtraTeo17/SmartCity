@@ -27,7 +27,7 @@ import routing.core.IZone;
 import smartcity.SimulationState;
 import smartcity.TimeProvider;
 import smartcity.config.ConfigContainer;
-import utilities.FileWriterWrapper;
+import utilities.FileWrapper;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -106,7 +106,7 @@ public class AgentsCreator {
     private boolean prepareStationsAndBuses() {
         BusPreparationData busData;
         long time = System.nanoTime();
-        var cachedData = FileWriterWrapper.<BusPreparationData>getFromCache(getBusDataPath(configContainer.getZone()));
+        var cachedData = FileWrapper.<BusPreparationData>getFromCache(getBusDataFileName(configContainer.getZone()));
         if (cachedData != null) {
             logger.info("Successfully retrieved bus data from cache. Took: " + TimeProvider.getTimeInMs(time) + "ms\n");
             busData = cachedData;
@@ -138,15 +138,15 @@ public class AgentsCreator {
         return true;
     }
 
-    private static String getBusDataPath(IZone zone) {
+    private static String getBusDataFileName(IZone zone) {
         var center = zone.getCenter();
         return "zone_" + zone.getRadius() + "_" + center.getLng() + "_" + center.getLat();
     }
 
     private void cacheData(BusPreparationData data) {
         var zone = configContainer.getZone();
-        String path = getBusDataPath(zone);
-        FileWriterWrapper.cacheToFile(data, path);
+        String path = getBusDataFileName(zone);
+        FileWrapper.cacheToFile(data, path);
     }
 
     private List<StationNode> prepareStations(Collection<OSMStation> stationPositions) {

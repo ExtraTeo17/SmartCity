@@ -13,6 +13,7 @@ import osmproxy.elements.OSMWaypoint;
 import routing.abstractions.IRouteGenerator;
 import routing.abstractions.IRouteTransformer;
 import routing.core.IGeoPosition;
+import utilities.FileWrapper;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -112,11 +113,40 @@ final class Router implements
     @Override
     public List<RouteNode> generateRouteInfoForBuses(List<OSMWay> route,
                                                      List<StationNode> stationNodes) {
+        String cacheFileName = getRouteFileName(route, stationNodes);
+        var data = FileWrapper.<ArrayList<RouteNode>>getFromCache(cacheFileName);
+        if (data != null) {
+            logger.info("Successfully retrieved bus route data from cache.");
+            return data;
+        }
+
         var busRouteData = generateBusRoute(route);
         List<OSMLight> lightsOnRoute = mapAccessManager.getOsmLights(busRouteData.waysIds);
         List<RouteNode> managersNodes = getManagersNodesForLights(lightsOnRoute);
         managersNodes.addAll(stationNodes);
-        return getRouteWithAdditionalNodes(busRouteData.route, managersNodes);
+
+        data = getRouteWithAdditionalNodes(busRouteData.route, managersNodes);
+        FileWrapper.cacheToFile(data, cacheFileName);
+
+        return data;
+    }
+
+    private static String getRouteFileName(List<OSMWay> route, List<StationNode> stationNodes) {
+        String routeFirst = "";
+        String routeLast = "";
+        if (route.size() > 0) {
+            routeFirst = String.valueOf(route.get(0).getId());
+            routeLast = String.valueOf(route.get(route.size() - 1).getId());
+        }
+
+        String stationFirst = "";
+        String stationLast = "";
+        if (stationNodes.size() > 0) {
+            stationFirst = String.valueOf(stationNodes.get(0).getOsmId());
+            stationLast = String.valueOf(stationNodes.get(stationNodes.size() - 1).getOsmId());
+        }
+
+        return "r_" + routeFirst + "_" + routeLast + "_" + stationFirst + "_" + stationLast;
     }
 
     // TODO: In some cases distance is 0 -> dx|dy is NaN -> same nodes?
@@ -182,11 +212,12 @@ final class Router implements
         return nodes;
     }
 
-    private static List<RouteNode> getRouteWithAdditionalNodes(List<RouteNode> route, List<RouteNode> additionalNodes) {
+    private static <T extends List<RouteNode>> T getRouteWithAdditionalNodes(T route, List<RouteNode> additionalNodes) {
         for (RouteNode node : additionalNodes) {
             int index = findPositionOfElementOnRoute(route, node);
             route.add(index, node);
         }
+
         return route;
     }
 
@@ -217,8 +248,8 @@ final class Router implements
     }
 
     private static BusRouteData generateBusRoute(List<OSMWay> route) {
-        List<Long> osmWaysIds = new ArrayList<>();
-        List<RouteNode> routeNodes = new ArrayList<>();
+        var osmWaysIds = new ArrayList<Long>();
+        var routeNodes = new ArrayList<RouteNode>();
         for (OSMWay way : route) {
             osmWaysIds.add(way.getId());
             var nodes = way.getWaypoints().stream()
@@ -229,10 +260,10 @@ final class Router implements
     }
 
     private static class BusRouteData {
-        private final List<Long> waysIds;
-        private final List<RouteNode> route;
+        private final ArrayList<Long> waysIds;
+        private final ArrayList<RouteNode> route;
 
-        private BusRouteData(List<Long> waysIds, List<RouteNode> route) {
+        private BusRouteData(ArrayList<Long> waysIds, ArrayList<RouteNode> route) {
             this.waysIds = waysIds;
             this.route = route;
         }
