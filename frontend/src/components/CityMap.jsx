@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Circle, LayersControl, Map as LeafletMap, Marker, Polyline, Popup, TileLayer } from "react-leaflet";
+import { Circle, Map as LeafletMap, Marker, Polyline, Popup, TileLayer } from "react-leaflet";
 import { connect } from "react-redux";
 import { dispatch } from "../redux/store";
 import { centerUpdated } from "../redux/actions";
@@ -8,7 +8,6 @@ import "../styles/CityMap.css";
 import Car from "./Markers/Car";
 import { generateRandomColor } from "../utils/helpers";
 import LightsLayer from "./Layers/LightsLayer";
-import { FeatureGroup, LayerGroup } from "leaflet";
 import StationsLayer from "./Layers/StationsLayer";
 
 const DEFAULT_ZOOM = 15;
