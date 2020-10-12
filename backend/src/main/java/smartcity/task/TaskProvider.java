@@ -10,6 +10,7 @@ import com.google.common.collect.Table;
 import com.google.common.eventbus.EventBus;
 import com.google.inject.Inject;
 import events.web.VehicleAgentCreatedEvent;
+import jade.wrapper.AgentState;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import routing.abstractions.IRouteGenerator;
@@ -111,11 +112,17 @@ public class TaskProvider implements ITaskProvider {
         };
     }
 
+    @SuppressWarnings("FeatureEnvy")
     @Override
     public Runnable getScheduleBusControlTask() {
         return () -> {
             try {
-                agentsContainer.removeIf(BusAgent.class, BusAgent::runBasedOnTimetable);
+                agentsContainer.forEach(BusAgent.class, (busAgent) -> {
+                    if (busAgent.shouldStart() && busAgent.getAgentState().getValue() != AgentState.cAGENT_STATE_ACTIVE) {
+                        agentsContainer.tryAccept(busAgent);
+                    }
+                    busAgent.runBasedOnTimetable();
+                });
             } catch (Exception e) {
                 logger.warn("Error in bus control task", e);
             }

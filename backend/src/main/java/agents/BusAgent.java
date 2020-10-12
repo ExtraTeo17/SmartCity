@@ -304,11 +304,15 @@ public class BusAgent extends AbstractAgent {
             }
         }
 
-        if (bus.shouldStart()) {
+        if (shouldStart()) {
             print("Running!");
             start();
         }
 
         return false;
+    }
+
+    public boolean shouldStart(){
+        return bus.shouldStart();
     }
 }

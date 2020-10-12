@@ -27,11 +27,16 @@ class HashAgentsContainer implements IAgentsContainer {
     }
 
     @Override
-    public boolean tryAdd(@NotNull AbstractAgent agent) {
+    public boolean tryAdd(@NotNull AbstractAgent agent, boolean shouldTryAccept) {
         var type = agent.getClass();
         var collection = getOrThrow(type);
 
-        if (tryAccept(agent)) {
+        if (shouldTryAccept) {
+            if (tryAccept(agent)) {
+                return collection.putIfAbsent(agent.getId(), agent) == null;
+            }
+        }
+        else {
             return collection.putIfAbsent(agent.getId(), agent) == null;
         }
 

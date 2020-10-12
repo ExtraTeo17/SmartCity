@@ -182,7 +182,7 @@ public class AgentsCreator {
                 var brigadeNr = brigade.brigadeId;
                 for (Timetable timetable : brigade) {
                     BusAgent agent = factory.create(route, timetable, busLine, brigadeNr);
-                    boolean result = agentsContainer.tryAdd(agent);
+                    boolean result = agentsContainer.tryAdd(agent, false);
                     if (result) {
                         ++busCount;
                     }
