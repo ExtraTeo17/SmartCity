@@ -6,7 +6,7 @@ const Car = props => {
   const { id, location, isTestCar } = props.car;
 
   return (
-    <Marker position={location} opacity={0.95} icon={isTestCar ? testCarIcon : carIcon} zIndexOffset={20}>
+    <Marker position={location} icon={isTestCar ? testCarIcon : carIcon} zIndexOffset={20}>
       <Popup>I am a car-{id}!</Popup>
     </Marker>
   );

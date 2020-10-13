@@ -125,11 +125,11 @@ final class Router implements
     public List<RouteNode> uniformRoute(List<RouteNode> route) {
         List<RouteNode> newRoute = new ArrayList<>();
         for (int i = 0; i < route.size() - 1; ++i) {
-            RouteNode routeA = route.get(i);
-            RouteNode routeB = route.get(i + 1);
+            RouteNode nodeA = route.get(i);
+            RouteNode nodeB = route.get(i + 1);
 
-            double x = routeB.getLng() - routeA.getLng();
-            double y = routeB.getLat() - routeA.getLat();
+            double x = nodeB.getLng() - nodeA.getLng();
+            double y = nodeB.getLat() - nodeA.getLat();
 
             double distance = RoutingConstants.METERS_PER_DEGREE * Math.sqrt(x * x + y * y);
             if (distance == 0) {
@@ -139,9 +139,9 @@ final class Router implements
             double dx = x / distance;
             double dy = y / distance;
 
-            double lon = routeA.getLng();
-            double lat = routeA.getLat();
-            newRoute.add(routeA);
+            double lon = nodeA.getLng();
+            double lat = nodeA.getLat();
+            newRoute.add(nodeA);
             for (int p = RoutingConstants.STEP_SIZE_METERS; p < distance; p += RoutingConstants.STEP_SIZE_METERS) {
                 lon = lon + RoutingConstants.STEP_SIZE_METERS * dx;
                 lat = lat + RoutingConstants.STEP_SIZE_METERS * dy;

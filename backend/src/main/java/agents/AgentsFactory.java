@@ -3,6 +3,8 @@ package agents;
 import agents.abstractions.IAgentsFactory;
 import com.google.common.eventbus.EventBus;
 import com.google.inject.Inject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.w3c.dom.Node;
 import osmproxy.buses.Timetable;
 import osmproxy.elements.OSMNode;
@@ -18,6 +20,8 @@ import vehicles.*;
 import java.util.List;
 
 class AgentsFactory implements IAgentsFactory {
+    private static final Logger logger = LoggerFactory.getLogger(AgentsFactory.class);
+
     private final IdGenerator idGenerator;
     private final ITimeProvider timeProvider;
     private final IRouteTransformer routeTransformer;
@@ -40,7 +44,8 @@ class AgentsFactory implements IAgentsFactory {
     @Override
     public VehicleAgent create(List<RouteNode> route, boolean testCar) {
         var uniformRoute = routeTransformer.uniformRoute(route);
-        var car = new MovingObjectImpl(route, uniformRoute);
+        logger.debug("DisplayRoute size: " + route.size() + ", routeSize: " + uniformRoute.size());
+        var car = new Car(route, uniformRoute);
         if (testCar) {
             car = new TestCar(car, timeProvider);
         }
@@ -63,6 +68,7 @@ class AgentsFactory implements IAgentsFactory {
     @Override
     public BusAgent create(List<RouteNode> route, Timetable timetable, String busLine, String brigadeNr) {
         var uniformRoute = routeTransformer.uniformRoute(route);
+        logger.debug("DisplayRoute size: " + route.size() + ", routeSize: " + uniformRoute.size());
         var bus = new Bus(timeProvider, route, uniformRoute,
                 timetable, busLine, brigadeNr);
         return new BusAgent(idGenerator.get(BusAgent.class), bus, timeProvider, eventBus);
