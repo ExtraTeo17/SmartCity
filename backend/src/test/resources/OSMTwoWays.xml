@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?><osm generator="Overpass API 0.7.56.3 eb200aeb" version="0.6">
+<note>The data included in this document is from www.openstreetmap.org. The data is made available under ODbL.</note>
+<meta osm_base="2020-08-08T21:14:03Z"/>
+
+  <way id="29115624">
+    <bounds maxlat="52.2051274" maxlon="20.8632894" minlat="52.1997660" minlon="20.8623364"/>
+    <nd lat="52.2051274" lon="20.8623775" ref="320278911"/>
+    <nd lat="52.2031152" lon="20.8630278" ref="320278915"/>
+    <nd lat="52.2022052" lon="20.8632697" ref="320278919"/>
+    <nd lat="52.2020599" lon="20.8632894" ref="320278921"/>
+    <nd lat="52.2019389" lon="20.8632796" ref="320278926"/>
+    <nd lat="52.2003792" lon="20.8626212" ref="320278936"/>
+    <nd lat="52.1997660" lon="20.8623364" ref="320278928"/>
+    <tag k="highway" v="residential"/>
+    <tag k="name" v="Boles?awa ?mia?ego"/>
+    <tag k="surface" v="asphalt"/>
+  </way>
+  <node id="320278911"/>
+  <node id="320278915"/>
+  <node id="320278919"/>
+  <node id="320278921"/>
+  <node id="320278926"/>
+  <node id="320278928">
+    <tag k="noexit" v="yes"/>
+  </node>
+  <node id="320278936"/>
+  <way id="124708077">
+    <bounds maxlat="52.2035159" maxlon="20.8662641" minlat="52.2027256" minlon="20.8598467"/>
+    <nd lat="52.2027256" lon="20.8598467" ref="320278637"/>
+    <nd lat="52.2029161" lon="20.8614024" ref="320278952"/>
+    <nd lat="52.2030836" lon="20.8627699" ref="3075614502"/>
+    <nd lat="52.2031152" lon="20.8630278" ref="320278915"/>
+    <nd lat="52.2033088" lon="20.8646083" ref="320278631"/>
+    <nd lat="52.2033541" lon="20.8649786" ref="3075614509"/>
+    <nd lat="52.2034143" lon="20.8654697" ref="320278624"/>
+    <nd lat="52.2035159" lon="20.8662641" ref="777371420"/>
+    <tag k="highway" v="residential"/>
+    <tag k="maxspeed" v="50"/>
+    <tag k="maxspeed:conditional" v="60 @ (23:00-05:00)"/>
+    <tag k="name" v="Kazimierza Jagiello?czyka"/>
+    <tag k="surface" v="asphalt"/>
+  </way>
+  <node id="320278624"/>
+  <node id="320278631"/>
+  <node id="320278637"/>
+  <node id="320278915"/>
+  <node id="320278952"/>
+  <node id="777371420"/>
+  <node id="3075614502">
+    <tag k="bus" v="yes"/>
+    <tag k="name" v="Boles?awa ?mia?ego 02"/>
+    <tag k="network" v="ZTM Warszawa"/>
+    <tag k="public_transport" v="stop_position"/>
+    <tag k="ref" v="412402"/>
+  </node>
+  <node id="3075614509">
+    <tag k="bus" v="yes"/>
+    <tag k="name" v="Przemys?awa II 02"/>
+    <tag k="network" v="ZTM Warszawa"/>
+    <tag k="public_transport" v="stop_position"/>
+    <tag k="ref" v="411502"/>
+  </node>
+
+</osm>
