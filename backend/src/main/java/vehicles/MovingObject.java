@@ -45,7 +45,7 @@ public abstract class MovingObject {
 
     public abstract String getVehicleType();
 
-    public abstract LightManagerNode getNextTrafficLight();
+    public abstract LightManagerNode switchToNextTrafficLight();
 
     public abstract LightManagerNode getCurrentTrafficLightNode();
 

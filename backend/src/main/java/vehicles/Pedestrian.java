@@ -30,7 +30,7 @@ public class Pedestrian extends MovingObject {
                       String preferredBusLine,
                       StationNode startStation,
                       StationNode finishStation) {
-        super(10, createRoute(startStation,uniformRouteToStation, finishStation, uniformRouteFromStation));
+        super(10, createRoute(startStation, uniformRouteToStation, finishStation, uniformRouteFromStation));
         this.displayRouteBeforeBus = routeToStation;
         this.routeBeforeBus = uniformRouteToStation;
         this.routeBeforeBus.add(startStation);
@@ -102,7 +102,7 @@ public class Pedestrian extends MovingObject {
     }
 
     @Override
-    public LightManagerNode getNextTrafficLight() {
+    public LightManagerNode switchToNextTrafficLight() {
         for (int i = moveIndex + 1; i < route.size(); i++) {
             if (route.get(i) instanceof LightManagerNode) {
                 closestLightIndex = i;

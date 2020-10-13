@@ -37,14 +37,8 @@ public class MovingObjectImpl extends MovingObject {
         return VehicleType.REGULAR_CAR.toString();
     }
 
-
-    // TODO: Check if behaviour is correct and add test
     @Override
-    public LightManagerNode getNextTrafficLight() {
-        if (closestLightIndex < route.size() && moveIndex <= closestLightIndex) {
-            return (LightManagerNode) route.get(closestLightIndex);
-        }
-
+    public LightManagerNode switchToNextTrafficLight() {
         for (int i = moveIndex + 1; i < route.size(); ++i) {
             var node = route.get(i);
             if (node instanceof LightManagerNode) {

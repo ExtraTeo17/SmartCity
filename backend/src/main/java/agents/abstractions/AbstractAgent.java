@@ -75,7 +75,7 @@ public abstract class AbstractAgent extends Agent {
     // TODO: Pass only LightManager here, remove movingObject and pass additional parameters
     protected void informLightManager(MovingObject movingObject) {
         // finds next traffic light and announces his arrival
-        LightManagerNode nextManager = movingObject.getNextTrafficLight();
+        LightManagerNode nextManager = movingObject.switchToNextTrafficLight();
         if (nextManager != null) {
             ACLMessage msg = prepareMessageForManager(nextManager, movingObject);
             send(msg);

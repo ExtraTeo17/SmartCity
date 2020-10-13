@@ -46,7 +46,7 @@ public class VehicleAgent extends AbstractAgent {
                     switch (vehicle.getState()) {
                         case MOVING:
                             vehicle.setState(DrivingState.WAITING_AT_LIGHT);
-                            LightManagerNode light = vehicle.getNextTrafficLight();
+                            LightManagerNode light = vehicle.switchToNextTrafficLight();
                             ACLMessage msg = createMessage(ACLMessage.REQUEST_WHEN, LightManagerAgent.name,
                                     light.getLightManagerId());
                             Properties properties = createProperties(MessageParameter.VEHICLE);
