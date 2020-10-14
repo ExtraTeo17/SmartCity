@@ -10,10 +10,10 @@ import jade.core.behaviours.TickerBehaviour;
 import jade.lang.acl.ACLMessage;
 import jade.util.leap.Properties;
 import jade.wrapper.AgentState;
-import routing.LightManagerNode;
-import routing.RouteNode;
 import routing.RoutingConstants;
-import routing.StationNode;
+import routing.nodes.LightManagerNode;
+import routing.nodes.RouteNode;
+import routing.nodes.StationNode;
 import smartcity.ITimeProvider;
 import smartcity.SmartCityAgent;
 import utilities.ConditionalExecutor;
@@ -298,14 +298,14 @@ public class BusAgent extends AbstractAgent {
     public boolean runBasedOnTimetable() {
         var state = this.getAgentState().getValue();
         if (state != AgentState.cAGENT_STATE_INITIATED) {
-            print("I am not in initiated state. State: " + this.getAgentState().getName());
             if (state == AgentState.cAGENT_STATE_ACTIVE && bus.isAtDestination()) {
+                print("Stopping!");
                 return true;
             }
         }
 
         if (bus.shouldStart()) {
-            logger.debug("Running!()");
+            print("Running!");
             start();
         }
 

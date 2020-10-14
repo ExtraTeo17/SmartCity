@@ -1,7 +1,8 @@
-package routing;
+package routing.nodes;
 
 import com.google.common.collect.HashBasedTable;
 import com.google.common.collect.Table;
+import routing.abstractions.INodesContainer;
 
 import javax.annotation.Nullable;
 import java.util.HashMap;

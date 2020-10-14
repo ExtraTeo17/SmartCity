@@ -1,15 +1,16 @@
 import { dispatch } from "./store";
-import { carUpdated, carCreated, lightLocationsUpdated, carKilled } from "./actions";
+import { carUpdated, carCreated, simulationPrepared, carKilled, lightsSwitched } from "./actions";
 import { batch } from "react-redux";
 
 const fps = 15;
 let timeScale = 1;
 let timer;
-let carUpdateQueue = [];
+let carUpdateQueue = new Map();
+let switchLightsQueue = new Map();
 
 export default {
-  prepareSimulation(lightLocations) {
-    dispatch(lightLocationsUpdated(lightLocations));
+  prepareSimulation(lights, stations) {
+    dispatch(simulationPrepared({ lights, stations }));
   },
 
   startSimulation(newTimeScale) {
@@ -17,8 +18,9 @@ export default {
     timer = setInterval(() => {
       batch(() => {
         carUpdateQueue.forEach(action => dispatch(action));
+        switchLightsQueue.forEach(action => dispatch(action));
       });
-      carUpdateQueue = [];
+      switchLightsQueue.clear();
     }, 1000 / fps);
   },
 
@@ -27,10 +29,19 @@ export default {
   },
 
   updateCar(car) {
-    carUpdateQueue.push(carUpdated(car));
+    carUpdateQueue.set(car.id, carUpdated(car));
   },
 
   killCar(id) {
     dispatch(carKilled(id));
+  },
+
+  switchLights(id) {
+    // WARN: May cause unwanted behaviour
+    if (switchLightsQueue.has(id)) {
+      switchLightsQueue.delete(id);
+    } else {
+      switchLightsQueue.set(id, lightsSwitched(id));
+    }
   },
 };

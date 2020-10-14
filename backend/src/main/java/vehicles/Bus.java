@@ -3,10 +3,10 @@ package vehicles;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import osmproxy.buses.Timetable;
-import routing.LightManagerNode;
-import routing.RouteNode;
 import routing.RoutingConstants;
-import routing.StationNode;
+import routing.nodes.LightManagerNode;
+import routing.nodes.RouteNode;
+import routing.nodes.StationNode;
 import smartcity.ITimeProvider;
 
 import java.time.LocalDateTime;

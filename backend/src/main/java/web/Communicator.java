@@ -1,18 +1,13 @@
 package web;
+
 import com.google.common.eventbus.Subscribe;
 import com.google.inject.Inject;
-import events.LightManagersReadyEvent;
-import events.web.SimulationStartedEvent;
-import events.web.VehicleAgentCreatedEvent;
-import events.web.VehicleAgentDeadEvent;
-import events.web.VehicleAgentUpdatedEvent;
+import events.web.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import smartcity.ITimeProvider;
 import smartcity.TimeProvider;
 import web.abstractions.IWebService;
-
-import java.util.stream.Collectors;
 
 class Communicator {
     private static final Logger logger = LoggerFactory.getLogger(Communicator.class);
@@ -27,15 +22,10 @@ class Communicator {
         this.timeProvider = timeProvider;
     }
 
-
-    // TODO: Should probably be changed to SimulationPreparedEvent
     @Subscribe
-    public void handle(LightManagersReadyEvent e) {
-        onHandle(e);
-        var positions = e.lightManagers.stream()
-                .flatMap(man -> man.getLights().stream())
-                .collect(Collectors.toList());
-        webService.prepareSimulation(positions);
+    public void handle(SimulationPreparedEvent e) {
+        onHandle(e, "Lights: " + e.lights.size() + ", stations: " + e.stations.size());
+        webService.prepareSimulation(e.lights, e.stations);
     }
 
     @Subscribe
@@ -54,14 +44,22 @@ class Communicator {
         webService.updateCar(e.agentId, e.agentPosition);
     }
 
+    @Subscribe
+    public void handle(SwitchLightsEvent e) {
+        webService.updateLights(e.osmLightId);
+    }
 
     @Subscribe
-    public void handle(VehicleAgentDeadEvent e){
+    public void handle(VehicleAgentDeadEvent e) {
         onHandle(e);
         webService.killCar(e.id);
     }
 
     private void onHandle(Object obj) {
         logger.info("Handling " + obj.getClass().getSimpleName());
+    }
+
+    private void onHandle(Object obj, String message) {
+        logger.info("Handling " + obj.getClass().getSimpleName() + ". " + message);
     }
 }

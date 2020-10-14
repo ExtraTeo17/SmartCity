@@ -25,7 +25,7 @@ import com.graphhopper.util.CmdArgs;
 import com.graphhopper.util.EdgeIteratorState;
 import com.graphhopper.util.PointList;
 import org.javatuples.Pair;
-import routing.RouteNode;
+import routing.nodes.RouteNode;
 
 import java.util.ArrayList;
 import java.util.List;

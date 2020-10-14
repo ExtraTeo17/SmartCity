@@ -12,6 +12,7 @@ import events.web.PrepareSimulationEvent;
 import events.web.SimulationPreparedEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import osmproxy.abstractions.ICacheWrapper;
 import osmproxy.abstractions.ILightAccessManager;
 import osmproxy.abstractions.IMapAccessManager;
 import osmproxy.buses.Timetable;
@@ -20,17 +21,20 @@ import osmproxy.buses.data.BusPreparationData;
 import osmproxy.elements.OSMNode;
 import osmproxy.elements.OSMStation;
 import osmproxy.elements.OSMWay;
-import routing.RouteNode;
-import routing.StationNode;
 import routing.abstractions.IRouteGenerator;
+import routing.core.IZone;
+import routing.nodes.RouteNode;
+import routing.nodes.StationNode;
 import smartcity.SimulationState;
 import smartcity.TimeProvider;
 import smartcity.config.ConfigContainer;
+import utilities.FileWrapper;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import static smartcity.config.StaticConfig.USE_DEPRECATED_XML_FOR_LIGHT_MANAGERS;
 
@@ -44,6 +48,7 @@ public class AgentsCreator {
     private final ILightAccessManager lightAccessManager;
     private final IMapAccessManager mapAccessManager;
     private final IRouteGenerator routeGenerator;
+    private final ICacheWrapper cacheWrapper;
 
     @Inject
     public AgentsCreator(IAgentsContainer agentsContainer,
@@ -53,7 +58,8 @@ public class AgentsCreator {
                          EventBus eventBus,
                          ILightAccessManager lightAccessManager,
                          IMapAccessManager mapAccessManager,
-                         IRouteGenerator routeGenerator) {
+                         IRouteGenerator routeGenerator,
+                         ICacheWrapper cacheWrapper) {
         this.agentsContainer = agentsContainer;
         this.configContainer = configContainer;
         this.busLinesManager = busLinesManager;
@@ -62,6 +68,7 @@ public class AgentsCreator {
         this.lightAccessManager = lightAccessManager;
         this.mapAccessManager = mapAccessManager;
         this.routeGenerator = routeGenerator;
+        this.cacheWrapper = cacheWrapper;
     }
 
 
@@ -70,15 +77,25 @@ public class AgentsCreator {
     public void handle(PrepareSimulationEvent e) {
         logger.info("Set zone event occurred: " + e.toString());
         if (configContainer.getSimulationState() == SimulationState.READY_TO_RUN) {
-            agentsContainer.clearAll();
+            clear();
         }
         configContainer.setZone(e.zone);
         configContainer.setSimulationState(SimulationState.IN_PREPARATION);
 
         if (prepareAgents()) {
             configContainer.setSimulationState(SimulationState.READY_TO_RUN);
-            eventBus.post(new SimulationPreparedEvent());
+            var lights = agentsContainer.stream(LightManagerAgent.class)
+                    .flatMap(man -> man.getLights().stream())
+                    .collect(Collectors.toList());
+            var stations = agentsContainer.stream(StationAgent.class).map(
+                    StationAgent::getStation).collect(Collectors.toList());
+            eventBus.post(new SimulationPreparedEvent(lights, stations));
         }
+    }
+
+    // TODO: Send clearSimulationEvent and handle simulationClearedEvent to continue - tasks should be cancelled
+    private void clear() {
+        agentsContainer.clearAll();
     }
 
     private boolean prepareAgents() {
@@ -91,13 +108,10 @@ public class AgentsCreator {
     }
 
     private boolean prepareStationsAndBuses() {
-        logger.info("Starting bus data preparation.");
-        long time = System.nanoTime();
-        var busData = busLinesManager.getBusData();
-        logger.info("Bus data preparation finished! Took: " + TimeProvider.getTimeInMs(time) + "ms\n");
+        var busData = getBusPreparationData();
 
         logger.info("Stations creation started.");
-        time = System.nanoTime();
+        long time = System.nanoTime();
         var stationNodes = prepareStations(busData.stations.values());
         if (stationNodes.size() == 0) {
             return false;
@@ -112,6 +126,23 @@ public class AgentsCreator {
         logger.info("Buses are created! Took: " + TimeProvider.getTimeInMs(time) + "ms\n");
 
         return true;
+    }
+
+    private BusPreparationData getBusPreparationData() {
+        BusPreparationData busData;
+        var cachedData = cacheWrapper.getBusPreparationData();
+        if (cachedData.isPresent()) {
+            busData = cachedData.get();
+        }
+        else {
+            logger.info("Starting bus data preparation.");
+            long time = System.nanoTime();
+            busData = busLinesManager.getBusData();
+            logger.info("Bus data preparation finished! Took: " + TimeProvider.getTimeInMs(time) + "ms\n");
+            cacheWrapper.cacheData(busData);
+        }
+
+        return busData;
     }
 
     private List<StationNode> prepareStations(Collection<OSMStation> stationPositions) {
@@ -248,7 +279,6 @@ public class AgentsCreator {
 
         if (managersCounter == 0) {
             logger.warn("No managers were created");
-            return false;
         }
 
 

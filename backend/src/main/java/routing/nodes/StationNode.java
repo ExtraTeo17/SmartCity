@@ -1,6 +1,8 @@
-package routing;
+package routing.nodes;
 
 import osmproxy.elements.OSMStation;
+
+import java.util.Objects;
 
 public class StationNode extends RouteNode {
     private final int agentId;
@@ -23,5 +25,25 @@ public class StationNode extends RouteNode {
 
     public long getOsmId() {
         return osmId;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        if (!super.equals(o)) {
+            return false;
+        }
+        StationNode that = (StationNode) o;
+        return osmId == that.osmId;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(super.hashCode(), osmId);
     }
 }

@@ -4,12 +4,14 @@ import org.jetbrains.annotations.NotNull;
 import osmproxy.elements.OSMStation;
 import osmproxy.elements.OSMWay;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 
-public class BusInfo implements Iterable<BrigadeInfo> {
+public class BusInfo implements
+        Iterable<BrigadeInfo>, Serializable {
     public final String busLine;
     public final List<OSMWay> route;
     public final List<OSMStation> stops;

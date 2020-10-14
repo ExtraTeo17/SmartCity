@@ -1,12 +1,13 @@
 import React from "react";
-import { greenLightIcon } from "../../styles/icons";
+import { greenLightIcon, redLightIcon } from "../../styles/icons";
 import { Marker, Popup } from "react-leaflet";
+import { LightColor } from "../Models/LightColor";
 
 const Light = props => {
-  const { location } = props;
+  const { light } = props;
 
   return (
-    <Marker position={location} opacity={0.95} icon={greenLightIcon} zIndexOffset={10}>
+    <Marker position={light.location} icon={light.color === LightColor.GREEN ? greenLightIcon : redLightIcon} zIndexOffset={10}>
       <Popup>I am a light!</Popup>
     </Marker>
   );

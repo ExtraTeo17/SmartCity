@@ -6,11 +6,14 @@ import com.fasterxml.jackson.annotation.JsonValue;
 public enum MessageType {
     PREPARE_SIMULATION_REQUEST(1),
     PREPARE_SIMULATION_RESPONSE(2),
+
     START_SIMULATION_REQUEST(3),
     START_SIMULATION_RESPONSE(4),
+
     CREATE_CAR_INFO(5),
     UPDATE_CAR_INFO(6),
-    KILL_CAR_INFO(7);
+    KILL_CAR_INFO(7),
+    SWITCH_LIGHTS_INFO(8);
 
     private final int code;
 

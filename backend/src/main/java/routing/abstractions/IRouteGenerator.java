@@ -2,9 +2,9 @@ package routing.abstractions;
 
 import com.google.common.annotations.Beta;
 import osmproxy.elements.OSMWay;
-import routing.RouteNode;
-import routing.StationNode;
 import routing.core.IGeoPosition;
+import routing.nodes.RouteNode;
+import routing.nodes.StationNode;
 
 import java.util.List;
 

@@ -206,7 +206,7 @@ public class BusDataParser implements IBusDataParser {
             }
         }
 
-        logger.debug("Station: " + osmId + " won't be included. IsPresent: " + isPresentVal);
+        logger.trace("Station: " + osmId + " won't be included. IsPresent: " + isPresentVal);
 
         return Optional.empty();
     }

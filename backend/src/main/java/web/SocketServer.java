@@ -16,6 +16,7 @@ import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 class SocketServer extends WebSocketServer {
+    public static final int CONNECTION_LOST_TIMEOUT = 300;
     private static final Logger logger = LoggerFactory.getLogger(SocketServer.class);
     private final MessageHandler messageHandler;
     private final HashSet<WebSocket> sockets;
@@ -25,6 +26,7 @@ class SocketServer extends WebSocketServer {
                  MessageHandler messageHandler) {
         super(getSocketAddress(port));
         this.messageHandler = messageHandler;
+        this.setConnectionLostTimeout(CONNECTION_LOST_TIMEOUT);
         sockets = new HashSet<>();
     }
 

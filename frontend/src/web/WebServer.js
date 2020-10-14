@@ -18,15 +18,17 @@ const createSocket = () => {
    * @param {{ data: object; }} e
    */
   socket.onmessage = e => {
-    // console.groupCollapsed("OnMessage");
-
-    // console.log("Message received:" + e.data);
+    // logMessage(e);
     let msgDto = JSON.parse(e.data);
     let msg = { type: msgDto.type, payload: JSON.parse(msgDto.payload) };
     MessageHandler.handle(msg);
-
-    // console.groupEnd();
   };
+
+  function logMessage(e) {
+    console.groupCollapsed("OnMessage");
+    console.log("Message received:" + e.data);
+    console.groupEnd();
+  }
 
   socket.onerror = err => {
     console.error("Socket encountered error: ", err, "Closing socket");
