@@ -15,5 +15,5 @@ public interface ITaskProvider {
 
     Runnable getScheduleBusControlTask();
 
-    Supplier<Integer> getSwitchLightsTask(Collection<Light> lights);
+    Supplier<Integer> getSwitchLightsTask(int managerId, Collection<Light> lights);
 }

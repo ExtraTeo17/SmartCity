@@ -33,7 +33,8 @@ class LightSwitcher implements Function<ISwitchLightsContext, Integer> {
     LightSwitcher(ITimeProvider timeProvider,
                   ConfigContainer configContainer,
                   EventBus eventBus,
-                  @Assisted int extendTimeSeconds,
+                  @Assisted("managerId") int managerId,
+                  @Assisted("extendTime") int extendTimeSeconds,
                   @Assisted Collection<Light> lights) {
         this.timeProvider = timeProvider;
         this.configContainer = configContainer;
@@ -43,9 +44,7 @@ class LightSwitcher implements Function<ISwitchLightsContext, Integer> {
         this.defaultExecutionDelay = extendTimeSeconds * 1000 / TimeProvider.TIME_SCALE;
         this.lights = lights;
         this.lightsOsmIds = lights.stream().map(Light::getOsmLightId).collect(Collectors.toSet());
-
-        var firstOsmId = lightsOsmIds.stream().findFirst().orElse(0L);
-        this.logger = LoggerFactory.getLogger("LightSwitcher" + firstOsmId);
+        this.logger = LoggerFactory.getLogger("LightSwitcher" + managerId);
     }
 
     @Override

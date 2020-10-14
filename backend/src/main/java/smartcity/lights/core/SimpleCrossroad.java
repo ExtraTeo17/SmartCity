@@ -20,21 +20,24 @@ class SimpleCrossroad implements ICrossroad {
     private static final Logger logger = LoggerFactory.getLogger(SimpleCrossroad.class);
 
     private final EventBus eventBus;
+    private final int managerId;
     @SuppressWarnings("MismatchedQueryAndUpdateOfCollection")
     private final Map<Long, Light> wayIdToLightMap;
 
     SimpleCrossroad(EventBus eventBus,
+                    int managerId,
                     Siblings<SimpleLightGroup> lightGroups) {
+        this.eventBus = eventBus;
+        this.managerId = managerId;
         this.wayIdToLightMap = new HashMap<>() {{
             putAll(lightGroups.first.prepareMap());
             putAll(lightGroups.second.prepareMap());
         }};
-        this.eventBus = eventBus;
     }
 
     @Override
     public void startLifetime() {
-        eventBus.post(new SwitchLightsStartEvent(wayIdToLightMap.values()));
+        eventBus.post(new SwitchLightsStartEvent(managerId, wayIdToLightMap.values()));
     }
 
     @Override

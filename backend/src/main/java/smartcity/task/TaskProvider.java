@@ -17,6 +17,7 @@ import routing.StationNode;
 import routing.abstractions.IRouteGenerator;
 import routing.abstractions.IRoutingHelper;
 import routing.core.IGeoPosition;
+import smartcity.config.ConfigContainer;
 import smartcity.lights.core.Light;
 import smartcity.task.abstractions.ITaskProvider;
 import smartcity.task.data.ISwitchLightsContext;
@@ -29,6 +30,7 @@ import java.util.function.Supplier;
 public class TaskProvider implements ITaskProvider {
     private static final Logger logger = LoggerFactory.getLogger(TaskProvider.class);
 
+    private final ConfigContainer configContainer;
     private final IRouteGenerator routeGenerator;
     private final IRoutingHelper routingHelper;
     private final IAgentsFactory agentsFactory;
@@ -39,12 +41,13 @@ public class TaskProvider implements ITaskProvider {
     private final Table<IGeoPosition, IGeoPosition, List<RouteNode>> routeInfoCache;
 
     @Inject
-    public TaskProvider(IRouteGenerator routeGenerator,
+    public TaskProvider(ConfigContainer configContainer, IRouteGenerator routeGenerator,
                         IRoutingHelper routingHelper,
                         IAgentsFactory agentsFactory,
                         IAgentsContainer agentsContainer,
                         IFunctionalTaskFactory functionalTaskFactory,
                         EventBus eventBus) {
+        this.configContainer = configContainer;
         this.routeGenerator = routeGenerator;
         this.routingHelper = routingHelper;
         this.agentsFactory = agentsFactory;
@@ -123,9 +126,9 @@ public class TaskProvider implements ITaskProvider {
     }
 
     @Override
-    public Supplier<Integer> getSwitchLightsTask(Collection<Light> lights) {
-        int extendTimeSeconds = 30;
-        var switchLights = functionalTaskFactory.createLightSwitcher(extendTimeSeconds, lights);
+    public Supplier<Integer> getSwitchLightsTask(int managerId, Collection<Light> lights) {
+        var switchLights = functionalTaskFactory
+                .createLightSwitcher(managerId, configContainer.getExtendTimeSeconds(), lights);
         // Can be moved somewhere else if needed and passed as parameter
         var switchLightsContext = new ISwitchLightsContext() {
             private boolean alreadyExtendedGreen = false;

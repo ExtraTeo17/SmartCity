@@ -91,8 +91,8 @@ public class TaskManager implements ITaskManager {
     }
 
     @Override
-    public void scheduleSwitchLightTask(Collection<Light> lights) {
-        var switchLightsTaskWithDelay = taskProvider.getSwitchLightsTask(lights);
+    public void scheduleSwitchLightTask(int managerId, Collection<Light> lights) {
+        var switchLightsTaskWithDelay = taskProvider.getSwitchLightsTask(managerId, lights);
         var runnable = runnableFactory.create(switchLightsTaskWithDelay, true);
         runnable.runEndless(0, TIME_UNIT);
     }

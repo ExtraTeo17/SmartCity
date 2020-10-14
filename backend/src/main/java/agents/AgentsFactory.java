@@ -71,14 +71,14 @@ class AgentsFactory implements IAgentsFactory {
     @Override
     public LightManagerAgent create(Node crossroadNode) {
         var id = idGenerator.get(LightManagerAgent.class);
-        var crossroad = crossroadFactory.create(crossroadNode);
+        var crossroad = crossroadFactory.create(id, crossroadNode);
         return new LightManagerAgent(id, crossroad, timeProvider, eventBus);
     }
 
     @Override
     public LightManagerAgent create(OSMNode centerCrossroad) {
         var id = idGenerator.get(LightManagerAgent.class);
-        var crossroad = crossroadFactory.create(centerCrossroad);
+        var crossroad = crossroadFactory.create(id, centerCrossroad);
         return new LightManagerAgent(id, crossroad, timeProvider, eventBus);
     }
 

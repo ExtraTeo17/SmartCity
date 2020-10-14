@@ -53,6 +53,6 @@ public class Scheduler {
 
     @Subscribe
     public void handle(SwitchLightsStartEvent e) {
-        taskManager.scheduleSwitchLightTask(e.lights);
+        taskManager.scheduleSwitchLightTask(e.managerId, e.lights);
     }
 }

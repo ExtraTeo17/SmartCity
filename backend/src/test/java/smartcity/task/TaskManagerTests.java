@@ -30,7 +30,7 @@ class TaskManagerTests {
         var lights = Arrays.asList(createLight(), createLight(), createLight());
         var taskProvider = mock(ITaskProvider.class);
         Supplier<Integer> switchLightTask = () -> 100;
-        when(taskProvider.getSwitchLightsTask(lights)).thenReturn(switchLightTask);
+        when(taskProvider.getSwitchLightsTask(1, lights)).thenReturn(switchLightTask);
 
         var runnableFactory = mock(IRunnableFactory.class);
         var runContext = new Object() {
@@ -52,7 +52,7 @@ class TaskManagerTests {
         var taskManager = getTaskManager(taskProvider, runnableFactory);
 
         // Act
-        taskManager.scheduleSwitchLightTask(lights);
+        taskManager.scheduleSwitchLightTask(1, lights);
 
         // Assert
         assertTrue(runContext.ranEndless, "RunEndless should be invoked");
