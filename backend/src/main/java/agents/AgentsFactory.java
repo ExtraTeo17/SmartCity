@@ -3,13 +3,15 @@ package agents;
 import agents.abstractions.IAgentsFactory;
 import com.google.common.eventbus.EventBus;
 import com.google.inject.Inject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.w3c.dom.Node;
 import osmproxy.buses.Timetable;
 import osmproxy.elements.OSMNode;
 import osmproxy.elements.OSMStation;
-import routing.RouteNode;
-import routing.StationNode;
 import routing.abstractions.IRouteTransformer;
+import routing.nodes.RouteNode;
+import routing.nodes.StationNode;
 import smartcity.ITimeProvider;
 import smartcity.lights.abstractions.ICrossroadFactory;
 import smartcity.stations.StationStrategy;
@@ -18,6 +20,8 @@ import vehicles.*;
 import java.util.List;
 
 class AgentsFactory implements IAgentsFactory {
+    private static final Logger logger = LoggerFactory.getLogger(AgentsFactory.class);
+
     private final IdGenerator idGenerator;
     private final ITimeProvider timeProvider;
     private final IRouteTransformer routeTransformer;
@@ -41,7 +45,8 @@ class AgentsFactory implements IAgentsFactory {
     public VehicleAgent create(List<RouteNode> route, boolean testCar) {
         var id = idGenerator.get(VehicleAgent.class);
         var uniformRoute = routeTransformer.uniformRoute(route);
-        var car = new MovingObjectImpl(id, route, uniformRoute);
+        logger.trace("DisplayRoute size: " + route.size() + ", routeSize: " + uniformRoute.size());
+        var car = new Car(id, route, uniformRoute);
         if (testCar) {
             car = new TestCar(car, timeProvider);
         }
@@ -63,10 +68,12 @@ class AgentsFactory implements IAgentsFactory {
 
     @Override
     public BusAgent create(List<RouteNode> route, Timetable timetable, String busLine, String brigadeNr) {
+        var id = idGenerator.get(BusAgent.class);
         var uniformRoute = routeTransformer.uniformRoute(route);
-        var bus = new Bus(timeProvider, route, uniformRoute,
+        logger.trace("DisplayRoute size: " + route.size() + ", routeSize: " + uniformRoute.size());
+        var bus = new Bus(timeProvider, id, route, uniformRoute,
                 timetable, busLine, brigadeNr);
-        return new BusAgent(idGenerator.get(BusAgent.class), bus, timeProvider, eventBus);
+        return new BusAgent(id, bus, timeProvider, eventBus);
     }
 
     @Override
@@ -88,9 +95,10 @@ class AgentsFactory implements IAgentsFactory {
     public PedestrianAgent create(List<RouteNode> routeToStation, List<RouteNode> routeFromStation, String preferredBusLine,
                                   StationNode startStation, StationNode finishStation,
                                   boolean testPedestrian) {
+        var id = idGenerator.get(PedestrianAgent.class);
         var uniformRouteToStation = routeTransformer.uniformRoute(routeToStation);
         var uniformRouteFromStation = routeTransformer.uniformRoute(routeFromStation);
-        var pedestrian = new Pedestrian(routeToStation, uniformRouteToStation,
+        var pedestrian = new Pedestrian(id, routeToStation, uniformRouteToStation,
                 routeFromStation, uniformRouteFromStation,
                 preferredBusLine,
                 startStation, finishStation);
@@ -98,7 +106,7 @@ class AgentsFactory implements IAgentsFactory {
             pedestrian = new TestPedestrian(pedestrian, timeProvider);
         }
 
-        return new PedestrianAgent(idGenerator.get(PedestrianAgent.class), pedestrian, timeProvider, eventBus);
+        return new PedestrianAgent(id, pedestrian, timeProvider, eventBus);
     }
 
     @Override

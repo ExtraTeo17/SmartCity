@@ -31,3 +31,11 @@ export const testCarIcon = new L.Icon({
   popupAnchor: [8, 8],
   iconSize: [32, 32],
 });
+
+export const stationIcon = new L.Icon({
+  iconUrl: "/images/bus_stop.png",
+  iconRetinaUrl: "/images/bus_stop.png",
+  iconAnchor: [16, 16],
+  popupAnchor: [8, 8],
+  iconSize: [32, 32],
+});

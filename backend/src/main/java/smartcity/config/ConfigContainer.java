@@ -11,11 +11,9 @@ import smartcity.SimulationState;
 
 public class ConfigContainer extends ConfigMutator
         implements IZoneMutator, ILightConfigContainer {
-    private final EventBus eventBus;
-
     private SimulationState simulationState = SimulationState.INITIAL;
-    private boolean shouldGeneratePedestriansAndBuses = false;
-    private boolean shouldGenerateCars = true;
+    private boolean shouldGeneratePedestriansAndBuses = true;
+    private boolean shouldGenerateCars = false;
     private boolean lightManagersLock = false;
     private boolean isLightStrategyActive = true;
     private int extendTimeSeconds = 30;
@@ -24,9 +22,7 @@ public class ConfigContainer extends ConfigMutator
     private final ObjectsConfig carsConfig;
 
     @Inject
-    public ConfigContainer(EventBus eventBus) {
-        this.eventBus = eventBus;
-
+    public ConfigContainer() {
         IGeoPosition warsawPos = Position.of(52.23682, 21.01681);
         int defaultRadius = 600;
         this.zone = Zone.of(warsawPos, defaultRadius);

@@ -8,9 +8,9 @@ import jade.core.behaviours.CyclicBehaviour;
 import jade.core.behaviours.TickerBehaviour;
 import jade.lang.acl.ACLMessage;
 import jade.util.leap.Properties;
-import routing.LightManagerNode;
+import routing.nodes.LightManagerNode;
 import routing.RoutingConstants;
-import routing.StationNode;
+import routing.nodes.StationNode;
 import smartcity.ITimeProvider;
 import smartcity.SmartCityAgent;
 import vehicles.DrivingState;
@@ -42,7 +42,7 @@ public class PedestrianAgent extends AbstractAgent {
                 if (pedestrian.isAtTrafficLights()) {
                     switch (pedestrian.getState()) {
                         case MOVING:
-                            LightManagerNode light = pedestrian.getCurrentTrafficLightNode();
+                            var light = pedestrian.getCurrentTrafficLightNode();
                             ACLMessage msg = createMessage(ACLMessage.REQUEST_WHEN, LightManagerAgent.name,
                                     light.getLightManagerId());
                             Properties properties = createProperties(MessageParameter.PEDESTRIAN);

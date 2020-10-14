@@ -7,12 +7,7 @@ const Light = props => {
   const { light } = props;
 
   return (
-    <Marker
-      position={light.location}
-      opacity={0.95}
-      icon={light.color === LightColor.GREEN ? greenLightIcon : redLightIcon}
-      zIndexOffset={10}
-    >
+    <Marker position={light.location} icon={light.color === LightColor.GREEN ? greenLightIcon : redLightIcon} zIndexOffset={10}>
       <Popup>I am a light!</Popup>
     </Marker>
   );

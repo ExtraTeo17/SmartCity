@@ -1,7 +1,6 @@
 package utilities;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.json.simple.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
@@ -9,17 +8,15 @@ import org.w3c.dom.Document;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.FileWriter;
-import java.io.OutputStreamWriter;
+import java.io.*;
 import java.nio.charset.StandardCharsets;
 
-public class FileWriterWrapper {
+public class FileWrapper {
     public static final String DEFAULT_OUTPUT_PATH_XML = "target/output.xml";
     public static final String DEFAULT_OUTPUT_PATH_JSON = "target/output.json";
+    public static final String DEFAULT_OUTPUT_PATH_CACHE = ".cache";
 
-    private static final Logger logger = LoggerFactory.getLogger(FileWriterWrapper.class);
+    private static final Logger logger = LoggerFactory.getLogger(FileWrapper.class);
     private static final TransformerFactory transformerFactory = TransformerFactory.newInstance();
     private static final ObjectMapper mapper = new ObjectMapper();
 
@@ -57,5 +54,43 @@ public class FileWriterWrapper {
         } catch (Exception e) {
             logger.warn("Could not write to file", e);
         }
+    }
+
+    public static <T extends Serializable> void cacheToFile(T obj, String fileName) {
+        String path = DEFAULT_OUTPUT_PATH_CACHE + "/" + fileName + ".ser";
+        try {
+            File file = new File(path);
+            if (file.exists() || file.createNewFile()) {
+                var fileStream = new FileOutputStream(file);
+                var objectStream = new ObjectOutputStream(fileStream);
+                objectStream.writeObject(obj);
+            }
+        } catch (Exception e) {
+            logger.warn("Could not serialize to file:  " + path, e);
+        }
+    }
+
+    @SuppressWarnings(value = "unchecked")
+    public static <T extends Serializable> T getFromCache(String fileName) {
+        String path = DEFAULT_OUTPUT_PATH_CACHE + "/" + fileName + ".ser";
+        T data = null;
+        File file = null;
+        try {
+            file = new File(path);
+            if (file.exists()) {
+                var fileStream = new FileInputStream(file);
+                var objectStream = new ObjectInputStream(fileStream);
+                data = (T) objectStream.readObject();
+            }
+        } catch (Exception e) {
+            logger.warn("Could not get file from cache: " + path + ", msg: " + e.getMessage());
+            if (file != null && file.exists()) {
+                if (file.delete()) {
+                    logger.info("Deleted: " + file.getPath());
+                }
+            }
+        }
+
+        return data;
     }
 }

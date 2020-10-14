@@ -1,24 +1,33 @@
 package vehicles;
 
 
-import routing.LightManagerNode;
-import routing.RouteNode;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import routing.core.IGeoPosition;
+import routing.nodes.LightManagerNode;
+import routing.nodes.RouteNode;
 import smartcity.TimeProvider;
 
 import java.util.List;
 
-// TODO: Interface or move some functionality here
 // TODO: Change name to IVehicle/AbstractVehicle
 public abstract class MovingObject {
+    final Logger logger;
+    final int agentId;
     final int speed;
     final List<RouteNode> route;
     int moveIndex;
+    int closestLightIndex;
+    DrivingState state;
 
-    MovingObject(int speed, List<RouteNode> route) {
+    MovingObject(int agentId, int speed, List<RouteNode> route) {
+        this.logger = LoggerFactory.getLogger(this.getClass().getSimpleName() + "Object" + agentId);
+        this.agentId = agentId;
         this.speed = speed;
         this.route = route;
         this.moveIndex = 0;
+        this.closestLightIndex = -1;
+        state = DrivingState.STARTING;
     }
 
     public IGeoPosition getPosition() {
@@ -45,21 +54,49 @@ public abstract class MovingObject {
 
     public abstract String getVehicleType();
 
-    public abstract LightManagerNode switchToNextTrafficLight();
+    public LightManagerNode switchToNextTrafficLight() {
+        for (int i = moveIndex; i < route.size(); ++i) {
+            var node = route.get(i);
+            if (node instanceof LightManagerNode) {
+                closestLightIndex = i;
+                return (LightManagerNode) node;
+            }
+        }
 
-    public abstract LightManagerNode getCurrentTrafficLightNode();
+        closestLightIndex = -1;
+        return null;
+    }
 
-    public abstract boolean isAtTrafficLights();
+    public boolean isAtTrafficLights() {
+        if (isAtDestination()) {
+            return false;
+        }
 
-    public abstract boolean isAtDestination();
+        return route.get(moveIndex) instanceof LightManagerNode;
+    }
+
+    public LightManagerNode getCurrentTrafficLightNode() {
+        if (closestLightIndex == -1) {
+            return null;
+        }
+        return (LightManagerNode) (route.get(closestLightIndex));
+    }
+
+    public boolean isAtDestination() {
+        return moveIndex == route.size();
+    }
+
+    public DrivingState getState() {
+        return state;
+    }
+
+    public void setState(DrivingState state) {
+        this.state = state;
+    }
 
     public abstract List<RouteNode> getDisplayRoute();
 
     public abstract long getAdjacentOsmWayId();
 
     public abstract int getMillisecondsToNextLight();
-
-    public abstract DrivingState getState();
-
-    public abstract void setState(DrivingState state);
 }

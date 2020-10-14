@@ -52,12 +52,12 @@ class LightSwitcher implements Function<ISwitchLightsContext, Integer> {
         if (configContainer.isLightStrategyActive()) {
             if (!context.haveAlreadyExtendedGreen()) {
                 if (shouldExtendGreenLightBecauseOfCarsOnLight()) {
-                    logger.info("-------------------------------------shouldExtendGreenLightBecauseOfCarsOnLight--------------");
+                    logger.trace("-------------------------------------shouldExtendGreenLightBecauseOfCarsOnLight--------------");
                     context.setExtendedGreen(true);
                     return defaultExecutionDelay;
                 }
                 else if (shouldExtendBecauseOfFarAwayQueue()) {
-                    logger.debug("-------------------------------------shouldExtendBecauseOfFarAwayQueue--------------");
+                    logger.trace("-------------------------------------shouldExtendBecauseOfFarAwayQueue--------------");
                     context.setExtendedGreen(true);
                     return defaultExecutionDelay;
                 }
@@ -99,7 +99,7 @@ class LightSwitcher implements Function<ISwitchLightsContext, Integer> {
             var timeCollection = light.getFarAwayTimeCollection();
             for (var time : timeCollection) {
                 if (currentTimePlusExtend.isAfter(time)) {
-                    logger.debug("Extending, time=" + time.toLocalTime() + ", currentTime=" + currentTime.toLocalTime());
+                    logger.trace("Extending, time=" + time.toLocalTime() + ", currentTime=" + currentTime.toLocalTime());
                     return true;
                 }
             }

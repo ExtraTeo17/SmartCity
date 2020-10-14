@@ -3,20 +3,20 @@ package agents;
 import agents.abstractions.IAgentsContainer;
 import agents.abstractions.IAgentsFactory;
 import com.google.common.eventbus.EventBus;
-import jdk.jfr.Event;
 import mocks.ContainerControllerMock;
 import org.junit.jupiter.api.Test;
 import osmproxy.LightAccessManager;
+import osmproxy.abstractions.ICacheWrapper;
 import osmproxy.abstractions.ILightAccessManager;
 import osmproxy.abstractions.IMapAccessManager;
 import osmproxy.buses.BusLinesManager;
-import routing.NodesContainer;
 import routing.RoutingConstants;
 import routing.abstractions.IRouteGenerator;
 import routing.abstractions.IRouteTransformer;
 import routing.core.IGeoPosition;
 import routing.core.IZone;
 import routing.core.Zone;
+import routing.nodes.NodesContainer;
 import smartcity.ITimeProvider;
 import smartcity.config.ConfigContainer;
 import smartcity.config.StaticConfig;
@@ -66,7 +66,7 @@ class AgentsCreatorTests {
             var lights = manager.getLights();
             // Assumptions for current car zone - change if algorithm changes
             assertTrue(lights.size() > 2);
-            var lightsPartition  = lights.stream().collect(Collectors.partitioningBy(Light::isGreen));
+            var lightsPartition = lights.stream().collect(Collectors.partitioningBy(Light::isGreen));
             var greenLights = lightsPartition.get(true);
             var redLights = lightsPartition.get(false);
             assertAll("At least one light should be green and at least one light should be red!",
@@ -129,9 +129,10 @@ class AgentsCreatorTests {
         var mapAccessManager = mock(IMapAccessManager.class);
         var routeGenerator = mock(IRouteGenerator.class);
         var osmContainer = mock(NodesContainer.class);
+        var cacheWrapper = mock(ICacheWrapper.class);
 
         return new AgentsCreator(agentsContainer, configContainer, busLinesManager, agentsFactory,
-                eventBus, lightAccessManager, mapAccessManager, routeGenerator);
+                eventBus, lightAccessManager, mapAccessManager, routeGenerator, cacheWrapper);
     }
 
     private ILightAccessManager setupLightAccessManager() {

@@ -10,7 +10,7 @@ import osmproxy.abstractions.IMapAccessManager;
 import osmproxy.buses.abstractions.IBusApiManager;
 import routing.core.IZone;
 import utilities.ConditionalExecutor;
-import utilities.FileWriterWrapper;
+import utilities.FileWrapper;
 
 import java.net.URL;
 import java.util.List;
@@ -34,11 +34,10 @@ public class BusApiManager implements IBusApiManager {
         var overpassInfo = mapAccessManager.getNodesDocument(query);
 
         ConditionalExecutor.debug(() -> {
-            overpassInfo.ifPresent(info -> {
-                logger.info("Writing bus-data to: " + FileWriterWrapper.DEFAULT_OUTPUT_PATH_XML);
-                FileWriterWrapper.write(info);
-            });
-        });
+            logger.info("Writing bus-data to: " + FileWrapper.DEFAULT_OUTPUT_PATH_XML);
+            //noinspection OptionalGetWithoutIsPresent
+            FileWrapper.write(overpassInfo.get());
+        }, overpassInfo.isPresent());
 
         return overpassInfo;
     }
@@ -63,7 +62,7 @@ public class BusApiManager implements IBusApiManager {
         ConditionalExecutor.debug(() -> {
             String path = "target/line_" + busLine + "_stop_" + busStopId + "_" + busStopNr + ".json";
             logger.info("Writing bus-brigade-date to: " + path);
-            FileWriterWrapper.write(jsonString, path);
+            FileWrapper.write(jsonString, path);
         });
 
         return Optional.of(jsonString);
@@ -80,7 +79,7 @@ public class BusApiManager implements IBusApiManager {
             String path = "busWays_" + waysIds.get(0) + "_" +
                     waysIds.get(waysIds.size() - 1) + ".xml";
             logger.info("Writing bus-ways to: " + path);
-            FileWriterWrapper.write(result, path);
+            FileWrapper.write(result, path);
         }, resultOpt.isPresent());
 
         return resultOpt;

@@ -6,13 +6,13 @@ import smartcity.ITimeProvider;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 
-public class TestCar extends MovingObjectImpl {
+public class TestCar extends Car {
     private final ITimeProvider timeProvider;
 
     private LocalDateTime start;
     private LocalDateTime end;
 
-    public TestCar(MovingObjectImpl movingObject,
+    public TestCar(Car movingObject,
                    ITimeProvider timeProvider) {
         super(movingObject);
         this.timeProvider = timeProvider;
@@ -20,7 +20,7 @@ public class TestCar extends MovingObjectImpl {
 
     @VisibleForTesting
     TestCar(ITimeProvider timeProvider) {
-        super(new ArrayList<>(), new ArrayList<>());
+        super(1, new ArrayList<>(), new ArrayList<>());
         this.timeProvider = timeProvider;
     }
 
@@ -39,7 +39,7 @@ public class TestCar extends MovingObjectImpl {
 
     @Override
     public String getVehicleType() {
-        return  VehicleType.TEST_CAR.toString();
+        return VehicleType.TEST_CAR.toString();
     }
 
     public LocalDateTime getStart() {

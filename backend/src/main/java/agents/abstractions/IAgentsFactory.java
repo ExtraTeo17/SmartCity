@@ -5,8 +5,8 @@ import org.w3c.dom.Node;
 import osmproxy.buses.Timetable;
 import osmproxy.elements.OSMNode;
 import osmproxy.elements.OSMStation;
-import routing.RouteNode;
-import routing.StationNode;
+import routing.nodes.RouteNode;
+import routing.nodes.StationNode;
 
 import java.util.List;
 

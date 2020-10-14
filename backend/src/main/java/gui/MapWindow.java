@@ -52,11 +52,11 @@ public class MapWindow {
     public JPanel MainPanel;
     private final JXMapViewer MapViewer;
     private boolean renderPedestrians = true;
-    private boolean renderPedestrianRoutes = true;
-    private boolean renderCars = true;
-    private boolean renderCarRoutes = true;
-    private boolean renderBuses = true;
-    private boolean renderBusRoutes = true;
+    private boolean renderPedestrianRoutes = false;
+    private boolean renderCars = false;
+    private boolean renderCarRoutes = false;
+    private boolean renderBuses = false;
+    private boolean renderBusRoutes = false;
     private boolean renderZone = true;
     private boolean renderLights = true;
     private boolean renderStations = true;

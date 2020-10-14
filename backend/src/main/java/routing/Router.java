@@ -5,14 +5,18 @@ import com.google.inject.Inject;
 import org.javatuples.Pair;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import osmproxy.abstractions.ICacheWrapper;
 import osmproxy.abstractions.IMapAccessManager;
 import osmproxy.elements.OSMLight;
 import osmproxy.elements.OSMWay;
 import osmproxy.elements.OSMWay.RouteOrientation;
 import osmproxy.elements.OSMWaypoint;
+import routing.abstractions.INodesContainer;
 import routing.abstractions.IRouteGenerator;
 import routing.abstractions.IRouteTransformer;
 import routing.core.IGeoPosition;
+import routing.nodes.RouteNode;
+import routing.nodes.StationNode;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -25,12 +29,16 @@ final class Router implements
     private static final Logger logger = LoggerFactory.getLogger(Router.class);
 
     private final IMapAccessManager mapAccessManager;
-    private final INodesContainer INodesContainer;
+    private final INodesContainer nodesContainer;
+    private final ICacheWrapper cacheWrapper;
 
     @Inject
-    public Router(IMapAccessManager mapAccessManager, INodesContainer INodesContainer) {
+    public Router(IMapAccessManager mapAccessManager,
+                  INodesContainer nodesContainer,
+                  ICacheWrapper cacheWrapper) {
         this.mapAccessManager = mapAccessManager;
-        this.INodesContainer = INodesContainer;
+        this.nodesContainer = nodesContainer;
+        this.cacheWrapper = cacheWrapper;
     }
 
     @Override
@@ -103,7 +111,7 @@ final class Router implements
         long nodeRefId = Long.parseLong(waypoint.getOsmNodeRef());
         // TODO: Is it needed?
         if (routeInfo.remove(nodeRefId)) {
-            return INodesContainer.getLightManagerNode(nodeRefId);
+            return nodesContainer.getLightManagerNode(nodeRefId);
         }
 
         return new RouteNode(waypoint.getLat(), waypoint.getLng());
@@ -112,11 +120,20 @@ final class Router implements
     @Override
     public List<RouteNode> generateRouteInfoForBuses(List<OSMWay> route,
                                                      List<StationNode> stationNodes) {
+        var data = cacheWrapper.getBusRoute(route, stationNodes);
+        if (data.size() > 0) {
+            return data;
+        }
+
         var busRouteData = generateBusRoute(route);
         List<OSMLight> lightsOnRoute = mapAccessManager.getOsmLights(busRouteData.waysIds);
         List<RouteNode> managersNodes = getManagersNodesForLights(lightsOnRoute);
         managersNodes.addAll(stationNodes);
-        return getRouteWithAdditionalNodes(busRouteData.route, managersNodes);
+
+        data = getRouteWithAdditionalNodes(busRouteData.route, managersNodes);
+        cacheWrapper.cacheData(route, stationNodes, data);
+
+        return data;
     }
 
     // TODO: In some cases distance is 0 -> dx|dy is NaN -> same nodes?
@@ -125,11 +142,11 @@ final class Router implements
     public List<RouteNode> uniformRoute(List<RouteNode> route) {
         List<RouteNode> newRoute = new ArrayList<>();
         for (int i = 0; i < route.size() - 1; ++i) {
-            RouteNode routeA = route.get(i);
-            RouteNode routeB = route.get(i + 1);
+            RouteNode nodeA = route.get(i);
+            RouteNode nodeB = route.get(i + 1);
 
-            double x = routeB.getLng() - routeA.getLng();
-            double y = routeB.getLat() - routeA.getLat();
+            double x = nodeB.getLng() - nodeA.getLng();
+            double y = nodeB.getLat() - nodeA.getLat();
 
             double distance = RoutingConstants.METERS_PER_DEGREE * Math.sqrt(x * x + y * y);
             if (distance == 0) {
@@ -139,9 +156,9 @@ final class Router implements
             double dx = x / distance;
             double dy = y / distance;
 
-            double lon = routeA.getLng();
-            double lat = routeA.getLat();
-            newRoute.add(routeA);
+            double lon = nodeA.getLng();
+            double lat = nodeA.getLat();
+            newRoute.add(nodeA);
             for (int p = RoutingConstants.STEP_SIZE_METERS; p < distance; p += RoutingConstants.STEP_SIZE_METERS) {
                 lon = lon + RoutingConstants.STEP_SIZE_METERS * dx;
                 lat = lat + RoutingConstants.STEP_SIZE_METERS * dy;
@@ -170,7 +187,7 @@ final class Router implements
         List<RouteNode> nodes = new ArrayList<>();
         long lastMangerId = -1;
         for (OSMLight light : lights) {
-            var nodeToAdd = INodesContainer.getLightManagerNode(light.getAdherentWayId(), light.getId());
+            var nodeToAdd = nodesContainer.getLightManagerNode(light.getAdherentWayId(), light.getId());
             if (nodeToAdd != null) {
                 var nodeManagerId = nodeToAdd.getLightManagerId();
                 if (nodeManagerId != lastMangerId) {
@@ -182,11 +199,12 @@ final class Router implements
         return nodes;
     }
 
-    private static List<RouteNode> getRouteWithAdditionalNodes(List<RouteNode> route, List<RouteNode> additionalNodes) {
+    private static <T extends List<RouteNode>> T getRouteWithAdditionalNodes(T route, List<RouteNode> additionalNodes) {
         for (RouteNode node : additionalNodes) {
             int index = findPositionOfElementOnRoute(route, node);
             route.add(index, node);
         }
+
         return route;
     }
 
@@ -217,8 +235,8 @@ final class Router implements
     }
 
     private static BusRouteData generateBusRoute(List<OSMWay> route) {
-        List<Long> osmWaysIds = new ArrayList<>();
-        List<RouteNode> routeNodes = new ArrayList<>();
+        var osmWaysIds = new ArrayList<Long>();
+        var routeNodes = new ArrayList<RouteNode>();
         for (OSMWay way : route) {
             osmWaysIds.add(way.getId());
             var nodes = way.getWaypoints().stream()
@@ -229,10 +247,10 @@ final class Router implements
     }
 
     private static class BusRouteData {
-        private final List<Long> waysIds;
-        private final List<RouteNode> route;
+        private final ArrayList<Long> waysIds;
+        private final ArrayList<RouteNode> route;
 
-        private BusRouteData(List<Long> waysIds, List<RouteNode> route) {
+        private BusRouteData(ArrayList<Long> waysIds, ArrayList<RouteNode> route) {
             this.waysIds = waysIds;
             this.route = route;
         }

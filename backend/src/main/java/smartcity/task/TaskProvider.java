@@ -12,12 +12,12 @@ import com.google.inject.Inject;
 import events.web.VehicleAgentCreatedEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import routing.RouteNode;
-import routing.StationNode;
 import routing.abstractions.IRouteGenerator;
 import routing.abstractions.IRoutingHelper;
 import routing.core.IGeoPosition;
 import smartcity.config.ConfigContainer;
+import routing.nodes.RouteNode;
+import routing.nodes.StationNode;
 import smartcity.lights.core.Light;
 import smartcity.task.abstractions.ITaskProvider;
 import smartcity.task.data.ISwitchLightsContext;
@@ -60,22 +60,22 @@ public class TaskProvider implements ITaskProvider {
 
     public Runnable getCreateCarTask(IGeoPosition start, IGeoPosition end, boolean testCar) {
         return () -> {
-            List<RouteNode> info;
+            List<RouteNode> route;
             try {
-                info = routeInfoCache.get(start, end);
-                if (info == null) {
-                    info = routeGenerator.generateRouteInfo(start, end);
-                    routeInfoCache.put(start, end, info);
+                route = routeInfoCache.get(start, end);
+                if (route == null) {
+                    route = routeGenerator.generateRouteInfo(start, end);
+                    routeInfoCache.put(start, end, route);
                 }
             } catch (Exception e) {
                 logger.warn("Error generating route info", e);
                 return;
             }
 
-            VehicleAgent agent = agentsFactory.create(info, testCar);
+            VehicleAgent agent = agentsFactory.create(route, testCar);
             if (agentsContainer.tryAdd(agent)) {
                 agent.start();
-                eventBus.post(new VehicleAgentCreatedEvent(agent.getId(), agent.getPosition(), testCar));
+                eventBus.post(new VehicleAgentCreatedEvent(agent.getId(), agent.getPosition(), route, testCar));
             }
         };
     }

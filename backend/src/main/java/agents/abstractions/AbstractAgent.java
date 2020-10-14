@@ -11,7 +11,7 @@ import jade.util.leap.Properties;
 import jade.wrapper.ControllerException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import routing.LightManagerNode;
+import routing.nodes.LightManagerNode;
 import smartcity.ITimeProvider;
 import utilities.ConditionalExecutor;
 import vehicles.MovingObject;

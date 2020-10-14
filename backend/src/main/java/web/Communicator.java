@@ -24,9 +24,8 @@ class Communicator {
 
     @Subscribe
     public void handle(SimulationPreparedEvent e) {
-        onHandle(e);
-        var lights = e.lights;
-        webService.prepareSimulation(lights);
+        onHandle(e, "Lights: " + e.lights.size() + ", stations: " + e.stations.size());
+        webService.prepareSimulation(e.lights, e.stations);
     }
 
     @Subscribe
@@ -37,7 +36,7 @@ class Communicator {
     @Subscribe
     public void handle(VehicleAgentCreatedEvent e) {
         onHandle(e);
-        webService.createCar(e.agentId, e.agentPosition, e.isTestCar);
+        webService.createCar(e.agentId, e.agentPosition, e.route, e.isTestCar);
     }
 
     @Subscribe
@@ -50,8 +49,17 @@ class Communicator {
         webService.updateLights(e.osmLightId);
     }
 
+    @Subscribe
+    public void handle(VehicleAgentDeadEvent e) {
+        onHandle(e);
+        webService.killCar(e.id);
+    }
 
     private void onHandle(Object obj) {
         logger.info("Handling " + obj.getClass().getSimpleName());
+    }
+
+    private void onHandle(Object obj, String message) {
+        logger.info("Handling " + obj.getClass().getSimpleName() + ". " + message);
     }
 }

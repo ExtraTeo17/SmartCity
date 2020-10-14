@@ -10,6 +10,7 @@ import jade.core.behaviours.CyclicBehaviour;
 import jade.core.behaviours.TickerBehaviour;
 import jade.lang.acl.ACLMessage;
 import jade.util.leap.Properties;
+import routing.nodes.LightManagerNode;
 import routing.core.IGeoPosition;
 import smartcity.ITimeProvider;
 import smartcity.SmartCityAgent;
