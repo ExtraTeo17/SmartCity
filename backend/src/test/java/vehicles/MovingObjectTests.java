@@ -19,7 +19,7 @@ class MovingObjectTests {
 
     @ParameterizedTest
     @MethodSource("routesProvider")
-    void getNextTrafficLight(String testCaseName, int initialMoveIndex, List<RouteNode> route, int expectedIndex) {
+    void switchToNextTrafficLight(String testCaseName, int initialMoveIndex, List<RouteNode> route, int expectedLightIndex) {
         // Arrange
         var movingObject = new Car(1, route, route);
         movingObject.moveIndex = initialMoveIndex;
@@ -28,9 +28,9 @@ class MovingObjectTests {
         var result = movingObject.switchToNextTrafficLight();
 
         // Assert
-        assertEquals(expectedIndex, movingObject.closestLightIndex, testCaseName + ": closest light index should match");
-        if (expectedIndex < route.size()) {
-            assertSame(route.get(expectedIndex), result, testCaseName + ": light manager instance should match");
+        assertEquals(expectedLightIndex, movingObject.closestLightIndex, testCaseName + ": closest light index should match");
+        if (expectedLightIndex < route.size()) {
+            assertSame(route.get(expectedLightIndex), result, testCaseName + ": light manager instance should match");
         }
     }
 
@@ -72,7 +72,7 @@ class MovingObjectTests {
 
     @ParameterizedTest
     @MethodSource("routesProvider")
-    void isAtTrafficLights(String testCaseName, int initialMoveIndex, List<RouteNode> route, int expectedIndex) {
+    void isAtTrafficLights(String testCaseName, int initialMoveIndex, List<RouteNode> route, int expectedLightIndex) {
         // Arrange
         var movingObject = new Car(1, route, route);
         movingObject.moveIndex = initialMoveIndex;
@@ -82,6 +82,22 @@ class MovingObjectTests {
         var result = movingObject.isAtTrafficLights();
 
         // Assert
-        assertEquals(initialMoveIndex == expectedIndex, result, testCaseName);
+        assertEquals(initialMoveIndex == expectedLightIndex, result, testCaseName);
+    }
+
+    @ParameterizedTest
+    @MethodSource("routesProvider")
+    void getCurrentTrafficLightNode(String testCaseName,
+                                    @SuppressWarnings("unused") int initialMoveIndex,
+                                    List<RouteNode> route) {
+        // Arrange
+        var movingObject = new Car(1, route, route);
+
+        // Act
+        var result = movingObject.switchToNextTrafficLight();
+        var lightNode = movingObject.getCurrentTrafficLightNode();
+
+        // Assert
+        assertSame(result, lightNode, testCaseName + ": closest light index should match");
     }
 }

@@ -26,7 +26,7 @@ public abstract class MovingObject {
         this.speed = speed;
         this.route = route;
         this.moveIndex = 0;
-        this.closestLightIndex = -1;
+        this.closestLightIndex = Integer.MAX_VALUE;
         state = DrivingState.STARTING;
     }
 
@@ -63,7 +63,7 @@ public abstract class MovingObject {
             }
         }
 
-        closestLightIndex = -1;
+        closestLightIndex = Integer.MAX_VALUE;
         return null;
     }
 
@@ -76,7 +76,7 @@ public abstract class MovingObject {
     }
 
     public LightManagerNode getCurrentTrafficLightNode() {
-        if (closestLightIndex == -1) {
+        if (closestLightIndex == Integer.MAX_VALUE) {
             return null;
         }
         return (LightManagerNode) (route.get(closestLightIndex));
