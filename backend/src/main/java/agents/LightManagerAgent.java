@@ -96,7 +96,7 @@ public class LightManagerAgent extends AbstractAgent {
                 switch (rcv.getPerformative()) {
                     case ACLMessage.INFORM -> {
                         var time = getDateParameter(rcv, MessageParameter.ARRIVAL_TIME);
-                        print(agentName + " is approaching at " + time);
+                        print(agentName + " is approaching at " + time.toLocalTime());
 
                         var arrivalInfo = ArrivalInfo.of(agentName, time);
                         crossroad.addCarToFarAwayQueue(getIntParameter(rcv, MessageParameter.ADJACENT_OSM_WAY_ID), arrivalInfo);

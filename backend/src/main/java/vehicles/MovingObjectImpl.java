@@ -1,5 +1,7 @@
 package vehicles;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import routing.LightManagerNode;
 import routing.RouteNode;
 import routing.RoutingConstants;
@@ -8,26 +10,34 @@ import java.util.List;
 
 // TODO: Maybe rename to Car - more descriptive?
 public class MovingObjectImpl extends MovingObject {
+    private final Logger logger;
+    private final int agentId;
     private final List<RouteNode> displayRoute;
 
     private transient DrivingState state = DrivingState.STARTING;
-    private transient int closestLightIndex = Integer.MAX_VALUE;
+    private transient int closestLightIndex = -1;
 
-    public MovingObjectImpl(List<RouteNode> displayRoute, List<RouteNode> uniformRoute) {
+    public MovingObjectImpl(int agentId, List<RouteNode> displayRoute, List<RouteNode> uniformRoute) {
         super(50, uniformRoute);
+        this.agentId = agentId;
         this.displayRoute = displayRoute;
+        this.logger = LoggerFactory.getLogger("CarObject" + agentId);
     }
 
+    @SuppressWarnings("CopyConstructorMissesField")
     MovingObjectImpl(MovingObjectImpl movingObject) {
-        super(movingObject.speed, movingObject.route);
-        this.displayRoute = movingObject.displayRoute;
+        this(movingObject.agentId, movingObject.displayRoute, movingObject.route);
     }
 
     // TODO: Why car is moving backwards here? Change name of the function to describe behaviour
     @Override
     public long getAdjacentOsmWayId() {
+        int index = moveIndex;
         while (!(route.get(moveIndex) instanceof LightManagerNode)) {
             --moveIndex;
+        }
+        if (index > moveIndex) {
+            logger.warn("I was moving backwards!");
         }
         return ((LightManagerNode) route.get(moveIndex)).getAdjacentWayId();
     }
@@ -47,7 +57,7 @@ public class MovingObjectImpl extends MovingObject {
             }
         }
 
-        closestLightIndex = Integer.MAX_VALUE;
+        closestLightIndex = -1;
         return null;
     }
 
@@ -59,14 +69,13 @@ public class MovingObjectImpl extends MovingObject {
         return (LightManagerNode) (route.get(closestLightIndex));
     }
 
-    // TODO: Behaviour was changed, confirm that is correct and add test.
     @Override
     public boolean isAtTrafficLights() {
         if (isAtDestination()) {
             return false;
         }
 
-        return closestLightIndex == moveIndex;
+        return route.get(moveIndex) instanceof LightManagerNode;
     }
 
     @Override

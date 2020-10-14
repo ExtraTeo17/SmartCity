@@ -39,13 +39,14 @@ class AgentsFactory implements IAgentsFactory {
 
     @Override
     public VehicleAgent create(List<RouteNode> route, boolean testCar) {
+        var id = idGenerator.get(VehicleAgent.class);
         var uniformRoute = routeTransformer.uniformRoute(route);
-        var car = new MovingObjectImpl(route, uniformRoute);
+        var car = new MovingObjectImpl(id, route, uniformRoute);
         if (testCar) {
             car = new TestCar(car, timeProvider);
         }
 
-        return new VehicleAgent(idGenerator.get(VehicleAgent.class), car, timeProvider, eventBus);
+        return new VehicleAgent(id, car, timeProvider, eventBus);
     }
 
     @Override

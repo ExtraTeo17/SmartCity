@@ -1,6 +1,7 @@
 package agents;
 
 import agents.abstractions.AbstractAgent;
+import agents.utilities.LoggerLevel;
 import agents.utilities.MessageParameter;
 import com.google.common.eventbus.EventBus;
 import events.web.VehicleAgentUpdatedEvent;
@@ -12,6 +13,7 @@ import jade.util.leap.Properties;
 import routing.core.IGeoPosition;
 import smartcity.ITimeProvider;
 import smartcity.SmartCityAgent;
+import utilities.ConditionalExecutor;
 import vehicles.DrivingState;
 import vehicles.MovingObject;
 
@@ -43,9 +45,13 @@ public class VehicleAgent extends AbstractAgent {
             public void onTick() {
                 if (vehicle.isAtTrafficLights()) {
                     switch (vehicle.getState()) {
-                        case MOVING:
+                        case MOVING -> {
                             vehicle.setState(DrivingState.WAITING_AT_LIGHT);
                             var lightNode = vehicle.getCurrentTrafficLightNode();
+                            if (lightNode == null) {
+                                print("LightNode not found, but I am at traffic lights", LoggerLevel.ERROR);
+                                return;
+                            }
                             ACLMessage msg = createMessage(ACLMessage.REQUEST_WHEN, LightManagerAgent.name,
                                     lightNode.getLightManagerId());
                             Properties properties = createProperties(MessageParameter.VEHICLE);
@@ -53,15 +59,14 @@ public class VehicleAgent extends AbstractAgent {
                             msg.setAllUserDefinedParameters(properties);
                             send(msg);
                             print("Asking LightManager" + lightNode.getLightManagerId() + " for right to passage.");
-                            break;
-                        case WAITING_AT_LIGHT:
-
-                            break;
-                        case PASSING_LIGHT:
-                            print("Passing");
+                        }
+                        case WAITING_AT_LIGHT ->
+                                ConditionalExecutor.trace(() -> print("Waiting at light", LoggerLevel.TRACE));
+                        case PASSING_LIGHT -> {
+                            print("Passing at: " + timeProvider.getCurrentSimulationTime().toLocalTime());
                             move();
                             vehicle.setState(DrivingState.MOVING);
-                            break;
+                        }
                     }
                 }
                 else if (vehicle.isAtDestination()) {

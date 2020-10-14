@@ -69,6 +69,7 @@ class LightSwitcher implements Function<ISwitchLightsContext, Integer> {
 
         // TODO: Can include yellow somehow?
         lights.forEach(Light::switchLight);
+        logger.trace("Switched light !!!!");
         lightsOsmIds.forEach(id -> eventBus.post(new SwitchLightsEvent(id)));
 
         return defaultExecutionDelay;
