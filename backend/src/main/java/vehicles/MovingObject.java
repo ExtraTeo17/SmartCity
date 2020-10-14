@@ -27,7 +27,7 @@ public abstract class MovingObject {
         this.route = route;
         this.moveIndex = 0;
         this.closestLightIndex = Integer.MAX_VALUE;
-        state = DrivingState.STARTING;
+        this.state = DrivingState.STARTING;
     }
 
     public IGeoPosition getPosition() {
@@ -55,7 +55,7 @@ public abstract class MovingObject {
     public abstract String getVehicleType();
 
     public LightManagerNode switchToNextTrafficLight() {
-        for (int i = moveIndex; i < route.size(); ++i) {
+        for (int i = moveIndex + 1; i < route.size(); ++i) {
             var node = route.get(i);
             if (node instanceof LightManagerNode) {
                 closestLightIndex = i;
