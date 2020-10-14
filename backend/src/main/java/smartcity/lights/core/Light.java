@@ -131,6 +131,4 @@ public class Light extends Position {
             pedestrianQueue.remove();
         }
     }
-
-
 }

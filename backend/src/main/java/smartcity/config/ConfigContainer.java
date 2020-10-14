@@ -12,8 +12,8 @@ import smartcity.SimulationState;
 public class ConfigContainer extends ConfigMutator
         implements IZoneMutator, ILightConfigContainer {
     private SimulationState simulationState = SimulationState.INITIAL;
-    private boolean shouldGeneratePedestriansAndBuses = true;
-    private boolean shouldGenerateCars = false;
+    private boolean shouldGeneratePedestriansAndBuses = false;
+    private boolean shouldGenerateCars = true;
     private boolean lightManagersLock = false;
     private boolean isLightStrategyActive = true;
     private int extendTimeSeconds = 30;

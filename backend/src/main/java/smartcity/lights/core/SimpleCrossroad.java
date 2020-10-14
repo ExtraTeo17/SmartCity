@@ -15,10 +15,10 @@ import utilities.Siblings;
 
 import java.util.*;
 import java.util.function.Consumer;
+import java.util.stream.Collectors;
 
 class SimpleCrossroad implements ICrossroad {
-    private static final Logger logger = LoggerFactory.getLogger(SimpleCrossroad.class);
-
+    private final Logger logger;
     private final EventBus eventBus;
     private final int managerId;
     @SuppressWarnings("MismatchedQueryAndUpdateOfCollection")
@@ -27,6 +27,7 @@ class SimpleCrossroad implements ICrossroad {
     SimpleCrossroad(EventBus eventBus,
                     int managerId,
                     Siblings<SimpleLightGroup> lightGroups) {
+        this.logger = LoggerFactory.getLogger("SimpleCrossroad" + managerId);
         this.eventBus = eventBus;
         this.managerId = managerId;
         this.wayIdToLightMap = new HashMap<>() {{
@@ -98,12 +99,9 @@ class SimpleCrossroad implements ICrossroad {
     }
 
     private void logAddError(long adjacentWayId) {
-        logger.warn("Failed to get adjacentWayId: " + adjacentWayId);
-        for (var entry : wayIdToLightMap.entrySet()) {
-            logger.warn("-------------\n " +
-                    entry.getKey() + "\n " +
-                    entry.getValue().getAdjacentWayId());
-        }
+        logger.warn("Failed to get adjacentWayId: " + adjacentWayId + "\n" + wayIdToLightMap.entrySet().stream()
+                .map(entry -> entry.getKey() + ", " + entry.getValue().getOsmLightId())
+                .collect(Collectors.joining("\n")));
     }
 
     @Override
