@@ -51,8 +51,6 @@ public class MovingObjectImpl extends MovingObject {
         return null;
     }
 
-    // TODO: Delete this function - replaced with getNextTrafficLight
-    @Deprecated
     @Override
     public LightManagerNode getCurrentTrafficLightNode() {
         if (closestLightIndex == -1) {

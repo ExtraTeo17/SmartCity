@@ -9,7 +9,6 @@ import jade.core.behaviours.CyclicBehaviour;
 import jade.core.behaviours.TickerBehaviour;
 import jade.lang.acl.ACLMessage;
 import jade.util.leap.Properties;
-import routing.LightManagerNode;
 import routing.core.IGeoPosition;
 import smartcity.ITimeProvider;
 import smartcity.SmartCityAgent;
@@ -46,14 +45,14 @@ public class VehicleAgent extends AbstractAgent {
                     switch (vehicle.getState()) {
                         case MOVING:
                             vehicle.setState(DrivingState.WAITING_AT_LIGHT);
-                            LightManagerNode light = vehicle.switchToNextTrafficLight();
+                            var lightNode = vehicle.getCurrentTrafficLightNode();
                             ACLMessage msg = createMessage(ACLMessage.REQUEST_WHEN, LightManagerAgent.name,
-                                    light.getLightManagerId());
+                                    lightNode.getLightManagerId());
                             Properties properties = createProperties(MessageParameter.VEHICLE);
                             properties.setProperty(MessageParameter.ADJACENT_OSM_WAY_ID, Long.toString(vehicle.getAdjacentOsmWayId()));
                             msg.setAllUserDefinedParameters(properties);
                             send(msg);
-                            print("Asking LightManager" + light.getLightManagerId() + " for right to passage.");
+                            print("Asking LightManager" + lightNode.getLightManagerId() + " for right to passage.");
                             break;
                         case WAITING_AT_LIGHT:
 

@@ -43,7 +43,7 @@ class SimpleCrossroad implements ICrossroad {
     }
 
     private OptimizationResult allCarsOnGreen() {
-        OptimizationResult result = new OptimizationResult();
+        var result = new OptimizationResult();
         for (Light light : wayIdToLightMap.values()) {
             if (light.isGreen()) {
                 for (String carName : light.carQueue) {
@@ -51,7 +51,6 @@ class SimpleCrossroad implements ICrossroad {
                 }
             }
             else {
-                // TODO: Sth is wrong here - pedestrianName <-> add-CAR-GrantedPassthrough?
                 for (String pedestrianName : light.pedestrianQueue) {
                     result.addCarGrantedPassthrough(pedestrianName);
                 }

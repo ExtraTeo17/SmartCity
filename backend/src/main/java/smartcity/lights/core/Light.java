@@ -133,6 +133,4 @@ public class Light extends Position {
     }
 
 
-
-
 }

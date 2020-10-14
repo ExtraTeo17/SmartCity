@@ -18,7 +18,7 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 class LightSwitcher implements Function<ISwitchLightsContext, Integer> {
-    private static final Logger logger = LoggerFactory.getLogger(LightSwitcher.class);
+    private final Logger logger;
 
     private final ITimeProvider timeProvider;
     private final ConfigContainer configContainer;
@@ -43,6 +43,9 @@ class LightSwitcher implements Function<ISwitchLightsContext, Integer> {
         this.defaultExecutionDelay = extendTimeSeconds * 1000 / TimeProvider.TIME_SCALE;
         this.lights = lights;
         this.lightsOsmIds = lights.stream().map(Light::getOsmLightId).collect(Collectors.toSet());
+
+        var firstOsmId = lightsOsmIds.stream().findFirst().orElse(0L);
+        this.logger = LoggerFactory.getLogger("LightSwitcher" + firstOsmId);
     }
 
     @Override
