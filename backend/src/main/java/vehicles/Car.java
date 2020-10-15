@@ -1,6 +1,5 @@
 package vehicles;
 
-import routing.RoutingConstants;
 import routing.nodes.LightManagerNode;
 import routing.nodes.RouteNode;
 
@@ -10,12 +9,12 @@ public class Car extends MovingObject {
     private final List<RouteNode> displayRoute;
 
     public Car(int agentId, List<RouteNode> displayRoute, List<RouteNode> uniformRoute) {
-        super(agentId,50, uniformRoute);
+        super(agentId, 50, uniformRoute);
         this.displayRoute = displayRoute;
     }
 
     Car(Car car) {
-        super(car.agentId, car.speed, car.route);
+        super(car.agentId, car.speed, car.uniformRoute);
         this.displayRoute = car.displayRoute;
     }
 
@@ -23,13 +22,13 @@ public class Car extends MovingObject {
     @Override
     public long getAdjacentOsmWayId() {
         int index = moveIndex;
-        while (!(route.get(moveIndex) instanceof LightManagerNode)) {
+        while (!(uniformRoute.get(moveIndex) instanceof LightManagerNode)) {
             --moveIndex;
         }
         if (index > moveIndex) {
             logger.warn("I was moving backwards!");
         }
-        return ((LightManagerNode) route.get(moveIndex)).getAdjacentWayId();
+        return ((LightManagerNode) uniformRoute.get(moveIndex)).getAdjacentWayId();
     }
 
     @Override
@@ -38,12 +37,7 @@ public class Car extends MovingObject {
     }
 
     @Override
-    public List<RouteNode> getDisplayRoute() {
+    public List<RouteNode> getSimpleRoute() {
         return displayRoute;
-    }
-
-    @Override
-    public int getMillisecondsToNextLight() {
-        return ((closestLightIndex - moveIndex) * RoutingConstants.STEP_CONSTANT) / getSpeed();
     }
 }

@@ -81,7 +81,7 @@ class MovingObjectTests {
         var result = movingObject.isAtTrafficLights();
 
         // Assert
-        assertEquals(movingObject.route.get(initialMoveIndex) instanceof LightManagerNode, result, testCaseName);
+        assertEquals(movingObject.uniformRoute.get(initialMoveIndex) instanceof LightManagerNode, result, testCaseName);
     }
 
     @ParameterizedTest

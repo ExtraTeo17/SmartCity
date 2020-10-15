@@ -3,6 +3,7 @@ package vehicles;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import routing.RoutingConstants;
 import routing.core.IGeoPosition;
 import routing.nodes.LightManagerNode;
 import routing.nodes.RouteNode;
@@ -15,27 +16,27 @@ public abstract class MovingObject {
     final Logger logger;
     final int agentId;
     final int speed;
-    final List<RouteNode> route;
+    final List<RouteNode> uniformRoute;
     int moveIndex;
     int closestLightIndex;
     DrivingState state;
 
-    MovingObject(int agentId, int speed, List<RouteNode> route) {
+    MovingObject(int agentId, int speed, List<RouteNode> uniformRoute) {
         this.logger = LoggerFactory.getLogger(this.getClass().getSimpleName() + "Object" + agentId);
         this.agentId = agentId;
         this.speed = speed;
-        this.route = route;
+        this.uniformRoute = uniformRoute;
         this.moveIndex = 0;
         this.closestLightIndex = Integer.MAX_VALUE;
         this.state = DrivingState.STARTING;
     }
 
     public IGeoPosition getPosition() {
-        if (moveIndex >= route.size()) {
-            return route.get(route.size() - 1);
+        if (moveIndex >= uniformRoute.size()) {
+            return uniformRoute.get(uniformRoute.size() - 1);
         }
 
-        return route.get(moveIndex);
+        return uniformRoute.get(moveIndex);
     }
 
     /**
@@ -47,16 +48,16 @@ public abstract class MovingObject {
 
     public void move() {
         ++moveIndex;
-        if (moveIndex > route.size()) {
-            throw new ArrayIndexOutOfBoundsException("MovingObject exceeded its route: " + moveIndex + "/" + route.size());
+        if (moveIndex > uniformRoute.size()) {
+            throw new ArrayIndexOutOfBoundsException("MovingObject exceeded its route: " + moveIndex + "/" + uniformRoute.size());
         }
     }
 
     public abstract String getVehicleType();
 
     public LightManagerNode switchToNextTrafficLight() {
-        for (int i = moveIndex + 1; i < route.size(); ++i) {
-            var node = route.get(i);
+        for (int i = moveIndex + 1; i < uniformRoute.size(); ++i) {
+            var node = uniformRoute.get(i);
             if (node instanceof LightManagerNode) {
                 closestLightIndex = i;
                 return (LightManagerNode) node;
@@ -72,18 +73,18 @@ public abstract class MovingObject {
             return false;
         }
 
-        return route.get(moveIndex) instanceof LightManagerNode;
+        return uniformRoute.get(moveIndex) instanceof LightManagerNode;
     }
 
     public LightManagerNode getCurrentTrafficLightNode() {
         if (closestLightIndex == Integer.MAX_VALUE) {
             return null;
         }
-        return (LightManagerNode) (route.get(closestLightIndex));
+        return (LightManagerNode) (uniformRoute.get(closestLightIndex));
     }
 
     public boolean isAtDestination() {
-        return moveIndex == route.size();
+        return moveIndex == uniformRoute.size();
     }
 
     public DrivingState getState() {
@@ -94,9 +95,11 @@ public abstract class MovingObject {
         this.state = state;
     }
 
-    public abstract List<RouteNode> getDisplayRoute();
+    public int getMillisecondsToNextLight(){
+        return ((closestLightIndex - moveIndex) * RoutingConstants.STEP_CONSTANT) / getSpeed();
+    }
+
+    public abstract List<RouteNode> getSimpleRoute();
 
     public abstract long getAdjacentOsmWayId();
-
-    public abstract int getMillisecondsToNextLight();
 }

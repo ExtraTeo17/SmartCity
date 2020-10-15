@@ -24,7 +24,7 @@ public class Bus extends MovingObject {
     private final HashMap<Integer, List<String>> stationsForPassengers;
     private final List<StationNode> stationNodesOnRoute;
     private final String busLine;
-    private final List<RouteNode> displayRoute;
+    private final List<RouteNode> simpleRoute;
     private final ITimeProvider timeProvider;
 
     private int closestStationIndex = -1;
@@ -40,7 +40,7 @@ public class Bus extends MovingObject {
                String brigadeNr) {
         super(agentId, 40, uniformRoute);
         this.timeProvider = timeProvider;
-        this.displayRoute = route;
+        this.simpleRoute = route;
         this.timetable = timetable;
         this.busLine = busLine;
         this.logger = LoggerFactory.getLogger(Bus.class.getName() + " (l_" + busLine + ") (br_" + brigadeNr + ")");
@@ -103,7 +103,7 @@ public class Bus extends MovingObject {
 
     @Override
     public long getAdjacentOsmWayId() {
-        return ((LightManagerNode) route.get(moveIndex)).getAdjacentWayId();
+        return ((LightManagerNode) uniformRoute.get(moveIndex)).getAdjacentWayId();
     }
 
     @Override
@@ -112,10 +112,10 @@ public class Bus extends MovingObject {
     }
 
     public Optional<StationNode> findNextStation() {
-        for (int i = moveIndex + 1; i < route.size(); ++i) {
-            if (route.get(i) instanceof StationNode) {
+        for (int i = moveIndex + 1; i < uniformRoute.size(); ++i) {
+            if (uniformRoute.get(i) instanceof StationNode) {
                 closestStationIndex = i;
-                return Optional.of((StationNode) route.get(i));
+                return Optional.of((StationNode) uniformRoute.get(i));
             }
         }
         closestStationIndex = -1;
@@ -136,29 +136,29 @@ public class Bus extends MovingObject {
     }
 
     public RouteNode findNextStop() {
-        for (int i = moveIndex + 1; i < route.size(); i++) {
-            if (route.get(i) instanceof StationNode) {
-                return route.get(i);
+        for (int i = moveIndex + 1; i < uniformRoute.size(); i++) {
+            if (uniformRoute.get(i) instanceof StationNode) {
+                return uniformRoute.get(i);
             }
-            else if (route.get(i) instanceof LightManagerNode) {
-                return route.get(i);
+            else if (uniformRoute.get(i) instanceof LightManagerNode) {
+                return uniformRoute.get(i);
             }
         }
         return null;
     }
 
     public boolean isAtStation() {
-        if (moveIndex == route.size()) {
+        if (moveIndex == uniformRoute.size()) {
             return false;
         }
-        return route.get(moveIndex) instanceof StationNode;
+        return uniformRoute.get(moveIndex) instanceof StationNode;
     }
 
     public Optional<StationNode> getCurrentStationNode() {
         if (closestStationIndex == -1) {
             return Optional.empty();
         }
-        return Optional.of((StationNode) (route.get(closestStationIndex)));
+        return Optional.of((StationNode) (uniformRoute.get(closestStationIndex)));
     }
 
     @Override
@@ -173,13 +173,8 @@ public class Bus extends MovingObject {
     }
 
     @Override
-    public List<RouteNode> getDisplayRoute() {
-        return displayRoute;
-    }
-
-    @Override
-    public int getMillisecondsToNextLight() {
-        return ((closestLightIndex - moveIndex) * RoutingConstants.STEP_CONSTANT) / getSpeed();
+    public List<RouteNode> getSimpleRoute() {
+        return simpleRoute;
     }
 
     // TODO: Are they though?
