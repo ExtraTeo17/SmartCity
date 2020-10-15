@@ -60,10 +60,10 @@ public class TaskManager implements ITaskManager {
             var posA = zoneCenter.sum(geoPosInZoneCircle);
             var posB = zoneCenter.diff(geoPosInZoneCircle);
 
-            taskProvider.getCreateCarTask(posA, posB, agentsContainer.size(VehicleAgent.class) == testCarId).run();
+            taskProvider.getCreateCarTask(posA, posB, agentsContainer.size(VehicleAgent.class) + 1 == testCarId).run();
         };
 
-        runIf(() -> agentsContainer.size(VehicleAgent.class) <= carsLimit, createCars, CREATE_CAR_INTERVAL, true);
+        runIf(() -> agentsContainer.size(VehicleAgent.class) < carsLimit, createCars, CREATE_CAR_INTERVAL, true);
     }
 
     @Override
@@ -79,9 +79,9 @@ public class TaskManager implements ITaskManager {
 
             // TODO: Move more logic here
             taskProvider.getCreatePedestrianTask(stations.first, stations.second, busAgent.getLine(),
-                    agentsContainer.size(PedestrianAgent.class) == testPedestrianId).run();
+                    agentsContainer.size(PedestrianAgent.class) + 1 == testPedestrianId).run();
         };
-        runIf(() -> agentsContainer.size(PedestrianAgent.class) <= numberOfPedestrians, createPedestrians,
+        runIf(() -> agentsContainer.size(PedestrianAgent.class) < numberOfPedestrians, createPedestrians,
                 CREATE_PEDESTRIAN_INTERVAL, true);
     }
 

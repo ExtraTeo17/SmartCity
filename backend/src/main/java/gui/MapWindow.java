@@ -54,8 +54,8 @@ public class MapWindow {
     private final JXMapViewer MapViewer;
     private boolean renderPedestrians = true;
     private boolean renderPedestrianRoutes = false;
-    private boolean renderCars = false;
-    private boolean renderCarRoutes = false;
+    private boolean renderCars = true;
+    private boolean renderCarRoutes = true;
     private boolean renderBuses = false;
     private boolean renderBusRoutes = false;
     private boolean renderZone = true;
