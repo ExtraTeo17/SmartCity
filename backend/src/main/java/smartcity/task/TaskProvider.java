@@ -15,9 +15,11 @@ import org.slf4j.LoggerFactory;
 import routing.abstractions.IRouteGenerator;
 import routing.abstractions.IRoutingHelper;
 import routing.core.IGeoPosition;
-import smartcity.config.ConfigContainer;
 import routing.nodes.RouteNode;
 import routing.nodes.StationNode;
+import smartcity.ITimeProvider;
+import smartcity.TimeProvider;
+import smartcity.config.ConfigContainer;
 import smartcity.lights.core.Light;
 import smartcity.task.abstractions.ITaskProvider;
 import smartcity.task.data.ISwitchLightsContext;
@@ -36,6 +38,7 @@ public class TaskProvider implements ITaskProvider {
     private final IAgentsFactory agentsFactory;
     private final IAgentsContainer agentsContainer;
     private final IFunctionalTaskFactory functionalTaskFactory;
+    private final ITimeProvider timeProvider;
     private final EventBus eventBus;
 
     private final Table<IGeoPosition, IGeoPosition, List<RouteNode>> routeInfoCache;
@@ -46,6 +49,7 @@ public class TaskProvider implements ITaskProvider {
                         IAgentsFactory agentsFactory,
                         IAgentsContainer agentsContainer,
                         IFunctionalTaskFactory functionalTaskFactory,
+                        ITimeProvider timeProvider,
                         EventBus eventBus) {
         this.configContainer = configContainer;
         this.routeGenerator = routeGenerator;
@@ -53,6 +57,7 @@ public class TaskProvider implements ITaskProvider {
         this.agentsFactory = agentsFactory;
         this.agentsContainer = agentsContainer;
         this.functionalTaskFactory = functionalTaskFactory;
+        this.timeProvider = timeProvider;
         this.eventBus = eventBus;
 
         this.routeInfoCache = HashBasedTable.create();
@@ -145,5 +150,15 @@ public class TaskProvider implements ITaskProvider {
         };
 
         return () -> switchLights.apply(switchLightsContext);
+    }
+
+    @Override
+    public Runnable getSimulationControlTask(long nanoStartTime) {
+        var updateTimeTask = timeProvider.getUpdateTimeTask((System.nanoTime() - nanoStartTime) /
+                (1_000_000 * TimeProvider.MS_PER_TICK));
+        return () -> {
+            updateTimeTask.run();
+            // TODO: Batch update of cars positions: eventBus.post();
+        };
     }
 }

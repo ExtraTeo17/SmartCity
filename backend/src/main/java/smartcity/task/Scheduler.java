@@ -6,6 +6,7 @@ import agents.abstractions.IAgentsContainer;
 import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
 import com.google.inject.Inject;
+import events.StartTimeEvent;
 import events.SwitchLightsStartEvent;
 import events.web.SimulationStartedEvent;
 import events.web.StartSimulationEvent;
@@ -54,5 +55,11 @@ public class Scheduler {
     @Subscribe
     public void handle(SwitchLightsStartEvent e) {
         taskManager.scheduleSwitchLightTask(e.managerId, e.lights);
+    }
+
+    @Subscribe
+    public void handle(StartTimeEvent e) {
+        taskManager.scheduleSimulationControl(() -> configContainer.getSimulationState() == SimulationState.RUNNING,
+                e.timePosted);
     }
 }

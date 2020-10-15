@@ -1,12 +1,14 @@
 package smartcity.task;
 
 import agents.BusAgent;
+import agents.VehicleAgent;
 import agents.abstractions.IAgentsContainer;
 import com.google.inject.Inject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import routing.abstractions.IRoutingHelper;
 import routing.core.IZone;
+import smartcity.TimeProvider;
 import smartcity.lights.core.Light;
 import smartcity.task.abstractions.ITaskManager;
 import smartcity.task.abstractions.ITaskProvider;
@@ -50,17 +52,17 @@ public class TaskManager implements ITaskManager {
     }
 
     @Override
-    public void scheduleCarCreation(int numberOfCars, int testCarId) {
-        Consumer<Integer> createCars = (Integer counter) -> {
+    public void scheduleCarCreation(int carsLimit, int testCarId) {
+        Runnable createCars = () -> {
             var zoneCenter = zone.getCenter();
             var geoPosInZoneCircle = routingHelper.generateRandomOffset(zone.getRadius());
             var posA = zoneCenter.sum(geoPosInZoneCircle);
             var posB = zoneCenter.diff(geoPosInZoneCircle);
 
-            taskProvider.getCreateCarTask(posA, posB, counter == testCarId).run();
+            taskProvider.getCreateCarTask(posA, posB, agentsContainer.size(VehicleAgent.class) == testCarId).run();
         };
 
-        runNTimes(createCars, numberOfCars, CREATE_CAR_INTERVAL, true);
+        runIf(() -> agentsContainer.size(VehicleAgent.class) <= carsLimit, createCars, CREATE_CAR_INTERVAL, true);
     }
 
     @Override
@@ -93,22 +95,32 @@ public class TaskManager implements ITaskManager {
     @Override
     public void scheduleSwitchLightTask(int managerId, Collection<Light> lights) {
         var switchLightsTaskWithDelay = taskProvider.getSwitchLightsTask(managerId, lights);
-        var runnable = runnableFactory.create(switchLightsTaskWithDelay, true);
+        var runnable = runnableFactory.createDelay(switchLightsTaskWithDelay, false);
         runnable.runEndless(0, TIME_UNIT);
     }
 
+    @Override
+    public void scheduleSimulationControl(BooleanSupplier testSimulationState, long nanoStartTime) {
+        var simulationControlTask = taskProvider.getSimulationControlTask(nanoStartTime);
+        runWhile(testSimulationState, simulationControlTask, TimeProvider.MS_PER_TICK);
+    }
 
     private void runNTimes(Consumer<Integer> runCountConsumer, int runCount, int interval) {
         runNTimes(runCountConsumer, runCount, interval, false);
     }
 
     private void runNTimes(Consumer<Integer> runCountConsumer, int runCount, int interval, boolean separateThread) {
-        var runnable = runnableFactory.create(runCountConsumer, runCount, separateThread);
+        var runnable = runnableFactory.createCount(runCountConsumer, runCount, separateThread);
         runnable.runFixed(interval, TIME_UNIT);
     }
 
     private void runWhile(BooleanSupplier test, Runnable action, int interval) {
-        var runnable = runnableFactory.create(test, action);
+        var runnable = runnableFactory.createWhile(test, action);
+        runnable.runFixed(interval, TIME_UNIT);
+    }
+
+    private void runIf(BooleanSupplier test, Runnable action, int interval, boolean separateThread) {
+        var runnable = runnableFactory.createIf(test, action, separateThread);
         runnable.runFixed(interval, TIME_UNIT);
     }
 }

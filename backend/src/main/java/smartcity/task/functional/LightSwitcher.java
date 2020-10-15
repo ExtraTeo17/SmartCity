@@ -52,12 +52,12 @@ class LightSwitcher implements Function<ISwitchLightsContext, Integer> {
         if (configContainer.isLightStrategyActive()) {
             if (!context.haveAlreadyExtendedGreen()) {
                 if (shouldExtendGreenLightBecauseOfCarsOnLight()) {
-                    logger.trace("-------------------------------------shouldExtendGreenLightBecauseOfCarsOnLight--------------");
+                    logger.debug("-------------------------------------shouldExtendGreenLightBecauseOfCarsOnLight--------------");
                     context.setExtendedGreen(true);
                     return defaultExecutionDelay;
                 }
                 else if (shouldExtendBecauseOfFarAwayQueue()) {
-                    logger.trace("-------------------------------------shouldExtendBecauseOfFarAwayQueue--------------");
+                    logger.debug("-------------------------------------shouldExtendBecauseOfFarAwayQueue--------------");
                     context.setExtendedGreen(true);
                     return defaultExecutionDelay;
                 }
@@ -69,7 +69,7 @@ class LightSwitcher implements Function<ISwitchLightsContext, Integer> {
 
         // TODO: Can include yellow somehow?
         lights.forEach(Light::switchLight);
-        logger.trace("Switched light !!!!");
+        logger.debug("Switched light at: " + timeProvider.getCurrentSimulationTime());
         lightsOsmIds.forEach(id -> eventBus.post(new SwitchLightsEvent(id)));
 
         return defaultExecutionDelay;
