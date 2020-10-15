@@ -1,6 +1,7 @@
 package smartcity.task;
 
 import agents.BusAgent;
+import agents.PedestrianAgent;
 import agents.VehicleAgent;
 import agents.abstractions.IAgentsContainer;
 import com.google.inject.Inject;
@@ -67,7 +68,7 @@ public class TaskManager implements ITaskManager {
 
     @Override
     public void schedulePedestrianCreation(int numberOfPedestrians, int testPedestrianId) {
-        Consumer<Integer> createPedestrians = (Integer counter) -> {
+        Runnable createPedestrians = () -> {
             var busAgentOpt = getRandomBusAgent();
             if (busAgentOpt.isEmpty()) {
                 logger.error("No buses exist");
@@ -78,9 +79,10 @@ public class TaskManager implements ITaskManager {
 
             // TODO: Move more logic here
             taskProvider.getCreatePedestrianTask(stations.first, stations.second, busAgent.getLine(),
-                    counter == testPedestrianId).run();
+                    agentsContainer.size(PedestrianAgent.class) == testPedestrianId).run();
         };
-        runNTimes(createPedestrians, numberOfPedestrians, CREATE_PEDESTRIAN_INTERVAL, true);
+        runIf(() -> agentsContainer.size(PedestrianAgent.class) <= numberOfPedestrians, createPedestrians,
+                CREATE_PEDESTRIAN_INTERVAL, true);
     }
 
     private Optional<BusAgent> getRandomBusAgent() {

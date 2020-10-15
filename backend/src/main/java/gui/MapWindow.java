@@ -5,6 +5,7 @@ import agents.abstractions.IAgentsContainer;
 import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
 import com.google.inject.Inject;
+import events.StartTimeEvent;
 import events.web.PrepareSimulationEvent;
 import events.web.SimulationPreparedEvent;
 import events.web.StartSimulationEvent;
@@ -249,6 +250,8 @@ public class MapWindow {
         var simulationTime = ((Date) setTimeSpinner.getValue()).toInstant().atZone(ZoneId.systemDefault())
                 .toLocalDateTime();
         timeProvider.setSimulationStartTime(simulationTime);
+        // TODO: Temporary until not set from web-gui and
+        eventBus.post(new StartTimeEvent(System.nanoTime()));
     }
 
     private int getZoneRadius() {
@@ -442,7 +445,7 @@ public class MapWindow {
     private void drawRoutes(List<Painter<JXMapViewer>> painters) {
         try {
             agentsContainer.forEach(VehicleAgent.class, a -> {
-                List<IGeoPosition> track = new ArrayList<>(a.getVehicle().getDisplayRoute());
+                List<IGeoPosition> track = new ArrayList<>(a.getVehicle().getSimpleRoute());
 
                 Random r = new Random(a.hashCode());
                 RoutePainter routePainter = new RoutePainter(track, new Color(r.nextInt(255), r.nextInt(255), r.nextInt(255)));
@@ -543,7 +546,7 @@ public class MapWindow {
         try {
             agentsContainer.forEach(BusAgent.class, busAgent -> {
                 var bus = busAgent.getBus();
-                List<IGeoPosition> track = new ArrayList<>(bus.getDisplayRoute());
+                List<IGeoPosition> track = new ArrayList<>(bus.getSimpleRoute());
 
                 Random r = new Random(busAgent.hashCode());
                 RoutePainter routePainter = new RoutePainter(track, new Color(r.nextInt(255), r.nextInt(255), r.nextInt(255)));

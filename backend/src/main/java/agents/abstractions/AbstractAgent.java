@@ -17,6 +17,7 @@ import utilities.ConditionalExecutor;
 import vehicles.MovingObject;
 
 import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.List;
 
 public abstract class AbstractAgent extends Agent {
@@ -87,8 +88,9 @@ public abstract class AbstractAgent extends Agent {
         ACLMessage msg = createMessage(ACLMessage.INFORM, LightManagerAgent.name, managerNode.getLightManagerId());
         var agentType = MessageParameter.getTypeByMovingObject(movingObject);
         Properties properties = createProperties(agentType);
-        var predictedTime = timeProvider.getCurrentSimulationTime().plusNanos(
-                movingObject.getMillisecondsToNextLight() * 1_000_000);
+        var simulationTime = timeProvider.getCurrentSimulationTime();
+        var msToNextLight = movingObject.getMillisecondsToNextLight();
+        var predictedTime = simulationTime.plus(msToNextLight, ChronoUnit.MILLIS);
         properties.setProperty(MessageParameter.ARRIVAL_TIME, "" + predictedTime);
         properties.setProperty(MessageParameter.ADJACENT_OSM_WAY_ID, "" + managerNode.getAdjacentWayId());
         msg.setAllUserDefinedParameters(properties);
