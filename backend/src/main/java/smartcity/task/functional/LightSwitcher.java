@@ -18,7 +18,7 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 class LightSwitcher implements Function<ISwitchLightsContext, Integer> {
-    private static final Logger logger = LoggerFactory.getLogger(LightSwitcher.class);
+    private final Logger logger;
 
     private final ITimeProvider timeProvider;
     private final ConfigContainer configContainer;
@@ -33,7 +33,8 @@ class LightSwitcher implements Function<ISwitchLightsContext, Integer> {
     LightSwitcher(ITimeProvider timeProvider,
                   ConfigContainer configContainer,
                   EventBus eventBus,
-                  @Assisted int extendTimeSeconds,
+                  @Assisted("managerId") int managerId,
+                  @Assisted("extendTime") int extendTimeSeconds,
                   @Assisted Collection<Light> lights) {
         this.timeProvider = timeProvider;
         this.configContainer = configContainer;
@@ -43,6 +44,7 @@ class LightSwitcher implements Function<ISwitchLightsContext, Integer> {
         this.defaultExecutionDelay = extendTimeSeconds * 1000 / TimeProvider.TIME_SCALE;
         this.lights = lights;
         this.lightsOsmIds = lights.stream().map(Light::getOsmLightId).collect(Collectors.toSet());
+        this.logger = LoggerFactory.getLogger("LightSwitcher" + managerId);
     }
 
     @Override
@@ -50,12 +52,12 @@ class LightSwitcher implements Function<ISwitchLightsContext, Integer> {
         if (configContainer.isLightStrategyActive()) {
             if (!context.haveAlreadyExtendedGreen()) {
                 if (shouldExtendGreenLightBecauseOfCarsOnLight()) {
-                    logger.trace("-------------------------------------shouldExtendGreenLightBecauseOfCarsOnLight--------------");
+                    logger.debug("-------------------------------------shouldExtendGreenLightBecauseOfCarsOnLight--------------");
                     context.setExtendedGreen(true);
                     return defaultExecutionDelay;
                 }
                 else if (shouldExtendBecauseOfFarAwayQueue()) {
-                    logger.trace("-------------------------------------shouldExtendBecauseOfFarAwayQueue--------------");
+                    logger.debug("-------------------------------------shouldExtendBecauseOfFarAwayQueue--------------");
                     context.setExtendedGreen(true);
                     return defaultExecutionDelay;
                 }
@@ -67,6 +69,7 @@ class LightSwitcher implements Function<ISwitchLightsContext, Integer> {
 
         // TODO: Can include yellow somehow?
         lights.forEach(Light::switchLight);
+        logger.debug("Switched light at: " + timeProvider.getCurrentSimulationTime());
         lightsOsmIds.forEach(id -> eventBus.post(new SwitchLightsEvent(id)));
 
         return defaultExecutionDelay;

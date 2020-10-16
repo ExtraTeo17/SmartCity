@@ -10,5 +10,7 @@ public interface ITimeProvider {
 
     LocalDateTime getStartSimulationTime();
 
-    long getNanoStartTime();
+    long getTicks();
+
+    Runnable getUpdateTimeTask(long initialTicks);
 }

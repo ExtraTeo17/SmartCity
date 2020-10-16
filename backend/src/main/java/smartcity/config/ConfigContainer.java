@@ -2,7 +2,6 @@ package smartcity.config;
 
 import com.google.common.eventbus.EventBus;
 import com.google.inject.Inject;
-import events.web.SimulationPreparedEvent;
 import routing.core.IGeoPosition;
 import routing.core.IZone;
 import routing.core.Position;
@@ -13,10 +12,12 @@ import smartcity.SimulationState;
 public class ConfigContainer extends ConfigMutator
         implements IZoneMutator, ILightConfigContainer {
     private SimulationState simulationState = SimulationState.INITIAL;
-    private boolean shouldGeneratePedestriansAndBuses = true;
-    private boolean shouldGenerateCars = false;
+    private boolean shouldGeneratePedestriansAndBuses = false;
+    private boolean shouldGenerateCars = true;
     private boolean lightManagersLock = false;
     private boolean isLightStrategyActive = true;
+    private int extendTimeSeconds = 30;
+
     private final IZone zone;
     private final ObjectsConfig carsConfig;
 
@@ -105,5 +106,9 @@ public class ConfigContainer extends ConfigMutator
     @Override
     public void setLightStrategyActive(boolean lightStrategyActive) {
         isLightStrategyActive = lightStrategyActive;
+    }
+
+    public int getExtendTimeSeconds() {
+        return extendTimeSeconds;
     }
 }

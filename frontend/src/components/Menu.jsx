@@ -108,7 +108,7 @@ const Menu = props => {
       </form>
       <form className="form-border">
         <div className="form-group">
-          <label htmlFor="carsNum">Cars number</label>
+          <label htmlFor="carsNum">Cars limit</label>
           <input
             type="number"
             defaultValue={carsNum}
@@ -116,7 +116,7 @@ const Menu = props => {
             id="carsNum"
             min={carMin}
             max={carMax}
-            placeholder="Enter number of cars"
+            placeholder="Enter limit for cars"
             onChange={e => setCarsNum(parseInt(e.target.value))}
           />
         </div>
