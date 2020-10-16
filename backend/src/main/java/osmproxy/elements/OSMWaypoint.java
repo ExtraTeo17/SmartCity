@@ -11,8 +11,8 @@ public class OSMWaypoint extends Position implements Serializable {
     private final String osmNodeRef;
 
     @ForSerialization
-    public OSMWaypoint(){
-        osmNodeRef ="";
+    public OSMWaypoint() {
+        osmNodeRef = "";
     }
 
     OSMWaypoint(String nodeRef, double lat, double lng) {

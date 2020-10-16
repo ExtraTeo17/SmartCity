@@ -22,13 +22,11 @@ import osmproxy.elements.OSMNode;
 import osmproxy.elements.OSMStation;
 import osmproxy.elements.OSMWay;
 import routing.abstractions.IRouteGenerator;
-import routing.core.IZone;
 import routing.nodes.RouteNode;
 import routing.nodes.StationNode;
 import smartcity.SimulationState;
 import smartcity.TimeProvider;
 import smartcity.config.ConfigContainer;
-import utilities.FileWrapper;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;

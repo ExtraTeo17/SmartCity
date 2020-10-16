@@ -1,4 +1,12 @@
-import { CAR_KILLED, CAR_UPDATED, CAR_CREATED, CENTER_UPDATED, SIMULATION_PREPARED, LIGHTS_SWITCHED } from "./constants";
+import {
+  CAR_KILLED,
+  CAR_UPDATED,
+  CAR_CREATED,
+  CENTER_UPDATED,
+  SIMULATION_PREPARED,
+  LIGHTS_SWITCHED,
+  TROUBLE_POINT_CREATED,
+} from "./constants";
 import { createAction } from "redux-actions";
 
 /**
@@ -39,3 +47,5 @@ export const carUpdated = createAction(CAR_UPDATED);
 export const carKilled = createAction(CAR_KILLED);
 
 export const lightsSwitched = createAction(LIGHTS_SWITCHED);
+
+export const troublePointCreated = createAction(TROUBLE_POINT_CREATED);

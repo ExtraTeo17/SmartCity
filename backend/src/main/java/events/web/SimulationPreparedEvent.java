@@ -1,6 +1,5 @@
 package events.web;
 
-import osmproxy.elements.OSMNode;
 import osmproxy.elements.OSMStation;
 import smartcity.lights.core.Light;
 

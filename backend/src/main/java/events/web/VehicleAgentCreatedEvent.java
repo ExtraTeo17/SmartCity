@@ -1,7 +1,7 @@
 package events.web;
 
-import routing.nodes.RouteNode;
 import routing.core.IGeoPosition;
+import routing.nodes.RouteNode;
 
 import java.util.List;
 
