@@ -22,6 +22,10 @@ public class MessageParameter {
     public static final String TROUBLE_LON = "trouble_lon";
     public static final String TROUBLE_LAT = "trouble_lat";
     public static final String EDGE_ID = "edge_id";
+    public static final String TROUBLE = "trouble";
+    public static final String SHOW = "show";
+    public static final String STOP = "stop";
+
 
     public static String getTypeByMovingObject(MovingObject movingObject) {
         var type = movingObject.getVehicleType();

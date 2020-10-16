@@ -101,6 +101,7 @@ public class Light extends Position {
     }
 
     void removeCarFromFarAwayQueue(String agentName) {
+        if(!farAwayCarMap.containsKey(agentName))
         farAwayCarMap.remove(agentName);
     }
 

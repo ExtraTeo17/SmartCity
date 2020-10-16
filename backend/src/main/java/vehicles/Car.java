@@ -31,6 +31,7 @@ public class Car extends MovingObject {
         return ((LightManagerNode) uniformRoute.get(moveIndex)).getAdjacentWayId();
     }
 
+
     @Override
     public String getVehicleType() {
         return VehicleType.REGULAR_CAR.toString();

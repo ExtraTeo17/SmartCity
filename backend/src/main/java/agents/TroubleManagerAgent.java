@@ -43,27 +43,30 @@ public class TroubleManagerAgent extends Agent {
                 if (rcv != null) {
                     switch (rcv.getPerformative()) {
                         case ACLMessage.INFORM -> {
+                            if(rcv.getUserDefinedParameter(MessageParameter.TROUBLE).equals(MessageParameter.SHOW)) {   //parsing received message
+                                //TODO: Show trouble point on gui
+                                var troublePoint = Position.of(Double.parseDouble(rcv.getUserDefinedParameter(MessageParameter.TROUBLE_LAT)),
+                                        Double.parseDouble(rcv.getUserDefinedParameter(MessageParameter.TROUBLE_LON)));
+                                System.out.println("TroubleAgent: Got message about trouble");
+                                System.out.println("troublePoint: " + troublePoint.getLat() + "  " + troublePoint.getLng());
+                                Long edgeId = Long.parseLong(rcv.getUserDefinedParameter(MessageParameter.EDGE_ID));
+                                System.out.println("trouble edge: " + edgeId);
+                                //broadcasting to everybody
+                                ACLMessage response = new ACLMessage(ACLMessage.PROPOSE);
+                                Properties properties = createProperties(MessageParameter.TROUBLE_MANAGER);
+                                properties.setProperty(MessageParameter.EDGE_ID, edgeId.toString());
+                                response.setAllUserDefinedParameters(properties);
 
-                            //parsing received message
-                            //TODO: Show trouble point on gui
-                            var troublePoint = Position.of(Double.parseDouble(rcv.getUserDefinedParameter(MessageParameter.TROUBLE_LAT)),
-                                    Double.parseDouble(rcv.getUserDefinedParameter(MessageParameter.TROUBLE_LON)));
-                            System.out.println("TroubleAgent: Got message about trouble");
-                            System.out.println("troublePoint: " + troublePoint.getLat() + "  " + troublePoint.getLng());
-                            Long edgeId = Long.parseLong(rcv.getUserDefinedParameter(MessageParameter.EDGE_ID));
-                            System.out.println("trouble edge: " + edgeId);
-                            //broadcasting to everybody
-                            ACLMessage response = new ACLMessage(ACLMessage.PROPOSE);
-                            Properties properties = createProperties(MessageParameter.TROUBLE_MANAGER);
-                            properties.setProperty(MessageParameter.EDGE_ID, edgeId.toString());
-                            response.setAllUserDefinedParameters(properties);
-
-                            agentsContainer.forEach(VehicleAgent.class, vehicleAgent -> {
-                                response.addReceiver(vehicleAgent.getAID());
-                            });
-                            send(response);
-                            System.out.println("Trouble Manger: send broadcast");
-
+                                agentsContainer.forEach(VehicleAgent.class, vehicleAgent -> {
+                                    response.addReceiver(vehicleAgent.getAID());
+                                });
+                                send(response);
+                                System.out.println("Trouble Manger: send broadcast");
+                            }
+                            else if (rcv.getUserDefinedParameter(MessageParameter.TROUBLE).equals(MessageParameter.STOP))
+                            {
+                                //TODO: FOR FUTURE CHANGE ROOT AGAIN OF THE CAR?
+                            }
                         }
                     }
                     block(100);

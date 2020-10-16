@@ -77,6 +77,13 @@ public abstract class MovingObject {
 
         return uniformRoute.get(moveIndex+index);
     }
+    public int getFarOnIndex(int  index) {
+        if (moveIndex >= uniformRoute.size()) {
+            return uniformRoute.size() - 1;
+        }
+
+        return moveIndex+index;
+    }
 
     public boolean checkIfEdgeExistsAndFarEnough(Long edgeId){
         int threshold = 5;
@@ -92,7 +99,7 @@ public abstract class MovingObject {
         return false;
     }
     public List<RouteNode> getUniformRoute(){return uniformRoute;}
-    public List<RouteNode> getDisplayRoute(){return displayRoute;}
+  //  public List<RouteNode> getDisplayRoute(){return displayRoute;}
 
     public abstract String getVehicleType();
 
@@ -108,7 +115,18 @@ public abstract class MovingObject {
         closestLightIndex = Integer.MAX_VALUE;
         return null;
     }
+    public LightManagerNode switchToNextTrafficLight(int farIndex) {
+        for (int i = moveIndex+farIndex + 1; i < uniformRoute.size(); ++i) {
+            var node = uniformRoute.get(i);
+            if (node instanceof LightManagerNode) {
+                closestLightIndex = i;
+                return (LightManagerNode) node;
+            }
+        }
 
+        closestLightIndex = Integer.MAX_VALUE;
+        return null;
+    }
     public boolean isAtTrafficLights() {
         if (isAtDestination()) {
             return false;
@@ -123,7 +141,16 @@ public abstract class MovingObject {
         }
         return (LightManagerNode) (uniformRoute.get(closestLightIndex));
     }
-
+    public long getAdjacentOsmWayId(int indexFar) {
+        int index = moveIndex+indexFar;
+        while (!(uniformRoute.get(moveIndex) instanceof LightManagerNode)) {
+            --moveIndex;
+        }
+        if (index > moveIndex) {
+            logger.warn("I was moving backwards!");
+        }
+        return ((LightManagerNode) uniformRoute.get(moveIndex)).getAdjacentWayId();
+    }
     public boolean isAtDestination() {
         return moveIndex == uniformRoute.size();
     }
@@ -143,4 +170,5 @@ public abstract class MovingObject {
     public abstract List<RouteNode> getSimpleRoute();
 
     public abstract long getAdjacentOsmWayId();
+
 }

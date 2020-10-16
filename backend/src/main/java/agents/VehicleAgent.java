@@ -19,6 +19,7 @@ import smartcity.SmartCityAgent;
 import vehicles.DrivingState;
 import vehicles.MovingObject;
 
+import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.Random;
 
@@ -30,7 +31,7 @@ public class VehicleAgent extends AbstractAgent {
     private final MovingObject vehicle;
     private  int timeBeforeAccident = 0;
     private IRouteGenerator  routeGenerator;
-
+    private  RouteNode troublePoint;
     VehicleAgent(int id, MovingObject vehicle, ITimeProvider timeProvider, EventBus eventBus, int timeBeforeAccident, IRouteGenerator routeGenerator ) {
         super(id, vehicle.getVehicleType(), timeProvider, eventBus);
         this.vehicle = vehicle;
@@ -117,31 +118,48 @@ public class VehicleAgent extends AbstractAgent {
                             if(vehicle.checkIfEdgeExistsAndFarEnough(edgeId))
                             {
                                 System.out.println("CAR:EDGE EXISTS");
+
                                 int threshold = 3;
                                 RouteNode routeCarOnThreshold = vehicle.getPositionFarOnIndex(threshold);
-                                List<RouteNode> route = vehicle.getDisplayRoute();
+                                int indexAfterWhichRouteChange = vehicle.getFarOnIndex(threshold);
+                                sendMessageToLightManager(indexAfterWhichRouteChange,threshold);
+                                List<RouteNode> route = vehicle.getUniformRoute();
                                 var newRoute = routeGenerator.generateRouteInfo(routeCarOnThreshold,route.get(route.size()-1));
                                 //TODO: merge lists
-
+                                //TODO: change route in the GUI and replace the old one PRZEMEK
                             }
 
                         }
                     }
                 }
                 block(100);
+
+            }
+            private void sendMessageToLightManager(int indexAfterWhichRouteChange,int howFar) {
+                //change route, that is why send stop
+                LightManagerNode nextManager = vehicle.switchToNextTrafficLight(indexAfterWhichRouteChange);
+                if (nextManager != null) {
+                    ACLMessage msg = createMessage(ACLMessage.REFUSE, LightManagerAgent.name, nextManager.getLightManagerId());
+                    Properties properties = createProperties(MessageParameter.VEHICLE);
+                    properties.setProperty(MessageParameter.ADJACENT_OSM_WAY_ID, Long.toString(vehicle.getAdjacentOsmWayId(howFar)));
+                    send(msg);
+                    print("Send REFUSE to LightManager" + nextManager.getLightManagerId() + ".");
+                }
             }
         };
         Behaviour troubleGenerator = new TickerBehaviour(this, this.timeBeforeAccident) {
             @Override
             public void onTick() {
-                List route = vehicle.getDisplayRoute();
+                List route = vehicle.getUniformRoute();
                 //TODO: from current index
                 Random random = new Random();
                 //choose trouble EdgeId
                 var el = random.nextInt(route.size());
-                RouteNode troublePoint =vehicle.getDisplayRoute().get(el);
+                RouteNode troublePointTmp =  vehicle.getUniformRoute().get(el);
+               troublePoint = new RouteNode(troublePointTmp.getLat(),troublePointTmp.getLng(),troublePointTmp.getInternalEdgeId())  ;
                 //send message to boss Agent
-                sendMessageAboutTrouble(troublePoint);
+                sendMessageAboutTrouble();
+
                 osmproxy.HighwayAccessor.getOsmWayIdsAndPointList(vehicle.getStartPosition().getLat(),
                         vehicle.getStartPosition().getLng(),
                         vehicle.getEndPosition().getLat(),
@@ -150,12 +168,11 @@ public class VehicleAgent extends AbstractAgent {
                         (int) troublePoint.getInternalEdgeId());
                 stop();
             }
-
-            //TODO: GET NAME OF BOSS AGENT
-            private void sendMessageAboutTrouble(RouteNode troublePoint) {
+            private void sendMessageAboutTrouble() {
 
                 ACLMessage msg = createMessage(ACLMessage.INFORM, TroubleManagerAgent.name);
                 Properties properties = createProperties(MessageParameter.VEHICLE);
+                properties.setProperty(MessageParameter.TROUBLE,MessageParameter.SHOW);
                 properties.setProperty(MessageParameter.TROUBLE_LAT, Double.toString(troublePoint.getLat()));
                 properties.setProperty(MessageParameter.TROUBLE_LON, Double.toString(troublePoint.getLng()));
 
@@ -167,11 +184,41 @@ public class VehicleAgent extends AbstractAgent {
 
 
         };
+        Behaviour troubleStopper = new TickerBehaviour(this, 3*this.timeBeforeAccident) {
+            @Override
+            public void onTick() {
 
+               sendMessageAboutTroubleStop();
+                osmproxy.HighwayAccessor.getOsmWayIdsAndPointList(vehicle.getStartPosition().getLat(),
+                        vehicle.getStartPosition().getLng(),
+                        vehicle.getEndPosition().getLat(),
+                        vehicle.getEndPosition().getLng(),
+                        false,
+                        (int) troublePoint.getInternalEdgeId());
+                stop();
+            }
+            private void sendMessageAboutTroubleStop() {
+
+                ACLMessage msg = createMessage(ACLMessage.INFORM, TroubleManagerAgent.name);
+                Properties properties = createProperties(MessageParameter.VEHICLE);
+                properties.setProperty(MessageParameter.TROUBLE,MessageParameter.STOP);
+
+                properties.setProperty(MessageParameter.TROUBLE_LAT, Double.toString(troublePoint.getLat()));
+                properties.setProperty(MessageParameter.TROUBLE_LON, Double.toString(troublePoint.getLng()));
+
+                properties.setProperty(MessageParameter.EDGE_ID, Long.toString(troublePoint.getInternalEdgeId()));
+                msg.setAllUserDefinedParameters(properties);
+                System.out.println(myAgent.getLocalName() + " send message about trouble stop on " +Long.toString(troublePoint.getInternalEdgeId()));
+                send(msg);
+            }
+
+        };
         addBehaviour(move);
         addBehaviour(communication);
         addBehaviour(troubleGenerator);
+        addBehaviour(troubleStopper);
     }
+
 
 
 
