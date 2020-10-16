@@ -39,3 +39,11 @@ export const stationIcon = new L.Icon({
   popupAnchor: [8, 8],
   iconSize: [32, 32],
 });
+
+export const troublePointIcon = new L.Icon({
+  iconUrl: "/images/trouble_point.png",
+  iconRetinaUrl: "/images/trouble_point.png",
+  iconAnchor: [16, 16],
+  popupAnchor: [8, 8],
+  iconSize: [32, 32],
+});

@@ -9,6 +9,7 @@ import Car from "./Markers/Car";
 import { generateRandomColor } from "../utils/helpers";
 import LightsLayer from "./Layers/LightsLayer";
 import StationsLayer from "./Layers/StationsLayer";
+import TroublePointsLayer from "./Layers/TroublePointsLayer";
 
 const DEFAULT_ZOOM = 15;
 const MAX_ZOOM = 20;
@@ -76,6 +77,7 @@ const CityMap = props => {
       </Circle>
       <LightsLayer />
       <StationsLayer />
+      <TroublePointsLayer />
     </LeafletMap>
   );
 };

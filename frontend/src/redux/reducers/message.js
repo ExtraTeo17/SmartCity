@@ -1,11 +1,12 @@
 import { LightColor } from "../../components/Models/LightColor";
-import { CAR_KILLED, CAR_CREATED, CAR_UPDATED, SIMULATION_PREPARED, LIGHTS_SWITCHED } from "../constants";
+import { CAR_KILLED, CAR_CREATED, CAR_UPDATED, SIMULATION_PREPARED, LIGHTS_SWITCHED, TROUBLE_POINT_CREATED } from "../constants";
 
 // Just for reference - defined in store.js
 const initialState = {
   lights: [],
   cars: [],
   stations: [],
+  troublePoints: [],
 };
 
 const message = (state = initialState, action) => {
@@ -54,6 +55,12 @@ const message = (state = initialState, action) => {
             : oldLight
         ),
       };
+    }
+
+    case TROUBLE_POINT_CREATED: {
+      const troublePoint = action.payload;
+
+      return { ...state, troublePoints: [...state.troublePoints, troublePoint] };
     }
 
     default:
