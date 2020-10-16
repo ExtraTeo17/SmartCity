@@ -46,7 +46,7 @@ public class LightManagerAgent extends AbstractAgent {
                 // if queue is empty
                 // apply strategy
                 //for elements in queue (if there are elements in queue, make green)
-                var result = crossroad.requestOptimizations();
+                OptimizationResult result = crossroad.requestOptimizations();
                 handleOptimizationResult(result);
             }
 
@@ -57,13 +57,14 @@ public class LightManagerAgent extends AbstractAgent {
                 }
             }
 
-            private void answerCanProceed(String agentName) {
-                print(agentName + " can proceed.");
-                ACLMessage msg = createMessage(ACLMessage.REQUEST, agentName);
+            private void answerCanProceed(String carName) {
+                print(carName + " can proceed.");
+                ACLMessage msg = createMessage(ACLMessage.REQUEST, carName);
                 Properties properties = createProperties(MessageParameter.LIGHT);
                 msg.setAllUserDefinedParameters(properties);
                 send(msg);
             }
+
         };
 
         var communicate = new CyclicBehaviour() {
@@ -96,7 +97,7 @@ public class LightManagerAgent extends AbstractAgent {
                 switch (rcv.getPerformative()) {
                     case ACLMessage.INFORM -> {
                         var time = getDateParameter(rcv, MessageParameter.ARRIVAL_TIME);
-                        print(agentName + " is approaching at " + time.toLocalTime());
+                        print(agentName + " is approaching at " + time);
 
                         var arrivalInfo = ArrivalInfo.of(agentName, time);
                         crossroad.addCarToFarAwayQueue(getIntParameter(rcv, MessageParameter.ADJACENT_OSM_WAY_ID), arrivalInfo);
@@ -126,7 +127,7 @@ public class LightManagerAgent extends AbstractAgent {
                 switch (rcv.getPerformative()) {
                     case ACLMessage.INFORM -> {
                         var time = getDateParameter(rcv, MessageParameter.ARRIVAL_TIME);
-                        print(agentName + " is approaching in " + time.toLocalTime());
+                        print(agentName + " is approaching in " + time);
                         var arrivalInfo = ArrivalInfo.of(agentName, time);
                         crossroad.addPedestrianToFarAwayQueue(getIntParameter(rcv, MessageParameter.ADJACENT_OSM_WAY_ID),
                                 arrivalInfo);

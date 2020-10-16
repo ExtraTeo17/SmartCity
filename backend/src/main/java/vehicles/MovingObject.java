@@ -17,27 +17,32 @@ public abstract class MovingObject {
     final int agentId;
     final int speed;
     final List<RouteNode> uniformRoute;
+    final List<RouteNode> displayRoute;
     int moveIndex;
     int closestLightIndex;
     DrivingState state;
 
+    MovingObject(int agentId, int speed, List<RouteNode> uniformRoute,List<RouteNode> displayRoute) {
+        this.logger = LoggerFactory.getLogger(this.getClass().getSimpleName() + "Object" + agentId);
+        this.agentId = agentId;
+        this.speed = speed;
+        this.uniformRoute = uniformRoute;
+        this.displayRoute = displayRoute;
+        this.moveIndex = 0;
+        this.closestLightIndex = Integer.MAX_VALUE;
+        this.state = DrivingState.STARTING;
+    }
     MovingObject(int agentId, int speed, List<RouteNode> uniformRoute) {
         this.logger = LoggerFactory.getLogger(this.getClass().getSimpleName() + "Object" + agentId);
         this.agentId = agentId;
         this.speed = speed;
         this.uniformRoute = uniformRoute;
+        this.displayRoute = null;
         this.moveIndex = 0;
         this.closestLightIndex = Integer.MAX_VALUE;
         this.state = DrivingState.STARTING;
     }
 
-    public IGeoPosition getPosition() {
-        if (moveIndex >= uniformRoute.size()) {
-            return uniformRoute.get(uniformRoute.size() - 1);
-        }
-
-        return uniformRoute.get(moveIndex);
-    }
 
     /**
      * @return Scaled speed in KM/H
@@ -52,6 +57,42 @@ public abstract class MovingObject {
             throw new ArrayIndexOutOfBoundsException("MovingObject exceeded its route: " + moveIndex + "/" + uniformRoute.size());
         }
     }
+    public IGeoPosition getStartPosition(){
+        return uniformRoute.get(0);
+    }
+    public IGeoPosition getEndPosition(){
+        return uniformRoute.get(uniformRoute.size()-1);
+    }
+    public IGeoPosition getPosition() {
+        if (moveIndex >= uniformRoute.size()) {
+            return uniformRoute.get(uniformRoute.size() - 1);
+        }
+
+        return uniformRoute.get(moveIndex);
+    }
+    public RouteNode getPositionFarOnIndex(int  index) {
+        if (moveIndex >= uniformRoute.size()) {
+            return uniformRoute.get(uniformRoute.size() - 1);
+        }
+
+        return uniformRoute.get(moveIndex+index);
+    }
+
+    public boolean checkIfEdgeExistsAndFarEnough(Long edgeId){
+        int threshold = 5;
+        int counter =0;
+        for (RouteNode r: uniformRoute) {
+            if(r.getInternalEdgeId() == edgeId)
+            {
+                if(moveIndex+threshold<=counter)
+                    return true;
+            }
+            counter ++;
+        }
+        return false;
+    }
+    public List<RouteNode> getUniformRoute(){return uniformRoute;}
+    public List<RouteNode> getDisplayRoute(){return displayRoute;}
 
     public abstract String getVehicleType();
 

@@ -1,4 +1,5 @@
 import agents.AgentsModule;
+import agents.TroubleManagerAgent;
 import com.google.inject.Guice;
 import genesis.GuiModule;
 import genesis.MainModule;
@@ -43,8 +44,12 @@ public class SmartCity {
         var mainAgent = injector.getInstance(SmartCityAgent.class);
         try {
             var agentController = controller.acceptNewAgent(SmartCityAgent.name, mainAgent);
+            var mainAgent2 = injector.getInstance(TroubleManagerAgent.class);
+            var agentController2 = controller.acceptNewAgent(TroubleManagerAgent.name, mainAgent2);
             agentController.activate();
             agentController.start();
+            agentController2.activate();
+            agentController2.start();
         } catch (StaleProxyException e) {
             logger.error("Error accepting main agent", e);
             System.exit(-1);

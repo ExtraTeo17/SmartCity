@@ -6,6 +6,7 @@ import vehicles.VehicleType;
 public class MessageParameter {
     public static final String TYPE = "type";
     public static final String VEHICLE = "vehicle";
+    public static final String TROUBLE_MANAGER = "trouble_manager";
     public static final String BUS = "bus";
     public static final String STATION = "station";
     public static final String LIGHT = "light";
@@ -18,6 +19,9 @@ public class MessageParameter {
     public static final String SCHEDULE_ARRIVAL = "schedule_arrival";
     public static final String DESIRED_BUS_LINE = "desired_bus";
     public static final String BUS_LINE = "bus_line";
+    public static final String TROUBLE_LON = "trouble_lon";
+    public static final String TROUBLE_LAT = "trouble_lat";
+    public static final String EDGE_ID = "edge_id";
 
     public static String getTypeByMovingObject(MovingObject movingObject) {
         var type = movingObject.getVehicleType();

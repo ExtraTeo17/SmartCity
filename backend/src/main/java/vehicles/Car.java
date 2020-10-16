@@ -9,12 +9,12 @@ public class Car extends MovingObject {
     private final List<RouteNode> displayRoute;
 
     public Car(int agentId, List<RouteNode> displayRoute, List<RouteNode> uniformRoute) {
-        super(agentId, 50, uniformRoute);
+        super(agentId, 50, uniformRoute,displayRoute);
         this.displayRoute = displayRoute;
     }
 
     Car(Car car) {
-        super(car.agentId, car.speed, car.uniformRoute);
+        super(car.agentId, car.speed, car.uniformRoute,car.displayRoute);
         this.displayRoute = car.displayRoute;
     }
 
