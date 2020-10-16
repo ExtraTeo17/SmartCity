@@ -6,7 +6,6 @@ import osmproxy.elements.OSMStation;
 import java.io.Serializable;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Set;
 
 public class BusPreparationData implements Serializable {
     public final HashSet<BusInfo> busInfos;

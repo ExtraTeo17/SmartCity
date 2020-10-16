@@ -4,7 +4,7 @@ import osmproxy.buses.BusInfo;
 
 import java.util.List;
 
-public  class BusInfoData {
+public class BusInfoData {
     public final BusInfo busInfo;
     public final List<Long> busStopIds;
 

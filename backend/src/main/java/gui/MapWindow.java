@@ -429,7 +429,8 @@ public class MapWindow {
                     testPainter.setWaypoints(testCarWaypoint);
                     testPainter.setRenderer(new CustomWaypointRenderer("test_car.png"));
                     painters.add(testPainter);
-                } else {
+                }
+                else {
                     set.add(waypoint);
                 }
             });
@@ -470,7 +471,8 @@ public class MapWindow {
                         testPainter.setWaypoints(testPedestrianWaypoint);
                         testPainter.setRenderer(new CustomWaypointRenderer("pedestrian_blue.png"));
                         painters.add(testPainter);
-                    } else {
+                    }
+                    else {
                         set.add(waypoint);
                     }
                 }
@@ -513,9 +515,11 @@ public class MapWindow {
                 var pos = bus.getPosition().toMapGeoPosition();
                 if (count > Bus.CAPACITY_HIGH) {
                     set_high.add(new DefaultWaypoint(pos));
-                } else if (count > Bus.CAPACITY_MID) {
+                }
+                else if (count > Bus.CAPACITY_MID) {
                     set_mid.add(new DefaultWaypoint(pos));
-                } else {
+                }
+                else {
                     set_low.add(new DefaultWaypoint(pos));
                 }
             });

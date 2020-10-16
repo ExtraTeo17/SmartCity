@@ -1,40 +1,40 @@
 package agents;
 
-import agents.abstractions.AbstractAgent;
 import agents.abstractions.IAgentsContainer;
 import agents.utilities.MessageParameter;
 import com.google.common.eventbus.EventBus;
+import com.google.common.eventbus.Subscribe;
 import com.google.inject.Inject;
-import jade.core.AID;
+import events.web.PrepareSimulationEvent;
+import events.web.TroublePointCreatedEvent;
 import jade.core.Agent;
 import jade.core.behaviours.Behaviour;
 import jade.core.behaviours.CyclicBehaviour;
 import jade.lang.acl.ACLMessage;
 import jade.util.leap.Properties;
-import org.jxmapviewer.viewer.GeoPosition;
-import routing.core.IGeoPosition;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import routing.core.Position;
-import smartcity.ITimeProvider;
-import vehicles.DrivingState;
 
-import java.awt.*;
+import static agents.message.MessageManager.createProperties;
 
 public class TroubleManagerAgent extends Agent {
     public static final String name = TroubleManagerAgent.class.getSimpleName().replace("Agent", "");
-    private final IAgentsContainer agentsContainer;
-    @Inject
-    TroubleManagerAgent(IAgentsContainer agentsContainer) {
-        this.agentsContainer = agentsContainer;
-    }
+    private final static Logger logger = LoggerFactory.getLogger(TroubleManagerAgent.class);
 
-    protected Properties createProperties(String senderType) {
-        var result = new Properties();
-        result.setProperty(MessageParameter.TYPE, senderType);
-        return result;
+    private final IAgentsContainer agentsContainer;
+    private final EventBus eventBus;
+
+    @Inject
+    TroubleManagerAgent(IAgentsContainer agentsContainer,
+                        EventBus eventBus) {
+        this.agentsContainer = agentsContainer;
+        this.eventBus = eventBus;
     }
 
     @Override
     protected void setup() {
+
         //TODO: wysłać broadcact kiedy trouble się skończy
         Behaviour communication = new CyclicBehaviour() {
             @Override
@@ -43,10 +43,12 @@ public class TroubleManagerAgent extends Agent {
                 if (rcv != null) {
                     switch (rcv.getPerformative()) {
                         case ACLMessage.INFORM -> {
-                            if(rcv.getUserDefinedParameter(MessageParameter.TROUBLE).equals(MessageParameter.SHOW)) {   //parsing received message
+                            if (rcv.getUserDefinedParameter(MessageParameter.TROUBLE).equals(MessageParameter.SHOW)) {   //parsing received message
                                 //TODO: Show trouble point on gui
                                 var troublePoint = Position.of(Double.parseDouble(rcv.getUserDefinedParameter(MessageParameter.TROUBLE_LAT)),
                                         Double.parseDouble(rcv.getUserDefinedParameter(MessageParameter.TROUBLE_LON)));
+                                // TODO: Generate id and save it to hide troublePoint later
+                                eventBus.post(new TroublePointCreatedEvent(1, troublePoint));
                                 System.out.println("TroubleAgent: Got message about trouble");
                                 System.out.println("troublePoint: " + troublePoint.getLat() + "  " + troublePoint.getLng());
                                 Long edgeId = Long.parseLong(rcv.getUserDefinedParameter(MessageParameter.EDGE_ID));
@@ -62,18 +64,29 @@ public class TroubleManagerAgent extends Agent {
                                 });
                                 send(response);
                                 System.out.println("Trouble Manger: send broadcast");
-                            }
-                            else if (rcv.getUserDefinedParameter(MessageParameter.TROUBLE).equals(MessageParameter.STOP))
-                            {
+                            } else if (rcv.getUserDefinedParameter(MessageParameter.TROUBLE).equals(MessageParameter.STOP)) {
                                 //TODO: FOR FUTURE CHANGE ROOT AGAIN OF THE CAR?
                             }
                         }
+
+
                     }
-                    block(100);
+
+
                 }
+                block(100);
             }
+
+
         };
+        super.setup();
         addBehaviour(communication);
     }
 
+    // for tests
+    @Subscribe
+    public void handle(PrepareSimulationEvent e) {
+        var troublePoint = Position.of(52.23682, 21.01683);
+        eventBus.post(new TroublePointCreatedEvent(1, troublePoint));
+    }
 }

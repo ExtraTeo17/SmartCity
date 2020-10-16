@@ -1,5 +1,5 @@
 import { dispatch } from "./store";
-import { carUpdated, carCreated, simulationPrepared, carKilled, lightsSwitched } from "./actions";
+import { carUpdated, carCreated, simulationPrepared, carKilled, lightsSwitched, troublePointCreated } from "./actions";
 import { batch } from "react-redux";
 
 const fps = 15;
@@ -43,5 +43,9 @@ export default {
     } else {
       switchLightsQueue.set(id, lightsSwitched(id));
     }
+  },
+
+  createTroublePoint(troublePoint) {
+    dispatch(troublePointCreated(troublePoint));
   },
 };

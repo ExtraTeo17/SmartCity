@@ -32,7 +32,7 @@ public class StationStrategy {
     public boolean addBusAgentWithLine(String agentName, String busLine) {
         return busAgentNameToLine.put(agentName, busLine) == null;
     }
-    
+
     public boolean addBusToFarAwayQueue(String agentName, LocalDateTime scheduled, LocalDateTime actual) {
         return farAwayBusAgentNameToArrivalTime.put(agentName, ScheduledArrivalTime.of(scheduled, actual)) == null;
     }

@@ -5,10 +5,13 @@ import com.google.common.eventbus.DeadEvent;
 import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
 import com.google.inject.Guice;
+import com.google.inject.Inject;
 import com.google.inject.Injector;
 import events.LightManagersReadyEvent;
 import events.SwitchLightsStartEvent;
 import events.web.*;
+import jade.wrapper.ContainerController;
+import jade.wrapper.StaleProxyException;
 import org.junit.jupiter.api.Test;
 import osmproxy.OsmModule;
 import osmproxy.buses.BusModule;
@@ -48,6 +51,9 @@ class InjectorTests {
         // Act & Assert
         assertInstancesNotNull(injector);
         assertEventsHandled(injector);
+
+
+        cleanUp(injector);
     }
 
     private void assertInstancesNotNull(Injector injector) {
@@ -85,5 +91,14 @@ class InjectorTests {
 
         int expectedDeadEvents = 3;
         assertEquals(expectedDeadEvents, counter.get(), "All events should be handled somewhere");
+    }
+
+    private void cleanUp(Injector injector){
+        var controller = injector.getInstance(ContainerController.class);
+        try {
+            controller.kill();
+        } catch (StaleProxyException e) {
+            e.printStackTrace();
+        }
     }
 }

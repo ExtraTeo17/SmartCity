@@ -14,6 +14,7 @@ const initialState = {
     lights: [],
     cars: [],
     stations: [],
+    troublePoints: [],
   },
 };
 

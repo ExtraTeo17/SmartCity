@@ -1,17 +1,13 @@
 import agents.AgentsModule;
-import agents.TroubleManagerAgent;
 import com.google.inject.Guice;
 import genesis.GuiModule;
 import genesis.MainModule;
 import genesis.SharedModule;
-import jade.wrapper.ContainerController;
-import jade.wrapper.StaleProxyException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import osmproxy.OsmModule;
 import osmproxy.buses.BusModule;
 import routing.RoutingModule;
-import smartcity.SmartCityAgent;
 import smartcity.SmartCityModule;
 import smartcity.config.ConfigProperties;
 import smartcity.lights.core.LightsModule;
@@ -27,7 +23,7 @@ public class SmartCity {
 
     public static void main(String[] args) {
         setupProperties();
-        var injector = Guice.createInjector(
+        Guice.createInjector(
                 new MainModule(args),
                 new SharedModule(),
                 new LightsModule(),
@@ -39,21 +35,6 @@ public class SmartCity {
                 new RoutingModule(),
                 new SmartCityModule()
         );
-
-        var controller = injector.getInstance(ContainerController.class);
-        var mainAgent = injector.getInstance(SmartCityAgent.class);
-        try {
-            var agentController = controller.acceptNewAgent(SmartCityAgent.name, mainAgent);
-            var mainAgent2 = injector.getInstance(TroubleManagerAgent.class);
-            var agentController2 = controller.acceptNewAgent(TroubleManagerAgent.name, mainAgent2);
-            agentController.activate();
-            agentController.start();
-            agentController2.activate();
-            agentController2.start();
-        } catch (StaleProxyException e) {
-            logger.error("Error accepting main agent", e);
-            System.exit(-1);
-        }
     }
 
     private static void setupProperties() {

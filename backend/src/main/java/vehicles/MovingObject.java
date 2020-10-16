@@ -22,7 +22,7 @@ public abstract class MovingObject {
     int closestLightIndex;
     DrivingState state;
 
-    MovingObject(int agentId, int speed, List<RouteNode> uniformRoute,List<RouteNode> displayRoute) {
+    MovingObject(int agentId, int speed, List<RouteNode> uniformRoute, List<RouteNode> displayRoute) {
         this.logger = LoggerFactory.getLogger(this.getClass().getSimpleName() + "Object" + agentId);
         this.agentId = agentId;
         this.speed = speed;
@@ -32,6 +32,7 @@ public abstract class MovingObject {
         this.closestLightIndex = Integer.MAX_VALUE;
         this.state = DrivingState.STARTING;
     }
+
     MovingObject(int agentId, int speed, List<RouteNode> uniformRoute) {
         this.logger = LoggerFactory.getLogger(this.getClass().getSimpleName() + "Object" + agentId);
         this.agentId = agentId;
@@ -57,12 +58,15 @@ public abstract class MovingObject {
             throw new ArrayIndexOutOfBoundsException("MovingObject exceeded its route: " + moveIndex + "/" + uniformRoute.size());
         }
     }
-    public IGeoPosition getStartPosition(){
+
+    public IGeoPosition getStartPosition() {
         return uniformRoute.get(0);
     }
-    public IGeoPosition getEndPosition(){
-        return uniformRoute.get(uniformRoute.size()-1);
+
+    public IGeoPosition getEndPosition() {
+        return uniformRoute.get(uniformRoute.size() - 1);
     }
+
     public IGeoPosition getPosition() {
         if (moveIndex >= uniformRoute.size()) {
             return uniformRoute.get(uniformRoute.size() - 1);
@@ -70,12 +74,13 @@ public abstract class MovingObject {
 
         return uniformRoute.get(moveIndex);
     }
-    public RouteNode getPositionFarOnIndex(int  index) {
+
+    public RouteNode getPositionFarOnIndex(int index) {
         if (moveIndex >= uniformRoute.size()) {
             return uniformRoute.get(uniformRoute.size() - 1);
         }
 
-        return uniformRoute.get(moveIndex+index);
+        return uniformRoute.get(moveIndex + index);
     }
     public int getFarOnIndex(int  index) {
         if (moveIndex >= uniformRoute.size()) {
@@ -85,21 +90,24 @@ public abstract class MovingObject {
         return moveIndex+index;
     }
 
-    public boolean checkIfEdgeExistsAndFarEnough(Long edgeId){
+    public boolean checkIfEdgeExistsAndFarEnough(Long edgeId) {
         int threshold = 5;
-        int counter =0;
-        for (RouteNode r: uniformRoute) {
-            if(r.getInternalEdgeId() == edgeId)
-            {
-                if(moveIndex+threshold<=counter)
+        int counter = 0;
+        for (RouteNode r : uniformRoute) {
+            if (r.getInternalEdgeId() == edgeId) {
+                if (moveIndex + threshold <= counter) {
                     return true;
+                }
             }
-            counter ++;
+            counter++;
         }
         return false;
     }
-    public List<RouteNode> getUniformRoute(){return uniformRoute;}
-  //  public List<RouteNode> getDisplayRoute(){return displayRoute;}
+
+
+    public List<RouteNode> getUniformRoute() {return uniformRoute;}
+
+    public List<RouteNode> getDisplayRoute() {return displayRoute;}
 
     public abstract String getVehicleType();
 
@@ -163,7 +171,7 @@ public abstract class MovingObject {
         this.state = state;
     }
 
-    public int getMillisecondsToNextLight(){
+    public int getMillisecondsToNextLight() {
         return ((closestLightIndex - moveIndex) * RoutingConstants.STEP_CONSTANT) / getSpeed();
     }
 

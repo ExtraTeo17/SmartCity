@@ -75,18 +75,19 @@ public class HighwayAccessor {
                 previousWayId = osmWayIdToAdd;
             }
 
-            pointList.addAll(getRouteNodeList(edgeId,edge.fetchWayGeometry(2)));
+            pointList.addAll(getRouteNodeList(edgeId, edge.fetchWayGeometry(2)));
 
         }
-        if(forbiddenEdgeId!=null)
-            System.out.println("FORBIDDEN EDGE IN HIGHWAY ACCESSOR: "+forbiddenEdgeId);
+        if (forbiddenEdgeId != null) {
+            System.out.println("FORBIDDEN EDGE IN HIGHWAY ACCESSOR: " + forbiddenEdgeId);
+        }
         return new Pair<>(osmWayIds, pointList);
     }
 
     private static List<RouteNode> getRouteNodeList(int edgeId, PointList pointList) {
         List<RouteNode> nodeList = new ArrayList<>();
         for (int i = 0; i < pointList.size(); ++i) {
-            nodeList.add(new RouteNode(pointList.toGHPoint(i).lat, pointList.toGHPoint(i).lon,edgeId));
+            nodeList.add(new RouteNode(pointList.toGHPoint(i).lat, pointList.toGHPoint(i).lon, edgeId));
         }
         return nodeList;
     }

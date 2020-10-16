@@ -37,7 +37,7 @@ class RunnableFactory implements IRunnableFactory {
 
     @Override
     public IFixedExecutionRunnable createIf(BooleanSupplier test, Runnable runnable, boolean separateThread) {
-         if (separateThread) {
+        if (separateThread) {
             return new IfRunnable(getNewThreadExecutor(), test, runnable);
         }
 

@@ -18,6 +18,8 @@ import smartcity.stations.ArrivalInfo;
 
 import java.util.List;
 
+import static agents.message.MessageManager.*;
+
 public class LightManagerAgent extends AbstractAgent {
     public static final String name = LightManagerAgent.class.getSimpleName().replace("Agent", "");
 

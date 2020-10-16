@@ -5,6 +5,7 @@ import {
   START_SIMULATION_RESPONSE,
   KILL_CAR_INFO,
   SWITCH_LIGHTS_INFO,
+  CREATE_TROUBLE_POINT_INFO,
 } from "./MessageType";
 import { NOTIFY_SHOW_SEC } from "../utils/constants";
 import { notify } from "react-notify-toast";
@@ -43,6 +44,11 @@ export default {
 
       case SWITCH_LIGHTS_INFO: {
         Dispatcher.switchLights(payload.lightGroupId);
+        break;
+      }
+
+      case CREATE_TROUBLE_POINT_INFO: {
+        Dispatcher.createTroublePoint(payload);
         break;
       }
 

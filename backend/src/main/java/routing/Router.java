@@ -162,7 +162,7 @@ final class Router implements
             for (int p = RoutingConstants.STEP_SIZE_METERS; p < distance; p += RoutingConstants.STEP_SIZE_METERS) {
                 lon = lon + RoutingConstants.STEP_SIZE_METERS * dx;
                 lat = lat + RoutingConstants.STEP_SIZE_METERS * dy;
-                newRoute.add(new RouteNode(lat, lon,nodeA.getInternalEdgeId()));
+                newRoute.add(new RouteNode(lat, lon, nodeA.getInternalEdgeId()));
             }
         }
 
@@ -180,7 +180,7 @@ final class Router implements
 
     private static Pair<List<Long>, List<RouteNode>> findRoute(IGeoPosition pointA, IGeoPosition pointB, boolean onFoot) {
         return osmproxy.HighwayAccessor.getOsmWayIdsAndPointList(pointA.getLat(), pointA.getLng(), pointB.getLat(),
-                pointB.getLng(), onFoot,null);
+                pointB.getLng(), onFoot, null);
     }
 
     private List<RouteNode> getManagersNodesForLights(List<OSMLight> lights) {
