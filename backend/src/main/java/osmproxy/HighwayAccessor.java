@@ -24,10 +24,15 @@ import com.graphhopper.routing.VirtualEdgeIteratorState;
 import com.graphhopper.util.CmdArgs;
 import com.graphhopper.util.EdgeIteratorState;
 import com.graphhopper.util.PointList;
+
+import gnu.trove.set.TIntSet;
+
 import org.javatuples.Pair;
 import routing.nodes.RouteNode;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
 
 /**
@@ -47,16 +52,20 @@ public class HighwayAccessor {
         graphHopper.init(CmdArgs.read(args));
         graphHopper.importOrLoad();
     }
+    
+    // TODO: tested manually, but add unit tests / integration tests
 
     public static Pair<List<Long>, List<RouteNode>> getOsmWayIdsAndPointList(double fromLat, double fromLon,
-                                                                             double toLat, double toLon,
-                                                                             boolean onFoot, Integer forbiddenEdgeId) {
+            double toLat, double toLon,
+            boolean onFoot, Integer forbiddenEdgeId) {
         List<Long> osmWayIds = new ArrayList<>();
         List<RouteNode> pointList = new ArrayList<>();
 
         GHResponse response = new GHResponse();
-        List<Path> paths = graphHopper.calcPaths(new GHRequest(fromLat, fromLon, toLat, toLon).
-                setWeighting("fastest").setVehicle(onFoot ? "foot" : "car"), response);
+        GHRequest request = new GHRequest(fromLat, fromLon, toLat, toLon)
+        		.setVehicle(onFoot ? "foot" : "car")
+        		.setWeighting(AvoidEdgesRemovableWeighting.NAME);
+        List<Path> paths = graphHopper.calcPaths(request, response);
         Path path0 = paths.get(0);
 
         long previousWayId = 0;
@@ -76,7 +85,6 @@ public class HighwayAccessor {
             }
 
             pointList.addAll(getRouteNodeList(edgeId, edge.fetchWayGeometry(2)));
-
         }
         if (forbiddenEdgeId != null) {
             System.out.println("FORBIDDEN EDGE IN HIGHWAY ACCESSOR: " + forbiddenEdgeId);
