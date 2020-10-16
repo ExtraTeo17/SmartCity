@@ -1,7 +1,7 @@
 import React from "react";
 import { connect } from "react-redux";
 
-import TroublePoint from "../Markers/Light";
+import TroublePoint from "../Markers/TroublePoint";
 
 const TroublePointsLayer = props => {
   const { troublePoints = [] } = props;
