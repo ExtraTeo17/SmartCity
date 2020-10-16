@@ -16,6 +16,9 @@ import smartcity.SmartCityAgent;
 import vehicles.DrivingState;
 import vehicles.Pedestrian;
 
+import static agents.message.MessageManager.createMessage;
+import static agents.message.MessageManager.createProperties;
+
 public class PedestrianAgent extends AbstractAgent {
     public static final String name = PedestrianAgent.class.getSimpleName().replace("Agent", "");
 
@@ -43,7 +46,7 @@ public class PedestrianAgent extends AbstractAgent {
                     switch (pedestrian.getState()) {
                         case MOVING:
                             var light = pedestrian.getCurrentTrafficLightNode();
-                            ACLMessage msg = createMessage(ACLMessage.REQUEST_WHEN, LightManagerAgent.name,
+                            ACLMessage msg = createMessageById(ACLMessage.REQUEST_WHEN, LightManagerAgent.name,
                                     light.getLightManagerId());
                             Properties properties = createProperties(MessageParameter.PEDESTRIAN);
                             properties.setProperty(MessageParameter.ADJACENT_OSM_WAY_ID, Long.toString(pedestrian.getAdjacentOsmWayId()));
@@ -67,7 +70,7 @@ public class PedestrianAgent extends AbstractAgent {
                     switch (pedestrian.getState()) {
                         case MOVING:
                             StationNode station = pedestrian.getStartingStation();
-                            ACLMessage msg = createMessage(ACLMessage.REQUEST_WHEN, StationAgent.name, station.getAgentId());
+                            ACLMessage msg = createMessageById(ACLMessage.REQUEST_WHEN, StationAgent.name, station.getAgentId());
                             Properties properties = createProperties(MessageParameter.PEDESTRIAN);
                             properties.setProperty(MessageParameter.DESIRED_BUS_LINE, pedestrian.getPreferredBusLine());
                             properties.setProperty(MessageParameter.ARRIVAL_TIME, timeProvider.getCurrentSimulationTime()
@@ -194,7 +197,7 @@ public class PedestrianAgent extends AbstractAgent {
         StationNode nextStation = pedestrian.findNextStation();
         pedestrian.setState(DrivingState.MOVING);
         if (nextStation != null) {
-            ACLMessage msg = createMessage(ACLMessage.INFORM, StationAgent.name, nextStation.getAgentId());
+            ACLMessage msg = createMessageById(ACLMessage.INFORM, StationAgent.name, nextStation.getAgentId());
             Properties properties = createProperties(MessageParameter.PEDESTRIAN);
             var currentTime = timeProvider.getCurrentSimulationTime();
             var predictedTime = currentTime.plusNanos(pedestrian.getMillisecondsToNextStation() * 1_000_000);

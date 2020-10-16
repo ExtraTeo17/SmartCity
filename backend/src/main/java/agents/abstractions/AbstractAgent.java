@@ -1,6 +1,7 @@
 package agents.abstractions;
 
 import agents.LightManagerAgent;
+import agents.message.MessageManager;
 import agents.utilities.LoggerLevel;
 import agents.utilities.MessageParameter;
 import com.google.common.eventbus.EventBus;
@@ -17,8 +18,9 @@ import utilities.ConditionalExecutor;
 import vehicles.MovingObject;
 
 import java.time.LocalDateTime;
+
 import java.time.temporal.ChronoUnit;
-import java.util.List;
+import static agents.message.MessageManager.createProperties;
 
 public abstract class AbstractAgent extends Agent {
     private final int id;
@@ -85,7 +87,7 @@ public abstract class AbstractAgent extends Agent {
     }
 
     private ACLMessage prepareMessageForManager(LightManagerNode managerNode, MovingObject movingObject) {
-        ACLMessage msg = createMessage(ACLMessage.INFORM, LightManagerAgent.name, managerNode.getLightManagerId());
+        ACLMessage msg = createMessageById(ACLMessage.INFORM, LightManagerAgent.name, managerNode.getLightManagerId());
         var agentType = MessageParameter.getTypeByMovingObject(movingObject);
         Properties properties = createProperties(agentType);
         var simulationTime = timeProvider.getCurrentSimulationTime();
@@ -98,39 +100,9 @@ public abstract class AbstractAgent extends Agent {
         return msg;
     }
 
-    // TODO: Special class - MessageCreator for all msg-related code, protected, dependency, injected
-    protected ACLMessage createMessage(int type, List<String> receivers) {
-        ACLMessage msg = new ACLMessage(type);
-        for (var name : receivers) {
-            msg.addReceiver(new AID(name, AID.ISLOCALNAME));
-        }
-        return msg;
-    }
-
-    protected ACLMessage createMessage(int type, String receiverName) {
-        var receiver = new AID(receiverName, AID.ISLOCALNAME);
-        return createMessage(type, receiver);
-    }
-
-    protected ACLMessage createMessage(int type, String receiverName, int receiverId) {
+    protected ACLMessage createMessageById(int type, String receiverName, int receiverId) {
         var receiver = new AID(getPredictedName(receiverName, receiverId), AID.ISLOCALNAME);
-        return createMessage(type, receiver);
-    }
-
-    protected ACLMessage createMessage(int type, AID receiver) {
-        ACLMessage msg = new ACLMessage(type);
-        msg.addReceiver(receiver);
-        return msg;
-    }
-
-    protected Properties createProperties(String senderType) {
-        var result = new Properties();
-        result.setProperty(MessageParameter.TYPE, senderType);
-        return result;
-    }
-
-    protected String getSender(ACLMessage rcv) {
-        return rcv.getSender().getLocalName();
+        return MessageManager.createMessage(type, receiver);
     }
 
     protected LocalDateTime getDateParameter(ACLMessage rcv, String param) {

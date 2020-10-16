@@ -42,4 +42,5 @@ public class AgentsModule extends AbstractModule {
         generator.registerAll(agentTypes);
         return generator;
     }
+
 }

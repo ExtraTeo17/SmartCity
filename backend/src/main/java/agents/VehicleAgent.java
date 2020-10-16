@@ -9,11 +9,10 @@ import jade.core.behaviours.CyclicBehaviour;
 import jade.core.behaviours.TickerBehaviour;
 import jade.lang.acl.ACLMessage;
 import jade.util.leap.Properties;
-import routing.nodes.LightManagerNode;
-import routing.nodes.RouteNode;
 import routing.abstractions.IRouteGenerator;
 import routing.core.IGeoPosition;
-import routing.core.Position;
+import routing.nodes.LightManagerNode;
+import routing.nodes.RouteNode;
 import smartcity.ITimeProvider;
 import smartcity.SmartCityAgent;
 import vehicles.DrivingState;
@@ -22,16 +21,18 @@ import vehicles.MovingObject;
 import java.util.List;
 import java.util.Random;
 
+import static agents.message.MessageManager.createMessage;
+import static agents.message.MessageManager.createProperties;
 import static routing.RoutingConstants.STEP_CONSTANT;
 
 @SuppressWarnings("serial")
 // TODO: Maybe rename to CarAgent? Bus is also a Vehicle
 public class VehicleAgent extends AbstractAgent {
     private final MovingObject vehicle;
-    private  int timeBeforeAccident = 0;
-    private IRouteGenerator  routeGenerator;
+    private int timeBeforeAccident = 0;
+    private IRouteGenerator routeGenerator;
 
-    VehicleAgent(int id, MovingObject vehicle, ITimeProvider timeProvider, EventBus eventBus, int timeBeforeAccident, IRouteGenerator routeGenerator ) {
+    VehicleAgent(int id, MovingObject vehicle, ITimeProvider timeProvider, EventBus eventBus, int timeBeforeAccident, IRouteGenerator routeGenerator) {
         super(id, vehicle.getVehicleType(), timeProvider, eventBus);
         this.vehicle = vehicle;
         this.timeBeforeAccident = timeBeforeAccident;
@@ -57,7 +58,7 @@ public class VehicleAgent extends AbstractAgent {
                         case MOVING:
                             vehicle.setState(DrivingState.WAITING_AT_LIGHT);
                             LightManagerNode light = vehicle.switchToNextTrafficLight();
-                            ACLMessage msg = createMessage(ACLMessage.REQUEST_WHEN, LightManagerAgent.name,
+                            ACLMessage msg = createMessageById(ACLMessage.REQUEST_WHEN, LightManagerAgent.name,
                                     light.getLightManagerId());
                             Properties properties = createProperties(MessageParameter.VEHICLE);
                             properties.setProperty(MessageParameter.ADJACENT_OSM_WAY_ID, Long.toString(vehicle.getAdjacentOsmWayId()));
@@ -112,15 +113,14 @@ public class VehicleAgent extends AbstractAgent {
                         case ACLMessage.AGREE -> vehicle.setState(DrivingState.WAITING_AT_LIGHT);
                         case ACLMessage.PROPOSE -> {
 
-                            Long edgeId =  Long.parseLong(rcv.getUserDefinedParameter(MessageParameter.EDGE_ID));
-                            System.out.println(myAgent.getLocalName()+  "  GOT PROPOSE TO CHANGE THE ROUTE. AND EXCLUDE: "+ edgeId);
-                            if(vehicle.checkIfEdgeExistsAndFarEnough(edgeId))
-                            {
+                            Long edgeId = Long.parseLong(rcv.getUserDefinedParameter(MessageParameter.EDGE_ID));
+                            System.out.println(myAgent.getLocalName() + "  GOT PROPOSE TO CHANGE THE ROUTE. AND EXCLUDE: " + edgeId);
+                            if (vehicle.checkIfEdgeExistsAndFarEnough(edgeId)) {
                                 System.out.println("CAR:EDGE EXISTS");
                                 int threshold = 3;
                                 RouteNode routeCarOnThreshold = vehicle.getPositionFarOnIndex(threshold);
                                 List<RouteNode> route = vehicle.getDisplayRoute();
-                                var newRoute = routeGenerator.generateRouteInfo(routeCarOnThreshold,route.get(route.size()-1));
+                                var newRoute = routeGenerator.generateRouteInfo(routeCarOnThreshold, route.get(route.size() - 1));
                                 //TODO: merge lists
 
                             }
@@ -134,12 +134,12 @@ public class VehicleAgent extends AbstractAgent {
         Behaviour troubleGenerator = new TickerBehaviour(this, this.timeBeforeAccident) {
             @Override
             public void onTick() {
-                List route = vehicle.getDisplayRoute();
+                var route = vehicle.getDisplayRoute();
                 //TODO: from current index
                 Random random = new Random();
                 //choose trouble EdgeId
                 var el = random.nextInt(route.size());
-                RouteNode troublePoint =vehicle.getDisplayRoute().get(el);
+                RouteNode troublePoint = vehicle.getDisplayRoute().get(el);
                 //send message to boss Agent
                 sendMessageAboutTrouble(troublePoint);
                 osmproxy.HighwayAccessor.getOsmWayIdsAndPointList(vehicle.getStartPosition().getLat(),
@@ -161,7 +161,7 @@ public class VehicleAgent extends AbstractAgent {
 
                 properties.setProperty(MessageParameter.EDGE_ID, Long.toString(troublePoint.getInternalEdgeId()));
                 msg.setAllUserDefinedParameters(properties);
-                System.out.println(myAgent.getLocalName() + " send message about trouble on " +Long.toString(troublePoint.getInternalEdgeId()));
+                print(" send message about trouble on " + Long.toString(troublePoint.getInternalEdgeId()));
                 send(msg);
             }
 
@@ -172,7 +172,6 @@ public class VehicleAgent extends AbstractAgent {
         addBehaviour(communication);
         addBehaviour(troubleGenerator);
     }
-
 
 
     public MovingObject getVehicle() {
