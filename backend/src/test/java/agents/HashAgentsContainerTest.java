@@ -86,7 +86,7 @@ class HashAgentsContainerTest {
 
     VehicleAgent getVehicleAgent() {
         return new VehicleAgent(idGenerator.get(VehicleAgent.class), mock(MovingObject.class),
-                createTimeProvider(), createEventBus(),5000,null);
+                createTimeProvider(), createEventBus(), 5000, null, null); // TODO: routeGenerator and routeTransformers are null
     }
 
     StationAgent getStationAgent() {

@@ -57,7 +57,7 @@ class AgentsFactory implements IAgentsFactory {
             car = new TestCar(car, timeProvider);
         }
 
-        return new VehicleAgent(id, car, timeProvider, eventBus, timeBeforeTrouble, routeGenerator);
+        return new VehicleAgent(id, car, timeProvider, eventBus, timeBeforeTrouble, routeGenerator, routeTransformer);
     }
 
     @Override

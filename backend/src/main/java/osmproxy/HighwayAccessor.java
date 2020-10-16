@@ -56,8 +56,7 @@ public class HighwayAccessor {
     // TODO: tested manually, but add unit tests / integration tests
 
     public static Pair<List<Long>, List<RouteNode>> getOsmWayIdsAndPointList(double fromLat, double fromLon,
-            double toLat, double toLon,
-            boolean onFoot, Integer forbiddenEdgeId) {
+            double toLat, double toLon, boolean onFoot) {
         List<Long> osmWayIds = new ArrayList<>();
         List<RouteNode> pointList = new ArrayList<>();
 
@@ -86,9 +85,7 @@ public class HighwayAccessor {
 
             pointList.addAll(getRouteNodeList(edgeId, edge.fetchWayGeometry(2)));
         }
-        if (forbiddenEdgeId != null) {
-            System.out.println("FORBIDDEN EDGE IN HIGHWAY ACCESSOR: " + forbiddenEdgeId);
-        }
+        
         return new Pair<>(osmWayIds, pointList);
     }
 

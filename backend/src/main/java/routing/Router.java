@@ -180,7 +180,7 @@ final class Router implements
 
     private static Pair<List<Long>, List<RouteNode>> findRoute(IGeoPosition pointA, IGeoPosition pointB, boolean onFoot) {
         return osmproxy.HighwayAccessor.getOsmWayIdsAndPointList(pointA.getLat(), pointA.getLng(), pointB.getLat(),
-                pointB.getLng(), onFoot, null);
+                pointB.getLng(), onFoot);
     }
 
     private List<RouteNode> getManagersNodesForLights(List<OSMLight> lights) {

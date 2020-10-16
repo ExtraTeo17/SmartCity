@@ -49,7 +49,7 @@ public class ExtendedGraphHopper extends GraphHopper {
 	// mapping of internal edge ID to OSM way ID
     private DataAccess edgeMapping;
     private BitUtil bitUtil;
-	private AvoidEdgesRemovableWeighting avoidEdgesWeighting = null;
+	private static AvoidEdgesRemovableWeighting avoidEdgesWeighting = null;
 
     @Override
     public boolean load(String graphHopperFolder) {
@@ -68,16 +68,16 @@ public class ExtendedGraphHopper extends GraphHopper {
     
     /* TODO: Utilize edge functions in the trouble generating strategy */
     
-    public final void addForbiddenEdges(final Collection<EdgeIteratorState> edges) {
-    	avoidEdgesWeighting.addEdges(edges);
+    public static final void addForbiddenEdges(final Collection<Integer> edgeIds) {
+    	avoidEdgesWeighting.addEdgeIds(edgeIds);
     }
     
-    public final void removeForbiddenEdges(final Collection<EdgeIteratorState> edges) {
-    	avoidEdgesWeighting.removeEdges(edges);
+    public static final void removeForbiddenEdges(final Collection<Integer> edgeIds) {
+    	avoidEdgesWeighting.removeEdgeIds(edgeIds);
     }
     
-    public final TIntSet getForbiddenEdges() {
-    	return avoidEdgesWeighting.getEdges();
+    public static final TIntSet getForbiddenEdges() {
+    	return avoidEdgesWeighting.getEdgeIds();
     }
     
     @Override
