@@ -22,7 +22,7 @@ public class SingletonAgentsActivator {
         activate(TroubleManagerAgent.name, troubleManagerAgent);
     }
 
-    public void activate(String name, Agent agent){
+    public void activate(String name, Agent agent) {
         try {
             var agentController = controller.acceptNewAgent(name, agent);
             agentController.activate();

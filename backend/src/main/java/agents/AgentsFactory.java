@@ -31,6 +31,7 @@ class AgentsFactory implements IAgentsFactory {
     private final EventBus eventBus;
     //TODO: GET from GUI;
     private final int timeBeforeTrouble = 5000;
+
     @Inject
     public AgentsFactory(IdGenerator idGenerator,
                          ITimeProvider timeProvider,
@@ -56,7 +57,7 @@ class AgentsFactory implements IAgentsFactory {
             car = new TestCar(car, timeProvider);
         }
 
-        return new VehicleAgent(id, car, timeProvider, eventBus,timeBeforeTrouble, routeGenerator);
+        return new VehicleAgent(id, car, timeProvider, eventBus, timeBeforeTrouble, routeGenerator);
     }
 
     @Override

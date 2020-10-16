@@ -18,8 +18,8 @@ import utilities.ConditionalExecutor;
 import vehicles.MovingObject;
 
 import java.time.LocalDateTime;
-
 import java.time.temporal.ChronoUnit;
+
 import static agents.message.MessageManager.createProperties;
 
 public abstract class AbstractAgent extends Agent {

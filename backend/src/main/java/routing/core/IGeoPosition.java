@@ -98,7 +98,7 @@ public interface IGeoPosition extends Comparable<IGeoPosition> {
         return cmp != 0 ? cmp : Double.compare(getLng(), o.getLng());
     }
 
-    default String pointText(){
+    default String pointText() {
         return "(" + getLat() + ", " + getLng() + ')';
     }
 

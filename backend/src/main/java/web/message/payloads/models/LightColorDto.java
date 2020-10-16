@@ -3,7 +3,7 @@ package web.message.payloads.models;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
 
-public  enum LightColorDto {
+public enum LightColorDto {
     GREEN(0),
     YELLOW(1),
     RED(2);

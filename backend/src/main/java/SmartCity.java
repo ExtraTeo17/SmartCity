@@ -1,17 +1,13 @@
 import agents.AgentsModule;
-import agents.TroubleManagerAgent;
 import com.google.inject.Guice;
 import genesis.GuiModule;
 import genesis.MainModule;
 import genesis.SharedModule;
-import jade.wrapper.ContainerController;
-import jade.wrapper.StaleProxyException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import osmproxy.OsmModule;
 import osmproxy.buses.BusModule;
 import routing.RoutingModule;
-import smartcity.SmartCityAgent;
 import smartcity.SmartCityModule;
 import smartcity.config.ConfigProperties;
 import smartcity.lights.core.LightsModule;
