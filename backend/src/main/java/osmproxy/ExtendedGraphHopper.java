@@ -23,20 +23,33 @@ import com.graphhopper.GraphHopper;
 import com.graphhopper.reader.DataReader;
 import com.graphhopper.reader.osm.OSMReader;
 import com.graphhopper.routing.Path;
+import com.graphhopper.routing.util.FlagEncoder;
+import com.graphhopper.routing.util.HintsMap;
+import com.graphhopper.routing.weighting.AvoidEdgesWeighting;
+import com.graphhopper.routing.weighting.FastestWeighting;
+import com.graphhopper.routing.weighting.Weighting;
 import com.graphhopper.storage.DataAccess;
 import com.graphhopper.storage.Directory;
 import com.graphhopper.storage.GraphHopperStorage;
 import com.graphhopper.util.BitUtil;
+import com.graphhopper.util.EdgeIteratorState;
 
+import gnu.trove.set.TIntSet;
+
+import java.util.Collection;
 import java.util.List;
 
 /**
  * @author Peter Karich
  */
 public class ExtendedGraphHopper extends GraphHopper {
-    // mapping of internal edge ID to OSM way ID
+
+	private static final double HEAVY_EDGE_PENALTY_FACTOR = 999999999;
+	
+	// mapping of internal edge ID to OSM way ID
     private DataAccess edgeMapping;
     private BitUtil bitUtil;
+	private AvoidEdgesRemovableWeighting avoidEdgesWeighting = null;
 
     @Override
     public boolean load(String graphHopperFolder) {
@@ -52,6 +65,34 @@ public class ExtendedGraphHopper extends GraphHopper {
 
         return loaded;
     }
+    
+    /* TODO: Utilize edge functions in the trouble generating strategy */
+    
+    public final void addForbiddenEdges(final Collection<EdgeIteratorState> edges) {
+    	avoidEdgesWeighting.addEdges(edges);
+    }
+    
+    public final void removeForbiddenEdges(final Collection<EdgeIteratorState> edges) {
+    	avoidEdgesWeighting.removeEdges(edges);
+    }
+    
+    public final TIntSet getForbiddenEdges() {
+    	return avoidEdgesWeighting.getEdges();
+    }
+    
+    @Override
+	public Weighting createWeighting(HintsMap hintsMap, FlagEncoder encoder) {
+    	String weightingStr = hintsMap.getWeighting().toLowerCase();
+        if (AvoidEdgesRemovableWeighting.NAME.equals(weightingStr)) {
+        	if (avoidEdgesWeighting == null) {
+        		avoidEdgesWeighting = new AvoidEdgesRemovableWeighting(new FastestWeighting(encoder));
+        		avoidEdgesWeighting.setEdgePenaltyFactor(HEAVY_EDGE_PENALTY_FACTOR);
+        	}
+            return avoidEdgesWeighting;
+        } else {
+            return super.createWeighting(hintsMap, encoder);
+        }
+	}
 
     @Override
     protected DataReader createReader(GraphHopperStorage ghStorage) {
