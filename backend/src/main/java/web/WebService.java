@@ -9,6 +9,7 @@ import web.message.MessageType;
 import web.message.payloads.infos.CreateCarInfo;
 import web.message.payloads.infos.KillCarInfo;
 import web.message.payloads.infos.SwitchLightsInfo;
+import web.message.payloads.infos.TroublePointInfo;
 import web.message.payloads.infos.UpdateCarInfo;
 import web.message.payloads.models.LightDto;
 import web.message.payloads.models.Location;
@@ -72,5 +73,12 @@ class WebService implements IWebService {
     public void killCar(int id) {
         var payload = new KillCarInfo(id);
         webConnector.broadcastMessage(MessageType.KILL_CAR_INFO, payload);
+    }
+
+    @Override
+    public void createTroublePoint(IGeoPosition position) {
+        var location = Converter.convert(position);
+        var payload = new TroublePointInfo(location);
+        webConnector.broadcastMessage(MessageType.TROUBLE_POINT_INFO, payload);
     }
 }

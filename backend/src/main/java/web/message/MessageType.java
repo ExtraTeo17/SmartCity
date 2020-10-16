@@ -13,7 +13,10 @@ public enum MessageType {
     CREATE_CAR_INFO(5),
     UPDATE_CAR_INFO(6),
     KILL_CAR_INFO(7),
-    SWITCH_LIGHTS_INFO(8);
+
+    SWITCH_LIGHTS_INFO(8),
+
+    TROUBLE_POINT_INFO(10);
 
     private final int code;
 

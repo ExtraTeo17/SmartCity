@@ -55,6 +55,11 @@ class Communicator {
         webService.killCar(e.id);
     }
 
+    @Subscribe
+    public void handle(TroublePointCreatedEvent e) {
+        webService.createTroublePoint(e.position);
+    }
+
     private void onHandle(Object obj) {
         logger.info("Handling " + obj.getClass().getSimpleName());
     }
