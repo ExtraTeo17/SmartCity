@@ -16,7 +16,7 @@ public enum MessageType {
 
     SWITCH_LIGHTS_INFO(8),
 
-    TROUBLE_POINT_INFO(10);
+    CREATE_TROUBLE_POINT_INFO(10);
 
     private final int code;
 

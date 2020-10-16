@@ -3,7 +3,9 @@ package agents;
 import agents.abstractions.IAgentsContainer;
 import agents.utilities.MessageParameter;
 import com.google.common.eventbus.EventBus;
+import com.google.common.eventbus.Subscribe;
 import com.google.inject.Inject;
+import events.web.PrepareSimulationEvent;
 import events.web.TroublePointCreatedEvent;
 import jade.core.Agent;
 import jade.core.behaviours.Behaviour;
@@ -50,7 +52,8 @@ public class TroubleManagerAgent extends Agent {
                         //TODO: Show trouble point on gui
                         var troublePoint = Position.of(Double.parseDouble(rcv.getUserDefinedParameter(MessageParameter.TROUBLE_LAT)),
                                 Double.parseDouble(rcv.getUserDefinedParameter(MessageParameter.TROUBLE_LON)));
-                        eventBus.post(new TroublePointCreatedEvent(troublePoint));
+                        // TODO: Generate id and save it to hide troublePoint later
+                        eventBus.post(new TroublePointCreatedEvent(1, troublePoint));
                         logger.info("TroubleAgent: Got message about trouble");
                         logger.info("troublePoint: " + troublePoint.getLat() + "  " + troublePoint.getLng());
                         var edgeId = Long.parseLong(rcv.getUserDefinedParameter(MessageParameter.EDGE_ID));
@@ -75,4 +78,11 @@ public class TroubleManagerAgent extends Agent {
             }
         }
     };
+
+    // for tests
+    @Subscribe
+    public void handle(PrepareSimulationEvent e){
+        var troublePoint = Position.of(52.23682, 21.01683);
+        eventBus.post(new TroublePointCreatedEvent(1, troublePoint));
+    }
 }

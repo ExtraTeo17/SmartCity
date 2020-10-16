@@ -57,7 +57,7 @@ class Communicator {
 
     @Subscribe
     public void handle(TroublePointCreatedEvent e) {
-        webService.createTroublePoint(e.position);
+        webService.createTroublePoint(e.id, e.position);
     }
 
     private void onHandle(Object obj) {

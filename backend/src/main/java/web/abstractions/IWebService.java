@@ -20,5 +20,5 @@ public interface IWebService extends IStartable {
 
     void updateLights(long lightGroupId);
 
-    void createTroublePoint(IGeoPosition position);
+    void createTroublePoint(int id, IGeoPosition position);
 }
