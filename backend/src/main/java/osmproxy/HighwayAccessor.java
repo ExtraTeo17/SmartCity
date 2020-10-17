@@ -24,17 +24,12 @@ import com.graphhopper.routing.VirtualEdgeIteratorState;
 import com.graphhopper.util.CmdArgs;
 import com.graphhopper.util.EdgeIteratorState;
 import com.graphhopper.util.PointList;
-
-import gnu.trove.set.TIntSet;
-
 import org.javatuples.Pair;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import routing.nodes.RouteNode;
 
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
 import java.util.List;
 
 /**
@@ -55,18 +50,18 @@ public class HighwayAccessor {
         graphHopper.init(CmdArgs.read(args));
         graphHopper.importOrLoad();
     }
-    
+
     // TODO: tested manually, but add unit tests / integration tests
 
     public static Pair<List<Long>, List<RouteNode>> getOsmWayIdsAndPointList(double fromLat, double fromLon,
-            double toLat, double toLon, boolean onFoot) {
+                                                                             double toLat, double toLon, boolean onFoot) {
         List<Long> osmWayIds = new ArrayList<>();
         List<RouteNode> pointList = new ArrayList<>();
 
         GHResponse response = new GHResponse();
         GHRequest request = new GHRequest(fromLat, fromLon, toLat, toLon)
-        		.setVehicle(onFoot ? "foot" : "car")
-        		.setWeighting(AvoidEdgesRemovableWeighting.NAME);
+                .setVehicle(onFoot ? "foot" : "car")
+                .setWeighting(AvoidEdgesRemovableWeighting.NAME);
         List<Path> paths = graphHopper.calcPaths(request, response);
         Path path0 = paths.get(0);
 

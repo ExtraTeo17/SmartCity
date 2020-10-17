@@ -55,9 +55,9 @@ public abstract class MovingObject {
             throw new ArrayIndexOutOfBoundsException("MovingObject exceeded its route: " + moveIndex + "/" + uniformRoute.size());
         }
     }
-    
+
     public void setUniformRoute(final List<RouteNode> uniformRoute) {
-    	this.uniformRoute = uniformRoute;
+        this.uniformRoute = uniformRoute;
     }
 
     public IGeoPosition getStartPosition() {
@@ -107,7 +107,7 @@ public abstract class MovingObject {
     }
 
 
-    public List<RouteNode> getUniformRoute() {return uniformRoute;}
+    public List<RouteNode> getUniformRoute() { return uniformRoute; }
 
     public abstract String getVehicleType();
 

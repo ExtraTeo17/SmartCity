@@ -25,15 +25,12 @@ import com.graphhopper.reader.osm.OSMReader;
 import com.graphhopper.routing.Path;
 import com.graphhopper.routing.util.FlagEncoder;
 import com.graphhopper.routing.util.HintsMap;
-import com.graphhopper.routing.weighting.AvoidEdgesWeighting;
 import com.graphhopper.routing.weighting.FastestWeighting;
 import com.graphhopper.routing.weighting.Weighting;
 import com.graphhopper.storage.DataAccess;
 import com.graphhopper.storage.Directory;
 import com.graphhopper.storage.GraphHopperStorage;
 import com.graphhopper.util.BitUtil;
-import com.graphhopper.util.EdgeIteratorState;
-
 import gnu.trove.set.TIntSet;
 
 import java.util.Collection;
@@ -44,12 +41,12 @@ import java.util.List;
  */
 public class ExtendedGraphHopper extends GraphHopper {
 
-	private static final double HEAVY_EDGE_PENALTY_FACTOR = 999999999;
-	
-	// mapping of internal edge ID to OSM way ID
+    private static final double HEAVY_EDGE_PENALTY_FACTOR = 999999999;
+
+    // mapping of internal edge ID to OSM way ID
     private DataAccess edgeMapping;
     private BitUtil bitUtil;
-	private static AvoidEdgesRemovableWeighting avoidEdgesWeighting = null;
+    private static AvoidEdgesRemovableWeighting avoidEdgesWeighting = null;
 
     @Override
     public boolean load(String graphHopperFolder) {
@@ -65,34 +62,35 @@ public class ExtendedGraphHopper extends GraphHopper {
 
         return loaded;
     }
-    
+
     /* TODO: Utilize edge functions in the trouble generating strategy */
-    
+
     public static final void addForbiddenEdges(final Collection<Integer> edgeIds) {
-    	avoidEdgesWeighting.addEdgeIds(edgeIds);
+        avoidEdgesWeighting.addEdgeIds(edgeIds);
     }
-    
+
     public static final void removeForbiddenEdges(final Collection<Integer> edgeIds) {
-    	avoidEdgesWeighting.removeEdgeIds(edgeIds);
+        avoidEdgesWeighting.removeEdgeIds(edgeIds);
     }
-    
+
     public static final TIntSet getForbiddenEdges() {
-    	return avoidEdgesWeighting.getEdgeIds();
+        return avoidEdgesWeighting.getEdgeIds();
     }
-    
+
     @Override
-	public Weighting createWeighting(HintsMap hintsMap, FlagEncoder encoder) {
-    	String weightingStr = hintsMap.getWeighting().toLowerCase();
+    public Weighting createWeighting(HintsMap hintsMap, FlagEncoder encoder) {
+        String weightingStr = hintsMap.getWeighting().toLowerCase();
         if (AvoidEdgesRemovableWeighting.NAME.equals(weightingStr)) {
-        	if (avoidEdgesWeighting == null) {
-        		avoidEdgesWeighting = new AvoidEdgesRemovableWeighting(new FastestWeighting(encoder));
-        		avoidEdgesWeighting.setEdgePenaltyFactor(HEAVY_EDGE_PENALTY_FACTOR);
-        	}
+            if (avoidEdgesWeighting == null) {
+                avoidEdgesWeighting = new AvoidEdgesRemovableWeighting(new FastestWeighting(encoder));
+                avoidEdgesWeighting.setEdgePenaltyFactor(HEAVY_EDGE_PENALTY_FACTOR);
+            }
             return avoidEdgesWeighting;
-        } else {
+        }
+        else {
             return super.createWeighting(hintsMap, encoder);
         }
-	}
+    }
 
     @Override
     protected DataReader createReader(GraphHopperStorage ghStorage) {

@@ -44,7 +44,6 @@ public class TroubleManagerAgent extends Agent {
                     switch (rcv.getPerformative()) {
                         case ACLMessage.INFORM -> {
                             if (rcv.getUserDefinedParameter(MessageParameter.TROUBLE).equals(MessageParameter.SHOW)) {   //parsing received message
-                                //TODO: Show trouble point on gui
                                 var troublePoint = Position.of(Double.parseDouble(rcv.getUserDefinedParameter(MessageParameter.TROUBLE_LAT)),
                                         Double.parseDouble(rcv.getUserDefinedParameter(MessageParameter.TROUBLE_LON)));
                                 // TODO: Generate id and save it to hide troublePoint later
@@ -64,7 +63,8 @@ public class TroubleManagerAgent extends Agent {
                                 });
                                 send(response);
                                 logger.info("Sent broadcast");
-                            } else if (rcv.getUserDefinedParameter(MessageParameter.TROUBLE).equals(MessageParameter.STOP)) {
+                            }
+                            else if (rcv.getUserDefinedParameter(MessageParameter.TROUBLE).equals(MessageParameter.STOP)) {
                                 //TODO: FOR FUTURE CHANGE ROOT AGAIN OF THE CAR?
                             }
                         }
