@@ -38,12 +38,14 @@ const message = (state = initialState, action) => {
     case CAR_UPDATED: {
       const car = action.payload;
 
-      var newCars = state.cars.map(c => {
-        if (c.id === car.id && !c.isDeleted) {
-          return { ...c, location: car.location };
-        }
-        return c;
-      });
+      var newCars = state.cars
+        .filter(c => !c.isDeleted)
+        .map(c => {
+          if (c.id === car.id) {
+            return { ...c, location: car.location };
+          }
+          return c;
+        });
 
       return { ...state, cars: newCars };
     }
