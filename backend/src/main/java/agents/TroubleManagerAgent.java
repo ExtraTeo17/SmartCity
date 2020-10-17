@@ -79,7 +79,6 @@ public class TroubleManagerAgent extends Agent {
 
 
         };
-        super.setup();
         addBehaviour(communication);
     }
 

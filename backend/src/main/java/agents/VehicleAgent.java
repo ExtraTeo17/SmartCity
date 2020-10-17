@@ -28,12 +28,16 @@ import static routing.RoutingConstants.STEP_CONSTANT;
 @SuppressWarnings("serial")
 // TODO: Maybe rename to CarAgent? Bus is also a Vehicle
 public class VehicleAgent extends AbstractAgent {
+    private final static Random random = new Random();
     private final MovingObject vehicle;
-    private int timeBeforeAccident = 0;
-    private IRouteGenerator routeGenerator;
+    private final int timeBeforeAccident;
+    private final IRouteGenerator routeGenerator;
     private RouteNode troublePoint;
 
-    VehicleAgent(int id, MovingObject vehicle, ITimeProvider timeProvider, EventBus eventBus, int timeBeforeAccident, IRouteGenerator routeGenerator) {
+    VehicleAgent(int id, MovingObject vehicle, int timeBeforeAccident,
+                 ITimeProvider timeProvider,
+                 IRouteGenerator routeGenerator,
+                 EventBus eventBus) {
         super(id, vehicle.getVehicleType(), timeProvider, eventBus);
         this.vehicle = vehicle;
         this.timeBeforeAccident = timeBeforeAccident;
@@ -150,18 +154,16 @@ public class VehicleAgent extends AbstractAgent {
                 }
             }
         };
+
         Behaviour troubleGenerator = new TickerBehaviour(this, this.timeBeforeAccident) {
             @Override
             public void onTick() {
-
-                List route = vehicle.getUniformRoute();
+                var route = vehicle.getUniformRoute();
 
                 //TODO: from current index
-                Random random = new Random();
                 //choose trouble EdgeId
                 var el = random.nextInt(route.size());
-
-                RouteNode troublePointTmp = vehicle.getUniformRoute().get(el);
+                RouteNode troublePointTmp = route.get(el);
                 troublePoint = new RouteNode(troublePointTmp.getLat(), troublePointTmp.getLng(), troublePointTmp.getInternalEdgeId());
 
                 //send message to boss Agent
@@ -192,6 +194,7 @@ public class VehicleAgent extends AbstractAgent {
 
 
         };
+
         Behaviour troubleStopper = new TickerBehaviour(this, 3 * this.timeBeforeAccident) {
             @Override
             public void onTick() {
@@ -222,6 +225,7 @@ public class VehicleAgent extends AbstractAgent {
             }
 
         };
+
         addBehaviour(move);
         addBehaviour(communication);
         addBehaviour(troubleGenerator);
