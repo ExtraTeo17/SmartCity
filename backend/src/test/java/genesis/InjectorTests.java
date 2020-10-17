@@ -5,7 +5,6 @@ import com.google.common.eventbus.DeadEvent;
 import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
 import com.google.inject.Guice;
-import com.google.inject.Inject;
 import com.google.inject.Injector;
 import events.LightManagersReadyEvent;
 import events.SwitchLightsStartEvent;
@@ -52,8 +51,7 @@ class InjectorTests {
         assertInstancesNotNull(injector);
         assertEventsHandled(injector);
 
-
-        cleanUp(injector);
+        // cleanUp(injector);
     }
 
     private void assertInstancesNotNull(Injector injector) {
@@ -93,7 +91,7 @@ class InjectorTests {
         assertEquals(expectedDeadEvents, counter.get(), "All events should be handled somewhere");
     }
 
-    private void cleanUp(Injector injector){
+    private void cleanUp(Injector injector) {
         var controller = injector.getInstance(ContainerController.class);
         try {
             controller.kill();
