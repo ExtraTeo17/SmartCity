@@ -9,6 +9,8 @@ import LightsLayer from "./Layers/LightsLayer";
 import StationsLayer from "./Layers/StationsLayer";
 import TroublePointsLayer from "./Layers/TroublePointsLayer";
 import CarsLayer from "./Layers/CarsLayer";
+import { notify } from "react-notify-toast";
+import { NOTIFY_SHOW_MS } from "../utils/constants";
 
 const DEFAULT_ZOOM = 15;
 const MAX_ZOOM = 20;
@@ -24,6 +26,14 @@ const CityMap = props => {
     dispatch(centerUpdated({ lat, lng, rad }));
   }
 
+  function rightClickOnMap(e) {
+    if (!wasStarted) {
+      setCenter(e.latlng);
+    } else {
+      notify.show("You cannot move zone when simulation started!", "warning", NOTIFY_SHOW_MS);
+    }
+  }
+
   return (
     <LeafletMap
       center={{ lat, lng }}
@@ -32,7 +42,7 @@ const CityMap = props => {
       onzoomanim={e => {
         setZoom(e.zoom);
       }}
-      oncontextmenu={e => !wasStarted && setCenter(e.latlng)}
+      oncontextmenu={e => rightClickOnMap(e)}
     >
       <TileLayer
         attribution='&amp;copy <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'

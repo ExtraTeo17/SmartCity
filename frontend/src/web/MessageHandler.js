@@ -7,7 +7,7 @@ import {
   SWITCH_LIGHTS_INFO,
   CREATE_TROUBLE_POINT_INFO,
 } from "./MessageType";
-import { NOTIFY_SHOW_SEC } from "../utils/constants";
+import { NOTIFY_SHOW_MS } from "../utils/constants";
 import { notify } from "react-notify-toast";
 import Dispatcher from "../redux/Dispatcher";
 
@@ -16,7 +16,7 @@ export default {
     const payload = msg.payload;
     switch (msg.type) {
       case PREPARE_SIMULATION_RESPONSE: {
-        notify.show("Simulation prepared!", "success", NOTIFY_SHOW_SEC * 1000);
+        notify.show("Simulation prepared!", "success", NOTIFY_SHOW_MS);
         console.groupCollapsed("Prepared");
         console.log(msg.payload);
         console.groupEnd();
@@ -25,7 +25,7 @@ export default {
       }
 
       case START_SIMULATION_RESPONSE:
-        notify.show("Simulation started!", "success", NOTIFY_SHOW_SEC * 1000);
+        notify.show("Simulation started!", "success", NOTIFY_SHOW_MS);
 
         Dispatcher.startSimulation(payload.timeScale);
         break;
