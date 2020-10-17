@@ -7,6 +7,7 @@ import {
   SIMULATION_STARTED,
   LIGHTS_SWITCHED,
   TROUBLE_POINT_CREATED,
+  CAR_ROUTE_CHANGED,
 } from "./constants";
 import { createAction } from "redux-actions";
 
@@ -41,6 +42,8 @@ export const carCreated = car => {
 export const carUpdated = createAction(CAR_UPDATED);
 
 export const carKilled = createAction(CAR_KILLED);
+
+export const carRouteChanged = createAction(CAR_ROUTE_CHANGED);
 
 export const lightsSwitched = createAction(LIGHTS_SWITCHED);
 

@@ -7,14 +7,23 @@ import {
   lightsSwitched,
   troublePointCreated,
   simulationStarted,
+  carRouteChanged,
 } from "./actions";
 import { batch } from "react-redux";
 
 const fps = 15;
 let timeScale = 1;
-let timer;
+let timer = null;
 let carUpdateQueue = new Map();
 let switchLightsQueue = new Map();
+
+function update() {
+  batch(() => {
+    carUpdateQueue.forEach(action => dispatch(action));
+    switchLightsQueue.forEach(action => dispatch(action));
+  });
+  switchLightsQueue.clear();
+}
 
 export default {
   prepareSimulation(lights, stations) {
@@ -23,18 +32,18 @@ export default {
 
   startSimulation(newTimeScale) {
     timeScale = newTimeScale;
-    timer = setInterval(() => {
-      batch(() => {
-        carUpdateQueue.forEach(action => dispatch(action));
-        switchLightsQueue.forEach(action => dispatch(action));
-      });
-      switchLightsQueue.clear();
-    }, 1000 / fps);
+    timer = setInterval(update, 1000 / fps);
     dispatch(simulationStarted());
   },
 
   createCar(car) {
     dispatch(carCreated(car));
+    if (timer == null) {
+      batch(() => {
+        this.prepareSimulation([], []);
+        this.startSimulation(10);
+      });
+    }
   },
 
   updateCar(car) {
@@ -43,6 +52,10 @@ export default {
 
   killCar(id) {
     dispatch(carKilled(id));
+  },
+
+  updateCarRoute(routeInfo) {
+    dispatch(carRouteChanged(routeInfo));
   },
 
   switchLights(id) {

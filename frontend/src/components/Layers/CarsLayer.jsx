@@ -14,19 +14,18 @@ const CarsLayer = props => {
   useEffect(() => {
     if (pathColors.size < cars.length) {
       for (let carsIter = pathColors.size; carsIter < cars.length; ++carsIter) {
-        const colorKey = cars[carsIter].id;
-        pathColors.set(colorKey, generateRandomColor());
+        pathColors.set(carsIter, generateRandomColor());
       }
     }
   });
 
   const carMarkers = cars.map(car => (car.isDeleted ? null : <Car key={car.id} car={car} />));
   const carRoutes = cars.map((car, ind) =>
-    car.isDeleted ? null : (
+    car.isDeleted || !car.route ? null : (
       <Polyline
         key={ind}
         weight={car.isTestCar ? DEFAULT_WEIGHT + 1 : DEFAULT_WEIGHT}
-        color={pathColors.get(car.id)}
+        color={pathColors.get(car.id % pathColors.size)}
         positions={car.route}
       />
     )

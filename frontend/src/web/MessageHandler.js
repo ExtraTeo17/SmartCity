@@ -6,6 +6,7 @@ import {
   KILL_CAR_INFO,
   SWITCH_LIGHTS_INFO,
   CREATE_TROUBLE_POINT_INFO,
+  UPDATE_CAR_ROUTE_INFO,
 } from "./MessageType";
 import { NOTIFY_SHOW_MS } from "../utils/constants";
 import { notify } from "react-notify-toast";
@@ -42,6 +43,10 @@ export default {
         Dispatcher.killCar(payload.id);
         break;
 
+      case UPDATE_CAR_ROUTE_INFO:
+        Dispatcher.updateCarRoute(payload);
+        break;
+
       case SWITCH_LIGHTS_INFO: {
         Dispatcher.switchLights(payload.lightGroupId);
         break;
@@ -55,7 +60,7 @@ export default {
       default:
         console.group("Unrecognized message");
         console.warn("Type: " + msg.type);
-        console.log(payload);
+        console.info(payload);
         console.groupEnd();
     }
   },

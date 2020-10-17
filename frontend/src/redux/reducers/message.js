@@ -7,6 +7,7 @@ import {
   LIGHTS_SWITCHED,
   TROUBLE_POINT_CREATED,
   SIMULATION_STARTED,
+  CAR_ROUTE_CHANGED,
 } from "../constants";
 
 // Just for reference - defined in store.js
@@ -20,6 +21,7 @@ const initialState = {
 };
 
 const message = (state = initialState, action) => {
+  const payload = action.payload;
   switch (action.type) {
     case SIMULATION_PREPARED: {
       const { lights, stations } = action.payload;
@@ -38,23 +40,39 @@ const message = (state = initialState, action) => {
     case CAR_UPDATED: {
       const car = action.payload;
 
-      var newCars = state.cars
+      let unrecognized = true;
+      const newCars = state.cars
         .filter(c => !c.isDeleted)
         .map(c => {
           if (c.id === car.id) {
+            unrecognized = false;
             return { ...c, location: car.location };
           }
           return c;
         });
+
+      if (unrecognized === true) {
+        newCars.push(car);
+      }
 
       return { ...state, cars: newCars };
     }
 
     case CAR_KILLED: {
       const id = action.payload;
-      let newCars = state.cars.slice();
-      newCars.forEach(c => {
-        if (c.id === id) c.isDeleted = true;
+      let newCars = state.cars.map(c => {
+        if (c.id == id) c.isDeleted = true;
+        return c;
+      });
+
+      return { ...state, cars: newCars };
+    }
+
+    case CAR_ROUTE_CHANGED: {
+      const id = payload.id;
+      let newCars = state.cars.map(c => {
+        if (c.id == id) c.route = payload.route;
+        return c;
       });
 
       return { ...state, cars: newCars };
