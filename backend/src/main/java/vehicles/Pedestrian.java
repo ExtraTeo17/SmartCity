@@ -1,9 +1,9 @@
 package vehicles;
 
 import com.google.common.annotations.VisibleForTesting;
+import routing.RoutingConstants;
 import routing.nodes.LightManagerNode;
 import routing.nodes.RouteNode;
-import routing.RoutingConstants;
 import routing.nodes.StationNode;
 
 import java.util.ArrayList;
@@ -19,14 +19,15 @@ public class Pedestrian extends MovingObject {
 
     private transient int stationIndex = 0;
 
-    public Pedestrian(List<RouteNode> routeToStation,
+    public Pedestrian(int agentId,
+                      List<RouteNode> routeToStation,
                       List<RouteNode> uniformRouteToStation,
                       List<RouteNode> routeFromStation,
                       List<RouteNode> uniformRouteFromStation,
                       String preferredBusLine,
                       StationNode startStation,
                       StationNode finishStation) {
-        super(10, createRoute(startStation, uniformRouteToStation, finishStation, uniformRouteFromStation));
+        super(agentId, 10, createRoute(startStation, uniformRouteToStation, finishStation, uniformRouteFromStation));
         this.displayRouteBeforeBus = routeToStation;
         this.routeBeforeBus = uniformRouteToStation;
         this.routeBeforeBus.add(startStation);
@@ -52,7 +53,7 @@ public class Pedestrian extends MovingObject {
     }
 
     Pedestrian(Pedestrian ped) {
-        super(ped.speed, ped.route);
+        super(ped.agentId, ped.speed, ped.uniformRoute);
         this.displayRouteBeforeBus = ped.displayRouteBeforeBus;
         this.routeBeforeBus = ped.routeBeforeBus;
 
@@ -66,7 +67,7 @@ public class Pedestrian extends MovingObject {
 
     @VisibleForTesting
     Pedestrian() {
-        super(10, new ArrayList<>());
+        super(1, 10, new ArrayList<>());
         preferredBusLine = "";
         displayRouteBeforeBus = new ArrayList<>();
         displayRouteAfterBus = new ArrayList<>();
@@ -76,11 +77,11 @@ public class Pedestrian extends MovingObject {
     }
 
     public StationNode getStartingStation() {
-        return (StationNode) route.get(stationIndex);
+        return (StationNode) uniformRoute.get(stationIndex);
     }
 
     public StationNode getTargetStation() {
-        return (StationNode) route.get(stationIndex + 1);
+        return (StationNode) uniformRoute.get(stationIndex + 1);
     }
 
     public String getPreferredBusLine() {
@@ -89,7 +90,7 @@ public class Pedestrian extends MovingObject {
 
     @Override
     public long getAdjacentOsmWayId() {
-        return ((LightManagerNode) route.get(moveIndex)).getCrossingOsmId1();
+        return ((LightManagerNode) uniformRoute.get(moveIndex)).getCrossingOsmId1();
     }
 
     @Override
@@ -98,32 +99,27 @@ public class Pedestrian extends MovingObject {
     }
 
     public RouteNode findNextStop() {
-        for (int i = moveIndex + 1; i < route.size(); i++) {
-            if (route.get(i) instanceof StationNode) {
-                return route.get(i);
+        for (int i = moveIndex + 1; i < uniformRoute.size(); i++) {
+            if (uniformRoute.get(i) instanceof StationNode) {
+                return uniformRoute.get(i);
             }
-            if (route.get(i) instanceof LightManagerNode) {
-                return route.get(i);
+            if (uniformRoute.get(i) instanceof LightManagerNode) {
+                return uniformRoute.get(i);
             }
         }
         return null;
     }
 
     public boolean isAtStation() {
-        if (moveIndex == route.size()) {
+        if (moveIndex == uniformRoute.size()) {
             return false;
         }
-        return route.get(moveIndex) instanceof StationNode;
+        return uniformRoute.get(moveIndex) instanceof StationNode;
     }
 
     @Override
-    public List<RouteNode> getDisplayRoute() {
+    public List<RouteNode> getSimpleRoute() {
         throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public int getMillisecondsToNextLight() {
-        return ((closestLightIndex - moveIndex) * RoutingConstants.STEP_CONSTANT) / getSpeed();
     }
 
     public List<RouteNode> getDisplayRouteBeforeBus() {

@@ -8,27 +8,28 @@ import java.time.temporal.ChronoUnit;
 
 // TODO: Realtime or fixed? IMPORTANT.
 public class TimeProvider implements ITimeProvider {
-    public static final int TIME_SCALE = 12;
+    public static final int TIME_SCALE = 10;
+    public static final int MS_PER_TICK = 100;
     private static final Logger logger = LoggerFactory.getLogger(TimeProvider.class);
 
     private LocalDateTime simulationStartTime;
-    private long realStartTimeNano;
+    private long ticks;
 
     TimeProvider() {
         simulationStartTime = LocalDateTime.now();
-        realStartTimeNano = System.nanoTime();
+        ticks = 0;
     }
 
     @Override
     public LocalDateTime getCurrentSimulationTime() {
-        var delta = System.nanoTime() - realStartTimeNano;
-        return simulationStartTime.plusNanos(TIME_SCALE * delta);
+        var delta = ticks * MS_PER_TICK;
+        return simulationStartTime.plus(TIME_SCALE * delta, ChronoUnit.MILLIS);
     }
 
     @Override
     public void setSimulationStartTime(LocalDateTime simulationTime) {
         this.simulationStartTime = simulationTime;
-        this.realStartTimeNano = System.nanoTime();
+        this.ticks = 0;
     }
 
     @Override
@@ -37,8 +38,14 @@ public class TimeProvider implements ITimeProvider {
     }
 
     @Override
-    public long getNanoStartTime() {
-        return realStartTimeNano;
+    public long getTicks() {
+        return ticks;
+    }
+
+    @Override
+    public Runnable getUpdateTimeTask(long initialTicks) {
+        ticks = initialTicks;
+        return () -> ++ticks;
     }
 
     public static long getTimeInMs(long timeNanoStart) {

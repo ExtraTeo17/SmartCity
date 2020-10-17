@@ -12,5 +12,7 @@ public interface ITaskManager {
 
     void scheduleBusControl(BooleanSupplier testSimulationState);
 
-    void scheduleSwitchLightTask(Collection<Light> lights);
+    void scheduleSwitchLightTask(int managerId, Collection<Light> lights);
+
+    void scheduleSimulationControl(BooleanSupplier testSimulationState, long nanoStartTime);
 }

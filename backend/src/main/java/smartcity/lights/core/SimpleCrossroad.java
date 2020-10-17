@@ -15,26 +15,30 @@ import utilities.Siblings;
 
 import java.util.*;
 import java.util.function.Consumer;
+import java.util.stream.Collectors;
 
 class SimpleCrossroad implements ICrossroad {
-    private static final Logger logger = LoggerFactory.getLogger(SimpleCrossroad.class);
-
+    private final Logger logger;
     private final EventBus eventBus;
+    private final int managerId;
     @SuppressWarnings("MismatchedQueryAndUpdateOfCollection")
     private final Map<Long, Light> wayIdToLightMap;
 
     SimpleCrossroad(EventBus eventBus,
+                    int managerId,
                     Siblings<SimpleLightGroup> lightGroups) {
+        this.logger = LoggerFactory.getLogger("SimpleCrossroad" + managerId);
+        this.eventBus = eventBus;
+        this.managerId = managerId;
         this.wayIdToLightMap = new HashMap<>() {{
             putAll(lightGroups.first.prepareMap());
             putAll(lightGroups.second.prepareMap());
         }};
-        this.eventBus = eventBus;
     }
 
     @Override
     public void startLifetime() {
-        eventBus.post(new SwitchLightsStartEvent(wayIdToLightMap.values()));
+        eventBus.post(new SwitchLightsStartEvent(managerId, wayIdToLightMap.values()));
     }
 
     @Override
@@ -43,7 +47,7 @@ class SimpleCrossroad implements ICrossroad {
     }
 
     private OptimizationResult allCarsOnGreen() {
-        OptimizationResult result = new OptimizationResult();
+        var result = new OptimizationResult();
         for (Light light : wayIdToLightMap.values()) {
             if (light.isGreen()) {
                 for (String carName : light.carQueue) {
@@ -51,7 +55,6 @@ class SimpleCrossroad implements ICrossroad {
                 }
             }
             else {
-                // TODO: Sth is wrong here - pedestrianName <-> add-CAR-GrantedPassthrough?
                 for (String pedestrianName : light.pedestrianQueue) {
                     result.addCarGrantedPassthrough(pedestrianName);
                 }
@@ -96,12 +99,9 @@ class SimpleCrossroad implements ICrossroad {
     }
 
     private void logAddError(long adjacentWayId) {
-        logger.warn("Failed to get adjacentWayId: " + adjacentWayId);
-        for (var entry : wayIdToLightMap.entrySet()) {
-            logger.warn("-------------\n " +
-                    entry.getKey() + "\n " +
-                    entry.getValue().getAdjacentWayId());
-        }
+        logger.warn("Failed to get adjacentWayId: " + adjacentWayId + "\n" + wayIdToLightMap.entrySet().stream()
+                .map(entry -> entry.getKey() + ", " + entry.getValue().getOsmLightId())
+                .collect(Collectors.joining("\n")));
     }
 
     @Override

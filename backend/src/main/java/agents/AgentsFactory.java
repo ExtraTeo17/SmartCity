@@ -43,14 +43,15 @@ class AgentsFactory implements IAgentsFactory {
 
     @Override
     public VehicleAgent create(List<RouteNode> route, boolean testCar) {
+        var id = idGenerator.get(VehicleAgent.class);
         var uniformRoute = routeTransformer.uniformRoute(route);
         logger.trace("DisplayRoute size: " + route.size() + ", routeSize: " + uniformRoute.size());
-        var car = new Car(route, uniformRoute);
+        var car = new Car(id, route, uniformRoute);
         if (testCar) {
             car = new TestCar(car, timeProvider);
         }
 
-        return new VehicleAgent(idGenerator.get(VehicleAgent.class), car, timeProvider, eventBus);
+        return new VehicleAgent(id, car, timeProvider, eventBus);
     }
 
     @Override
@@ -67,24 +68,25 @@ class AgentsFactory implements IAgentsFactory {
 
     @Override
     public BusAgent create(List<RouteNode> route, Timetable timetable, String busLine, String brigadeNr) {
+        var id = idGenerator.get(BusAgent.class);
         var uniformRoute = routeTransformer.uniformRoute(route);
         logger.trace("DisplayRoute size: " + route.size() + ", routeSize: " + uniformRoute.size());
-        var bus = new Bus(timeProvider, route, uniformRoute,
+        var bus = new Bus(timeProvider, id, route, uniformRoute,
                 timetable, busLine, brigadeNr);
-        return new BusAgent(idGenerator.get(BusAgent.class), bus, timeProvider, eventBus);
+        return new BusAgent(id, bus, timeProvider, eventBus);
     }
 
     @Override
     public LightManagerAgent create(Node crossroadNode) {
         var id = idGenerator.get(LightManagerAgent.class);
-        var crossroad = crossroadFactory.create(crossroadNode);
+        var crossroad = crossroadFactory.create(id, crossroadNode);
         return new LightManagerAgent(id, crossroad, timeProvider, eventBus);
     }
 
     @Override
     public LightManagerAgent create(OSMNode centerCrossroad) {
         var id = idGenerator.get(LightManagerAgent.class);
-        var crossroad = crossroadFactory.create(centerCrossroad);
+        var crossroad = crossroadFactory.create(id, centerCrossroad);
         return new LightManagerAgent(id, crossroad, timeProvider, eventBus);
     }
 
@@ -93,9 +95,10 @@ class AgentsFactory implements IAgentsFactory {
     public PedestrianAgent create(List<RouteNode> routeToStation, List<RouteNode> routeFromStation, String preferredBusLine,
                                   StationNode startStation, StationNode finishStation,
                                   boolean testPedestrian) {
+        var id = idGenerator.get(PedestrianAgent.class);
         var uniformRouteToStation = routeTransformer.uniformRoute(routeToStation);
         var uniformRouteFromStation = routeTransformer.uniformRoute(routeFromStation);
-        var pedestrian = new Pedestrian(routeToStation, uniformRouteToStation,
+        var pedestrian = new Pedestrian(id, routeToStation, uniformRouteToStation,
                 routeFromStation, uniformRouteFromStation,
                 preferredBusLine,
                 startStation, finishStation);
@@ -103,7 +106,7 @@ class AgentsFactory implements IAgentsFactory {
             pedestrian = new TestPedestrian(pedestrian, timeProvider);
         }
 
-        return new PedestrianAgent(idGenerator.get(PedestrianAgent.class), pedestrian, timeProvider, eventBus);
+        return new PedestrianAgent(id, pedestrian, timeProvider, eventBus);
     }
 
     @Override

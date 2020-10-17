@@ -18,6 +18,9 @@ import routing.abstractions.IRoutingHelper;
 import routing.core.IGeoPosition;
 import routing.nodes.RouteNode;
 import routing.nodes.StationNode;
+import smartcity.ITimeProvider;
+import smartcity.TimeProvider;
+import smartcity.config.ConfigContainer;
 import smartcity.lights.core.Light;
 import smartcity.task.abstractions.ITaskProvider;
 import smartcity.task.data.ISwitchLightsContext;
@@ -30,27 +33,32 @@ import java.util.function.Supplier;
 public class TaskProvider implements ITaskProvider {
     private static final Logger logger = LoggerFactory.getLogger(TaskProvider.class);
 
+    private final ConfigContainer configContainer;
     private final IRouteGenerator routeGenerator;
     private final IRoutingHelper routingHelper;
     private final IAgentsFactory agentsFactory;
     private final IAgentsContainer agentsContainer;
     private final IFunctionalTaskFactory functionalTaskFactory;
+    private final ITimeProvider timeProvider;
     private final EventBus eventBus;
 
     private final Table<IGeoPosition, IGeoPosition, List<RouteNode>> routeInfoCache;
 
     @Inject
-    public TaskProvider(IRouteGenerator routeGenerator,
+    public TaskProvider(ConfigContainer configContainer, IRouteGenerator routeGenerator,
                         IRoutingHelper routingHelper,
                         IAgentsFactory agentsFactory,
                         IAgentsContainer agentsContainer,
                         IFunctionalTaskFactory functionalTaskFactory,
+                        ITimeProvider timeProvider,
                         EventBus eventBus) {
+        this.configContainer = configContainer;
         this.routeGenerator = routeGenerator;
         this.routingHelper = routingHelper;
         this.agentsFactory = agentsFactory;
         this.agentsContainer = agentsContainer;
         this.functionalTaskFactory = functionalTaskFactory;
+        this.timeProvider = timeProvider;
         this.eventBus = eventBus;
 
         this.routeInfoCache = HashBasedTable.create();
@@ -130,9 +138,9 @@ public class TaskProvider implements ITaskProvider {
     }
 
     @Override
-    public Supplier<Integer> getSwitchLightsTask(Collection<Light> lights) {
-        int extendTimeSeconds = 20;
-        var switchLights = functionalTaskFactory.createLightSwitcher(extendTimeSeconds, lights);
+    public Supplier<Integer> getSwitchLightsTask(int managerId, Collection<Light> lights) {
+        var switchLights = functionalTaskFactory
+                .createLightSwitcher(managerId, configContainer.getExtendTimeSeconds(), lights);
         // Can be moved somewhere else if needed and passed as parameter
         var switchLightsContext = new ISwitchLightsContext() {
             private boolean alreadyExtendedGreen = false;
@@ -149,5 +157,15 @@ public class TaskProvider implements ITaskProvider {
         };
 
         return () -> switchLights.apply(switchLightsContext);
+    }
+
+    @Override
+    public Runnable getSimulationControlTask(long nanoStartTime) {
+        var updateTimeTask = timeProvider.getUpdateTimeTask((System.nanoTime() - nanoStartTime) /
+                (1_000_000 * TimeProvider.MS_PER_TICK));
+        return () -> {
+            updateTimeTask.run();
+            // TODO: Batch update of cars positions: eventBus.post();
+        };
     }
 }

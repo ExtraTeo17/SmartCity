@@ -23,19 +23,19 @@ public class CrossroadFactory implements ICrossroadFactory {
     }
 
     @Override
-    public ICrossroad create(Node crossroad) {
+    public ICrossroad create(int managerId, Node crossroad) {
         var lightGroups = getLightGroups(crossroad);
-        return create(lightGroups);
+        return create(managerId, lightGroups);
     }
 
     @Override
-    public ICrossroad create(OSMNode centerCrossroadNode) {
+    public ICrossroad create(int managerId, OSMNode centerCrossroadNode) {
         var lightGroups = getLightGroups(centerCrossroadNode);
-        return create(lightGroups);
+        return create(managerId, lightGroups);
     }
 
-    private ICrossroad create(Siblings<SimpleLightGroup> lightGroups) {
-        return new SimpleCrossroad(eventBus, lightGroups);
+    private ICrossroad create(int managerId, Siblings<SimpleLightGroup> lightGroups) {
+        return new SimpleCrossroad(eventBus, managerId, lightGroups);
     }
 
     private Siblings<SimpleLightGroup> getLightGroups(Node crossroad) {

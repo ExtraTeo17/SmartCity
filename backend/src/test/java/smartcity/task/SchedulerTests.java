@@ -26,10 +26,10 @@ class SchedulerTests {
         doAnswer(invocationOnMock -> {
             taskScheduled.set(true);
             return null;
-        }).when(taskManager).scheduleSwitchLightTask(any());
+        }).when(taskManager).scheduleSwitchLightTask(any(int.class), any());
         var scheduler = createScheduler(taskManager);
         var lights = Arrays.asList(createLight(), createLight(), createLight());
-        var event = new SwitchLightsStartEvent(lights);
+        var event = new SwitchLightsStartEvent(1, lights);
 
         // Act
         scheduler.handle(event);

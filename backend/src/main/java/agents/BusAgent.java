@@ -60,7 +60,7 @@ public class BusAgent extends AbstractAgent {
                 if (bus.isAtTrafficLights()) {
                     switch (bus.getState()) {
                         case MOVING:
-                            LightManagerNode light = bus.getNextTrafficLight();
+                            var light = bus.getCurrentTrafficLightNode();
                             ACLMessage msg = createMessage(ACLMessage.REQUEST_WHEN, LightManagerAgent.name,
                                     light.getLightManagerId());
                             // TODO: Should it be Vehicle?

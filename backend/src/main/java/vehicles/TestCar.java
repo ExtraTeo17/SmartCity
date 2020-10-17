@@ -20,7 +20,7 @@ public class TestCar extends Car {
 
     @VisibleForTesting
     TestCar(ITimeProvider timeProvider) {
-        super(new ArrayList<>(), new ArrayList<>());
+        super(1, new ArrayList<>(), new ArrayList<>());
         this.timeProvider = timeProvider;
     }
 

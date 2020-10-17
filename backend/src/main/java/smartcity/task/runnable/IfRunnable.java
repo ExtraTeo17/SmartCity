@@ -6,14 +6,13 @@ import java.util.function.BooleanSupplier;
 /**
  * Executes until predicate is true using provided supplier, but at least once
  */
-public class TestingRunnable extends AbstractFixedExecutionRunnable {
+public class IfRunnable extends AbstractFixedExecutionRunnable {
     private final BooleanSupplier test;
     private final Runnable runnable;
-    private boolean wasRun;
 
-    TestingRunnable(ScheduledExecutorService executor,
-                    BooleanSupplier test,
-                    Runnable runnable) {
+    IfRunnable(ScheduledExecutorService executor,
+               BooleanSupplier test,
+               Runnable runnable) {
         super(executor);
         this.test = test;
         this.runnable = runnable;
@@ -23,10 +22,6 @@ public class TestingRunnable extends AbstractFixedExecutionRunnable {
     public void run() {
         if (test.getAsBoolean()) {
             runnable.run();
-            wasRun = true;
-        }
-        else if (wasRun) {
-            super.onComplete();
         }
     }
 }
