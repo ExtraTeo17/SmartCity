@@ -117,11 +117,6 @@ public class Pedestrian extends MovingObject {
         return uniformRoute.get(moveIndex) instanceof StationNode;
     }
 
-    @Override
-    public List<RouteNode> getSimpleRoute() {
-        throw new UnsupportedOperationException();
-    }
-
     public List<RouteNode> getDisplayRouteBeforeBus() {
         return displayRouteBeforeBus;
     }

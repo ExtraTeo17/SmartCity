@@ -57,7 +57,7 @@ class Communicator {
 
     @Subscribe
     public void handle(VehicleAgentRouteChangedEvent e) {
-        webService.changeRoute(e.agentId, e.route, e.changePosition);
+        webService.changeRoute(e.agentId, e.routeStart, e.changePosition, e.routeEnd);
     }
 
     @Subscribe

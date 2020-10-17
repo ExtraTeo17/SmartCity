@@ -5,6 +5,7 @@ import org.jetbrains.annotations.Contract;
 import java.util.List;
 
 public final class NumericHelper {
+    public final static double PRECISION = 1e-6;
 
     /**
      * @return cosine in radians, calculated from the Law of Cosines in triangle

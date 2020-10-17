@@ -22,10 +22,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
-// TODO: Add fields to this class and make it some kind of service (not static)
 final class Router implements
-        IRouteGenerator,
-        IRouteTransformer {
+        IRouteGenerator {
     private static final Logger logger = LoggerFactory.getLogger(Router.class);
 
     private final IMapAccessManager mapAccessManager;
@@ -134,43 +132,6 @@ final class Router implements
         cacheWrapper.cacheData(route, stationNodes, data);
 
         return data;
-    }
-
-    // TODO: In some cases distance is 0 -> dx|dy is NaN -> same nodes?
-    @SuppressWarnings("FeatureEnvy")
-    @Override
-    public List<RouteNode> uniformRoute(List<RouteNode> route) {
-        List<RouteNode> newRoute = new ArrayList<>();
-        for (int i = 0; i < route.size() - 1; ++i) {
-            RouteNode nodeA = route.get(i);
-            RouteNode nodeB = route.get(i + 1);
-
-            double x = nodeB.getLng() - nodeA.getLng();
-            double y = nodeB.getLat() - nodeA.getLat();
-
-            double distance = RoutingHelper.getDistance(nodeA, nodeB);
-            if (distance == 0) {
-                continue;
-            }
-
-            double dx = x / distance;
-            double dy = y / distance;
-
-            double lon = nodeA.getLng();
-            double lat = nodeA.getLat();
-            newRoute.add(nodeA);
-            for (int p = RoutingConstants.STEP_SIZE_METERS; p < distance; p += RoutingConstants.STEP_SIZE_METERS) {
-                lon = lon + RoutingConstants.STEP_SIZE_METERS * dx;
-                lat = lat + RoutingConstants.STEP_SIZE_METERS * dy;
-                newRoute.add(new RouteNode(lat, lon, nodeA.getInternalEdgeId()));
-            }
-        }
-
-        if (route.size() > 0) {
-            newRoute.add(route.get(route.size() - 1));
-        }
-
-        return newRoute;
     }
 
     /////////////////////////////////////////////////////////////

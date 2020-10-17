@@ -1,18 +1,22 @@
 package events.web;
 
 import routing.core.IGeoPosition;
-import routing.nodes.RouteNode;
 
 import java.util.List;
 
 public class VehicleAgentRouteChangedEvent {
     public final int agentId;
+    public final List<? extends IGeoPosition> routeStart;
     public final IGeoPosition changePosition;
-    public final List<RouteNode> route;
+    public final List<? extends IGeoPosition> routeEnd;
 
-    public VehicleAgentRouteChangedEvent(int agentId, List<RouteNode> route, IGeoPosition changePosition) {
+    public VehicleAgentRouteChangedEvent(int agentId,
+                                         List<? extends IGeoPosition> routeStart,
+                                         IGeoPosition changePosition,
+                                         List<? extends IGeoPosition> routeEnd) {
         this.agentId = agentId;
         this.changePosition = changePosition;
-        this.route = route;
+        this.routeEnd = routeEnd;
+        this.routeStart = routeStart;
     }
 }

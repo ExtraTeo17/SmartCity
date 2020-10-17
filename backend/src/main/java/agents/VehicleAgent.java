@@ -22,7 +22,6 @@ import vehicles.DrivingState;
 import vehicles.MovingObject;
 
 import java.util.Arrays;
-import java.util.List;
 import java.util.Random;
 
 import static agents.message.MessageManager.createMessage;
@@ -134,16 +133,20 @@ public class VehicleAgent extends AbstractAgent {
                                 RouteNode routeCarOnThreshold = vehicle.getPositionFarOnIndex(THRESHOLD_UNTIL_INDEX_CHANGE);
                                 int indexAfterWhichRouteChange = vehicle.getFarOnIndex(THRESHOLD_UNTIL_INDEX_CHANGE);
                                 sendMessageToLightManager(indexAfterWhichRouteChange, THRESHOLD_UNTIL_INDEX_CHANGE);
-                                List<RouteNode> uniformRoute = vehicle.getUniformRoute();
-                                var simpleRoute = routeGenerator.generateRouteInfo(routeCarOnThreshold,
+
+                                var uniformRoute = vehicle.getUniformRoute();
+                                var newSimpleRouteEnd = routeGenerator.generateRouteInfo(routeCarOnThreshold,
                                         uniformRoute.get(uniformRoute.size() - 1));
-                                var newRouteAfterChangeIndex = routeTransformer.uniformRoute(simpleRoute);
+                                var newRouteAfterChangeIndex = routeTransformer.uniformRoute(newSimpleRouteEnd);
+
                                 var route = uniformRoute.subList(0, indexAfterWhichRouteChange);
                                 route.addAll(newRouteAfterChangeIndex);
-                                vehicle.setUniformRoute(route);
+                                var mergeResult = routeTransformer.mergeByDistance(vehicle.getSimpleRoute(),
+                                        newSimpleRouteEnd);
+                                vehicle.setRoutes(mergeResult.mergedRoute, route);
 
-                                //TODO: change route in the GUI and replace the old one PRZEMEK
-                                eventBus.post(new VehicleAgentRouteChangedEvent(getId(), simpleRoute, routeCarOnThreshold));
+                                eventBus.post(new VehicleAgentRouteChangedEvent(getId(), mergeResult.startNodes, routeCarOnThreshold,
+                                        newSimpleRouteEnd));
                             }
 
                         }

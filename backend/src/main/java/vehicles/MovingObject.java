@@ -16,16 +16,18 @@ public abstract class MovingObject {
     final Logger logger;
     final int agentId;
     final int speed;
+    List<RouteNode> simpleRoute;
     List<RouteNode> uniformRoute;
     int moveIndex;
     int closestLightIndex;
     DrivingState state;
 
-    MovingObject(int agentId, int speed, List<RouteNode> uniformRoute, List<RouteNode> displayRoute) {
+    MovingObject(int agentId, int speed, List<RouteNode> uniformRoute, List<RouteNode> simpleRoute) {
         this.logger = LoggerFactory.getLogger(this.getClass().getSimpleName() + "Object" + agentId);
         this.agentId = agentId;
         this.speed = speed;
         this.uniformRoute = uniformRoute;
+        this.simpleRoute = simpleRoute;
         this.moveIndex = 0;
         this.closestLightIndex = Integer.MAX_VALUE;
         this.state = DrivingState.STARTING;
@@ -56,7 +58,8 @@ public abstract class MovingObject {
         }
     }
 
-    public void setUniformRoute(final List<RouteNode> uniformRoute) {
+    public void setRoutes(final List<RouteNode> simpleRoute, final List<RouteNode> uniformRoute) {
+        this.simpleRoute = simpleRoute;
         this.uniformRoute = uniformRoute;
     }
 
@@ -179,7 +182,7 @@ public abstract class MovingObject {
         return ((closestLightIndex - moveIndex) * RoutingConstants.STEP_CONSTANT) / getSpeed();
     }
 
-    public abstract List<RouteNode> getSimpleRoute();
+    public List<RouteNode> getSimpleRoute() { return simpleRoute; }
 
     public abstract long getAdjacentOsmWayId();
 
