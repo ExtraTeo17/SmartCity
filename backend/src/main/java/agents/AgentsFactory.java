@@ -9,6 +9,7 @@ import org.w3c.dom.Node;
 import osmproxy.buses.Timetable;
 import osmproxy.elements.OSMNode;
 import osmproxy.elements.OSMStation;
+import routing.abstractions.IRouteGenerator;
 import routing.abstractions.IRouteTransformer;
 import routing.nodes.RouteNode;
 import routing.nodes.StationNode;
@@ -25,20 +26,25 @@ class AgentsFactory implements IAgentsFactory {
     private final IdGenerator idGenerator;
     private final ITimeProvider timeProvider;
     private final IRouteTransformer routeTransformer;
+    private final IRouteGenerator routeGenerator;
     private final ICrossroadFactory crossroadFactory;
     private final EventBus eventBus;
+    //TODO: GET from GUI;
+    private final int timeBeforeTrouble = 5000;
 
     @Inject
     public AgentsFactory(IdGenerator idGenerator,
                          ITimeProvider timeProvider,
                          IRouteTransformer routeTransformer,
                          ICrossroadFactory crossroadFactory,
-                         EventBus eventBus) {
+                         EventBus eventBus,
+                         IRouteGenerator routeGenerator) {
         this.idGenerator = idGenerator;
         this.timeProvider = timeProvider;
         this.routeTransformer = routeTransformer;
         this.crossroadFactory = crossroadFactory;
         this.eventBus = eventBus;
+        this.routeGenerator = routeGenerator;
     }
 
     @Override
@@ -51,7 +57,7 @@ class AgentsFactory implements IAgentsFactory {
             car = new TestCar(car, timeProvider);
         }
 
-        return new VehicleAgent(id, car, timeProvider, eventBus);
+        return new VehicleAgent(id, car, timeBeforeTrouble, timeProvider, routeGenerator, routeTransformer, eventBus);
     }
 
     @Override

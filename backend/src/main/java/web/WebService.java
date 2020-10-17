@@ -6,10 +6,7 @@ import routing.core.IGeoPosition;
 import smartcity.lights.core.Light;
 import web.abstractions.IWebService;
 import web.message.MessageType;
-import web.message.payloads.infos.CreateCarInfo;
-import web.message.payloads.infos.KillCarInfo;
-import web.message.payloads.infos.SwitchLightsInfo;
-import web.message.payloads.infos.UpdateCarInfo;
+import web.message.payloads.infos.*;
 import web.message.payloads.models.LightDto;
 import web.message.payloads.models.Location;
 import web.message.payloads.models.StationDto;
@@ -72,5 +69,24 @@ class WebService implements IWebService {
     public void killCar(int id) {
         var payload = new KillCarInfo(id);
         webConnector.broadcastMessage(MessageType.KILL_CAR_INFO, payload);
+    }
+
+    @Override
+    public void createTroublePoint(int id, IGeoPosition position) {
+        var location = Converter.convert(position);
+        var payload = new CreateTroublePointInfo(id, location);
+        webConnector.broadcastMessage(MessageType.CREATE_TROUBLE_POINT_INFO, payload);
+    }
+
+    @Override
+    public void changeRoute(int agentId,
+                            List<? extends IGeoPosition> routeStart,
+                            IGeoPosition changePosition,
+                            List<? extends IGeoPosition> routeEnd) {
+        var changeLocation = Converter.convert(changePosition);
+        var routeStartLocations = routeStart.stream().map(Converter::convert).toArray(Location[]::new);
+        var routeEndLocations = routeEnd.stream().map(Converter::convert).toArray(Location[]::new);
+        var payload = new ChangeCarRouteInfo(agentId, routeStartLocations, changeLocation, routeEndLocations);
+        webConnector.broadcastMessage(MessageType.UPDATE_CAR_ROUTE_INFO, payload);
     }
 }

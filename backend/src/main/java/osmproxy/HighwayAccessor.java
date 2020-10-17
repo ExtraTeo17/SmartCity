@@ -24,15 +24,12 @@ import com.graphhopper.routing.VirtualEdgeIteratorState;
 import com.graphhopper.util.CmdArgs;
 import com.graphhopper.util.EdgeIteratorState;
 import com.graphhopper.util.PointList;
-
-import gnu.trove.set.TIntSet;
-
 import org.javatuples.Pair;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import routing.nodes.RouteNode;
 
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
 import java.util.List;
 
 /**
@@ -43,6 +40,7 @@ import java.util.List;
  * @author Peter Karich
  */
 public class HighwayAccessor {
+    private static final Logger logger = LoggerFactory.getLogger(HighwayAccessor.class);
     private static final String CONFIG_PATH = "config/graphHopper.properties";
     private static final String[] args = new String[]{"config=" + CONFIG_PATH, "datareader.file=mazowieckie-latest.osm.pbf"};
     private static final ExtendedGraphHopper graphHopper;
@@ -52,18 +50,18 @@ public class HighwayAccessor {
         graphHopper.init(CmdArgs.read(args));
         graphHopper.importOrLoad();
     }
-    
+
     // TODO: tested manually, but add unit tests / integration tests
 
     public static Pair<List<Long>, List<RouteNode>> getOsmWayIdsAndPointList(double fromLat, double fromLon,
-            double toLat, double toLon, boolean onFoot) {
+                                                                             double toLat, double toLon, boolean onFoot) {
         List<Long> osmWayIds = new ArrayList<>();
         List<RouteNode> pointList = new ArrayList<>();
 
         GHResponse response = new GHResponse();
         GHRequest request = new GHRequest(fromLat, fromLon, toLat, toLon)
-        		.setVehicle(onFoot ? "foot" : "car")
-        		.setWeighting(AvoidEdgesRemovableWeighting.NAME);
+                .setVehicle(onFoot ? "foot" : "car")
+                .setWeighting(AvoidEdgesRemovableWeighting.NAME);
         List<Path> paths = graphHopper.calcPaths(request, response);
         Path path0 = paths.get(0);
 
@@ -83,17 +81,18 @@ public class HighwayAccessor {
                 previousWayId = osmWayIdToAdd;
             }
 
-            pointList.addAll(getRouteNodeList(edge.fetchWayGeometry(2)));
+            pointList.addAll(getRouteNodeList(edgeId, edge.fetchWayGeometry(2)));
         }
 
         return new Pair<>(osmWayIds, pointList);
     }
 
-    private static List<RouteNode> getRouteNodeList(PointList pointList) {
+    private static List<RouteNode> getRouteNodeList(int edgeId, PointList pointList) {
         List<RouteNode> nodeList = new ArrayList<>();
         for (int i = 0; i < pointList.size(); ++i) {
-            nodeList.add(new RouteNode(pointList.toGHPoint(i).lat, pointList.toGHPoint(i).lon));
+            nodeList.add(new RouteNode(pointList.toGHPoint(i).lat, pointList.toGHPoint(i).lon, edgeId));
         }
         return nodeList;
     }
+
 }

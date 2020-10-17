@@ -19,6 +19,8 @@ public interface IRunnableFactory {
 
     IFixedExecutionRunnable createIf(BooleanSupplier test, Runnable runnable, boolean separateThread);
 
+    IFixedExecutionRunnable createIf(BooleanSupplier test, Consumer<Integer> countConsumer, boolean separateThread);
+
     IVariableExecutionRunnable createDelay(Supplier<Integer> delayRunnable, int initialDelay, boolean separateThread);
 
     default IVariableExecutionRunnable createDelay(Supplier<Integer> delayRunnable, boolean separateThread) {

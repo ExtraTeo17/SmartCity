@@ -2,7 +2,6 @@ package smartcity.lights.abstractions;
 
 import org.jxmapviewer.JXMapViewer;
 import org.jxmapviewer.painter.Painter;
-import routing.core.IGeoPosition;
 import smartcity.lights.OptimizationResult;
 import smartcity.lights.core.Light;
 import smartcity.stations.ArrivalInfo;

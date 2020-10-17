@@ -25,6 +25,9 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Random;
 
+import static agents.message.MessageManager.createMessage;
+import static agents.message.MessageManager.createProperties;
+
 @SuppressWarnings("serial")
 public class BusAgent extends AbstractAgent {
     public static final String name = BusAgent.class.getSimpleName().replace("Agent", "");
@@ -61,7 +64,7 @@ public class BusAgent extends AbstractAgent {
                     switch (bus.getState()) {
                         case MOVING:
                             var light = bus.getCurrentTrafficLightNode();
-                            ACLMessage msg = createMessage(ACLMessage.REQUEST_WHEN, LightManagerAgent.name,
+                            ACLMessage msg = createMessageById(ACLMessage.REQUEST_WHEN, LightManagerAgent.name,
                                     light.getLightManagerId());
                             // TODO: Should it be Vehicle?
                             Properties properties = createProperties(MessageParameter.VEHICLE);
@@ -101,7 +104,7 @@ public class BusAgent extends AbstractAgent {
                                 send(leave);
                             }
 
-                            ACLMessage msg = createMessage(ACLMessage.REQUEST_WHEN, StationAgent.name, station.getAgentId());
+                            ACLMessage msg = createMessageById(ACLMessage.REQUEST_WHEN, StationAgent.name, station.getAgentId());
                             Properties properties = createProperties(MessageParameter.BUS);
 
                             var timeOnStation = bus.getTimeOnStation(station.getOsmId());
@@ -239,7 +242,7 @@ public class BusAgent extends AbstractAgent {
         if (stationOpt.isPresent()) {
             var station = stationOpt.get();
             var stationId = station.getAgentId();
-            ACLMessage msg = createMessage(ACLMessage.INFORM, StationAgent.name, stationId);
+            ACLMessage msg = createMessageById(ACLMessage.INFORM, StationAgent.name, stationId);
             var properties = createProperties(MessageParameter.BUS);
             var currentTime = timeProvider.getCurrentSimulationTime();
             var predictedTime = currentTime.plusNanos(bus.getMillisecondsToNextStation() * 1_000_000);

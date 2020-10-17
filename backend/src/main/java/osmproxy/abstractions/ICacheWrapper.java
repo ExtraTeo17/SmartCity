@@ -5,7 +5,6 @@ import osmproxy.elements.OSMWay;
 import routing.nodes.RouteNode;
 import routing.nodes.StationNode;
 
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
