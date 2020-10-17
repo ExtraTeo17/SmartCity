@@ -3,6 +3,7 @@ package agents;
 import agents.abstractions.AbstractAgent;
 import agents.utilities.MessageParameter;
 import com.google.common.eventbus.EventBus;
+import events.web.VehicleAgentRouteChangedEvent;
 import events.web.VehicleAgentUpdatedEvent;
 import jade.core.behaviours.Behaviour;
 import jade.core.behaviours.CyclicBehaviour;
@@ -134,12 +135,15 @@ public class VehicleAgent extends AbstractAgent {
                                 int indexAfterWhichRouteChange = vehicle.getFarOnIndex(THRESHOLD_UNTIL_INDEX_CHANGE);
                                 sendMessageToLightManager(indexAfterWhichRouteChange, THRESHOLD_UNTIL_INDEX_CHANGE);
                                 List<RouteNode> uniformRoute = vehicle.getUniformRoute();
-                                var newRouteAfterChangeIndex = routeTransformer.uniformRoute(routeGenerator.generateRouteInfo(routeCarOnThreshold, uniformRoute.get(uniformRoute.size() - 1)));
+                                var simpleRoute = routeGenerator.generateRouteInfo(routeCarOnThreshold,
+                                        uniformRoute.get(uniformRoute.size() - 1));
+                                var newRouteAfterChangeIndex = routeTransformer.uniformRoute(simpleRoute);
                                 var route = uniformRoute.subList(0, indexAfterWhichRouteChange);
                                 route.addAll(newRouteAfterChangeIndex);
                                 vehicle.setUniformRoute(route);
 
                                 //TODO: change route in the GUI and replace the old one PRZEMEK
+                                eventBus.post(new VehicleAgentRouteChangedEvent(getId(), simpleRoute, routeCarOnThreshold));
                             }
 
                         }

@@ -3,6 +3,7 @@ package web;
 import com.google.inject.Inject;
 import osmproxy.elements.OSMNode;
 import routing.core.IGeoPosition;
+import routing.nodes.RouteNode;
 import smartcity.lights.core.Light;
 import web.abstractions.IWebService;
 import web.message.MessageType;
@@ -76,5 +77,13 @@ class WebService implements IWebService {
         var location = Converter.convert(position);
         var payload = new CreateTroublePointInfo(id, location);
         webConnector.broadcastMessage(MessageType.CREATE_TROUBLE_POINT_INFO, payload);
+    }
+
+    @Override
+    public void changeRoute(int agentId, List<RouteNode> route, IGeoPosition changePosition) {
+        var changeLocation = Converter.convert(changePosition);
+        var routeLocations = route.stream().map(Converter::convert).toArray(Location[]::new);
+        var payload = new ChangeCarRouteInfo(agentId, routeLocations, changeLocation);
+        webConnector.broadcastMessage(MessageType.UPDATE_CAR_ROUTE_INFO, payload);
     }
 }

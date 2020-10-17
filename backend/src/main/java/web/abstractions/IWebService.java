@@ -3,6 +3,7 @@ package web.abstractions;
 
 import osmproxy.elements.OSMNode;
 import routing.core.IGeoPosition;
+import routing.nodes.RouteNode;
 import smartcity.lights.core.Light;
 
 import java.util.List;
@@ -21,4 +22,6 @@ public interface IWebService extends IStartable {
     void updateLights(long lightGroupId);
 
     void createTroublePoint(int id, IGeoPosition position);
+
+    void changeRoute(int agentId, List<RouteNode> route, IGeoPosition changePosition);
 }
