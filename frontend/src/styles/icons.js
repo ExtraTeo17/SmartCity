@@ -47,3 +47,11 @@ export const troublePointIcon = new L.Icon({
   popupAnchor: [8, 8],
   iconSize: [32, 32],
 });
+
+export const goldMarkerIcon = new L.Icon({
+  iconUrl: "/images/marker-icon-gold.png",
+  iconRetinaUrl: "/images/marker-icon-gold.png",
+  iconSize: [25, 41],
+  popupAnchor: [1, -34],
+  iconAnchor: [12, 41],
+});

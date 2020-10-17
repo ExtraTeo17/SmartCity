@@ -69,9 +69,12 @@ const message = (state = initialState, action) => {
     }
 
     case CAR_ROUTE_CHANGED: {
-      const id = payload.id;
+      const { id, route, location } = payload;
       let newCars = state.cars.map(c => {
-        if (c.id == id) c.route = payload.route;
+        if (c.id == id) {
+          c.route = route;
+          c.routeChangePoint = location;
+        }
         return c;
       });
 

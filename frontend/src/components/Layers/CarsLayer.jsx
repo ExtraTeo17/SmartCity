@@ -3,8 +3,8 @@ import { Polyline } from "react-leaflet";
 import { connect } from "react-redux";
 
 import Car from "../Markers/Car";
+import RouteChangePoint from "../Markers/RouteChangePoint";
 import { generateRandomColor } from "../../utils/helpers";
-
 const DEFAULT_WEIGHT = 3;
 
 const pathColors = new Map();
@@ -19,16 +19,21 @@ const CarsLayer = props => {
     }
   });
 
-  const carMarkers = cars.map(car => (car.isDeleted ? null : <Car key={car.id} car={car} />));
+  const carMarkers = cars.map(car => <Car key={car.id} car={car} />);
   const carRoutes = cars.map((car, ind) =>
-    car.isDeleted || !car.route ? null : (
-      <Polyline
-        key={ind}
-        weight={car.isTestCar ? DEFAULT_WEIGHT + 1 : DEFAULT_WEIGHT}
-        color={pathColors.get(car.id % pathColors.size)}
-        positions={car.route}
-      />
-    )
+    car.route
+      ? [
+          <Polyline
+            key={ind}
+            weight={car.isTestCar ? DEFAULT_WEIGHT + 1 : DEFAULT_WEIGHT}
+            color={pathColors.get(car.id % pathColors.size)}
+            positions={car.route}
+            bubblingMouseEvents={false}
+            interactive={false}
+          />,
+          <RouteChangePoint key={ind} point={car.routeChangePoint} />,
+        ]
+      : []
   );
 
   return (
@@ -42,7 +47,7 @@ const CarsLayer = props => {
 const mapStateToProps = (state /* , ownProps */) => {
   const { message } = state;
   return {
-    cars: message.cars,
+    cars: message.cars.filter(c => !c.isDeleted),
   };
 };
 
