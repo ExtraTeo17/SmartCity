@@ -16,8 +16,7 @@ public abstract class MovingObject {
     final Logger logger;
     final int agentId;
     final int speed;
-    final List<RouteNode> uniformRoute;
-    final List<RouteNode> displayRoute;
+    List<RouteNode> uniformRoute;
     int moveIndex;
     int closestLightIndex;
     DrivingState state;
@@ -27,7 +26,6 @@ public abstract class MovingObject {
         this.agentId = agentId;
         this.speed = speed;
         this.uniformRoute = uniformRoute;
-        this.displayRoute = displayRoute;
         this.moveIndex = 0;
         this.closestLightIndex = Integer.MAX_VALUE;
         this.state = DrivingState.STARTING;
@@ -38,7 +36,6 @@ public abstract class MovingObject {
         this.agentId = agentId;
         this.speed = speed;
         this.uniformRoute = uniformRoute;
-        this.displayRoute = null;
         this.moveIndex = 0;
         this.closestLightIndex = Integer.MAX_VALUE;
         this.state = DrivingState.STARTING;
@@ -57,6 +54,10 @@ public abstract class MovingObject {
         if (moveIndex > uniformRoute.size()) {
             throw new ArrayIndexOutOfBoundsException("MovingObject exceeded its route: " + moveIndex + "/" + uniformRoute.size());
         }
+    }
+    
+    public void setUniformRoute(final List<RouteNode> uniformRoute) {
+    	this.uniformRoute = uniformRoute;
     }
 
     public IGeoPosition getStartPosition() {
@@ -107,8 +108,6 @@ public abstract class MovingObject {
 
 
     public List<RouteNode> getUniformRoute() {return uniformRoute;}
-
-    public List<RouteNode> getDisplayRoute() {return displayRoute;}
 
     public abstract String getVehicleType();
 

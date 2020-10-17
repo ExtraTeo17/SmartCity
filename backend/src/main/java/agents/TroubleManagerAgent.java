@@ -68,11 +68,7 @@ public class TroubleManagerAgent extends Agent {
                                 //TODO: FOR FUTURE CHANGE ROOT AGAIN OF THE CAR?
                             }
                         }
-
-
                     }
-
-
                 }
                 block(100);
             }

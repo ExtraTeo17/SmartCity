@@ -5,9 +5,9 @@ import { composeWithDevTools } from "redux-devtools-extension";
 const initialState = {
   interaction: {
     center: {
-      lat: 52.23682,
-      lng: 21.01681,
-      rad: 600,
+      lat: 52.30667,
+      lng: 20.9343,
+      rad: 1000,
     },
   },
   message: {

@@ -10,14 +10,18 @@ import jade.core.behaviours.TickerBehaviour;
 import jade.lang.acl.ACLMessage;
 import jade.util.leap.Properties;
 import routing.abstractions.IRouteGenerator;
+import routing.abstractions.IRouteTransformer;
 import routing.core.IGeoPosition;
 import routing.nodes.LightManagerNode;
 import routing.nodes.RouteNode;
 import smartcity.ITimeProvider;
 import smartcity.SmartCityAgent;
+import vehicles.Car;
 import vehicles.DrivingState;
 import vehicles.MovingObject;
 
+import java.time.temporal.ChronoUnit;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
 
@@ -28,23 +32,29 @@ import static routing.RoutingConstants.STEP_CONSTANT;
 @SuppressWarnings("serial")
 // TODO: Maybe rename to CarAgent? Bus is also a Vehicle
 public class VehicleAgent extends AbstractAgent {
+
+	private final int THRESHOLD_UNTIL_INDEX_CHANGE = 3;
+
     private final static Random random = new Random();
     private final MovingObject vehicle;
     private final int timeBeforeAccident;
     private final IRouteGenerator routeGenerator;
+    private final IRouteTransformer routeTransformer;
     private RouteNode troublePoint;
 
     VehicleAgent(int id, MovingObject vehicle, int timeBeforeAccident,
                  ITimeProvider timeProvider,
                  IRouteGenerator routeGenerator,
+                 IRouteTransformer routeTransformer,
                  EventBus eventBus) {
         super(id, vehicle.getVehicleType(), timeProvider, eventBus);
         this.vehicle = vehicle;
         this.timeBeforeAccident = timeBeforeAccident;
         this.routeGenerator = routeGenerator;
+        this.routeTransformer = routeTransformer;
     }
 
-    @Override
+	@Override
     protected void setup() {
         informLightManager(vehicle);
         vehicle.setState(DrivingState.MOVING);
@@ -122,15 +132,15 @@ public class VehicleAgent extends AbstractAgent {
                             if (vehicle.checkIfEdgeExistsAndFarEnough(edgeId)) {
                                 logger.info("CAR:EDGE EXISTS");
 
-                                int threshold = 3;
-                                RouteNode routeCarOnThreshold = vehicle.getPositionFarOnIndex(threshold);
+                                RouteNode routeCarOnThreshold = vehicle.getPositionFarOnIndex(THRESHOLD_UNTIL_INDEX_CHANGE);
+                                int indexAfterWhichRouteChange = vehicle.getFarOnIndex(THRESHOLD_UNTIL_INDEX_CHANGE);
+                                sendMessageToLightManager(indexAfterWhichRouteChange, THRESHOLD_UNTIL_INDEX_CHANGE);
+                                List<RouteNode> uniformRoute = vehicle.getUniformRoute();
+                                var newRouteAfterChangeIndex = routeTransformer.uniformRoute( routeGenerator.generateRouteInfo(routeCarOnThreshold, uniformRoute.get(uniformRoute.size() - 1)));
+                                var route = uniformRoute.subList(0, indexAfterWhichRouteChange);
+                                route.addAll(newRouteAfterChangeIndex);
+                                vehicle.setUniformRoute(route);
 
-                                int indexAfterWhichRouteChange = vehicle.getFarOnIndex(threshold);
-                                sendMessageToLightManager(indexAfterWhichRouteChange, threshold);
-                                List<RouteNode> route = vehicle.getUniformRoute();
-                                var newRoute = routeGenerator.generateRouteInfo(routeCarOnThreshold, route.get(route.size() - 1));
-
-                                //TODO: merge lists
                                 //TODO: change route in the GUI and replace the old one PRZEMEK
                             }
 
@@ -169,12 +179,7 @@ public class VehicleAgent extends AbstractAgent {
                 //send message to boss Agent
                 sendMessageAboutTrouble();
 
-                osmproxy.HighwayAccessor.getOsmWayIdsAndPointList(vehicle.getStartPosition().getLat(),
-                        vehicle.getStartPosition().getLng(),
-                        vehicle.getEndPosition().getLat(),
-                        vehicle.getEndPosition().getLng(),
-                        false,
-                        (int) troublePoint.getInternalEdgeId());
+                osmproxy.ExtendedGraphHopper.addForbiddenEdges(Arrays.asList(troublePoint.getInternalEdgeId()));
                 stop();
             }
 
@@ -200,12 +205,7 @@ public class VehicleAgent extends AbstractAgent {
             public void onTick() {
 
                 sendMessageAboutTroubleStop();
-                osmproxy.HighwayAccessor.getOsmWayIdsAndPointList(vehicle.getStartPosition().getLat(),
-                        vehicle.getStartPosition().getLng(),
-                        vehicle.getEndPosition().getLat(),
-                        vehicle.getEndPosition().getLng(),
-                        false,
-                        (int) troublePoint.getInternalEdgeId());
+                osmproxy.ExtendedGraphHopper.removeForbiddenEdges(Arrays.asList(troublePoint.getInternalEdgeId()));
                 stop();
             }
 
