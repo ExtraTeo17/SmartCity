@@ -20,21 +20,26 @@ const CarsLayer = props => {
   });
 
   const carMarkers = cars.map(car => <Car key={car.id} car={car} />);
-  const carRoutes = cars.map((car, ind) =>
-    car.route
-      ? [
-          <Polyline
-            key={ind}
-            weight={car.isTestCar ? DEFAULT_WEIGHT + 1 : DEFAULT_WEIGHT}
-            color={pathColors.get(car.id % pathColors.size)}
-            positions={car.route}
-            bubblingMouseEvents={false}
-            interactive={false}
-          />,
-          <RouteChangePoint key={ind} point={car.routeChangePoint} />,
-        ]
-      : []
-  );
+  const carRoutes = cars.map((car, ind) => {
+    const route = car.route;
+    if (!route) {
+      return null;
+    }
+
+    const color = pathColors.get(car.id % pathColors.size);
+
+    return [
+      <Polyline
+        key={ind}
+        weight={car.isTestCar ? DEFAULT_WEIGHT + 1 : DEFAULT_WEIGHT}
+        color={color}
+        positions={route}
+        bubblingMouseEvents={false}
+        interactive={false}
+      />,
+      <RouteChangePoint key={cars.length + ind} point={car.routeChangePoint} />,
+    ];
+  });
 
   return (
     <div>
@@ -47,7 +52,7 @@ const CarsLayer = props => {
 const mapStateToProps = (state /* , ownProps */) => {
   const { message } = state;
   return {
-    cars: message.cars.filter(c => !c.isDeleted),
+    cars: message.cars.filter(c => c.isDeleted === undefined),
   };
 };
 

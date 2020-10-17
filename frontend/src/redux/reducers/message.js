@@ -20,6 +20,8 @@ const initialState = {
   wasStarted: false,
 };
 
+let deletedIds = [];
+
 const message = (state = initialState, action) => {
   const payload = action.payload;
   switch (action.type) {
@@ -42,7 +44,7 @@ const message = (state = initialState, action) => {
 
       let unrecognized = true;
       const newCars = state.cars
-        .filter(c => !c.isDeleted)
+        .filter(c => c.isDeleted === undefined)
         .map(c => {
           if (c.id === car.id) {
             unrecognized = false;
@@ -51,7 +53,7 @@ const message = (state = initialState, action) => {
           return c;
         });
 
-      if (unrecognized === true) {
+      if (unrecognized === true && !deletedIds.includes(car.id)) {
         newCars.push(car);
       }
 
@@ -60,19 +62,20 @@ const message = (state = initialState, action) => {
 
     case CAR_KILLED: {
       const id = action.payload;
-      let newCars = state.cars.map(c => {
-        if (c.id == id) c.isDeleted = true;
+      const newCars = state.cars.map(c => {
+        if (c.id === id) c.isDeleted = true;
         return c;
       });
+      deletedIds.push(id);
 
       return { ...state, cars: newCars };
     }
 
     case CAR_ROUTE_CHANGED: {
-      const { id, route, location } = payload;
+      const { id, routeStart, routeEnd, location } = payload;
       let newCars = state.cars.map(c => {
-        if (c.id == id) {
-          c.route = route;
+        if (c.id === id) {
+          c.route = [...routeStart, ...routeEnd];
           c.routeChangePoint = location;
         }
         return c;
