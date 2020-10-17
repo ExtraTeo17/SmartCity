@@ -4,6 +4,7 @@ import {
   CAR_CREATED,
   CENTER_UPDATED,
   SIMULATION_PREPARED,
+  SIMULATION_STARTED,
   LIGHTS_SWITCHED,
   TROUBLE_POINT_CREATED,
 } from "./constants";
@@ -12,20 +13,15 @@ import { createAction } from "redux-actions";
 /**
  * @param {{ lat: number; lng:number; rad:number }} center
  */
-export const centerUpdated = center => {
-  return {
-    type: CENTER_UPDATED,
-    payload: {
-      center,
-    },
-  };
-};
+export const centerUpdated = createAction(CENTER_UPDATED);
 
 export const simulationPrepared = createAction(
   SIMULATION_PREPARED,
   simulationData => simulationData,
   () => ({ lights: [], stations: [] })
 );
+
+export const simulationStarted = createAction(SIMULATION_STARTED);
 
 /**
  * @param {{id:number; location:{lat:number; lng:number;}; route:Array<> isTestCar:boolean; }} car

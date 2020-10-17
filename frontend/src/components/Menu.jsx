@@ -11,6 +11,7 @@ const DEFAULT_TEST_CAR = 2;
 const DECIMAL_PLACES = 5;
 
 const Menu = props => {
+  const { wasPrepared, wasStarted } = props;
   let { lat, lng, rad } = props.center;
   lat = lat.toFixed(DECIMAL_PLACES);
   lng = lng.toFixed(DECIMAL_PLACES);
@@ -102,7 +103,13 @@ const Menu = props => {
             onChange={e => setRad(parseFloat(e.target.value))}
           />
         </div>
-        <button className="btn btn-primary" type="button" onClick={() => ApiManager.prepareSimulation({ lat, lng, rad })}>
+        <button
+          className="btn btn-primary"
+          disabled={wasPrepared || wasStarted}
+          title={wasStarted ? "Simulation already started!" : wasPrepared ? "Simulation already prepared!" : "Prepare simulation"}
+          type="button"
+          onClick={() => ApiManager.prepareSimulation({ lat, lng, rad })}
+        >
           Prepare simulation
         </button>
       </form>
@@ -133,7 +140,19 @@ const Menu = props => {
             onChange={e => setTestCarNum(parseInt(e.target.value))}
           />
         </div>
-        <button className="btn btn-success" type="button" onClick={() => ApiManager.startVehicles({ carsNum, testCarNum })}>
+        <button
+          className="btn btn-success"
+          disabled={wasStarted || !wasPrepared}
+          title={
+            wasStarted
+              ? "Simulation already started"
+              : wasPrepared
+              ? "Simulation is ready to run"
+              : "You must prepare simulation!"
+          }
+          type="button"
+          onClick={() => ApiManager.startVehicles({ carsNum, testCarNum })}
+        >
           Start simulation
         </button>
       </form>
@@ -142,8 +161,11 @@ const Menu = props => {
 };
 
 const mapStateToProps = (state /* , ownProps */) => {
+  var { wasPrepared, wasStarted } = state.message;
   return {
     center: state.interaction.center,
+    wasPrepared: wasPrepared,
+    wasStarted: wasStarted,
   };
 };
 

@@ -1,5 +1,13 @@
 import { dispatch } from "./store";
-import { carUpdated, carCreated, simulationPrepared, carKilled, lightsSwitched, troublePointCreated } from "./actions";
+import {
+  carUpdated,
+  carCreated,
+  simulationPrepared,
+  carKilled,
+  lightsSwitched,
+  troublePointCreated,
+  simulationStarted,
+} from "./actions";
 import { batch } from "react-redux";
 
 const fps = 15;
@@ -22,6 +30,7 @@ export default {
       });
       switchLightsQueue.clear();
     }, 1000 / fps);
+    dispatch(simulationStarted());
   },
 
   createCar(car) {

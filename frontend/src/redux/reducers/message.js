@@ -1,5 +1,13 @@
 import { LightColor } from "../../components/Models/LightColor";
-import { CAR_KILLED, CAR_CREATED, CAR_UPDATED, SIMULATION_PREPARED, LIGHTS_SWITCHED, TROUBLE_POINT_CREATED } from "../constants";
+import {
+  CAR_KILLED,
+  CAR_CREATED,
+  CAR_UPDATED,
+  SIMULATION_PREPARED,
+  LIGHTS_SWITCHED,
+  TROUBLE_POINT_CREATED,
+  SIMULATION_STARTED,
+} from "../constants";
 
 // Just for reference - defined in store.js
 const initialState = {
@@ -7,13 +15,19 @@ const initialState = {
   cars: [],
   stations: [],
   troublePoints: [],
+  wasPrepared: false,
+  wasStarted: false,
 };
 
 const message = (state = initialState, action) => {
   switch (action.type) {
     case SIMULATION_PREPARED: {
       const { lights, stations } = action.payload;
-      return { ...state, lights: lights, stations: stations };
+      return { ...state, lights: lights, stations: stations, wasPrepared: true };
+    }
+
+    case SIMULATION_STARTED: {
+      return { ...state, wasStarted: true };
     }
 
     case CAR_CREATED: {

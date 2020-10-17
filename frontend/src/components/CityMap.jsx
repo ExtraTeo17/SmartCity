@@ -22,7 +22,7 @@ const pathColors = new Map();
 const CityMap = props => {
   const [zoom, setZoom] = useState(DEFAULT_ZOOM);
   const { lat, lng, rad } = props.center;
-  const { cars = [] } = props;
+  const { cars = [], wasStarted } = props;
 
   // Similar to componentDidMount and componentDidUpdate:
   useEffect(() => {
@@ -59,7 +59,7 @@ const CityMap = props => {
       onzoomanim={e => {
         setZoom(e.zoom);
       }}
-      oncontextmenu={e => setCenter(e.latlng)}
+      oncontextmenu={e => !wasStarted && setCenter(e.latlng)}
     >
       <TileLayer
         attribution='&amp;copy <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
@@ -87,6 +87,7 @@ const mapStateToProps = (state /* , ownProps */) => {
   return {
     center: interaction.center,
     cars: message.cars,
+    wasStarted: interaction.wasStarted,
   };
 };
 

@@ -27,7 +27,7 @@ export default {
       case START_SIMULATION_RESPONSE:
         notify.show("Simulation started!", "success", NOTIFY_SHOW_SEC * 1000);
 
-        Dispatcher.startSimulation(msg.payload.timeScale);
+        Dispatcher.startSimulation(payload.timeScale);
         break;
 
       case CREATE_CAR_INFO:
@@ -53,7 +53,10 @@ export default {
       }
 
       default:
-        console.warn("Unrecognized message type");
+        console.group("Unrecognized message");
+        console.warn("Type: " + msg.type);
+        console.log(payload);
+        console.groupEnd();
     }
   },
 };
