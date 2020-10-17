@@ -49,21 +49,21 @@ public class TroubleManagerAgent extends Agent {
                                         Double.parseDouble(rcv.getUserDefinedParameter(MessageParameter.TROUBLE_LON)));
                                 // TODO: Generate id and save it to hide troublePoint later
                                 eventBus.post(new TroublePointCreatedEvent(1, troublePoint));
-                                System.out.println("TroubleAgent: Got message about trouble");
-                                System.out.println("troublePoint: " + troublePoint.getLat() + "  " + troublePoint.getLng());
-                                Long edgeId = Long.parseLong(rcv.getUserDefinedParameter(MessageParameter.EDGE_ID));
-                                System.out.println("trouble edge: " + edgeId);
+                                logger.info("Got message about trouble");
+                                logger.info("troublePoint: " + troublePoint.getLat() + "  " + troublePoint.getLng());
+                                long edgeId = Long.parseLong(rcv.getUserDefinedParameter(MessageParameter.EDGE_ID));
+                                logger.info("trouble edge: " + edgeId);
                                 //broadcasting to everybody
                                 ACLMessage response = new ACLMessage(ACLMessage.PROPOSE);
                                 Properties properties = createProperties(MessageParameter.TROUBLE_MANAGER);
-                                properties.setProperty(MessageParameter.EDGE_ID, edgeId.toString());
+                                properties.setProperty(MessageParameter.EDGE_ID, Long.toString(edgeId));
                                 response.setAllUserDefinedParameters(properties);
 
                                 agentsContainer.forEach(VehicleAgent.class, vehicleAgent -> {
                                     response.addReceiver(vehicleAgent.getAID());
                                 });
                                 send(response);
-                                System.out.println("Trouble Manger: send broadcast");
+                                logger.info("Sent broadcast");
                             } else if (rcv.getUserDefinedParameter(MessageParameter.TROUBLE).equals(MessageParameter.STOP)) {
                                 //TODO: FOR FUTURE CHANGE ROOT AGAIN OF THE CAR?
                             }

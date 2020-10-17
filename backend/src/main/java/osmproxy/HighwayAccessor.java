@@ -28,6 +28,8 @@ import com.graphhopper.util.PointList;
 import gnu.trove.set.TIntSet;
 
 import org.javatuples.Pair;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import routing.nodes.RouteNode;
 
 import java.util.ArrayList;
@@ -43,6 +45,7 @@ import java.util.List;
  * @author Peter Karich
  */
 public class HighwayAccessor {
+    private static final Logger logger = LoggerFactory.getLogger(HighwayAccessor.class);
     private static final String CONFIG_PATH = "config/graphHopper.properties";
     private static final String[] args = new String[]{"config=" + CONFIG_PATH, "datareader.file=mazowieckie-latest.osm.pbf"};
     private static final ExtendedGraphHopper graphHopper;
@@ -87,7 +90,7 @@ public class HighwayAccessor {
             pointList.addAll(getRouteNodeList(edgeId, edge.fetchWayGeometry(2)));
         }
         if (forbiddenEdgeId != null) {
-            System.out.println("FORBIDDEN EDGE IN HIGHWAY ACCESSOR: " + forbiddenEdgeId);
+            logger.info("FORBIDDEN EDGE: " + forbiddenEdgeId);
         }
         return new Pair<>(osmWayIds, pointList);
     }
