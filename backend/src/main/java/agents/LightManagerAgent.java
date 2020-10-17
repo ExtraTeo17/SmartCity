@@ -148,8 +148,7 @@ public class LightManagerAgent extends AbstractAgent {
                         Properties properties = createProperties(MessageParameter.LIGHT);
                         agree.setAllUserDefinedParameters(properties);
                         send(agree);
-                        crossroad.addPedestrianToQueue(getIntParameter(rcv, MessageParameter.ADJACENT_OSM_WAY_ID), agentName
-                        );
+                        crossroad.addPedestrianToQueue(getIntParameter(rcv, MessageParameter.ADJACENT_OSM_WAY_ID), agentName);
                     }
                     case ACLMessage.AGREE -> {
                         print(agentName + " passed the light.");

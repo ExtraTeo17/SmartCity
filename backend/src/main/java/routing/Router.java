@@ -148,7 +148,7 @@ final class Router implements
             double x = nodeB.getLng() - nodeA.getLng();
             double y = nodeB.getLat() - nodeA.getLat();
 
-            double distance = RoutingConstants.METERS_PER_DEGREE * Math.sqrt(x * x + y * y);
+            double distance = RoutingHelper.getDistance(nodeA, nodeB);
             if (distance == 0) {
                 continue;
             }
