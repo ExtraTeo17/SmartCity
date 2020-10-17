@@ -14,7 +14,7 @@ const CarsLayer = props => {
   useEffect(() => {
     if (pathColors.size < cars.length) {
       for (let carsIter = pathColors.size; carsIter < cars.length; ++carsIter) {
-        pathColors.set(carsIter, generateRandomColor());
+        if (!pathColors.has(carsIter)) pathColors.set(carsIter, generateRandomColor());
       }
     }
   });
