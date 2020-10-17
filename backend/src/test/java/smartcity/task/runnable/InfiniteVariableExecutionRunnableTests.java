@@ -19,7 +19,7 @@ class InfiniteVariableExecutionRunnableTests {
         var executor = Executors.newSingleThreadScheduledExecutor();
         var initialDelay = 10;
         var delay = 100;
-        var delta = delay/2;
+        var delta = delay / 2;
         var counter = new AtomicInteger();
         Supplier<Integer> task = () -> {
             counter.getAndIncrement();

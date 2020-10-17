@@ -54,13 +54,13 @@ public class TaskManager implements ITaskManager {
 
     @Override
     public void scheduleCarCreation(int carsLimit, int testCarId) {
-        Runnable createCars = () -> {
+        Consumer<Integer> createCars = (runCount) -> {
             var zoneCenter = zone.getCenter();
             var geoPosInZoneCircle = routingHelper.generateRandomOffset(zone.getRadius());
             var posA = zoneCenter.sum(geoPosInZoneCircle);
             var posB = zoneCenter.diff(geoPosInZoneCircle);
 
-            taskProvider.getCreateCarTask(posA, posB, agentsContainer.size(VehicleAgent.class) + 1 == testCarId).run();
+            taskProvider.getCreateCarTask(posA, posB, runCount % testCarId == 0).run();
         };
 
         runIf(() -> agentsContainer.size(VehicleAgent.class) < carsLimit, createCars, CREATE_CAR_INTERVAL, true);
@@ -68,7 +68,7 @@ public class TaskManager implements ITaskManager {
 
     @Override
     public void schedulePedestrianCreation(int numberOfPedestrians, int testPedestrianId) {
-        Runnable createPedestrians = () -> {
+        Consumer<Integer> createPedestrians = (runCount) -> {
             var busAgentOpt = getRandomBusAgent();
             if (busAgentOpt.isEmpty()) {
                 logger.error("No buses exist");
@@ -79,7 +79,7 @@ public class TaskManager implements ITaskManager {
 
             // TODO: Move more logic here
             taskProvider.getCreatePedestrianTask(stations.first, stations.second, busAgent.getLine(),
-                    agentsContainer.size(PedestrianAgent.class) + 1 == testPedestrianId).run();
+                    runCount % testPedestrianId == 0).run();
         };
         runIf(() -> agentsContainer.size(PedestrianAgent.class) < numberOfPedestrians, createPedestrians,
                 CREATE_PEDESTRIAN_INTERVAL, true);
@@ -122,6 +122,11 @@ public class TaskManager implements ITaskManager {
     }
 
     private void runIf(BooleanSupplier test, Runnable action, int interval, boolean separateThread) {
+        var runnable = runnableFactory.createIf(test, action, separateThread);
+        runnable.runFixed(interval, TIME_UNIT);
+    }
+
+    private void runIf(BooleanSupplier test, Consumer<Integer> action, int interval, boolean separateThread) {
         var runnable = runnableFactory.createIf(test, action, separateThread);
         runnable.runFixed(interval, TIME_UNIT);
     }

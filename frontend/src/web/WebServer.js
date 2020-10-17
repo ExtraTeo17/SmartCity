@@ -1,4 +1,4 @@
-import { SERVER_ADDRESS, RECONNECT_INTERVAL_SEC, NOTIFY_SHOW_SEC } from "../utils/constants";
+import { SERVER_ADDRESS, RECONNECT_INTERVAL_SEC, NOTIFY_SHOW_MS } from "../utils/constants";
 import MessageHandler from "./MessageHandler";
 import { notify } from "react-notify-toast";
 
@@ -11,7 +11,7 @@ const createSocket = () => {
   socket.onopen = () => {
     console.info("Connected !!!");
 
-    notify.show("Sucessfully connected", "success", NOTIFY_SHOW_SEC * 1000);
+    notify.show("Sucessfully connected", "success", NOTIFY_SHOW_MS);
   };
 
   /**

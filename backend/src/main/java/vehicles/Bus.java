@@ -24,7 +24,6 @@ public class Bus extends MovingObject {
     private final HashMap<Integer, List<String>> stationsForPassengers;
     private final List<StationNode> stationNodesOnRoute;
     private final String busLine;
-    private final List<RouteNode> simpleRoute;
     private final ITimeProvider timeProvider;
 
     private int closestStationIndex = -1;
@@ -170,11 +169,6 @@ public class Bus extends MovingObject {
         else {
             ++moveIndex;
         }
-    }
-
-    @Override
-    public List<RouteNode> getSimpleRoute() {
-        return simpleRoute;
     }
 
     // TODO: Are they though?

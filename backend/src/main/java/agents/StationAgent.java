@@ -17,6 +17,9 @@ import smartcity.stations.StationStrategy;
 
 import java.util.List;
 
+import static agents.message.MessageManager.createMessage;
+import static agents.message.MessageManager.createProperties;
+
 public class StationAgent extends AbstractAgent {
     public static final String name = StationAgent.class.getSimpleName().replace("Agent", "");
 
