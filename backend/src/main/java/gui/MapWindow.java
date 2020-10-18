@@ -56,8 +56,8 @@ public class MapWindow {
     private boolean renderPedestrianRoutes = false;
     private boolean renderCars = true;
     private boolean renderCarRoutes = true;
-    private boolean renderBuses = false;
-    private boolean renderBusRoutes = false;
+    private boolean renderBuses = true;
+    private boolean renderBusRoutes = true;
     private boolean renderZone = true;
     private boolean renderLights = true;
     private boolean renderStations = true;

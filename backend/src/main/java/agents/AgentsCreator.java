@@ -82,12 +82,15 @@ public class AgentsCreator {
 
         if (prepareAgents()) {
             configContainer.setSimulationState(SimulationState.READY_TO_RUN);
+
             var lights = agentsContainer.stream(LightManagerAgent.class)
                     .flatMap(man -> man.getLights().stream())
                     .collect(Collectors.toList());
             var stations = agentsContainer.stream(StationAgent.class).map(
                     StationAgent::getStation).collect(Collectors.toList());
-            eventBus.post(new SimulationPreparedEvent(lights, stations));
+            var buses = agentsContainer.stream(BusAgent.class).map(
+                    BusAgent::getBus).collect(Collectors.toList());
+            eventBus.post(new SimulationPreparedEvent(lights, stations, buses));
         }
     }
 

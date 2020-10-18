@@ -9,6 +9,7 @@ import com.google.common.collect.HashBasedTable;
 import com.google.common.collect.Table;
 import com.google.common.eventbus.EventBus;
 import com.google.inject.Inject;
+import events.web.BusAgentStartedEvent;
 import events.web.VehicleAgentCreatedEvent;
 import jade.wrapper.AgentState;
 import org.slf4j.Logger;
@@ -128,6 +129,7 @@ public class TaskProvider implements ITaskProvider {
                 agentsContainer.forEach(BusAgent.class, (busAgent) -> {
                     if (busAgent.shouldStart() && busAgent.getAgentState().getValue() != AgentState.cAGENT_STATE_ACTIVE) {
                         agentsContainer.tryAccept(busAgent);
+                        eventBus.post(new BusAgentStartedEvent());
                     }
                     busAgent.runBasedOnTimetable();
                 });

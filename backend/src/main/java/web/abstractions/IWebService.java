@@ -4,11 +4,14 @@ package web.abstractions;
 import osmproxy.elements.OSMNode;
 import routing.core.IGeoPosition;
 import smartcity.lights.core.Light;
+import vehicles.Bus;
 
 import java.util.List;
 
 public interface IWebService extends IStartable {
-    void prepareSimulation(List<? extends Light> lights, List<? extends OSMNode> stations);
+    void prepareSimulation(List<? extends Light> lights,
+                           List<? extends OSMNode> stations,
+                           List<? extends Bus> buses);
 
     void startSimulation(int timeScale);
 

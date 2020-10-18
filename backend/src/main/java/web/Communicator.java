@@ -24,8 +24,10 @@ class Communicator {
 
     @Subscribe
     public void handle(SimulationPreparedEvent e) {
-        onHandle(e, "Lights: " + e.lights.size() + ", stations: " + e.stations.size());
-        webService.prepareSimulation(e.lights, e.stations);
+        onHandle(e, "Lights: " + e.lights.size() +
+                ", stations: " + e.stations.size() +
+                ", buses: " + e.buses.size());
+        webService.prepareSimulation(e.lights, e.stations, e.buses);
     }
 
     @Subscribe
@@ -63,6 +65,11 @@ class Communicator {
     @Subscribe
     public void handle(TroublePointCreatedEvent e) {
         webService.createTroublePoint(e.id, e.position);
+    }
+
+    @Subscribe
+    public void handle(BusAgentStartedEvent e) {
+
     }
 
     private void onHandle(Object obj) {

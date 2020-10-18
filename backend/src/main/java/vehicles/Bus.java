@@ -32,21 +32,20 @@ public class Bus extends MovingObject {
     // TODO: Factory for vehicles - inject
     public Bus(ITimeProvider timeProvider,
                int agentId,
-               List<RouteNode> route,
+               List<RouteNode> simpleRoute,
                List<RouteNode> uniformRoute,
                Timetable timetable,
                String busLine,
                String brigadeNr) {
-        super(agentId, 40, uniformRoute);
+        super(agentId, 40, uniformRoute, simpleRoute);
         this.timeProvider = timeProvider;
-        this.simpleRoute = route;
         this.timetable = timetable;
         this.busLine = busLine;
         this.logger = LoggerFactory.getLogger(Bus.class.getName() + " (l_" + busLine + ") (br_" + brigadeNr + ")");
 
         this.stationsForPassengers = new HashMap<>();
         this.stationNodesOnRoute = new ArrayList<>();
-        for (RouteNode node : route) {
+        for (RouteNode node : simpleRoute) {
             if (node instanceof StationNode) {
                 StationNode station = (StationNode) node;
                 stationsForPassengers.put(station.getAgentId(), new ArrayList<>());

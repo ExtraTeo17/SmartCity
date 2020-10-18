@@ -77,7 +77,7 @@ class InjectorTests {
         // Will throw but we are testing handle-invoke
         eventBus.post(new PrepareSimulationEvent(null));
         eventBus.post(new LightManagersReadyEvent(null));
-        eventBus.post(new SimulationPreparedEvent(new ArrayList<>(), new ArrayList<>()));
+        eventBus.post(new SimulationPreparedEvent(new ArrayList<>(), new ArrayList<>(), new ArrayList<>()));
         eventBus.post("Test"); // Dead event
         eventBus.post(new StartSimulationEvent(0, 0));
         eventBus.post(new SimulationStartedEvent());

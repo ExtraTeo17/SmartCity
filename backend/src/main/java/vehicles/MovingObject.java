@@ -43,6 +43,9 @@ public abstract class MovingObject {
         this.state = DrivingState.STARTING;
     }
 
+    public int getAgentId() {
+        return agentId;
+    }
 
     /**
      * @return Scaled speed in KM/H
