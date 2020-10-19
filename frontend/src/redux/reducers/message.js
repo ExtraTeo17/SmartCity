@@ -8,6 +8,7 @@ import {
   TROUBLE_POINT_CREATED,
   SIMULATION_STARTED,
   CAR_ROUTE_CHANGED,
+  BUS_UPDATED,
 } from "../constants";
 
 // Just for reference - defined in store.js
@@ -102,6 +103,25 @@ const message = (state = initialState, action) => {
       const troublePoint = action.payload;
 
       return { ...state, troublePoints: [...state.troublePoints, troublePoint] };
+    }
+
+    case BUS_UPDATED: {
+      const bus = action.payload;
+
+      let unrecognized = true;
+      const newBuses = state.buses.map(b => {
+        if (b.id === bus.id) {
+          unrecognized = false;
+          return { ...b, location: bus.location };
+        }
+        return b;
+      });
+
+      if (unrecognized === true) {
+        newBuses.push(bus);
+      }
+
+      return { ...state, buses: newBuses };
     }
 
     default:

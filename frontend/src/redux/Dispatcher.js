@@ -8,6 +8,7 @@ import {
   troublePointCreated,
   simulationStarted,
   carRouteChanged,
+  busUpdated,
 } from "./actions";
 import { batch } from "react-redux";
 
@@ -16,11 +17,13 @@ let timeScale = 1;
 let timer = null;
 const carUpdateQueue = new Map();
 const switchLightsQueue = new Map();
+const busUpdateQueue = new Map();
 
 function update() {
   batch(() => {
     carUpdateQueue.forEach(action => dispatch(action));
     switchLightsQueue.forEach(action => dispatch(action));
+    busUpdateQueue.forEach(action => dispatch(action));
   });
   switchLightsQueue.clear();
 }
@@ -69,5 +72,9 @@ export default {
 
   createTroublePoint(troublePoint) {
     dispatch(troublePointCreated(troublePoint));
+  },
+
+  updateBus(bus) {
+    busUpdateQueue.set(bus.id, busUpdated(bus));
   },
 };

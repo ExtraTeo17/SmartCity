@@ -56,10 +56,15 @@ public class SmartCityAgent extends Agent {
                         logger.warn("Received message from" + rcv.getSender() + " without type:" + rcv);
                         return;
                     }
-                    switch (type) {
-                        case MessageParameter.VEHICLE -> onReceiveVehicle(rcv);
-                        case MessageParameter.PEDESTRIAN -> onReceivePedestrian(rcv);
-                        case MessageParameter.BUS -> onReceiveBus(rcv);
+                    try {
+                        switch (type) {
+                            case MessageParameter.VEHICLE -> onReceiveVehicle(rcv);
+                            case MessageParameter.PEDESTRIAN -> onReceivePedestrian(rcv);
+                            case MessageParameter.BUS -> onReceiveBus(rcv);
+                        }
+                    }
+                    catch (Exception e){
+                        logger.warn("Unknown error", e);
                     }
                 }
                 block(1000);
@@ -113,6 +118,6 @@ public class SmartCityAgent extends Agent {
 
     private void onReceiveBus(ACLMessage rcv) {
         agentsContainer.removeIf(BusAgent.class,
-                v -> v.getLocalName().equals(rcv.getSender().getLocalName()));
+                v -> v.isAlive() && v.getPredictedName().equals(rcv.getSender().getLocalName()));
     }
 }

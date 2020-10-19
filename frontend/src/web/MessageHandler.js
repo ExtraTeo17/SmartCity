@@ -7,6 +7,7 @@ import {
   SWITCH_LIGHTS_INFO,
   CREATE_TROUBLE_POINT_INFO,
   UPDATE_CAR_ROUTE_INFO,
+  BUS_UPDATED,
 } from "./MessageType";
 import { NOTIFY_SHOW_MS } from "../utils/constants";
 import { notify } from "react-notify-toast";
@@ -55,6 +56,11 @@ export default {
 
       case CREATE_TROUBLE_POINT_INFO: {
         Dispatcher.createTroublePoint(payload);
+        break;
+      }
+
+      case BUS_UPDATED: {
+        Dispatcher.updateBus(payload);
         break;
       }
 
