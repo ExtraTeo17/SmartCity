@@ -19,7 +19,7 @@ import smartcity.SmartCityAgent;
 import utilities.ConditionalExecutor;
 import utilities.Siblings;
 import vehicles.Bus;
-import vehicles.DrivingState;
+import vehicles.enums.DrivingState;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -315,7 +315,7 @@ public class BusAgent extends AbstractAgent {
         return false;
     }
 
-    public boolean shouldStart(){
+    public boolean shouldStart() {
         return bus.shouldStart();
     }
 }

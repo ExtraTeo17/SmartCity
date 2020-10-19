@@ -18,8 +18,8 @@ import routing.nodes.LightManagerNode;
 import routing.nodes.RouteNode;
 import smartcity.ITimeProvider;
 import smartcity.SmartCityAgent;
-import vehicles.DrivingState;
 import vehicles.MovingObject;
+import vehicles.enums.DrivingState;
 
 import java.util.Arrays;
 import java.util.Random;

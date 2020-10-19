@@ -1,5 +1,6 @@
 package vehicles;
 
+import com.google.common.annotations.VisibleForTesting;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import osmproxy.buses.Timetable;
@@ -8,6 +9,8 @@ import routing.nodes.LightManagerNode;
 import routing.nodes.RouteNode;
 import routing.nodes.StationNode;
 import smartcity.ITimeProvider;
+import vehicles.enums.BusFillState;
+import vehicles.enums.VehicleType;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -26,6 +29,7 @@ public class Bus extends MovingObject {
     private final String busLine;
     private final ITimeProvider timeProvider;
 
+    private BusFillState fillState;
     private int closestStationIndex = -1;
     private int passengersCount = 0;
 
@@ -41,6 +45,7 @@ public class Bus extends MovingObject {
         this.timeProvider = timeProvider;
         this.timetable = timetable;
         this.busLine = busLine;
+        this.fillState = BusFillState.LOW;
         this.logger = LoggerFactory.getLogger(Bus.class.getName() + " (l_" + busLine + ") (br_" + brigadeNr + ")");
 
         this.stationsForPassengers = new HashMap<>();
@@ -62,11 +67,43 @@ public class Bus extends MovingObject {
         return passengersCount;
     }
 
+    @VisibleForTesting
+    void increasePassengersCount() {
+        ++passengersCount;
+        if (passengersCount > CAPACITY_HIGH) {
+            setFillState(BusFillState.HIGH);
+        }
+        else if (passengersCount > CAPACITY_MID) {
+            setFillState(BusFillState.MID);
+        }
+    }
+
+    @VisibleForTesting
+    void decreasePassengersCount() {
+        --passengersCount;
+        if (passengersCount <= CAPACITY_MID) {
+            setFillState(BusFillState.LOW);
+        }
+        else if (passengersCount <= CAPACITY_HIGH) {
+            setFillState(BusFillState.MID);
+        }
+    }
+
+    private void setFillState(BusFillState newState) {
+        if (this.fillState != newState) {
+            this.fillState = newState;
+        }
+    }
+
+    public BusFillState getFillState() {
+        return fillState;
+    }
+
     public void addPassengerToStation(int id, String name) {
         var passengers = stationsForPassengers.get(id);
         if (passengers != null) {
             passengers.add(name);
-            ++passengersCount;
+            increasePassengersCount();
         }
         else {
             logger.warn("Unrecognized station id: " + id);
@@ -75,7 +112,7 @@ public class Bus extends MovingObject {
 
     public boolean removePassengerFromStation(int id, String name) {
         if (getPassengers(id).remove(name)) {
-            --passengersCount;
+            decreasePassengersCount();
             return true;
         }
 

@@ -13,7 +13,7 @@ import routing.nodes.LightManagerNode;
 import routing.nodes.StationNode;
 import smartcity.ITimeProvider;
 import smartcity.SmartCityAgent;
-import vehicles.DrivingState;
+import vehicles.enums.DrivingState;
 import vehicles.Pedestrian;
 
 import static agents.message.MessageManager.createMessage;

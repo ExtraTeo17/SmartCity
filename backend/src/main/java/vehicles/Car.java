@@ -2,6 +2,7 @@ package vehicles;
 
 import routing.nodes.LightManagerNode;
 import routing.nodes.RouteNode;
+import vehicles.enums.VehicleType;
 
 import java.util.List;
 
