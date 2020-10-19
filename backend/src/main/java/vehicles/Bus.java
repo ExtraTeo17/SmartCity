@@ -21,8 +21,8 @@ import java.util.List;
 import java.util.Optional;
 
 public class Bus extends MovingObject {
-    public static final int CAPACITY_MID = 10;
-    public static final int CAPACITY_HIGH = 25;
+    public static final int CAPACITY_MID = 5;
+    public static final int CAPACITY_HIGH = 10;
 
     private final Logger logger;
     private final Timetable timetable;
@@ -204,12 +204,7 @@ public class Bus extends MovingObject {
 
     @Override
     public void move() {
-        if (isAtDestination()) {
-            moveIndex = 0;
-        }
-        else {
-            ++moveIndex;
-        }
+        ++moveIndex;
     }
 
     // TODO: Are they though?

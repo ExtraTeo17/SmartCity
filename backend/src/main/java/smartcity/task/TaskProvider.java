@@ -11,7 +11,6 @@ import com.google.common.eventbus.EventBus;
 import com.google.inject.Inject;
 import events.web.BusAgentStartedEvent;
 import events.web.VehicleAgentCreatedEvent;
-import jade.wrapper.AgentState;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import routing.abstractions.IRouteGenerator;
@@ -127,7 +126,8 @@ public class TaskProvider implements ITaskProvider {
         return () -> {
             try {
                 agentsContainer.forEach(BusAgent.class, (busAgent) -> {
-                    if (busAgent.shouldStart() && busAgent.getAgentState().getValue() != AgentState.cAGENT_STATE_ACTIVE) {
+                    // Agent was created but not accepted.
+                    if (busAgent.shouldStart() && busAgent.getAID() == null) {
                         agentsContainer.tryAccept(busAgent);
                         eventBus.post(new BusAgentStartedEvent());
                     }

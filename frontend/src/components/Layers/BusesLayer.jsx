@@ -19,9 +19,9 @@ const BusesLayer = props => {
 };
 
 const mapStateToProps = (state /* , ownProps */) => {
-  const { message } = state;
+  const { buses } = state.message;
   return {
-    buses: message.buses,
+    buses: buses,
   };
 };
 

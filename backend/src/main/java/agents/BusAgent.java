@@ -311,10 +311,11 @@ public class BusAgent extends AbstractAgent {
                 print("Stopping!");
                 return true;
             }
+            return false;
         }
 
         if (shouldStart()) {
-            print("Running!");
+            print("Running, state: " + this.getAgentState().getName() + ", isAlive: " + isAlive());
             start();
         }
 

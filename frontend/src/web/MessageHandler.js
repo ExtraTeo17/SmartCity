@@ -8,6 +8,7 @@ import {
   CREATE_TROUBLE_POINT_INFO,
   UPDATE_CAR_ROUTE_INFO,
   BUS_UPDATED,
+  BUS_FILL_STATE_UPDATED,
 } from "./MessageType";
 import { NOTIFY_SHOW_MS } from "../utils/constants";
 import { notify } from "react-notify-toast";
@@ -61,6 +62,11 @@ export default {
 
       case BUS_UPDATED: {
         Dispatcher.updateBus(payload);
+        break;
+      }
+
+      case BUS_FILL_STATE_UPDATED: {
+        Dispatcher.updateBusFillState(payload);
         break;
       }
 

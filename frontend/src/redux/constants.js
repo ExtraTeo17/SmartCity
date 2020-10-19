@@ -13,3 +13,4 @@ export const CAR_ROUTE_CHANGED = "Car/ROUTE_CHANGED";
 export const TROUBLE_POINT_CREATED = "TP/CREATED";
 
 export const BUS_UPDATED = "Bus/UPDATED";
+export const BUS_FILL_STATE_UPDATED = "Bus/FILL";

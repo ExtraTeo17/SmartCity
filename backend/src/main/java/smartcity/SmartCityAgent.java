@@ -21,7 +21,7 @@ import java.time.Duration;
 import java.time.LocalDateTime;
 
 public class SmartCityAgent extends Agent {
-    public static final String name = SmartCityAgent.class.getName().replace("Agent", "");
+    public static final String name = SmartCityAgent.class.getSimpleName().replace("Agent", "");
     private static final Logger logger = LoggerFactory.getLogger(SmartCityAgent.class);
 
     private final MapWindow window;
@@ -62,8 +62,7 @@ public class SmartCityAgent extends Agent {
                             case MessageParameter.PEDESTRIAN -> onReceivePedestrian(rcv);
                             case MessageParameter.BUS -> onReceiveBus(rcv);
                         }
-                    }
-                    catch (Exception e){
+                    } catch (Exception e) {
                         logger.warn("Unknown error", e);
                     }
                 }

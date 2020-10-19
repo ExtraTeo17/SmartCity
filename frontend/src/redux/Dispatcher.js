@@ -9,6 +9,7 @@ import {
   simulationStarted,
   carRouteChanged,
   busUpdated,
+  busFillStateUpdated,
 } from "./actions";
 import { batch } from "react-redux";
 
@@ -76,5 +77,19 @@ export default {
 
   updateBus(bus) {
     busUpdateQueue.set(bus.id, busUpdated(bus));
+  },
+
+  updateBusFillState(busData) {
+    dispatch(busFillStateUpdated(busData));
+    console.group("Bus-fill-" + busData.id);
+    console.info(busData);
+    console.groupEnd();
+
+    if (timer === null) {
+      batch(() => {
+        this.prepareSimulation([], []);
+        this.startSimulation(10);
+      });
+    }
   },
 };

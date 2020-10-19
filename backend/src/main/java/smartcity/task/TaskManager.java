@@ -107,6 +107,18 @@ public class TaskManager implements ITaskManager {
         runWhile(testSimulationState, simulationControlTask, TimeProvider.MS_PER_TICK);
     }
 
+    @Override
+    public void cancelAll() {
+        var executors = runnableFactory.clearAllExecutors();
+        for (var executor : executors) {
+            try {
+                executor.shutdownNow();
+            } catch (Exception e) {
+                logger.warn("Error cancelling executor: ", e);
+            }
+        }
+    }
+
     private void runNTimes(Consumer<Integer> runCountConsumer, int runCount, int interval) {
         runNTimes(runCountConsumer, runCount, interval, false);
     }

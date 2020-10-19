@@ -9,6 +9,7 @@ import {
   SIMULATION_STARTED,
   CAR_ROUTE_CHANGED,
   BUS_UPDATED,
+  BUS_FILL_STATE_UPDATED,
 } from "../constants";
 
 // Just for reference - defined in store.js
@@ -120,6 +121,20 @@ const message = (state = initialState, action) => {
       if (unrecognized === true) {
         newBuses.push(bus);
       }
+
+      return { ...state, buses: newBuses };
+    }
+
+    case BUS_FILL_STATE_UPDATED: {
+      const busData = payload;
+      console.log("Update fill");
+      console.log(busData);
+      const newBuses = state.buses.map(b => {
+        if (b.id === busData.id) {
+          return { ...b, fillState: busData.fillState };
+        }
+        return b;
+      });
 
       return { ...state, buses: newBuses };
     }

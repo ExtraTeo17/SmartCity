@@ -11,6 +11,7 @@ import {
   BUS_UPDATED,
 } from "./constants";
 import { createAction } from "redux-actions";
+import { BUS_FILL_STATE_UPDATED } from "../web/MessageType";
 
 /**
  * @param {{ lat: number; lng:number; rad:number }} center
@@ -51,3 +52,5 @@ export const lightsSwitched = createAction(LIGHTS_SWITCHED);
 export const troublePointCreated = createAction(TROUBLE_POINT_CREATED);
 
 export const busUpdated = createAction(BUS_UPDATED);
+
+export const busFillStateUpdated = createAction(BUS_FILL_STATE_UPDATED);
