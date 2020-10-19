@@ -127,9 +127,11 @@ public class TaskProvider implements ITaskProvider {
             try {
                 agentsContainer.forEach(BusAgent.class, (busAgent) -> {
                     // Agent was created but not accepted.
-                    if (busAgent.shouldStart() && busAgent.getAID() == null) {
-                        agentsContainer.tryAccept(busAgent);
-                        eventBus.post(new BusAgentStartedEvent());
+                    if (busAgent.shouldStart()) {
+                        eventBus.post(new BusAgentStartedEvent(busAgent.getId()));
+                        if(busAgent.getAID() == null) {
+                            agentsContainer.tryAccept(busAgent);
+                        }
                     }
                     busAgent.runBasedOnTimetable();
                 });

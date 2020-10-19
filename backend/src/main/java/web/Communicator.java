@@ -81,6 +81,12 @@ class Communicator {
         webService.updateBusFillState(e.id, e.fillState);
     }
 
+    @Subscribe
+    public void handle(BusAgentDeadEvent e) {
+        onHandle(e);
+        webService.killBus(e.id);
+    }
+
     private void onHandle(Object obj) {
         logger.info("Handling " + obj.getClass().getSimpleName());
     }

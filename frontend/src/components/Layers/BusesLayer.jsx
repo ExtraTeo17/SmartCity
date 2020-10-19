@@ -21,7 +21,7 @@ const BusesLayer = props => {
 const mapStateToProps = (state /* , ownProps */) => {
   const { buses } = state.message;
   return {
-    buses: buses,
+    buses: buses.filter(b => b.isDeleted === undefined),
   };
 };
 

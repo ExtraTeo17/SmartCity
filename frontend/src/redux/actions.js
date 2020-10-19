@@ -10,6 +10,7 @@ import {
   CAR_ROUTE_CHANGED,
   BUS_UPDATED,
   BUS_FILL_STATE_UPDATED,
+  BUS_KILLED,
 } from "./constants";
 import { createAction } from "redux-actions";
 
@@ -54,3 +55,5 @@ export const troublePointCreated = createAction(TROUBLE_POINT_CREATED);
 export const busUpdated = createAction(BUS_UPDATED);
 
 export const busFillStateUpdated = createAction(BUS_FILL_STATE_UPDATED);
+
+export const busKilled = createAction(BUS_KILLED);

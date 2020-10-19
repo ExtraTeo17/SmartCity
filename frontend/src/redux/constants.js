@@ -14,3 +14,4 @@ export const TROUBLE_POINT_CREATED = "TP/CREATED";
 
 export const BUS_UPDATED = "Bus/UPDATED";
 export const BUS_FILL_STATE_UPDATED = "Bus/FILL";
+export const BUS_KILLED = "Bus/KILLED";

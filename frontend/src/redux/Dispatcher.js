@@ -10,6 +10,7 @@ import {
   carRouteChanged,
   busUpdated,
   busFillStateUpdated,
+  busKilled,
 } from "./actions";
 import { batch } from "react-redux";
 
@@ -87,5 +88,9 @@ export default {
         this.startSimulation(10);
       });
     }
+  },
+
+  killBus(id) {
+    dispatch(busKilled(id));
   },
 };

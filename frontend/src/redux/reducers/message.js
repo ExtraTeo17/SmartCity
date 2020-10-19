@@ -1,3 +1,4 @@
+import { BusFillState } from "../../components/Models/BusFillState";
 import { LightColor } from "../../components/Models/LightColor";
 import {
   CAR_KILLED,
@@ -10,6 +11,7 @@ import {
   CAR_ROUTE_CHANGED,
   BUS_UPDATED,
   BUS_FILL_STATE_UPDATED,
+  BUS_KILLED,
 } from "../constants";
 
 // Just for reference - defined in store.js
@@ -23,7 +25,8 @@ const initialState = {
   wasStarted: false,
 };
 
-const deletedIds = [];
+const deletedCarIds = [];
+const deletedBusIds = [];
 
 const message = (state = initialState, action) => {
   const payload = action.payload;
@@ -56,7 +59,7 @@ const message = (state = initialState, action) => {
           return c;
         });
 
-      if (unrecognized === true && !deletedIds.includes(car.id)) {
+      if (unrecognized === true && !deletedCarIds.includes(car.id)) {
         newCars.push(car);
       }
 
@@ -69,7 +72,7 @@ const message = (state = initialState, action) => {
         if (c.id === id) c.isDeleted = true;
         return c;
       });
-      deletedIds.push(id);
+      deletedCarIds.push(id);
 
       return { ...state, cars: newCars };
     }
@@ -110,16 +113,18 @@ const message = (state = initialState, action) => {
       const bus = action.payload;
 
       let unrecognized = true;
-      const newBuses = state.buses.map(b => {
-        if (b.id === bus.id) {
-          unrecognized = false;
-          return { ...b, location: bus.location };
-        }
-        return b;
-      });
+      const newBuses = state.buses
+        .filter(b => !b.isDeleted)
+        .map(b => {
+          if (b.id === bus.id) {
+            unrecognized = false;
+            return { ...b, location: bus.location };
+          }
+          return b;
+        });
 
-      if (unrecognized === true) {
-        newBuses.push(bus);
+      if (unrecognized === true && !deletedBusIds.includes(bus.id)) {
+        newBuses.push({ ...bus, fillState: BusFillState.LOW });
       }
 
       return { ...state, buses: newBuses };
@@ -136,6 +141,18 @@ const message = (state = initialState, action) => {
         }
         return b;
       });
+
+      return { ...state, buses: newBuses };
+    }
+
+    case BUS_KILLED: {
+      console.log("killed " + payload);
+      const id = payload;
+      const newBuses = state.buses.map(b => {
+        if (b.id === id) b.isDeleted = true;
+        return b;
+      });
+      deletedBusIds.push(id);
 
       return { ...state, buses: newBuses };
     }

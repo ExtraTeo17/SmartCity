@@ -35,4 +35,6 @@ public interface IWebService extends IStartable {
     void updateBus(int id, IGeoPosition position);
 
     void updateBusFillState(int id, BusFillState fillState);
+
+    void killBus(int id);
 }

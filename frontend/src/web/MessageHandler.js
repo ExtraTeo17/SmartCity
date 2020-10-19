@@ -7,8 +7,9 @@ import {
   SWITCH_LIGHTS_INFO,
   CREATE_TROUBLE_POINT_INFO,
   UPDATE_CAR_ROUTE_INFO,
-  BUS_UPDATED,
-  BUS_FILL_STATE_UPDATED,
+  UPDATE_BUS_INFO,
+  UPDATE_BUS_FILL_STATE_INFO,
+  KILL_BUS_INFO,
 } from "./MessageType";
 import { NOTIFY_SHOW_MS } from "../utils/constants";
 import { notify } from "react-notify-toast";
@@ -60,13 +61,18 @@ export default {
         break;
       }
 
-      case BUS_UPDATED: {
+      case UPDATE_BUS_INFO: {
         Dispatcher.updateBus(payload);
         break;
       }
 
-      case BUS_FILL_STATE_UPDATED: {
+      case UPDATE_BUS_FILL_STATE_INFO: {
         Dispatcher.updateBusFillState(payload);
+        break;
+      }
+
+      case KILL_BUS_INFO: {
+        Dispatcher.killBus(payload.id);
         break;
       }
 

@@ -20,7 +20,8 @@ public enum MessageType {
     CREATE_TROUBLE_POINT_INFO(21),
 
     UPDATE_BUS_INFO(30),
-    UPDATE_BUS_FILL_STATE_INFO(31);
+    UPDATE_BUS_FILL_STATE_INFO(31),
+    KILL_BUS_INFO(32);
 
     private final int code;
 

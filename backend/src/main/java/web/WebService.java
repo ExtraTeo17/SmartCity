@@ -111,4 +111,10 @@ class WebService implements IWebService {
         var payload = new UpdateBusFillStateInfo(id, fillStateDto);
         webConnector.broadcastMessage(MessageType.UPDATE_BUS_FILL_STATE_INFO, payload);
     }
+
+    @Override
+    public void killBus(int id) {
+        var payload = new KillBusInfo(id);
+        webConnector.broadcastMessage(MessageType.KILL_BUS_INFO, payload);
+    }
 }
