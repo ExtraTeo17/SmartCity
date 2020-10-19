@@ -7,7 +7,7 @@ const initialState = {
     center: {
       lat: 52.203,
       lng: 20.861,
-      rad: 600,
+      rad: 350,
     },
   },
   message: {

@@ -5,6 +5,7 @@ import osmproxy.elements.OSMNode;
 import routing.core.IGeoPosition;
 import smartcity.lights.core.Light;
 import vehicles.Bus;
+import vehicles.enums.BusFillState;
 import web.abstractions.IWebService;
 import web.message.MessageType;
 import web.message.payloads.infos.*;
@@ -18,6 +19,7 @@ import web.serialization.Converter;
 
 import java.util.List;
 
+@SuppressWarnings("OverlyCoupledClass")
 class WebService implements IWebService {
     private final WebConnector webConnector;
 
@@ -101,5 +103,12 @@ class WebService implements IWebService {
         var location = Converter.convert(position);
         var payload = new UpdateBusInfo(id, location);
         webConnector.broadcastMessage(MessageType.UPDATE_BUS_INFO, payload);
+    }
+
+    @Override
+    public void updateBusFillState(int id, BusFillState fillState) {
+        var fillStateDto = Converter.convert(fillState);
+        var payload = new UpdateBusFillStateInfo(id, fillStateDto);
+        webConnector.broadcastMessage(MessageType.UPDATE_BUS_FILL_STATE_INFO, payload);
     }
 }

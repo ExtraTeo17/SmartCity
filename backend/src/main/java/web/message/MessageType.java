@@ -19,7 +19,8 @@ public enum MessageType {
     SWITCH_LIGHTS_INFO(20),
     CREATE_TROUBLE_POINT_INFO(21),
 
-    UPDATE_BUS_INFO(30);
+    UPDATE_BUS_INFO(30),
+    UPDATE_BUS_FILL_STATE_INFO(31);
 
     private final int code;
 

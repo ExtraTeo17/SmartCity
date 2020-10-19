@@ -5,6 +5,7 @@ import osmproxy.elements.OSMNode;
 import routing.core.IGeoPosition;
 import smartcity.lights.core.Light;
 import vehicles.Bus;
+import vehicles.enums.BusFillState;
 
 import java.util.List;
 
@@ -32,4 +33,6 @@ public interface IWebService extends IStartable {
                      List<? extends IGeoPosition> routeEnd);
 
     void updateBus(int id, IGeoPosition position);
+
+    void updateBusFillState(int id, BusFillState fillState);
 }

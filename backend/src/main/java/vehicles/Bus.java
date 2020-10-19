@@ -1,6 +1,8 @@
 package vehicles;
 
 import com.google.common.annotations.VisibleForTesting;
+import com.google.common.eventbus.EventBus;
+import events.web.BusAgentFillStateUpdatedEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import osmproxy.buses.Timetable;
@@ -28,13 +30,15 @@ public class Bus extends MovingObject {
     private final List<StationNode> stationNodesOnRoute;
     private final String busLine;
     private final ITimeProvider timeProvider;
+    private final EventBus eventBus;
 
     private BusFillState fillState;
     private int closestStationIndex = -1;
     private int passengersCount = 0;
 
     // TODO: Factory for vehicles - inject
-    public Bus(ITimeProvider timeProvider,
+    public Bus(EventBus eventBus,
+               ITimeProvider timeProvider,
                int agentId,
                List<RouteNode> simpleRoute,
                List<RouteNode> uniformRoute,
@@ -43,6 +47,7 @@ public class Bus extends MovingObject {
                String brigadeNr) {
         super(agentId, 40, uniformRoute, simpleRoute);
         this.timeProvider = timeProvider;
+        this.eventBus = eventBus;
         this.timetable = timetable;
         this.busLine = busLine;
         this.fillState = BusFillState.LOW;
@@ -92,6 +97,7 @@ public class Bus extends MovingObject {
     private void setFillState(BusFillState newState) {
         if (this.fillState != newState) {
             this.fillState = newState;
+            eventBus.post(new BusAgentFillStateUpdatedEvent(agentId, newState));
         }
     }
 

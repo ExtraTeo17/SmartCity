@@ -1,5 +1,6 @@
 package vehicles;
 
+import com.google.common.eventbus.EventBus;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
@@ -123,7 +124,7 @@ class BusTests {
 
 
     private static Bus createBus() {
-        return new Bus(mock(ITimeProvider.class), 1, new ArrayList<>(), new ArrayList<>(),
+        return new Bus(mock(EventBus.class),mock(ITimeProvider.class), 1, new ArrayList<>(), new ArrayList<>(),
                 mock(Timetable.class), "523", "01");
     }
 
