@@ -53,7 +53,7 @@ public class MapWindow {
     public JPanel MainPanel;
     private final JXMapViewer MapViewer;
     private boolean renderPedestrians = true;
-    private boolean renderPedestrianRoutes = false;
+    private boolean renderPedestrianRoutes = true;
     private boolean renderCars = true;
     private boolean renderCarRoutes = true;
     private boolean renderBuses = true;

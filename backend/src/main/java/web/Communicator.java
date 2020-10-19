@@ -43,7 +43,7 @@ class Communicator {
 
     @Subscribe
     public void handle(VehicleAgentUpdatedEvent e) {
-        webService.updateCar(e.agentId, e.agentPosition);
+        webService.updateCar(e.id, e.position);
     }
 
     @Subscribe
@@ -69,7 +69,11 @@ class Communicator {
 
     @Subscribe
     public void handle(BusAgentStartedEvent e) {
+    }
 
+    @Subscribe
+    public void handle(BusAgentUpdatedEvent e) {
+        webService.updateBus(e.id, e.position);
     }
 
     private void onHandle(Object obj) {

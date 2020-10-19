@@ -9,6 +9,7 @@ import vehicles.Bus;
 import java.util.List;
 
 public interface IWebService extends IStartable {
+
     void prepareSimulation(List<? extends Light> lights,
                            List<? extends OSMNode> stations,
                            List<? extends Bus> buses);
@@ -29,4 +30,6 @@ public interface IWebService extends IStartable {
                      List<? extends IGeoPosition> routeStart,
                      IGeoPosition changePosition,
                      List<? extends IGeoPosition> routeEnd);
+
+    void updateBus(int id, IGeoPosition position);
 }

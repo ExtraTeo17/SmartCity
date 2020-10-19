@@ -95,4 +95,11 @@ class WebService implements IWebService {
         var payload = new ChangeCarRouteInfo(agentId, routeStartLocations, changeLocation, routeEndLocations);
         webConnector.broadcastMessage(MessageType.UPDATE_CAR_ROUTE_INFO, payload);
     }
+
+    @Override
+    public void updateBus(int id, IGeoPosition position) {
+        var location = Converter.convert(position);
+        var payload = new UpdateBusInfo(id, location);
+        webConnector.broadcastMessage(MessageType.UPDATE_BUS_INFO, payload);
+    }
 }

@@ -3,6 +3,7 @@ package web.message;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
 
+@SuppressWarnings("ClassWithTooManyFields")
 public enum MessageType {
     PREPARE_SIMULATION_REQUEST(1),
     PREPARE_SIMULATION_RESPONSE(2),
@@ -17,7 +18,9 @@ public enum MessageType {
 
     SWITCH_LIGHTS_INFO(8),
 
-    CREATE_TROUBLE_POINT_INFO(10);
+    CREATE_TROUBLE_POINT_INFO(10),
+
+    UPDATE_BUS_INFO(30);
 
     private final int code;
 

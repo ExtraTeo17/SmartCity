@@ -199,7 +199,6 @@ public class Bus extends MovingObject {
     @Override
     public void move() {
         if (isAtDestination()) {
-            // TODO: why?
             moveIndex = 0;
         }
         else {
