@@ -11,6 +11,7 @@ import TroublePointsLayer from "./Layers/TroublePointsLayer";
 import CarsLayer from "./Layers/CarsLayer";
 import { notify } from "react-notify-toast";
 import { NOTIFY_SHOW_MS } from "../utils/constants";
+import BusesLayer from "./Layers/BusesLayer";
 
 const DEFAULT_ZOOM = 15;
 const MAX_ZOOM = 20;
@@ -59,6 +60,7 @@ const CityMap = props => {
       <CarsLayer />
       <LightsLayer />
       <StationsLayer />
+      <BusesLayer />
       <TroublePointsLayer />
     </LeafletMap>
   );

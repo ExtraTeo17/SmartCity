@@ -21,7 +21,8 @@ export default {
         console.groupCollapsed("Prepared");
         console.log(msg.payload);
         console.groupEnd();
-        Dispatcher.prepareSimulation(payload.lights, payload.stations);
+        const { lights, stations, buses } = payload;
+        Dispatcher.prepareSimulation(lights, stations, buses);
         break;
       }
 

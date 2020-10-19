@@ -51,6 +51,10 @@
     "jest/no-identical-title": 2,
     "jest/prefer-to-have-length": 1,
     "jest/valid-expect": 2,
-    "react/prop-types": 0
+    "react/prop-types": 0,
+    "prefer-const": [2, {
+      "destructuring": "any",
+      "ignoreReadBeforeAssign": false
+    }]
   }
 }

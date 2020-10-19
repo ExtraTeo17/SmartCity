@@ -15,19 +15,20 @@ const initialState = {
   lights: [],
   cars: [],
   stations: [],
+  buses: [],
   troublePoints: [],
   wasPrepared: false,
   wasStarted: false,
 };
 
-let deletedIds = [];
+const deletedIds = [];
 
 const message = (state = initialState, action) => {
   const payload = action.payload;
   switch (action.type) {
     case SIMULATION_PREPARED: {
-      const { lights, stations } = action.payload;
-      return { ...state, lights: lights, stations: stations, wasPrepared: true };
+      const { lights, stations, buses } = action.payload;
+      return { ...state, lights: lights, stations: stations, buses: buses, wasPrepared: true };
     }
 
     case SIMULATION_STARTED: {
@@ -73,7 +74,7 @@ const message = (state = initialState, action) => {
 
     case CAR_ROUTE_CHANGED: {
       const { id, routeStart, routeEnd, location } = payload;
-      let newCars = state.cars.map(c => {
+      const newCars = state.cars.map(c => {
         if (c.id === id) {
           c.route = [...routeStart, ...routeEnd];
           c.routeChangePoint = location;

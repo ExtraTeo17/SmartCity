@@ -19,7 +19,7 @@ export const centerUpdated = createAction(CENTER_UPDATED);
 export const simulationPrepared = createAction(
   SIMULATION_PREPARED,
   simulationData => simulationData,
-  () => ({ lights: [], stations: [] })
+  () => ({ lights: [], stations: [], buses: [] })
 );
 
 export const simulationStarted = createAction(SIMULATION_STARTED);

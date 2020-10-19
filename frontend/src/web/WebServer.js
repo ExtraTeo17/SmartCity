@@ -19,8 +19,8 @@ const createSocket = () => {
    */
   socket.onmessage = e => {
     logMessage(e);
-    let msgDto = JSON.parse(e.data);
-    let msg = { type: msgDto.type, payload: JSON.parse(msgDto.payload) };
+    const msgDto = JSON.parse(e.data);
+    const msg = { type: msgDto.type, payload: JSON.parse(msgDto.payload) };
     MessageHandler.handle(msg);
   };
 

@@ -14,8 +14,8 @@ import { batch } from "react-redux";
 const fps = 15;
 let timeScale = 1;
 let timer = null;
-let carUpdateQueue = new Map();
-let switchLightsQueue = new Map();
+const carUpdateQueue = new Map();
+const switchLightsQueue = new Map();
 
 function update() {
   batch(() => {
@@ -26,8 +26,8 @@ function update() {
 }
 
 export default {
-  prepareSimulation(lights, stations) {
-    dispatch(simulationPrepared({ lights, stations }));
+  prepareSimulation(lights, stations, buses) {
+    dispatch(simulationPrepared({ lights, stations, buses }));
   },
 
   startSimulation(newTimeScale) {
