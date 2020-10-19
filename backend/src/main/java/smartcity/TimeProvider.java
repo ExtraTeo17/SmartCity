@@ -8,7 +8,7 @@ import java.time.temporal.ChronoUnit;
 
 // TODO: Realtime or fixed? IMPORTANT.
 public class TimeProvider implements ITimeProvider {
-    public static final int TIME_SCALE = 5;
+    public static final int TIME_SCALE = 10;
     public static final int MS_PER_TICK = 100;
     private static final Logger logger = LoggerFactory.getLogger(TimeProvider.class);
 

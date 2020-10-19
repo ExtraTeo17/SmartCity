@@ -41,7 +41,7 @@ public class Scheduler {
         }
         if (configContainer.shouldGeneratePedestriansAndBuses()) {
             // TODO: Add pedestrians limit and testPedestrianID
-            taskManager.schedulePedestrianCreation(100, e.testCarId);
+            taskManager.schedulePedestrianCreation(50, e.testCarId);
             taskManager.scheduleBusControl(() -> configContainer.getSimulationState() == SimulationState.RUNNING);
         }
 

@@ -81,10 +81,6 @@ export default {
 
   updateBusFillState(busData) {
     dispatch(busFillStateUpdated(busData));
-    console.group("Bus-fill-" + busData.id);
-    console.info(busData);
-    console.groupEnd();
-
     if (timer === null) {
       batch(() => {
         this.prepareSimulation([], []);

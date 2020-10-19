@@ -127,8 +127,9 @@ const message = (state = initialState, action) => {
 
     case BUS_FILL_STATE_UPDATED: {
       const busData = payload;
-      console.log("Update fill");
-      console.log(busData);
+      console.groupCollapsed("Update fill-" + busData.id);
+      console.info(busData);
+      console.groupEnd();
       const newBuses = state.buses.map(b => {
         if (b.id === busData.id) {
           return { ...b, fillState: busData.fillState };

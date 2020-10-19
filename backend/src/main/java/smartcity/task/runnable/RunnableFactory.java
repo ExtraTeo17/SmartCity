@@ -14,7 +14,7 @@ import java.util.function.Supplier;
 
 class RunnableFactory implements IRunnableFactory {
     private ScheduledExecutorService mainExecutor;
-    private final List<ScheduledExecutorService> executors;
+    private List<ScheduledExecutorService> executors;
 
     public RunnableFactory() {
         this.mainExecutor = Executors.newSingleThreadScheduledExecutor();
@@ -52,12 +52,17 @@ class RunnableFactory implements IRunnableFactory {
         return new InfiniteVariableExecutionRunnable(currentExecutor, delayRunnable);
     }
 
+    /**
+     * @return Old executors
+     */
     @Override
     public List<ScheduledExecutorService> clearAllExecutors() {
         this.mainExecutor = Executors.newSingleThreadScheduledExecutor();
-        this.executors.clear();
+        var oldExecutors = executors;
+        this.executors = new ArrayList<>();
         this.executors.add(mainExecutor);
-        return executors;
+
+        return oldExecutors;
     }
 
     private ScheduledExecutorService getNewThreadExecutor() {

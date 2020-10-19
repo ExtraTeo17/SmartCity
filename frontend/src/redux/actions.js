@@ -9,9 +9,9 @@ import {
   TROUBLE_POINT_CREATED,
   CAR_ROUTE_CHANGED,
   BUS_UPDATED,
+  BUS_FILL_STATE_UPDATED,
 } from "./constants";
 import { createAction } from "redux-actions";
-import { BUS_FILL_STATE_UPDATED } from "../web/MessageType";
 
 /**
  * @param {{ lat: number; lng:number; rad:number }} center

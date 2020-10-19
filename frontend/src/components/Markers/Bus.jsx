@@ -13,7 +13,6 @@ const Bus = props => {
       case BusFillState.MID:
         return busMidIcon;
       case BusFillState.HIGH:
-        console.log("High!");
         return busHighIcon;
 
       default:
