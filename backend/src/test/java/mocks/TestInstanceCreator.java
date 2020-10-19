@@ -1,6 +1,6 @@
 package mocks;
 
-import agents.utilities.LightColor;
+import smartcity.lights.LightColor;
 import com.google.common.eventbus.EventBus;
 import routing.core.Position;
 import smartcity.ITimeProvider;

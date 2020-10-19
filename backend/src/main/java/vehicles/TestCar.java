@@ -2,6 +2,8 @@ package vehicles;
 
 import com.google.common.annotations.VisibleForTesting;
 import smartcity.ITimeProvider;
+import vehicles.enums.DrivingState;
+import vehicles.enums.VehicleType;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;

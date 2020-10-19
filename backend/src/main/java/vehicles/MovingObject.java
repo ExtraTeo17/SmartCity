@@ -8,6 +8,7 @@ import routing.core.IGeoPosition;
 import routing.nodes.LightManagerNode;
 import routing.nodes.RouteNode;
 import smartcity.TimeProvider;
+import vehicles.enums.DrivingState;
 
 import java.util.List;
 

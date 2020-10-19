@@ -1,11 +1,12 @@
 package web.serialization;
 
 
-import agents.utilities.LightColor;
+import smartcity.lights.LightColor;
 import osmproxy.elements.OSMNode;
 import routing.core.IGeoPosition;
 import smartcity.lights.core.Light;
 import vehicles.Bus;
+import vehicles.enums.BusFillState;
 import web.message.payloads.models.*;
 
 public class Converter {
@@ -40,7 +41,16 @@ public class Converter {
         var id = bus.getAgentId();
         var location = convert((IGeoPosition) bus.getPosition());
         var routeLocations = bus.getSimpleRoute().stream().map(Converter::convert).toArray(Location[]::new);
+        var fillState = convert(bus.getFillState());
 
-        return new BusDto(id, location, routeLocations);
+        return new BusDto(id, location, routeLocations, fillState);
+    }
+
+    public static BusFillStateDto convert(BusFillState fillState) {
+        return switch (fillState) {
+            case LOW -> BusFillStateDto.LOW;
+            case MID -> BusFillStateDto.MID;
+            case HIGH -> BusFillStateDto.HIGH;
+        };
     }
 }
