@@ -99,7 +99,6 @@ class HashAgentsContainer implements IAgentsContainer {
         var agent = getOrThrow(type).remove(agentId);
         if (agent != null) {
             agent.doDelete();
-            agent.clean(true);
             return Optional.of(type.cast(agent));
         }
 
@@ -133,7 +132,6 @@ class HashAgentsContainer implements IAgentsContainer {
         for (var agent : collection) {
             try {
                 agent.doDelete();
-                agent.clean(true);
             } catch (Exception e) {
                 logger.warn("Failed to delete agent from container.", e);
             }
