@@ -16,10 +16,22 @@ public abstract class MovingObject {
     final Logger logger;
     final int agentId;
     final int speed;
-    final List<RouteNode> uniformRoute;
-    int moveIndex;
+    List<RouteNode> simpleRoute;
+    List<RouteNode> uniformRoute;
+    public int moveIndex;
     int closestLightIndex;
     DrivingState state;
+
+    MovingObject(int agentId, int speed, List<RouteNode> uniformRoute, List<RouteNode> simpleRoute) {
+        this.logger = LoggerFactory.getLogger(this.getClass().getSimpleName() + "Object" + agentId);
+        this.agentId = agentId;
+        this.speed = speed;
+        this.uniformRoute = uniformRoute;
+        this.simpleRoute = simpleRoute;
+        this.moveIndex = 0;
+        this.closestLightIndex = Integer.MAX_VALUE;
+        this.state = DrivingState.STARTING;
+    }
 
     MovingObject(int agentId, int speed, List<RouteNode> uniformRoute) {
         this.logger = LoggerFactory.getLogger(this.getClass().getSimpleName() + "Object" + agentId);
@@ -29,14 +41,6 @@ public abstract class MovingObject {
         this.moveIndex = 0;
         this.closestLightIndex = Integer.MAX_VALUE;
         this.state = DrivingState.STARTING;
-    }
-
-    public IGeoPosition getPosition() {
-        if (moveIndex >= uniformRoute.size()) {
-            return uniformRoute.get(uniformRoute.size() - 1);
-        }
-
-        return uniformRoute.get(moveIndex);
     }
 
     /**
@@ -52,6 +56,60 @@ public abstract class MovingObject {
             throw new ArrayIndexOutOfBoundsException("MovingObject exceeded its route: " + moveIndex + "/" + uniformRoute.size());
         }
     }
+
+    public void setRoutes(final List<RouteNode> simpleRoute, final List<RouteNode> uniformRoute) {
+        this.simpleRoute = simpleRoute;
+        this.uniformRoute = uniformRoute;
+    }
+
+    public IGeoPosition getStartPosition() {
+        return uniformRoute.get(0);
+    }
+
+    public IGeoPosition getEndPosition() {
+        return uniformRoute.get(uniformRoute.size() - 1);
+    }
+
+    public IGeoPosition getPosition() {
+        if (moveIndex >= uniformRoute.size()) {
+            return uniformRoute.get(uniformRoute.size() - 1);
+        }
+
+        return uniformRoute.get(moveIndex);
+    }
+
+    public RouteNode getPositionFarOnIndex(int index) {
+        if (moveIndex >= uniformRoute.size()) {
+            return uniformRoute.get(uniformRoute.size() - 1);
+        }
+
+        return uniformRoute.get(moveIndex + index);
+    }
+
+    public int getFarOnIndex(int index) {
+        if (moveIndex >= uniformRoute.size()) {
+            return uniformRoute.size() - 1;
+        }
+
+        return moveIndex + index;
+    }
+
+    public boolean checkIfEdgeExistsAndFarEnough(Long edgeId) {
+        int threshold = 5;
+        int counter = 0;
+        for (RouteNode r : uniformRoute) {
+            if (r.getInternalEdgeId() == edgeId) {
+                if (moveIndex + threshold <= counter) {
+                    return true;
+                }
+            }
+            counter++;
+        }
+        return false;
+    }
+
+
+    public List<RouteNode> getUniformRoute() { return uniformRoute; }
 
     public abstract String getVehicleType();
 
@@ -83,6 +141,17 @@ public abstract class MovingObject {
         return (LightManagerNode) (uniformRoute.get(closestLightIndex));
     }
 
+    public long getAdjacentOsmWayId(int indexFar) {
+        int index = moveIndex + indexFar;
+        while (!(uniformRoute.get(index) instanceof LightManagerNode)) {
+            --index;
+        }
+        /*if (index > moveIndex) {
+            logger.warn("I was moving backwards!");
+        }*/
+        return ((LightManagerNode) uniformRoute.get(index)).getAdjacentWayId();
+    }
+
     public boolean isAtDestination() {
         return moveIndex == uniformRoute.size();
     }
@@ -95,11 +164,16 @@ public abstract class MovingObject {
         this.state = state;
     }
 
-    public int getMillisecondsToNextLight(){
+    public int getMillisecondsToNextLight() {
         return ((closestLightIndex - moveIndex) * RoutingConstants.STEP_CONSTANT) / getSpeed();
     }
 
-    public abstract List<RouteNode> getSimpleRoute();
+    public List<RouteNode> getSimpleRoute() { return simpleRoute; }
 
     public abstract long getAdjacentOsmWayId();
+
+	public boolean currentTrafficLightNodeWithinAlternativeRouteThreshold(int thresholdUntilIndexChange) {
+		return moveIndex + thresholdUntilIndexChange >= closestLightIndex;
+	}
+
 }

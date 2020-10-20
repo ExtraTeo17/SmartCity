@@ -1,6 +1,5 @@
 package mocks;
 
-import org.json.simple.JSONObject;
 import org.w3c.dom.Document;
 import osmproxy.buses.abstractions.IBusApiManager;
 import routing.core.IZone;

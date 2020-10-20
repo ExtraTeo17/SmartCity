@@ -9,7 +9,7 @@ public class StationDto {
     private final Location location;
 
     public StationDto(long id, Location location) {
-      this.id = id;
-      this.location = location;
+        this.id = id;
+        this.location = location;
     }
 }

@@ -1,6 +1,5 @@
 package routing.core;
 
-import routing.RoutingConstants;
 import routing.RoutingHelper;
 import smartcity.config.ConfigMutator;
 

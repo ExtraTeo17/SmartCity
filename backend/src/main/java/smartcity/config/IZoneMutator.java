@@ -4,7 +4,7 @@ import routing.core.IGeoPosition;
 import routing.core.IZone;
 
 public interface IZoneMutator {
-    default void setZone(double lat, double lng, int radius){
+    default void setZone(double lat, double lng, int radius) {
         setZone(new IGeoPosition() {
             @Override
             public double getLat() {

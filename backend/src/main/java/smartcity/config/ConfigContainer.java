@@ -1,6 +1,5 @@
 package smartcity.config;
 
-import com.google.common.eventbus.EventBus;
 import com.google.inject.Inject;
 import routing.core.IGeoPosition;
 import routing.core.IZone;

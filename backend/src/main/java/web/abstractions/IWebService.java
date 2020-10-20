@@ -19,4 +19,11 @@ public interface IWebService extends IStartable {
     void killCar(int id);
 
     void updateLights(long lightGroupId);
+
+    void createTroublePoint(int id, IGeoPosition position);
+
+    void changeRoute(int agentId,
+                     List<? extends IGeoPosition> routeStart,
+                     IGeoPosition changePosition,
+                     List<? extends IGeoPosition> routeEnd);
 }
