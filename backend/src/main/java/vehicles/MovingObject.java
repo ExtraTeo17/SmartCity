@@ -18,7 +18,7 @@ public abstract class MovingObject {
     final int speed;
     List<RouteNode> simpleRoute;
     List<RouteNode> uniformRoute;
-    int moveIndex;
+    public int moveIndex;
     int closestLightIndex;
     DrivingState state;
 
@@ -42,7 +42,6 @@ public abstract class MovingObject {
         this.closestLightIndex = Integer.MAX_VALUE;
         this.state = DrivingState.STARTING;
     }
-
 
     /**
      * @return Scaled speed in KM/H
@@ -127,19 +126,6 @@ public abstract class MovingObject {
         return null;
     }
 
-    public LightManagerNode switchToNextTrafficLight(int farIndex) {
-        for (int i = moveIndex + farIndex + 1; i < uniformRoute.size(); ++i) {
-            var node = uniformRoute.get(i);
-            if (node instanceof LightManagerNode) {
-                closestLightIndex = i;
-                return (LightManagerNode) node;
-            }
-        }
-
-        closestLightIndex = Integer.MAX_VALUE;
-        return null;
-    }
-
     public boolean isAtTrafficLights() {
         if (isAtDestination()) {
             return false;
@@ -157,13 +143,13 @@ public abstract class MovingObject {
 
     public long getAdjacentOsmWayId(int indexFar) {
         int index = moveIndex + indexFar;
-        while (!(uniformRoute.get(moveIndex) instanceof LightManagerNode)) {
-            --moveIndex;
+        while (!(uniformRoute.get(index) instanceof LightManagerNode)) {
+            --index;
         }
-        if (index > moveIndex) {
+        /*if (index > moveIndex) {
             logger.warn("I was moving backwards!");
-        }
-        return ((LightManagerNode) uniformRoute.get(moveIndex)).getAdjacentWayId();
+        }*/
+        return ((LightManagerNode) uniformRoute.get(index)).getAdjacentWayId();
     }
 
     public boolean isAtDestination() {
@@ -185,5 +171,9 @@ public abstract class MovingObject {
     public List<RouteNode> getSimpleRoute() { return simpleRoute; }
 
     public abstract long getAdjacentOsmWayId();
+
+	public boolean currentTrafficLightNodeWithinAlternativeRouteThreshold(int thresholdUntilIndexChange) {
+		return moveIndex + thresholdUntilIndexChange >= closestLightIndex;
+	}
 
 }

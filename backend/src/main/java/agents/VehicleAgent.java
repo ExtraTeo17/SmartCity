@@ -22,6 +22,7 @@ import vehicles.DrivingState;
 import vehicles.MovingObject;
 
 import java.util.Arrays;
+import java.util.List;
 import java.util.Random;
 
 import static agents.message.MessageManager.createMessage;
@@ -69,7 +70,7 @@ public class VehicleAgent extends AbstractAgent {
                     switch (vehicle.getState()) {
                         case MOVING:
                             vehicle.setState(DrivingState.WAITING_AT_LIGHT);
-                            LightManagerNode light = vehicle.switchToNextTrafficLight();
+                            LightManagerNode light = vehicle.getCurrentTrafficLightNode();
                             ACLMessage msg = createMessageById(ACLMessage.REQUEST_WHEN, LightManagerAgent.name,
                                     light.getLightManagerId());
                             Properties properties = createProperties(MessageParameter.VEHICLE);
@@ -132,18 +133,28 @@ public class VehicleAgent extends AbstractAgent {
 
                                 RouteNode routeCarOnThreshold = vehicle.getPositionFarOnIndex(THRESHOLD_UNTIL_INDEX_CHANGE);
                                 int indexAfterWhichRouteChange = vehicle.getFarOnIndex(THRESHOLD_UNTIL_INDEX_CHANGE);
-                                sendMessageToLightManager(indexAfterWhichRouteChange, THRESHOLD_UNTIL_INDEX_CHANGE);
 
-                                var uniformRoute = vehicle.getUniformRoute();
+                                if (!vehicle.currentTrafficLightNodeWithinAlternativeRouteThreshold(THRESHOLD_UNTIL_INDEX_CHANGE)) {
+                                	sendRefusalMessageToLightManagerAfterRouteChange(THRESHOLD_UNTIL_INDEX_CHANGE);
+                                }
+
+                                var oldUniformRoute = vehicle.getUniformRoute();
+
+                                displayTheRoute(oldUniformRoute);
+
                                 var newSimpleRouteEnd = routeGenerator.generateRouteInfo(routeCarOnThreshold,
-                                        uniformRoute.get(uniformRoute.size() - 1));
+                                        oldUniformRoute.get(oldUniformRoute.size() - 1));
                                 var newRouteAfterChangeIndex = routeTransformer.uniformRoute(newSimpleRouteEnd);
 
-                                var route = uniformRoute.subList(0, indexAfterWhichRouteChange);
+                                var route = oldUniformRoute.subList(0, indexAfterWhichRouteChange);
                                 route.addAll(newRouteAfterChangeIndex);
                                 var mergeResult = routeTransformer.mergeByDistance(vehicle.getSimpleRoute(),
                                         newSimpleRouteEnd);
                                 vehicle.setRoutes(mergeResult.mergedRoute, route);
+
+                                displayTheRoute(route);
+                                
+                                vehicle.switchToNextTrafficLight();
 
                                 eventBus.post(new VehicleAgentRouteChangedEvent(getId(), mergeResult.startNodes, routeCarOnThreshold,
                                         newSimpleRouteEnd));
@@ -156,16 +167,31 @@ public class VehicleAgent extends AbstractAgent {
 
             }
 
-            private void sendMessageToLightManager(int indexAfterWhichRouteChange, int howFar) {
+            private void displayTheRoute(List<RouteNode> uniformRoute) {
+				for (int i = 0; i < uniformRoute.size(); ++i) {
+					if (uniformRoute.get(i) instanceof LightManagerNode) {
+						System.out.print("LMN");
+					} else {
+						System.out.print("RN");
+					}
+					if (vehicle.moveIndex == i) {
+						System.out.print("+US");
+					}
+					System.out.print("  ");
+				}
+				System.out.println();
+			}
+
+			private void sendRefusalMessageToLightManagerAfterRouteChange(int howFar) {
                 //change route, that is why send stop
-                LightManagerNode nextManager = vehicle.switchToNextTrafficLight(indexAfterWhichRouteChange);
-                if (nextManager != null) {
+                LightManagerNode currentManager = vehicle.getCurrentTrafficLightNode();
+                if (currentManager != null) {
                     //TODO:check if it is correct
-                    ACLMessage msg = createMessage(ACLMessage.REFUSE, LightManagerAgent.name + nextManager.getLightManagerId());
+                    ACLMessage msg = createMessage(ACLMessage.REFUSE, LightManagerAgent.name + currentManager.getLightManagerId());
                     Properties properties = createProperties(MessageParameter.VEHICLE);
-                    properties.setProperty(MessageParameter.ADJACENT_OSM_WAY_ID, Long.toString(vehicle.getAdjacentOsmWayId(howFar)));
+                    properties.setProperty(MessageParameter.ADJACENT_OSM_WAY_ID, Long.toString(currentManager.getAdjacentWayId()));
                     send(msg);
-                    print("Send REFUSE to LightManager" + nextManager.getLightManagerId() + ".");
+                    print("Send REFUSE to LightManager" + currentManager.getLightManagerId() + ".");
                 }
             }
         };

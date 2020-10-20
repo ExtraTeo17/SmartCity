@@ -18,13 +18,13 @@ public class Car extends MovingObject {
     @Override
     public long getAdjacentOsmWayId() {
         int index = moveIndex;
-        while (!(uniformRoute.get(moveIndex) instanceof LightManagerNode)) {
-            --moveIndex;
+        while (!(uniformRoute.get(index) instanceof LightManagerNode)) {
+            --index;
         }
-        if (index > moveIndex) {
+        /*if (index > moveIndex) {
             logger.warn("I was moving backwards!");
-        }
-        return ((LightManagerNode) uniformRoute.get(moveIndex)).getAdjacentWayId();
+        }*/
+        return ((LightManagerNode) uniformRoute.get(index)).getAdjacentWayId();
     }
 
 
