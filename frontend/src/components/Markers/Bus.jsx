@@ -28,4 +28,4 @@ const Bus = props => {
   );
 };
 
-export default Bus;
+export default React.memo(Bus);

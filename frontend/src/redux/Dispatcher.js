@@ -15,19 +15,36 @@ import {
 import { batch } from "react-redux";
 
 const fps = 15;
+const fpsInterval = 1000 / fps;
 let timeScale = 1;
 let timer = null;
 const carUpdateQueue = new Map();
 const switchLightsQueue = new Map();
 const busUpdateQueue = new Map();
+let start = window.performance.now();
 
-function update() {
+function update(now) {
+  const elapsed = now - start;
+
+  if (elapsed > fpsInterval) {
+    // https://stackoverflow.com/a/19772220/6841224
+    start = now - (elapsed % fpsInterval);
+    batch(() => {
+      carUpdateQueue.forEach(action => dispatch(action));
+      switchLightsQueue.forEach(action => dispatch(action));
+      busUpdateQueue.forEach(action => dispatch(action));
+    });
+    switchLightsQueue.clear();
+  }
+
+  window.requestAnimationFrame(update);
+}
+
+function onDetectStartedSimulation() {
   batch(() => {
-    carUpdateQueue.forEach(action => dispatch(action));
-    switchLightsQueue.forEach(action => dispatch(action));
-    busUpdateQueue.forEach(action => dispatch(action));
+    this.prepareSimulation([], [], []);
+    this.startSimulation(10);
   });
-  switchLightsQueue.clear();
 }
 
 export default {
@@ -37,17 +54,14 @@ export default {
 
   startSimulation(newTimeScale) {
     timeScale = newTimeScale;
-    timer = setInterval(update, 1000 / fps);
+    timer = update(window.performance.now());
     dispatch(simulationStarted());
   },
 
   createCar(car) {
     dispatch(carCreated(car));
-    if (timer == null) {
-      batch(() => {
-        this.prepareSimulation([], []);
-        this.startSimulation(10);
-      });
+    if (timer === null) {
+      onDetectStartedSimulation();
     }
   },
 
@@ -83,10 +97,7 @@ export default {
   updateBusFillState(busData) {
     dispatch(busFillStateUpdated(busData));
     if (timer === null) {
-      batch(() => {
-        this.prepareSimulation([], []);
-        this.startSimulation(10);
-      });
+      onDetectStartedSimulation();
     }
   },
 

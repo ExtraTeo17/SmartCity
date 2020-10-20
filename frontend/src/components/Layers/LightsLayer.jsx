@@ -5,9 +5,9 @@ import Light from "../Markers/Light";
 
 const LightsLayer = props => {
   const { lights = [] } = props;
-  const lightMarkers = lights.map((light, ind) => <Light key={ind} light={light} />);
+  const lightMarkers = lights.map(light => <Light key={"light" + light.groupId} light={light} />);
 
-  return <div>{lightMarkers}</div>;
+  return <React.Fragment>{lightMarkers}</React.Fragment>;
 };
 
 const mapStateToProps = (state /* , ownProps */) => {

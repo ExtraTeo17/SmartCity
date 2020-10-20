@@ -12,4 +12,4 @@ const Car = props => {
   );
 };
 
-export default Car;
+export default React.memo(Car);

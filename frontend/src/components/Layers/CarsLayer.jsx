@@ -7,10 +7,10 @@ import CarRoute from "../Routes/CarRoute";
 const CarsLayer = props => {
   const { cars = [] } = props;
 
-  const carMarkers = cars.map(car => <Car key={car.id} car={car} />);
-  const carRoutes = cars.map((car, ind) => (
+  const carMarkers = cars.map(car => <Car key={"car" + car.id} car={car} />);
+  const carRoutes = cars.map(car => (
     <CarRoute
-      key={cars.length + ind}
+      key={"carRoute" + car.id}
       carId={car.id}
       route={car.route}
       isTestCarRoute={car.isTestCar}
@@ -19,18 +19,18 @@ const CarsLayer = props => {
   ));
 
   return (
-    <div>
+    <React.Fragment>
       {carMarkers}
       {carRoutes}
-    </div>
+    </React.Fragment>
   );
 };
 
 const mapStateToProps = (state /* , ownProps */) => {
   const { message } = state;
   return {
-    cars: message.cars.filter(c => c.isDeleted === undefined),
+    cars: message.cars,
   };
 };
 
-export default connect(mapStateToProps)(CarsLayer);
+export default connect(mapStateToProps)(React.memo(CarsLayer));

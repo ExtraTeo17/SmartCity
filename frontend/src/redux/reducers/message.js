@@ -49,15 +49,13 @@ const message = (state = initialState, action) => {
       const car = action.payload;
 
       let unrecognized = true;
-      const newCars = state.cars
-        .filter(c => c.isDeleted === undefined)
-        .map(c => {
-          if (c.id === car.id) {
-            unrecognized = false;
-            return { ...c, location: car.location };
-          }
-          return c;
-        });
+      const newCars = state.cars.map(c => {
+        if (c.id === car.id) {
+          unrecognized = false;
+          return { ...c, location: car.location };
+        }
+        return c;
+      });
 
       if (unrecognized === true && !deletedCarIds.includes(car.id)) {
         newCars.push(car);
@@ -68,10 +66,7 @@ const message = (state = initialState, action) => {
 
     case CAR_KILLED: {
       const id = action.payload;
-      const newCars = state.cars.map(c => {
-        if (c.id === id) c.isDeleted = true;
-        return c;
-      });
+      const newCars = state.cars.filter(c => c.id !== id);
       deletedCarIds.push(id);
 
       return { ...state, cars: newCars };
@@ -113,15 +108,13 @@ const message = (state = initialState, action) => {
       const bus = action.payload;
 
       let unrecognized = true;
-      const newBuses = state.buses
-        .filter(b => !b.isDeleted)
-        .map(b => {
-          if (b.id === bus.id) {
-            unrecognized = false;
-            return { ...b, location: bus.location };
-          }
-          return b;
-        });
+      const newBuses = state.buses.map(b => {
+        if (b.id === bus.id) {
+          unrecognized = false;
+          return { ...b, location: bus.location };
+        }
+        return b;
+      });
 
       if (unrecognized === true && !deletedBusIds.includes(bus.id)) {
         newBuses.push({ ...bus, fillState: BusFillState.LOW });
@@ -132,7 +125,7 @@ const message = (state = initialState, action) => {
 
     case BUS_FILL_STATE_UPDATED: {
       const busData = payload;
-      console.groupCollapsed("Update fill-" + busData.id);
+      console.groupCollapsed("Update bus fill-" + busData.id);
       console.info(busData);
       console.groupEnd();
       const newBuses = state.buses.map(b => {
@@ -146,12 +139,9 @@ const message = (state = initialState, action) => {
     }
 
     case BUS_KILLED: {
-      console.log("killed " + payload);
+      console.info("Killed bus: " + payload);
       const id = payload;
-      const newBuses = state.buses.map(b => {
-        if (b.id === id) b.isDeleted = true;
-        return b;
-      });
+      const newBuses = state.buses.filter(b => b.id !== id);
       deletedBusIds.push(id);
 
       return { ...state, buses: newBuses };
