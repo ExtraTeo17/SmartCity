@@ -129,8 +129,6 @@ public class VehicleAgent extends AbstractAgent {
                             Long edgeId = Long.parseLong(rcv.getUserDefinedParameter(MessageParameter.EDGE_ID));
                             logger.info("  GOT PROPOSE TO CHANGE THE ROUTE. AND EXCLUDE: " + edgeId);
                             if (vehicle.checkIfEdgeExistsAndFarEnough(edgeId)) {
-                                logger.info("CAR:EDGE EXISTS");
-
                                 RouteNode routeCarOnThreshold = vehicle.getPositionFarOnIndex(THRESHOLD_UNTIL_INDEX_CHANGE);
                                 int indexAfterWhichRouteChange = vehicle.getFarOnIndex(THRESHOLD_UNTIL_INDEX_CHANGE);
 
@@ -139,8 +137,6 @@ public class VehicleAgent extends AbstractAgent {
                                 }
 
                                 var oldUniformRoute = vehicle.getUniformRoute();
-
-                                displayTheRoute(oldUniformRoute);
 
                                 var newSimpleRouteEnd = routeGenerator.generateRouteInfo(routeCarOnThreshold,
                                         oldUniformRoute.get(oldUniformRoute.size() - 1));
@@ -151,8 +147,6 @@ public class VehicleAgent extends AbstractAgent {
                                 var mergeResult = routeTransformer.mergeByDistance(vehicle.getSimpleRoute(),
                                         newSimpleRouteEnd);
                                 vehicle.setRoutes(mergeResult.mergedRoute, route);
-
-                                displayTheRoute(route);
                                 
                                 vehicle.switchToNextTrafficLight();
 
@@ -166,21 +160,6 @@ public class VehicleAgent extends AbstractAgent {
                 block(100);
 
             }
-
-            private void displayTheRoute(List<RouteNode> uniformRoute) {
-				for (int i = 0; i < uniformRoute.size(); ++i) {
-					if (uniformRoute.get(i) instanceof LightManagerNode) {
-						System.out.print("LMN");
-					} else {
-						System.out.print("RN");
-					}
-					if (vehicle.moveIndex == i) {
-						System.out.print("+US");
-					}
-					System.out.print("  ");
-				}
-				System.out.println();
-			}
 
 			private void sendRefusalMessageToLightManagerAfterRouteChange(int howFar) {
                 //change route, that is why send stop
