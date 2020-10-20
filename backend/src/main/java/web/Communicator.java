@@ -56,6 +56,11 @@ class Communicator {
     }
 
     @Subscribe
+    public void handle(VehicleAgentRouteChangedEvent e) {
+        webService.changeRoute(e.agentId, e.routeStart, e.changePosition, e.routeEnd);
+    }
+
+    @Subscribe
     public void handle(TroublePointCreatedEvent e) {
         webService.createTroublePoint(e.id, e.position);
     }

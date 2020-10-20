@@ -15,6 +15,8 @@ const initialState = {
     cars: [],
     stations: [],
     troublePoints: [],
+    wasPrepared: false,
+    wasStarted: false,
   },
 };
 

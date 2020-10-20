@@ -16,16 +16,18 @@ public abstract class MovingObject {
     final Logger logger;
     final int agentId;
     final int speed;
+    List<RouteNode> simpleRoute;
     List<RouteNode> uniformRoute;
-    int moveIndex;
+    public int moveIndex;
     int closestLightIndex;
     DrivingState state;
 
-    MovingObject(int agentId, int speed, List<RouteNode> uniformRoute, List<RouteNode> displayRoute) {
+    MovingObject(int agentId, int speed, List<RouteNode> uniformRoute, List<RouteNode> simpleRoute) {
         this.logger = LoggerFactory.getLogger(this.getClass().getSimpleName() + "Object" + agentId);
         this.agentId = agentId;
         this.speed = speed;
         this.uniformRoute = uniformRoute;
+        this.simpleRoute = simpleRoute;
         this.moveIndex = 0;
         this.closestLightIndex = Integer.MAX_VALUE;
         this.state = DrivingState.STARTING;
@@ -41,7 +43,6 @@ public abstract class MovingObject {
         this.state = DrivingState.STARTING;
     }
 
-
     /**
      * @return Scaled speed in KM/H
      */
@@ -55,9 +56,10 @@ public abstract class MovingObject {
             throw new ArrayIndexOutOfBoundsException("MovingObject exceeded its route: " + moveIndex + "/" + uniformRoute.size());
         }
     }
-    
-    public void setUniformRoute(final List<RouteNode> uniformRoute) {
-    	this.uniformRoute = uniformRoute;
+
+    public void setRoutes(final List<RouteNode> simpleRoute, final List<RouteNode> uniformRoute) {
+        this.simpleRoute = simpleRoute;
+        this.uniformRoute = uniformRoute;
     }
 
     public IGeoPosition getStartPosition() {
@@ -83,12 +85,13 @@ public abstract class MovingObject {
 
         return uniformRoute.get(moveIndex + index);
     }
-    public int getFarOnIndex(int  index) {
+
+    public int getFarOnIndex(int index) {
         if (moveIndex >= uniformRoute.size()) {
             return uniformRoute.size() - 1;
         }
 
-        return moveIndex+index;
+        return moveIndex + index;
     }
 
     public boolean checkIfEdgeExistsAndFarEnough(Long edgeId) {
@@ -106,7 +109,7 @@ public abstract class MovingObject {
     }
 
 
-    public List<RouteNode> getUniformRoute() {return uniformRoute;}
+    public List<RouteNode> getUniformRoute() { return uniformRoute; }
 
     public abstract String getVehicleType();
 
@@ -122,18 +125,7 @@ public abstract class MovingObject {
         closestLightIndex = Integer.MAX_VALUE;
         return null;
     }
-    public LightManagerNode switchToNextTrafficLight(int farIndex) {
-        for (int i = moveIndex+farIndex + 1; i < uniformRoute.size(); ++i) {
-            var node = uniformRoute.get(i);
-            if (node instanceof LightManagerNode) {
-                closestLightIndex = i;
-                return (LightManagerNode) node;
-            }
-        }
 
-        closestLightIndex = Integer.MAX_VALUE;
-        return null;
-    }
     public boolean isAtTrafficLights() {
         if (isAtDestination()) {
             return false;
@@ -148,16 +140,18 @@ public abstract class MovingObject {
         }
         return (LightManagerNode) (uniformRoute.get(closestLightIndex));
     }
+
     public long getAdjacentOsmWayId(int indexFar) {
-        int index = moveIndex+indexFar;
-        while (!(uniformRoute.get(moveIndex) instanceof LightManagerNode)) {
-            --moveIndex;
+        int index = moveIndex + indexFar;
+        while (!(uniformRoute.get(index) instanceof LightManagerNode)) {
+            --index;
         }
-        if (index > moveIndex) {
+        /*if (index > moveIndex) {
             logger.warn("I was moving backwards!");
-        }
-        return ((LightManagerNode) uniformRoute.get(moveIndex)).getAdjacentWayId();
+        }*/
+        return ((LightManagerNode) uniformRoute.get(index)).getAdjacentWayId();
     }
+
     public boolean isAtDestination() {
         return moveIndex == uniformRoute.size();
     }
@@ -174,8 +168,12 @@ public abstract class MovingObject {
         return ((closestLightIndex - moveIndex) * RoutingConstants.STEP_CONSTANT) / getSpeed();
     }
 
-    public abstract List<RouteNode> getSimpleRoute();
+    public List<RouteNode> getSimpleRoute() { return simpleRoute; }
 
     public abstract long getAdjacentOsmWayId();
+
+	public boolean currentTrafficLightNodeWithinAlternativeRouteThreshold(int thresholdUntilIndexChange) {
+		return moveIndex + thresholdUntilIndexChange >= closestLightIndex;
+	}
 
 }

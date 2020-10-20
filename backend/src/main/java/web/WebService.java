@@ -77,4 +77,16 @@ class WebService implements IWebService {
         var payload = new CreateTroublePointInfo(id, location);
         webConnector.broadcastMessage(MessageType.CREATE_TROUBLE_POINT_INFO, payload);
     }
+
+    @Override
+    public void changeRoute(int agentId,
+                            List<? extends IGeoPosition> routeStart,
+                            IGeoPosition changePosition,
+                            List<? extends IGeoPosition> routeEnd) {
+        var changeLocation = Converter.convert(changePosition);
+        var routeStartLocations = routeStart.stream().map(Converter::convert).toArray(Location[]::new);
+        var routeEndLocations = routeEnd.stream().map(Converter::convert).toArray(Location[]::new);
+        var payload = new ChangeCarRouteInfo(agentId, routeStartLocations, changeLocation, routeEndLocations);
+        webConnector.broadcastMessage(MessageType.UPDATE_CAR_ROUTE_INFO, payload);
+    }
 }

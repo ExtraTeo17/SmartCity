@@ -12,6 +12,7 @@ import org.junit.runner.RunWith;
 import org.mockito.Mockito;
 import org.mockito.junit.MockitoJUnitRunner;
 import osmproxy.elements.OSMStation;
+import routing.abstractions.IRouteGenerator;
 import routing.abstractions.IRouteTransformer;
 import smartcity.lights.abstractions.ICrossroad;
 import smartcity.stations.StationStrategy;
@@ -86,7 +87,8 @@ class HashAgentsContainerTest {
 
     VehicleAgent getVehicleAgent() {
         return new VehicleAgent(idGenerator.get(VehicleAgent.class), mock(MovingObject.class),
-                createTimeProvider(), createEventBus(), 5000, null, null); // TODO: routeGenerator and routeTransformers are null
+                5000, createTimeProvider(), mock(IRouteGenerator.class), mock(IRouteTransformer.class),
+                createEventBus());
     }
 
     StationAgent getStationAgent() {

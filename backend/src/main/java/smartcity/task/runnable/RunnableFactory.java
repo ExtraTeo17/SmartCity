@@ -19,37 +19,32 @@ class RunnableFactory implements IRunnableFactory {
 
     @Override
     public IFixedExecutionRunnable createCount(Consumer<Integer> action, int maxRunCount, boolean separateThread) {
-        if (separateThread) {
-            return new CounterRunnable(getNewThreadExecutor(), action, maxRunCount);
-        }
-
-        return new CounterRunnable(executor, action, maxRunCount);
+        var currentExecutor = separateThread ? getNewThreadExecutor() : executor;
+        return new CounterRunnable(currentExecutor, action, maxRunCount);
     }
 
     @Override
     public IFixedExecutionRunnable createWhile(BooleanSupplier test, Runnable runnable, boolean separateThread) {
-        if (separateThread) {
-            return new WhileRunnable(getNewThreadExecutor(), test, runnable);
-        }
-
-        return new WhileRunnable(executor, test, runnable);
+        var currentExecutor = separateThread ? getNewThreadExecutor() : executor;
+        return new WhileRunnable(currentExecutor, test, runnable);
     }
 
     @Override
     public IFixedExecutionRunnable createIf(BooleanSupplier test, Runnable runnable, boolean separateThread) {
-        if (separateThread) {
-            return new IfRunnable(getNewThreadExecutor(), test, runnable);
-        }
+        var currentExecutor = separateThread ? getNewThreadExecutor() : executor;
+        return new IfRunnable(currentExecutor, test, runnable);
+    }
 
-        return new IfRunnable(executor, test, runnable);
+    @Override
+    public IFixedExecutionRunnable createIf(BooleanSupplier test, Consumer<Integer> countConsumer, boolean separateThread) {
+        var currentExecutor = separateThread ? getNewThreadExecutor() : executor;
+        return new IfCounterRunnable(currentExecutor, test, countConsumer);
     }
 
     @Override
     public IVariableExecutionRunnable createDelay(Supplier<Integer> delayRunnable, int initialDelay, boolean separateThread) {
-        if (separateThread) {
-            return new InfiniteVariableExecutionRunnable(getNewThreadExecutor(), delayRunnable);
-        }
-        return new InfiniteVariableExecutionRunnable(executor, delayRunnable);
+        var currentExecutor = separateThread ? getNewThreadExecutor() : executor;
+        return new InfiniteVariableExecutionRunnable(currentExecutor, delayRunnable);
     }
 
     private static ScheduledExecutorService getNewThreadExecutor() {

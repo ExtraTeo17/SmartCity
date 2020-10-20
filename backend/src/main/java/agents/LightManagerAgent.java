@@ -121,8 +121,8 @@ public class LightManagerAgent extends AbstractAgent {
                     }
                     case ACLMessage.REFUSE -> {
                         print(agentName + " was deleted from queque");
-                 //       crossroad.removeCarFromQueue(getIntParameter(rcv, MessageParameter.ADJACENT_OSM_WAY_ID));
-                        crossroad.removeCarFromFarAwayQueue(getIntParameter(rcv, MessageParameter.ADJACENT_OSM_WAY_ID),agentName);
+                        //       crossroad.removeCarFromQueue(getIntParameter(rcv, MessageParameter.ADJACENT_OSM_WAY_ID));
+                        crossroad.removeCarFromFarAwayQueue(getIntParameter(rcv, MessageParameter.ADJACENT_OSM_WAY_ID), agentName);
                     }
                     default -> logger.info("Wait");
                 }
@@ -148,8 +148,7 @@ public class LightManagerAgent extends AbstractAgent {
                         Properties properties = createProperties(MessageParameter.LIGHT);
                         agree.setAllUserDefinedParameters(properties);
                         send(agree);
-                        crossroad.addPedestrianToQueue(getIntParameter(rcv, MessageParameter.ADJACENT_OSM_WAY_ID), agentName
-                        );
+                        crossroad.addPedestrianToQueue(getIntParameter(rcv, MessageParameter.ADJACENT_OSM_WAY_ID), agentName);
                     }
                     case ACLMessage.AGREE -> {
                         print(agentName + " passed the light.");

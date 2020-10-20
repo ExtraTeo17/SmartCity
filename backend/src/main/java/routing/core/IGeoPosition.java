@@ -64,6 +64,23 @@ public interface IGeoPosition extends Comparable<IGeoPosition> {
         };
     }
 
+    default IGeoPosition multiply(double multipler) {
+        return new IGeoPosition() {
+            private final double lat = IGeoPosition.this.getLat() * multipler;
+            private final double lng = IGeoPosition.this.getLng() * multipler;
+
+            @Override
+            public double getLat() {
+                return lat;
+            }
+
+            @Override
+            public double getLng() {
+                return lng;
+            }
+        };
+    }
+
     default double squaredSum() {
         return getLat() * getLat() + getLng() * getLng();
     }

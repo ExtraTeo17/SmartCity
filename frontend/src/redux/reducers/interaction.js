@@ -11,7 +11,7 @@ const initialState = {
 const interaction = (state = initialState, action) => {
   switch (action.type) {
     case CENTER_UPDATED: {
-      const { center } = action.payload;
+      const center = action.payload;
       return { ...state, center };
     }
 
