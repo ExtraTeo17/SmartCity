@@ -1,7 +1,6 @@
 import React from "react";
 import { connect } from "react-redux";
-import MarkerClusterGroup from "react-leaflet-markercluster";
-import { bigPedestrianIcon } from "../../styles/icons";
+import pedestrianSelector from "../../redux/selectors/pedestriansSelector";
 
 import Pedestrian from "../Markers/Pedestrian";
 import PedestrianRoute from "../Routes/PedestrianRoute";
@@ -19,23 +18,16 @@ const PedestriansLayer = props => {
     />
   ));
 
-  const iconCreate = () => bigPedestrianIcon;
-
   return (
     <>
-      <MarkerClusterGroup showCoverageOnHover={false} iconCreateFunction={iconCreate} animateAddingMarkers maxClusterRadius={10}>
-        {pedestrianMarkers}
-      </MarkerClusterGroup>
+      {pedestrianMarkers}
       {pedestrianRoutes}
     </>
   );
 };
 
-const mapStateToProps = (state /* , ownProps */) => {
-  const { message } = state;
-  return {
-    pedestrians: message.pedestrians,
-  };
-};
+const mapStateToProps = (state /* , ownProps */) => ({
+  pedestrians: pedestrianSelector(state),
+});
 
 export default connect(mapStateToProps)(React.memo(PedestriansLayer));

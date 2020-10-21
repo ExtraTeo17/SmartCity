@@ -31,4 +31,4 @@ const CarRoute = props => {
   );
 };
 
-export default CarRoute;
+export default React.memo(CarRoute);

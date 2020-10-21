@@ -26,7 +26,6 @@ const initialState = {
   stations: [],
   buses: [],
   pedestrians: [],
-  hiddenPedestrians: [],
   troublePoints: [],
   wasPrepared: false,
   wasStarted: false,
@@ -172,52 +171,48 @@ const message = (state = initialState, action) => {
     case PEDESTRIAN_UPDATED: {
       const ped = payload;
 
-      let unrecognized = true;
       const newPedestrians = state.pedestrians.map(p => {
         if (p.id === ped.id) {
-          unrecognized = false;
           return { ...p, location: ped.location };
         }
         return p;
       });
-
-      if (unrecognized === true && !deletedPedestrianIds.includes(ped.id)) {
-        newPedestrians.push({ ...ped });
-      }
 
       return { ...state, pedestrians: newPedestrians };
     }
 
     case PEDESTRIAN_PUSHED: {
       const id = payload;
-      let pushedPed = null;
-      const newPedestrians = state.pedestrians.filter(p => {
+      const newPedestrians = state.pedestrians.map(p => {
         if (p.id === id) {
-          pushedPed = p;
-          return false;
+          return { ...p, hidden: true };
         }
-        return true;
+        return p;
       });
 
-      if (pushedPed === null) {
-        return state;
-      }
-
-      return { ...state, pedestrians: newPedestrians, hiddenPedestrians: [...state.hiddenPedestrians, pushedPed] };
+      return { ...state, pedestrians: newPedestrians };
     }
 
     case PEDESTRIAN_PULLED: {
       const pedData = payload;
-      let ped = state.hiddenPedestrians.find(p => p.id === pedData.id);
-      ped = { ...ped, location: pedData.location, route: ped.routeFromStation };
+      if (deletedPedestrianIds.includes(pedData.id)) {
+        return state;
+      }
 
-      return { ...state, pedestrians: [...state.pedestrians, ped] };
+      const newPedestrians = state.pedestrians.map(p => {
+        if (p.id === pedData.id) {
+          return { ...p, location: pedData.location, hidden: false, route: p.routeFromStation };
+        }
+        return p;
+      });
+
+      return { ...state, pedestrians: newPedestrians };
     }
 
     case PEDESTRIAN_KILLED: {
       const id = payload;
 
-      const newPedestrians = state.pedestrians.filter(b => b.id !== id);
+      const newPedestrians = state.pedestrians.filter(p => p.id !== id);
       deletedPedestrianIds.push(id);
 
       return { ...state, pedestrians: newPedestrians };

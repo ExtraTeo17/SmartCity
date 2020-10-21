@@ -1,10 +1,12 @@
 import React from "react";
-import { busLowIcon, busMidIcon, busHighIcon } from "../../styles/icons";
 import { Marker, Popup } from "react-leaflet";
+import { busLowIcon, busMidIcon, busHighIcon } from "../../styles/icons";
 import { BusFillState } from "../Models/BusFillState";
 
 const Bus = props => {
-  const { id, location, fillState } = props.bus;
+  const {
+    bus: { id, location, fillState },
+  } = props;
 
   function getIcon() {
     switch (fillState) {
@@ -16,7 +18,7 @@ const Bus = props => {
         return busHighIcon;
 
       default:
-        console.warn("Unrecognized fillState: " + fillState);
+        console.warn(`Unrecognized fillState: ${fillState}`);
         return busLowIcon;
     }
   }

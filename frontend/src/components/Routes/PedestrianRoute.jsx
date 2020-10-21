@@ -29,4 +29,4 @@ const PedestrianRoute = props => {
   );
 };
 
-export default PedestrianRoute;
+export default React.memo(PedestrianRoute);
