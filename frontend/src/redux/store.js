@@ -1,5 +1,5 @@
-import appReducer from "./reducers/index";
 import { createStore } from "redux";
+import appReducer from "./reducers/index";
 // import { composeWithDevTools } from "redux-devtools-extension";
 
 const initialState = {
@@ -15,6 +15,7 @@ const initialState = {
     cars: [],
     stations: [],
     buses: [],
+    pedestrians: [],
     troublePoints: [],
     wasPrepared: false,
     wasStarted: false,
@@ -22,6 +23,6 @@ const initialState = {
 };
 
 const store = createStore(appReducer, initialState);
-export const dispatch = store.dispatch;
+export const { dispatch } = store;
 
 export default store;

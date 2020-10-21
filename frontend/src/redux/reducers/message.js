@@ -12,6 +12,11 @@ import {
   BUS_UPDATED,
   BUS_FILL_STATE_UPDATED,
   BUS_KILLED,
+  PEDESTRIAN_CREATED,
+  PEDESTRIAN_UPDATED,
+  PEDESTRIAN_KILLED,
+  PEDESTRIAN_PUSHED,
+  PEDESTRIAN_PULLED,
 } from "../constants";
 
 // Just for reference - defined in store.js
@@ -20,6 +25,7 @@ const initialState = {
   cars: [],
   stations: [],
   buses: [],
+  pedestrians: [],
   troublePoints: [],
   wasPrepared: false,
   wasStarted: false,
@@ -27,13 +33,20 @@ const initialState = {
 
 const deletedCarIds = [];
 const deletedBusIds = [];
+const deletedPedestrianIds = [];
 
 const message = (state = initialState, action) => {
-  const payload = action.payload;
+  const { payload } = action;
   switch (action.type) {
     case SIMULATION_PREPARED: {
       const { lights, stations, buses } = action.payload;
-      return { ...state, lights: lights, stations: stations, buses: buses, wasPrepared: true };
+      return {
+        ...state,
+        lights,
+        stations,
+        buses,
+        wasPrepared: true,
+      };
     }
 
     case SIMULATION_STARTED: {
@@ -76,8 +89,7 @@ const message = (state = initialState, action) => {
       const { id, routeStart, routeEnd, location } = payload;
       const newCars = state.cars.map(c => {
         if (c.id === id) {
-          c.route = [...routeStart, ...routeEnd];
-          c.routeChangePoint = location;
+          return { ...c, route: [...routeStart, ...routeEnd], routeChangePoint: location };
         }
         return c;
       });
@@ -88,13 +100,17 @@ const message = (state = initialState, action) => {
     case LIGHTS_SWITCHED: {
       const id = action.payload;
 
+      const newLights = state.lights.map(oldLight => {
+        if (oldLight.groupId === id) {
+          return { ...oldLight, color: oldLight.color === LightColor.GREEN ? LightColor.RED : LightColor.GREEN };
+        }
+
+        return oldLight;
+      });
+
       return {
         ...state,
-        lights: state.lights.map(oldLight =>
-          oldLight.groupId === id
-            ? { ...oldLight, color: oldLight.color === LightColor.GREEN ? LightColor.RED : LightColor.GREEN }
-            : oldLight
-        ),
+        lights: newLights,
       };
     }
 
@@ -125,7 +141,7 @@ const message = (state = initialState, action) => {
 
     case BUS_FILL_STATE_UPDATED: {
       const busData = payload;
-      console.groupCollapsed("Update bus fill-" + busData.id);
+      console.groupCollapsed(`Update bus fill-${busData.id}`);
       console.info(busData);
       console.groupEnd();
       const newBuses = state.buses.map(b => {
@@ -139,12 +155,55 @@ const message = (state = initialState, action) => {
     }
 
     case BUS_KILLED: {
-      console.info("Killed bus: " + payload);
+      console.info(`Killed bus: ${payload}`);
       const id = payload;
       const newBuses = state.buses.filter(b => b.id !== id);
       deletedBusIds.push(id);
 
       return { ...state, buses: newBuses };
+    }
+
+    case PEDESTRIAN_CREATED: {
+      const pedestrian = payload;
+      return { ...state, pedestrians: [...state.pedestrians, pedestrian] };
+    }
+
+    case PEDESTRIAN_UPDATED: {
+      const ped = payload;
+
+      let unrecognized = true;
+      const newPedestrians = state.buses.map(p => {
+        if (p.id === ped.id) {
+          unrecognized = false;
+          return { ...p, location: ped.location };
+        }
+        return p;
+      });
+
+      if (unrecognized === true && !deletedPedestrianIds.includes(ped.id)) {
+        newPedestrians.push({ ...ped });
+      }
+
+      return { ...state, pedestrians: newPedestrians };
+    }
+
+    case PEDESTRIAN_PUSHED: {
+      console.log(`pushed: ${payload}`);
+      return state;
+    }
+
+    case PEDESTRIAN_PULLED: {
+      console.log(`from pulled: ${payload.id}`);
+      return state;
+    }
+
+    case PEDESTRIAN_KILLED: {
+      const id = payload;
+
+      const newPedestrians = state.pedestrians.filter(b => b.id !== id);
+      deletedPedestrianIds.push(id);
+
+      return { ...state, pedestrians: newPedestrians };
     }
 
     default:

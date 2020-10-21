@@ -1,3 +1,4 @@
+import { createAction } from "redux-actions";
 import {
   CAR_KILLED,
   CAR_UPDATED,
@@ -11,8 +12,12 @@ import {
   BUS_UPDATED,
   BUS_FILL_STATE_UPDATED,
   BUS_KILLED,
+  PEDESTRIAN_CREATED,
+  PEDESTRIAN_UPDATED,
+  PEDESTRIAN_PUSHED,
+  PEDESTRIAN_PULLED,
+  PEDESTRIAN_KILLED,
 } from "./constants";
-import { createAction } from "redux-actions";
 
 /**
  * @param {{ lat: number; lng:number; rad:number }} center
@@ -30,30 +35,29 @@ export const simulationStarted = createAction(SIMULATION_STARTED);
 /**
  * @param {{id:number; location:{lat:number; lng:number;}; route:Array<> isTestCar:boolean; }} car
  */
-export const carCreated = car => {
-  return {
-    type: CAR_CREATED,
-    payload: {
-      car,
-    },
-  };
-};
+export const carCreated = car => ({
+  type: CAR_CREATED,
+  payload: {
+    car,
+  },
+});
 
 /**
  * @param {{id:number; location:{lat:number; lng:number;}; }} car
  */
 export const carUpdated = createAction(CAR_UPDATED);
-
 export const carKilled = createAction(CAR_KILLED);
-
 export const carRouteChanged = createAction(CAR_ROUTE_CHANGED);
 
 export const lightsSwitched = createAction(LIGHTS_SWITCHED);
-
 export const troublePointCreated = createAction(TROUBLE_POINT_CREATED);
 
 export const busUpdated = createAction(BUS_UPDATED);
-
 export const busFillStateUpdated = createAction(BUS_FILL_STATE_UPDATED);
-
 export const busKilled = createAction(BUS_KILLED);
+
+export const pedestrianCreated = createAction(PEDESTRIAN_CREATED);
+export const pedestrianUpdated = createAction(PEDESTRIAN_UPDATED);
+export const pedestrianPushedIntoBus = createAction(PEDESTRIAN_PUSHED);
+export const pedestrianPulledFromBus = createAction(PEDESTRIAN_PULLED);
+export const pedestrianKilled = createAction(PEDESTRIAN_KILLED);

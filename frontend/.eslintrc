@@ -46,7 +46,10 @@
       }
     ],
     "object-curly-spacing": 2,
+    "object-curly-newline": 0,
     "camelcase": 1,
+    "arrow-parens": 0,
+    "comma-dangle": 0,
     "no-underscore-dangle": 0,
     "no-unused-vars": 1,
     "no-undef": 2,

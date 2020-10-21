@@ -1,9 +1,9 @@
-export const CENTER_UPDATED = "Center/CENTER_UPDATED";
+export const CENTER_UPDATED = "Center/UPDATED";
 
 export const SIMULATION_PREPARED = "Simulation/PREPARED";
 export const SIMULATION_STARTED = "Simulation/STARTED";
 
-export const LIGHTS_SWITCHED = "Lights/LIGHTS_SWITCHED";
+export const LIGHTS_SWITCHED = "Lights/SWITCHED";
 
 export const CAR_CREATED = "Car/CREATED";
 export const CAR_UPDATED = "Car/UPDATED";
@@ -15,3 +15,9 @@ export const TROUBLE_POINT_CREATED = "TP/CREATED";
 export const BUS_UPDATED = "Bus/UPDATED";
 export const BUS_FILL_STATE_UPDATED = "Bus/FILL";
 export const BUS_KILLED = "Bus/KILLED";
+
+export const PEDESTRIAN_CREATED = "Ped/CREATED";
+export const PEDESTRIAN_UPDATED = "Ped/UPDATED";
+export const PEDESTRIAN_PUSHED = "Ped/PUSHED";
+export const PEDESTRIAN_PULLED = "Ped/PULLED";
+export const PEDESTRIAN_KILLED = "Ped/KILLED";

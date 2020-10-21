@@ -1,3 +1,4 @@
+import { batch } from "react-redux";
 import { dispatch } from "./store";
 import {
   carUpdated,
@@ -11,8 +12,12 @@ import {
   busUpdated,
   busFillStateUpdated,
   busKilled,
+  pedestrianCreated,
+  pedestrianUpdated,
+  pedestrianPushedIntoBus,
+  pedestrianPulledFromBus,
+  pedestrianKilled,
 } from "./actions";
-import { batch } from "react-redux";
 
 const fps = 15;
 const fpsInterval = 1000 / fps;
@@ -21,6 +26,7 @@ let timer = null;
 const carUpdateQueue = new Map();
 const switchLightsQueue = new Map();
 const busUpdateQueue = new Map();
+const pedestrianUpdateQueue = new Map();
 let start = window.performance.now();
 
 function dispatchFromMap(action, key, map) {
@@ -38,6 +44,7 @@ function update(now) {
       carUpdateQueue.forEach(dispatchFromMap);
       switchLightsQueue.forEach(dispatchFromMap);
       busUpdateQueue.forEach(dispatchFromMap);
+      pedestrianUpdateQueue.forEach(dispatchFromMap);
     });
   }
 
@@ -46,7 +53,9 @@ function update(now) {
 
 function onDetectStartedSimulation() {
   batch(() => {
+    // eslint-disable-next-line no-use-before-define
     Dispatcher.prepareSimulation([], [], []);
+    // eslint-disable-next-line no-use-before-define
     Dispatcher.startSimulation(10);
   });
 }
@@ -108,6 +117,29 @@ const Dispatcher = {
   killBus(id) {
     dispatch(busKilled(id));
     busUpdateQueue.delete(id);
+  },
+
+  createPedestrian(pedestrian) {
+    dispatch(pedestrianCreated(pedestrian));
+    if (timer === null) {
+      onDetectStartedSimulation();
+    }
+  },
+
+  updatePedestrian(pedData) {
+    pedestrianUpdateQueue.set(pedData.id, pedestrianUpdated(pedData));
+  },
+
+  pushPedestrianIntoBus(id) {
+    dispatch(pedestrianPushedIntoBus(id));
+  },
+
+  pullPedestrianFromBus(pedData) {
+    dispatch(pedestrianPulledFromBus(pedData));
+  },
+
+  killPedestrian(id) {
+    dispatch(pedestrianKilled(id));
   },
 };
 

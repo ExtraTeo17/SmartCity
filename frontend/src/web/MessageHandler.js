@@ -1,3 +1,4 @@
+import { notify } from "react-notify-toast";
 import {
   PREPARE_SIMULATION_RESPONSE,
   CREATE_CAR_INFO,
@@ -10,14 +11,19 @@ import {
   UPDATE_BUS_INFO,
   UPDATE_BUS_FILL_STATE_INFO,
   KILL_BUS_INFO,
+  CREATE_PEDESTRIAN_INFO,
+  UPDATE_PEDESTRIAN_INFO,
+  PUSH_PEDESTRIAN_INTO_BUS_INFO,
+  PULL_PEDESTRIAN_FROM_BUS_INFO,
+  KILL_PEDESTRIAN_INFO,
 } from "./MessageType";
 import { NOTIFY_SHOW_MS } from "../utils/constants";
-import { notify } from "react-notify-toast";
 import Dispatcher from "../redux/Dispatcher";
+import { BusFillState } from "../components/Models/BusFillState";
 
 export default {
   handle(msg) {
-    const payload = msg.payload;
+    const { payload } = msg;
     switch (msg.type) {
       case PREPARE_SIMULATION_RESPONSE: {
         notify.show("Simulation prepared!", "success", NOTIFY_SHOW_MS);
@@ -67,6 +73,9 @@ export default {
       }
 
       case UPDATE_BUS_FILL_STATE_INFO: {
+        if (payload.fillState === BusFillState.HIGH) {
+          notify.show(`Bus-${payload.id}success`, NOTIFY_SHOW_MS);
+        }
         Dispatcher.updateBusFillState(payload);
         break;
       }
@@ -76,9 +85,34 @@ export default {
         break;
       }
 
+      case CREATE_PEDESTRIAN_INFO: {
+        Dispatcher.createPedestrian(payload);
+        break;
+      }
+
+      case UPDATE_PEDESTRIAN_INFO: {
+        Dispatcher.updatePedestrian(payload.id, payload.location);
+        break;
+      }
+
+      case PUSH_PEDESTRIAN_INTO_BUS_INFO: {
+        Dispatcher.pushPedestrianIntoBus(payload.id);
+        break;
+      }
+
+      case PULL_PEDESTRIAN_FROM_BUS_INFO: {
+        Dispatcher.pullPedestrianFromBus(payload);
+        break;
+      }
+
+      case KILL_PEDESTRIAN_INFO: {
+        Dispatcher.killPedestrian(payload.id);
+        break;
+      }
+
       default:
-        console.group("Unrecognized message");
-        console.warn("Type: " + msg.type);
+        console.group("Unrecognized-message");
+        console.warn(`Type: ${msg.type}`);
         console.info(payload);
         console.groupEnd();
     }
