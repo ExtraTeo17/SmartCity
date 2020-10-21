@@ -1,4 +1,4 @@
-package events.web;
+package events.web.bus;
 
 import routing.core.IGeoPosition;
 

@@ -3,8 +3,8 @@ package agents;
 import agents.abstractions.AbstractAgent;
 import agents.utilities.MessageParameter;
 import com.google.common.eventbus.EventBus;
-import events.web.VehicleAgentRouteChangedEvent;
-import events.web.VehicleAgentUpdatedEvent;
+import events.web.vehicle.VehicleAgentRouteChangedEvent;
+import events.web.vehicle.VehicleAgentUpdatedEvent;
 import jade.core.behaviours.Behaviour;
 import jade.core.behaviours.CyclicBehaviour;
 import jade.core.behaviours.TickerBehaviour;
@@ -135,7 +135,7 @@ public class VehicleAgent extends AbstractAgent {
                                 int indexAfterWhichRouteChange = vehicle.getFarOnIndex(THRESHOLD_UNTIL_INDEX_CHANGE);
 
                                 if (!vehicle.currentTrafficLightNodeWithinAlternativeRouteThreshold(THRESHOLD_UNTIL_INDEX_CHANGE)) {
-                                	sendRefusalMessageToLightManagerAfterRouteChange(THRESHOLD_UNTIL_INDEX_CHANGE);
+                                    sendRefusalMessageToLightManagerAfterRouteChange(THRESHOLD_UNTIL_INDEX_CHANGE);
                                 }
 
                                 var oldUniformRoute = vehicle.getUniformRoute();
@@ -153,7 +153,7 @@ public class VehicleAgent extends AbstractAgent {
                                 vehicle.setRoutes(mergeResult.mergedRoute, route);
 
                                 displayTheRoute(route);
-                                
+
                                 vehicle.switchToNextTrafficLight();
 
                                 eventBus.post(new VehicleAgentRouteChangedEvent(getId(), mergeResult.startNodes, routeCarOnThreshold,
@@ -168,21 +168,22 @@ public class VehicleAgent extends AbstractAgent {
             }
 
             private void displayTheRoute(List<RouteNode> uniformRoute) {
-				for (int i = 0; i < uniformRoute.size(); ++i) {
-					if (uniformRoute.get(i) instanceof LightManagerNode) {
-						System.out.print("LMN");
-					} else {
-						System.out.print("RN");
-					}
-					if (vehicle.getMoveIndex() == i) {
-						System.out.print("+US");
-					}
-					System.out.print("  ");
-				}
-				System.out.println();
-			}
+                for (int i = 0; i < uniformRoute.size(); ++i) {
+                    if (uniformRoute.get(i) instanceof LightManagerNode) {
+                        System.out.print("LMN");
+                    }
+                    else {
+                        System.out.print("RN");
+                    }
+                    if (vehicle.getMoveIndex() == i) {
+                        System.out.print("+US");
+                    }
+                    System.out.print("  ");
+                }
+                System.out.println();
+            }
 
-			private void sendRefusalMessageToLightManagerAfterRouteChange(int howFar) {
+            private void sendRefusalMessageToLightManagerAfterRouteChange(int howFar) {
                 //change route, that is why send stop
                 LightManagerNode currentManager = vehicle.getCurrentTrafficLightNode();
                 if (currentManager != null) {

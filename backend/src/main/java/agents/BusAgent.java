@@ -4,7 +4,7 @@ import agents.abstractions.AbstractAgent;
 import agents.utilities.LoggerLevel;
 import agents.utilities.MessageParameter;
 import com.google.common.eventbus.EventBus;
-import events.web.BusAgentUpdatedEvent;
+import events.web.bus.BusAgentUpdatedEvent;
 import jade.core.behaviours.Behaviour;
 import jade.core.behaviours.CyclicBehaviour;
 import jade.core.behaviours.TickerBehaviour;

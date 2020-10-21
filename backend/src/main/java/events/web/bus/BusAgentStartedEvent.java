@@ -1,4 +1,4 @@
-package events.web;
+package events.web.bus;
 
 // TODO: Will be useful?
 public class BusAgentStartedEvent {

@@ -1,4 +1,4 @@
-package events.web;
+package events.web.bus;
 
 public class BusAgentDeadEvent {
     public final int id;
