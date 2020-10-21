@@ -26,6 +26,7 @@ const initialState = {
   stations: [],
   buses: [],
   pedestrians: [],
+  hiddenPedestrians: [],
   troublePoints: [],
   wasPrepared: false,
   wasStarted: false,
@@ -164,7 +165,7 @@ const message = (state = initialState, action) => {
     }
 
     case PEDESTRIAN_CREATED: {
-      const pedestrian = payload;
+      const pedestrian = { ...payload, route: payload.routeToStation };
       return { ...state, pedestrians: [...state.pedestrians, pedestrian] };
     }
 
@@ -172,7 +173,7 @@ const message = (state = initialState, action) => {
       const ped = payload;
 
       let unrecognized = true;
-      const newPedestrians = state.buses.map(p => {
+      const newPedestrians = state.pedestrians.map(p => {
         if (p.id === ped.id) {
           unrecognized = false;
           return { ...p, location: ped.location };
@@ -188,13 +189,29 @@ const message = (state = initialState, action) => {
     }
 
     case PEDESTRIAN_PUSHED: {
-      console.log(`pushed: ${payload}`);
-      return state;
+      const id = payload;
+      let pushedPed = null;
+      const newPedestrians = state.pedestrians.filter(p => {
+        if (p.id === id) {
+          pushedPed = p;
+          return false;
+        }
+        return true;
+      });
+
+      if (pushedPed === null) {
+        return state;
+      }
+
+      return { ...state, pedestrians: newPedestrians, hiddenPedestrians: [...state.hiddenPedestrians, pushedPed] };
     }
 
     case PEDESTRIAN_PULLED: {
-      console.log(`from pulled: ${payload.id}`);
-      return state;
+      const pedData = payload;
+      let ped = state.hiddenPedestrians.find(p => p.id === pedData.id);
+      ped = { ...ped, location: pedData.location, route: ped.routeFromStation };
+
+      return { ...state, pedestrians: [...state.pedestrians, ped] };
     }
 
     case PEDESTRIAN_KILLED: {

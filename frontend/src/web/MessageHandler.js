@@ -74,7 +74,7 @@ export default {
 
       case UPDATE_BUS_FILL_STATE_INFO: {
         if (payload.fillState === BusFillState.HIGH) {
-          notify.show(`Bus-${payload.id}success`, NOTIFY_SHOW_MS);
+          notify.show(`Bus-${payload.id} overloaded!`, "warn", NOTIFY_SHOW_MS);
         }
         Dispatcher.updateBusFillState(payload);
         break;
@@ -91,7 +91,7 @@ export default {
       }
 
       case UPDATE_PEDESTRIAN_INFO: {
-        Dispatcher.updatePedestrian(payload.id, payload.location);
+        Dispatcher.updatePedestrian(payload);
         break;
       }
 

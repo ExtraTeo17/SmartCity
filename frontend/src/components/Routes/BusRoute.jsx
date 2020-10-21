@@ -15,11 +15,11 @@ const BusRoute = props => {
   const color = pathColors.get(busId % pathColors.size);
 
   return (
-    <div>
+    <>
       {route && (
         <Polyline weight={DEFAULT_WEIGHT} color={color} positions={route} bubblingMouseEvents={false} interactive={false} />
       )}
-    </div>
+    </>
   );
 };
 

@@ -23,10 +23,16 @@ const fps = 15;
 const fpsInterval = 1000 / fps;
 let timeScale = 1;
 let timer = null;
+
 const carUpdateQueue = new Map();
 const switchLightsQueue = new Map();
 const busUpdateQueue = new Map();
 const pedestrianUpdateQueue = new Map();
+
+const pushPullCount = 10;
+const pullKillPedQueue = [];
+const pushPedQueue = [];
+
 let start = window.performance.now();
 
 function dispatchFromMap(action, key, map) {
@@ -45,7 +51,16 @@ function update(now) {
       switchLightsQueue.forEach(dispatchFromMap);
       busUpdateQueue.forEach(dispatchFromMap);
       pedestrianUpdateQueue.forEach(dispatchFromMap);
+      pushPedQueue.forEach(a => dispatch(a));
+      if (pullKillPedQueue.length > 0) {
+        const end = Math.min(pullKillPedQueue.length, pushPullCount);
+        for (let i = 0; i < end; ++i) {
+          const a = pullKillPedQueue.pop();
+          dispatch(a);
+        }
+      }
     });
+    pushPedQueue.length = 0;
   }
 
   window.requestAnimationFrame(update);
@@ -131,15 +146,15 @@ const Dispatcher = {
   },
 
   pushPedestrianIntoBus(id) {
-    dispatch(pedestrianPushedIntoBus(id));
+    pushPedQueue.push(pedestrianPushedIntoBus(id));
   },
 
   pullPedestrianFromBus(pedData) {
-    dispatch(pedestrianPulledFromBus(pedData));
+    pullKillPedQueue.push(pedestrianPulledFromBus(pedData));
   },
 
   killPedestrian(id) {
-    dispatch(pedestrianKilled(id));
+    pullKillPedQueue.push(pedestrianKilled(id));
   },
 };
 

@@ -7,10 +7,10 @@ import CarRoute from "../Routes/CarRoute";
 const CarsLayer = props => {
   const { cars = [] } = props;
 
-  const carMarkers = cars.map(car => <Car key={"car" + car.id} car={car} />);
+  const carMarkers = cars.map(car => <Car key={`car${car.id}`} car={car} />);
   const carRoutes = cars.map(car => (
     <CarRoute
-      key={"carRoute" + car.id}
+      key={`carRoute${car.id}`}
       carId={car.id}
       route={car.route}
       isTestCarRoute={car.isTestCar}
@@ -19,10 +19,10 @@ const CarsLayer = props => {
   ));
 
   return (
-    <React.Fragment>
+    <>
       {carMarkers}
       {carRoutes}
-    </React.Fragment>
+    </>
   );
 };
 

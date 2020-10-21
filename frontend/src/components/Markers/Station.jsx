@@ -1,6 +1,6 @@
 import React from "react";
-import { stationIcon } from "../../styles/icons";
 import { Marker, Popup } from "react-leaflet";
+import { stationIcon } from "../../styles/icons";
 
 const Station = props => {
   const { station } = props;

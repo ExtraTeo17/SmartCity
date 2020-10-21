@@ -1,34 +1,32 @@
 import React from "react";
 import { Polyline } from "react-leaflet";
 
-import RouteChangePoint from "../Markers/RouteChangePoint";
 import { generateRandomColor } from "../../utils/helpers";
 import { COLORS_NUMBER, DEFAULT_WEIGHT } from "./constants";
 
 const pathColors = new Map();
-for (let pathsIter = 0; pathsIter < COLORS_NUMBER; ++pathsIter) {
+for (let pathsIter = 0; pathsIter < COLORS_NUMBER * 2; ++pathsIter) {
   pathColors.set(pathsIter, generateRandomColor());
 }
 
-const CarRoute = props => {
-  const { carId, route, isTestCarRoute, routeChangePoint } = props;
+const PedestrianRoute = props => {
+  const { pedestrianId, route, isTestPedestrianRoute } = props;
 
-  const color = pathColors.get(carId % pathColors.size);
+  const color = pathColors.get(pedestrianId % pathColors.size);
 
   return (
     <>
       {route && (
         <Polyline
-          weight={isTestCarRoute ? DEFAULT_WEIGHT + 1 : DEFAULT_WEIGHT}
+          weight={isTestPedestrianRoute ? DEFAULT_WEIGHT + 1 : DEFAULT_WEIGHT}
           color={color}
           positions={route}
           bubblingMouseEvents={false}
           interactive={false}
         />
       )}
-      {routeChangePoint && <RouteChangePoint point={routeChangePoint} />}
     </>
   );
 };
 
-export default CarRoute;
+export default PedestrianRoute;

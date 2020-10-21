@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { Circle, Map as LeafletMap, Marker, Popup, TileLayer } from "react-leaflet";
 import { connect } from "react-redux";
+import { notify } from "react-notify-toast";
 import { dispatch } from "../redux/store";
 import { centerUpdated } from "../redux/actions";
 
@@ -9,9 +10,9 @@ import LightsLayer from "./Layers/LightsLayer";
 import StationsLayer from "./Layers/StationsLayer";
 import TroublePointsLayer from "./Layers/TroublePointsLayer";
 import CarsLayer from "./Layers/CarsLayer";
-import { notify } from "react-notify-toast";
 import { NOTIFY_SHOW_MS } from "../utils/constants";
 import BusesLayer from "./Layers/BusesLayer";
+import PedestriansLayer from "./Layers/PedestriansLayer";
 
 const DEFAULT_ZOOM = 15;
 const MAX_ZOOM = 20;
@@ -19,7 +20,9 @@ const MAX_NATIVE_ZOOM = 19;
 
 const CityMap = props => {
   const [zoom, setZoom] = useState(DEFAULT_ZOOM);
-  const { lat, lng, rad } = props.center;
+  const {
+    center: { lat, lng, rad },
+  } = props;
   const { wasStarted } = props;
 
   function setCenter(latlng) {
@@ -40,7 +43,7 @@ const CityMap = props => {
   }
 
   return (
-    <LeafletMap center={{ lat, lng }} zoom={zoom} preferCanvas={true} onzoomanim={onZoom} oncontextmenu={rightClickOnMap}>
+    <LeafletMap center={{ lat, lng }} zoom={zoom} preferCanvas onzoomanim={onZoom} oncontextmenu={rightClickOnMap}>
       <TileLayer
         attribution='&amp;copy <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
         url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
@@ -58,6 +61,7 @@ const CityMap = props => {
       <StationsLayer />
       <BusesLayer />
       <TroublePointsLayer />
+      <PedestriansLayer />
     </LeafletMap>
   );
 };

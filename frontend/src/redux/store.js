@@ -16,6 +16,7 @@ const initialState = {
     stations: [],
     buses: [],
     pedestrians: [],
+    hiddenPedestrians: [],
     troublePoints: [],
     wasPrepared: false,
     wasStarted: false,

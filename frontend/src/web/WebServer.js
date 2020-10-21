@@ -1,8 +1,8 @@
+import { notify } from "react-notify-toast";
 import { SERVER_ADDRESS, RECONNECT_INTERVAL_SEC, NOTIFY_SHOW_MS } from "../utils/constants";
 import MessageHandler from "./MessageHandler";
-import { notify } from "react-notify-toast";
 
-var socketContainer = {
+const socketContainer = {
   socket: {},
 };
 
@@ -26,7 +26,7 @@ const createSocket = () => {
 
   function logMessage(e) {
     console.groupCollapsed("OnMessage");
-    console.log("Message received:" + e.data);
+    console.log(`Message received:${e.data}`);
     console.groupEnd();
   }
 
@@ -57,7 +57,7 @@ export default {
   send(msgObj) {
     console.group("Send");
 
-    var msg = {
+    const msg = {
       type: msgObj.type,
       payload: JSON.stringify(msgObj.payload),
     };

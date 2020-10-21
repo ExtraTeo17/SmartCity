@@ -5,9 +5,9 @@ import Station from "../Markers/Station";
 
 const StationLayer = props => {
   const { stations = [] } = props;
-  const stationMarkers = stations.map(station => <Station key={"station" + station.id} station={station} />);
+  const stationMarkers = stations.map(station => <Station key={`station${station.id}`} station={station} />);
 
-  return <React.Fragment>{stationMarkers}</React.Fragment>;
+  return <>{stationMarkers}</>;
 };
 
 const mapStateToProps = (state /* , ownProps */) => {
