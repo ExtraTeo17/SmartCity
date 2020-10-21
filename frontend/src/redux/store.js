@@ -1,6 +1,6 @@
 import appReducer from "./reducers/index";
 import { createStore } from "redux";
-import { composeWithDevTools } from "redux-devtools-extension";
+// import { composeWithDevTools } from "redux-devtools-extension";
 
 const initialState = {
   interaction: {
@@ -21,7 +21,7 @@ const initialState = {
   },
 };
 
-const store = createStore(appReducer, initialState, composeWithDevTools());
+const store = createStore(appReducer, initialState);
 export const dispatch = store.dispatch;
 
 export default store;

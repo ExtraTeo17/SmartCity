@@ -23,4 +23,4 @@ const BusRoute = props => {
   );
 };
 
-export default BusRoute;
+export default React.memo(BusRoute);

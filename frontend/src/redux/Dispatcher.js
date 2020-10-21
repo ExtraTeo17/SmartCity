@@ -15,39 +15,57 @@ import {
 import { batch } from "react-redux";
 
 const fps = 15;
+const fpsInterval = 1000 / fps;
 let timeScale = 1;
 let timer = null;
 const carUpdateQueue = new Map();
 const switchLightsQueue = new Map();
 const busUpdateQueue = new Map();
+let start = window.performance.now();
 
-function update() {
-  batch(() => {
-    carUpdateQueue.forEach(action => dispatch(action));
-    switchLightsQueue.forEach(action => dispatch(action));
-    busUpdateQueue.forEach(action => dispatch(action));
-  });
-  switchLightsQueue.clear();
+function dispatchFromMap(action, key, map) {
+  map.delete(key);
+  dispatch(action);
 }
 
-export default {
+function update(now) {
+  const elapsed = now - start;
+
+  if (elapsed > fpsInterval) {
+    // https://stackoverflow.com/a/19772220/6841224
+    start = now - (elapsed % fpsInterval);
+    batch(() => {
+      carUpdateQueue.forEach(dispatchFromMap);
+      switchLightsQueue.forEach(dispatchFromMap);
+      busUpdateQueue.forEach(dispatchFromMap);
+    });
+  }
+
+  window.requestAnimationFrame(update);
+}
+
+function onDetectStartedSimulation() {
+  batch(() => {
+    Dispatcher.prepareSimulation([], [], []);
+    Dispatcher.startSimulation(10);
+  });
+}
+
+const Dispatcher = {
   prepareSimulation(lights, stations, buses) {
     dispatch(simulationPrepared({ lights, stations, buses }));
   },
 
   startSimulation(newTimeScale) {
     timeScale = newTimeScale;
-    timer = setInterval(update, 1000 / fps);
+    timer = update(window.performance.now());
     dispatch(simulationStarted());
   },
 
   createCar(car) {
     dispatch(carCreated(car));
-    if (timer == null) {
-      batch(() => {
-        this.prepareSimulation([], []);
-        this.startSimulation(10);
-      });
+    if (timer === null) {
+      onDetectStartedSimulation();
     }
   },
 
@@ -83,14 +101,14 @@ export default {
   updateBusFillState(busData) {
     dispatch(busFillStateUpdated(busData));
     if (timer === null) {
-      batch(() => {
-        this.prepareSimulation([], []);
-        this.startSimulation(10);
-      });
+      onDetectStartedSimulation();
     }
   },
 
   killBus(id) {
     dispatch(busKilled(id));
+    busUpdateQueue.delete(id);
   },
 };
+
+export default Dispatcher;

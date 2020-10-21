@@ -7,22 +7,22 @@ import BusRoute from "../Routes/BusRoute";
 const BusesLayer = props => {
   const { buses = [] } = props;
 
-  const busMarkers = buses.map(bus => <Bus key={bus.id} bus={bus} />);
-  const busRoutes = buses.map((bus, ind) => <BusRoute key={buses.length + ind} busId={bus.id} route={bus.route} />);
+  const busMarkers = buses.map(bus => <Bus key={"bus" + bus.id} bus={bus} />);
+  const busRoutes = buses.map(bus => <BusRoute key={"busRoute" + bus.id} busId={bus.id} route={bus.route} />);
 
   return (
-    <div>
+    <React.Fragment>
       {busMarkers}
       {busRoutes}
-    </div>
+    </React.Fragment>
   );
 };
 
 const mapStateToProps = (state /* , ownProps */) => {
   const { buses } = state.message;
   return {
-    buses: buses.filter(b => b.isDeleted === undefined),
+    buses: buses,
   };
 };
 
-export default connect(mapStateToProps)(BusesLayer);
+export default connect(mapStateToProps)(React.memo(BusesLayer));

@@ -12,4 +12,4 @@ const TroublePoint = props => {
   );
 };
 
-export default TroublePoint;
+export default React.memo(TroublePoint);

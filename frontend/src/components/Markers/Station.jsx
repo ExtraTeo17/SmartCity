@@ -12,4 +12,4 @@ const Station = props => {
   );
 };
 
-export default Station;
+export default React.memo(Station);

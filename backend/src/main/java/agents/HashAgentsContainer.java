@@ -98,7 +98,7 @@ class HashAgentsContainer implements IAgentsContainer {
     public <TAgent extends AbstractAgent> Optional<TAgent> remove(Class<TAgent> type, int agentId) {
         var agent = getOrThrow(type).remove(agentId);
         if (agent != null) {
-            agent.doDelete();
+            tryKillAgent(agent);
             return Optional.of(type.cast(agent));
         }
 
@@ -130,13 +130,17 @@ class HashAgentsContainer implements IAgentsContainer {
 
     private void tryDeleteAll(Collection<AbstractAgent> collection) {
         for (var agent : collection) {
-            try {
-                agent.doDelete();
-            } catch (Exception e) {
-                logger.warn("Failed to delete agent from container.", e);
-            }
+            tryKillAgent(agent);
         }
         collection.clear();
+    }
+
+    private void tryKillAgent(AbstractAgent agent) {
+        try {
+            agent.doDelete();
+        } catch (Exception e) {
+            logger.warn("Failed to stop agent execution:", e);
+        }
     }
 
     private Map<Integer, AbstractAgent> getOrThrow(Class<?> type) {

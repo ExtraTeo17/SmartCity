@@ -12,4 +12,4 @@ const RouteChangePoint = props => {
   ) : null;
 };
 
-export default RouteChangePoint;
+export default React.memo(RouteChangePoint);

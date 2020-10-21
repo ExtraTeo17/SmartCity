@@ -35,16 +35,12 @@ const CityMap = props => {
     }
   }
 
+  function onZoom(e) {
+    setZoom(e.zoom);
+  }
+
   return (
-    <LeafletMap
-      center={{ lat, lng }}
-      zoom={zoom}
-      preferCanvas={true}
-      onzoomanim={e => {
-        setZoom(e.zoom);
-      }}
-      oncontextmenu={e => rightClickOnMap(e)}
-    >
+    <LeafletMap center={{ lat, lng }} zoom={zoom} preferCanvas={true} onzoomanim={onZoom} oncontextmenu={rightClickOnMap}>
       <TileLayer
         attribution='&amp;copy <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
         url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"

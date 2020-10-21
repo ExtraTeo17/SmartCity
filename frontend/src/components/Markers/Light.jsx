@@ -13,4 +13,4 @@ const Light = props => {
   );
 };
 
-export default Light;
+export default React.memo(Light);
