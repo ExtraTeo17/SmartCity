@@ -9,13 +9,13 @@ import com.google.common.eventbus.EventBus;
 import com.google.inject.Inject;
 import events.web.BusAgentDeadEvent;
 import events.web.VehicleAgentDeadEvent;
+import events.web.pedestrian.PedestrianAgentDeadEvent;
 import gui.MapWindow;
 import jade.core.Agent;
 import jade.core.behaviours.CyclicBehaviour;
 import jade.lang.acl.ACLMessage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import vehicles.Bus;
 import vehicles.TestCar;
 import vehicles.TestPedestrian;
 
@@ -85,7 +85,9 @@ public class SmartCityAgent extends Agent {
                 setResultTime(testPedestrian.getStart(), testPedestrian.getEnd());
             }
 
-            agentsContainer.remove(agent);
+            if (agentsContainer.remove(agent)) {
+                eventBus.post(new PedestrianAgentDeadEvent(agent.getId()));
+            }
         }
     }
 
@@ -122,7 +124,7 @@ public class SmartCityAgent extends Agent {
         var agentOpt = agentsContainer.get(BusAgent.class, (v) -> senderName.equals(v.getLocalName()));
         if (agentOpt.isPresent()) {
             var agent = agentOpt.get();
-            if(agentsContainer.remove(agent)){
+            if (agentsContainer.remove(agent)) {
                 eventBus.post(new BusAgentDeadEvent(agent.getId()));
             }
         }

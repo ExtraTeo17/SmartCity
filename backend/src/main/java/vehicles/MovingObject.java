@@ -155,10 +155,12 @@ public abstract class MovingObject {
         while (!(uniformRoute.get(index) instanceof LightManagerNode)) {
             --index;
         }
-        /*if (index > moveIndex) {
-            logger.warn("I was moving backwards!");
-        }*/
+
         return ((LightManagerNode) uniformRoute.get(index)).getAdjacentWayId();
+    }
+
+    public long getAdjacentOsmWayId(){
+        return getAdjacentOsmWayId(0);
     }
 
     public boolean isAtDestination() {
@@ -178,8 +180,6 @@ public abstract class MovingObject {
     }
 
     public List<RouteNode> getSimpleRoute() { return simpleRoute; }
-
-    public abstract long getAdjacentOsmWayId();
 
 	public boolean currentTrafficLightNodeWithinAlternativeRouteThreshold(int thresholdUntilIndexChange) {
 		return moveIndex + thresholdUntilIndexChange >= closestLightIndex;

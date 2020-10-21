@@ -11,6 +11,7 @@ import com.google.common.eventbus.EventBus;
 import com.google.inject.Inject;
 import events.web.BusAgentStartedEvent;
 import events.web.VehicleAgentCreatedEvent;
+import events.web.pedestrian.PedestrianAgentCreatedEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import routing.abstractions.IRouteGenerator;
@@ -113,6 +114,10 @@ public class TaskProvider implements ITaskProvider {
                         busLine, startStation, endStation, testPedestrian);
                 if (agentsContainer.tryAdd(agent)) {
                     agent.start();
+                    eventBus.post(new PedestrianAgentCreatedEvent(agent.getId(), agent.getPosition(),
+                            routeToStation,
+                            routeFromStation,
+                            testPedestrian));
                 }
             } catch (Exception e) {
                 logger.warn("Unknown error in pedestrian creation", e);
@@ -129,7 +134,7 @@ public class TaskProvider implements ITaskProvider {
                     // Agent was created but not accepted.
                     if (busAgent.shouldStart()) {
                         eventBus.post(new BusAgentStartedEvent(busAgent.getId()));
-                        if(busAgent.getAID() == null) {
+                        if (busAgent.getAID() == null) {
                             agentsContainer.tryAccept(busAgent);
                         }
                     }

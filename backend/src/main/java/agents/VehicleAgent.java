@@ -263,7 +263,6 @@ public class VehicleAgent extends AbstractAgent {
         addBehaviour(troubleStopper);
     }
 
-
     public MovingObject getVehicle() {
         return vehicle;
     }

@@ -445,10 +445,10 @@ public class MapWindow {
 
     private void drawRoutes(List<Painter<JXMapViewer>> painters) {
         try {
-            agentsContainer.forEach(VehicleAgent.class, a -> {
-                List<IGeoPosition> track = new ArrayList<>(a.getVehicle().getSimpleRoute());
+            agentsContainer.forEach(VehicleAgent.class, veh -> {
+                List<IGeoPosition> track = new ArrayList<>(veh.getVehicle().getSimpleRoute());
 
-                Random r = new Random(a.hashCode());
+                Random r = new Random(veh.hashCode());
                 RoutePainter routePainter = new RoutePainter(track, new Color(r.nextInt(255), r.nextInt(255), r.nextInt(255)));
                 painters.add(routePainter);
             });
@@ -460,10 +460,10 @@ public class MapWindow {
     private void drawPedestrians(List<Painter<JXMapViewer>> painters) {
         try {
             Set<Waypoint> set = new HashSet<>();
-            agentsContainer.forEach(PedestrianAgent.class, (a) -> {
-                if (!a.isInBus()) {
-                    var waypoint = new DefaultWaypoint(a.getPedestrian().getPosition().toMapGeoPosition());
-                    if (a.getPedestrian() instanceof TestPedestrian) {
+            agentsContainer.forEach(PedestrianAgent.class, (ped) -> {
+                if (!ped.isInBus()) {
+                    var waypoint = new DefaultWaypoint(ped.getPedestrian().getPosition().toMapGeoPosition());
+                    if (ped.getPedestrian() instanceof TestPedestrian) {
                         Set<Waypoint> testPedestrianWaypoint = new HashSet<>();
                         testPedestrianWaypoint.add(waypoint);
 
