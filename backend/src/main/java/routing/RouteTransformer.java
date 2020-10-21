@@ -4,6 +4,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import routing.abstractions.IRouteTransformer;
 import routing.data.RouteMergeInfo;
+import routing.nodes.LightManagerNode;
 import routing.nodes.RouteNode;
 
 import java.util.ArrayList;
@@ -47,6 +48,12 @@ final class RouteTransformer implements
 
         if (route.size() > 0) {
             newRoute.add(route.get(route.size() - 1));
+        }
+        
+        for (RouteNode node : newRoute) {
+        	if (node instanceof LightManagerNode) {
+        		System.out.println("AHHHHHHHHHHH  HHAAAAA  HHHHHHHHHHHHHHAAA  AAAAAAAAAAAAAAHH  HHHHHHHHHHHHHAAAAAAAA  AAAAAAAAAHHHHHHHHHHHHHH  HHHAAAAAAAAAAAAAAHHHHHH  HHHHHHHHHAAAAAAAAAAAA");
+        	}
         }
 
         return newRoute;
