@@ -37,4 +37,18 @@ public interface IWebService extends IStartable {
     void updateBusFillState(int id, BusFillState fillState);
 
     void killBus(int id);
+
+    void createPedestrian(int id,
+                          IGeoPosition position,
+                          List<? extends IGeoPosition> routeToStation,
+                          List<? extends IGeoPosition> routeFromStation,
+                          boolean isTestPedestrian);
+
+    void updatePedestrian(int id, IGeoPosition position);
+
+    void pushPedestrianIntoBus(int id);
+
+    void pullPedestrianFromBus(int id, IGeoPosition position);
+
+    void killPedestrian(int id);
 }

@@ -1,4 +1,4 @@
-package web.message.payloads.infos;
+package web.message.payloads.infos.kill;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import web.message.payloads.AbstractPayload;

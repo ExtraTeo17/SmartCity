@@ -1,9 +1,8 @@
-package web.message.payloads.infos;
+package web.message.payloads.infos.update;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import web.message.payloads.AbstractPayload;
 import web.message.payloads.models.BusFillStateDto;
-import web.message.payloads.models.Location;
 
 public class UpdateBusFillStateInfo extends AbstractPayload {
     @JsonProperty("id")

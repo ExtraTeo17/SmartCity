@@ -1,18 +1,19 @@
-package web.message.payloads.infos;
+package web.message.payloads.infos.create;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import web.message.payloads.AbstractPayload;
 import web.message.payloads.models.Location;
 
-public class UpdateCarInfo extends AbstractPayload {
+public class CreateTroublePointInfo extends AbstractPayload {
     @JsonProperty("id")
     private final int id;
     @JsonProperty("location")
     private final Location location;
 
-    public UpdateCarInfo(int id,
-                         Location location) {
+    public CreateTroublePointInfo(int id, Location location) {
         this.id = id;
+
         this.location = location;
+
     }
 }

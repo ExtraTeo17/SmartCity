@@ -10,6 +10,7 @@ import events.web.bus.BusAgentDeadEvent;
 import events.web.bus.BusAgentFillStateUpdatedEvent;
 import events.web.bus.BusAgentStartedEvent;
 import events.web.bus.BusAgentUpdatedEvent;
+import events.web.pedestrian.*;
 import events.web.vehicle.VehicleAgentCreatedEvent;
 import events.web.vehicle.VehicleAgentDeadEvent;
 import events.web.vehicle.VehicleAgentRouteChangedEvent;
@@ -96,6 +97,34 @@ class Communicator {
     public void handle(BusAgentDeadEvent e) {
         onHandle(e);
         webService.killBus(e.id);
+    }
+
+    @Subscribe
+    public void handle(PedestrianAgentCreatedEvent e) {
+        webService.createPedestrian(e.id, e.position, e.routeToStation, e.routeFromStation, e.isTestPedestrian);
+    }
+
+    @Subscribe
+    public void handle(PedestrianAgentUpdatedEvent e) {
+        webService.updatePedestrian(e.id, e.position);
+    }
+
+    @Subscribe
+    public void handle(PedestrianAgentEnteredBusEvent e) {
+        onHandle(e);
+        webService.pushPedestrianIntoBus(e.id);
+    }
+
+    @Subscribe
+    public void handle(PedestrianAgentLeftBusEvent e) {
+        onHandle(e);
+        webService.pullPedestrianFromBus(e.id, e.position);
+    }
+
+    @Subscribe
+    public void handle(PedestrianAgentDeadEvent e) {
+        onHandle(e);
+        webService.killPedestrian(e.id);
     }
 
     private void onHandle(Object obj) {

@@ -4,13 +4,16 @@ import agents.AgentsModule;
 import com.google.common.eventbus.DeadEvent;
 import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
+import com.google.inject.Binder;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
+import com.google.inject.Singleton;
 import events.*;
 import events.web.*;
 import events.web.bus.*;
 import events.web.pedestrian.*;
 import events.web.vehicle.*;
+import gui.MapWindow;
 import jade.wrapper.ContainerController;
 import jade.wrapper.StaleProxyException;
 import org.junit.jupiter.api.Test;
@@ -28,6 +31,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.mockito.Mockito.mock;
 
 @SuppressWarnings("OverlyCoupledClass")
 class InjectorTests {
@@ -41,7 +45,13 @@ class InjectorTests {
                         new SharedModule(),
                         new LightsModule(),
                         new AgentsModule(),
-                        new GuiModule(),
+                        new AbstractModule() {
+                            @Override
+                            public void configure(Binder binder) {
+                                super.configure(binder);
+                                binder.bind(MapWindow.class).toInstance(mock(MapWindow.class));
+                            }
+                        },
                         new WebModule(4002),
                         new BusModule(),
                         new OsmModule(),
