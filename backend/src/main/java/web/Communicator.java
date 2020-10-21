@@ -111,13 +111,11 @@ class Communicator {
 
     @Subscribe
     public void handle(PedestrianAgentEnteredBusEvent e) {
-        onHandle(e);
         webService.pushPedestrianIntoBus(e.id);
     }
 
     @Subscribe
     public void handle(PedestrianAgentLeftBusEvent e) {
-        onHandle(e);
         webService.pullPedestrianFromBus(e.id, e.position);
     }
 

@@ -65,7 +65,7 @@ public class PedestrianAgent extends AbstractAgent {
                             break;
                         case PASSING_LIGHT:
                             print("Passing the light.");
-                            pedestrian.move();
+                            move();
                             pedestrian.setState(DrivingState.MOVING);
                             break;
                     }
@@ -94,7 +94,7 @@ public class PedestrianAgent extends AbstractAgent {
 
                             break;
                         case PASSING_STATION:
-                            pedestrian.move();
+                            move();
                             pedestrian.setState(DrivingState.MOVING);
                             break;
                     }
@@ -111,7 +111,7 @@ public class PedestrianAgent extends AbstractAgent {
                     doDelete();
                 }
                 else {
-                    pedestrian.move();
+                    move();
                 }
             }
         };
@@ -167,7 +167,7 @@ public class PedestrianAgent extends AbstractAgent {
 
                             // TODO: What's happening here? Why does he use teleportation?
                             while (!pedestrian.isAtStation() && !pedestrian.isAtDestination()) {
-                                pedestrian.move();
+                                move();
                             }
                         }
                         break;
