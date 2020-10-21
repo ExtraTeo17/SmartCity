@@ -143,7 +143,8 @@ class WebService implements IWebService {
         var location = Converter.convert(position);
         var routeToStationLocations = routeToStation.stream().map(Converter::convert).toArray(Location[]::new);
         var routeFromStationLocations = routeFromStation.stream().map(Converter::convert).toArray(Location[]::new);
-        var payload = new CreatePedestrianInfo(id, location, routeToStationLocations, routeFromStationLocations,
+        var payload = new CreatePedestrianInfo(id, location, routeFromStationLocations,
+                routeToStationLocations,
                 isTestPedestrian);
 
         webConnector.broadcastMessage(MessageType.CREATE_PEDESTRIAN_INFO, payload);
