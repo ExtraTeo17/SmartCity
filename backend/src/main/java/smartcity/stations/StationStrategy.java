@@ -83,7 +83,6 @@ public class StationStrategy {
         return arrivalInfos.removeIf(arrivalInfo -> arrivalInfo.agentName.equals(agentName));
     }
 
-
     public OptimizationResult requestBusesAndPeopleFreeToGo() {
         var result = new OptimizationResult();
         for (var entry : busAgentOnStationToArrivalTime.entrySet()) {
@@ -113,7 +112,11 @@ public class StationStrategy {
                 result.addBusAndPedestrianGrantedPassthrough(busLine, passengersThatCanLeave);
             }
             else if (actualTime.isBefore(scheduledTimeMinusWait)) {
-                logger.debug("------------------BUS TOO EARLY-----------------------");
+                // TODO: Maybe bus should send message to bus or sth? Or check if simulation_time.now() == scheduled.
+                //  I added it because bus was waiting indefinitely on station
+                List<String> passengersThatCanLeave = getPassengersWhoAreReadyToGo(busLine);
+                result.addBusAndPedestrianGrantedPassthrough(busLine, passengersThatCanLeave);
+                logger.debug("BUS TOO EARLY: scheduled: " + scheduledTimeMinusWait + ", actual: " + actualTime);
             }
             else {
                 logger.warn("Undetermined situation for line " + busLine + ", scheduledTime" + scheduledTime +
