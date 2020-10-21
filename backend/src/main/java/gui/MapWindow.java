@@ -170,7 +170,7 @@ public class MapWindow {
         setTimeSpinner.setModel(new SpinnerDateModel());
         JSpinner.DateEditor dateTimeEditor = new JSpinner.DateEditor(setTimeSpinner, "HH:mm:ss dd-MM-yyyy");
         setTimeSpinner.setEditor(dateTimeEditor);
-        var date = new Date(2020, 10, 14, 12, 15);
+        var date = new Date(2020, 10, 14, 12, 25);
         setTimeSpinner.setValue(date);
 
         //Left click event

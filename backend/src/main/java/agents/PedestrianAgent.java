@@ -165,9 +165,8 @@ public class PedestrianAgent extends AbstractAgent {
                             enterBus();
                             send(msg);
 
-                            // TODO: What's happening here? Why does he use teleportation?
                             while (!pedestrian.isAtStation() && !pedestrian.isAtDestination()) {
-                                move();
+                                pedestrian.move();
                             }
                         }
                         break;
