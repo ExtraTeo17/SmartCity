@@ -23,6 +23,11 @@ const switchLightsQueue = new Map();
 const busUpdateQueue = new Map();
 let start = window.performance.now();
 
+function dispatchFromMap(action, key, map) {
+  map.delete(key);
+  dispatch(action);
+}
+
 function update(now) {
   const elapsed = now - start;
 
@@ -30,11 +35,10 @@ function update(now) {
     // https://stackoverflow.com/a/19772220/6841224
     start = now - (elapsed % fpsInterval);
     batch(() => {
-      carUpdateQueue.forEach(action => dispatch(action));
-      switchLightsQueue.forEach(action => dispatch(action));
-      busUpdateQueue.forEach(action => dispatch(action));
+      carUpdateQueue.forEach(dispatchFromMap);
+      switchLightsQueue.forEach(dispatchFromMap);
+      busUpdateQueue.forEach(dispatchFromMap);
     });
-    switchLightsQueue.clear();
   }
 
   window.requestAnimationFrame(update);
@@ -42,12 +46,12 @@ function update(now) {
 
 function onDetectStartedSimulation() {
   batch(() => {
-    this.prepareSimulation([], [], []);
-    this.startSimulation(10);
+    Dispatcher.prepareSimulation([], [], []);
+    Dispatcher.startSimulation(10);
   });
 }
 
-export default {
+const Dispatcher = {
   prepareSimulation(lights, stations, buses) {
     dispatch(simulationPrepared({ lights, stations, buses }));
   },
@@ -103,5 +107,8 @@ export default {
 
   killBus(id) {
     dispatch(busKilled(id));
+    busUpdateQueue.delete(id);
   },
 };
+
+export default Dispatcher;
