@@ -7,6 +7,7 @@ import jade.core.behaviours.CyclicBehaviour;
 import jade.core.behaviours.TickerBehaviour;
 import jade.lang.acl.ACLMessage;
 import jade.util.leap.Properties;
+import org.javatuples.Pair;
 import org.jxmapviewer.JXMapViewer;
 import org.jxmapviewer.painter.Painter;
 import smartcity.ITimeProvider;
@@ -54,9 +55,41 @@ public class LightManagerAgent extends AbstractAgent {
 
             private void handleOptimizationResult(OptimizationResult result) {
                 List<String> agents = result.carsFreeToProceed();
+                handleTrafficJams(result);
                 for (String agentName : agents) {
                     answerCanProceed(agentName);
                 }
+
+            }
+
+            private void handleTrafficJams(OptimizationResult result) {
+
+                //TODO:CHANGE TO CROSSROAD
+             /*   for(Pair<Integer,Boolean> road : result.getTrafficJamsInfo())
+                {
+                    if(road.getValue1())
+                    {
+                        sendMessageAboutTroubleToVehicle(road);
+                    }
+                }*/
+            }
+
+            private void sendMessageAboutTroubleToVehicle(Pair<Integer, Boolean> road) {
+
+
+                    ACLMessage msg = createMessage(ACLMessage.REQUEST, TroubleManagerAgent.name);
+                    Properties properties = createProperties(MessageParameter.LIGHT);
+                    properties.setProperty(MessageParameter.TYPEOFTROUBLE,MessageParameter.TRAFFIC_JAMS);
+                    properties.setProperty(MessageParameter.TROUBLE, MessageParameter.SHOW);
+
+                  //  properties.setProperty(MessageParameter.TROUBLE_LAT, Double.toString(troublePoint.getLat()));
+                  //  properties.setProperty(MessageParameter.TROUBLE_LON, Double.toString(troublePoint.getLng()));
+
+                 //   properties.setProperty(MessageParameter.EDGE_ID, Long.toString(troublePoint.getInternalEdgeId()));
+                    msg.setAllUserDefinedParameters(properties);
+                    //print(" send message about trouble on " + Long.toString(troublePoint.getInternalEdgeId()));
+                    send(msg);
+
             }
 
             private void answerCanProceed(String carName) {

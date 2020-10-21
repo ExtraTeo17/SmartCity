@@ -21,6 +21,7 @@ class SimpleCrossroad implements ICrossroad {
     private final Logger logger;
     private final EventBus eventBus;
     private final int managerId;
+
     @SuppressWarnings("MismatchedQueryAndUpdateOfCollection")
     private final Map<Long, Light> wayIdToLightMap;
 
@@ -48,11 +49,19 @@ class SimpleCrossroad implements ICrossroad {
 
     private OptimizationResult allCarsOnGreen() {
         var result = new OptimizationResult();
+        int counter= 0;
+        int maxNumberOfCarsThatCanPass = 2;
         for (Light light : wayIdToLightMap.values()) {
             if (light.isGreen()) {
                 for (String carName : light.carQueue) {
-                    result.addCarGrantedPassthrough(carName);
+                    if(counter < maxNumberOfCarsThatCanPass) {
+                        counter++;
+                        result.addCarGrantedPassthrough(carName);
+                    }
                 }
+
+                //Nie wiem czy to miejsce jest najlepsze dla sprawdzenie korków
+
             }
             else {
                 for (String pedestrianName : light.pedestrianQueue) {
@@ -62,6 +71,8 @@ class SimpleCrossroad implements ICrossroad {
         }
         return result;
     }
+
+
 
     @Override
     public void draw(List<Painter<JXMapViewer>> painters) {

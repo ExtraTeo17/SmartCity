@@ -7,6 +7,7 @@ import java.util.List;
 
 public class OptimizationResult {
     private final List<String> carsFreeToProceedNames = new ArrayList<>();
+    //private final List<Pair<CROSSROAD, Boolean>> trafficJams = new ArrayList<>();
     private final List<Pair<String, List<String>>> busesAndPedestriansFreeToProceedNames = new ArrayList<>();
 
     public static OptimizationResult empty() {
@@ -28,4 +29,5 @@ public class OptimizationResult {
     public List<Pair<String, List<String>>> busesAndPedestriansFreeToProceed() {
         return busesAndPedestriansFreeToProceedNames;
     }
+   // public List<Pair<CROSSROAD, Boolean>> getTrafficJamsInfo(){return trafficJams; }
 }
