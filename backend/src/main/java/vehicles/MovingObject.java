@@ -86,6 +86,13 @@ public abstract class MovingObject {
 
         return uniformRoute.get(moveIndex);
     }
+    public RouteNode getCurrentRouteNode() {
+        if (moveIndex >= uniformRoute.size()) {
+            return uniformRoute.get(uniformRoute.size() - 1);
+        }
+
+        return uniformRoute.get(moveIndex);
+    }
 
     public RouteNode getPositionFarOnIndex(int index) {
         if (moveIndex >= uniformRoute.size()) {
@@ -179,6 +186,9 @@ public abstract class MovingObject {
         return ((closestLightIndex - moveIndex) * RoutingConstants.STEP_CONSTANT) / getSpeed();
     }
 
+    public int getMillisecondsFromAToB(int startIndex, int finishIndex) {
+        return ((startIndex - startIndex) * RoutingConstants.STEP_CONSTANT) / getSpeed();
+    }
     public List<RouteNode> getSimpleRoute() { return simpleRoute; }
 
 	public boolean currentTrafficLightNodeWithinAlternativeRouteThreshold(int thresholdUntilIndexChange) {
