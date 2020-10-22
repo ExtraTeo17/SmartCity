@@ -1,6 +1,6 @@
 package smartcity.lights.core;
 
-import agents.utilities.LightColor;
+import smartcity.lights.LightColor;
 import org.jxmapviewer.viewer.Waypoint;
 import org.jxmapviewer.viewer.WaypointPainter;
 

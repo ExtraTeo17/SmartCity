@@ -1,7 +1,7 @@
 package agents.utilities;
 
 import vehicles.MovingObject;
-import vehicles.VehicleType;
+import vehicles.enums.VehicleType;
 
 public class MessageParameter {
     public static final String TYPE = "type";

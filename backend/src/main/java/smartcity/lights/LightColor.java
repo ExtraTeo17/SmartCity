@@ -1,4 +1,4 @@
-package agents.utilities;
+package smartcity.lights;
 
 public enum LightColor {
     GREEN,

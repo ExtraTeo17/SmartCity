@@ -3,8 +3,8 @@ package agents;
 import agents.abstractions.AbstractAgent;
 import agents.utilities.MessageParameter;
 import com.google.common.eventbus.EventBus;
-import events.web.VehicleAgentRouteChangedEvent;
-import events.web.VehicleAgentUpdatedEvent;
+import events.web.vehicle.VehicleAgentRouteChangedEvent;
+import events.web.vehicle.VehicleAgentUpdatedEvent;
 import jade.core.behaviours.Behaviour;
 import jade.core.behaviours.CyclicBehaviour;
 import jade.core.behaviours.TickerBehaviour;
@@ -18,8 +18,9 @@ import routing.nodes.LightManagerNode;
 import routing.nodes.RouteNode;
 import smartcity.ITimeProvider;
 import smartcity.SmartCityAgent;
-import vehicles.DrivingState;
+import utilities.ConditionalExecutor;
 import vehicles.MovingObject;
+import vehicles.enums.DrivingState;
 
 import java.util.Arrays;
 import java.util.List;
@@ -135,12 +136,12 @@ public class VehicleAgent extends AbstractAgent {
                                 int indexAfterWhichRouteChange = vehicle.getFarOnIndex(THRESHOLD_UNTIL_INDEX_CHANGE);
 
                                 if (!vehicle.currentTrafficLightNodeWithinAlternativeRouteThreshold(THRESHOLD_UNTIL_INDEX_CHANGE)) {
-                                	sendRefusalMessageToLightManagerAfterRouteChange(THRESHOLD_UNTIL_INDEX_CHANGE);
+                                    sendRefusalMessageToLightManagerAfterRouteChange(THRESHOLD_UNTIL_INDEX_CHANGE);
                                 }
 
                                 var oldUniformRoute = vehicle.getUniformRoute();
 
-                                displayTheRoute(oldUniformRoute);
+                                ConditionalExecutor.trace(() -> displayTheRoute(oldUniformRoute));
 
                                 var newSimpleRouteEnd = routeGenerator.generateRouteInfo(routeCarOnThreshold,
                                         oldUniformRoute.get(oldUniformRoute.size() - 1));
@@ -152,8 +153,8 @@ public class VehicleAgent extends AbstractAgent {
                                         newSimpleRouteEnd);
                                 vehicle.setRoutes(mergeResult.mergedRoute, route);
 
-                                displayTheRoute(route);
-                                
+                                ConditionalExecutor.trace(() -> displayTheRoute(route));
+
                                 vehicle.switchToNextTrafficLight();
 
                                 eventBus.post(new VehicleAgentRouteChangedEvent(getId(), mergeResult.startNodes, routeCarOnThreshold,
@@ -168,21 +169,22 @@ public class VehicleAgent extends AbstractAgent {
             }
 
             private void displayTheRoute(List<RouteNode> uniformRoute) {
-				for (int i = 0; i < uniformRoute.size(); ++i) {
-					if (uniformRoute.get(i) instanceof LightManagerNode) {
-						System.out.print("LMN");
-					} else {
-						System.out.print("RN");
-					}
-					if (vehicle.moveIndex == i) {
-						System.out.print("+US");
-					}
-					System.out.print("  ");
-				}
-				System.out.println();
-			}
+                for (int i = 0; i < uniformRoute.size(); ++i) {
+                    if (uniformRoute.get(i) instanceof LightManagerNode) {
+                        System.out.print("LMN");
+                    }
+                    else {
+                        System.out.print("RN");
+                    }
+                    if (vehicle.getMoveIndex() == i) {
+                        System.out.print("+US");
+                    }
+                    System.out.print("  ");
+                }
+                System.out.println();
+            }
 
-			private void sendRefusalMessageToLightManagerAfterRouteChange(int howFar) {
+            private void sendRefusalMessageToLightManagerAfterRouteChange(int howFar) {
                 //change route, that is why send stop
                 LightManagerNode currentManager = vehicle.getCurrentTrafficLightNode();
                 if (currentManager != null) {
@@ -262,7 +264,6 @@ public class VehicleAgent extends AbstractAgent {
         addBehaviour(troubleGenerator);
         addBehaviour(troubleStopper);
     }
-
 
     public MovingObject getVehicle() {
         return vehicle;

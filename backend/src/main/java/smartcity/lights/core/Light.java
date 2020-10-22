@@ -1,12 +1,12 @@
 package smartcity.lights.core;
 
-import agents.utilities.LightColor;
 import gui.CustomWaypointRenderer;
 import org.jetbrains.annotations.NotNull;
 import org.jxmapviewer.viewer.DefaultWaypoint;
 import org.jxmapviewer.viewer.Waypoint;
 import org.jxmapviewer.viewer.WaypointPainter;
 import routing.core.Position;
+import smartcity.lights.LightColor;
 import smartcity.stations.ArrivalInfo;
 
 import java.time.LocalDateTime;

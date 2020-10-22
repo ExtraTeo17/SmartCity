@@ -1,6 +1,6 @@
 import React from "react";
-import { troublePointIcon } from "../../styles/icons";
 import { Marker, Popup } from "react-leaflet";
+import { troublePointIcon } from "../../styles/icons";
 
 const TroublePoint = props => {
   const { troublePoint } = props;
@@ -12,4 +12,4 @@ const TroublePoint = props => {
   );
 };
 
-export default TroublePoint;
+export default React.memo(TroublePoint);

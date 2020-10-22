@@ -1,6 +1,6 @@
 import React from "react";
-import { stationIcon } from "../../styles/icons";
 import { Marker, Popup } from "react-leaflet";
+import { stationIcon } from "../../styles/icons";
 
 const Station = props => {
   const { station } = props;
@@ -12,4 +12,4 @@ const Station = props => {
   );
 };
 
-export default Station;
+export default React.memo(Station);

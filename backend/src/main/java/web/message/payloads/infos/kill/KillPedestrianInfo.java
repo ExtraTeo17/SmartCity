@@ -1,11 +1,11 @@
-package web.message.payloads.infos;
+package web.message.payloads.infos.kill;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import web.message.payloads.AbstractPayload;
 
-public class KillCarInfo extends AbstractPayload {
+public class KillPedestrianInfo extends AbstractPayload {
     @JsonProperty("id")
     private final int id;
 
-    public KillCarInfo(int id) {this.id = id;}
+    public KillPedestrianInfo(int id) {this.id = id;}
 }
