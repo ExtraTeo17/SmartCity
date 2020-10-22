@@ -38,7 +38,7 @@ public class LightManagerAgent extends AbstractAgent {
         print("I'm a traffic manager.");
         crossroad.startLifetime();
 
-        var switchLights = new TickerBehaviour(this, 100 / TimeProvider.TIME_SCALE) {
+        var notifyCarAboutGreen = new TickerBehaviour(this, 1000) {//100 / TimeProvider.TIME_SCALE) {
             @Override
             protected void onTick() {
                 //for all Light check
@@ -64,7 +64,7 @@ public class LightManagerAgent extends AbstractAgent {
 
             private void handleTrafficJams(OptimizationResult result) {
 
-                //TODO:CHANGE TO CROSSROAD
+                //TODO: CHANGE TO CROSSROAD
              /*   for(Pair<Integer,Boolean> road : result.getTrafficJamsInfo())
                 {
                     if(road.getValue1())
@@ -72,6 +72,11 @@ public class LightManagerAgent extends AbstractAgent {
                         sendMessageAboutTroubleToVehicle(road);
                     }
                 }*/
+            	
+            	
+            	if (result.shouldNotifyCarAboutTrafficJamOnThisLight()) {
+            		// TODO: use result.getJammedLight(...)
+            	}
             }
 
             private void sendMessageAboutTroubleToVehicle(Pair<Integer, Boolean> road) {
@@ -192,7 +197,7 @@ public class LightManagerAgent extends AbstractAgent {
             }
         };
 
-        addBehaviour(switchLights);
+        addBehaviour(notifyCarAboutGreen);
         addBehaviour(communicate);
     }
 

@@ -18,7 +18,8 @@ import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 class SimpleCrossroad implements ICrossroad {
-    private final Logger logger;
+    private static final int TRAFFIC_JAM_THRESHOLD = 3;
+	private final Logger logger;
     private final EventBus eventBus;
     private final int managerId;
 
@@ -49,23 +50,20 @@ class SimpleCrossroad implements ICrossroad {
 
     private OptimizationResult allCarsOnGreen() {
         var result = new OptimizationResult();
-        int counter= 0;
-        int maxNumberOfCarsThatCanPass = 2;
         for (Light light : wayIdToLightMap.values()) {
             if (light.isGreen()) {
                 for (String carName : light.carQueue) {
-                    if(counter < maxNumberOfCarsThatCanPass) {
-                        counter++;
-                        result.addCarGrantedPassthrough(carName);
+                    result.addCarGrantedPassthrough(carName);
+                    if (light.carQueue.size() > TRAFFIC_JAM_THRESHOLD) {
+                    	result.setShouldNotifyCarAboutTrafficJamOnThisLight(light.getLat(), light.getLng());
                     }
+                    break;
                 }
-
-                //Nie wiem czy to miejsce jest najlepsze dla sprawdzenie korków
-
             }
             else {
                 for (String pedestrianName : light.pedestrianQueue) {
                     result.addCarGrantedPassthrough(pedestrianName);
+                    break;
                 }
             }
         }

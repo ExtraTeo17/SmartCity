@@ -323,8 +323,8 @@ public class VehicleAgent extends AbstractAgent {
 
         addBehaviour(move);
         addBehaviour(communication);
-        addBehaviour(troubleGenerator);
-        addBehaviour(troubleStopper);
+        //addBehaviour(troubleGenerator); // TODO: ADD TOGGLE FOR THIS FEATURE
+        //addBehaviour(troubleStopper);
     }
 
 
