@@ -18,6 +18,7 @@ import routing.nodes.LightManagerNode;
 import routing.nodes.RouteNode;
 import smartcity.ITimeProvider;
 import smartcity.SmartCityAgent;
+import utilities.ConditionalExecutor;
 import vehicles.MovingObject;
 import vehicles.enums.DrivingState;
 
@@ -140,7 +141,7 @@ public class VehicleAgent extends AbstractAgent {
 
                                 var oldUniformRoute = vehicle.getUniformRoute();
 
-                                displayTheRoute(oldUniformRoute);
+                                ConditionalExecutor.trace(() -> displayTheRoute(oldUniformRoute));
 
                                 var newSimpleRouteEnd = routeGenerator.generateRouteInfo(routeCarOnThreshold,
                                         oldUniformRoute.get(oldUniformRoute.size() - 1));
@@ -152,7 +153,7 @@ public class VehicleAgent extends AbstractAgent {
                                         newSimpleRouteEnd);
                                 vehicle.setRoutes(mergeResult.mergedRoute, route);
 
-                                displayTheRoute(route);
+                                ConditionalExecutor.trace(() -> displayTheRoute(route));
 
                                 vehicle.switchToNextTrafficLight();
 
