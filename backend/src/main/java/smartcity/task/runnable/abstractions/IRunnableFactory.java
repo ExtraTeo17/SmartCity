@@ -1,5 +1,7 @@
 package smartcity.task.runnable.abstractions;
 
+import java.util.List;
+import java.util.concurrent.ScheduledExecutorService;
 import java.util.function.BooleanSupplier;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
@@ -34,4 +36,6 @@ public interface IRunnableFactory {
     default IVariableExecutionRunnable createDelay(Supplier<Integer> delayRunnable) {
         return createDelay(delayRunnable, 0, false);
     }
+
+    List<ScheduledExecutorService> clearAllExecutors();
 }

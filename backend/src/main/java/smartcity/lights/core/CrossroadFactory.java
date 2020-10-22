@@ -1,6 +1,6 @@
 package smartcity.lights.core;
 
-import agents.utilities.LightColor;
+import smartcity.lights.LightColor;
 import com.google.common.eventbus.EventBus;
 import com.google.inject.Inject;
 import org.w3c.dom.Node;

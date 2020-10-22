@@ -8,6 +8,7 @@ import routing.core.IGeoPosition;
 import routing.nodes.LightManagerNode;
 import routing.nodes.RouteNode;
 import smartcity.TimeProvider;
+import vehicles.enums.DrivingState;
 
 import java.util.List;
 
@@ -18,7 +19,7 @@ public abstract class MovingObject {
     final int speed;
     List<RouteNode> simpleRoute;
     List<RouteNode> uniformRoute;
-    public int moveIndex;
+    int moveIndex;
     int closestLightIndex;
     DrivingState state;
 
@@ -43,6 +44,10 @@ public abstract class MovingObject {
         this.state = DrivingState.STARTING;
     }
 
+    public int getAgentId() {
+        return agentId;
+    }
+
     /**
      * @return Scaled speed in KM/H
      */
@@ -55,6 +60,10 @@ public abstract class MovingObject {
         if (moveIndex > uniformRoute.size()) {
             throw new ArrayIndexOutOfBoundsException("MovingObject exceeded its route: " + moveIndex + "/" + uniformRoute.size());
         }
+    }
+
+    public int getMoveIndex() {
+        return moveIndex;
     }
 
     public void setRoutes(final List<RouteNode> simpleRoute, final List<RouteNode> uniformRoute) {
@@ -153,10 +162,12 @@ public abstract class MovingObject {
         while (!(uniformRoute.get(index) instanceof LightManagerNode)) {
             --index;
         }
-        /*if (index > moveIndex) {
-            logger.warn("I was moving backwards!");
-        }*/
+
         return ((LightManagerNode) uniformRoute.get(index)).getAdjacentWayId();
+    }
+
+    public long getAdjacentOsmWayId(){
+        return getAdjacentOsmWayId(0);
     }
 
     public boolean isAtDestination() {
@@ -179,8 +190,6 @@ public abstract class MovingObject {
         return ((startIndex - startIndex) * RoutingConstants.STEP_CONSTANT) / getSpeed();
     }
     public List<RouteNode> getSimpleRoute() { return simpleRoute; }
-
-    public abstract long getAdjacentOsmWayId();
 
 	public boolean currentTrafficLightNodeWithinAlternativeRouteThreshold(int thresholdUntilIndexChange) {
 		return moveIndex + thresholdUntilIndexChange >= closestLightIndex;

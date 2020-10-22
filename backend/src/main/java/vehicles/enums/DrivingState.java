@@ -1,4 +1,4 @@
-package vehicles;
+package vehicles.enums;
 
 public enum DrivingState {
     STARTING,

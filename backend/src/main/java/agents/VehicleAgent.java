@@ -3,8 +3,8 @@ package agents;
 import agents.abstractions.AbstractAgent;
 import agents.utilities.MessageParameter;
 import com.google.common.eventbus.EventBus;
-import events.web.VehicleAgentRouteChangedEvent;
-import events.web.VehicleAgentUpdatedEvent;
+import events.web.vehicle.VehicleAgentRouteChangedEvent;
+import events.web.vehicle.VehicleAgentUpdatedEvent;
 import jade.core.behaviours.Behaviour;
 import jade.core.behaviours.CyclicBehaviour;
 import jade.core.behaviours.TickerBehaviour;
@@ -18,8 +18,9 @@ import routing.nodes.LightManagerNode;
 import routing.nodes.RouteNode;
 import smartcity.ITimeProvider;
 import smartcity.SmartCityAgent;
-import vehicles.DrivingState;
+import utilities.ConditionalExecutor;
 import vehicles.MovingObject;
+import vehicles.enums.DrivingState;
 
 import java.time.LocalDateTime;
 import java.util.Arrays;
@@ -127,26 +128,19 @@ public class VehicleAgent extends AbstractAgent {
                         }
                         case ACLMessage.AGREE -> vehicle.setState(DrivingState.WAITING_AT_LIGHT);
                         case ACLMessage.PROPOSE -> {
-                            if(rcv.getUserDefinedParameter(MessageParameter.TYPEOFTROUBLE).equals(MessageParameter.CONSTRUCTION)) {
+                            if (rcv.getUserDefinedParameter(MessageParameter.TYPEOFTROUBLE).equals(MessageParameter.CONSTRUCTION)) {
                                  handleConstruction(rcv);
-
-                            }
-                            else if (rcv.getUserDefinedParameter(MessageParameter.TYPEOFTROUBLE).equals(MessageParameter.TRAFFIC_JAMS))
-                            {
-                                if(rcv.getSender().getLocalName().equals(MessageParameter.TROUBLE_MANAGER))
-                                {
+                            } else if (rcv.getUserDefinedParameter(MessageParameter.TYPEOFTROUBLE).equals(MessageParameter.TRAFFIC_JAMS)) {
+                                if (rcv.getSender().getLocalName().equals(MessageParameter.TROUBLE_MANAGER)) {
                                     handleTrafficJamsFromTroubleManager(rcv);
-                                }
-                                else{
+                                } else {
                                     handleTrafficJamsFromLightManager(rcv);
                                 }
                             }
-
                         }
                     }
                 }
                 block(100);
-
             }
 
             private void handleTrafficJamsFromLightManager(ACLMessage rcv) {
@@ -154,18 +148,19 @@ public class VehicleAgent extends AbstractAgent {
                 logger.info("INTERNAL EDGE ID WHEN light manger asked"+currentInternalID);
                 sendMessageAboutTrafficJamTrouble(currentInternalID);
             }
+          
             private void sendMessageAboutTrafficJamTrouble(int currentInternalID) {
 
                 ACLMessage msg = createMessage(ACLMessage.INFORM, TroubleManagerAgent.name);
                 Properties properties = createProperties(MessageParameter.VEHICLE);
                 properties.setProperty(MessageParameter.TYPEOFTROUBLE,MessageParameter.TRAFFIC_JAMS);
                 properties.setProperty(MessageParameter.TROUBLE, MessageParameter.SHOW);
-
                 properties.setProperty(MessageParameter.EDGE_ID, Long.toString(currentInternalID));
                 msg.setAllUserDefinedParameters(properties);
                 print(" send message about trouble on " + Long.toString(currentInternalID));
                 send(msg);
             }
+          
             private void handleTrafficJamsFromTroubleManager(ACLMessage rcv) {
 
                 int howLongTakesJam = Integer.parseInt(rcv.getUserDefinedParameter(MessageParameter.LENGTH_OF_JAM));
@@ -243,8 +238,6 @@ public class VehicleAgent extends AbstractAgent {
                             newSimpleRouteEnd));
                 }
             }
-
-
 
 			private void sendRefusalMessageToLightManagerAfterRouteChange(int howFar) {
                 //change route, that is why send stop
@@ -326,7 +319,6 @@ public class VehicleAgent extends AbstractAgent {
         //addBehaviour(troubleGenerator); // TODO: ADD TOGGLE FOR THIS FEATURE
         //addBehaviour(troubleStopper);
     }
-
 
     public MovingObject getVehicle() {
         return vehicle;

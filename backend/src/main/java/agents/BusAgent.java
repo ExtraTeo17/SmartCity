@@ -4,6 +4,7 @@ import agents.abstractions.AbstractAgent;
 import agents.utilities.LoggerLevel;
 import agents.utilities.MessageParameter;
 import com.google.common.eventbus.EventBus;
+import events.web.bus.BusAgentUpdatedEvent;
 import jade.core.behaviours.Behaviour;
 import jade.core.behaviours.CyclicBehaviour;
 import jade.core.behaviours.TickerBehaviour;
@@ -19,7 +20,7 @@ import smartcity.SmartCityAgent;
 import utilities.ConditionalExecutor;
 import utilities.Siblings;
 import vehicles.Bus;
-import vehicles.DrivingState;
+import vehicles.enums.DrivingState;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -80,7 +81,7 @@ public class BusAgent extends AbstractAgent {
                             break;
                         case PASSING_LIGHT:
                             print("Passing the light.");
-                            bus.move();
+                            move();
                             bus.setState(DrivingState.MOVING);
                             break;
                     }
@@ -133,7 +134,7 @@ public class BusAgent extends AbstractAgent {
                             informNextStation();
 
                             bus.setState(DrivingState.MOVING);
-                            bus.move();
+                            move();
                             break;
                     }
                 }
@@ -149,7 +150,7 @@ public class BusAgent extends AbstractAgent {
                     doDelete();
                 }
                 else {
-                    bus.move();
+                    move();
                 }
             }
         };
@@ -283,8 +284,13 @@ public class BusAgent extends AbstractAgent {
         return bus;
     }
 
-    public final String getLine() {
+    public String getLine() {
         return bus.getLine();
+    }
+
+    public void move() {
+        bus.move();
+        eventBus.post(new BusAgentUpdatedEvent(this.getId(), bus.getPosition()));
     }
 
     // TODO: Fix situation where bus route contains only one station and pedestrians tries to choose two
@@ -305,13 +311,18 @@ public class BusAgent extends AbstractAgent {
                 print("Stopping!");
                 return true;
             }
+            return false;
         }
 
-        if (bus.shouldStart()) {
-            print("Running!");
+        if (shouldStart()) {
+            print("Running, state: " + this.getAgentState().getName() + ", isAlive: " + isAlive());
             start();
         }
 
         return false;
+    }
+
+    public boolean shouldStart() {
+        return bus.shouldStart();
     }
 }
