@@ -164,7 +164,7 @@ public class VehicleAgent extends AbstractAgent {
             private void handleTrafficJamsFromTroubleManager(ACLMessage rcv) {
 
                 int howLongTakesJam = Integer.parseInt(rcv.getUserDefinedParameter(MessageParameter.LENGTH_OF_JAM));
-                int timeForTheEndWithoutJam = vehicle.getMillisecondsFromAToB(vehicle.moveIndex,vehicle.getUniformRoute().size()-1);
+                int timeForTheEndWithoutJam = vehicle.getMillisecondsFromAToB(vehicle.getMoveIndex(),vehicle.getUniformRoute().size()-1);
                 int timeForTheEndWithJam = timeForTheEndWithoutJam + howLongTakesJam;
                 Long edgeId = Long.parseLong(rcv.getUserDefinedParameter(MessageParameter.EDGE_ID));
                 logger.info("  GOT PROPOSE TO CHANGE THE ROUTE. AND EXCLUDE: " + edgeId);
@@ -179,7 +179,7 @@ public class VehicleAgent extends AbstractAgent {
                     var newRouteAfterChangeIndex = routeTransformer.uniformRoute(newSimpleRouteEnd);
                     var route = oldUniformRoute.subList(0, indexAfterWhichRouteChange);
                     route.addAll(newRouteAfterChangeIndex);
-                    timeForOfDynamicRoute = vehicle.getMillisecondsFromAToB(vehicle.moveIndex,route.size()-1);
+                    timeForOfDynamicRoute = vehicle.getMillisecondsFromAToB(vehicle.getMoveIndex(),route.size()-1);
                     logger.info("TIME of route with jam: " + timeForTheEndWithJam + " TIME of dynamic route:" + timeForOfDynamicRoute );
 
                     if(timeForTheEndWithJam> timeForOfDynamicRoute) {
