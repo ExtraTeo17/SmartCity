@@ -37,31 +37,33 @@ const Menu = props => {
     <div>
       <PrepareMenu />
       <form className="form-border">
-        <div className="form-group">
-          <label htmlFor="carsNum">Cars limit</label>
-          <input
-            type="number"
-            defaultValue={carsNum}
-            className="form-control"
-            id="carsNum"
-            min={CAR_MIN}
-            max={CAR_MAX}
-            placeholder="Enter limit for cars"
-            onChange={e => setCarsNum(e.target.value)}
-          />
-        </div>
-        <div className="form-group">
-          <label htmlFor="testCarNum">Test car number</label>
-          <input
-            type="number"
-            defaultValue={testCarNum}
-            className="form-control"
-            id="testCarNum"
-            min={1}
-            max={1000}
-            placeholder="Enter test car number"
-            onChange={e => setTestCarNum(e.target.value)}
-          />
+        <div className="form-row">
+          <div className="form-group col-md-6">
+            <label htmlFor="carsNum">Cars limit</label>
+            <input
+              type="number"
+              defaultValue={carsNum}
+              className="form-control"
+              id="carsNum"
+              min={CAR_MIN}
+              max={CAR_MAX}
+              placeholder="Enter limit for cars"
+              onChange={e => setCarsNum(e.target.value)}
+            />
+          </div>
+          <div className="form-grou col-md-6">
+            <label htmlFor="testCarNum">Test car number</label>
+            <input
+              type="number"
+              defaultValue={testCarNum}
+              className="form-control"
+              id="testCarNum"
+              min={1}
+              max={1000}
+              placeholder="Enter test car number"
+              onChange={e => setTestCarNum(e.target.value)}
+            />
+          </div>
         </div>
         <div className="form-check user-select-none">
           <input

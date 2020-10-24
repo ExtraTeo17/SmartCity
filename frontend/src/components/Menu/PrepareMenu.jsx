@@ -47,34 +47,36 @@ const PrepareMenu = props => {
 
   return (
     <form className="mb-4 form-border">
-      <div className="form-group">
-        <label htmlFor="lat">Latitude </label>
-        <input
-          type="number"
-          value={lat}
-          className="form-control"
-          id="lat"
-          step="0.0001"
-          min={latMin}
-          max={latMax}
-          placeholder="Enter latitude"
-          onChange={e => setLat(parseFloat(e.target.value))}
-        />
-      </div>
+      <div className="form-row">
+        <div className="form-group col-md-6">
+          <label htmlFor="lat">Latitude </label>
+          <input
+            type="number"
+            value={lat}
+            className="form-control"
+            id="lat"
+            step="0.0001"
+            min={latMin}
+            max={latMax}
+            placeholder="Enter latitude"
+            onChange={e => setLat(parseFloat(e.target.value))}
+          />
+        </div>
 
-      <div className="form-group">
-        <label htmlFor="lng">Longitude</label>
-        <input
-          type="number"
-          value={lng}
-          className="form-control"
-          id="lng"
-          step="0.0001"
-          min={lngMin}
-          max={lngMax}
-          placeholder="Enter longitude"
-          onChange={e => setLng(parseFloat(e.target.value))}
-        />
+        <div className="form-group col-md-6">
+          <label htmlFor="lng">Longitude</label>
+          <input
+            type="number"
+            value={lng}
+            className="form-control"
+            id="lng"
+            step="0.0001"
+            min={lngMin}
+            max={lngMax}
+            placeholder="Enter longitude"
+            onChange={e => setLng(parseFloat(e.target.value))}
+          />
+        </div>
       </div>
       <div className="form-group">
         <label htmlFor="rad">Radius</label>
