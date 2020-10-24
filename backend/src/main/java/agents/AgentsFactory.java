@@ -14,6 +14,7 @@ import routing.abstractions.IRouteTransformer;
 import routing.nodes.RouteNode;
 import routing.nodes.StationNode;
 import smartcity.ITimeProvider;
+import smartcity.config.ConfigContainer;
 import smartcity.lights.abstractions.ICrossroadFactory;
 import smartcity.stations.StationStrategy;
 import vehicles.*;
@@ -29,6 +30,8 @@ class AgentsFactory implements IAgentsFactory {
     private final IRouteGenerator routeGenerator;
     private final ICrossroadFactory crossroadFactory;
     private final EventBus eventBus;
+    private final ConfigContainer configContainer;
+
     //TODO: GET from GUI;
     private final int timeBeforeTrouble = 5000;
 
@@ -38,13 +41,15 @@ class AgentsFactory implements IAgentsFactory {
                          ITimeProvider timeProvider,
                          IRouteTransformer routeTransformer,
                          ICrossroadFactory crossroadFactory,
-                         IRouteGenerator routeGenerator) {
+                         IRouteGenerator routeGenerator,
+                         ConfigContainer configContainer) {
         this.idGenerator = idGenerator;
         this.timeProvider = timeProvider;
         this.routeTransformer = routeTransformer;
         this.crossroadFactory = crossroadFactory;
         this.eventBus = eventBus;
         this.routeGenerator = routeGenerator;
+        this.configContainer = configContainer;
     }
 
     @Override
@@ -57,7 +62,15 @@ class AgentsFactory implements IAgentsFactory {
             car = new TestCar(car, timeProvider);
         }
 
-        return new VehicleAgent(id, car, timeBeforeTrouble, timeProvider, routeGenerator, routeTransformer, eventBus);
+        VehicleAgent agent;
+        if (configContainer.shouldGenerateTroublePoints()) {
+            agent = new VehicleAgent(id, car, timeBeforeTrouble, timeProvider, routeGenerator, routeTransformer, eventBus);
+        }
+        else {
+            agent = new VehicleAgent(id, car, timeProvider, eventBus);
+        }
+
+        return agent;
     }
 
     @Override

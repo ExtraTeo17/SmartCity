@@ -36,10 +36,11 @@ public class Scheduler {
     @Subscribe
     public void handle(StartSimulationEvent e) {
         activateLightManagerAgents();
-        if (configContainer.shouldGenerateCars()) {
+        if (e.shouldGenerateCars) {
+            configContainer.setGenerateTroublePoints(e.shouldGenerateTroublePoints);
             taskManager.scheduleCarCreation(e.carsNum, e.testCarId);
         }
-        if (configContainer.shouldGeneratePedestriansAndBuses()) {
+        if (e.shouldGeneratePedestrians) {
             // TODO: Add pedestrians limit and testPedestrianID
             taskManager.schedulePedestrianCreation(50, e.testCarId);
             taskManager.scheduleBusControl(() -> configContainer.getSimulationState() == SimulationState.RUNNING);
@@ -65,7 +66,7 @@ public class Scheduler {
     }
 
     @Subscribe
-    public void handle(ClearSimulationEvent e){
+    public void handle(ClearSimulationEvent e) {
         taskManager.cancelAll();
     }
 }

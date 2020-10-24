@@ -13,6 +13,8 @@ public class ConfigContainer extends ConfigMutator
     private SimulationState simulationState = SimulationState.INITIAL;
     private boolean shouldGeneratePedestriansAndBuses = false;
     private boolean shouldGenerateCars = true;
+    private boolean shouldGenerateTroublePoints = true;
+
     private boolean lightManagersLock = false;
     private boolean isLightStrategyActive = true;
     private int extendTimeSeconds = 30;
@@ -109,5 +111,13 @@ public class ConfigContainer extends ConfigMutator
 
     public int getExtendTimeSeconds() {
         return extendTimeSeconds;
+    }
+
+    public boolean shouldGenerateTroublePoints() {
+        return shouldGenerateTroublePoints;
+    }
+
+    public void setGenerateTroublePoints(boolean shouldGenerateTroublePoints) {
+        this.shouldGenerateTroublePoints = shouldGenerateTroublePoints;
     }
 }

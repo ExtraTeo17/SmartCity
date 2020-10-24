@@ -47,6 +47,7 @@
     ],
     "object-curly-spacing": 2,
     "object-curly-newline": 0,
+    "react/jsx-curly-newline": 0,
     "no-plusplus": 0,
     "camelcase": 1,
     "arrow-parens": 0,

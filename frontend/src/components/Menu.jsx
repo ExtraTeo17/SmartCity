@@ -22,6 +22,9 @@ const Menu = props => {
 
   const [carsNum, setCarsNum] = useState(DEFAULT_CARS_NUM);
   const [testCarNum, setTestCarNum] = useState(DEFAULT_TEST_CAR);
+  const [generateCars, setGenerateCars] = useState(true);
+  const [generatePedestrians, setGeneratePedestrians] = useState(true);
+  const [generateTroublePoints, setGenerateTroublePoints] = useState(true);
 
   const latMin = -90;
   const latMax = 90;
@@ -32,9 +35,6 @@ const Menu = props => {
   const carMin = 1;
   const carMax = 50;
 
-  /**
-   * @param {number} val
-   */
   const setLat = val => {
     if (!isNaN(val) && val >= latMin && val <= latMax) {
       const center = { ...props.center, lat: val };
@@ -42,9 +42,6 @@ const Menu = props => {
     }
   };
 
-  /**
-   * @param {number} val
-   */
   const setLng = val => {
     if (!isNaN(val) && val >= lngMin && val <= lngMax) {
       const center = { ...props.center, lng: val };
@@ -52,14 +49,21 @@ const Menu = props => {
     }
   };
 
-  /**
-   * @param {number} val
-   */
   const setRad = val => {
     if (!isNaN(val) && val >= radMin && val <= radMax) {
       const center = { ...props.center, rad: val };
       dispatch(centerUpdated(center));
     }
+  };
+
+  const startSimulation = () => {
+    ApiManager.startSimulation({
+      carsNum,
+      testCarNum,
+      generateCars,
+      generatePedestrians,
+      generateTroublePoints: generateCars && generateTroublePoints,
+    });
   };
 
   return (
@@ -108,15 +112,19 @@ const Menu = props => {
             onChange={e => setRad(parseFloat(e.target.value))}
           />
         </div>
-        <button
-          className="btn btn-primary"
-          disabled={wasStarted}
-          title={wasStarted ? "Simulation already started!" : wasPrepared ? "Simulation already prepared!" : "Prepare simulation"}
-          type="button"
-          onClick={() => ApiManager.prepareSimulation({ lat, lng, rad })}
-        >
-          Prepare simulation
-        </button>
+        <div className="center-wrapper">
+          <button
+            className="btn btn-primary"
+            disabled={wasStarted}
+            title={
+              wasStarted ? "Simulation already started!" : wasPrepared ? "Simulation already prepared!" : "Prepare simulation"
+            }
+            type="button"
+            onClick={() => ApiManager.prepareSimulation({ lat, lng, rad })}
+          >
+            Prepare simulation
+          </button>
+        </div>
       </form>
       <form className="form-border">
         <div className="form-group">
@@ -145,21 +153,60 @@ const Menu = props => {
             onChange={e => setTestCarNum(parseInt(e.target.value, 10))}
           />
         </div>
-        <button
-          className="btn btn-success"
-          disabled={wasStarted || !wasPrepared}
-          title={
-            wasStarted
-              ? "Simulation already started"
-              : wasPrepared
-              ? "Simulation is ready to run"
-              : "You must prepare simulation!"
-          }
-          type="button"
-          onClick={() => ApiManager.startVehicles({ carsNum, testCarNum })}
-        >
-          Start simulation
-        </button>
+        <div className="form-check">
+          <input
+            type="checkbox"
+            checked={generateCars}
+            className="form-check-input"
+            id="generateCars"
+            onChange={e => setGenerateCars(e.target.checked)}
+          />
+          <label htmlFor="generateCars" className="form-check-label">
+            Generate cars
+          </label>
+        </div>
+        <div className="form-check">
+          <input
+            type="checkbox"
+            checked={generatePedestrians}
+            className="form-check-input"
+            id="generatePedestrians"
+            onChange={e => setGeneratePedestrians(e.target.checked)}
+          />
+          <label htmlFor="generatePedestrians" className="form-check-label">
+            Generate pedestrians
+          </label>
+        </div>
+        <div className="form-check">
+          <input
+            type="checkbox"
+            checked={generateTroublePoints}
+            disabled={!generateCars}
+            className="form-check-input"
+            id="generateTroublePoints"
+            onChange={e => setGenerateTroublePoints(e.target.checked)}
+          />
+          <label htmlFor="generateTroublePoints" className="form-check-label">
+            Generate trouble points
+          </label>
+        </div>
+        <div className="center-wrapper">
+          <button
+            className="btn btn-success mt-3"
+            disabled={wasStarted || !wasPrepared}
+            title={
+              wasStarted
+                ? "Simulation already started"
+                : wasPrepared
+                ? "Simulation is ready to run"
+                : "You must prepare simulation!"
+            }
+            type="button"
+            onClick={startSimulation}
+          >
+            Start simulation
+          </button>
+        </div>
       </form>
     </div>
   );

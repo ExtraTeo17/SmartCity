@@ -16,12 +16,17 @@ export default {
     WebServer.send(msg);
   },
 
-  startVehicles({ carsNum, testCarNum } = { carsNum: 0, testCarNum: 0 }) {
+  startSimulation(
+    { carsNum, testCarNum, generateCars, generatePedestrians, generateTroublePoints } = { carsNum: 0, testCarNum: 0 }
+  ) {
     const msg = {
       type: START_SIMULATION_REQUEST,
       payload: {
-        carsNum: carsNum,
+        carsNum,
         testCarId: testCarNum,
+        generateCars,
+        generatePedestrians,
+        generateTroublePoints,
       },
     };
     WebServer.send(msg);

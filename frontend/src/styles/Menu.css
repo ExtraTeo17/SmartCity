@@ -2,3 +2,7 @@
   border: 1px dotted bisque;
   padding: 1em;
 }
+
+.center-wrapper {
+  text-align: center;
+}

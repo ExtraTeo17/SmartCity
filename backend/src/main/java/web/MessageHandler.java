@@ -48,7 +48,8 @@ class MessageHandler {
                 var payload = tryDeserialize(message.payload, StartSimulationRequest.class);
                 if (payload.isPresent()) {
                     var pVal = payload.get();
-                    eventBus.post(new StartSimulationEvent(pVal.carsNum, pVal.testCarId));
+                    eventBus.post(new StartSimulationEvent(pVal.carsNum, pVal.testCarId, pVal.generateCars, pVal.generatePedestrians,
+                            pVal.generateTroublePoints));
                 }
             }
         }

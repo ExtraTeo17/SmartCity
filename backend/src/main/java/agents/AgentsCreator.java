@@ -96,7 +96,6 @@ public class AgentsCreator {
         }
     }
 
-    // TODO: Send clearSimulationEvent and handle simulationClearedEvent to continue - tasks should be cancelled
     private void clear() {
         eventBus.post(new ClearSimulationEvent());
         agentsContainer.clearAll();

@@ -51,6 +51,16 @@ public class VehicleAgent extends AbstractAgent {
         this.routeTransformer = routeTransformer;
     }
 
+    VehicleAgent(int id, MovingObject vehicle,
+                 ITimeProvider timeProvider,
+                 EventBus eventBus) {
+        super(id, vehicle.getVehicleType(), timeProvider, eventBus);
+        this.vehicle = vehicle;
+        this.timeBeforeAccident = -1;
+        this.routeGenerator = null;
+        this.routeTransformer = null;
+    }
+
     @Override
     protected void setup() {
         informLightManager(vehicle);
@@ -248,72 +258,74 @@ public class VehicleAgent extends AbstractAgent {
             }
         };
 
-        Behaviour troubleGenerator = new TickerBehaviour(this, this.timeBeforeAccident) {
-            @Override
-            public void onTick() {
-                var route = vehicle.getUniformRoute();
-
-                //TODO: from current index
-                //choose trouble EdgeId
-                var el = random.nextInt(route.size());
-                RouteNode troublePointTmp = route.get(el);
-                troublePoint = new RouteNode(troublePointTmp.getLat(), troublePointTmp.getLng(),
-                        troublePointTmp.getInternalEdgeId());
-
-                //send message to boss Agent
-                sendMessageAboutConstructionTrouble();
-
-                ExtendedGraphHopper.addForbiddenEdges(Arrays.asList(troublePoint.getInternalEdgeId()));
-                stop();
-            }
-
-            private void sendMessageAboutConstructionTrouble() {
-
-                ACLMessage msg = createMessage(ACLMessage.INFORM, TroubleManagerAgent.name);
-                Properties properties = createProperties(MessageParameter.VEHICLE);
-                properties.setProperty(MessageParameter.TYPEOFTROUBLE, MessageParameter.CONSTRUCTION);
-                properties.setProperty(MessageParameter.TROUBLE, MessageParameter.SHOW);
-                properties.setProperty(MessageParameter.TROUBLE_LAT, Double.toString(troublePoint.getLat()));
-                properties.setProperty(MessageParameter.TROUBLE_LON, Double.toString(troublePoint.getLng()));
-
-                properties.setProperty(MessageParameter.EDGE_ID, Long.toString(troublePoint.getInternalEdgeId()));
-                msg.setAllUserDefinedParameters(properties);
-                print(" send message about trouble on " + Long.toString(troublePoint.getInternalEdgeId()));
-                send(msg);
-            }
-
-
-        };
-
-        Behaviour troubleStopper = new TickerBehaviour(this, 3 * this.timeBeforeAccident) {
-            @Override
-            public void onTick() {
-
-                sendMessageAboutTroubleStop(MessageParameter.CONSTRUCTION);
-                ExtendedGraphHopper.removeForbiddenEdges(Arrays.asList(troublePoint.getInternalEdgeId()));
-                stop();
-            }
-
-            private void sendMessageAboutTroubleStop(String type) {
-
-                ACLMessage msg = createMessage(ACLMessage.INFORM, TroubleManagerAgent.name);
-                Properties properties = createProperties(MessageParameter.VEHICLE);
-                properties.setProperty(MessageParameter.TROUBLE, MessageParameter.STOP);
-                properties.setProperty(MessageParameter.TYPEOFTROUBLE, type);
-                properties.setProperty(MessageParameter.TROUBLE_LAT, Double.toString(troublePoint.getLat()));
-                properties.setProperty(MessageParameter.TROUBLE_LON, Double.toString(troublePoint.getLng()));
-                properties.setProperty(MessageParameter.EDGE_ID, Long.toString(troublePoint.getInternalEdgeId()));
-                msg.setAllUserDefinedParameters(properties);
-                print(" send message about trouble stop on " + Long.toString(troublePoint.getInternalEdgeId()));
-                send(msg);
-            }
-
-        };
-
         addBehaviour(move);
         addBehaviour(communication);
-        //addBehaviour(troubleGenerator); // TODO: ADD TOGGLE FOR THIS FEATURE
-        //addBehaviour(troubleStopper);
+
+        if (this.timeBeforeAccident > 0) {
+            Behaviour troubleGenerator = new TickerBehaviour(this, this.timeBeforeAccident) {
+                @Override
+                public void onTick() {
+                    var route = vehicle.getUniformRoute();
+
+                    //TODO: from current index
+                    //choose trouble EdgeId
+                    var el = random.nextInt(route.size());
+                    RouteNode troublePointTmp = route.get(el);
+                    troublePoint = new RouteNode(troublePointTmp.getLat(), troublePointTmp.getLng(),
+                            troublePointTmp.getInternalEdgeId());
+
+                    //send message to boss Agent
+                    sendMessageAboutConstructionTrouble();
+
+                    ExtendedGraphHopper.addForbiddenEdges(Arrays.asList(troublePoint.getInternalEdgeId()));
+                    stop();
+                }
+
+                private void sendMessageAboutConstructionTrouble() {
+
+                    ACLMessage msg = createMessage(ACLMessage.INFORM, TroubleManagerAgent.name);
+                    Properties properties = createProperties(MessageParameter.VEHICLE);
+                    properties.setProperty(MessageParameter.TYPEOFTROUBLE, MessageParameter.CONSTRUCTION);
+                    properties.setProperty(MessageParameter.TROUBLE, MessageParameter.SHOW);
+                    properties.setProperty(MessageParameter.TROUBLE_LAT, Double.toString(troublePoint.getLat()));
+                    properties.setProperty(MessageParameter.TROUBLE_LON, Double.toString(troublePoint.getLng()));
+
+                    properties.setProperty(MessageParameter.EDGE_ID, Long.toString(troublePoint.getInternalEdgeId()));
+                    msg.setAllUserDefinedParameters(properties);
+                    print(" send message about trouble on " + Long.toString(troublePoint.getInternalEdgeId()));
+                    send(msg);
+                }
+
+
+            };
+            Behaviour troubleStopper = new TickerBehaviour(this, 3 * this.timeBeforeAccident) {
+                @Override
+                public void onTick() {
+
+                    sendMessageAboutTroubleStop(MessageParameter.CONSTRUCTION);
+                    ExtendedGraphHopper.removeForbiddenEdges(Arrays.asList(troublePoint.getInternalEdgeId()));
+                    stop();
+                }
+
+                private void sendMessageAboutTroubleStop(String type) {
+
+                    ACLMessage msg = createMessage(ACLMessage.INFORM, TroubleManagerAgent.name);
+                    Properties properties = createProperties(MessageParameter.VEHICLE);
+                    properties.setProperty(MessageParameter.TROUBLE, MessageParameter.STOP);
+                    properties.setProperty(MessageParameter.TYPEOFTROUBLE, type);
+                    properties.setProperty(MessageParameter.TROUBLE_LAT, Double.toString(troublePoint.getLat()));
+                    properties.setProperty(MessageParameter.TROUBLE_LON, Double.toString(troublePoint.getLng()));
+                    properties.setProperty(MessageParameter.EDGE_ID, Long.toString(troublePoint.getInternalEdgeId()));
+                    msg.setAllUserDefinedParameters(properties);
+                    print(" send message about trouble stop on " + Long.toString(troublePoint.getInternalEdgeId()));
+                    send(msg);
+                }
+
+            };
+
+            addBehaviour(troubleGenerator);
+            addBehaviour(troubleStopper);
+        }
     }
 
     public MovingObject getVehicle() {
