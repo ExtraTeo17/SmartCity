@@ -1,9 +1,10 @@
 import React from "react";
 import { Provider } from "react-redux";
 import Notifications from "react-notify-toast";
+
 import CityMap from "./CityMap";
 import "../styles/App.css";
-import Menu from "./Menu";
+import Menu from "./Menu/Menu";
 
 import store from "../redux/store";
 

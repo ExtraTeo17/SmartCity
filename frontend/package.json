@@ -6,6 +6,7 @@
     "leaflet": "1.6.0",
     "react": "^16.13.1",
     "react-dom": "^16.13.1",
+    "react-flatpickr": "^3.10.6",
     "react-leaflet": "2.7.0",
     "react-leaflet-markercluster": "^2.0.0",
     "react-notify-toast": "0.5.1",

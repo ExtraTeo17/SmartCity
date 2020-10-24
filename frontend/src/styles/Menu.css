@@ -6,3 +6,11 @@
 .center-wrapper {
   text-align: center;
 }
+
+.form-check {
+  display: flex;
+  align-items: center;
+}
+.form-check-input {
+  margin-top: 2px;
+}
