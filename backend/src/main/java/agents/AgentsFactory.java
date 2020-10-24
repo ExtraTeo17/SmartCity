@@ -81,7 +81,7 @@ class AgentsFactory implements IAgentsFactory {
     @Override
     public StationAgent create(OSMStation station) {
         var id = idGenerator.get(StationAgent.class);
-        var stationStrategy = new StationStrategy(id);
+        var stationStrategy = new StationStrategy(id, configContainer);
         return new StationAgent(id, station, stationStrategy, timeProvider, eventBus);
     }
 

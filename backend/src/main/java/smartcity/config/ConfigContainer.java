@@ -17,6 +17,7 @@ public class ConfigContainer extends ConfigMutator
 
     private boolean lightManagersLock = false;
     private boolean isLightStrategyActive = true;
+    private boolean isStationStrategyActive = true;
     private int extendTimeSeconds = 30;
 
     private final IZone zone;
@@ -119,5 +120,14 @@ public class ConfigContainer extends ConfigMutator
 
     public void setGenerateTroublePoints(boolean shouldGenerateTroublePoints) {
         this.shouldGenerateTroublePoints = shouldGenerateTroublePoints;
+    }
+
+
+    public boolean isStationStrategyActive() {
+        return isStationStrategyActive;
+    }
+
+    public void setStationStrategyActive(boolean stationStrategyActive) {
+        isStationStrategyActive = stationStrategyActive;
     }
 }

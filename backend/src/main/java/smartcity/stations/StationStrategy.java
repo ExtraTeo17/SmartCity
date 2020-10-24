@@ -2,6 +2,7 @@ package smartcity.stations;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import smartcity.config.ConfigContainer;
 import smartcity.lights.OptimizationResult;
 
 import java.time.LocalDateTime;
@@ -13,12 +14,14 @@ import java.util.stream.Collectors;
 
 @SuppressWarnings("UnusedReturnValue")
 public class StationStrategy {
-    private final static boolean SHOULD_USE_STRATEGY = true;
     private final static int WAIT_PERIOD_SECONDS = 60;
-    private final Logger logger;
 
-    public StationStrategy(int managerId) {
+    private final Logger logger;
+    private final ConfigContainer configContainer;
+
+    public StationStrategy(int managerId, ConfigContainer configContainer) {
         this.logger = LoggerFactory.getLogger(this.getClass().getSimpleName() + managerId);
+        this.configContainer = configContainer;
     }
 
     // AgentName - Schedule Arrival Time / Arrival Time
@@ -103,7 +106,7 @@ public class StationStrategy {
                     actualTime.isBefore(scheduledTimePlusWait)) {
                 logger.debug("------------------BUS WAS ON TIME-----------------------");
                 List<String> passengersThatCanLeave = getPassengersWhoAreReadyToGo(busLine);
-                if (SHOULD_USE_STRATEGY) {
+                if (configContainer.isStationStrategyActive()) {
                     var farPassengers = getPassengersWhoAreFar(busLine, scheduledTime.plusSeconds(WAIT_PERIOD_SECONDS));
                     passengersThatCanLeave.addAll(farPassengers);
                     logger.debug("-----------------WAITING FOR: " + farPassengers.size() + " PASSENGERS------------------");
