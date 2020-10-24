@@ -45,6 +45,7 @@ const Menu = props => {
               defaultValue={carsNum}
               className="form-control"
               id="carsNum"
+              disabled={!generateCars}
               min={CAR_MIN}
               max={CAR_MAX}
               placeholder="Enter limit for cars"
@@ -58,6 +59,7 @@ const Menu = props => {
               defaultValue={testCarNum}
               className="form-control"
               id="testCarNum"
+              disabled={!generateCars}
               min={1}
               max={1000}
               placeholder="Enter test car number"
