@@ -15,11 +15,12 @@ public class Converter {
     }
 
     public static LightDto convert(Light light) {
+        var id = light.getAdjacentWayId() + light.getOsmLightId();
         var lightGroupId = light.getOsmLightId();
         var location = convert((IGeoPosition) light);
         var color = light.isGreen() ? LightColorDto.GREEN : LightColorDto.RED;
 
-        return new LightDto(lightGroupId, location, color);
+        return new LightDto(id, lightGroupId, location, color);
     }
 
     public static LightColorDto convert(LightColor lightColor) {

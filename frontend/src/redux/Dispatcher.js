@@ -7,6 +7,7 @@ import {
   carKilled,
   lightsSwitched,
   troublePointCreated,
+  troublePointVanished,
   simulationStarted,
   carRouteChanged,
   busUpdated,
@@ -116,6 +117,10 @@ const Dispatcher = {
 
   createTroublePoint(troublePoint) {
     dispatch(troublePointCreated(troublePoint));
+  },
+
+  hideTroublePoint(id) {
+    dispatch(troublePointVanished(id));
   },
 
   updateBus(bus) {

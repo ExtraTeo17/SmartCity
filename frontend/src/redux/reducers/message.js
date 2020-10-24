@@ -1,5 +1,11 @@
 import { LightColor } from "../../components/Models/LightColor";
-import { SIMULATION_PREPARED, LIGHTS_SWITCHED, TROUBLE_POINT_CREATED, SIMULATION_STARTED } from "../constants";
+import {
+  SIMULATION_PREPARED,
+  LIGHTS_SWITCHED,
+  TROUBLE_POINT_CREATED,
+  SIMULATION_STARTED,
+  TROUBLE_POINT_VANISHED,
+} from "../constants";
 
 // Just for reference - defined in store.js
 const initialState = {
@@ -47,6 +53,13 @@ const message = (state = initialState, action) => {
       const troublePoint = action.payload;
 
       return { ...state, troublePoints: [...state.troublePoints, troublePoint] };
+    }
+
+    case TROUBLE_POINT_VANISHED: {
+      const id = action.payload;
+
+      console.log(`Handling tp-hide: ${id}`);
+      return { ...state, troublePoints: state.troublePoints.filter(tp => tp.id !== id) };
     }
 
     default:

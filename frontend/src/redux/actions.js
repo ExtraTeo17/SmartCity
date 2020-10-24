@@ -17,6 +17,7 @@ import {
   PEDESTRIAN_PUSHED,
   PEDESTRIAN_PULLED,
   PEDESTRIAN_KILLED,
+  TROUBLE_POINT_VANISHED,
 } from "./constants";
 
 /**
@@ -51,6 +52,7 @@ export const carRouteChanged = createAction(CAR_ROUTE_CHANGED);
 
 export const lightsSwitched = createAction(LIGHTS_SWITCHED);
 export const troublePointCreated = createAction(TROUBLE_POINT_CREATED);
+export const troublePointVanished = createAction(TROUBLE_POINT_VANISHED);
 
 export const busUpdated = createAction(BUS_UPDATED);
 export const busFillStateUpdated = createAction(BUS_FILL_STATE_UPDATED);

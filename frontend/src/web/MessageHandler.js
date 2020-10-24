@@ -7,6 +7,7 @@ import {
   KILL_CAR_INFO,
   SWITCH_LIGHTS_INFO,
   CREATE_TROUBLE_POINT_INFO,
+  HIDE_TROUBLE_POINT_INFO,
   UPDATE_CAR_ROUTE_INFO,
   UPDATE_BUS_INFO,
   UPDATE_BUS_FILL_STATE_INFO,
@@ -64,6 +65,11 @@ export default {
 
       case CREATE_TROUBLE_POINT_INFO: {
         Dispatcher.createTroublePoint(payload);
+        break;
+      }
+
+      case HIDE_TROUBLE_POINT_INFO: {
+        Dispatcher.hideTroublePoint(payload.id);
         break;
       }
 

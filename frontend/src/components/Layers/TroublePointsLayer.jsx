@@ -5,11 +5,9 @@ import TroublePoint from "../Markers/TroublePoint";
 
 const TroublePointsLayer = props => {
   const { troublePoints = [] } = props;
-  const troublePointMarkers = troublePoints.map((troublePoint, ind) => (
-    <TroublePoint key={"tp" + ind} troublePoint={troublePoint} />
-  ));
+  const troublePointMarkers = troublePoints.map(tp => <TroublePoint key={`tp${tp.id}`} troublePoint={tp} />);
 
-  return <React.Fragment>{troublePointMarkers}</React.Fragment>;
+  return <>{troublePointMarkers}</>;
 };
 
 const mapStateToProps = (state /* , ownProps */) => {
