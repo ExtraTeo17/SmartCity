@@ -36,7 +36,7 @@ public class TroubleManagerAgent extends Agent {
                         EventBus eventBus) {
         this.agentsContainer = agentsContainer;
         this.eventBus = eventBus;
-        troublePointsMap = new HashMap<>();
+        this.troublePointsMap = new HashMap<>();
     }
 
     @Override

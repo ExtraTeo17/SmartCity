@@ -289,17 +289,17 @@ public class VehicleAgent extends AbstractAgent {
             @Override
             public void onTick() {
 
-                sendMessageAboutTroubleStop();
+                sendMessageAboutTroubleStop(MessageParameter.CONSTRUCTION);
                 ExtendedGraphHopper.removeForbiddenEdges(Arrays.asList(troublePoint.getInternalEdgeId()));
                 stop();
             }
 
-            private void sendMessageAboutTroubleStop() {
+            private void sendMessageAboutTroubleStop(String type) {
 
                 ACLMessage msg = createMessage(ACLMessage.INFORM, TroubleManagerAgent.name);
                 Properties properties = createProperties(MessageParameter.VEHICLE);
                 properties.setProperty(MessageParameter.TROUBLE, MessageParameter.STOP);
-
+                properties.setProperty(MessageParameter.TYPEOFTROUBLE, type);
                 properties.setProperty(MessageParameter.TROUBLE_LAT, Double.toString(troublePoint.getLat()));
                 properties.setProperty(MessageParameter.TROUBLE_LON, Double.toString(troublePoint.getLng()));
                 properties.setProperty(MessageParameter.EDGE_ID, Long.toString(troublePoint.getInternalEdgeId()));

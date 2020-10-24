@@ -52,7 +52,7 @@ final class RouteTransformer implements
         
         for (RouteNode node : newRoute) {
         	if (node instanceof LightManagerNode) {
-        		System.out.println("AHHHHHHHHHHH  HHAAAAA  HHHHHHHHHHHHHHAAA  AAAAAAAAAAAAAAHH  HHHHHHHHHHHHHAAAAAAAA  AAAAAAAAAHHHHHHHHHHHHHH  HHHAAAAAAAAAAAAAAHHHHHH  HHHHHHHHHAAAAAAAAAAAA");
+        	    logger.warn("Light manager node on the route");
         	}
         }
 
