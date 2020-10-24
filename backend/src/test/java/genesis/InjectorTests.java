@@ -9,7 +9,6 @@ import com.google.inject.Guice;
 import com.google.inject.Injector;
 import events.ClearSimulationEvent;
 import events.LightManagersReadyEvent;
-import events.StartTimeEvent;
 import events.SwitchLightsStartEvent;
 import events.web.*;
 import events.web.bus.BusAgentDeadEvent;
@@ -34,6 +33,7 @@ import smartcity.lights.core.LightsModule;
 import testutils.ReflectionHelper;
 import web.WebModule;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -101,9 +101,9 @@ class InjectorTests {
         eventBus.post(new LightManagersReadyEvent(null));
         eventBus.post(new SimulationPreparedEvent(new ArrayList<>(), new ArrayList<>(), new ArrayList<>()));
         eventBus.post("Test"); // Dead event
-        eventBus.post(new StartSimulationEvent(0, 0, false, false));
+        eventBus.post(new StartSimulationEvent(0, 0, false, false,
+                LocalDateTime.now()));
         eventBus.post(new SimulationStartedEvent());
-        eventBus.post(new StartTimeEvent(0));
         eventBus.post(new ClearSimulationEvent());
 
         // other

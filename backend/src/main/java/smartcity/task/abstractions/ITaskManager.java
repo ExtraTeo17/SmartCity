@@ -2,6 +2,7 @@ package smartcity.task.abstractions;
 
 import smartcity.lights.core.Light;
 
+import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.function.BooleanSupplier;
 
@@ -14,7 +15,7 @@ public interface ITaskManager {
 
     void scheduleSwitchLightTask(int managerId, Collection<Light> lights);
 
-    void scheduleSimulationControl(BooleanSupplier testSimulationState, long nanoStartTime);
+    void scheduleSimulationControl(BooleanSupplier testSimulationState, LocalDateTime simulationStartTime);
 
     void cancelAll();
 }

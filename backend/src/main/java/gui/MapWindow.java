@@ -5,7 +5,6 @@ import agents.abstractions.IAgentsContainer;
 import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
 import com.google.inject.Inject;
-import events.StartTimeEvent;
 import events.web.PrepareSimulationEvent;
 import events.web.SimulationPreparedEvent;
 import events.web.StartSimulationEvent;
@@ -214,7 +213,9 @@ public class MapWindow {
         MapPanel.revalidate();
         StartRouteButton.addActionListener(e -> eventBus.post(new StartSimulationEvent((int) carLimitSpinner.getValue(),
                 (int) testCarIdSpinner.getValue(), configContainer.shouldGenerateCars(),
-                configContainer.shouldGenerateTroublePoints())));
+                configContainer.shouldGenerateTroublePoints(), ((Date) setTimeSpinner.getValue()).toInstant()
+                .atZone(ZoneId.systemDefault())
+                .toLocalDateTime())));
         refreshTimer.scheduleAtFixedRate(new RefreshTask(), 0, REFRESH_MAP_INTERVAL_MILLISECONDS);
     }
 
@@ -248,13 +249,6 @@ public class MapWindow {
         ResultTimeLabel.setVisible(true);
         ResultTimeTitle.setVisible(true);
         random.setSeed(getSeed());
-
-        // TODO: This time will be received from web-gui and set via event
-        var simulationTime = ((Date) setTimeSpinner.getValue()).toInstant().atZone(ZoneId.systemDefault())
-                .toLocalDateTime();
-        timeProvider.setSimulationStartTime(simulationTime);
-        // TODO: Temporary until not set from web-gui and
-        eventBus.post(new StartTimeEvent(System.nanoTime()));
     }
 
     private int getZoneRadius() {

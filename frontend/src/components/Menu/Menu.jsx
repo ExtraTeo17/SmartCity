@@ -11,6 +11,8 @@ import PrepareMenu from "./PrepareMenu";
 
 const DEFAULT_CARS_NUM = 4;
 const DEFAULT_TEST_CAR = 2;
+const CAR_MIN = 1;
+const CAR_MAX = 50;
 
 const Menu = props => {
   const { wasPrepared, wasStarted } = props;
@@ -18,11 +20,8 @@ const Menu = props => {
   const [carsNum, setCarsNum] = useState(DEFAULT_CARS_NUM);
   const [testCarNum, setTestCarNum] = useState(DEFAULT_TEST_CAR);
   const [generateCars, setGenerateCars] = useState(true);
-  const [generateTroublePoints, setGenerateTroublePoints] = useState(true);
+  const [generateTroublePoints, setGenerateTroublePoints] = useState(false);
   const [time, setTime] = useState(new Date());
-
-  const carMin = 1;
-  const carMax = 50;
 
   const startSimulation = () => {
     ApiManager.startSimulation({
@@ -30,6 +29,7 @@ const Menu = props => {
       testCarNum,
       generateCars,
       generateTroublePoints: generateCars && generateTroublePoints,
+      startTime: time,
     });
   };
 
@@ -44,10 +44,10 @@ const Menu = props => {
             defaultValue={carsNum}
             className="form-control"
             id="carsNum"
-            min={carMin}
-            max={carMax}
+            min={CAR_MIN}
+            max={CAR_MAX}
             placeholder="Enter limit for cars"
-            onChange={e => setCarsNum(parseInt(e.target.value, 10))}
+            onChange={e => setCarsNum(e.target.value)}
           />
         </div>
         <div className="form-group">
@@ -60,7 +60,7 @@ const Menu = props => {
             min={1}
             max={1000}
             placeholder="Enter test car number"
-            onChange={e => setTestCarNum(parseInt(e.target.value, 10))}
+            onChange={e => setTestCarNum(e.target.value)}
           />
         </div>
         <div className="form-check user-select-none">

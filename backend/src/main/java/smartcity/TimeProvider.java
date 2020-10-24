@@ -4,9 +4,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.time.temporal.ChronoUnit;
 
-// TODO: Realtime or fixed? IMPORTANT.
 public class TimeProvider implements ITimeProvider {
     public static final int TIME_SCALE = 10;
     public static final int MS_PER_TICK = 100;
@@ -57,5 +58,9 @@ public class TimeProvider implements ITimeProvider {
         var diffB = Math.abs(source.until(b, ChronoUnit.MILLIS));
 
         return diffA < diffB ? a : b;
+    }
+
+    public static ZonedDateTime convertFromUtcToLocal(ZonedDateTime utcDate) {
+        return utcDate.withZoneSameInstant(ZoneId.systemDefault());
     }
 }

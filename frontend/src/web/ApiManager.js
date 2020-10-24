@@ -17,7 +17,15 @@ export default {
     WebServer.send(msg);
   },
 
-  startSimulation({ carsNum, testCarNum, generateCars, generateTroublePoints } = { carsNum: 0, testCarNum: 0 }) {
+  startSimulation(
+    { carsNum, testCarNum, generateCars, generateTroublePoints, startTime } = {
+      carsNum: 0,
+      testCarNum: 0,
+      generateCars: true,
+      generateTroublePoints: false,
+      startTime: new Date(),
+    }
+  ) {
     const msg = {
       type: START_SIMULATION_REQUEST,
       payload: {
@@ -25,6 +33,7 @@ export default {
         testCarId: testCarNum,
         generateCars,
         generateTroublePoints,
+        startTime,
       },
     };
     WebServer.send(msg);

@@ -15,6 +15,7 @@ import smartcity.task.abstractions.ITaskManager;
 import smartcity.task.abstractions.ITaskProvider;
 import smartcity.task.runnable.abstractions.IRunnableFactory;
 
+import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.Optional;
 import java.util.Random;
@@ -106,8 +107,8 @@ public class TaskManager implements ITaskManager {
     }
 
     @Override
-    public void scheduleSimulationControl(BooleanSupplier testSimulationState, long nanoStartTime) {
-        var simulationControlTask = taskProvider.getSimulationControlTask(nanoStartTime);
+    public void scheduleSimulationControl(BooleanSupplier testSimulationState, LocalDateTime simulationStartTime) {
+        var simulationControlTask = taskProvider.getSimulationControlTask(simulationStartTime);
         runWhile(testSimulationState, simulationControlTask, TimeProvider.MS_PER_TICK);
     }
 

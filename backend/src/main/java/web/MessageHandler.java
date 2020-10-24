@@ -7,20 +7,23 @@ import events.web.PrepareSimulationEvent;
 import events.web.StartSimulationEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import smartcity.TimeProvider;
 import web.message.MessageDto;
 import web.message.payloads.requests.PrepareSimulationRequest;
 import web.message.payloads.requests.StartSimulationRequest;
 
 import java.io.IOException;
+import java.sql.Time;
 import java.util.Optional;
 
 class MessageHandler {
-    private static final ObjectMapper objectMapper = new ObjectMapper();
     private static final Logger logger = LoggerFactory.getLogger(MessageHandler.class);
+    private final ObjectMapper objectMapper;
     private final EventBus eventBus;
 
     @Inject
-    MessageHandler(EventBus eventBus) {
+    MessageHandler(ObjectMapper objectMapper, EventBus eventBus) {
+        this.objectMapper = objectMapper;
         this.eventBus = eventBus;
     }
 
@@ -49,8 +52,11 @@ class MessageHandler {
                 var payload = tryDeserialize(message.payload, StartSimulationRequest.class);
                 if (payload.isPresent()) {
                     var pVal = payload.get();
+
+                    var timeLocal = TimeProvider.convertFromUtcToLocal(pVal.startTime).toLocalDateTime();
+                    logger.info("Starting simulation request with time: " + timeLocal);
                     eventBus.post(new StartSimulationEvent(pVal.carsNum, pVal.testCarId, pVal.generateCars,
-                            pVal.generateTroublePoints));
+                            pVal.generateTroublePoints, timeLocal));
                 }
             }
         }

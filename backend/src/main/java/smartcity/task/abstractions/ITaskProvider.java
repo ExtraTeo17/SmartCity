@@ -4,6 +4,7 @@ import routing.core.IGeoPosition;
 import routing.nodes.StationNode;
 import smartcity.lights.core.Light;
 
+import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.function.Supplier;
 
@@ -17,5 +18,5 @@ public interface ITaskProvider {
 
     Supplier<Integer> getSwitchLightsTask(int managerId, Collection<Light> lights);
 
-    Runnable getSimulationControlTask(long nanoStartTime);
+    Runnable getSimulationControlTask(LocalDateTime simulationStartTime);
 }
