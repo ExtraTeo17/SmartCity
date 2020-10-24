@@ -110,7 +110,7 @@ const Menu = props => {
         </div>
         <button
           className="btn btn-primary"
-          disabled={wasPrepared || wasStarted}
+          disabled={wasStarted}
           title={wasStarted ? "Simulation already started!" : wasPrepared ? "Simulation already prepared!" : "Prepare simulation"}
           type="button"
           onClick={() => ApiManager.prepareSimulation({ lat, lng, rad })}
