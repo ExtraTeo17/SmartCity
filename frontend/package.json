@@ -5,6 +5,7 @@
   "dependencies": {
     "leaflet": "1.6.0",
     "react": "^16.13.1",
+    "react-bootstrap": "^1.4.0",
     "react-dom": "^16.13.1",
     "react-flatpickr": "^3.10.6",
     "react-leaflet": "2.7.0",

@@ -4,9 +4,9 @@ import Notifications from "react-notify-toast";
 
 import CityMap from "./CityMap";
 import "../styles/App.css";
-import Menu from "./Menu/Menu";
 
 import store from "../redux/store";
+import MenusContainer from "./Menu/MenusContainer";
 
 const App = () => (
   <Provider store={store}>
@@ -18,7 +18,7 @@ const App = () => (
             <CityMap />
           </div>
           <div className="col-3">
-            <Menu />
+            <MenusContainer />
           </div>
         </div>
       </header>
