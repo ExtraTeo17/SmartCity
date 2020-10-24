@@ -144,7 +144,7 @@ public class MapWindow {
                 new PrepareSimulationEvent(
                         (double) latSpinner.getValue(),
                         (double) lonSpinner.getValue(),
-                        (int) radiusSpinner.getValue())
+                        (int) radiusSpinner.getValue(), configContainer.shouldGeneratePedestriansAndBuses())
         ));
 
         testCarZoneButton.addActionListener(e -> {
@@ -153,7 +153,7 @@ public class MapWindow {
             seedSpinner.setValue(34);
             radiusSpinner.setValue(600);
             eventBus.post(new PrepareSimulationEvent(52.23682, 21.01681,
-                    600));
+                    600, configContainer.shouldGeneratePedestriansAndBuses()));
         });
 
         testBusZoneButton.addActionListener(e -> {
@@ -164,7 +164,7 @@ public class MapWindow {
                 logger.warn("Pedestrians won't be generated");
             }
             eventBus.post(new PrepareSimulationEvent(52.203342, 20.861213,
-                    300));
+                    300, configContainer.shouldGeneratePedestriansAndBuses()));
         });
 
         setTimeSpinner.setModel(new SpinnerDateModel());
@@ -213,8 +213,8 @@ public class MapWindow {
         MapPanel.add(MapViewer);
         MapPanel.revalidate();
         StartRouteButton.addActionListener(e -> eventBus.post(new StartSimulationEvent((int) carLimitSpinner.getValue(),
-                (int) testCarIdSpinner.getValue(), true, false,
-                false)));
+                (int) testCarIdSpinner.getValue(), configContainer.shouldGenerateCars(),
+                configContainer.shouldGenerateTroublePoints())));
         refreshTimer.scheduleAtFixedRate(new RefreshTask(), 0, REFRESH_MAP_INTERVAL_MILLISECONDS);
     }
 
@@ -316,7 +316,7 @@ public class MapWindow {
             double lng = 21.017934679985046;
             mapViewer.setAddressLocation(new GeoPosition(lat, lng));
             mapViewer.setZoom(1);
-            eventBus.post(new PrepareSimulationEvent(lat, lng, 100));
+            eventBus.post(new PrepareSimulationEvent(lat, lng, 100, configContainer.shouldGeneratePedestriansAndBuses()));
 
             simulationReadyCallback = () -> {
                 IGeoPosition N = Position.of(52.23758683540269, 21.017720103263855);

@@ -75,9 +75,13 @@ public class TaskManager implements ITaskManager {
                 return;
             }
             var busAgent = busAgentOpt.get();
-            var stations = busAgent.getTwoSubsequentStations(random);
+            var stationsOpt = busAgent.getTwoSubsequentStations(random);
+            if (stationsOpt.isEmpty()) {
+                logger.warn("Failed to get stations for pedestrian");
+                return;
+            }
 
-            // TODO: Move more logic here
+            var stations = stationsOpt.get();
             taskProvider.getCreatePedestrianTask(stations.first, stations.second, busAgent.getLine(),
                     runCount == testPedestrianId).run();
         };

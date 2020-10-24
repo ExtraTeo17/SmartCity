@@ -1,13 +1,16 @@
 package web.serialization;
 
 
-import smartcity.lights.LightColor;
+import com.google.common.hash.HashCode;
 import osmproxy.elements.OSMNode;
 import routing.core.IGeoPosition;
+import smartcity.lights.LightColor;
 import smartcity.lights.core.Light;
 import vehicles.Bus;
 import vehicles.enums.BusFillState;
 import web.message.payloads.models.*;
+
+import java.util.Objects;
 
 public class Converter {
     public static Location convert(IGeoPosition geoPosition) {
@@ -15,7 +18,7 @@ public class Converter {
     }
 
     public static LightDto convert(Light light) {
-        var id = light.getAdjacentWayId() + light.getOsmLightId();
+        var id = Objects.hash(light.getAdjacentWayId(),light.getOsmLightId());
         var lightGroupId = light.getOsmLightId();
         var location = convert((IGeoPosition) light);
         var color = light.isGreen() ? LightColorDto.GREEN : LightColorDto.RED;

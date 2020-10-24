@@ -18,7 +18,6 @@ const Menu = props => {
   const [carsNum, setCarsNum] = useState(DEFAULT_CARS_NUM);
   const [testCarNum, setTestCarNum] = useState(DEFAULT_TEST_CAR);
   const [generateCars, setGenerateCars] = useState(true);
-  const [generatePedestrians, setGeneratePedestrians] = useState(true);
   const [generateTroublePoints, setGenerateTroublePoints] = useState(true);
   const [time, setTime] = useState(new Date());
 
@@ -30,7 +29,6 @@ const Menu = props => {
       carsNum,
       testCarNum,
       generateCars,
-      generatePedestrians,
       generateTroublePoints: generateCars && generateTroublePoints,
     });
   };
@@ -77,18 +75,7 @@ const Menu = props => {
             Generate cars
           </label>
         </div>
-        <div className="form-check user-select-none">
-          <input
-            type="checkbox"
-            checked={generatePedestrians}
-            className="form-check-input"
-            id="generatePedestrians"
-            onChange={e => setGeneratePedestrians(e.target.checked)}
-          />
-          <label htmlFor="generatePedestrians" className="form-check-label">
-            Generate pedestrians
-          </label>
-        </div>
+
         <div className="form-check user-select-none">
           <input
             type="checkbox"

@@ -4,28 +4,26 @@ import WebServer from "./WebServer";
 /** PUBLIC INTERFACE ---------------------------------------------------------- */
 
 export default {
-  prepareSimulation({ lat, lng, rad } = { lat: 0, lng: 0, rad: 0 }) {
+  prepareSimulation({ lat, lng, rad, generatePedestrians } = { lat: 0, lng: 0, rad: 0 }) {
     const msg = {
       type: PREPARE_SIMULATION_REQUEST,
       payload: {
         latitude: lat,
         longitude: lng,
         radius: rad,
+        generatePedestrians,
       },
     };
     WebServer.send(msg);
   },
 
-  startSimulation(
-    { carsNum, testCarNum, generateCars, generatePedestrians, generateTroublePoints } = { carsNum: 0, testCarNum: 0 }
-  ) {
+  startSimulation({ carsNum, testCarNum, generateCars, generateTroublePoints } = { carsNum: 0, testCarNum: 0 }) {
     const msg = {
       type: START_SIMULATION_REQUEST,
       payload: {
         carsNum,
         testCarId: testCarNum,
         generateCars,
-        generatePedestrians,
         generateTroublePoints,
       },
     };

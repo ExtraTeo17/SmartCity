@@ -1,12 +1,18 @@
 /* eslint-disable no-restricted-globals */
 import { connect } from "react-redux";
-import React from "react";
+import React, { useState } from "react";
 import ApiManager from "../../web/ApiManager";
 import { centerUpdated } from "../../redux/actions";
 import { dispatch } from "../../redux/store";
 import "../../styles/Menu.css";
 
 const DECIMAL_PLACES = 5;
+const latMin = -90;
+const latMax = 90;
+const lngMin = -180;
+const lngMax = 180;
+const radMin = 0;
+const radMax = 10000;
 
 const PrepareMenu = props => {
   const { wasPrepared, wasStarted } = props;
@@ -16,12 +22,7 @@ const PrepareMenu = props => {
   lat = lat.toFixed(DECIMAL_PLACES);
   lng = lng.toFixed(DECIMAL_PLACES);
 
-  const latMin = -90;
-  const latMax = 90;
-  const lngMin = -180;
-  const lngMax = 180;
-  const radMin = 0;
-  const radMax = 10000;
+  const [generatePedestrians, setGeneratePedestrians] = useState(false);
 
   const setLat = val => {
     if (!isNaN(val) && val >= latMin && val <= latMax) {
@@ -89,13 +90,25 @@ const PrepareMenu = props => {
           onChange={e => setRad(parseFloat(e.target.value))}
         />
       </div>
-      <div className="center-wrapper">
+      <div className="form-check user-select-none">
+        <input
+          type="checkbox"
+          checked={generatePedestrians}
+          className="form-check-input"
+          id="generatePedestrians"
+          onChange={e => setGeneratePedestrians(e.target.checked)}
+        />
+        <label htmlFor="generatePedestrians" className="form-check-label">
+          Generate pedestrians, buses and stations
+        </label>
+      </div>
+      <div className="center-wrapper mt-3">
         <button
           className="btn btn-primary"
           disabled={wasStarted}
           title={wasStarted ? "Simulation already started!" : wasPrepared ? "Simulation already prepared!" : "Prepare simulation"}
           type="button"
-          onClick={() => ApiManager.prepareSimulation({ lat, lng, rad })}
+          onClick={() => ApiManager.prepareSimulation({ lat, lng, rad, generatePedestrians })}
         >
           Prepare simulation
         </button>

@@ -40,7 +40,7 @@ public class Scheduler {
             configContainer.setGenerateTroublePoints(e.shouldGenerateTroublePoints);
             taskManager.scheduleCarCreation(e.carsNum, e.testCarId);
         }
-        if (e.shouldGeneratePedestrians) {
+        if (configContainer.shouldGeneratePedestriansAndBuses()) {
             // TODO: Add pedestrians limit and testPedestrianID
             taskManager.schedulePedestrianCreation(50, e.testCarId);
             taskManager.scheduleBusControl(() -> configContainer.getSimulationState() == SimulationState.RUNNING);

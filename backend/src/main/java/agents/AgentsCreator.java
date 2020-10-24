@@ -80,6 +80,7 @@ public class AgentsCreator {
             clear();
         }
         configContainer.setZone(e.zone);
+        configContainer.setGeneratePedestriansAndBuses(e.shouldGeneratePedestriansAndBuses);
         configContainer.setSimulationState(SimulationState.IN_PREPARATION);
 
         if (prepareAgents()) {

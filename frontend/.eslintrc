@@ -84,7 +84,7 @@
       2,
       {
         "destructuring": "all",
-        "ignoreReadBeforeAssign": true,
+        "ignoreReadBeforeAssign": true
       }
     ],
     "no-bitwise": 0,
