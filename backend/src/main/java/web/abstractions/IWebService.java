@@ -27,6 +27,8 @@ public interface IWebService extends IStartable {
 
     void createTroublePoint(int id, IGeoPosition position);
 
+    void hideTroublePoint(int id);
+
     void changeRoute(int agentId,
                      List<? extends IGeoPosition> routeStart,
                      IGeoPosition changePosition,

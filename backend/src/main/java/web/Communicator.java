@@ -2,10 +2,7 @@ package web;
 
 import com.google.common.eventbus.Subscribe;
 import com.google.inject.Inject;
-import events.web.SimulationPreparedEvent;
-import events.web.SimulationStartedEvent;
-import events.web.SwitchLightsEvent;
-import events.web.TroublePointCreatedEvent;
+import events.web.*;
 import events.web.bus.BusAgentDeadEvent;
 import events.web.bus.BusAgentFillStateUpdatedEvent;
 import events.web.bus.BusAgentStartedEvent;
@@ -77,6 +74,11 @@ class Communicator {
     @Subscribe
     public void handle(TroublePointCreatedEvent e) {
         webService.createTroublePoint(e.id, e.position);
+    }
+
+    @Subscribe
+    public void handle(TroublePointVanishedEvent e) {
+        webService.hideTroublePoint(e.id);
     }
 
     @Subscribe

@@ -7,6 +7,7 @@ import com.google.common.eventbus.Subscribe;
 import com.google.inject.Inject;
 import events.web.PrepareSimulationEvent;
 import events.web.TroublePointCreatedEvent;
+import events.web.TroublePointVanishedEvent;
 import jade.core.Agent;
 import jade.core.behaviours.Behaviour;
 import jade.core.behaviours.CyclicBehaviour;
@@ -14,7 +15,10 @@ import jade.lang.acl.ACLMessage;
 import jade.util.leap.Properties;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import routing.core.IGeoPosition;
 import routing.core.Position;
+
+import java.util.HashMap;
 
 import static agents.message.MessageManager.createProperties;
 
@@ -24,12 +28,15 @@ public class TroubleManagerAgent extends Agent {
 
     private final IAgentsContainer agentsContainer;
     private final EventBus eventBus;
+    private final HashMap<IGeoPosition, Integer> troublePointsMap;
+    private int latestTroublePointId;
 
     @Inject
     TroubleManagerAgent(IAgentsContainer agentsContainer,
                         EventBus eventBus) {
         this.agentsContainer = agentsContainer;
         this.eventBus = eventBus;
+        troublePointsMap = new HashMap<>();
     }
 
     @Override
@@ -46,16 +53,18 @@ public class TroubleManagerAgent extends Agent {
 
                             if (rcv.getUserDefinedParameter(MessageParameter.TROUBLE).equals(MessageParameter.SHOW)) {
                                 //parsing received message
-                                if(rcv.getUserDefinedParameter(MessageParameter.TYPEOFTROUBLE).equals(MessageParameter.CONSTRUCTION)) {
-                                      constructionAppearedHandle(rcv);
-                                   }
-                                else if(rcv.getUserDefinedParameter(MessageParameter.TYPEOFTROUBLE).equals(MessageParameter.TRAFFIC_JAMS))
-                                {
+                                if (rcv.getUserDefinedParameter(MessageParameter.TYPEOFTROUBLE).equals(MessageParameter.CONSTRUCTION)) {
+                                    constructionAppearedHandle(rcv);
+                                }
+                                else if (rcv.getUserDefinedParameter(MessageParameter.TYPEOFTROUBLE).equals(MessageParameter.TRAFFIC_JAMS)) {
                                     trafficJamsAppearedHandle(rcv);
                                 }
                             }
                             else if (rcv.getUserDefinedParameter(MessageParameter.TROUBLE).equals(MessageParameter.STOP)) {
                                 //TODO: FOR FUTURE CHANGE ROOT AGAIN OF THE CAR?
+                                if (rcv.getUserDefinedParameter(MessageParameter.TYPEOFTROUBLE).equals(MessageParameter.CONSTRUCTION)) {
+                                    constructionHideHandle(rcv);
+                                }
                             }
                         }
                     }
@@ -66,11 +75,11 @@ public class TroubleManagerAgent extends Agent {
             private void trafficJamsAppearedHandle(ACLMessage rcv) {
                 //TODO: Rysowanie w LightManager - Przemek
                 logger.info("Got message about trouble - TRAFFIC JAM");
-                sendBroadcast(generateMessageAboutTrouble( rcv, MessageParameter.TRAFFIC_JAMS));
+                sendBroadcast(generateMessageAboutTrouble(rcv, MessageParameter.TRAFFIC_JAMS));
 
             }
-            private void sendBroadcast(ACLMessage response)
-            {
+
+            private void sendBroadcast(ACLMessage response) {
                 agentsContainer.forEach(VehicleAgent.class, vehicleAgent -> {
                     response.addReceiver(vehicleAgent.getAID());
                 });
@@ -78,42 +87,52 @@ public class TroubleManagerAgent extends Agent {
                 logger.info("Sent broadcast");
             }
 
-            private ACLMessage generateMessageAboutTrouble( ACLMessage rcv, String typeOfTrouble)
-            {
+            private ACLMessage generateMessageAboutTrouble(ACLMessage rcv, String typeOfTrouble) {
                 long edgeId = Long.parseLong(rcv.getUserDefinedParameter(MessageParameter.EDGE_ID));
                 logger.info("trouble edge: " + edgeId);
-                //broadcasting to everybody
+                // broadcasting to everybody
                 ACLMessage response = new ACLMessage(ACLMessage.PROPOSE);
                 Properties properties = createProperties(MessageParameter.TROUBLE_MANAGER);
                 properties.setProperty(MessageParameter.EDGE_ID, Long.toString(edgeId));
                 properties.setProperty(MessageParameter.TYPEOFTROUBLE, typeOfTrouble);
-                if(typeOfTrouble.equals(MessageParameter.TRAFFIC_JAMS))
-                {
+                if (typeOfTrouble.equals(MessageParameter.TRAFFIC_JAMS)) {
                     properties.setProperty(MessageParameter.LENGTH_OF_JAM, rcv.getUserDefinedParameter(MessageParameter.LENGTH_OF_JAM));
                 }
                 response.setAllUserDefinedParameters(properties);
                 return response;
             }
+
             private void constructionAppearedHandle(ACLMessage rcv) {
                 var troublePoint = Position.of(Double.parseDouble(rcv.getUserDefinedParameter(MessageParameter.TROUBLE_LAT)),
                         Double.parseDouble(rcv.getUserDefinedParameter(MessageParameter.TROUBLE_LON)));
+                troublePointsMap.put(troublePoint, ++latestTroublePointId);
+
                 // TODO: Generate id and save it to hide troublePoint later
-                eventBus.post(new TroublePointCreatedEvent(1, troublePoint));
+                eventBus.post(new TroublePointCreatedEvent(latestTroublePointId, troublePoint));
                 logger.info("Got message about trouble - CONSTRUCTION");
                 logger.info("troublePoint: " + troublePoint.getLat() + "  " + troublePoint.getLng());
-                sendBroadcast(generateMessageAboutTrouble(rcv,MessageParameter.CONSTRUCTION));
-
+                sendBroadcast(generateMessageAboutTrouble(rcv, MessageParameter.CONSTRUCTION));
             }
 
+            private void constructionHideHandle(ACLMessage rcv) {
+                var troublePoint = Position.of(Double.parseDouble(rcv.getUserDefinedParameter(MessageParameter.TROUBLE_LAT)),
+                        Double.parseDouble(rcv.getUserDefinedParameter(MessageParameter.TROUBLE_LON)));
+                var id = troublePointsMap.remove(troublePoint);
+
+                eventBus.post(new TroublePointVanishedEvent(id));
+                logger.info("Hiding construction" + id);
+            }
 
         };
         addBehaviour(communication);
     }
+
 
     // for tests
     @Subscribe
     public void handle(PrepareSimulationEvent e) {
         var troublePoint = Position.of(52.23682, 21.01683);
         eventBus.post(new TroublePointCreatedEvent(1, troublePoint));
+        eventBus.post(new TroublePointVanishedEvent(1));
     }
 }

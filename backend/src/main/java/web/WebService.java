@@ -11,6 +11,7 @@ import web.message.MessageType;
 import web.message.payloads.infos.create.CreateCarInfo;
 import web.message.payloads.infos.create.CreatePedestrianInfo;
 import web.message.payloads.infos.create.CreateTroublePointInfo;
+import web.message.payloads.infos.kill.HideTroublePointInfo;
 import web.message.payloads.infos.kill.KillBusInfo;
 import web.message.payloads.infos.kill.KillCarInfo;
 import web.message.payloads.infos.kill.KillPedestrianInfo;
@@ -96,6 +97,13 @@ class WebService implements IWebService {
         var payload = new CreateTroublePointInfo(id, location);
 
         webConnector.broadcastMessage(MessageType.CREATE_TROUBLE_POINT_INFO, payload);
+    }
+
+    @Override
+    public void hideTroublePoint(int id) {
+        var payload = new HideTroublePointInfo(id);
+
+        webConnector.broadcastMessage(MessageType.HIDE_TROUBLE_POINT_INFO, payload);
     }
 
     @Override
