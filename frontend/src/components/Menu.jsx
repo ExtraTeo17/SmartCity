@@ -1,8 +1,10 @@
+/* eslint-disable no-restricted-globals */
+/* eslint-disable indent */
+import { connect } from "react-redux";
+import React, { useState } from "react";
 import ApiManager from "../web/ApiManager";
 import { centerUpdated } from "../redux/actions";
 import { dispatch } from "../redux/store";
-import { connect } from "react-redux";
-import React, { useState } from "react";
 import "../styles/Menu.css";
 
 const DEFAULT_CARS_NUM = 4;
@@ -12,22 +14,23 @@ const DECIMAL_PLACES = 5;
 
 const Menu = props => {
   const { wasPrepared, wasStarted } = props;
-  let { lat, lng } = props.center;
+  let {
+    center: { lat, lng, rad },
+  } = props;
   lat = lat.toFixed(DECIMAL_PLACES);
   lng = lng.toFixed(DECIMAL_PLACES);
-  const rad = props.center.rad;
 
   const [carsNum, setCarsNum] = useState(DEFAULT_CARS_NUM);
   const [testCarNum, setTestCarNum] = useState(DEFAULT_TEST_CAR);
 
-  const latMin = -90,
-    latMax = 90;
-  const lngMin = -180,
-    lngMax = 180;
-  const radMin = 0,
-    radMax = 10000;
-  const carMin = 1,
-    carMax = 50;
+  const latMin = -90;
+  const latMax = 90;
+  const lngMin = -180;
+  const lngMax = 180;
+  const radMin = 0;
+  const radMax = 10000;
+  const carMin = 1;
+  const carMax = 50;
 
   /**
    * @param {number} val
@@ -63,7 +66,7 @@ const Menu = props => {
     <div>
       <form className="mb-4 form-border">
         <div className="form-group">
-          <label htmlFor="lat">Latitude</label>
+          <label htmlFor="lat">Latitude </label>
           <input
             type="number"
             value={lat}
@@ -76,6 +79,7 @@ const Menu = props => {
             onChange={e => setLat(parseFloat(e.target.value))}
           />
         </div>
+
         <div className="form-group">
           <label htmlFor="lng">Longitude</label>
           <input
@@ -125,7 +129,7 @@ const Menu = props => {
             min={carMin}
             max={carMax}
             placeholder="Enter limit for cars"
-            onChange={e => setCarsNum(parseInt(e.target.value))}
+            onChange={e => setCarsNum(parseInt(e.target.value, 10))}
           />
         </div>
         <div className="form-group">
@@ -135,10 +139,10 @@ const Menu = props => {
             defaultValue={testCarNum}
             className="form-control"
             id="testCarNum"
-            min={carMin}
-            max={carsNum}
+            min={1}
+            max={1000}
             placeholder="Enter test car number"
-            onChange={e => setTestCarNum(parseInt(e.target.value))}
+            onChange={e => setTestCarNum(parseInt(e.target.value, 10))}
           />
         </div>
         <button
@@ -162,11 +166,11 @@ const Menu = props => {
 };
 
 const mapStateToProps = (state /* , ownProps */) => {
-  var { wasPrepared, wasStarted } = state.message;
+  const { wasPrepared, wasStarted } = state.message;
   return {
     center: state.interaction.center,
-    wasPrepared: wasPrepared,
-    wasStarted: wasStarted,
+    wasPrepared,
+    wasStarted,
   };
 };
 
