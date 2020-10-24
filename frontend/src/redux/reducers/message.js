@@ -25,6 +25,7 @@ const message = (state = initialState, action) => {
         lights,
         stations,
         wasPrepared: true,
+        wasStarted: false,
       };
     }
 
