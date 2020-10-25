@@ -49,12 +49,6 @@ final class RouteTransformer implements
         if (route.size() > 0) {
             newRoute.add(route.get(route.size() - 1));
         }
-        
-        for (RouteNode node : newRoute) {
-        	if (node instanceof LightManagerNode) {
-        		System.out.println("AHHHHHHHHHHH  HHAAAAA  HHHHHHHHHHHHHHAAA  AAAAAAAAAAAAAAHH  HHHHHHHHHHHHHAAAAAAAA  AAAAAAAAAHHHHHHHHHHHHHH  HHHAAAAAAAAAAAAAAHHHHHH  HHHHHHHHHAAAAAAAAAAAA");
-        	}
-        }
 
         return newRoute;
     }
