@@ -9,7 +9,8 @@ import smartcity.SimulationState;
 
 
 public class ConfigContainer extends ConfigMutator
-        implements IZoneMutator, ILightConfigContainer {
+        implements IZoneMutator, ILightConfigContainer,
+        IConstructionSiteConfigContainer {
     private SimulationState simulationState = SimulationState.INITIAL;
     private boolean shouldGeneratePedestriansAndBuses = false;
     private boolean shouldGenerateCars = true;
@@ -109,10 +110,12 @@ public class ConfigContainer extends ConfigMutator
         isLightStrategyActive = lightStrategyActive;
     }
     
+    @Override
     public boolean isConstructionSiteStrategyActive() {
     	return isConstructionSiteStrategyActive;
     }
     
+    @Override
     public void setConstructionSiteStrategyActive(boolean constructionSiteStrategyActive) {
     	isConstructionSiteStrategyActive = constructionSiteStrategyActive;
     }

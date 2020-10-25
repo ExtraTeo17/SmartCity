@@ -35,6 +35,7 @@ import static routing.RoutingConstants.STEP_CONSTANT;
 public class VehicleAgent extends AbstractAgent {
     private static final Random random = new Random();
     private static final int THRESHOLD_UNTIL_INDEX_CHANGE = 3;
+	protected static final int NO_CONSTRUCTION_SITE_STRATEGY_FACTOR = 20;
 
     private final MovingObject vehicle;
     private final int timeBeforeAccident;
@@ -148,8 +149,8 @@ public class VehicleAgent extends AbstractAgent {
 				if (configContainer.isConstructionSiteStrategyActive()) {
 					indexAfterWhichRouteChanges = vehicle.getFarOnIndex(THRESHOLD_UNTIL_INDEX_CHANGE);
 				} else {
-					indexAfterWhichRouteChanges = indexOfRouteNodeWithEdge - (30 * THRESHOLD_UNTIL_INDEX_CHANGE) < 0
-							? 0 : indexOfRouteNodeWithEdge - (30 * THRESHOLD_UNTIL_INDEX_CHANGE);
+					indexAfterWhichRouteChanges = indexOfRouteNodeWithEdge - (NO_CONSTRUCTION_SITE_STRATEGY_FACTOR * THRESHOLD_UNTIL_INDEX_CHANGE) < 0
+							? 0 : indexOfRouteNodeWithEdge - (NO_CONSTRUCTION_SITE_STRATEGY_FACTOR * THRESHOLD_UNTIL_INDEX_CHANGE);
 				}
 				updateRouteFromIndex(indexAfterWhichRouteChanges);
 			}
@@ -166,9 +167,6 @@ public class VehicleAgent extends AbstractAgent {
                 var newRouteAfterChangeIndex = routeTransformer.uniformRoute(newSimpleRouteEnd);
                 var route = oldUniformRoute.subList(0, indexAfterWhichRouteChanges);
                 route.addAll(newRouteAfterChangeIndex);
-                
-                displayRouteDebug(route);
-                
                 var mergeResult = routeTransformer.mergeByDistance(vehicle.getSimpleRoute(),
                         newSimpleRouteEnd);
                 vehicle.setRoutes(mergeResult.mergedRoute, route);
