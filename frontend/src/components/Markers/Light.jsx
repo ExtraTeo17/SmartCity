@@ -1,6 +1,6 @@
 import React from "react";
-import { greenLightIcon, redLightIcon } from "../../styles/icons";
 import { Marker, Popup } from "react-leaflet";
+import { greenLightIcon, redLightIcon } from "../../styles/icons";
 import { LightColor } from "../Models/LightColor";
 
 const Light = props => {
@@ -13,4 +13,4 @@ const Light = props => {
   );
 };
 
-export default Light;
+export default React.memo(Light);

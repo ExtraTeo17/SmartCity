@@ -6,6 +6,7 @@ import agents.abstractions.IAgentsContainer;
 import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
 import com.google.inject.Inject;
+import events.ClearSimulationEvent;
 import events.StartTimeEvent;
 import events.SwitchLightsStartEvent;
 import events.web.SimulationStartedEvent;
@@ -40,7 +41,7 @@ public class Scheduler {
         }
         if (configContainer.shouldGeneratePedestriansAndBuses()) {
             // TODO: Add pedestrians limit and testPedestrianID
-            taskManager.schedulePedestrianCreation(100, e.testCarId);
+            taskManager.schedulePedestrianCreation(50, e.testCarId);
             taskManager.scheduleBusControl(() -> configContainer.getSimulationState() == SimulationState.RUNNING);
         }
 
@@ -61,5 +62,10 @@ public class Scheduler {
     public void handle(StartTimeEvent e) {
         taskManager.scheduleSimulationControl(() -> configContainer.getSimulationState() == SimulationState.RUNNING,
                 e.timePosted);
+    }
+
+    @Subscribe
+    public void handle(ClearSimulationEvent e){
+        taskManager.cancelAll();
     }
 }

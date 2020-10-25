@@ -3,8 +3,8 @@ package agents;
 import agents.abstractions.AbstractAgent;
 import agents.utilities.MessageParameter;
 import com.google.common.eventbus.EventBus;
-import events.web.VehicleAgentRouteChangedEvent;
-import events.web.VehicleAgentUpdatedEvent;
+import events.web.vehicle.VehicleAgentRouteChangedEvent;
+import events.web.vehicle.VehicleAgentUpdatedEvent;
 import jade.core.behaviours.Behaviour;
 import jade.core.behaviours.CyclicBehaviour;
 import jade.core.behaviours.TickerBehaviour;
@@ -19,8 +19,9 @@ import routing.nodes.LightManagerNode;
 import routing.nodes.RouteNode;
 import smartcity.ITimeProvider;
 import smartcity.SmartCityAgent;
-import vehicles.DrivingState;
+import utilities.ConditionalExecutor;
 import vehicles.MovingObject;
+import vehicles.enums.DrivingState;
 
 import java.time.LocalDateTime;
 import java.util.Arrays;
@@ -129,8 +130,9 @@ private static int counterEXTREME = 0;
                         }
                         case ACLMessage.AGREE -> vehicle.setState(DrivingState.WAITING_AT_LIGHT);
                         case ACLMessage.PROPOSE -> {
-                            if(rcv.getUserDefinedParameter(MessageParameter.TYPEOFTROUBLE).equals(MessageParameter.CONSTRUCTION)) {
+                            if (rcv.getUserDefinedParameter(MessageParameter.TYPEOFTROUBLE).equals(MessageParameter.CONSTRUCTION)) {
                                  handleConstruction(rcv);
+
 
                             }
                             else if (rcv.getUserDefinedParameter(MessageParameter.TYPEOFTROUBLE).equals(MessageParameter.TRAFFIC_JAMS))
@@ -140,19 +142,18 @@ private static int counterEXTREME = 0;
                                 if(rcv.getSender().getLocalName().equals(TroubleManagerAgent.name))
                                 {
                                     if(counterEXTREME<=1)
-                                    {handleTrafficJamsFromTroubleManager(rcv);counterEXTREME++;}
+                                    { handleTrafficJamsFromTroubleManager(rcv);counterEXTREME++;}
                                 }
                                 else{
                                         logger.info("CAR OTRZYMAl od ligth manager");
                                         handleTrafficJamsFromLightManager(rcv);
+
                                 }
                             }
-
                         }
                     }
                 }
                 block(100);
-
             }
 
             private void handleTrafficJamsFromLightManager(ACLMessage rcv) {
@@ -166,25 +167,30 @@ private static int counterEXTREME = 0;
                                                   positionOfTroubleLight,
                                                   Double.parseDouble(rcv.getUserDefinedParameter(MessageParameter.LENGTH_OF_JAM)));
             }
+
             private void sendMessageAboutTrafficJamTrouble(int currentInternalID,Position positionOfTroubleLight , double lengthOfJam ) {
+
 
                 ACLMessage msg = createMessage(ACLMessage.INFORM, TroubleManagerAgent.name);
                 Properties properties = createProperties(MessageParameter.VEHICLE);
                 properties.setProperty(MessageParameter.TYPEOFTROUBLE,MessageParameter.TRAFFIC_JAMS);
                 properties.setProperty(MessageParameter.TROUBLE, MessageParameter.SHOW);
+
                 properties.setProperty(MessageParameter.TROUBLE_LAT, String.valueOf(positionOfTroubleLight.getLat()));
                 properties.setProperty(MessageParameter.TROUBLE_LON, String.valueOf(positionOfTroubleLight.getLng()));
                 properties.setProperty(MessageParameter.LENGTH_OF_JAM, String.valueOf(lengthOfJam));
+
                 properties.setProperty(MessageParameter.EDGE_ID, Long.toString(currentInternalID));
                 msg.setAllUserDefinedParameters(properties);
                 print(" send message about trouble on " + Long.toString(currentInternalID) +" with position: "+ positionOfTroubleLight.toString());
 
                 send(msg);
             }
+          
             private void handleTrafficJamsFromTroubleManager(ACLMessage rcv) {
 
                 double howLongTakesJam = 1000*Double.parseDouble(rcv.getUserDefinedParameter(MessageParameter.LENGTH_OF_JAM));
-                double timeForTheEndWithoutJam = vehicle.getMillisecondsFromAToB(vehicle.moveIndex,vehicle.getUniformRoute().size()-1);
+                double timeForTheEndWithoutJam = vehicle.getMillisecondsFromAToB(vehicle.getMoveIndex(),vehicle.getUniformRoute().size()-1);
                 double timeForTheEndWithJam = timeForTheEndWithoutJam + howLongTakesJam;
                 Long edgeId = Long.valueOf(404932);//Long.parseLong(rcv.getUserDefinedParameter(MessageParameter.EDGE_ID));
                 logger.info("JAKA KRAWEDZ ________________________"+ edgeId);
@@ -269,8 +275,6 @@ private static int counterEXTREME = 0;
                 }
             }
 
-
-
 			private void sendRefusalMessageToLightManagerAfterRouteChange(int howFar) {
                 //change route, that is why send stop
                 LightManagerNode currentManager = vehicle.getCurrentTrafficLightNode();
@@ -351,7 +355,6 @@ private static int counterEXTREME = 0;
         //addBehaviour(troubleGenerator); // TODO: ADD TOGGLE FOR THIS FEATURE
         //addBehaviour(troubleStopper);
     }
-
 
     public MovingObject getVehicle() {
         return vehicle;

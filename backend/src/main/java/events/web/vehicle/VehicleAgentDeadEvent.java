@@ -1,4 +1,4 @@
-package events.web;
+package events.web.vehicle;
 
 public class VehicleAgentDeadEvent {
     public final int id;

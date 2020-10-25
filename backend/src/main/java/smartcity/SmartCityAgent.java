@@ -7,7 +7,9 @@ import agents.abstractions.IAgentsContainer;
 import agents.utilities.MessageParameter;
 import com.google.common.eventbus.EventBus;
 import com.google.inject.Inject;
-import events.web.VehicleAgentDeadEvent;
+import events.web.bus.BusAgentDeadEvent;
+import events.web.pedestrian.PedestrianAgentDeadEvent;
+import events.web.vehicle.VehicleAgentDeadEvent;
 import gui.MapWindow;
 import jade.core.Agent;
 import jade.core.behaviours.CyclicBehaviour;
@@ -21,7 +23,7 @@ import java.time.Duration;
 import java.time.LocalDateTime;
 
 public class SmartCityAgent extends Agent {
-    public static final String name = SmartCityAgent.class.getName().replace("Agent", "");
+    public static final String name = SmartCityAgent.class.getSimpleName().replace("Agent", "");
     private static final Logger logger = LoggerFactory.getLogger(SmartCityAgent.class);
 
     private final MapWindow window;
@@ -56,10 +58,14 @@ public class SmartCityAgent extends Agent {
                         logger.warn("Received message from" + rcv.getSender() + " without type:" + rcv);
                         return;
                     }
-                    switch (type) {
-                        case MessageParameter.VEHICLE -> onReceiveVehicle(rcv);
-                        case MessageParameter.PEDESTRIAN -> onReceivePedestrian(rcv);
-                        case MessageParameter.BUS -> onReceiveBus(rcv);
+                    try {
+                        switch (type) {
+                            case MessageParameter.VEHICLE -> onReceiveVehicle(rcv);
+                            case MessageParameter.PEDESTRIAN -> onReceivePedestrian(rcv);
+                            case MessageParameter.BUS -> onReceiveBus(rcv);
+                        }
+                    } catch (Exception e) {
+                        logger.warn("Unknown error", e);
                     }
                 }
                 block(1000);
@@ -79,7 +85,9 @@ public class SmartCityAgent extends Agent {
                 setResultTime(testPedestrian.getStart(), testPedestrian.getEnd());
             }
 
-            agentsContainer.remove(agent);
+            if (agentsContainer.remove(agent)) {
+                eventBus.post(new PedestrianAgentDeadEvent(agent.getId()));
+            }
         }
     }
 
@@ -112,7 +120,13 @@ public class SmartCityAgent extends Agent {
     }
 
     private void onReceiveBus(ACLMessage rcv) {
-        agentsContainer.removeIf(BusAgent.class,
-                v -> v.getLocalName().equals(rcv.getSender().getLocalName()));
+        var senderName = rcv.getSender().getLocalName();
+        var agentOpt = agentsContainer.get(BusAgent.class, (v) -> senderName.equals(v.getLocalName()));
+        if (agentOpt.isPresent()) {
+            var agent = agentOpt.get();
+            if (agentsContainer.remove(agent)) {
+                eventBus.post(new BusAgentDeadEvent(agent.getId()));
+            }
+        }
     }
 }

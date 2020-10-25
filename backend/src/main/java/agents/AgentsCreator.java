@@ -7,6 +7,7 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
 import com.google.inject.Inject;
+import events.ClearSimulationEvent;
 import events.LightManagersReadyEvent;
 import events.web.PrepareSimulationEvent;
 import events.web.SimulationPreparedEvent;
@@ -74,7 +75,8 @@ public class AgentsCreator {
     @Subscribe
     public void handle(PrepareSimulationEvent e) {
         logger.info("Set zone event occurred: " + e.toString());
-        if (configContainer.getSimulationState() == SimulationState.READY_TO_RUN) {
+        var state = configContainer.getSimulationState();
+        if (state == SimulationState.READY_TO_RUN || state == SimulationState.RUNNING) {
             clear();
         }
         configContainer.setZone(e.zone);
@@ -82,17 +84,21 @@ public class AgentsCreator {
 
         if (prepareAgents()) {
             configContainer.setSimulationState(SimulationState.READY_TO_RUN);
+
             var lights = agentsContainer.stream(LightManagerAgent.class)
                     .flatMap(man -> man.getLights().stream())
                     .collect(Collectors.toList());
             var stations = agentsContainer.stream(StationAgent.class).map(
                     StationAgent::getStation).collect(Collectors.toList());
-            eventBus.post(new SimulationPreparedEvent(lights, stations));
+            var buses = agentsContainer.stream(BusAgent.class).map(
+                    BusAgent::getBus).collect(Collectors.toList());
+            eventBus.post(new SimulationPreparedEvent(lights, stations, buses));
         }
     }
 
     // TODO: Send clearSimulationEvent and handle simulationClearedEvent to continue - tasks should be cancelled
     private void clear() {
+        eventBus.post(new ClearSimulationEvent());
         agentsContainer.clearAll();
     }
 
@@ -180,7 +186,7 @@ public class AgentsCreator {
                 var brigadeNr = brigade.brigadeId;
                 for (Timetable timetable : brigade) {
                     BusAgent agent = factory.create(route, timetable, busLine, brigadeNr);
-                    boolean result = agentsContainer.tryAdd(agent);
+                    boolean result = agentsContainer.tryAdd(agent, true);
                     if (result) {
                         ++busCount;
                     }

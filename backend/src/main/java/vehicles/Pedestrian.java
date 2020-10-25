@@ -5,6 +5,7 @@ import routing.RoutingConstants;
 import routing.nodes.LightManagerNode;
 import routing.nodes.RouteNode;
 import routing.nodes.StationNode;
+import vehicles.enums.VehicleType;
 
 import java.util.ArrayList;
 import java.util.List;

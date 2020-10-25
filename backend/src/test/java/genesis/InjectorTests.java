@@ -4,11 +4,16 @@ import agents.AgentsModule;
 import com.google.common.eventbus.DeadEvent;
 import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
+import com.google.inject.Binder;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
-import events.LightManagersReadyEvent;
-import events.SwitchLightsStartEvent;
+import com.google.inject.Singleton;
+import events.*;
 import events.web.*;
+import events.web.bus.*;
+import events.web.pedestrian.*;
+import events.web.vehicle.*;
+import gui.MapWindow;
 import jade.wrapper.ContainerController;
 import jade.wrapper.StaleProxyException;
 import org.junit.jupiter.api.Test;
@@ -26,6 +31,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.mockito.Mockito.mock;
 
 @SuppressWarnings("OverlyCoupledClass")
 class InjectorTests {
@@ -39,7 +45,13 @@ class InjectorTests {
                         new SharedModule(),
                         new LightsModule(),
                         new AgentsModule(),
-                        new GuiModule(),
+                        new AbstractModule() {
+                            @Override
+                            public void configure(Binder binder) {
+                                super.configure(binder);
+                                binder.bind(MapWindow.class).toInstance(mock(MapWindow.class));
+                            }
+                        },
                         new WebModule(4002),
                         new BusModule(),
                         new OsmModule(),
@@ -74,18 +86,43 @@ class InjectorTests {
         eventBus.register(deadEventListener);
 
         eventBus.post("Test"); // Dead event
-        // Will throw but we are testing handle-invoke
+        // Some events will throw but we are testing handle-invoke
+
+        //  Simulation-related
         eventBus.post(new PrepareSimulationEvent(null));
         eventBus.post(new LightManagersReadyEvent(null));
-        eventBus.post(new SimulationPreparedEvent(new ArrayList<>(), new ArrayList<>()));
+        eventBus.post(new SimulationPreparedEvent(new ArrayList<>(), new ArrayList<>(), new ArrayList<>()));
         eventBus.post("Test"); // Dead event
         eventBus.post(new StartSimulationEvent(0, 0));
         eventBus.post(new SimulationStartedEvent());
+        eventBus.post(new StartTimeEvent(0));
+        eventBus.post(new ClearSimulationEvent());
+
+        // other
+        eventBus.post(new TroublePointCreatedEvent(1, null));
+        eventBus.post(new SwitchLightsStartEvent(1, null));
+
+        // vehicle
         eventBus.post(new VehicleAgentCreatedEvent(1, null, null, false));
         eventBus.post(new VehicleAgentUpdatedEvent(1, null));
-        eventBus.post(new SwitchLightsStartEvent(1, null));
+        eventBus.post(new VehicleAgentRouteChangedEvent(1, new ArrayList<>(), null, new ArrayList<>()));
+        eventBus.post(new VehicleAgentDeadEvent(1));
+
         eventBus.post("Test"); // Dead event
 
+        // bus
+        eventBus.post(new BusAgentDeadEvent(1));
+        eventBus.post(new BusAgentFillStateUpdatedEvent(0, null));
+        eventBus.post(new BusAgentUpdatedEvent(1, null));
+        eventBus.post(new BusAgentStartedEvent(1));
+        eventBus.post(new BusAgentDeadEvent(1));
+
+        // pedestrian
+        eventBus.post(new PedestrianAgentCreatedEvent(1, null, new ArrayList<>(), new ArrayList<>(), false));
+        eventBus.post(new PedestrianAgentUpdatedEvent(1, null));
+        eventBus.post(new PedestrianAgentEnteredBusEvent(1));
+        eventBus.post(new PedestrianAgentLeftBusEvent(1, null));
+        eventBus.post(new PedestrianAgentDeadEvent(1));
 
         int expectedDeadEvents = 3;
         assertEquals(expectedDeadEvents, counter.get(), "All events should be handled somewhere");

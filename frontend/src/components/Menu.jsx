@@ -12,9 +12,10 @@ const DECIMAL_PLACES = 5;
 
 const Menu = props => {
   const { wasPrepared, wasStarted } = props;
-  let { lat, lng, rad } = props.center;
+  let { lat, lng } = props.center;
   lat = lat.toFixed(DECIMAL_PLACES);
   lng = lng.toFixed(DECIMAL_PLACES);
+  const rad = props.center.rad;
 
   const [carsNum, setCarsNum] = useState(DEFAULT_CARS_NUM);
   const [testCarNum, setTestCarNum] = useState(DEFAULT_TEST_CAR);
@@ -23,7 +24,7 @@ const Menu = props => {
     latMax = 90;
   const lngMin = -180,
     lngMax = 180;
-  const radMin = 20,
+  const radMin = 0,
     radMax = 10000;
   const carMin = 1,
     carMax = 50;
@@ -33,7 +34,7 @@ const Menu = props => {
    */
   const setLat = val => {
     if (!isNaN(val) && val >= latMin && val <= latMax) {
-      let center = { ...props.center, lat: val };
+      const center = { ...props.center, lat: val };
       dispatch(centerUpdated(center));
     }
   };
@@ -43,7 +44,7 @@ const Menu = props => {
    */
   const setLng = val => {
     if (!isNaN(val) && val >= lngMin && val <= lngMax) {
-      let center = { ...props.center, lng: val };
+      const center = { ...props.center, lng: val };
       dispatch(centerUpdated(center));
     }
   };
@@ -53,7 +54,7 @@ const Menu = props => {
    */
   const setRad = val => {
     if (!isNaN(val) && val >= radMin && val <= radMax) {
-      let center = { ...props.center, rad: val };
+      const center = { ...props.center, rad: val };
       dispatch(centerUpdated(center));
     }
   };
