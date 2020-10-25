@@ -24,7 +24,6 @@ import static java.lang.Thread.sleep;
 
 public class LightManagerAgent extends AbstractAgent {
     public static final String name = LightManagerAgent.class.getSimpleName().replace("Agent", "");
-    private static int cou =0;
     private final ICrossroad crossroad;
 
     LightManagerAgent(int id, ICrossroad crossroad,
@@ -60,41 +59,36 @@ public class LightManagerAgent extends AbstractAgent {
 
             private void handleOptimizationResult(OptimizationResult result) throws Exception {
                 //Expected one agent in the list
-                if(cou<1)
-                { logger.info("I AM IN!"); sleep(1000);
-                    sendMessageAboutTroubleToVehicle(null, "RegularCar1");cou++;}
-               /* List<String> agents = result.carsFreeToProceed();
+               List<String> agents = result.carsFreeToProceed();
                 if(agents.size()!=0) {
-                    handleTrafficJams(result, agents.get(0));
+                    // handleTrafficJams(result, agents.get(0)); // TODO: Add toggle for this feature
                     for (String agentName : agents) {
                         answerCanProceed(agentName);
                     }
-                }*/
+                }
             }
 
             private void handleTrafficJams(OptimizationResult result, String nameOfAgent) throws Exception {
-                //TODO shouldNotifyCarAboutTrafficJamOnThisLight have an old state to stop the jam
-            	if (true){//result.shouldNotifyCarAboutTrafficJamOnThisLight()) {
+                // TODO shouldNotifyCarAboutTrafficJamOnThisLight have an old state to stop the jam
+            	if (result.shouldNotifyCarAboutTrafficJamOnThisLight()) {
             		// TODO: use result.getJammedLight(...)
                     sendMessageAboutTroubleToVehicle(result,nameOfAgent);
             	}
-            	else{
+            	else {
             	    //stop jam
                 }
             }
 
             private void sendMessageAboutTroubleToVehicle(OptimizationResult result, String nameOfAgent) throws Exception {
-
-
                     ACLMessage msg = createMessage(ACLMessage.PROPOSE, nameOfAgent);
                     Properties properties = createProperties(MessageParameter.LIGHT);
-                    properties.setProperty(MessageParameter.TYPEOFTROUBLE,MessageParameter.TRAFFIC_JAMS);
+                    properties.setProperty(MessageParameter.TYPEOFTROUBLE, MessageParameter.TRAFFIC_JAMS);
                     properties.setProperty(MessageParameter.TROUBLE, MessageParameter.SHOW);
-                    properties.setProperty(MessageParameter.LENGTH_OF_JAM,Double.toString(1000));//result.getLengthOfJam()));
-                    properties.setProperty(MessageParameter.TROUBLE_LAT, Double.toString(52.23455));//result.getJammedLightPosition().getLat()));
-                    properties.setProperty(MessageParameter.TROUBLE_LON, Double.toString(20.99076));//result.getJammedLightPosition().getLng()));
+                    properties.setProperty(MessageParameter.LENGTH_OF_JAM, Double.toString(result.getLengthOfJam()));
+                    properties.setProperty(MessageParameter.TROUBLE_LAT, Double.toString(result.getJammedLightPosition().getLat()));
+                    properties.setProperty(MessageParameter.TROUBLE_LON, Double.toString(result.getJammedLightPosition().getLng()));
                     msg.setAllUserDefinedParameters(properties);
-                    logger.info("Send message to "+nameOfAgent+" for request of EdgeID");
+                    logger.info("Send message to " + nameOfAgent + " for request of EdgeID");
                     //print(" send message about trouble on " + Long.toString(troublePoint.getInternalEdgeId()));
                     send(msg);
 
@@ -107,7 +101,6 @@ public class LightManagerAgent extends AbstractAgent {
                 msg.setAllUserDefinedParameters(properties);
                 send(msg);
             }
-
         };
 
         var communicate = new CyclicBehaviour() {
@@ -140,14 +133,14 @@ public class LightManagerAgent extends AbstractAgent {
                 switch (rcv.getPerformative()) {
                     case ACLMessage.INFORM -> {
                         var time = getDateParameter(rcv, MessageParameter.ARRIVAL_TIME);
-                        print(agentName + " is approaching at " + time);
+                        //print(agentName + " is approaching at " + time);
 
                         var arrivalInfo = ArrivalInfo.of(agentName, time);
                         crossroad.addCarToFarAwayQueue(getIntParameter(rcv, MessageParameter.ADJACENT_OSM_WAY_ID), arrivalInfo);
                     }
                     case ACLMessage.REQUEST_WHEN -> {
-                        print(agentName + " is waiting on way " + getIntParameter(rcv,
-                                MessageParameter.ADJACENT_OSM_WAY_ID) + ".");
+                        //print(agentName + " is waiting on way " + getIntParameter(rcv,
+                        //        MessageParameter.ADJACENT_OSM_WAY_ID) + ".");
                         crossroad.removeCarFromFarAwayQueue(getIntParameter(rcv,
                                 MessageParameter.ADJACENT_OSM_WAY_ID), agentName);
                         ACLMessage agree = createMessage(ACLMessage.AGREE, agentName);
@@ -157,11 +150,11 @@ public class LightManagerAgent extends AbstractAgent {
                         crossroad.addCarToQueue(getIntParameter(rcv, MessageParameter.ADJACENT_OSM_WAY_ID), agentName);
                     }
                     case ACLMessage.AGREE -> {
-                        print(agentName + " passed the light.");
+                        //print(agentName + " passed the light.");
                         crossroad.removeCarFromQueue(getIntParameter(rcv, MessageParameter.ADJACENT_OSM_WAY_ID));
                     }
                     case ACLMessage.REFUSE -> {
-                        print(agentName + " was deleted from queque");
+                        //print(agentName + " was deleted from queque");
                         //       crossroad.removeCarFromQueue(getIntParameter(rcv, MessageParameter.ADJACENT_OSM_WAY_ID));
                         crossroad.removeCarFromFarAwayQueue(getIntParameter(rcv, MessageParameter.ADJACENT_OSM_WAY_ID), agentName);
                     }
@@ -175,14 +168,14 @@ public class LightManagerAgent extends AbstractAgent {
                 switch (rcv.getPerformative()) {
                     case ACLMessage.INFORM -> {
                         var time = getDateParameter(rcv, MessageParameter.ARRIVAL_TIME);
-                        print(agentName + " is approaching in " + time);
+                        //print(agentName + " is approaching in " + time);
                         var arrivalInfo = ArrivalInfo.of(agentName, time);
                         crossroad.addPedestrianToFarAwayQueue(getIntParameter(rcv, MessageParameter.ADJACENT_OSM_WAY_ID),
                                 arrivalInfo);
                     }
                     case ACLMessage.REQUEST_WHEN -> {
-                        print(agentName + " is waiting on way " + getIntParameter(rcv,
-                                MessageParameter.ADJACENT_OSM_WAY_ID) + ".");
+                        //print(agentName + " is waiting on way " + getIntParameter(rcv,
+                        //        MessageParameter.ADJACENT_OSM_WAY_ID) + ".");
                         crossroad.removePedestrianFromFarAwayQueue(getIntParameter(rcv, MessageParameter.ADJACENT_OSM_WAY_ID),
                                 agentName);
                         ACLMessage agree = createMessage(ACLMessage.AGREE, rcv.getSender());
@@ -192,7 +185,7 @@ public class LightManagerAgent extends AbstractAgent {
                         crossroad.addPedestrianToQueue(getIntParameter(rcv, MessageParameter.ADJACENT_OSM_WAY_ID), agentName);
                     }
                     case ACLMessage.AGREE -> {
-                        print(agentName + " passed the light.");
+                        //print(agentName + " passed the light.");
                         crossroad.removePedestrianFromQueue(getIntParameter(rcv, MessageParameter.ADJACENT_OSM_WAY_ID));
                     }
                     default -> print("Wait");

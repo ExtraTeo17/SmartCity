@@ -97,7 +97,7 @@ public abstract class MovingObject {
         if (moveIndex >= uniformRoute.size()) {
             return uniformRoute.get(uniformRoute.size() - 1);
         }
-        return uniformRoute.get(moveIndex-1);
+        return uniformRoute.get(moveIndex - 1);
     }
 
     public IGeoPosition getPosition() {

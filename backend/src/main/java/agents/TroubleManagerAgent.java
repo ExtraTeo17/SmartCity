@@ -49,11 +49,10 @@ public class TroubleManagerAgent extends Agent {
 
                             if (rcv.getUserDefinedParameter(MessageParameter.TROUBLE).equals(MessageParameter.SHOW)) {
                                 //parsing received message
-                                if(rcv.getUserDefinedParameter(MessageParameter.TYPEOFTROUBLE).equals(MessageParameter.CONSTRUCTION)) {
+                                if (rcv.getUserDefinedParameter(MessageParameter.TYPEOFTROUBLE).equals(MessageParameter.CONSTRUCTION)) {
                                       constructionAppearedHandle(rcv);
-                                   }
-                                else if(rcv.getUserDefinedParameter(MessageParameter.TYPEOFTROUBLE).equals(MessageParameter.TRAFFIC_JAMS))
-                                {
+                                }
+                                else if(rcv.getUserDefinedParameter(MessageParameter.TYPEOFTROUBLE).equals(MessageParameter.TRAFFIC_JAMS)) {
                                     trafficJamsAppearedHandle(rcv);
                                 }
                             }
@@ -71,17 +70,15 @@ public class TroubleManagerAgent extends Agent {
                 Position positionOfTroubleLight = Position.of(rcv.getUserDefinedParameter(MessageParameter.TROUBLE_LAT),
                                                               rcv.getUserDefinedParameter(MessageParameter.TROUBLE_LON));
                 logger.info("Got message about trouble - TRAFFIC JAM");
-
                 int edgeId = Integer.parseInt(rcv.getUserDefinedParameter(MessageParameter.EDGE_ID));
-                if(!setOfBlockedEdges.contains(edgeId))
-                {
+                if (!setOfBlockedEdges.contains(edgeId)) { // TODO: REMEMBER TO UNCOMMENT
                     setOfBlockedEdges.add(edgeId);
-                    sendBroadcast(generateMessageAboutTrouble( rcv, MessageParameter.TRAFFIC_JAMS));
+                    sendBroadcast(generateMessageAboutTrouble(rcv, MessageParameter.TRAFFIC_JAMS));
                 }
 
             }
-            private void sendBroadcast(ACLMessage response)
-            {
+            
+            private void sendBroadcast(ACLMessage response) {
                 agentsContainer.forEach(VehicleAgent.class, vehicleAgent -> {
                     response.addReceiver(vehicleAgent.getAID());
                 });

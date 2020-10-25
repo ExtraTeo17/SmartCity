@@ -16,8 +16,8 @@ public class ConfigContainer extends ConfigMutator
     private boolean shouldGenerateCars = true;
     private boolean lightManagersLock = false;
     private boolean isLightStrategyActive = true;
-    private boolean isConstructionSiteStrategyActive = false;
-	private boolean isConstructionSiteGenerationActive = false;
+    private boolean isConstructionSiteStrategyActive = true;
+	private boolean isConstructionSiteGenerationActive = true;
     private int extendTimeSeconds = 30;
 
     private final IZone zone;
