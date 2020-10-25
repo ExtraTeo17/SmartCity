@@ -1,7 +1,8 @@
 import React from "react";
 import Tabs from "react-bootstrap/Tabs";
 import Tab from "react-bootstrap/Tab";
-import Menu from "./Menu";
+import Menu from "./Main/Menu";
+import StrategyMenu from "./StrategyMenu";
 import "../../styles/MenusContainer.css";
 
 const MenusContainer = props => {
@@ -11,7 +12,7 @@ const MenusContainer = props => {
         <Menu />
       </Tab>
       <Tab eventKey="strategy" title="Strategy">
-        <div className="form-border border-top-0">Strategy settings</div>
+        <StrategyMenu />
       </Tab>
       <Tab eventKey="contact" title="Setups">
         <div className="form-border">Predefined setups (ex. Test Bus Zone) will be here</div>

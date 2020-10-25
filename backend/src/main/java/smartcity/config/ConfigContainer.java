@@ -6,9 +6,9 @@ import routing.core.IZone;
 import routing.core.Position;
 import routing.core.Zone;
 import smartcity.SimulationState;
-import smartcity.config.abstractions.IConstructionSiteConfigContainer;
 import smartcity.config.abstractions.ILightConfigContainer;
 import smartcity.config.abstractions.IStationConfigContainer;
+import smartcity.config.abstractions.ITroublePointsConfigContainer;
 import smartcity.config.abstractions.IZoneMutator;
 
 
@@ -16,7 +16,7 @@ import smartcity.config.abstractions.IZoneMutator;
 public class ConfigContainer extends ConfigMutator
         implements IZoneMutator,
         ILightConfigContainer,
-        IConstructionSiteConfigContainer,
+        ITroublePointsConfigContainer,
         IStationConfigContainer {
     private SimulationState simulationState = SimulationState.INITIAL;
     private boolean shouldGeneratePedestriansAndBuses = false;
@@ -124,12 +124,12 @@ public class ConfigContainer extends ConfigMutator
     }
 
     @Override
-    public boolean isConstructionSiteStrategyActive() {
+    public boolean isChangeRouteStrategyActive() {
         return isConstructionSiteStrategyActive;
     }
 
     @Override
-    public void setConstructionSiteStrategyActive(boolean constructionSiteStrategyActive) {
+    public void setChangeRouteStrategyActive(boolean constructionSiteStrategyActive) {
         isConstructionSiteStrategyActive = constructionSiteStrategyActive;
     }
 

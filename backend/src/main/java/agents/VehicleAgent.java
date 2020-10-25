@@ -18,7 +18,7 @@ import routing.nodes.LightManagerNode;
 import routing.nodes.RouteNode;
 import smartcity.ITimeProvider;
 import smartcity.SmartCityAgent;
-import smartcity.config.abstractions.IConstructionSiteConfigContainer;
+import smartcity.config.abstractions.ITroublePointsConfigContainer;
 import vehicles.MovingObject;
 import vehicles.enums.DrivingState;
 
@@ -40,7 +40,7 @@ public class VehicleAgent extends AbstractAgent {
     private final int timeBeforeAccident;
     private final IRouteGenerator routeGenerator;
     private final IRouteTransformer routeTransformer;
-    private final IConstructionSiteConfigContainer configContainer;
+    private final ITroublePointsConfigContainer configContainer;
     private RouteNode troublePoint;
 
     VehicleAgent(int id, MovingObject vehicle, int timeBeforeAccident,
@@ -48,7 +48,7 @@ public class VehicleAgent extends AbstractAgent {
                  IRouteGenerator routeGenerator,
                  IRouteTransformer routeTransformer,
                  EventBus eventBus,
-                 IConstructionSiteConfigContainer configContainer) {
+                 ITroublePointsConfigContainer configContainer) {
         super(id, vehicle.getVehicleType(), timeProvider, eventBus);
         this.vehicle = vehicle;
         this.timeBeforeAccident = timeBeforeAccident;
@@ -158,7 +158,7 @@ public class VehicleAgent extends AbstractAgent {
 
             private void handleRouteChange(final int indexOfRouteNodeWithEdge) {
                 int indexAfterWhichRouteChanges;
-                if (configContainer.isConstructionSiteStrategyActive()) {
+                if (configContainer.isChangeRouteStrategyActive()) {
                     indexAfterWhichRouteChanges = vehicle.getFarOnIndex(THRESHOLD_UNTIL_INDEX_CHANGE);
                 }
                 else {

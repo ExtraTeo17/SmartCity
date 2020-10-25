@@ -9,7 +9,6 @@ public interface ILightConfigContainer {
 
     void setLightStrategyActive(boolean lightStrategyActive);
 
-
     /**
      * @return extend light time in seconds
      */

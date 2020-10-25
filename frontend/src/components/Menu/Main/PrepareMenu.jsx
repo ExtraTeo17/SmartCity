@@ -1,10 +1,10 @@
 /* eslint-disable no-restricted-globals */
 import { connect } from "react-redux";
 import React, { useState } from "react";
-import ApiManager from "../../web/ApiManager";
-import { centerUpdated } from "../../redux/actions";
-import { dispatch } from "../../redux/store";
-import "../../styles/Menu.css";
+import ApiManager from "../../../web/ApiManager";
+import { centerUpdated } from "../../../redux/actions";
+import { dispatch } from "../../../redux/store";
+import "../../../styles/Menu.css";
 
 const DECIMAL_PLACES = 5;
 const latMin = -90;
@@ -80,17 +80,22 @@ const PrepareMenu = props => {
       </div>
       <div className="form-group">
         <label htmlFor="rad">Radius</label>
-        <input
-          type="number"
-          value={rad}
-          className="form-control"
-          id="rad"
-          step="10"
-          min={radMin}
-          max={radMax}
-          placeholder="Enter radius"
-          onChange={e => setRad(parseFloat(e.target.value))}
-        />
+        <div className="input-group">
+          <input
+            type="number"
+            value={rad}
+            className="form-control"
+            id="rad"
+            step="10"
+            min={radMin}
+            max={radMax}
+            placeholder="Enter radius"
+            onChange={e => setRad(parseFloat(e.target.value))}
+          />
+          <div className="input-group-append">
+            <span className="input-group-text">meters</span>
+          </div>
+        </div>
       </div>
       <div className="form-check user-select-none">
         <input
@@ -128,4 +133,4 @@ const mapStateToProps = (state /* , ownProps */) => {
   };
 };
 
-export default connect(mapStateToProps)(PrepareMenu);
+export default connect(mapStateToProps)(React.memo(PrepareMenu));

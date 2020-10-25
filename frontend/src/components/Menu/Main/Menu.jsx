@@ -5,8 +5,8 @@ import React, { useState } from "react";
 import Flatpickr from "react-flatpickr";
 import "flatpickr/dist/themes/material_blue.css";
 
-import ApiManager from "../../web/ApiManager";
-import "../../styles/Menu.css";
+import ApiManager from "../../../web/ApiManager";
+import "../../../styles/Menu.css";
 import PrepareMenu from "./PrepareMenu";
 
 const DEFAULT_CARS_NUM = 4;
@@ -21,6 +21,7 @@ const Menu = props => {
   const [testCarNum, setTestCarNum] = useState(DEFAULT_TEST_CAR);
   const [generateCars, setGenerateCars] = useState(true);
   const [generateTroublePoints, setGenerateTroublePoints] = useState(false);
+  const [timeBeforeTrouble, setTimeBeforeTrouble] = useState(5);
   const [time, setTime] = useState(new Date());
 
   const startSimulation = () => {
@@ -93,6 +94,25 @@ const Menu = props => {
             Generate trouble points
           </label>
         </div>
+        {generateTroublePoints && (
+          <div className="form-group mt-2">
+            <label htmlFor="timeBeforeTrouble">Time before road trouble occurs</label>
+            <div className="input-group">
+              <input
+                type="number"
+                defaultValue={timeBeforeTrouble}
+                className="form-control"
+                id="timeBeforeTrouble"
+                placeholder="Enter time before road trouble occurs"
+                onChange={e => setTimeBeforeTrouble(e.target.value)}
+              />
+              <div className="input-group-append">
+                <span className="input-group-text">seconds</span>
+              </div>
+            </div>
+          </div>
+        )}
+
         <div className="mt-3">
           <label htmlFor="simulationTime">Simulation time</label>
           <Flatpickr
@@ -135,10 +155,9 @@ const Menu = props => {
 const mapStateToProps = (state /* , ownProps */) => {
   const { wasPrepared, wasStarted } = state.message;
   return {
-    center: state.interaction.center,
     wasPrepared,
     wasStarted,
   };
 };
 
-export default connect(mapStateToProps)(Menu);
+export default connect(mapStateToProps)(React.memo(Menu));
