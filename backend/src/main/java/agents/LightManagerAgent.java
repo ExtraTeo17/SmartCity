@@ -61,7 +61,7 @@ public class LightManagerAgent extends AbstractAgent {
                 //Expected one agent in the list
                List<String> agents = result.carsFreeToProceed();
                 if(agents.size()!=0) {
-                    // handleTrafficJams(result, agents.get(0)); // TODO: Add toggle for this feature
+                     handleTrafficJams(result, agents.get(0)); // TODO: Add toggle for this feature
                     for (String agentName : agents) {
                         answerCanProceed(agentName);
                     }

@@ -26,9 +26,7 @@ import utilities.ConditionalExecutor;
 import vehicles.MovingObject;
 
 import java.time.LocalDateTime;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Random;
+import java.util.*;
 
 import static agents.message.MessageManager.createMessage;
 import static agents.message.MessageManager.createProperties;
@@ -38,7 +36,7 @@ import static routing.RoutingConstants.STEP_CONSTANT;
 // TODO: Maybe rename to CarAgent? Bus is also a Vehicle
 public class VehicleAgent extends AbstractAgent {
     private static final Random random = new Random();
-    private static final int THRESHOLD_UNTIL_INDEX_CHANGE = 3;
+    private static final int THRESHOLD_UNTIL_INDEX_CHANGE = 20;
 	protected static final int NO_CONSTRUCTION_SITE_STRATEGY_FACTOR = 20;
     private final MovingObject vehicle;
     private final int timeBeforeAccident;
@@ -46,7 +44,7 @@ public class VehicleAgent extends AbstractAgent {
     private final IRouteTransformer routeTransformer;
     private final ConfigContainer configContainer;
     private RouteNode troublePoint;
-    
+    private Set<Integer> trafficJamsEdgeId = new HashSet<>();
     VehicleAgent(int id, MovingObject vehicle, int timeBeforeAccident,
                  ITimeProvider timeProvider,
                  IRouteGenerator routeGenerator,
@@ -173,7 +171,7 @@ public class VehicleAgent extends AbstractAgent {
 				updateVehicleRouteAfterMerge(indexAfterWhichRouteChanges, mergeResult);
 			}
 
-			private final RouteMergeInfo createMergedWithOldRouteAlternativeRouteFromIndex(final int indexAfterWhichRouteChanges) {
+			private   final RouteMergeInfo createMergedWithOldRouteAlternativeRouteFromIndex(final int indexAfterWhichRouteChanges) {
 				final IGeoPosition positionAfterWhichRouteChanges = vehicle
 						.getPositionOnIndex(indexAfterWhichRouteChanges);
                 var oldUniformRoute = vehicle.getUniformRoute();
@@ -192,9 +190,9 @@ public class VehicleAgent extends AbstractAgent {
 					final RouteMergeInfo mergeResult) {
 				final IGeoPosition positionAfterWhichRouteChanges = vehicle
 						.getPositionOnIndex(indexAfterWhichRouteChanges);
-                if (!vehicle.currentTrafficLightNodeWithinAlternativeRouteThreshold(indexAfterWhichRouteChanges)) {
-                	sendRefusalMessageToLightManagerAfterRouteChange();
-                }
+               if (!vehicle.currentTrafficLightNodeWithinAlternativeRouteThreshold(indexAfterWhichRouteChanges)) {
+              	sendRefusalMessageToLightManagerAfterRouteChange();
+               }
                 vehicle.setRoutes(mergeResult.mergedRoute, mergeResult.newUniformRoute);
                 vehicle.switchToNextTrafficLight();
                 eventBus.post(new VehicleAgentRouteChangedEvent(getId(), mergeResult.startNodes,
@@ -226,11 +224,21 @@ public class VehicleAgent extends AbstractAgent {
             }
 
             private void handleTrafficJamsFromTroubleManager(ACLMessage rcv) {
+                int edgeId = Integer.parseInt(rcv.getUserDefinedParameter(MessageParameter.EDGE_ID));
+                if(trafficJamsEdgeId.contains(edgeId))
+                {
+                    logger.info("JUŻ MAM DODANĄ TĘ KRAWĘDŹ");
+                    return;
+                }
+
+                trafficJamsEdgeId.add(edgeId);
+
+
                 double howLongTakesJam = 1000 * Double.parseDouble(rcv.getUserDefinedParameter(MessageParameter.LENGTH_OF_JAM));
                 double timeForTheEndWithoutJam = vehicle.getMillisecondsFromAToB(vehicle.getMoveIndex(),vehicle.getUniformRoute().size() - 1);
                 double timeForTheEndWithJam = timeForTheEndWithoutJam + howLongTakesJam;
-                Long edgeId = Long.parseLong(rcv.getUserDefinedParameter(MessageParameter.EDGE_ID));
-                final Integer indexOfRouteNodeWithEdge = vehicle.findIndexOfEdgeOnRoute(edgeId,
+
+                final Integer indexOfRouteNodeWithEdge = vehicle.findIndexOfEdgeOnRoute((long) edgeId,
                         THRESHOLD_UNTIL_INDEX_CHANGE);
                 if (indexOfRouteNodeWithEdge != null) {
                 	final int indexAfterWhichRouteChanges = vehicle.getFarOnIndex(THRESHOLD_UNTIL_INDEX_CHANGE);
