@@ -321,8 +321,10 @@ public class VehicleAgent extends AbstractAgent {
 
         addBehaviour(move);
         addBehaviour(communication);
-        addBehaviour(troubleGenerator); // TODO: ADD TOGGLE FOR THIS FEATURE
-        addBehaviour(troubleStopper);
+        if (configContainer.isConstructionSiteGenerationActive()) {
+	        addBehaviour(troubleGenerator);
+	        addBehaviour(troubleStopper);
+        }
     }
 
 	private void displayRouteDebug(List<RouteNode> route) {

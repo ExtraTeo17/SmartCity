@@ -17,6 +17,7 @@ public class ConfigContainer extends ConfigMutator
     private boolean lightManagersLock = false;
     private boolean isLightStrategyActive = true;
     private boolean isConstructionSiteStrategyActive = false;
+	private boolean isConstructionSiteGenerationActive = false;
     private int extendTimeSeconds = 30;
 
     private final IZone zone;
@@ -123,4 +124,14 @@ public class ConfigContainer extends ConfigMutator
     public int getExtendTimeSeconds() {
         return extendTimeSeconds;
     }
+
+	@Override
+	public boolean isConstructionSiteGenerationActive() {
+		return isConstructionSiteGenerationActive;
+	}
+
+	@Override
+	public void setConstructionSiteGenerationActive(boolean constructionSiteGenerationActive) {
+		isConstructionSiteGenerationActive = constructionSiteGenerationActive;
+	}
 }
