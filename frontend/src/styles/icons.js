@@ -40,6 +40,54 @@ export const stationIcon = new L.Icon({
   iconSize: [32, 32],
 });
 
+export const busLowIcon = new L.Icon({
+  iconUrl: "/images/bus_low.png",
+  iconRetinaUrl: "/images/bus_low.png",
+  iconAnchor: [16, 16],
+  popupAnchor: [8, 8],
+  iconSize: [32, 32],
+});
+
+export const busMidIcon = new L.Icon({
+  iconUrl: "/images/bus_mid.png",
+  iconRetinaUrl: "/images/bus_mid.png",
+  iconAnchor: [16, 16],
+  popupAnchor: [8, 8],
+  iconSize: [32, 32],
+});
+
+export const busHighIcon = new L.Icon({
+  iconUrl: "/images/bus_high.png",
+  iconRetinaUrl: "/images/bus_high.png",
+  iconAnchor: [16, 16],
+  popupAnchor: [8, 8],
+  iconSize: [32, 32],
+});
+
+export const pedestrianIcon = new L.Icon({
+  iconUrl: "/images/pedestrian_small.png",
+  iconRetinaUrl: "/images/pedestrian_small.png",
+  iconAnchor: [12, 12],
+  popupAnchor: [6, 6],
+  iconSize: [24, 24],
+});
+
+export const testPedestrianIcon = new L.Icon({
+  iconUrl: "/images/pedestrian_small_blue.png",
+  iconRetinaUrl: "/images/pedestrian_small_blue.png",
+  iconAnchor: [12, 12],
+  popupAnchor: [6, 6],
+  iconSize: [24, 24],
+});
+
+export const bigPedestrianIcon = new L.Icon({
+  iconUrl: "/images/pedestrian.png",
+  iconRetinaUrl: "/images/pedestrian.png",
+  iconAnchor: [16, 16],
+  popupAnchor: [8, 8],
+  iconSize: [32, 32],
+});
+
 export const troublePointIcon = new L.Icon({
   iconUrl: "/images/trouble_point.png",
   iconRetinaUrl: "/images/trouble_point.png",

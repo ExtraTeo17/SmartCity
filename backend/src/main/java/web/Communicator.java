@@ -2,7 +2,19 @@ package web;
 
 import com.google.common.eventbus.Subscribe;
 import com.google.inject.Inject;
-import events.web.*;
+import events.web.SimulationPreparedEvent;
+import events.web.SimulationStartedEvent;
+import events.web.SwitchLightsEvent;
+import events.web.TroublePointCreatedEvent;
+import events.web.bus.BusAgentDeadEvent;
+import events.web.bus.BusAgentFillStateUpdatedEvent;
+import events.web.bus.BusAgentStartedEvent;
+import events.web.bus.BusAgentUpdatedEvent;
+import events.web.pedestrian.*;
+import events.web.vehicle.VehicleAgentCreatedEvent;
+import events.web.vehicle.VehicleAgentDeadEvent;
+import events.web.vehicle.VehicleAgentRouteChangedEvent;
+import events.web.vehicle.VehicleAgentUpdatedEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import smartcity.ITimeProvider;
@@ -24,8 +36,10 @@ class Communicator {
 
     @Subscribe
     public void handle(SimulationPreparedEvent e) {
-        onHandle(e, "Lights: " + e.lights.size() + ", stations: " + e.stations.size());
-        webService.prepareSimulation(e.lights, e.stations);
+        onHandle(e, "Lights: " + e.lights.size() +
+                ", stations: " + e.stations.size() +
+                ", buses: " + e.buses.size());
+        webService.prepareSimulation(e.lights, e.stations, e.buses);
     }
 
     @Subscribe
@@ -41,7 +55,7 @@ class Communicator {
 
     @Subscribe
     public void handle(VehicleAgentUpdatedEvent e) {
-        webService.updateCar(e.agentId, e.agentPosition);
+        webService.updateCar(e.id, e.position);
     }
 
     @Subscribe
@@ -63,6 +77,52 @@ class Communicator {
     @Subscribe
     public void handle(TroublePointCreatedEvent e) {
         webService.createTroublePoint(e.id, e.position);
+    }
+
+    @Subscribe
+    public void handle(BusAgentStartedEvent e) {
+    }
+
+    @Subscribe
+    public void handle(BusAgentUpdatedEvent e) {
+        webService.updateBus(e.id, e.position);
+    }
+
+    @Subscribe
+    public void handle(BusAgentFillStateUpdatedEvent e) {
+        webService.updateBusFillState(e.id, e.fillState);
+    }
+
+    @Subscribe
+    public void handle(BusAgentDeadEvent e) {
+        onHandle(e);
+        webService.killBus(e.id);
+    }
+
+    @Subscribe
+    public void handle(PedestrianAgentCreatedEvent e) {
+        webService.createPedestrian(e.id, e.position, e.routeToStation, e.routeFromStation, e.isTestPedestrian);
+    }
+
+    @Subscribe
+    public void handle(PedestrianAgentUpdatedEvent e) {
+        webService.updatePedestrian(e.id, e.position);
+    }
+
+    @Subscribe
+    public void handle(PedestrianAgentEnteredBusEvent e) {
+        webService.pushPedestrianIntoBus(e.id);
+    }
+
+    @Subscribe
+    public void handle(PedestrianAgentLeftBusEvent e) {
+        webService.pullPedestrianFromBus(e.id, e.position);
+    }
+
+    @Subscribe
+    public void handle(PedestrianAgentDeadEvent e) {
+        onHandle(e);
+        webService.killPedestrian(e.id);
     }
 
     private void onHandle(Object obj) {

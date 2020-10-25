@@ -12,8 +12,8 @@ public class ConfigContainer extends ConfigMutator
         implements IZoneMutator, ILightConfigContainer,
         IConstructionSiteConfigContainer {
     private SimulationState simulationState = SimulationState.INITIAL;
-    private boolean shouldGeneratePedestriansAndBuses = false;
-    private boolean shouldGenerateCars = true;
+    private boolean shouldGeneratePedestriansAndBuses = true;
+    private boolean shouldGenerateCars = false;
     private boolean lightManagersLock = false;
     private boolean isLightStrategyActive = true;
     private boolean isConstructionSiteStrategyActive = false;

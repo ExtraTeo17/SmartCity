@@ -83,7 +83,6 @@ public class StationStrategy {
         return arrivalInfos.removeIf(arrivalInfo -> arrivalInfo.agentName.equals(agentName));
     }
 
-
     public OptimizationResult requestBusesAndPeopleFreeToGo() {
         var result = new OptimizationResult();
         for (var entry : busAgentOnStationToArrivalTime.entrySet()) {
@@ -102,18 +101,22 @@ public class StationStrategy {
             }
             else if (actualTime.isAfter(scheduledTimeMinusWait) &&
                     actualTime.isBefore(scheduledTimePlusWait)) {
-                logger.info("------------------BUS WAS ON TIME-----------------------");
+                logger.debug("------------------BUS WAS ON TIME-----------------------");
                 List<String> passengersThatCanLeave = getPassengersWhoAreReadyToGo(busLine);
                 if (SHOULD_USE_STRATEGY) {
                     var farPassengers = getPassengersWhoAreFar(busLine, scheduledTime.plusSeconds(WAIT_PERIOD_SECONDS));
                     passengersThatCanLeave.addAll(farPassengers);
-                    logger.info("-----------------WAITING FOR: " + farPassengers.size() + " PASSENGERS------------------");
+                    logger.debug("-----------------WAITING FOR: " + farPassengers.size() + " PASSENGERS------------------");
                 }
 
                 result.addBusAndPedestrianGrantedPassthrough(busLine, passengersThatCanLeave);
             }
             else if (actualTime.isBefore(scheduledTimeMinusWait)) {
-                logger.debug("------------------BUS TOO EARLY-----------------------");
+                // TODO: Maybe bus should send message to bus or sth? Or check if simulation_time.now() == scheduled.
+                //  I added it because bus was waiting indefinitely on station
+                List<String> passengersThatCanLeave = getPassengersWhoAreReadyToGo(busLine);
+                result.addBusAndPedestrianGrantedPassthrough(busLine, passengersThatCanLeave);
+                logger.debug("BUS TOO EARLY: scheduled: " + scheduledTimeMinusWait + ", actual: " + actualTime);
             }
             else {
                 logger.warn("Undetermined situation for line " + busLine + ", scheduledTime" + scheduledTime +

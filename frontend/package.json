@@ -7,17 +7,25 @@
     "react": "^16.13.1",
     "react-dom": "^16.13.1",
     "react-leaflet": "2.7.0",
+    "react-leaflet-markercluster": "^2.0.0",
     "react-notify-toast": "0.5.1",
     "react-redux": "^7.2.1",
-    "react-scripts": "^3.4.3",
+    "react-scripts": "^3.4.4",
     "redux": "^4.0.5",
-    "redux-actions": "^2.6.5"
+    "redux-actions": "^2.6.5",
+    "reselect": "^4.0.0"
   },
   "devDependencies": {
     "eslint": "^6.8.0",
+    "eslint-config-airbnb": "^18.0.1",
+    "eslint-config-prettier": "^6.4.0",
+    "eslint-loader": "^3.0.2",
     "eslint-plugin-autofix": "^1.0.2",
     "eslint-plugin-jest": "^22.17.0",
     "eslint-plugin-react": "^7.20.3",
+    "eslint-plugin-import": "^2.18.2",
+    "eslint-plugin-jsx-a11y": "^6.2.3",
+    "eslint-plugin-prettier": "^3.1.1",
     "prettier": "^1.19.1",
     "redux-devtools-extension": "2.13.8"
   },

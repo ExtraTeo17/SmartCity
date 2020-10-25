@@ -60,14 +60,14 @@ public class TaskManager implements ITaskManager {
             var posA = zoneCenter.sum(geoPosInZoneCircle);
             var posB = zoneCenter.diff(geoPosInZoneCircle);
 
-            taskProvider.getCreateCarTask(posA, posB, runCount % testCarId == 0).run();
+            taskProvider.getCreateCarTask(posA, posB, runCount == testCarId).run();
         };
 
         runIf(() -> agentsContainer.size(VehicleAgent.class) < carsLimit, createCars, CREATE_CAR_INTERVAL, true);
     }
 
     @Override
-    public void schedulePedestrianCreation(int numberOfPedestrians, int testPedestrianId) {
+    public void schedulePedestrianCreation(int pedestriansLimit, int testPedestrianId) {
         Consumer<Integer> createPedestrians = (runCount) -> {
             var busAgentOpt = getRandomBusAgent();
             if (busAgentOpt.isEmpty()) {
@@ -79,9 +79,9 @@ public class TaskManager implements ITaskManager {
 
             // TODO: Move more logic here
             taskProvider.getCreatePedestrianTask(stations.first, stations.second, busAgent.getLine(),
-                    runCount % testPedestrianId == 0).run();
+                    runCount == testPedestrianId).run();
         };
-        runIf(() -> agentsContainer.size(PedestrianAgent.class) < numberOfPedestrians, createPedestrians,
+        runIf(() -> agentsContainer.size(PedestrianAgent.class) < pedestriansLimit, createPedestrians,
                 CREATE_PEDESTRIAN_INTERVAL, true);
     }
 
@@ -105,6 +105,18 @@ public class TaskManager implements ITaskManager {
     public void scheduleSimulationControl(BooleanSupplier testSimulationState, long nanoStartTime) {
         var simulationControlTask = taskProvider.getSimulationControlTask(nanoStartTime);
         runWhile(testSimulationState, simulationControlTask, TimeProvider.MS_PER_TICK);
+    }
+
+    @Override
+    public void cancelAll() {
+        var executors = runnableFactory.clearAllExecutors();
+        for (var executor : executors) {
+            try {
+                executor.shutdownNow();
+            } catch (Exception e) {
+                logger.warn("Error cancelling executor: ", e);
+            }
+        }
     }
 
     private void runNTimes(Consumer<Integer> runCountConsumer, int runCount, int interval) {

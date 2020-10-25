@@ -36,10 +36,10 @@ class AgentsFactory implements IAgentsFactory {
 
     @Inject
     public AgentsFactory(IdGenerator idGenerator,
+                         EventBus eventBus,
                          ITimeProvider timeProvider,
                          IRouteTransformer routeTransformer,
                          ICrossroadFactory crossroadFactory,
-                         EventBus eventBus,
                          IRouteGenerator routeGenerator,
                          ConfigContainer configContainer) {
         this.idGenerator = idGenerator;
@@ -82,8 +82,7 @@ class AgentsFactory implements IAgentsFactory {
         var id = idGenerator.get(BusAgent.class);
         var uniformRoute = routeTransformer.uniformRoute(route);
         logger.trace("DisplayRoute size: " + route.size() + ", routeSize: " + uniformRoute.size());
-        var bus = new Bus(timeProvider, id, route, uniformRoute,
-                timetable, busLine, brigadeNr);
+        var bus = new Bus(eventBus, timeProvider, id, route, uniformRoute, timetable, busLine, brigadeNr);
         return new BusAgent(id, bus, timeProvider, eventBus);
     }
 

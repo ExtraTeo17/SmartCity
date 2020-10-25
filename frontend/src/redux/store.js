@@ -1,19 +1,21 @@
-import appReducer from "./reducers/index";
 import { createStore } from "redux";
 import { composeWithDevTools } from "redux-devtools-extension";
+import appReducer from "./reducers/index";
 
 const initialState = {
   interaction: {
     center: {
-      lat: 52.23682,
-      lng: 21.01681,
-      rad: 600,
+      lat: 52.203,
+      lng: 20.861,
+      rad: 350,
     },
   },
   message: {
     lights: [],
     cars: [],
     stations: [],
+    buses: [],
+    pedestrians: [],
     troublePoints: [],
     wasPrepared: false,
     wasStarted: false,
@@ -21,6 +23,6 @@ const initialState = {
 };
 
 const store = createStore(appReducer, initialState, composeWithDevTools());
-export const dispatch = store.dispatch;
+export const { dispatch } = store;
 
 export default store;

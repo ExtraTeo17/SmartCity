@@ -1,7 +1,7 @@
 package agents.utilities;
 
 import vehicles.MovingObject;
-import vehicles.VehicleType;
+import vehicles.enums.VehicleType;
 
 public class MessageParameter {
     public static final String TYPE = "type";
@@ -23,8 +23,13 @@ public class MessageParameter {
     public static final String TROUBLE_LAT = "trouble_lat";
     public static final String EDGE_ID = "edge_id";
     public static final String TROUBLE = "trouble";
+    public static final String TYPEOFTROUBLE = "type_of_trouble";
+    public static final String CONSTRUCTION = "construction";
+    public static final String ACCIDENT = "accident";
+    public static final String TRAFFIC_JAMS = "traffic_jams";
     public static final String SHOW = "show";
     public static final String STOP = "stop";
+    public static final String LENGTH_OF_JAM = "length_of_jam";
 
 
     public static String getTypeByMovingObject(MovingObject movingObject) {

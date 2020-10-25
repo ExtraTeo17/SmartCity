@@ -9,7 +9,9 @@ import com.google.common.collect.HashBasedTable;
 import com.google.common.collect.Table;
 import com.google.common.eventbus.EventBus;
 import com.google.inject.Inject;
-import events.web.VehicleAgentCreatedEvent;
+import events.web.bus.BusAgentStartedEvent;
+import events.web.pedestrian.PedestrianAgentCreatedEvent;
+import events.web.vehicle.VehicleAgentCreatedEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import routing.abstractions.IRouteGenerator;
@@ -112,6 +114,10 @@ public class TaskProvider implements ITaskProvider {
                         busLine, startStation, endStation, testPedestrian);
                 if (agentsContainer.tryAdd(agent)) {
                     agent.start();
+                    eventBus.post(new PedestrianAgentCreatedEvent(agent.getId(), agent.getPosition(),
+                            routeToStation,
+                            routeFromStation,
+                            testPedestrian));
                 }
             } catch (Exception e) {
                 logger.warn("Unknown error in pedestrian creation", e);
@@ -119,11 +125,21 @@ public class TaskProvider implements ITaskProvider {
         };
     }
 
+    @SuppressWarnings("FeatureEnvy")
     @Override
     public Runnable getScheduleBusControlTask() {
         return () -> {
             try {
-                agentsContainer.removeIf(BusAgent.class, BusAgent::runBasedOnTimetable);
+                agentsContainer.forEach(BusAgent.class, (busAgent) -> {
+                    // Agent was created but not accepted.
+                    if (busAgent.shouldStart()) {
+                        eventBus.post(new BusAgentStartedEvent(busAgent.getId()));
+                        if (busAgent.getAID() == null) {
+                            agentsContainer.tryAccept(busAgent);
+                        }
+                    }
+                    busAgent.runBasedOnTimetable();
+                });
             } catch (Exception e) {
                 logger.warn("Error in bus control task", e);
             }

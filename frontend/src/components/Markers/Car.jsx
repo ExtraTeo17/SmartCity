@@ -1,9 +1,11 @@
 import React from "react";
-import { carIcon, testCarIcon } from "../../styles/icons";
 import { Marker, Popup } from "react-leaflet";
+import { carIcon, testCarIcon } from "../../styles/icons";
 
 const Car = props => {
-  const { id, location, isTestCar } = props.car;
+  const {
+    car: { id, location, isTestCar },
+  } = props;
 
   return (
     <Marker position={location} icon={isTestCar ? testCarIcon : carIcon} zIndexOffset={20}>
@@ -12,4 +14,4 @@ const Car = props => {
   );
 };
 
-export default Car;
+export default React.memo(Car);
