@@ -43,6 +43,8 @@ public abstract class MovingObject {
         this.state = DrivingState.STARTING;
     }
 
+    public int getMoveIndex(){return moveIndex;}
+
     /**
      * @return Scaled speed in KM/H
      */
@@ -77,12 +79,16 @@ public abstract class MovingObject {
 
         return uniformRoute.get(moveIndex);
     }
-    public RouteNode getCurrentRouteNode() {
+
+    //TODO: RETURN TO NORMAL  return uniformRoute.get(moveIndex-1);
+    public RouteNode getRouteNodeBeforeLight() {
+        if (moveIndex - 1 <= 0 ) {
+            return uniformRoute.get(0);
+        }
         if (moveIndex >= uniformRoute.size()) {
             return uniformRoute.get(uniformRoute.size() - 1);
         }
-
-        return uniformRoute.get(moveIndex);
+        return uniformRoute.get(moveIndex-1);
     }
 
     public RouteNode getPositionFarOnIndex(int index) {
@@ -102,7 +108,8 @@ public abstract class MovingObject {
     }
 
     public boolean checkIfEdgeExistsAndFarEnough(Long edgeId) {
-        int threshold = 5;
+        //TODO: change back
+        int threshold = 3;
         int counter = 0;
         for (RouteNode r : uniformRoute) {
             if (r.getInternalEdgeId() == edgeId) {
@@ -176,7 +183,7 @@ public abstract class MovingObject {
     }
 
     public int getMillisecondsFromAToB(int startIndex, int finishIndex) {
-        return ((startIndex - startIndex) * RoutingConstants.STEP_CONSTANT) / getSpeed();
+        return ((finishIndex - startIndex) * RoutingConstants.STEP_CONSTANT) / getSpeed();
     }
     public List<RouteNode> getSimpleRoute() { return simpleRoute; }
 

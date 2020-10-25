@@ -18,7 +18,7 @@ import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 class SimpleCrossroad implements ICrossroad {
-    private static final int TRAFFIC_JAM_THRESHOLD = 3;
+    private static final int TRAFFIC_JAM_THRESHOLD = 2;
 	private final Logger logger;
     private final EventBus eventBus;
     private final int managerId;
@@ -55,7 +55,8 @@ class SimpleCrossroad implements ICrossroad {
                 for (String carName : light.carQueue) {
                     result.addCarGrantedPassthrough(carName);
                     if (light.carQueue.size() > TRAFFIC_JAM_THRESHOLD) {
-                    	result.setShouldNotifyCarAboutTrafficJamOnThisLight(light.getLat(), light.getLng());
+                        logger.info("---------------------------------BIIIIIIITCHEEEEES JAM---------------------------");
+                    	result.setShouldNotifyCarAboutTrafficJamOnThisLight(light.getLat(), light.getLng(),light.carQueue.size());
                     }
                     break;
                 }

@@ -16,6 +16,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import routing.core.Position;
 
+import java.util.HashSet;
+import java.util.Set;
+
 import static agents.message.MessageManager.createProperties;
 
 public class TroubleManagerAgent extends Agent {
@@ -24,7 +27,7 @@ public class TroubleManagerAgent extends Agent {
 
     private final IAgentsContainer agentsContainer;
     private final EventBus eventBus;
-
+    private Set<Integer> setOfBlockedEdges = new HashSet<Integer>();
     @Inject
     TroubleManagerAgent(IAgentsContainer agentsContainer,
                         EventBus eventBus) {
@@ -65,8 +68,16 @@ public class TroubleManagerAgent extends Agent {
 
             private void trafficJamsAppearedHandle(ACLMessage rcv) {
                 //TODO: Rysowanie w LightManager - Przemek
+                Position positionOfTroubleLight = Position.of(rcv.getUserDefinedParameter(MessageParameter.TROUBLE_LAT),
+                                                              rcv.getUserDefinedParameter(MessageParameter.TROUBLE_LON));
                 logger.info("Got message about trouble - TRAFFIC JAM");
-                sendBroadcast(generateMessageAboutTrouble( rcv, MessageParameter.TRAFFIC_JAMS));
+
+                int edgeId = Integer.parseInt(rcv.getUserDefinedParameter(MessageParameter.EDGE_ID));
+                if(!setOfBlockedEdges.contains(edgeId))
+                {
+                    setOfBlockedEdges.add(edgeId);
+                    sendBroadcast(generateMessageAboutTrouble( rcv, MessageParameter.TRAFFIC_JAMS));
+                }
 
             }
             private void sendBroadcast(ACLMessage response)

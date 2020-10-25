@@ -55,6 +55,14 @@ public class HighwayAccessor {
 
     public static Pair<List<Long>, List<RouteNode>> getOsmWayIdsAndPointList(double fromLat, double fromLon,
                                                                              double toLat, double toLon, boolean onFoot) {
+
+/*
+        fromLat =52.23394;
+        fromLon=20.99125;
+        toLat=52.23437;
+    toLon=20.99096;
+
+*/
         List<Long> osmWayIds = new ArrayList<>();
         List<RouteNode> pointList = new ArrayList<>();
 
@@ -80,7 +88,7 @@ public class HighwayAccessor {
                 osmWayIds.add(osmWayIdToAdd);
                 previousWayId = osmWayIdToAdd;
             }
-
+            System.out.println("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"+ edgeId);
             pointList.addAll(getRouteNodeList(edgeId, edge.fetchWayGeometry(2)));
         }
 

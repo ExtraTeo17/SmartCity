@@ -20,10 +20,11 @@ import smartcity.stations.ArrivalInfo;
 import java.util.List;
 
 import static agents.message.MessageManager.*;
+import static java.lang.Thread.sleep;
 
 public class LightManagerAgent extends AbstractAgent {
     public static final String name = LightManagerAgent.class.getSimpleName().replace("Agent", "");
-
+    private static int cou =0;
     private final ICrossroad crossroad;
 
     LightManagerAgent(int id, ICrossroad crossroad,
@@ -50,48 +51,50 @@ public class LightManagerAgent extends AbstractAgent {
                 // apply strategy
                 //for elements in queue (if there are elements in queue, make green)
                 OptimizationResult result = crossroad.requestOptimizations();
-                handleOptimizationResult(result);
-            }
-
-            private void handleOptimizationResult(OptimizationResult result) {
-                List<String> agents = result.carsFreeToProceed();
-                handleTrafficJams(result);
-                for (String agentName : agents) {
-                    answerCanProceed(agentName);
+                try {
+                    handleOptimizationResult(result);
+                } catch (Exception e) {
+                    e.printStackTrace();
                 }
-
             }
 
-            private void handleTrafficJams(OptimizationResult result) {
-
-                //TODO: CHANGE TO CROSSROAD
-             /*   for(Pair<Integer,Boolean> road : result.getTrafficJamsInfo())
-                {
-                    if(road.getValue1())
-                    {
-                        sendMessageAboutTroubleToVehicle(road);
+            private void handleOptimizationResult(OptimizationResult result) throws Exception {
+                //Expected one agent in the list
+                if(cou<1)
+                { logger.info("I AM IN!"); sleep(1000);
+                    sendMessageAboutTroubleToVehicle(null, "RegularCar1");cou++;}
+               /* List<String> agents = result.carsFreeToProceed();
+                if(agents.size()!=0) {
+                    handleTrafficJams(result, agents.get(0));
+                    for (String agentName : agents) {
+                        answerCanProceed(agentName);
                     }
                 }*/
-            	
-            	
-            	if (result.shouldNotifyCarAboutTrafficJamOnThisLight()) {
-            		// TODO: use result.getJammedLight(...)
-            	}
             }
 
-            private void sendMessageAboutTroubleToVehicle(Pair<Integer, Boolean> road) {
+            private void handleTrafficJams(OptimizationResult result, String nameOfAgent) throws Exception {
+                //TODO shouldNotifyCarAboutTrafficJamOnThisLight have an old state to stop the jam
+            	if (true){//result.shouldNotifyCarAboutTrafficJamOnThisLight()) {
+            		// TODO: use result.getJammedLight(...)
+                    sendMessageAboutTroubleToVehicle(result,nameOfAgent);
+            	}
+            	else{
+            	    //stop jam
+                }
+            }
+
+            private void sendMessageAboutTroubleToVehicle(OptimizationResult result, String nameOfAgent) throws Exception {
 
 
-                    ACLMessage msg = createMessage(ACLMessage.REQUEST, TroubleManagerAgent.name);
+                    ACLMessage msg = createMessage(ACLMessage.PROPOSE, nameOfAgent);
                     Properties properties = createProperties(MessageParameter.LIGHT);
                     properties.setProperty(MessageParameter.TYPEOFTROUBLE,MessageParameter.TRAFFIC_JAMS);
                     properties.setProperty(MessageParameter.TROUBLE, MessageParameter.SHOW);
-
-                  //  properties.setProperty(MessageParameter.TROUBLE_LAT, Double.toString(troublePoint.getLat()));
-                  //  properties.setProperty(MessageParameter.TROUBLE_LON, Double.toString(troublePoint.getLng()));
-
-                 //   properties.setProperty(MessageParameter.EDGE_ID, Long.toString(troublePoint.getInternalEdgeId()));
+                    properties.setProperty(MessageParameter.LENGTH_OF_JAM,Double.toString(1000));//result.getLengthOfJam()));
+                    properties.setProperty(MessageParameter.TROUBLE_LAT, Double.toString(52.23455));//result.getJammedLightPosition().getLat()));
+                    properties.setProperty(MessageParameter.TROUBLE_LON, Double.toString(20.99076));//result.getJammedLightPosition().getLng()));
                     msg.setAllUserDefinedParameters(properties);
+                    logger.info("Send message to "+nameOfAgent+" for request of EdgeID");
                     //print(" send message about trouble on " + Long.toString(troublePoint.getInternalEdgeId()));
                     send(msg);
 
