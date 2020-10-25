@@ -150,7 +150,8 @@ class AgentsCreatorTests {
         var crossroadFactory = setupCrossroadFactory();
         var eventBus = new EventBus();
 
-        return new AgentsFactory(idGenerator, timeProvider, routeTransformer, crossroadFactory, eventBus, mock(IRouteGenerator.class));
+        return new AgentsFactory(idGenerator, timeProvider, routeTransformer, crossroadFactory,
+        		eventBus, mock(IRouteGenerator.class), mock(ConfigContainer.class));
     }
 
     private ICrossroadFactory setupCrossroadFactory() {

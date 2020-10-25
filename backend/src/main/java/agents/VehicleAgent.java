@@ -18,6 +18,7 @@ import routing.nodes.LightManagerNode;
 import routing.nodes.RouteNode;
 import smartcity.ITimeProvider;
 import smartcity.SmartCityAgent;
+import smartcity.config.ConfigContainer;
 import vehicles.DrivingState;
 import vehicles.MovingObject;
 
@@ -39,18 +40,21 @@ public class VehicleAgent extends AbstractAgent {
     private final int timeBeforeAccident;
     private final IRouteGenerator routeGenerator;
     private final IRouteTransformer routeTransformer;
+    private final ConfigContainer configContainer;
     private RouteNode troublePoint;
 
     VehicleAgent(int id, MovingObject vehicle, int timeBeforeAccident,
                  ITimeProvider timeProvider,
                  IRouteGenerator routeGenerator,
                  IRouteTransformer routeTransformer,
-                 EventBus eventBus) {
+                 EventBus eventBus,
+                 ConfigContainer configContainer) {
         super(id, vehicle.getVehicleType(), timeProvider, eventBus);
         this.vehicle = vehicle;
         this.timeBeforeAccident = timeBeforeAccident;
         this.routeGenerator = routeGenerator;
         this.routeTransformer = routeTransformer;
+        this.configContainer = configContainer;
     }
 
     @Override
@@ -128,40 +132,59 @@ public class VehicleAgent extends AbstractAgent {
 
                             Long edgeId = Long.parseLong(rcv.getUserDefinedParameter(MessageParameter.EDGE_ID));
                             logger.info("  GOT PROPOSE TO CHANGE THE ROUTE. AND EXCLUDE: " + edgeId);
-                            if (vehicle.checkIfEdgeExistsAndFarEnough(edgeId)) {
-                                RouteNode routeCarOnThreshold = vehicle.getPositionFarOnIndex(THRESHOLD_UNTIL_INDEX_CHANGE);
-                                int indexAfterWhichRouteChange = vehicle.getFarOnIndex(THRESHOLD_UNTIL_INDEX_CHANGE);
-
-                                if (!vehicle.currentTrafficLightNodeWithinAlternativeRouteThreshold(THRESHOLD_UNTIL_INDEX_CHANGE)) {
-                                	sendRefusalMessageToLightManagerAfterRouteChange(THRESHOLD_UNTIL_INDEX_CHANGE);
-                                }
-
-                                var oldUniformRoute = vehicle.getUniformRoute();
-
-                                var newSimpleRouteEnd = routeGenerator.generateRouteInfo(routeCarOnThreshold,
-                                        oldUniformRoute.get(oldUniformRoute.size() - 1));
-                                var newRouteAfterChangeIndex = routeTransformer.uniformRoute(newSimpleRouteEnd);
-
-                                var route = oldUniformRoute.subList(0, indexAfterWhichRouteChange);
-                                route.addAll(newRouteAfterChangeIndex);
-                                var mergeResult = routeTransformer.mergeByDistance(vehicle.getSimpleRoute(),
-                                        newSimpleRouteEnd);
-                                vehicle.setRoutes(mergeResult.mergedRoute, route);
-                                
-                                vehicle.switchToNextTrafficLight();
-
-                                eventBus.post(new VehicleAgentRouteChangedEvent(getId(), mergeResult.startNodes, routeCarOnThreshold,
-                                        newSimpleRouteEnd));
+                            final Integer indexOfRouteNodeWithEdge = vehicle.findIndexOfEdgeOnRoute(edgeId,
+                            		THRESHOLD_UNTIL_INDEX_CHANGE);
+                            if (indexOfRouteNodeWithEdge != null) {
+                            	handleRouteChange(indexOfRouteNodeWithEdge);
                             }
-
                         }
                     }
                 }
                 block(100);
-
             }
 
-			private void sendRefusalMessageToLightManagerAfterRouteChange(int howFar) {
+			private void handleRouteChange(final int indexOfRouteNodeWithEdge) {
+				int indexAfterWhichRouteChanges;
+				if (configContainer.isConstructionSiteStrategyActive()) {
+					indexAfterWhichRouteChanges = vehicle.getFarOnIndex(THRESHOLD_UNTIL_INDEX_CHANGE);
+				} else {
+					indexAfterWhichRouteChanges = indexOfRouteNodeWithEdge - (30 * THRESHOLD_UNTIL_INDEX_CHANGE) < 0
+							? 0 : indexOfRouteNodeWithEdge - (30 * THRESHOLD_UNTIL_INDEX_CHANGE);
+				}
+				updateRouteFromIndex(indexAfterWhichRouteChanges);
+			}
+
+			private void updateRouteFromIndex(final int indexAfterWhichRouteChanges) {
+				final IGeoPosition positionAfterWhichRouteChanges = vehicle
+						.getPositionOnIndex(indexAfterWhichRouteChanges);
+                if (!vehicle.currentTrafficLightNodeWithinIndex(indexAfterWhichRouteChanges)) {
+                	sendRefusalMessageToLightManagerAfterRouteChange();
+                }
+                var oldUniformRoute = vehicle.getUniformRoute();
+            	var newSimpleRouteEnd = routeGenerator.generateRouteInfo(positionAfterWhichRouteChanges,
+                    oldUniformRoute.get(oldUniformRoute.size() - 1));
+                var newRouteAfterChangeIndex = routeTransformer.uniformRoute(newSimpleRouteEnd);
+                var route = oldUniformRoute.subList(0, indexAfterWhichRouteChanges);
+                route.addAll(newRouteAfterChangeIndex);
+                
+                displayRouteDebug(route);
+                
+                var mergeResult = routeTransformer.mergeByDistance(vehicle.getSimpleRoute(),
+                        newSimpleRouteEnd);
+                vehicle.setRoutes(mergeResult.mergedRoute, route);
+                vehicle.switchToNextTrafficLight();
+                eventBus.post(new VehicleAgentRouteChangedEvent(getId(), mergeResult.startNodes,
+                		positionAfterWhichRouteChanges, newSimpleRouteEnd));
+			}
+
+			private void displayRouteDebug(List<RouteNode> route) {
+				for (RouteNode node : route) {
+					System.out.print(node.getDebugString(node instanceof LightManagerNode));
+					System.out.println();
+				}
+			}
+
+			private void sendRefusalMessageToLightManagerAfterRouteChange() {
                 //change route, that is why send stop
                 LightManagerNode currentManager = vehicle.getCurrentTrafficLightNode();
                 if (currentManager != null) {

@@ -69,43 +69,46 @@ public abstract class MovingObject {
     public IGeoPosition getEndPosition() {
         return uniformRoute.get(uniformRoute.size() - 1);
     }
-
-    public IGeoPosition getPosition() {
-        if (moveIndex >= uniformRoute.size()) {
+    
+    public IGeoPosition getPositionOnIndex(int index) {
+        if (index >= uniformRoute.size()) {
             return uniformRoute.get(uniformRoute.size() - 1);
         }
 
-        return uniformRoute.get(moveIndex);
+        return uniformRoute.get(index);
     }
 
-    public RouteNode getPositionFarOnIndex(int index) {
-        if (moveIndex >= uniformRoute.size()) {
-            return uniformRoute.get(uniformRoute.size() - 1);
-        }
+    public IGeoPosition getPosition() {
+    	return getPositionOnIndex(moveIndex);
+    }
 
-        return uniformRoute.get(moveIndex + index);
+    public IGeoPosition getPositionFarOnIndex(int index) {
+        return getPositionOnIndex(moveIndex + index);
     }
 
     public int getFarOnIndex(int index) {
-        if (moveIndex >= uniformRoute.size()) {
+        if (moveIndex + index >= uniformRoute.size()) {
             return uniformRoute.size() - 1;
         }
 
         return moveIndex + index;
     }
 
-    public boolean checkIfEdgeExistsAndFarEnough(Long edgeId) {
-        int threshold = 5;
-        int counter = 0;
-        for (RouteNode r : uniformRoute) {
-            if (r.getInternalEdgeId() == edgeId) {
-                if (moveIndex + threshold <= counter) {
-                    return true;
+    /**
+     * Checks whether an edge exists on the uniformRoute
+     * @param ID of the edge checked for existence
+     * @return Index of the RouteNode on uniformRoute
+     * which contains the edge if edge is found, otherwise null
+     */
+    public Integer findIndexOfEdgeOnRoute(Long edgeId, int thresholdUntilIndexChange) {
+        for (int counter = 0; counter < uniformRoute.size(); ++counter) {
+            if (uniformRoute.get(counter).getInternalEdgeId() == edgeId) {
+                if (moveIndex + thresholdUntilIndexChange <= counter) {
+                    return counter;
                 }
             }
-            counter++;
         }
-        return false;
+        return null;
     }
 
 
@@ -172,8 +175,8 @@ public abstract class MovingObject {
 
     public abstract long getAdjacentOsmWayId();
 
-	public boolean currentTrafficLightNodeWithinAlternativeRouteThreshold(int thresholdUntilIndexChange) {
-		return moveIndex + thresholdUntilIndexChange >= closestLightIndex;
+	public boolean currentTrafficLightNodeWithinIndex(int index) {
+		return index >= closestLightIndex;
 	}
 
 }

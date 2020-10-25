@@ -15,6 +15,7 @@ public class ConfigContainer extends ConfigMutator
     private boolean shouldGenerateCars = true;
     private boolean lightManagersLock = false;
     private boolean isLightStrategyActive = true;
+    private boolean isConstructionSiteStrategyActive = false;
     private int extendTimeSeconds = 30;
 
     private final IZone zone;
@@ -97,6 +98,7 @@ public class ConfigContainer extends ConfigMutator
         carsConfig.setNumber(mutation, num);
     }
 
+    // TODO: Why the override is here, Przemek?
     @Override
     public boolean isLightStrategyActive() {
         return isLightStrategyActive;
@@ -105,6 +107,14 @@ public class ConfigContainer extends ConfigMutator
     @Override
     public void setLightStrategyActive(boolean lightStrategyActive) {
         isLightStrategyActive = lightStrategyActive;
+    }
+    
+    public boolean isConstructionSiteStrategyActive() {
+    	return isConstructionSiteStrategyActive;
+    }
+    
+    public void setConstructionSiteStrategyActive(boolean constructionSiteStrategyActive) {
+    	isConstructionSiteStrategyActive = constructionSiteStrategyActive;
     }
 
     public int getExtendTimeSeconds() {
