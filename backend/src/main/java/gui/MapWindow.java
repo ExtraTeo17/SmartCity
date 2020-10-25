@@ -213,7 +213,7 @@ public class MapWindow {
         MapPanel.revalidate();
         StartRouteButton.addActionListener(e -> eventBus.post(new StartSimulationEvent((int) carLimitSpinner.getValue(),
                 (int) testCarIdSpinner.getValue(), configContainer.shouldGenerateCars(),
-                configContainer.shouldGenerateTroublePoints(), ((Date) setTimeSpinner.getValue()).toInstant()
+                configContainer.shouldGenerateConstructionSites(), ((Date) setTimeSpinner.getValue()).toInstant()
                 .atZone(ZoneId.systemDefault())
                 .toLocalDateTime())));
         refreshTimer.scheduleAtFixedRate(new RefreshTask(), 0, REFRESH_MAP_INTERVAL_MILLISECONDS);

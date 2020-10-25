@@ -6,19 +6,27 @@ import routing.core.IZone;
 import routing.core.Position;
 import routing.core.Zone;
 import smartcity.SimulationState;
+import smartcity.config.abstractions.IConstructionSiteConfigContainer;
+import smartcity.config.abstractions.ILightConfigContainer;
+import smartcity.config.abstractions.IStationConfigContainer;
+import smartcity.config.abstractions.IZoneMutator;
 
 
+@SuppressWarnings("ClassWithTooManyFields")
 public class ConfigContainer extends ConfigMutator
-        implements IZoneMutator, ILightConfigContainer {
+        implements IZoneMutator,
+        ILightConfigContainer,
+        IConstructionSiteConfigContainer,
+        IStationConfigContainer {
     private SimulationState simulationState = SimulationState.INITIAL;
     private boolean shouldGeneratePedestriansAndBuses = false;
     private boolean shouldGenerateCars = true;
-    private boolean shouldGenerateTroublePoints = true;
-
     private boolean lightManagersLock = false;
     private boolean isLightStrategyActive = true;
+    private boolean isConstructionSiteStrategyActive = false;
+    private boolean isConstructionSiteGenerationActive = false;
     private boolean isStationStrategyActive = true;
-    private int extendTimeSeconds = 30;
+    private int lightExtendTime = 30;
 
     private final IZone zone;
     private final ObjectsConfig carsConfig;
@@ -110,23 +118,37 @@ public class ConfigContainer extends ConfigMutator
         isLightStrategyActive = lightStrategyActive;
     }
 
-    public int getExtendTimeSeconds() {
-        return extendTimeSeconds;
+    @Override
+    public int getExtendLightTime() {
+        return lightExtendTime;
     }
 
-    public boolean shouldGenerateTroublePoints() {
-        return shouldGenerateTroublePoints;
+    @Override
+    public boolean isConstructionSiteStrategyActive() {
+        return isConstructionSiteStrategyActive;
     }
 
-    public void setGenerateTroublePoints(boolean shouldGenerateTroublePoints) {
-        this.shouldGenerateTroublePoints = shouldGenerateTroublePoints;
+    @Override
+    public void setConstructionSiteStrategyActive(boolean constructionSiteStrategyActive) {
+        isConstructionSiteStrategyActive = constructionSiteStrategyActive;
     }
 
+    @Override
+    public boolean shouldGenerateConstructionSites() {
+        return isConstructionSiteGenerationActive;
+    }
 
+    @Override
+    public void setShouldGenerateConstructionSites(boolean constructionSiteGenerationActive) {
+        isConstructionSiteGenerationActive = constructionSiteGenerationActive;
+    }
+
+    @Override
     public boolean isStationStrategyActive() {
         return isStationStrategyActive;
     }
 
+    @Override
     public void setStationStrategyActive(boolean stationStrategyActive) {
         isStationStrategyActive = stationStrategyActive;
     }

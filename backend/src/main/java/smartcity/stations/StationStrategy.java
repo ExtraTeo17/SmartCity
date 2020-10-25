@@ -2,7 +2,7 @@ package smartcity.stations;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import smartcity.config.ConfigContainer;
+import smartcity.config.abstractions.IStationConfigContainer;
 import smartcity.lights.OptimizationResult;
 
 import java.time.LocalDateTime;
@@ -17,9 +17,9 @@ public class StationStrategy {
     private final static int WAIT_PERIOD_SECONDS = 60;
 
     private final Logger logger;
-    private final ConfigContainer configContainer;
+    private final IStationConfigContainer configContainer;
 
-    public StationStrategy(int managerId, ConfigContainer configContainer) {
+    public StationStrategy(int managerId, IStationConfigContainer configContainer) {
         this.logger = LoggerFactory.getLogger(this.getClass().getSimpleName() + managerId);
         this.configContainer = configContainer;
     }

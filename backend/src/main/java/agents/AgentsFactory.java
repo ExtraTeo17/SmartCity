@@ -31,7 +31,6 @@ class AgentsFactory implements IAgentsFactory {
     private final ICrossroadFactory crossroadFactory;
     private final EventBus eventBus;
     private final ConfigContainer configContainer;
-
     //TODO: GET from GUI;
     private final int timeBeforeTrouble = 5000;
 
@@ -62,15 +61,8 @@ class AgentsFactory implements IAgentsFactory {
             car = new TestCar(car, timeProvider);
         }
 
-        VehicleAgent agent;
-        if (configContainer.shouldGenerateTroublePoints()) {
-            agent = new VehicleAgent(id, car, timeBeforeTrouble, timeProvider, routeGenerator, routeTransformer, eventBus);
-        }
-        else {
-            agent = new VehicleAgent(id, car, timeProvider, eventBus);
-        }
-
-        return agent;
+        return new VehicleAgent(id, car, timeBeforeTrouble, timeProvider,
+                routeGenerator, routeTransformer, eventBus, configContainer);
     }
 
     @Override

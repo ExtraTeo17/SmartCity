@@ -36,7 +36,7 @@ public class Scheduler {
     public void handle(StartSimulationEvent e) {
         activateLightManagerAgents();
         if (e.shouldGenerateCars) {
-            configContainer.setGenerateTroublePoints(e.shouldGenerateTroublePoints);
+            configContainer.setShouldGenerateConstructionSites(e.shouldGenerateTroublePoints);
             taskManager.scheduleCarCreation(e.carsNum, e.testCarId);
         }
         if (configContainer.shouldGeneratePedestriansAndBuses()) {
