@@ -18,12 +18,8 @@ const DEFAULT_ZOOM = 15;
 const MAX_ZOOM = 20;
 const MAX_NATIVE_ZOOM = 19;
 
-const CityMap = props => {
+const CityMap = ({ center: { lat, lng, rad }, wasStarted }) => {
   const [zoom, setZoom] = useState(DEFAULT_ZOOM);
-  const {
-    center: { lat, lng, rad },
-  } = props;
-  const { wasStarted } = props;
 
   function setCenter(latlng) {
     const { lat, lng } = latlng;
@@ -74,4 +70,4 @@ const mapStateToProps = (state /* , ownProps */) => {
   };
 };
 
-export default connect(mapStateToProps)(CityMap);
+export default connect(mapStateToProps)(React.memo(CityMap));

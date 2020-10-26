@@ -18,12 +18,12 @@ export default {
   },
 
   startSimulation(
-    { carsNum, testCarNum, generateCars, generateTroublePoints, startTime } = {
+    { carsNum, testCarNum, generateCars, generateTroublePoints, time } = {
       carsNum: 0,
       testCarNum: 0,
       generateCars: true,
       generateTroublePoints: false,
-      startTime: new Date(),
+      time: new Date(),
     }
   ) {
     const msg = {
@@ -33,7 +33,7 @@ export default {
         testCarId: testCarNum,
         generateCars,
         generateTroublePoints,
-        startTime,
+        startTime: time,
       },
     };
     WebServer.send(msg);

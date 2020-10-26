@@ -1,4 +1,5 @@
 export const CENTER_UPDATED = "Center/UPDATED";
+export const START_SIMULATION_DATA_UPDATED = "StartData/UPDATED";
 
 export const SIMULATION_PREPARED = "Simulation/PREPARED";
 export const SIMULATION_STARTED = "Simulation/STARTED";

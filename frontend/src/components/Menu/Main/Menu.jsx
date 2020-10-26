@@ -1,117 +1,32 @@
 /* eslint-disable no-restricted-globals */
 /* eslint-disable indent */
 import { connect } from "react-redux";
-import React, { useState } from "react";
+import React from "react";
 import Flatpickr from "react-flatpickr";
 import "flatpickr/dist/themes/material_blue.css";
 
+import { dispatch } from "../../../redux/store";
+import { startSimulationDataUpdated } from "../../../redux/actions";
 import ApiManager from "../../../web/ApiManager";
 import "../../../styles/Menu.css";
 import PrepareMenu from "./PrepareMenu";
+import CarsMenu from "./CarsMenu";
 
-const DEFAULT_CARS_NUM = 4;
-const DEFAULT_TEST_CAR = 2;
-const CAR_MIN = 1;
-const CAR_MAX = 50;
-
-const Menu = props => {
-  const { wasPrepared, wasStarted } = props;
-
-  const [carsNum, setCarsNum] = useState(DEFAULT_CARS_NUM);
-  const [testCarNum, setTestCarNum] = useState(DEFAULT_TEST_CAR);
-  const [generateCars, setGenerateCars] = useState(true);
-  const [generateTroublePoints, setGenerateTroublePoints] = useState(false);
-  const [timeBeforeTrouble, setTimeBeforeTrouble] = useState(5);
-  const [time, setTime] = useState(new Date());
+const Menu = ({ wasPrepared, wasStarted, startSimulationData }) => {
+  function setTime(newTime) {
+    dispatch(startSimulationDataUpdated({ time: newTime }));
+  }
 
   const startSimulation = () => {
-    ApiManager.startSimulation({
-      carsNum,
-      testCarNum,
-      generateCars,
-      generateTroublePoints: generateCars && generateTroublePoints,
-      startTime: time,
-    });
+    ApiManager.startSimulation(startSimulationData);
   };
 
   return (
     <div>
       <PrepareMenu />
-      <form className="form-border">
-        <div className="form-row">
-          <div className="form-group col-md-6">
-            <label htmlFor="carsNum">Cars limit</label>
-            <input
-              type="number"
-              defaultValue={carsNum}
-              className="form-control"
-              id="carsNum"
-              disabled={!generateCars}
-              min={CAR_MIN}
-              max={CAR_MAX}
-              placeholder="Enter limit for cars"
-              onChange={e => setCarsNum(e.target.value)}
-            />
-          </div>
-          <div className="form-grou col-md-6">
-            <label htmlFor="testCarNum">Test car number</label>
-            <input
-              type="number"
-              defaultValue={testCarNum}
-              className="form-control"
-              id="testCarNum"
-              disabled={!generateCars}
-              min={1}
-              max={1000}
-              placeholder="Enter test car number"
-              onChange={e => setTestCarNum(e.target.value)}
-            />
-          </div>
-        </div>
-        <div className="form-check user-select-none">
-          <input
-            type="checkbox"
-            checked={generateCars}
-            className="form-check-input"
-            id="generateCars"
-            onChange={e => setGenerateCars(e.target.checked)}
-          />
-          <label htmlFor="generateCars" className="form-check-label">
-            Generate cars
-          </label>
-        </div>
 
-        <div className="form-check user-select-none">
-          <input
-            type="checkbox"
-            checked={generateTroublePoints}
-            disabled={!generateCars}
-            className="form-check-input"
-            id="generateTroublePoints"
-            onChange={e => setGenerateTroublePoints(e.target.checked)}
-          />
-          <label htmlFor="generateTroublePoints" className="form-check-label">
-            Generate trouble points
-          </label>
-        </div>
-        {generateTroublePoints && (
-          <div className="form-group mt-2">
-            <label htmlFor="timeBeforeTrouble">Time before road trouble occurs</label>
-            <div className="input-group">
-              <input
-                type="number"
-                defaultValue={timeBeforeTrouble}
-                className="form-control"
-                id="timeBeforeTrouble"
-                placeholder="Enter time before road trouble occurs"
-                onChange={e => setTimeBeforeTrouble(e.target.value)}
-              />
-              <div className="input-group-append">
-                <span className="input-group-text">seconds</span>
-              </div>
-            </div>
-          </div>
-        )}
+      <form className="form-border">
+        <CarsMenu />
 
         <div className="mt-3">
           <label htmlFor="simulationTime">Simulation time</label>
@@ -123,11 +38,11 @@ const Menu = props => {
               time_24hr: true,
               allowInput: true,
               wrap: true,
+              defaultDate: startSimulationData.time,
             }}
-            value={time}
             onChange={setTime}
           >
-            <input type="text" className="form-control" placeholder="Select Date.." data-input />
+            <input type="text" className="form-control" disabled={wasStarted} placeholder="Select Date.." data-input />
           </Flatpickr>
         </div>
         <div className="center-wrapper">
@@ -157,6 +72,7 @@ const mapStateToProps = (state /* , ownProps */) => {
   return {
     wasPrepared,
     wasStarted,
+    startSimulationData: state.interaction.startSimulationData,
   };
 };
 
