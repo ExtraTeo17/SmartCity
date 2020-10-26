@@ -120,7 +120,6 @@ public class MapWindow {
             if (getTestCarId() > value) {
                 testCarIdSpinner.setValue(value);
             }
-            configContainer.setCarsNumber(value);
         });
 
         UseStrategyCheckBox.addItemListener(e -> configContainer.setLightStrategyActive(UseStrategyCheckBox.isSelected()));
@@ -137,7 +136,6 @@ public class MapWindow {
                 value = limit;
                 testCarIdSpinner.setValue(value);
             }
-            configContainer.setTestCarId(value);
         });
         setZoneButton.addActionListener(e -> eventBus.post(
                 new PrepareSimulationEvent(
@@ -381,11 +379,11 @@ public class MapWindow {
     }
 
     private int getCarLimit() {
-        return configContainer.getCarsNumber();
+        return 8;
     }
 
     private int getTestCarId() {
-        return configContainer.getTestCarId();
+        return 4;
     }
 
     private int getSeed() {

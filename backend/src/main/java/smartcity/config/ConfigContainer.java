@@ -28,7 +28,6 @@ public class ConfigContainer extends ConfigMutator
     private int extendWaitTime = 60;
 
     private final IZone zone;
-    private final ObjectsConfig carsConfig;
     private final ObjectsConfig pedestriansConfig;
 
     @Inject
@@ -37,7 +36,6 @@ public class ConfigContainer extends ConfigMutator
         int defaultRadius = 600;
         this.zone = Zone.of(warsawPos, defaultRadius);
 
-        this.carsConfig = CarsConfig.of(4, 2);
         this.pedestriansConfig = PedestriansConfig.of(20, 8);
     }
 
@@ -150,23 +148,6 @@ public class ConfigContainer extends ConfigMutator
     public void setStationStrategyActive(boolean stationStrategyActive) {
         isStationStrategyActive = stationStrategyActive;
     }
-
-    public int getTestCarId() {
-        return carsConfig.getTestObjectNumber();
-    }
-
-    public void setTestCarId(int id) {
-        carsConfig.setTestObjectNumber(mutation, id);
-    }
-
-    public int getCarsNumber() {
-        return carsConfig.getNumber();
-    }
-
-    public void setCarsNumber(int num) {
-        carsConfig.setNumber(mutation, num);
-    }
-
 
     @Override
     public int getTestPedestrianId() {

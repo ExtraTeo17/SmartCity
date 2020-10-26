@@ -81,6 +81,7 @@ const StrategyMenu = props => {
             <input
               type="number"
               defaultValue={extendWaitTime}
+              disabled={wasStarted}
               className="form-control"
               id="extendWaitTime"
               placeholder="Enter bus extension wait time"
