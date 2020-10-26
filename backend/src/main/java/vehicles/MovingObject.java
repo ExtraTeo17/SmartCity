@@ -10,6 +10,8 @@ import routing.nodes.RouteNode;
 import smartcity.TimeProvider;
 import vehicles.enums.DrivingState;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 // TODO: Change name to IVehicle/AbstractVehicle
@@ -66,9 +68,8 @@ public abstract class MovingObject {
         }
     }
 
-
-
     public void setRoutes(final List<RouteNode> simpleRoute, final List<RouteNode> uniformRoute) {
+    	logger.debug("Set simple route and uniform route");
         this.simpleRoute = simpleRoute;
         this.uniformRoute = uniformRoute;
     }
@@ -134,22 +135,34 @@ public abstract class MovingObject {
     }
 
 
-    public List<RouteNode> getUniformRoute() { return uniformRoute; }
+    public List<RouteNode> getUniformRoute() { return new ArrayList<>(uniformRoute); }
 
     public abstract String getVehicleType();
 
     public LightManagerNode switchToNextTrafficLight() {
+    	logger.debug("Switch to next traffic light");
         for (int i = moveIndex + 1; i < uniformRoute.size(); ++i) {
             var node = uniformRoute.get(i);
             if (node instanceof LightManagerNode) {
+            	logger.debug("Next traffic light found at uniform route index: " + i);
                 closestLightIndex = i;
                 return (LightManagerNode) node;
             }
         }
 
+        logger.debug("Next traffic light has not been found");
         closestLightIndex = Integer.MAX_VALUE;
         return null;
     }
+    
+	private void displayRouteDebug(List<RouteNode> route) {
+		logger.debug("Display route debug of size: " + route.size());
+		StringBuilder builder = new StringBuilder();
+		for (int i = 0; i < route.size(); ++i) {
+			builder.append("R[" + i + "]: " + route.get(i).getDebugString(route.get(i) instanceof LightManagerNode) + "; ");
+		}
+		logger.debug(builder.toString());
+	}
 
     public boolean isAtTrafficLights() {
         if (isAtDestination()) {
@@ -163,6 +176,7 @@ public abstract class MovingObject {
         if (closestLightIndex == Integer.MAX_VALUE) {
             return null;
         }
+        logger.debug("Get closest light index: " + closestLightIndex);
         return (LightManagerNode) (uniformRoute.get(closestLightIndex));
     }
 
