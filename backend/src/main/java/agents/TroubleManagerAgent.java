@@ -3,9 +3,7 @@ package agents;
 import agents.abstractions.IAgentsContainer;
 import agents.utilities.MessageParameter;
 import com.google.common.eventbus.EventBus;
-import com.google.common.eventbus.Subscribe;
 import com.google.inject.Inject;
-import events.web.PrepareSimulationEvent;
 import events.web.TroublePointCreatedEvent;
 import events.web.TroublePointVanishedEvent;
 import jade.core.Agent;
@@ -106,11 +104,10 @@ public class TroubleManagerAgent extends Agent {
                 var troublePoint = Position.of(Double.parseDouble(rcv.getUserDefinedParameter(MessageParameter.TROUBLE_LAT)),
                         Double.parseDouble(rcv.getUserDefinedParameter(MessageParameter.TROUBLE_LON)));
                 troublePointsMap.put(troublePoint, ++latestTroublePointId);
-
-                // TODO: Generate id and save it to hide troublePoint later
                 eventBus.post(new TroublePointCreatedEvent(latestTroublePointId, troublePoint));
-                logger.info("Got message about trouble - CONSTRUCTION");
-                logger.info("troublePoint: " + troublePoint.getLat() + "  " + troublePoint.getLng());
+
+                logger.info("Got message about trouble - CONSTRUCTION\n"
+                        + "    troublePoints: " + troublePoint.toString());
                 sendBroadcast(generateMessageAboutTrouble(rcv, MessageParameter.CONSTRUCTION));
             }
 
