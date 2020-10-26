@@ -5,7 +5,9 @@ import events.SwitchLightsStartEvent;
 import events.web.StartSimulationEvent;
 import org.junit.jupiter.api.Test;
 import smartcity.config.ConfigContainer;
+import smartcity.config.ConfigMutator;
 import smartcity.task.abstractions.ITaskManager;
+import testutils.ReflectionHelper;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -54,18 +56,26 @@ class SchedulerTests {
     @Test
     void handle_StartSimulationEvent_shouldSetAllSettingsInConfigContainer() {
         // Arrange
+        ReflectionHelper.setStatic("counter", ConfigMutator.class, 0);
         var configContainer = new ConfigContainer();
         configContainer.setGeneratePedestriansAndBuses(true);
-        var carsRef = new Object() {
+        var ref = new Object() {
             int carsLimit = 0;
             int testCarId = 0;
+            int pedLimit = 0;
+            int testPedId = 0;
         };
         var taskManager = mock(ITaskManager.class);
         doAnswer(invocationOnMock -> {
-            carsRef.carsLimit = invocationOnMock.getArgument(0);
-            carsRef.testCarId = invocationOnMock.getArgument(1);
+            ref.carsLimit = invocationOnMock.getArgument(0);
+            ref.testCarId = invocationOnMock.getArgument(1);
             return null;
         }).when(taskManager).scheduleCarCreation(any(int.class), any(int.class));
+        doAnswer(invocationOnMock -> {
+            ref.pedLimit = invocationOnMock.getArgument(0);
+            ref.testPedId = invocationOnMock.getArgument(1);
+            return null;
+        }).when(taskManager).schedulePedestrianCreation(any(int.class), any(int.class));
 
         var scheduler = createScheduler(configContainer, taskManager);
 
@@ -73,6 +83,10 @@ class SchedulerTests {
         var testCarId = 112;
         var shouldGenerateCars = true;
         var shouldGenerateTP = true;
+
+        int pedestriansLimit = 155;
+        int testPedestrianId = 555;
+
         var startTime = LocalDateTime.of(LocalDate.of(2020, 10, 14),
                 LocalTime.of(10, 10, 10));
         var lightStrategyActive = false;
@@ -81,16 +95,18 @@ class SchedulerTests {
         var extendWaitTime = 354;
         var changeRouteStrategyActive = false;
 
-        var event = new StartSimulationEvent(carsNum, testCarId, shouldGenerateCars, shouldGenerateTP, startTime,
+        var event = new StartSimulationEvent(carsNum, testCarId, shouldGenerateCars, shouldGenerateTP, pedestriansLimit, testPedestrianId, startTime,
                 lightStrategyActive, extendLightTime, stationStrategyActive, extendWaitTime, changeRouteStrategyActive);
 
         // Act
         scheduler.handle(event);
 
         // Assert
-        assertEquals(carsNum, carsRef.carsLimit);
-        assertEquals(testCarId, carsRef.testCarId);
+        assertEquals(carsNum, ref.carsLimit);
+        assertEquals(testCarId, ref.testCarId);
         assertEquals(shouldGenerateCars, configContainer.shouldGenerateCars());
+        assertEquals(pedestriansLimit, ref.pedLimit);
+        assertEquals(testPedestrianId, ref.testPedId);
         assertEquals(shouldGenerateTP, configContainer.shouldGenerateConstructionSites());
         assertEquals(lightStrategyActive, configContainer.isLightStrategyActive());
         assertEquals(extendLightTime, configContainer.getExtendLightTime());
@@ -128,7 +144,8 @@ class SchedulerTests {
     }
 
     private StartSimulationEvent prepareSimulationEvent(LocalDateTime startTime) {
-        return new StartSimulationEvent(111, 112, false, true, startTime,
+        return new StartSimulationEvent(111, 112, false, true,
+                222, 223, startTime,
                 false, 333, false, 354, false);
     }
 

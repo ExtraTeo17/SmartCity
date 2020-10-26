@@ -74,7 +74,7 @@ public class AgentsCreator {
     @SuppressWarnings("FeatureEnvy")
     @Subscribe
     public void handle(PrepareSimulationEvent e) {
-        logger.info("Set zone event occurred: " + e.toString());
+        logger.info(PrepareSimulationEvent.class.getSimpleName() + " event occurred: " + e.toString());
         var state = configContainer.getSimulationState();
         if (state == SimulationState.READY_TO_RUN || state == SimulationState.RUNNING) {
             clear();
@@ -82,8 +82,6 @@ public class AgentsCreator {
 
         configContainer.setZone(e.zone);
         configContainer.setGeneratePedestriansAndBuses(e.shouldGeneratePedestriansAndBuses);
-        configContainer.setPedestriansNumber(e.pedestriansLimit);
-        configContainer.setTestPedestrianId(e.testPedestrianId);
         configContainer.setSimulationState(SimulationState.IN_PREPARATION);
 
         if (prepareAgents()) {

@@ -4,7 +4,7 @@ import WebServer from "./WebServer";
 /** PUBLIC INTERFACE ---------------------------------------------------------- */
 
 export default {
-  prepareSimulation({ lat, lng, rad, generatePedestrians, pedLimit, testPedId } = { lat: 0, lng: 0, rad: 0 }) {
+  prepareSimulation({ lat, lng, rad, generatePedestrians } = { lat: 0, lng: 0, rad: 0, generatePedestrians: false }) {
     const msg = {
       type: PREPARE_SIMULATION_REQUEST,
       payload: {
@@ -12,8 +12,6 @@ export default {
         longitude: lng,
         radius: rad,
         generatePedestrians,
-        pedLimit,
-        testPedId,
       },
     };
     WebServer.send(msg);
@@ -30,6 +28,8 @@ export default {
     stationStrategyActive,
     extendWaitTime,
     changeRouteStrategyActive,
+    pedLimit,
+    testPedId,
   }) {
     const msg = {
       type: START_SIMULATION_REQUEST,
@@ -44,6 +44,8 @@ export default {
         stationStrategyActive,
         extendWaitTime,
         changeRouteStrategyActive,
+        pedLimit,
+        testPedId,
       },
     };
     WebServer.send(msg);

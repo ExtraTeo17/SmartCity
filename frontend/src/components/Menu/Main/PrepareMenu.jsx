@@ -1,9 +1,11 @@
 /* eslint-disable no-restricted-globals */
 import { connect } from "react-redux";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import ApiManager from "../../../web/ApiManager";
-import { centerUpdated } from "../../../redux/actions";
+import { centerUpdated, startSimulationDataUpdated } from "../../../redux/actions";
 import { dispatch } from "../../../redux/store";
+import { StartState } from "../../../redux/models/startState";
+
 import "../../../styles/Menu.css";
 
 const PED_MIN = 1;
@@ -18,16 +20,22 @@ const radMin = 0;
 const radMax = 10000;
 
 const PrepareMenu = props => {
-  const { wasPrepared, wasStarted } = props;
-  let {
-    center: { lat, lng, rad },
-  } = props;
-  lat = lat.toFixed(DECIMAL_PLACES);
-  lng = lng.toFixed(DECIMAL_PLACES);
-
+  const { wasPrepared, wasStarted, shouldStart } = props;
   const [generatePedestrians, setGeneratePedestrians] = useState(false);
   const [pedLimit, setPedLimit] = useState(20);
   const [testPedId, setTestPedId] = useState(5);
+
+  const onStart = () => {
+    if (shouldStart === StartState.Invoke) {
+      dispatch(
+        startSimulationDataUpdated({
+          pedLimit,
+          testPedId,
+        })
+      );
+    }
+  };
+  useEffect(onStart, [shouldStart]);
 
   const setLat = val => {
     if (!isNaN(val) && val >= latMin && val <= latMax) {
@@ -50,8 +58,14 @@ const PrepareMenu = props => {
     }
   };
 
+  let {
+    center: { lat, lng, rad },
+  } = props;
+  lat = lat.toFixed(DECIMAL_PLACES);
+  lng = lng.toFixed(DECIMAL_PLACES);
+
   const prepareSimulation = () => {
-    ApiManager.prepareSimulation({ lat, lng, rad, generatePedestrians, pedLimit, testPedId });
+    ApiManager.prepareSimulation({ lat, lng, rad, generatePedestrians });
   };
 
   return (

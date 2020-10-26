@@ -6,7 +6,10 @@ import routing.core.IZone;
 import routing.core.Position;
 import routing.core.Zone;
 import smartcity.SimulationState;
-import smartcity.config.abstractions.*;
+import smartcity.config.abstractions.ILightConfigContainer;
+import smartcity.config.abstractions.IStationConfigContainer;
+import smartcity.config.abstractions.ITroublePointsConfigContainer;
+import smartcity.config.abstractions.IZoneMutator;
 
 
 @SuppressWarnings("ClassWithTooManyFields")
@@ -14,8 +17,7 @@ public class ConfigContainer extends ConfigMutator
         implements IZoneMutator,
         ILightConfigContainer,
         ITroublePointsConfigContainer,
-        IStationConfigContainer ,
-        IPedestriansConfigContainer {
+        IStationConfigContainer {
     private SimulationState simulationState = SimulationState.INITIAL;
     private boolean shouldGeneratePedestriansAndBuses = false;
     private boolean shouldGenerateCars = true;
@@ -28,15 +30,12 @@ public class ConfigContainer extends ConfigMutator
     private int extendWaitTime = 60;
 
     private final IZone zone;
-    private final ObjectsConfig pedestriansConfig;
 
     @Inject
     public ConfigContainer() {
         IGeoPosition warsawPos = Position.of(52.23682, 21.01681);
         int defaultRadius = 600;
         this.zone = Zone.of(warsawPos, defaultRadius);
-
-        this.pedestriansConfig = PedestriansConfig.of(20, 8);
     }
 
     public boolean shouldGenerateCars() {
@@ -106,7 +105,7 @@ public class ConfigContainer extends ConfigMutator
 
     @Override
     public void setExtendWaitTime(int extendWaitTime) {
-        this.extendWaitTime =extendWaitTime;
+        this.extendWaitTime = extendWaitTime;
     }
 
     @Override
@@ -147,25 +146,5 @@ public class ConfigContainer extends ConfigMutator
     @Override
     public void setStationStrategyActive(boolean stationStrategyActive) {
         isStationStrategyActive = stationStrategyActive;
-    }
-
-    @Override
-    public int getTestPedestrianId() {
-        return pedestriansConfig.getTestObjectNumber();
-    }
-
-    @Override
-    public void setTestPedestrianId(int id) {
-        pedestriansConfig.setTestObjectNumber(mutation, id);
-    }
-
-    @Override
-    public int getPedestriansNumber() {
-        return pedestriansConfig.getNumber();
-    }
-
-    @Override
-    public void setPedestriansNumber(int num) {
-        pedestriansConfig.setNumber(mutation, num);
     }
 }

@@ -47,7 +47,7 @@ public class Scheduler {
             configContainer.setStationStrategyActive(e.stationStrategyActive);
             configContainer.setExtendWaitTime(e.extendWaitTime);
 
-            taskManager.schedulePedestrianCreation(configContainer.getPedestriansNumber(), configContainer.getTestPedestrianId());
+            taskManager.schedulePedestrianCreation(e.pedestriansLimit, e.testPedestrianId);
             taskManager.scheduleBusControl(() -> configContainer.getSimulationState() == SimulationState.RUNNING);
         }
 

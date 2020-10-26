@@ -65,17 +65,19 @@ public class Converter {
     public static PrepareSimulationEvent convert(PrepareSimulationRequest req) {
 
         return new PrepareSimulationEvent(req.latitude, req.longitude, req.radius,
-                req.generatePedestrians, req.pedestriansLimit, req.testPedestrianId);
+                req.generatePedestrians);
     }
 
     public static StartSimulationEvent convert(StartSimulationRequest req) {
         var timeLocal = TimeProvider.convertFromUtcToLocal(req.startTime).toLocalDateTime();
 
-       return  new StartSimulationEvent(req.carsLimit,
-               req.testCarId, req.generateCars,
-               req.generateTroublePoints, timeLocal,
-               req.lightStrategyActive, req.extendLightTime,
-               req.stationStrategyActive, req.extendWaitTime,
-               req.changeRouteStrategyActive);
+        return new StartSimulationEvent(req.carsLimit,
+                req.testCarId, req.generateCars,
+                req.generateTroublePoints,
+                req.pedestriansLimit, req.testPedestrianId,
+                timeLocal,
+                req.lightStrategyActive, req.extendLightTime,
+                req.stationStrategyActive, req.extendWaitTime,
+                req.changeRouteStrategyActive);
     }
 }

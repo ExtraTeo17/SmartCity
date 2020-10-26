@@ -12,17 +12,23 @@ const initialState = {
     },
     shouldStart: StartState.Initial,
     startSimulationData: {
+      pedLimit: 0,
+      testPedId: 0,
+
       carsLimit: 0,
       testCarId: 0,
       generateCars: true,
       generateTroublePoints: false,
       timeBeforeTrouble: 5,
+
       startTime: new Date(),
 
       lightStrategyActive: true,
       extendLightTime: true,
+
       stationStrategyActive: true,
       extendWaitTime: 30,
+
       changeRouteStrategyActive: true,
     },
   },
