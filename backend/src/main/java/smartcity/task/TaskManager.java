@@ -1,13 +1,16 @@
 package smartcity.task;
 
+import agents.BikeAgent;
 import agents.BusAgent;
 import agents.PedestrianAgent;
 import agents.VehicleAgent;
 import agents.abstractions.IAgentsContainer;
 import com.google.inject.Inject;
+import org.javatuples.Pair;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import routing.abstractions.IRoutingHelper;
+import routing.core.IGeoPosition;
 import routing.core.IZone;
 import smartcity.TimeProvider;
 import smartcity.lights.core.Light;
@@ -55,16 +58,35 @@ public class TaskManager implements ITaskManager {
     @Override
     public void scheduleCarCreation(int carsLimit, int testCarId) {
         Consumer<Integer> createCars = (runCount) -> {
-            var zoneCenter = zone.getCenter();
-            var geoPosInZoneCircle = routingHelper.generateRandomOffset(zone.getRadius());
-            var posA = zoneCenter.sum(geoPosInZoneCircle);
-            var posB = zoneCenter.diff(geoPosInZoneCircle);
+            var posAandB = geographicalPositioning();
 
-            taskProvider.getCreateCarTask(posA, posB, runCount == testCarId).run();
+            taskProvider.getCreateCarTask(posAandB.getValue0(), posAandB.getValue1(), runCount == testCarId).run();
         };
 
         runIf(() -> agentsContainer.size(VehicleAgent.class) < carsLimit, createCars, CREATE_CAR_INTERVAL, true);
     }
+
+    Pair<IGeoPosition,IGeoPosition> geographicalPositioning(){
+        var zoneCenter = zone.getCenter();
+        var geoPosInZoneCircle = routingHelper.generateRandomOffset(zone.getRadius());
+        var posA = zoneCenter.sum(geoPosInZoneCircle);
+        var posB = zoneCenter.diff(geoPosInZoneCircle);
+        return new Pair<>(posA,posB);
+    }
+
+    @Override
+    public void scheduleBikeCreation(int bikeLimit, int testBikeId) {
+        Consumer<Integer> createBikes = (runCount) -> {
+           var posAandB = geographicalPositioning();
+            taskProvider.getCreateBikeTask(posAandB.getValue0(), posAandB.getValue1(), runCount == testBikeId).run();
+        };
+
+        runIf(() -> agentsContainer.size(BikeAgent.class) < bikeLimit, createBikes, CREATE_CAR_INTERVAL, true);
+    }
+
+
+
+
 
     @Override
     public void schedulePedestrianCreation(int pedestriansLimit, int testPedestrianId) {

@@ -70,6 +70,28 @@ class AgentsFactory implements IAgentsFactory {
         return create(route, false);
     }
 
+
+    @Override
+    public BikeAgent create(List<RouteNode> route, boolean testBike,String check) {
+        var id = idGenerator.get(VehicleAgent.class);
+        var uniformRoute = routeTransformer.uniformRoute(route);
+        logger.trace("DisplayRoute size: " + route.size() + ", routeSize: " + uniformRoute.size());
+        var bike = new Bike(id, route, uniformRoute);
+        if (testBike) {
+            //TODO: CHANGE TO TEST BIKE
+          //  bike = new Bike(bike, timeProvider);
+        }
+
+        return new BikeAgent(id, bike, timeBeforeTrouble, timeProvider,
+                routeGenerator, routeTransformer, eventBus, configContainer);
+    }
+
+    @Override
+    public BikeAgent create(List<RouteNode> route, String check) {
+        return create(route, false,check );
+    }
+
+
     @Override
     public StationAgent create(OSMStation station) {
         var id = idGenerator.get(StationAgent.class);

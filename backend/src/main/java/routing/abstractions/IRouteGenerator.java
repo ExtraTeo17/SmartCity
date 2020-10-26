@@ -9,7 +9,7 @@ import routing.nodes.StationNode;
 import java.util.List;
 
 public interface IRouteGenerator {
-    List<RouteNode> generateRouteInfo(IGeoPosition pointA, IGeoPosition pointB);
+    List<RouteNode> generateRouteInfo(IGeoPosition pointA, IGeoPosition pointB,String typeOfVehicle);
 
     // TODO: Merge with function for cars if testing proves they are identical
     List<RouteNode> generateRouteForPedestrians(IGeoPosition pointA, IGeoPosition pointB);

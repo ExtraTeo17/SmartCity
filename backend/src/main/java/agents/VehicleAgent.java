@@ -176,7 +176,7 @@ public class VehicleAgent extends AbstractAgent {
                 }
                 var oldUniformRoute = vehicle.getUniformRoute();
             	var newSimpleRouteEnd = routeGenerator.generateRouteInfo(positionAfterWhichRouteChanges,
-                    oldUniformRoute.get(oldUniformRoute.size() - 1));
+                    oldUniformRoute.get(oldUniformRoute.size() - 1),"car");
                 var newRouteAfterChangeIndex = routeTransformer.uniformRoute(newSimpleRouteEnd);
                 var route = oldUniformRoute.subList(0, indexAfterWhichRouteChanges);
                 route.addAll(newRouteAfterChangeIndex);
@@ -220,7 +220,7 @@ public class VehicleAgent extends AbstractAgent {
 
                     var oldUniformRoute = vehicle.getUniformRoute();
                     var newSimpleRouteEnd = routeGenerator.generateRouteInfo(routeCarOnThreshold,
-                            oldUniformRoute.get(oldUniformRoute.size() - 1));
+                            oldUniformRoute.get(oldUniformRoute.size() - 1),"car");
                     var newRouteAfterChangeIndex = routeTransformer.uniformRoute(newSimpleRouteEnd);
                     var route = oldUniformRoute.subList(0, indexAfterWhichRouteChange);
                     route.addAll(newRouteAfterChangeIndex);

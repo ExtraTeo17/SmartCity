@@ -40,8 +40,8 @@ final class Router implements
     }
 
     @Override
-    public List<RouteNode> generateRouteInfo(IGeoPosition pointA, IGeoPosition pointB) {
-        Pair<List<Long>, List<RouteNode>> osmWayIdsAndPointList = findRoute(pointA, pointB, false);
+    public List<RouteNode> generateRouteInfo(IGeoPosition pointA, IGeoPosition pointB, String typeOfVehicle) {
+        Pair<List<Long>, List<RouteNode>> osmWayIdsAndPointList = findRoute(pointA, pointB, typeOfVehicle);
         var wayIds = osmWayIdsAndPointList.getValue0();
         if (wayIds == null || wayIds.isEmpty()) {
             logger.warn("Generating routeInfo failed because of empty wayIds.");
@@ -58,7 +58,7 @@ final class Router implements
     // TODO: Merge with function for cars if testing proves they are identical
     @Override
     public List<RouteNode> generateRouteForPedestrians(IGeoPosition pointA, IGeoPosition pointB) {
-        Pair<List<Long>, List<RouteNode>> osmWayIdsAndPointList = Router.findRoute(pointA, pointB, true);
+        Pair<List<Long>, List<RouteNode>> osmWayIdsAndPointList = Router.findRoute(pointA, pointB, "foot");
         List<OSMLight> lightInfo = mapAccessManager.getOsmLights(osmWayIdsAndPointList.getValue0());
         List<RouteNode> managersNodes = getManagersNodesForLights(lightInfo);
         return getRouteWithAdditionalNodes(osmWayIdsAndPointList.getValue1(), managersNodes);
@@ -70,7 +70,7 @@ final class Router implements
     @Beta
     public List<RouteNode> generateRouteForPedestrians(IGeoPosition pointA, IGeoPosition pointB,
                                                        String startingOsmNodeRef, String finishingOsmNodeRef) {
-        var osmWayIdsAndPointList = findRoute(pointA, pointB, true);
+        var osmWayIdsAndPointList = findRoute(pointA, pointB, "foot");
         var osmWayIds = osmWayIdsAndPointList.getValue0();
         var routeInfoOpt = mapAccessManager.getRouteInfo(osmWayIds);
         if (routeInfoOpt.isEmpty()) {
@@ -139,9 +139,9 @@ final class Router implements
     /////////////////////////////////////////////////////////////
 
 
-    private static Pair<List<Long>, List<RouteNode>> findRoute(IGeoPosition pointA, IGeoPosition pointB, boolean onFoot) {
+    private static Pair<List<Long>, List<RouteNode>> findRoute(IGeoPosition pointA, IGeoPosition pointB, String typeOfVehicle) {
         return osmproxy.HighwayAccessor.getOsmWayIdsAndPointList(pointA.getLat(), pointA.getLng(), pointB.getLat(),
-                pointB.getLng(), onFoot);
+                pointB.getLng(), typeOfVehicle);
     }
 
     private List<RouteNode> getManagersNodesForLights(List<OSMLight> lights) {
@@ -150,7 +150,7 @@ final class Router implements
         for (OSMLight light : lights) {
             var nodeToAdd = nodesContainer.getLightManagerNode(light.getAdherentWayId(), light.getId());
             if (nodeToAdd != null) {
-                logger.info("EDGE ID U LMN:"+nodeToAdd.getInternalEdgeId());
+
                 var nodeManagerId = nodeToAdd.getLightManagerId();
                 if (nodeManagerId != lastMangerId) {
                     nodes.add(nodeToAdd);

@@ -7,6 +7,7 @@ import java.util.function.BooleanSupplier;
 
 public interface ITaskManager {
     void scheduleCarCreation(int carsLimit, int testCarId);
+    void scheduleBikeCreation(int bikesLimit, int testbikeId);
 
     void schedulePedestrianCreation(int pedestriansLimit, int testPedestrianId);
 

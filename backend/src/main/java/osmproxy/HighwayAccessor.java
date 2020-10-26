@@ -54,14 +54,22 @@ public class HighwayAccessor {
     // TODO: tested manually, but add unit tests / integration tests
 
     public static Pair<List<Long>, List<RouteNode>> getOsmWayIdsAndPointList(double fromLat, double fromLon,
-                                                                             double toLat, double toLon, boolean onFoot) {
+                                                                             double toLat, double toLon, String typeOfVehicle) {
         List<Long> osmWayIds = new ArrayList<>();
         List<RouteNode> pointList = new ArrayList<>();
 
         GHResponse response = new GHResponse();
-        GHRequest request = new GHRequest(fromLat, fromLon, toLat, toLon)
-                .setVehicle(onFoot ? "foot" : "car")
-                .setWeighting(AvoidEdgesRemovableWeighting.NAME);
+        GHRequest request;
+        if(typeOfVehicle.equals("car")) {
+            request = new GHRequest(fromLat, fromLon, toLat, toLon)
+                    .setVehicle(typeOfVehicle)//onFoot ? "foot" : "car")
+                    .setWeighting(AvoidEdgesRemovableWeighting.NAME);
+        }
+        else {
+            request = new GHRequest(fromLat, fromLon, toLat, toLon)
+                    .setVehicle(typeOfVehicle)//onFoot ? "foot" : "car")
+                    .setWeighting("fastest");
+        }
         List<Path> paths = graphHopper.calcPaths(request, response);
         Path path0 = paths.get(0);
 
