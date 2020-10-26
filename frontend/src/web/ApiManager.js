@@ -4,7 +4,7 @@ import WebServer from "./WebServer";
 /** PUBLIC INTERFACE ---------------------------------------------------------- */
 
 export default {
-  prepareSimulation({ lat, lng, rad, generatePedestrians } = { lat: 0, lng: 0, rad: 0 }) {
+  prepareSimulation({ lat, lng, rad, generatePedestrians, pedLimit, testPedId } = { lat: 0, lng: 0, rad: 0 }) {
     const msg = {
       type: PREPARE_SIMULATION_REQUEST,
       payload: {
@@ -12,30 +12,41 @@ export default {
         longitude: lng,
         radius: rad,
         generatePedestrians,
+        pedLimit,
+        testPedId,
       },
     };
     WebServer.send(msg);
   },
 
-  startSimulation(
-    { carsNum, testCarNum, generateCars, generateTroublePoints, time } = {
-      carsNum: 0,
-      testCarNum: 0,
-      generateCars: true,
-      generateTroublePoints: false,
-      time: new Date(),
-    }
-  ) {
+  startSimulation({
+    carsLimit,
+    testCarId,
+    generateCars,
+    generateTroublePoints,
+    startTime,
+    lightStrategyActive,
+    extendLightTime,
+    stationStrategyActive,
+    extendWaitTime,
+    changeRouteStrategyActive,
+  }) {
     const msg = {
       type: START_SIMULATION_REQUEST,
       payload: {
-        carsNum,
-        testCarId: testCarNum,
+        carsLimit,
+        testCarId,
         generateCars,
         generateTroublePoints,
-        startTime: time,
+        startTime,
+        lightStrategyActive,
+        extendLightTime,
+        stationStrategyActive,
+        extendWaitTime,
+        changeRouteStrategyActive,
       },
     };
+    console.log(msg);
     WebServer.send(msg);
   },
 };

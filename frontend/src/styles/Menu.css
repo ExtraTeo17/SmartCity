@@ -14,3 +14,7 @@
 .form-check-input {
   margin-top: 2px;
 }
+
+.card {
+  min-height: 300px;
+}

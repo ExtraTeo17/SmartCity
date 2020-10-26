@@ -1,9 +1,7 @@
 import { createStore } from "redux";
 import { composeWithDevTools } from "redux-devtools-extension";
+import { StartState } from "./models/startState";
 import appReducer from "./reducers/index";
-
-const DEFAULT_CARS_NUM = 4;
-const DEFAULT_TEST_CAR = 2;
 
 const initialState = {
   interaction: {
@@ -12,13 +10,20 @@ const initialState = {
       lng: 21.01681,
       rad: 600,
     },
+    shouldStart: StartState.Initial,
     startSimulationData: {
-      carsNum: DEFAULT_CARS_NUM,
-      testCarNum: DEFAULT_TEST_CAR,
+      carsLimit: 0,
+      testCarId: 0,
       generateCars: true,
       generateTroublePoints: false,
       timeBeforeTrouble: 5,
-      time: new Date(),
+      startTime: new Date(),
+
+      lightStrategyActive: true,
+      extendLightTime: true,
+      stationStrategyActive: true,
+      extendWaitTime: 30,
+      changeRouteStrategyActive: true,
     },
   },
   message: {

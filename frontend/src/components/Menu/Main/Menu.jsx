@@ -1,32 +1,39 @@
 /* eslint-disable no-restricted-globals */
 /* eslint-disable indent */
 import { connect } from "react-redux";
-import React from "react";
+import React, { useEffect, useState } from "react";
+
 import Flatpickr from "react-flatpickr";
 import "flatpickr/dist/themes/material_blue.css";
 
 import { dispatch } from "../../../redux/store";
 import { startSimulationDataUpdated } from "../../../redux/actions";
-import ApiManager from "../../../web/ApiManager";
-import "../../../styles/Menu.css";
 import PrepareMenu from "./PrepareMenu";
-import CarsMenu from "./CarsMenu";
+import CarsSubMenu from "./CarsSubMenu";
+import SimulationStarter from "./SimulationStarter";
+import "../../../styles/Menu.css";
+import { StartState } from "../../../redux/models/startState";
 
-const Menu = ({ wasPrepared, wasStarted, startSimulationData }) => {
-  function setTime(newTime) {
-    dispatch(startSimulationDataUpdated({ time: newTime }));
-  }
-
-  const startSimulation = () => {
-    ApiManager.startSimulation(startSimulationData);
+const Menu = props => {
+  const { wasStarted, shouldStart } = props;
+  const [startTime, setTime] = useState(new Date());
+  const onStart = () => {
+    if (shouldStart === StartState.Invoke) {
+      dispatch(startSimulationDataUpdated({ startTime }));
+    }
   };
+  useEffect(onStart, [shouldStart]);
+
+  function evSetTime(newTime) {
+    setTime(newTime[0]);
+  }
 
   return (
     <div>
       <PrepareMenu />
 
       <form className="form-border">
-        <CarsMenu />
+        <CarsSubMenu />
 
         <div className="mt-3">
           <label htmlFor="simulationTime">Simulation time</label>
@@ -38,30 +45,14 @@ const Menu = ({ wasPrepared, wasStarted, startSimulationData }) => {
               time_24hr: true,
               allowInput: true,
               wrap: true,
-              defaultDate: startSimulationData.time,
+              defaultDate: startTime,
             }}
-            onChange={setTime}
+            onChange={evSetTime}
           >
             <input type="text" className="form-control" disabled={wasStarted} placeholder="Select Date.." data-input />
           </Flatpickr>
         </div>
-        <div className="center-wrapper">
-          <button
-            className="btn btn-success mt-3"
-            disabled={wasStarted || !wasPrepared}
-            title={
-              wasStarted
-                ? "Simulation already started"
-                : wasPrepared
-                ? "Simulation is ready to run"
-                : "You must prepare simulation!"
-            }
-            type="button"
-            onClick={startSimulation}
-          >
-            Start simulation
-          </button>
-        </div>
+        <SimulationStarter />
       </form>
     </div>
   );
@@ -72,7 +63,7 @@ const mapStateToProps = (state /* , ownProps */) => {
   return {
     wasPrepared,
     wasStarted,
-    startSimulationData: state.interaction.startSimulationData,
+    shouldStart: state.interaction.shouldStart,
   };
 };
 

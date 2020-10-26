@@ -68,6 +68,7 @@
     "no-nested-ternary": 0,
     "import/prefer-default-export": 0,
     "operator-linebreak": 0,
+    "radix": 0,
     "brace-style": [
       0,
       "stroustrup"

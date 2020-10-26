@@ -1,17 +1,35 @@
-import { CENTER_UPDATED, START_SIMULATION_DATA_UPDATED } from "../constants";
+import { CENTER_UPDATED, SHOULD_START_SIMULATION, START_SIMULATION_DATA_UPDATED } from "../constants";
+import { StartState } from "../models/startState";
 
 // Just for reference - defined in store.js
 const initialState = {
   center: { lat: 0, lng: 0, rad: 0 },
+  shouldStart: 0,
   startSimulationData: {
-    carsNum: 0,
-    testCarNum: 0,
+    carsLimit: 0,
+    testCarId: 0,
     generateCars: true,
     generateTroublePoints: false,
     timeBeforeTrouble: 5,
-    time: new Date(),
+
+    pedLimit: 0,
+    testPedId: 0,
+
+    startTime: new Date(),
   },
 };
+
+function getNextState(oldState) {
+  switch (oldState) {
+    case StartState.Initial:
+      return StartState.Invoke;
+    case StartState.Invoke:
+      return StartState.Proceed;
+
+    default:
+      return StartState.Initial;
+  }
+}
 
 /**
  * @param {{ type: any; payload: { center: { lat: number; lng: number; rad: number}; }; }} action
@@ -26,6 +44,11 @@ const interaction = (state = initialState, action) => {
     case START_SIMULATION_DATA_UPDATED: {
       const data = action.payload;
       return { ...state, startSimulationData: { ...state.startSimulationData, ...data } };
+    }
+
+    case SHOULD_START_SIMULATION: {
+      const newState = getNextState(state.shouldStart);
+      return { ...state, shouldStart: newState };
     }
 
     default:

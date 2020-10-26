@@ -1,10 +1,13 @@
 /* eslint-disable no-restricted-globals */
 import { connect } from "react-redux";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import { StartState } from "../../redux/models/startState";
+import { dispatch } from "../../redux/store";
+import { startSimulationDataUpdated } from "../../redux/actions";
 import "../../styles/Menu.css";
 
 const StrategyMenu = props => {
-  const { wasStarted } = props;
+  const { wasStarted, shouldStart } = props;
   const [lightStrategyActive, setLightStrategyActive] = useState(true);
   const [extendLightTime, setExtendLightTime] = useState(30);
 
@@ -12,6 +15,21 @@ const StrategyMenu = props => {
   const [extendWaitTime, setExtendWaitTime] = useState(60);
 
   const [changeRouteStrategyActive, setChangeRouteStrategyActive] = useState(true);
+
+  const onStart = () => {
+    if (shouldStart === StartState.Invoke) {
+      dispatch(
+        startSimulationDataUpdated({
+          lightStrategyActive,
+          extendLightTime,
+          stationStrategyActive,
+          extendWaitTime,
+          changeRouteStrategyActive,
+        })
+      );
+    }
+  };
+  useEffect(onStart, [shouldStart]);
 
   return (
     <>
@@ -93,8 +111,10 @@ const StrategyMenu = props => {
 
 const mapStateToProps = (state /* , ownProps */) => {
   const { wasStarted } = state.message;
+  const { shouldStart } = state.interaction;
   return {
     wasStarted,
+    shouldStart,
   };
 };
 
