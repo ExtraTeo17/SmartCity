@@ -183,8 +183,10 @@ const PrepareMenu = props => {
 
 const mapStateToProps = (state /* , ownProps */) => {
   const { wasPrepared, wasStarted } = state.message;
+  const { center, shouldStart } = state.interaction;
   return {
-    center: state.interaction.center,
+    center,
+    shouldStart,
     wasPrepared,
     wasStarted,
   };
