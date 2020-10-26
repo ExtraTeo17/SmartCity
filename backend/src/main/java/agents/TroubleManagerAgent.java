@@ -126,13 +126,4 @@ public class TroubleManagerAgent extends Agent {
         };
         addBehaviour(communication);
     }
-
-
-    // for tests
-    @Subscribe
-    public void handle(PrepareSimulationEvent e) {
-        var troublePoint = Position.of(52.23682, 21.01683);
-        eventBus.post(new TroublePointCreatedEvent(1, troublePoint));
-        eventBus.post(new TroublePointVanishedEvent(1));
-    }
 }

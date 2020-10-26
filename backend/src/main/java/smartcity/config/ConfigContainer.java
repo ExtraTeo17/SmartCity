@@ -6,10 +6,7 @@ import routing.core.IZone;
 import routing.core.Position;
 import routing.core.Zone;
 import smartcity.SimulationState;
-import smartcity.config.abstractions.ILightConfigContainer;
-import smartcity.config.abstractions.IStationConfigContainer;
-import smartcity.config.abstractions.ITroublePointsConfigContainer;
-import smartcity.config.abstractions.IZoneMutator;
+import smartcity.config.abstractions.*;
 
 
 @SuppressWarnings("ClassWithTooManyFields")
@@ -17,7 +14,8 @@ public class ConfigContainer extends ConfigMutator
         implements IZoneMutator,
         ILightConfigContainer,
         ITroublePointsConfigContainer,
-        IStationConfigContainer {
+        IStationConfigContainer ,
+        IPedestriansConfigContainer {
     private SimulationState simulationState = SimulationState.INITIAL;
     private boolean shouldGeneratePedestriansAndBuses = false;
     private boolean shouldGenerateCars = true;
@@ -27,9 +25,11 @@ public class ConfigContainer extends ConfigMutator
     private boolean isConstructionSiteGenerationActive = false;
     private boolean isStationStrategyActive = true;
     private int lightExtendTime = 30;
+    private int extendWaitTime = 60;
 
     private final IZone zone;
     private final ObjectsConfig carsConfig;
+    private final ObjectsConfig pedestriansConfig;
 
     @Inject
     public ConfigContainer() {
@@ -37,9 +37,8 @@ public class ConfigContainer extends ConfigMutator
         int defaultRadius = 600;
         this.zone = Zone.of(warsawPos, defaultRadius);
 
-        int defaultTestCarId = 2;
-        int defaultCarsNum = 4;
-        this.carsConfig = CarsConfig.of(defaultCarsNum, defaultTestCarId);
+        this.carsConfig = CarsConfig.of(4, 2);
+        this.pedestriansConfig = PedestriansConfig.of(20, 8);
     }
 
     public boolean shouldGenerateCars() {
@@ -92,22 +91,6 @@ public class ConfigContainer extends ConfigMutator
         }
     }
 
-    public int getTestCarId() {
-        return carsConfig.getTestObjectNumber();
-    }
-
-    public void setTestCarId(int id) {
-        carsConfig.setTestObjectNumber(mutation, id);
-    }
-
-    public int getCarsNumber() {
-        return carsConfig.getNumber();
-    }
-
-    public void setCarsNumber(int num) {
-        carsConfig.setNumber(mutation, num);
-    }
-
     @Override
     public boolean isLightStrategyActive() {
         return isLightStrategyActive;
@@ -119,8 +102,23 @@ public class ConfigContainer extends ConfigMutator
     }
 
     @Override
+    public int getExtendWaitTime() {
+        return extendWaitTime;
+    }
+
+    @Override
+    public void setExtendWaitTime(int extendWaitTime) {
+        this.extendWaitTime =extendWaitTime;
+    }
+
+    @Override
     public int getExtendLightTime() {
         return lightExtendTime;
+    }
+
+    @Override
+    public void setExtendLightTime(int lightExtendTime) {
+        this.lightExtendTime = lightExtendTime;
     }
 
     @Override
@@ -151,5 +149,42 @@ public class ConfigContainer extends ConfigMutator
     @Override
     public void setStationStrategyActive(boolean stationStrategyActive) {
         isStationStrategyActive = stationStrategyActive;
+    }
+
+    public int getTestCarId() {
+        return carsConfig.getTestObjectNumber();
+    }
+
+    public void setTestCarId(int id) {
+        carsConfig.setTestObjectNumber(mutation, id);
+    }
+
+    public int getCarsNumber() {
+        return carsConfig.getNumber();
+    }
+
+    public void setCarsNumber(int num) {
+        carsConfig.setNumber(mutation, num);
+    }
+
+
+    @Override
+    public int getTestPedestrianId() {
+        return pedestriansConfig.getTestObjectNumber();
+    }
+
+    @Override
+    public void setTestPedestrianId(int id) {
+        pedestriansConfig.setTestObjectNumber(mutation, id);
+    }
+
+    @Override
+    public int getPedestriansNumber() {
+        return pedestriansConfig.getNumber();
+    }
+
+    @Override
+    public void setPedestriansNumber(int num) {
+        pedestriansConfig.setNumber(mutation, num);
     }
 }

@@ -13,4 +13,6 @@ public interface ILightConfigContainer {
      * @return extend light time in seconds
      */
     int getExtendLightTime();
+
+    void setExtendLightTime(int lightExtendTime);
 }

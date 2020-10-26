@@ -79,8 +79,11 @@ public class AgentsCreator {
         if (state == SimulationState.READY_TO_RUN || state == SimulationState.RUNNING) {
             clear();
         }
+
         configContainer.setZone(e.zone);
         configContainer.setGeneratePedestriansAndBuses(e.shouldGeneratePedestriansAndBuses);
+        configContainer.setPedestriansNumber(e.pedestriansLimit);
+        configContainer.setTestPedestrianId(e.testPedestrianId);
         configContainer.setSimulationState(SimulationState.IN_PREPARATION);
 
         if (prepareAgents()) {

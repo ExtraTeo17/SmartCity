@@ -34,14 +34,20 @@ public class Scheduler {
     @SuppressWarnings("FeatureEnvy")
     @Subscribe
     public void handle(StartSimulationEvent e) {
+        configContainer.setExtendLightTime(e.extendLightTime);
+        configContainer.setLightStrategyActive(e.lightStrategyActive);
+
         activateLightManagerAgents();
         if (e.shouldGenerateCars) {
             configContainer.setShouldGenerateConstructionSites(e.shouldGenerateTroublePoints);
+            configContainer.setChangeRouteStrategyActive(e.changeRouteStrategyActive);
             taskManager.scheduleCarCreation(e.carsNum, e.testCarId);
         }
         if (configContainer.shouldGeneratePedestriansAndBuses()) {
-            // TODO: Add pedestrians limit and testPedestrianID
-            taskManager.schedulePedestrianCreation(50, e.testCarId);
+            configContainer.setStationStrategyActive(e.stationStrategyActive);
+            configContainer.setExtendWaitTime(e.extendWaitTime);
+
+            taskManager.schedulePedestrianCreation(configContainer.getPedestriansNumber(), configContainer.getTestPedestrianId());
             taskManager.scheduleBusControl(() -> configContainer.getSimulationState() == SimulationState.RUNNING);
         }
 

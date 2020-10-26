@@ -149,7 +149,7 @@ public class TaskProvider implements ITaskProvider {
     @Override
     public Supplier<Integer> getSwitchLightsTask(int managerId, Collection<Light> lights) {
         var switchLights = functionalTaskFactory
-                .createLightSwitcher(managerId, configContainer.getExtendLightTime(), lights);
+                .createLightSwitcher(managerId, configContainer.getExtendWaitTime(), lights);
         // Can be moved somewhere else if needed and passed as parameter
         var switchLightsContext = new ISwitchLightsContext() {
             private boolean alreadyExtendedGreen = false;

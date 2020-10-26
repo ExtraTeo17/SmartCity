@@ -46,7 +46,6 @@ export default {
         changeRouteStrategyActive,
       },
     };
-    console.log(msg);
     WebServer.send(msg);
   },
 };

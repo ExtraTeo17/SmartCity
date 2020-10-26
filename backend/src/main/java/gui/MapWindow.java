@@ -143,7 +143,7 @@ public class MapWindow {
                 new PrepareSimulationEvent(
                         (double) latSpinner.getValue(),
                         (double) lonSpinner.getValue(),
-                        (int) radiusSpinner.getValue(), configContainer.shouldGeneratePedestriansAndBuses())
+                        (int) radiusSpinner.getValue(), configContainer.shouldGeneratePedestriansAndBuses(), 50, 5)
         ));
 
         testCarZoneButton.addActionListener(e -> {
@@ -152,7 +152,7 @@ public class MapWindow {
             seedSpinner.setValue(34);
             radiusSpinner.setValue(600);
             eventBus.post(new PrepareSimulationEvent(52.23682, 21.01681,
-                    600, configContainer.shouldGeneratePedestriansAndBuses()));
+                    600, configContainer.shouldGeneratePedestriansAndBuses(), 50, 5));
         });
 
         testBusZoneButton.addActionListener(e -> {
@@ -163,7 +163,7 @@ public class MapWindow {
                 logger.warn("Pedestrians won't be generated");
             }
             eventBus.post(new PrepareSimulationEvent(52.203342, 20.861213,
-                    300, configContainer.shouldGeneratePedestriansAndBuses()));
+                    300, configContainer.shouldGeneratePedestriansAndBuses(), 50, 5));
         });
 
         setTimeSpinner.setModel(new SpinnerDateModel());
@@ -215,7 +215,7 @@ public class MapWindow {
                 (int) testCarIdSpinner.getValue(), configContainer.shouldGenerateCars(),
                 configContainer.shouldGenerateConstructionSites(), ((Date) setTimeSpinner.getValue()).toInstant()
                 .atZone(ZoneId.systemDefault())
-                .toLocalDateTime())));
+                .toLocalDateTime(), true, 30, true, 60, true)));
         refreshTimer.scheduleAtFixedRate(new RefreshTask(), 0, REFRESH_MAP_INTERVAL_MILLISECONDS);
     }
 
@@ -310,7 +310,8 @@ public class MapWindow {
             double lng = 21.017934679985046;
             mapViewer.setAddressLocation(new GeoPosition(lat, lng));
             mapViewer.setZoom(1);
-            eventBus.post(new PrepareSimulationEvent(lat, lng, 100, configContainer.shouldGeneratePedestriansAndBuses()));
+            eventBus.post(new PrepareSimulationEvent(lat, lng, 100, configContainer.shouldGeneratePedestriansAndBuses(),
+                    50, 5));
 
             simulationReadyCallback = () -> {
                 IGeoPosition N = Position.of(52.23758683540269, 21.017720103263855);
