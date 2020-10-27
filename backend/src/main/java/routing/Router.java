@@ -13,7 +13,6 @@ import osmproxy.elements.OSMWay.RouteOrientation;
 import osmproxy.elements.OSMWaypoint;
 import routing.abstractions.INodesContainer;
 import routing.abstractions.IRouteGenerator;
-import routing.abstractions.IRouteTransformer;
 import routing.core.IGeoPosition;
 import routing.nodes.RouteNode;
 import routing.nodes.StationNode;
@@ -120,7 +119,9 @@ final class Router implements
                                                      List<StationNode> stationNodes) {
         var data = cacheWrapper.getBusRoute(route, stationNodes);
         if (data.size() > 0) {
-            return data;
+            if(updateCacheDataAgentId(data, stationNodes)) {
+                return data;
+            }
         }
 
         var busRouteData = generateBusRoute(route);
@@ -138,6 +139,24 @@ final class Router implements
     //  HELPERS - Most are abominable :(
     /////////////////////////////////////////////////////////////
 
+    private boolean updateCacheDataAgentId(List<RouteNode> data, List<StationNode> stationNodes){
+        for (RouteNode node : data) {
+            if (node instanceof StationNode) {
+                var st = (StationNode) node;
+                var newStation = stationNodes.stream().filter(f -> f.getOsmId() == st.getOsmId()).findFirst();
+                if (newStation.isPresent()) {
+                    st.setAgentId(newStation.get().getAgentId());
+                }
+                else {
+                    logger.warn("Skipping cache because station not found on the route");
+                    return false;
+                }
+            }
+        }
+
+        return true;
+    }
+
 
     private static Pair<List<Long>, List<RouteNode>> findRoute(IGeoPosition pointA, IGeoPosition pointB, boolean onFoot) {
         return osmproxy.HighwayAccessor.getOsmWayIdsAndPointList(pointA.getLat(), pointA.getLng(), pointB.getLat(),
@@ -150,7 +169,7 @@ final class Router implements
         for (OSMLight light : lights) {
             var nodeToAdd = nodesContainer.getLightManagerNode(light.getAdherentWayId(), light.getId());
             if (nodeToAdd != null) {
-                logger.info("EDGE ID U LMN:"+nodeToAdd.getInternalEdgeId());
+                logger.info("EDGE ID U LMN:" + nodeToAdd.getInternalEdgeId());
                 var nodeManagerId = nodeToAdd.getLightManagerId();
                 if (nodeManagerId != lastMangerId) {
                     nodes.add(nodeToAdd);

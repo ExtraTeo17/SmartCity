@@ -5,8 +5,8 @@ import osmproxy.elements.OSMStation;
 import java.util.Objects;
 
 public class StationNode extends RouteNode {
-    private final int agentId;
     private final long osmId;
+    private int agentId;
 
     public StationNode(double lat, double lon,
                        long osmId, int agentId) {
@@ -21,6 +21,10 @@ public class StationNode extends RouteNode {
 
     public int getAgentId() {
         return agentId;
+    }
+
+    public void setAgentId(int agentId) {
+        this.agentId = agentId;
     }
 
     public long getOsmId() {

@@ -67,7 +67,13 @@ function update(now) {
   window.requestAnimationFrame(update);
 }
 
+let localWasPrepared = false;
+
 function onDetectStartedSimulation() {
+  if (localWasPrepared === true) {
+    return;
+  }
+
   batch(() => {
     // eslint-disable-next-line no-use-before-define
     Dispatcher.prepareSimulation([], [], []);
@@ -78,10 +84,12 @@ function onDetectStartedSimulation() {
 
 const Dispatcher = {
   prepareSimulation(lights, stations, buses) {
+    localWasPrepared = true;
     dispatch(simulationPrepared({ lights, stations, buses }));
   },
 
   startSimulation(newTimeScale) {
+    localWasPrepared = false;
     timeScale = newTimeScale;
     timer = update(window.performance.now());
     dispatch(simulationStarted(timeScale));
