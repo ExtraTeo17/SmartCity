@@ -43,8 +43,8 @@ class SimpleCrossroad implements ICrossroad {
     }
 
     @Override
-    public OptimizationResult requestOptimizations() {
-    	final OptimizationResult result = new OptimizationResult();
+    public OptimizationResult requestOptimizations(int extendTimeSeconds) {
+    	final OptimizationResult result = new OptimizationResult(extendTimeSeconds);
         for (Light light : wayIdToLightMap.values()) {
         	light.checkForTrafficJams(result);
             if (light.isGreen()) {

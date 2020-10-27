@@ -175,16 +175,17 @@ public class VehicleAgent extends AbstractAgent {
 							? 0 : indexOfRouteNodeWithEdge - (NO_CONSTRUCTION_SITE_STRATEGY_FACTOR * THRESHOLD_UNTIL_INDEX_CHANGE);
 				}
 				final RouteMergeInfo mergeResult =
-						createMergedWithOldRouteAlternativeRouteFromIndex(indexAfterWhichRouteChanges);
+						createMergedWithOldRouteAlternativeRouteFromIndex(indexAfterWhichRouteChanges, true);
 				updateVehicleRouteAfterMerge(indexAfterWhichRouteChanges, mergeResult);
 			}
 
-			private final RouteMergeInfo createMergedWithOldRouteAlternativeRouteFromIndex(final int indexAfterWhichRouteChanges) {
+			private final RouteMergeInfo createMergedWithOldRouteAlternativeRouteFromIndex(final int indexAfterWhichRouteChanges,
+					boolean bewareOfJammedEdge) {
 				final IGeoPosition positionAfterWhichRouteChanges = vehicle
 						.getPositionOnIndex(indexAfterWhichRouteChanges);
                 var oldUniformRoute = vehicle.getUniformRoute();
             	var newSimpleRouteEnd = routeGenerator.generateRouteInfo(positionAfterWhichRouteChanges,
-                    oldUniformRoute.get(oldUniformRoute.size() - 1));
+                    oldUniformRoute.get(oldUniformRoute.size() - 1), bewareOfJammedEdge);
                 var newRouteAfterChangeIndex = routeTransformer.uniformRoute(newSimpleRouteEnd);
                 var route = oldUniformRoute.subList(0, indexAfterWhichRouteChanges);
                 route.addAll(newRouteAfterChangeIndex);
@@ -252,15 +253,18 @@ public class VehicleAgent extends AbstractAgent {
                 }
                 int edgeId = Integer.parseInt(rcv.getUserDefinedParameter(MessageParameter.EDGE_ID));
                 String showOrStop =  rcv.getUserDefinedParameter(MessageParameter.TROUBLE);
+                boolean jamStart;
                 if (showOrStop.equals(MessageParameter.SHOW)) {
                     if (trafficJamsEdgeId.contains(edgeId)) {
                     	logger.info("I'm already notified about traffic jam on edge: " + edgeId);
                     	return;
                     }
                     trafficJamsEdgeId.add(edgeId);
+                    jamStart = true;
                 } else {
                     logger.info("Traffic jam has ended on edge: " + edgeId);
                     trafficJamsEdgeId.remove(edgeId);
+                    jamStart = false;
                 }
                 double howLongTakesJam = 0;
                 if (rcv.getAllUserDefinedParameters().containsKey(MessageParameter.LENGTH_OF_JAM)) {
@@ -268,23 +272,27 @@ public class VehicleAgent extends AbstractAgent {
                 }
                 double timeForTheEndWithoutJam = vehicle.getMillisecondsFromAToB(vehicle.getMoveIndex(), vehicle.getUniformRoute().size() - 1);
                 double timeForTheEndWithJam = timeForTheEndWithoutJam + howLongTakesJam;
-                final Integer indexOfRouteNodeWithEdge = vehicle.findIndexOfEdgeOnRoute((long) edgeId,
+                final Integer indexOfRouteNodeWithEdge = vehicle.findIndexOfEdgeOnRoute((long)edgeId,
                         THRESHOLD_UNTIL_INDEX_CHANGE);
-                if (indexOfRouteNodeWithEdge != null) {
-                	final int indexAfterWhichRouteChanges = vehicle.getFarOnIndex(THRESHOLD_UNTIL_INDEX_CHANGE);
-                	handleLightTrafficJamRouteChange(indexAfterWhichRouteChanges, timeForTheEndWithJam);
+                int indexAfterWhichRouteChanges;
+                if (indexOfRouteNodeWithEdge != null || !jamStart) {
+                	indexAfterWhichRouteChanges = vehicle.getFarOnIndex(THRESHOLD_UNTIL_INDEX_CHANGE);
+                	handleLightTrafficJamRouteChange(indexAfterWhichRouteChanges, timeForTheEndWithJam, jamStart);
                 }
             }
 
 			private void handleLightTrafficJamRouteChange(final int indexAfterWhichRouteChanges,
-					final double timeForTheEndWithJam) {
-				logger.info("The traffic light with the jam is on my route");
+					final double timeForTheEndWithJam, boolean bewareOfJammedEdge) {
+				logger.info("The traffic light with the jam is on my route, handle it");
                 double timeForOfDynamicRoute = 0; // refuse after this line normally
-                final RouteMergeInfo mergeResult = createMergedWithOldRouteAlternativeRouteFromIndex(indexAfterWhichRouteChanges);	//logger.info("THE SIZE OF NEW ROUTE TO CHECK IS " + route.size() + "------------------------");
+                final RouteMergeInfo mergeResult = createMergedWithOldRouteAlternativeRouteFromIndex(indexAfterWhichRouteChanges,
+                		bewareOfJammedEdge);	//logger.info("THE SIZE OF NEW ROUTE TO CHECK IS " + route.size() + "------------------------");
                 timeForOfDynamicRoute = vehicle.getMillisecondsFromAToB(vehicle.getMoveIndex(), mergeResult.newUniformRoute.size() - 1);	//logger.info("TIME of route with jam: " + timeForTheEndWithJam + " TIME of dynamic route:" + timeForOfDynamicRoute );
-                if (timeForTheEndWithJam > timeForOfDynamicRoute) {
-                    logger.info("Time with traffic light jam was longer, so route will be changed"); // TODO: CHECK IF send refusal is on place // switchToNextLight was after this line
+                if (true) {//timeForTheEndWithJam > timeForOfDynamicRoute) {
+                    logger.info("Trip time through the jam: " + timeForTheEndWithJam + " is longer than alternative route time: " + timeForOfDynamicRoute + ", so route will be changed"); // TODO: CHECK IF send refusal is on place // switchToNextLight was after this line
                     updateVehicleRouteAfterMerge(indexAfterWhichRouteChanges, mergeResult);
+                } else {
+                	logger.info("Trip time through the jam: " + timeForTheEndWithJam + " is shorter than alternative route time: " + timeForOfDynamicRoute + ", so route won't be changed");
                 }
 			}
 

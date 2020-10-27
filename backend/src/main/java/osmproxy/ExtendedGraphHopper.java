@@ -80,11 +80,11 @@ public class ExtendedGraphHopper extends GraphHopper {
     @Override
     public Weighting createWeighting(HintsMap hintsMap, FlagEncoder encoder) {
         String weightingStr = hintsMap.getWeighting().toLowerCase();
+        if (avoidEdgesWeighting == null) {
+            avoidEdgesWeighting = new AvoidEdgesRemovableWeighting(new FastestWeighting(encoder));
+            avoidEdgesWeighting.setEdgePenaltyFactor(HEAVY_EDGE_PENALTY_FACTOR);
+        }
         if (AvoidEdgesRemovableWeighting.NAME.equals(weightingStr)) {
-            if (avoidEdgesWeighting == null) {
-                avoidEdgesWeighting = new AvoidEdgesRemovableWeighting(new FastestWeighting(encoder));
-                avoidEdgesWeighting.setEdgePenaltyFactor(HEAVY_EDGE_PENALTY_FACTOR);
-            }
             return avoidEdgesWeighting;
         }
         else {

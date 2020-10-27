@@ -18,7 +18,7 @@ public class ConfigContainer extends ConfigMutator
     private boolean isConstructionSiteStrategyActive = false;
 	private boolean isConstructionSiteGenerationActive = false;
     private boolean lightManagersLock = false;
-    private int extendTimeSeconds = 3000; // TODO: change back to 30
+    private int extendTimeSeconds = 30;
 
     private final IZone zone;
     private final ObjectsConfig carsConfig;

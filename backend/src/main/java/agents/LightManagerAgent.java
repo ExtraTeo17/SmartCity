@@ -12,6 +12,7 @@ import org.jxmapviewer.JXMapViewer;
 import org.jxmapviewer.painter.Painter;
 import smartcity.ITimeProvider;
 import smartcity.TimeProvider;
+import smartcity.config.ConfigContainer;
 import smartcity.lights.OptimizationResult;
 import smartcity.lights.abstractions.ICrossroad;
 import smartcity.lights.core.Light;
@@ -28,12 +29,14 @@ public class LightManagerAgent extends AbstractAgent {
     public static final String name = LightManagerAgent.class.getSimpleName().replace("Agent", "");
     private final ICrossroad crossroad;
     private Map<String,String> trafficJammedEdgeSet = new HashMap<>();
+    private final ConfigContainer configContainer;
     
     LightManagerAgent(int id, ICrossroad crossroad,
                       ITimeProvider timeProvider,
-                      EventBus eventBus) {
+                      EventBus eventBus, ConfigContainer configContainer) {
         super(id, name, timeProvider, eventBus);
         this.crossroad = crossroad;
+        this.configContainer = configContainer;
     }
 
     @Override
@@ -52,7 +55,7 @@ public class LightManagerAgent extends AbstractAgent {
                 // if queue is empty
                 // apply strategy
                 //for elements in queue (if there are elements in queue, make green)
-                OptimizationResult result = crossroad.requestOptimizations();
+                OptimizationResult result = crossroad.requestOptimizations(configContainer.getExtendTimeSeconds());
                 try {
                     handleOptimizationResult(result);
                 } catch (Exception e) {

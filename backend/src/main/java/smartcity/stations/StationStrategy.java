@@ -84,7 +84,7 @@ public class StationStrategy {
     }
 
     public OptimizationResult requestBusesAndPeopleFreeToGo() {
-        var result = new OptimizationResult();
+        var result = new OptimizationResult(0); // TODO: Inject config container
         for (var entry : busAgentOnStationToArrivalTime.entrySet()) {
             var busLine = entry.getKey();
             var scheduledArrival = entry.getValue();
