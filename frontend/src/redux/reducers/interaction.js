@@ -1,10 +1,16 @@
-import { CENTER_UPDATED, SHOULD_START_SIMULATION, START_SIMULATION_DATA_UPDATED } from "../core/constants";
+import {
+  CENTER_UPDATED,
+  GENERATE_PEDESTRIANS_UPDATED,
+  SHOULD_START_SIMULATION,
+  START_SIMULATION_DATA_UPDATED,
+} from "../core/constants";
 import { StartState } from "../models/startState";
 
 // Just for reference - defined in store.js
 const initialState = {
   center: { lat: 0, lng: 0, rad: 0 },
-  shouldStart: 0,
+  generatePedestrians: false,
+  shouldStart: StartState.Initial,
   startSimulationData: {
     carsLimit: 0,
     testCarId: 0,
@@ -38,7 +44,12 @@ const interaction = (state = initialState, action) => {
   switch (action.type) {
     case CENTER_UPDATED: {
       const center = action.payload;
-      return { ...state, center };
+      return { ...state, center: { ...state.center, ...center } };
+    }
+
+    case GENERATE_PEDESTRIANS_UPDATED: {
+      const generatePedestrians = action.payload;
+      return { ...state, generatePedestrians };
     }
 
     case START_SIMULATION_DATA_UPDATED: {

@@ -1,6 +1,7 @@
 export const CENTER_UPDATED = "Center/UPDATED";
 export const START_SIMULATION_DATA_UPDATED = "StartData/UPDATED";
 export const SHOULD_START_SIMULATION = "Start/SHOULD";
+export const GENERATE_PEDESTRIANS_UPDATED = "GenPed/UPDATED";
 
 export const SIMULATION_PREPARED = "Simulation/PREPARED";
 export const SIMULATION_STARTED = "Simulation/STARTED";

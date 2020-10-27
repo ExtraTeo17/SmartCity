@@ -10,6 +10,7 @@ const initialState = {
       lng: 21.01681,
       rad: 600,
     },
+    generatePedestrians: false,
     shouldStart: StartState.Initial,
     startSimulationData: {
       pedLimit: 0,

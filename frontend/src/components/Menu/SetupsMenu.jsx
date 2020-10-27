@@ -1,11 +1,16 @@
 import React from "react";
-import { centerUpdated } from "../../redux/core/actions";
+import { batch } from "react-redux";
+
+import { centerUpdated, generatePedestriansUpdated } from "../../redux/core/actions";
 import { dispatch } from "../../redux/store";
 import ApiManager from "../../web/ApiManager";
 import "../../styles/Menu.css";
 
 const prepareSimulation = data => {
-  dispatch(centerUpdated(data));
+  batch(() => {
+    dispatch(centerUpdated(data));
+    dispatch(generatePedestriansUpdated(data.generatePedestrians));
+  });
   ApiManager.prepareSimulation(data);
 };
 

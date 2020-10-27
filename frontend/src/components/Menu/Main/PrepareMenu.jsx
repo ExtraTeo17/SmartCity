@@ -2,7 +2,7 @@
 import { connect } from "react-redux";
 import React, { useState, useEffect } from "react";
 import ApiManager from "../../../web/ApiManager";
-import { centerUpdated, startSimulationDataUpdated } from "../../../redux/core/actions";
+import { centerUpdated, generatePedestriansUpdated, startSimulationDataUpdated } from "../../../redux/core/actions";
 import { dispatch } from "../../../redux/store";
 import { StartState } from "../../../redux/models/startState";
 
@@ -20,8 +20,7 @@ const radMin = 0;
 const radMax = 10000;
 
 const PrepareMenu = props => {
-  const { wasPrepared, wasStarted, shouldStart } = props;
-  const [generatePedestrians, setGeneratePedestrians] = useState(false);
+  const { wasPrepared, wasStarted, shouldStart, generatePedestrians } = props;
   const [pedLimit, setPedLimit] = useState(20);
   const [testPedId, setTestPedId] = useState(5);
 
@@ -37,25 +36,30 @@ const PrepareMenu = props => {
   };
   useEffect(onStart, [shouldStart]);
 
-  const setLat = val => {
+  const setLat = e => {
+    const val = parseFloat(e.target.value);
     if (!isNaN(val) && val >= latMin && val <= latMax) {
-      const center = { ...props.center, lat: val };
-      dispatch(centerUpdated(center));
+      dispatch(centerUpdated({ lat: val }));
     }
   };
 
-  const setLng = val => {
+  const setLng = e => {
+    const val = parseFloat(e.target.value);
     if (!isNaN(val) && val >= lngMin && val <= lngMax) {
-      const center = { ...props.center, lng: val };
-      dispatch(centerUpdated(center));
+      dispatch(centerUpdated({ lng: val }));
     }
   };
 
-  const setRad = val => {
+  const setRad = e => {
+    const val = parseFloat(e.target.value);
     if (!isNaN(val) && val >= radMin && val <= radMax) {
-      const center = { ...props.center, rad: val };
-      dispatch(centerUpdated(center));
+      dispatch(centerUpdated({ rad: val }));
     }
+  };
+
+  const setGeneratePedestrians = e => {
+    const val = e.target.checked;
+    dispatch(generatePedestriansUpdated(val));
   };
 
   let {
@@ -82,7 +86,7 @@ const PrepareMenu = props => {
             min={latMin}
             max={latMax}
             placeholder="Enter latitude"
-            onChange={e => setLat(parseFloat(e.target.value))}
+            onChange={setLat}
           />
         </div>
 
@@ -97,7 +101,7 @@ const PrepareMenu = props => {
             min={lngMin}
             max={lngMax}
             placeholder="Enter longitude"
-            onChange={e => setLng(parseFloat(e.target.value))}
+            onChange={setLng}
           />
         </div>
       </div>
@@ -106,14 +110,14 @@ const PrepareMenu = props => {
         <div className="input-group">
           <input
             type="number"
-            defaultValue={rad}
+            value={rad}
             className="form-control"
             id="rad"
             step="10"
             min={radMin}
             max={radMax}
             placeholder="Enter radius"
-            onChange={e => setRad(parseFloat(e.target.value))}
+            onChange={setRad}
           />
           <div className="input-group-append">
             <span className="input-group-text">meters</span>
@@ -124,10 +128,10 @@ const PrepareMenu = props => {
       <div className="form-check user-select-none">
         <input
           type="checkbox"
-          defaultChecked={generatePedestrians}
+          checked={generatePedestrians}
           className="form-check-input"
           id="generatePedestrians"
-          onChange={e => setGeneratePedestrians(e.target.checked)}
+          onChange={setGeneratePedestrians}
         />
         <label htmlFor="generatePedestrians" className="form-check-label">
           Generate pedestrians, buses and stations
@@ -183,12 +187,13 @@ const PrepareMenu = props => {
 
 const mapStateToProps = (state /* , ownProps */) => {
   const { wasPrepared, wasStarted } = state.message;
-  const { center, shouldStart } = state.interaction;
+  const { center, shouldStart, generatePedestrians } = state.interaction;
   return {
     center,
     shouldStart,
     wasPrepared,
     wasStarted,
+    generatePedestrians,
   };
 };
 

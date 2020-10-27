@@ -20,6 +20,7 @@ import {
   TROUBLE_POINT_VANISHED,
   START_SIMULATION_DATA_UPDATED,
   SHOULD_START_SIMULATION,
+  GENERATE_PEDESTRIANS_UPDATED,
 } from "./constants";
 
 /**
@@ -30,6 +31,8 @@ export const centerUpdated = createAction(CENTER_UPDATED);
 export const startSimulationDataUpdated = createAction(START_SIMULATION_DATA_UPDATED);
 
 export const shouldStartSimulation = createAction(SHOULD_START_SIMULATION);
+
+export const generatePedestriansUpdated = createAction(GENERATE_PEDESTRIANS_UPDATED);
 
 export const simulationPrepared = createAction(
   SIMULATION_PREPARED,
