@@ -150,7 +150,6 @@ final class Router implements
         for (OSMLight light : lights) {
             var nodeToAdd = nodesContainer.getLightManagerNode(light.getAdherentWayId(), light.getId());
             if (nodeToAdd != null) {
-                logger.info("EDGE ID U LMN:"+nodeToAdd.getInternalEdgeId());
                 var nodeManagerId = nodeToAdd.getLightManagerId();
                 if (nodeManagerId != lastMangerId) {
                     nodes.add(nodeToAdd);

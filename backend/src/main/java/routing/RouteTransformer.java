@@ -74,9 +74,9 @@ final class RouteTransformer implements
         }
         else {
             oldNodes = new ArrayList<>();
-            result = newRoute;
+            result = List.copyOf(newRoute);
         }
 
-        return new RouteMergeInfo(oldNodes, result);
+        return new RouteMergeInfo(oldNodes, result, newRoute);
     }
 }

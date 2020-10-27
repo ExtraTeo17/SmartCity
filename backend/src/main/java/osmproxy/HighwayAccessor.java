@@ -73,17 +73,14 @@ public class HighwayAccessor {
                 VirtualEdgeIteratorState vEdge = (VirtualEdgeIteratorState) edge;
                 edgeId = vEdge.getOriginalTraversalKey() / 2;
             }
-
             long osmWayIdToAdd = graphHopper.getOSMWay(edgeId);
             // deleting duplicates
             if (osmWayIdToAdd != previousWayId) {
                 osmWayIds.add(osmWayIdToAdd);
                 previousWayId = osmWayIdToAdd;
             }
-
             pointList.addAll(getRouteNodeList(edgeId, edge.fetchWayGeometry(2)));
         }
-
         return new Pair<>(osmWayIds, pointList);
     }
 
