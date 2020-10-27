@@ -6,7 +6,9 @@ public class StartSimulationEvent {
     public final boolean shouldGenerateCars;
     public final int carsNum;
     public final int testCarId;
+
     public final boolean shouldGenerateTroublePoints;
+    public final int timeBeforeTrouble;
 
     public final int pedestriansLimit;
     public final int testPedestrianId;
@@ -22,16 +24,19 @@ public class StartSimulationEvent {
 
     public final boolean changeRouteStrategyActive;
 
-    public StartSimulationEvent(int carsNum, int testCarId,
-                                boolean shouldGenerateCars, boolean generateTroublePoints,
+    public StartSimulationEvent(boolean shouldGenerateCars,
+                                int carsNum, int testCarId,
+                                boolean generateTroublePoints, int timeBeforeTrouble,
                                 int pedestriansLimit, int testPedestrianId,
-                                LocalDateTime startTime, boolean lightStrategyActive,
-                                int extendLightTime, boolean stationStrategyActive,
-                                int extendWaitTime, boolean changeRouteStrategyActive) {
+                                LocalDateTime startTime,
+                                boolean lightStrategyActive, int extendLightTime,
+                                boolean stationStrategyActive, int extendWaitTime,
+                                boolean changeRouteStrategyActive) {
         this.carsNum = carsNum;
         this.testCarId = testCarId;
         this.shouldGenerateCars = shouldGenerateCars;
         this.shouldGenerateTroublePoints = generateTroublePoints;
+        this.timeBeforeTrouble = timeBeforeTrouble;
         this.pedestriansLimit = pedestriansLimit;
         this.testPedestrianId = testPedestrianId;
         this.startTime = startTime;

@@ -209,12 +209,12 @@ public class MapWindow {
 
         MapPanel.add(MapViewer);
         MapPanel.revalidate();
-        StartRouteButton.addActionListener(e -> eventBus.post(new StartSimulationEvent((int) carLimitSpinner.getValue(),
-                (int) testCarIdSpinner.getValue(), configContainer.shouldGenerateCars(),
-                configContainer.shouldGenerateConstructionSites(), 20, 5,
+        StartRouteButton.addActionListener(e -> eventBus.post(new StartSimulationEvent(configContainer.shouldGenerateCars(), (int) carLimitSpinner.getValue(),
+                (int) testCarIdSpinner.getValue(),
+                configContainer.shouldGenerateConstructionSites(), 5000, 20, 5,
                 ((Date) setTimeSpinner.getValue()).toInstant()
-                .atZone(ZoneId.systemDefault())
-                .toLocalDateTime(), true, 30, true, 60, true)));
+                        .atZone(ZoneId.systemDefault())
+                        .toLocalDateTime(), true, 30, true, 60, true)));
         refreshTimer.scheduleAtFixedRate(new RefreshTask(), 0, REFRESH_MAP_INTERVAL_MILLISECONDS);
     }
 

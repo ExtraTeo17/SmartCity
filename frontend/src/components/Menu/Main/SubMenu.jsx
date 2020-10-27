@@ -4,25 +4,44 @@ import React, { useEffect, useState } from "react";
 import { dispatch } from "../../../redux/store";
 import { startSimulationDataUpdated } from "../../../redux/core/actions";
 
-import "../../../styles/Menu.css";
+import {
+  D_PEDS_NUM,
+  D_TEST_PED,
+  D_CARS_NUM,
+  D_TEST_CAR,
+  D_TIME_BEFORE_TROUBLE,
+  D_GENERATE_CARS,
+  D_GENERATE_TP,
+} from "../../../constants/defaults";
+
+import { PED_MIN, PED_MAX, CAR_MIN, CAR_MAX } from "../../../constants/minMax";
+
 import { StartState } from "../../../redux/models/startState";
+import "../../../styles/Menu.css";
 
-const CAR_MIN = 1;
-const CAR_MAX = 50;
-const DEFAULT_CARS_NUM = 4;
-const DEFAULT_TEST_CAR = 2;
-
-const CarsSubMenu = props => {
-  const { shouldStart, wasStarted } = props;
-  const [carsLimit, setCarsLimit] = useState(DEFAULT_CARS_NUM);
-  const [testCarId, setTestCarId] = useState(DEFAULT_TEST_CAR);
-  const [generateCars, setGenerateCars] = useState(true);
-  const [generateTroublePoints, setGenerateTroublePoints] = useState(false);
-  const [timeBeforeTrouble, setTimeBeforeTrouble] = useState(5);
+const SubMenu = props => {
+  const { shouldStart, wasStarted, generatePedestrians } = props;
+  const [pedLimit, setPedLimit] = useState(D_PEDS_NUM);
+  const [testPedId, setTestPedId] = useState(D_TEST_PED);
+  const [carsLimit, setCarsLimit] = useState(D_CARS_NUM);
+  const [testCarId, setTestCarId] = useState(D_TEST_CAR);
+  const [generateCars, setGenerateCars] = useState(D_GENERATE_CARS);
+  const [generateTroublePoints, setGenerateTroublePoints] = useState(D_GENERATE_TP);
+  const [timeBeforeTrouble, setTimeBeforeTrouble] = useState(D_TIME_BEFORE_TROUBLE);
 
   function onStart() {
     if (shouldStart === StartState.Invoke) {
-      dispatch(startSimulationDataUpdated({ carsLimit, testCarId, generateCars, generateTroublePoints, timeBeforeTrouble }));
+      dispatch(
+        startSimulationDataUpdated({
+          carsLimit,
+          testCarId,
+          generateCars,
+          generateTroublePoints,
+          timeBeforeTrouble,
+          pedLimit,
+          testPedId,
+        })
+      );
     }
   }
   useEffect(onStart, [shouldStart]);
@@ -58,6 +77,38 @@ const CarsSubMenu = props => {
 
   return (
     <>
+      {generatePedestrians && (
+        <div className="form-row mt-2 align-items-end">
+          <div className="form-group col-md-5">
+            <label htmlFor="pedLimit">Pedestrians limit</label>
+            <input
+              type="number"
+              defaultValue={pedLimit}
+              className="form-control"
+              id="pedLimit"
+              disabled={wasStarted}
+              min={PED_MIN}
+              max={PED_MAX}
+              placeholder="Enter limit for pedestrians"
+              onChange={e => setPedLimit(parseInt(e.target.value))}
+            />
+          </div>
+          <div className="form-group col-md-7">
+            <label htmlFor="testPedId">Test pedestrian number</label>
+            <input
+              type="number"
+              className="form-control"
+              id="testPedId"
+              disabled={wasStarted}
+              min={1}
+              max={1000}
+              defaultValue={testPedId}
+              placeholder="Enter test pedestrians number"
+              onChange={e => setTestPedId(parseInt(e.target.value))}
+            />
+          </div>
+        </div>
+      )}
       <div className="form-check user-select-none">
         <input
           type="checkbox"
@@ -145,6 +196,7 @@ const mapStateToProps = (state /* ownProps */) => {
   const {
     startSimulationData: { carsNum, testCarNum, generateCars, generateTroublePoints, timeBeforeTrouble },
     shouldStart,
+    generatePedestrians,
   } = state.interaction;
   return {
     wasPrepared,
@@ -153,9 +205,10 @@ const mapStateToProps = (state /* ownProps */) => {
     carsNum,
     testCarNum,
     generateCars,
+    generatePedestrians,
     generateTroublePoints,
     timeBeforeTrouble,
   };
 };
 
-export default connect(mapStateToProps)(React.memo(CarsSubMenu));
+export default connect(mapStateToProps)(React.memo(SubMenu));

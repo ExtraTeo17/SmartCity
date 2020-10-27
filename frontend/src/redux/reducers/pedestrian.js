@@ -63,7 +63,7 @@ const pedestrian = (state = initialState, action) => {
     }
 
     case PEDESTRIAN_KILLED: {
-      const id = payload;
+      const { id } = payload;
 
       const newPedestrians = state.pedestrians.filter(p => p.id !== id);
       deletedPedestrianIds.push(id);

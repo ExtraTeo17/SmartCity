@@ -71,9 +71,9 @@ public class Converter {
     public static StartSimulationEvent convert(StartSimulationRequest req) {
         var timeLocal = TimeProvider.convertFromUtcToLocal(req.startTime).toLocalDateTime();
 
-        return new StartSimulationEvent(req.carsLimit,
-                req.testCarId, req.generateCars,
-                req.generateTroublePoints,
+        return new StartSimulationEvent(req.generateCars, req.carsLimit,
+                req.testCarId,
+                req.generateTroublePoints, req.timeBeforeTrouble,
                 req.pedestriansLimit, req.testPedestrianId,
                 timeLocal,
                 req.lightStrategyActive, req.extendLightTime,

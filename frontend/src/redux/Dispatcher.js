@@ -158,8 +158,8 @@ const Dispatcher = {
     pullKillPedQueue.push(pedestrianPulledFromBus(pedData));
   },
 
-  killPedestrian(id) {
-    pullKillPedQueue.push(pedestrianKilled(id));
+  killPedestrian(pedData) {
+    pullKillPedQueue.push(pedestrianKilled(pedData));
   },
 };
 

@@ -37,13 +37,12 @@ public class VehicleAgent extends AbstractAgent {
     protected static final int NO_CONSTRUCTION_SITE_STRATEGY_FACTOR = 20;
 
     private final MovingObject vehicle;
-    private final int timeBeforeAccident;
     private final IRouteGenerator routeGenerator;
     private final IRouteTransformer routeTransformer;
     private final ITroublePointsConfigContainer configContainer;
     private RouteNode troublePoint;
 
-    VehicleAgent(int id, MovingObject vehicle, int timeBeforeAccident,
+    VehicleAgent(int id, MovingObject vehicle,
                  ITimeProvider timeProvider,
                  IRouteGenerator routeGenerator,
                  IRouteTransformer routeTransformer,
@@ -51,7 +50,6 @@ public class VehicleAgent extends AbstractAgent {
                  ITroublePointsConfigContainer configContainer) {
         super(id, vehicle.getVehicleType(), timeProvider, eventBus);
         this.vehicle = vehicle;
-        this.timeBeforeAccident = timeBeforeAccident;
         this.routeGenerator = routeGenerator;
         this.routeTransformer = routeTransformer;
         this.configContainer = configContainer;
@@ -211,7 +209,7 @@ public class VehicleAgent extends AbstractAgent {
                 int timeForTheEndWithJam = timeForTheEndWithoutJam + howLongTakesJam;
                 Long edgeId = Long.parseLong(rcv.getUserDefinedParameter(MessageParameter.EDGE_ID));
                 logger.info("  GOT PROPOSE TO CHANGE THE ROUTE. AND EXCLUDE: " + edgeId);
-                int timeForOfDynamicRoute = 0;
+                int timeForOfDynamicRoute;
                 final Integer indexOfRouteNodeWithEdge = vehicle.findIndexOfEdgeOnRoute(edgeId,
                         THRESHOLD_UNTIL_INDEX_CHANGE);
                 if (indexOfRouteNodeWithEdge != null) {
@@ -261,7 +259,8 @@ public class VehicleAgent extends AbstractAgent {
         addBehaviour(communication);
 
         if (configContainer.shouldGenerateConstructionSites()) {
-            Behaviour troubleGenerator = new TickerBehaviour(this, this.timeBeforeAccident) {
+            var timeBeforeTroubleMs = this.configContainer.getTimeBeforeTrouble() * 1000;
+            Behaviour troubleGenerator = new TickerBehaviour(this, timeBeforeTroubleMs) {
                 @Override
                 public void onTick() {
                     var route = vehicle.getUniformRoute();
@@ -297,7 +296,8 @@ public class VehicleAgent extends AbstractAgent {
 
 
             };
-            Behaviour troubleStopper = new TickerBehaviour(this, 3 * this.timeBeforeAccident) {
+
+            Behaviour troubleStopper = new TickerBehaviour(this, 3 * timeBeforeTroubleMs) {
                 @Override
                 public void onTick() {
 

@@ -1,58 +1,35 @@
 /* eslint-disable no-restricted-globals */
 import { connect } from "react-redux";
-import React, { useState, useEffect } from "react";
+import React from "react";
 import ApiManager from "../../../web/ApiManager";
-import { centerUpdated, generatePedestriansUpdated, startSimulationDataUpdated } from "../../../redux/core/actions";
+import { centerUpdated, generatePedestriansUpdated } from "../../../redux/core/actions";
 import { dispatch } from "../../../redux/store";
-import { StartState } from "../../../redux/models/startState";
+
+import { D_DECIMAL_PLACES } from "../../../constants/defaults";
+import { LAT_MIN, LAT_MAX, LNG_MIN, LNG_MAX, RAD_MIN, RAD_MAX } from "../../../constants/minMax";
 
 import "../../../styles/Menu.css";
 
-const PED_MIN = 1;
-const PED_MAX = 200;
-
-const DECIMAL_PLACES = 5;
-const latMin = -90;
-const latMax = 90;
-const lngMin = -180;
-const lngMax = 180;
-const radMin = 0;
-const radMax = 10000;
-
 const PrepareMenu = props => {
-  const { wasPrepared, wasStarted, shouldStart, generatePedestrians } = props;
-  const [pedLimit, setPedLimit] = useState(20);
-  const [testPedId, setTestPedId] = useState(5);
-
-  const onStart = () => {
-    if (shouldStart === StartState.Invoke) {
-      dispatch(
-        startSimulationDataUpdated({
-          pedLimit,
-          testPedId,
-        })
-      );
-    }
-  };
-  useEffect(onStart, [shouldStart]);
+  const { wasPrepared, wasStarted, generatePedestrians } = props;
 
   const setLat = e => {
     const val = parseFloat(e.target.value);
-    if (!isNaN(val) && val >= latMin && val <= latMax) {
+    if (!isNaN(val) && val >= LAT_MIN && val <= LAT_MAX) {
       dispatch(centerUpdated({ lat: val }));
     }
   };
 
   const setLng = e => {
     const val = parseFloat(e.target.value);
-    if (!isNaN(val) && val >= lngMin && val <= lngMax) {
+    if (!isNaN(val) && val >= LNG_MIN && val <= LNG_MAX) {
       dispatch(centerUpdated({ lng: val }));
     }
   };
 
   const setRad = e => {
     const val = parseFloat(e.target.value);
-    if (!isNaN(val) && val >= radMin && val <= radMax) {
+    if (!isNaN(val) && val >= RAD_MIN && val <= RAD_MAX) {
       dispatch(centerUpdated({ rad: val }));
     }
   };
@@ -65,8 +42,8 @@ const PrepareMenu = props => {
   let {
     center: { lat, lng, rad },
   } = props;
-  lat = lat.toFixed(DECIMAL_PLACES);
-  lng = lng.toFixed(DECIMAL_PLACES);
+  lat = lat.toFixed(D_DECIMAL_PLACES);
+  lng = lng.toFixed(D_DECIMAL_PLACES);
 
   const prepareSimulation = () => {
     ApiManager.prepareSimulation({ lat, lng, rad, generatePedestrians });
@@ -83,8 +60,8 @@ const PrepareMenu = props => {
             className="form-control"
             id="lat"
             step="0.0001"
-            min={latMin}
-            max={latMax}
+            min={LAT_MIN}
+            max={LAT_MAX}
             placeholder="Enter latitude"
             onChange={setLat}
           />
@@ -98,8 +75,8 @@ const PrepareMenu = props => {
             className="form-control"
             id="lng"
             step="0.0001"
-            min={lngMin}
-            max={lngMax}
+            min={LNG_MIN}
+            max={LNG_MAX}
             placeholder="Enter longitude"
             onChange={setLng}
           />
@@ -114,8 +91,8 @@ const PrepareMenu = props => {
             className="form-control"
             id="rad"
             step="10"
-            min={radMin}
-            max={radMax}
+            min={RAD_MIN}
+            max={RAD_MAX}
             placeholder="Enter radius"
             onChange={setRad}
           />
@@ -137,38 +114,6 @@ const PrepareMenu = props => {
           Generate pedestrians, buses and stations
         </label>
       </div>
-      {generatePedestrians && (
-        <div className="form-row mt-2 align-items-end">
-          <div className="form-group col-md-5">
-            <label htmlFor="pedLimit">Pedestrians limit</label>
-            <input
-              type="number"
-              defaultValue={pedLimit}
-              className="form-control"
-              id="pedLimit"
-              disabled={wasStarted}
-              min={PED_MIN}
-              max={PED_MAX}
-              placeholder="Enter limit for pedestrians"
-              onChange={e => setPedLimit(parseInt(e.target.value))}
-            />
-          </div>
-          <div className="form-group col-md-7">
-            <label htmlFor="testPedId">Test pedestrian number</label>
-            <input
-              type="number"
-              className="form-control"
-              id="testPedId"
-              disabled={wasStarted}
-              min={1}
-              max={1000}
-              defaultValue={testPedId}
-              placeholder="Enter test pedestrians number"
-              onChange={e => setTestPedId(parseInt(e.target.value))}
-            />
-          </div>
-        </div>
-      )}
 
       <div className="center-wrapper mt-3">
         <button
@@ -187,10 +132,9 @@ const PrepareMenu = props => {
 
 const mapStateToProps = (state /* , ownProps */) => {
   const { wasPrepared, wasStarted } = state.message;
-  const { center, shouldStart, generatePedestrians } = state.interaction;
+  const { center, generatePedestrians } = state.interaction;
   return {
     center,
-    shouldStart,
     wasPrepared,
     wasStarted,
     generatePedestrians,

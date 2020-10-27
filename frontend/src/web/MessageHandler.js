@@ -18,7 +18,7 @@ import {
   PULL_PEDESTRIAN_FROM_BUS_INFO,
   KILL_PEDESTRIAN_INFO,
 } from "./MessageType";
-import { NOTIFY_SHOW_MS } from "../utils/constants";
+import { NOTIFY_SHOW_MS } from "../constants/global";
 import Dispatcher from "../redux/Dispatcher";
 import { BusFillState } from "../components/Models/BusFillState";
 
@@ -112,7 +112,7 @@ export default {
       }
 
       case KILL_PEDESTRIAN_INFO: {
-        Dispatcher.killPedestrian(payload.id);
+        Dispatcher.killPedestrian(payload);
         break;
       }
 

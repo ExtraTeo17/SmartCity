@@ -1,5 +1,5 @@
 import { notify } from "react-notify-toast";
-import { NOTIFY_SHOW_MS } from "../../utils/constants";
+import { NOTIFY_SHOW_MS } from "../../constants/global";
 import { LightColor } from "../../components/Models/LightColor";
 import { getResultObj } from "../dataUtils/helpers";
 import {
@@ -17,7 +17,7 @@ const initialState = {
   lights: [],
   stations: [],
   troublePoints: [],
-  wasPrepared: false,
+  wasPrepared: 0,
   wasStarted: false,
   timeScale: 10,
   timeResults: [],
@@ -41,7 +41,7 @@ const message = (state = initialState, action) => {
         ...state,
         lights,
         stations,
-        wasPrepared: true,
+        wasPrepared: state.wasPrepared + 1,
         wasStarted: false,
       };
     }

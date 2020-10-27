@@ -88,7 +88,6 @@ public class SmartCityAgent extends Agent {
         }
     }
 
-
     private void onReceiveVehicle(ACLMessage rcv) {
         var name = rcv.getSender().getLocalName();
         var agentOpt = agentsContainer.get(VehicleAgent.class, (v) -> v.getLocalName().equals(name));

@@ -28,6 +28,7 @@ public class ConfigContainer extends ConfigMutator
     private boolean isStationStrategyActive = true;
     private int lightExtendTime = 30;
     private int extendWaitTime = 60;
+    private int timeBeforeTrouble = 5000;
 
     private final IZone zone;
 
@@ -146,5 +147,15 @@ public class ConfigContainer extends ConfigMutator
     @Override
     public void setStationStrategyActive(boolean stationStrategyActive) {
         isStationStrategyActive = stationStrategyActive;
+    }
+
+    @Override
+    public int getTimeBeforeTrouble() {
+        return timeBeforeTrouble;
+    }
+
+    @Override
+    public void setTimeBeforeTrouble(int timeBeforeTrouble) {
+        this.timeBeforeTrouble = timeBeforeTrouble;
     }
 }

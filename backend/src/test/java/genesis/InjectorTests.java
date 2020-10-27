@@ -101,8 +101,8 @@ class InjectorTests {
         eventBus.post(new LightManagersReadyEvent(null));
         eventBus.post(new SimulationPreparedEvent(new ArrayList<>(), new ArrayList<>(), new ArrayList<>()));
         eventBus.post("Test"); // Dead event
-        eventBus.post(new StartSimulationEvent(0, 0, false, false,
-                0, 1, LocalDateTime.now(), false, 30, false, 60, false));
+        eventBus.post(new StartSimulationEvent(false, 0, 0, false,
+                5000, 0, 1, LocalDateTime.now(), false, 30, false, 60, false));
         eventBus.post(new SimulationStartedEvent());
         eventBus.post(new ClearSimulationEvent());
 
@@ -114,7 +114,7 @@ class InjectorTests {
         eventBus.post(new VehicleAgentCreatedEvent(1, null, null, false));
         eventBus.post(new VehicleAgentUpdatedEvent(1, null));
         eventBus.post(new VehicleAgentRouteChangedEvent(1, new ArrayList<>(), null, new ArrayList<>()));
-        eventBus.post(new VehicleAgentDeadEvent(1,0, null));
+        eventBus.post(new VehicleAgentDeadEvent(1, 0, null));
 
         eventBus.post("Test"); // Dead event
 
@@ -130,7 +130,7 @@ class InjectorTests {
         eventBus.post(new PedestrianAgentUpdatedEvent(1, null));
         eventBus.post(new PedestrianAgentEnteredBusEvent(1));
         eventBus.post(new PedestrianAgentLeftBusEvent(1, null));
-        eventBus.post(new PedestrianAgentDeadEvent(1,0,null));
+        eventBus.post(new PedestrianAgentDeadEvent(1, 0, null));
 
         int expectedDeadEvents = 3;
         assertEquals(expectedDeadEvents, counter.get(), "All events should be handled somewhere");

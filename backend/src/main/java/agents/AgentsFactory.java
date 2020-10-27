@@ -31,8 +31,6 @@ class AgentsFactory implements IAgentsFactory {
     private final ICrossroadFactory crossroadFactory;
     private final EventBus eventBus;
     private final ConfigContainer configContainer;
-    //TODO: GET from GUI;
-    private final int timeBeforeTrouble = 5000;
 
     @Inject
     public AgentsFactory(IdGenerator idGenerator,
@@ -61,7 +59,7 @@ class AgentsFactory implements IAgentsFactory {
             car = new TestCar(car, timeProvider);
         }
 
-        return new VehicleAgent(id, car, timeBeforeTrouble, timeProvider,
+        return new VehicleAgent(id, car, timeProvider,
                 routeGenerator, routeTransformer, eventBus, configContainer);
     }
 

@@ -1,5 +1,5 @@
 import { notify } from "react-notify-toast";
-import { SERVER_ADDRESS, RECONNECT_INTERVAL_SEC, NOTIFY_SHOW_MS } from "../utils/constants";
+import { SERVER_ADDRESS, RECONNECT_INTERVAL_SEC, NOTIFY_SHOW_MS } from "../constants/global";
 import MessageHandler from "./MessageHandler";
 
 const socketContainer = {

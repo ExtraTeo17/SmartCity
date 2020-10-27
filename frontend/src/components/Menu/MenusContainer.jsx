@@ -12,7 +12,6 @@ const MenusContainer = ({ timeResults, wasPrepared }) => {
   const [key, setKey] = useState("main");
 
   useEffect(() => {
-    console.log("using effect");
     if (wasPrepared) {
       setKey("main");
     }

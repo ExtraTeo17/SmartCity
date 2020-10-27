@@ -3,6 +3,7 @@ package agents;
 import agents.abstractions.AbstractAgent;
 import agents.abstractions.IAgentsContainer;
 import com.google.inject.Inject;
+import jade.wrapper.AgentController;
 import jade.wrapper.ContainerController;
 import jade.wrapper.StaleProxyException;
 import org.jetbrains.annotations.NotNull;
@@ -45,8 +46,9 @@ class HashAgentsContainer implements IAgentsContainer {
 
     @Override
     public boolean tryAccept(@NotNull AbstractAgent agent) {
+        AgentController agentController;
         try {
-            controller.acceptNewAgent(agent.getPredictedName(), agent);
+            agentController = controller.acceptNewAgent(agent.getPredictedName(), agent);
         } catch (StaleProxyException e) {
             logger.warn("Error adding agent", e);
             return false;
@@ -128,16 +130,19 @@ class HashAgentsContainer implements IAgentsContainer {
         }
     }
 
-    private void tryDeleteAll(Collection<AbstractAgent> collection) {
-        for (var agent : collection) {
+    private void tryDeleteAll(Collection<AbstractAgent> agents) {
+        for (var agent : agents) {
             tryKillAgent(agent);
         }
-        collection.clear();
+        agents.clear();
     }
 
     private void tryKillAgent(AbstractAgent agent) {
         try {
-            agent.doDelete();
+            if (agent.isAlive()) {
+                agent.doDelete();
+            }
+            // TODO: AgentController - kill
         } catch (Exception e) {
             logger.warn("Failed to stop agent execution:", e);
         }
@@ -156,6 +161,16 @@ class HashAgentsContainer implements IAgentsContainer {
     public void registerAll(Class<?>[] types) {
         for (var type : types) {
             container.put(type, new ConcurrentHashMap<>());
+        }
+    }
+
+    private static class AgentWithController {
+        private final AbstractAgent agent;
+        private final AgentController controller;
+
+        private AgentWithController(AbstractAgent agent, AgentController controller) {
+            this.agent = agent;
+            this.controller = controller;
         }
     }
 }

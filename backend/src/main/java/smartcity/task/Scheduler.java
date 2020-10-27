@@ -40,6 +40,7 @@ public class Scheduler {
         activateLightManagerAgents();
         if (e.shouldGenerateCars) {
             configContainer.setShouldGenerateConstructionSites(e.shouldGenerateTroublePoints);
+            configContainer.setTimeBeforeTrouble(e.timeBeforeTrouble);
             configContainer.setChangeRouteStrategyActive(e.changeRouteStrategyActive);
             taskManager.scheduleCarCreation(e.carsNum, e.testCarId);
         }

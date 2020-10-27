@@ -83,6 +83,7 @@ class SchedulerTests {
         var testCarId = 112;
         var shouldGenerateCars = true;
         var shouldGenerateTP = true;
+        var timeBeforeTrouble = 5006;
 
         int pedestriansLimit = 155;
         int testPedestrianId = 555;
@@ -95,7 +96,7 @@ class SchedulerTests {
         var extendWaitTime = 354;
         var changeRouteStrategyActive = false;
 
-        var event = new StartSimulationEvent(carsNum, testCarId, shouldGenerateCars, shouldGenerateTP, pedestriansLimit, testPedestrianId, startTime,
+        var event = new StartSimulationEvent(shouldGenerateCars, carsNum, testCarId, shouldGenerateTP, timeBeforeTrouble, pedestriansLimit, testPedestrianId, startTime,
                 lightStrategyActive, extendLightTime, stationStrategyActive, extendWaitTime, changeRouteStrategyActive);
 
         // Act
@@ -105,9 +106,11 @@ class SchedulerTests {
         assertEquals(carsNum, ref.carsLimit);
         assertEquals(testCarId, ref.testCarId);
         assertEquals(shouldGenerateCars, configContainer.shouldGenerateCars());
+        assertEquals(shouldGenerateTP, configContainer.shouldGenerateConstructionSites());
+        assertEquals(timeBeforeTrouble, configContainer.getTimeBeforeTrouble());
+        
         assertEquals(pedestriansLimit, ref.pedLimit);
         assertEquals(testPedestrianId, ref.testPedId);
-        assertEquals(shouldGenerateTP, configContainer.shouldGenerateConstructionSites());
         assertEquals(lightStrategyActive, configContainer.isLightStrategyActive());
         assertEquals(extendLightTime, configContainer.getExtendLightTime());
         assertEquals(stationStrategyActive, configContainer.isStationStrategyActive());
@@ -144,8 +147,8 @@ class SchedulerTests {
     }
 
     private StartSimulationEvent prepareSimulationEvent(LocalDateTime startTime) {
-        return new StartSimulationEvent(111, 112, false, true,
-                222, 223, startTime,
+        return new StartSimulationEvent(false, 111, 112, true,
+                5005, 222, 223, startTime,
                 false, 333, false, 354, false);
     }
 

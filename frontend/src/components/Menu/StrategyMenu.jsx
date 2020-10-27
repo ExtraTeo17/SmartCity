@@ -5,16 +5,23 @@ import { StartState } from "../../redux/models/startState";
 import { dispatch } from "../../redux/store";
 import { startSimulationDataUpdated } from "../../redux/core/actions";
 import "../../styles/Menu.css";
+import {
+  D_EXTEND_WAIT_TIME,
+  D_LIGHT_STRATEGY_ACTIVE,
+  D_STATION_STRATEGY_ACTIVE,
+  D_EXTEND_LIGHT_TIME,
+  D_CHANGE_ROUTE_STRATEGY_ACTIVE,
+} from "../../constants/defaults";
 
 const StrategyMenu = props => {
   const { wasStarted, shouldStart } = props;
-  const [lightStrategyActive, setLightStrategyActive] = useState(true);
-  const [extendLightTime, setExtendLightTime] = useState(30);
+  const [lightStrategyActive, setLightStrategyActive] = useState(D_LIGHT_STRATEGY_ACTIVE);
+  const [extendLightTime, setExtendLightTime] = useState(D_EXTEND_LIGHT_TIME);
 
-  const [stationStrategyActive, setStationStrategyActive] = useState(true);
-  const [extendWaitTime, setExtendWaitTime] = useState(60);
+  const [stationStrategyActive, setStationStrategyActive] = useState(D_STATION_STRATEGY_ACTIVE);
+  const [extendWaitTime, setExtendWaitTime] = useState(D_EXTEND_WAIT_TIME);
 
-  const [changeRouteStrategyActive, setChangeRouteStrategyActive] = useState(true);
+  const [changeRouteStrategyActive, setChangeRouteStrategyActive] = useState(D_CHANGE_ROUTE_STRATEGY_ACTIVE);
 
   const onStart = () => {
     if (shouldStart === StartState.Invoke) {
@@ -77,7 +84,7 @@ const StrategyMenu = props => {
         </div>
         {stationStrategyActive && (
           <div className="form-group mt-2">
-            <label htmlFor="extendWaitTime">Enter bus extension wait time</label>
+            <label htmlFor="extendWaitTime">Bus extension wait time</label>
             <input
               type="number"
               defaultValue={extendWaitTime}

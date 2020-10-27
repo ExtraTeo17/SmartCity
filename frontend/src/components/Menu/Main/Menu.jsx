@@ -9,15 +9,16 @@ import "flatpickr/dist/themes/material_blue.css";
 import { dispatch } from "../../../redux/store";
 import { startSimulationDataUpdated } from "../../../redux/core/actions";
 import PrepareMenu from "./PrepareMenu";
-import CarsSubMenu from "./CarsSubMenu";
+import SubMenu from "./SubMenu";
 import SimulationStarter from "./SimulationStarter";
 import "../../../styles/Menu.css";
 import { StartState } from "../../../redux/models/startState";
 import CustomClock from "./CustomClock";
+import { D_START_TIME } from "../../../constants/defaults";
 
 const Menu = props => {
   const { wasStarted, shouldStart } = props;
-  const [startTime, setTime] = useState(new Date());
+  const [startTime, setTime] = useState(D_START_TIME);
   const onStart = () => {
     if (shouldStart === StartState.Invoke) {
       dispatch(startSimulationDataUpdated({ startTime }));
@@ -31,13 +32,13 @@ const Menu = props => {
 
   return (
     <div>
-      <PrepareMenu />
+      {!wasStarted && <PrepareMenu />}
 
       <form className="form-border">
-        <CarsSubMenu />
+        <SubMenu />
 
         <div className="mt-3">
-          <label htmlFor="simulationTime">Simulation time</label>
+          <label htmlFor="simulationTime">Simulation start time</label>
           <Flatpickr
             key="simulationTime"
             options={{
