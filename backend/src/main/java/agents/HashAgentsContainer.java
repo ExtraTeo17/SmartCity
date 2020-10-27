@@ -142,9 +142,8 @@ class HashAgentsContainer implements IAgentsContainer {
             if (agent.isAlive()) {
                 agent.doDelete();
             }
-            // TODO: AgentController - kill
         } catch (Exception e) {
-            logger.warn("Failed to stop agent execution:", e);
+            logger.warn("Failed to stop agent execution:" + agent.getLocalName(), e);
         }
     }
 
@@ -161,16 +160,6 @@ class HashAgentsContainer implements IAgentsContainer {
     public void registerAll(Class<?>[] types) {
         for (var type : types) {
             container.put(type, new ConcurrentHashMap<>());
-        }
-    }
-
-    private static class AgentWithController {
-        private final AbstractAgent agent;
-        private final AgentController controller;
-
-        private AgentWithController(AbstractAgent agent, AgentController controller) {
-            this.agent = agent;
-            this.controller = controller;
         }
     }
 }
