@@ -52,5 +52,5 @@ public interface IWebService extends IStartable {
 
     void pullPedestrianFromBus(int id, IGeoPosition position);
 
-    void killPedestrian(int id);
+    void killPedestrian(int id, int travelDistance, Long travelTime);
 }

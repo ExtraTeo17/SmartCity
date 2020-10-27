@@ -124,7 +124,7 @@ class Communicator {
     @Subscribe
     public void handle(PedestrianAgentDeadEvent e) {
         onHandle(e);
-        webService.killPedestrian(e.id);
+        webService.killPedestrian(e.id, e.travelDistance, e.travelTime);
     }
 
     private void onHandle(Object obj) {

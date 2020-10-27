@@ -19,9 +19,7 @@ import org.slf4j.LoggerFactory;
 import routing.RoutingConstants;
 import vehicles.ITestable;
 import vehicles.MovingObject;
-import vehicles.TestPedestrian;
 
-import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 
 public class SmartCityAgent extends Agent {
@@ -75,20 +73,17 @@ public class SmartCityAgent extends Agent {
         };
     }
 
-    // TODO: Almost the same as ReceiveVehicle - merge when TestPedestrian/TestCar will have common Interface
     private void onReceivePedestrian(ACLMessage rcv) {
         var name = rcv.getSender().getLocalName();
         var agentOpt = agentsContainer.get(PedestrianAgent.class, (v) -> v.getLocalName().equals(name));
         if (agentOpt.isPresent()) {
             var agent = agentOpt.get();
             var pedestrian = agent.getPedestrian();
-            if (pedestrian instanceof ITestable) {
-                var testPedestrian = (ITestable) pedestrian;
-                // getTimeIfTestable(testPedestrian.getStart(), testPedestrian.getEnd());
-            }
 
+            Long resultTime = getTimeIfTestable(pedestrian);
+            int distance = pedestrian.getUniformRouteSize() * RoutingConstants.STEP_SIZE_METERS;
             if (agentsContainer.remove(agent)) {
-                eventBus.post(new PedestrianAgentDeadEvent(agent.getId()));
+                eventBus.post(new PedestrianAgentDeadEvent(agent.getId(), distance, resultTime));
             }
         }
     }

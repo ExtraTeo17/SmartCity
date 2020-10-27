@@ -1,9 +1,11 @@
 package events.web.pedestrian;
 
-public class PedestrianAgentDeadEvent {
-    public final int id;
+import events.web.abstractions.AbstractAgentDeadWithTravelDataEvent;
 
-    public PedestrianAgentDeadEvent(int id) {
-        this.id = id;
+import javax.annotation.Nullable;
+
+public class PedestrianAgentDeadEvent extends AbstractAgentDeadWithTravelDataEvent {
+    public PedestrianAgentDeadEvent(int id, int travelDistance, @Nullable Long travelTime) {
+        super(id, travelDistance, travelTime);
     }
 }

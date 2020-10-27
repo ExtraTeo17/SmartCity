@@ -130,7 +130,7 @@ class InjectorTests {
         eventBus.post(new PedestrianAgentUpdatedEvent(1, null));
         eventBus.post(new PedestrianAgentEnteredBusEvent(1));
         eventBus.post(new PedestrianAgentLeftBusEvent(1, null));
-        eventBus.post(new PedestrianAgentDeadEvent(1));
+        eventBus.post(new PedestrianAgentDeadEvent(1,0,null));
 
         int expectedDeadEvents = 3;
         assertEquals(expectedDeadEvents, counter.get(), "All events should be handled somewhere");

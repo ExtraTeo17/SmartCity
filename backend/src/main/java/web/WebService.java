@@ -182,8 +182,8 @@ class WebService implements IWebService {
     }
 
     @Override
-    public void killPedestrian(int id) {
-        var payload = new KillPedestrianInfo(id);
+    public void killPedestrian(int id, int travelDistance, Long travelTime) {
+        var payload = new KillPedestrianInfo(id, travelDistance, travelTime);
 
         webConnector.broadcastMessage(MessageType.KILL_PEDESTRIAN_INFO, payload);
     }

@@ -9,6 +9,7 @@ import {
   SIMULATION_STARTED,
   TROUBLE_POINT_VANISHED,
   CAR_KILLED,
+  PEDESTRIAN_KILLED,
 } from "../core/constants";
 
 // Just for reference - defined in store.js
@@ -81,7 +82,10 @@ const message = (state = initialState, action) => {
     }
 
     case CAR_KILLED: {
-      return onKilled(state, action.payload, "car");
+      return onKilled(state, action.payload, "Car");
+    }
+    case PEDESTRIAN_KILLED: {
+      return onKilled(state, action.payload, "Pedestrian");
     }
 
     default:
