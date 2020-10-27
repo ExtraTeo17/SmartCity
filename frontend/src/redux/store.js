@@ -41,6 +41,7 @@ const initialState = {
     troublePoints: [],
     wasPrepared: false,
     wasStarted: false,
+    timeScale: 10,
   },
 };
 

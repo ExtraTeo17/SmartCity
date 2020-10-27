@@ -13,9 +13,10 @@ import CarsSubMenu from "./CarsSubMenu";
 import SimulationStarter from "./SimulationStarter";
 import "../../../styles/Menu.css";
 import { StartState } from "../../../redux/models/startState";
+import CustomClock from "./CustomClock";
 
 const Menu = props => {
-  const { wasStarted, shouldStart } = props;
+  const { wasStarted, wasPrepared, shouldStart } = props;
   const [startTime, setTime] = useState(new Date());
   const onStart = () => {
     if (shouldStart === StartState.Invoke) {
@@ -54,6 +55,8 @@ const Menu = props => {
         </div>
         <SimulationStarter />
       </form>
+
+      {wasStarted && <CustomClock />}
     </div>
   );
 };

@@ -84,7 +84,7 @@ const Dispatcher = {
   startSimulation(newTimeScale) {
     timeScale = newTimeScale;
     timer = update(window.performance.now());
-    dispatch(simulationStarted());
+    dispatch(simulationStarted(timeScale));
   },
 
   createCar(car) {

@@ -14,11 +14,11 @@ const MenusContainer = props => {
       <Tab eventKey="strategy" title="Strategy">
         <StrategyMenu />
       </Tab>
-      <Tab eventKey="contact" title="Setups">
-        <div className="form-border">Predefined setups (ex. Test Bus Zone) will be here</div>
+      <Tab eventKey="contact" title="Setups" disabled>
+        <div className="form-border">Predefined setups (ex. Test Bus Zone) will be here.</div>
       </Tab>
-      <Tab eventKey="results" title="Results" disabled>
-        <div className="form-border">List of test results will be here</div>
+      <Tab eventKey="results" title="Results">
+        <div className="form-border">List of test results will be here.</div>
       </Tab>
     </Tabs>
   );
