@@ -13,7 +13,7 @@ import java.time.LocalDateTime;
 import java.util.*;
 
 public class Light extends Position {
-    private static final int TRAFFIC_JAM_THRESHOLD = 0;
+    private static final int TRAFFIC_JAM_THRESHOLD = 1;
 	
     private LightColor carLightColor;
     private final long adjacentOsmWayId;

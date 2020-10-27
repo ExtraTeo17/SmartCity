@@ -14,8 +14,10 @@ public class OptimizationResult {
 	private boolean shouldNotifyCarAboutStartOfTrafficJamOnThisLight = false;
 	private boolean shouldNotifyCarAboutStopOfTrafficJamOnThisLight = false;
     private double lengthOfJam = 0;
+    private long osmWayId =0;
 	private Position jammedLightPosition = null;
 
+	public long getOsmWayId(){return  osmWayId;}
     public static OptimizationResult empty() {
         return new OptimizationResult();
     }
@@ -37,9 +39,10 @@ public class OptimizationResult {
     }
     // public List<Pair<CROSSROAD, Boolean>> getTrafficJamsInfo(){return trafficJams; }
 
-	public void setShouldNotifyCarAboutStartOfTrafficJamOnThisLight(double jammedLightLat, double jammedLightLon, int numerOfCarsInTheQueue) {
+	public void setShouldNotifyCarAboutStartOfTrafficJamOnThisLight(double jammedLightLat, double jammedLightLon,  int numerOfCarsInTheQueue,long osmWayId) {
 		shouldNotifyCarAboutStartOfTrafficJamOnThisLight = true;
 		jammedLightPosition = Position.of(jammedLightLat, jammedLightLon);
+		this.osmWayId = osmWayId;
 		//TODO: change 2 na liczbé samochodów które przejzdzaja podczas jednego swiatla. Oraz change how long is green and red
 		lengthOfJam = Math.floor(Math.floor(numerOfCarsInTheQueue / 2) * ((5 + 5) + (5 + 5 + 2.5)) / 2); // TODO: Magic numbers
 
@@ -64,8 +67,9 @@ public class OptimizationResult {
 		return shouldNotifyCarAboutStopOfTrafficJamOnThisLight;
 	}
 
-	public void setShouldNotifyCarAboutEndOfTrafficJamOnThisLight(double jammedLightLat, double jammedLightLon) {
+	public void setShouldNotifyCarAboutEndOfTrafficJamOnThisLight(double jammedLightLat, double jammedLightLon, long osmWayId) {
 		shouldNotifyCarAboutStopOfTrafficJamOnThisLight = true;
 		jammedLightPosition = Position.of(jammedLightLat, jammedLightLon);
+		this.osmWayId = osmWayId ;
 	}
 }

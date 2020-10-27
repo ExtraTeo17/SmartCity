@@ -55,10 +55,10 @@ class SimpleCrossroad implements ICrossroad {
                     result.addCarGrantedPassthrough(carName);
                     if (light.trafficJamEmerged()) {
                         logger.info("Jam has been detected during crossroad optimizations on light: " + light.getOsmLightId());
-                    	result.setShouldNotifyCarAboutStartOfTrafficJamOnThisLight(light.getLat(), light.getLng(), light.carQueue.size());
+                    	result.setShouldNotifyCarAboutStartOfTrafficJamOnThisLight(light.getLat(), light.getLng(), light.carQueue.size(),light.getOsmLightId());
                     } else if (light.trafficJamDisappeared()) {
                     	logger.info("No jams have been detected right now on light: " + light.getOsmLightId());
-                    	result.setShouldNotifyCarAboutEndOfTrafficJamOnThisLight(light.getLat(), light.getLng());
+                    	result.setShouldNotifyCarAboutEndOfTrafficJamOnThisLight(light.getLat(), light.getLng(),light.getOsmLightId());
                     }
                     break;
                 }

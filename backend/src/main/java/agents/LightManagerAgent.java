@@ -17,11 +17,7 @@ import smartcity.lights.abstractions.ICrossroad;
 import smartcity.lights.core.Light;
 import smartcity.stations.ArrivalInfo;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 import static agents.message.MessageManager.*;
 import static java.lang.Thread.sleep;
@@ -31,7 +27,7 @@ import java.awt.Container;
 public class LightManagerAgent extends AbstractAgent {
     public static final String name = LightManagerAgent.class.getSimpleName().replace("Agent", "");
     private final ICrossroad crossroad;
-    private List<String> trafficJammedEdgeSet = new ArrayList<>();
+    private Map<String,String> trafficJammedEdgeSet = new HashMap<>();
     
     LightManagerAgent(int id, ICrossroad crossroad,
                       ITimeProvider timeProvider,
@@ -75,16 +71,23 @@ public class LightManagerAgent extends AbstractAgent {
                 } else if (result.shouldNotifyCarAboutStopOfTrafficJamOnThisLight()) {
                 	sendMessageAboutTroubleStopToTroubleManager(result);
                 }
+                else if(agents.size() != 0)
+                {
+                    for (String agentName : agents) {
+                        answerCanProceed(agentName);
+                    }
+                }
             }
 
-            private void sendMessageAboutTroubleStopToTroubleManager(OptimizationResult result) throws Exception {
-            	ACLMessage msg = createMessage(ACLMessage.PROPOSE, TroubleManagerAgent.name); // Remember that this solution is based on different agents expected to return the same graphhopper edge ID when traffic jam starts and stops
+            private synchronized void sendMessageAboutTroubleStopToTroubleManager(OptimizationResult result) throws Exception {
+            	ACLMessage msg = createMessage(ACLMessage.INFORM, TroubleManagerAgent.name); // Remember that this solution is based on different agents expected to return the same graphhopper edge ID when traffic jam starts and stops
                 Properties properties = createProperties(MessageParameter.LIGHT);
                 properties.setProperty(MessageParameter.TYPEOFTROUBLE, MessageParameter.TRAFFIC_JAMS);
                 properties.setProperty(MessageParameter.TROUBLE, MessageParameter.STOP);
                 properties.setProperty(MessageParameter.TROUBLE_LAT, Double.toString(result.getJammedLightPosition().getLat()));
                 properties.setProperty(MessageParameter.TROUBLE_LON, Double.toString(result.getJammedLightPosition().getLng()));
-                //properties.setProperty(MessageParameter.EDGE_ID, trafficJammedEdgeSet.contains(o)); // TODO: Kasia to implement <3
+                properties.setProperty(MessageParameter.EDGE_ID, trafficJammedEdgeSet.get(String.valueOf(result.getOsmWayId())));
+                trafficJammedEdgeSet.remove(result.getOsmWayId());
                 msg.setAllUserDefinedParameters(properties);
                 logger.info("Send message to " + TroubleManagerAgent.name + " for request of EdgeID when stopping traffic jam");
                 //print(" send message about trouble on " + Long.toString(troublePoint.getInternalEdgeId()));
@@ -105,13 +108,14 @@ public class LightManagerAgent extends AbstractAgent {
                 properties.setProperty(MessageParameter.LENGTH_OF_JAM, Double.toString(result.getLengthOfJam()));
                 properties.setProperty(MessageParameter.TROUBLE_LAT, Double.toString(result.getJammedLightPosition().getLat()));
                 properties.setProperty(MessageParameter.TROUBLE_LON, Double.toString(result.getJammedLightPosition().getLng()));
+                properties.setProperty(MessageParameter.ADJACENT_OSM_WAY_ID, Long.toString(result.getOsmWayId()));
                 msg.setAllUserDefinedParameters(properties);
                 logger.info("Send message to " + nameOfAgent + " for request of EdgeID when starting traffic jam");
                 //print(" send message about trouble on " + Long.toString(troublePoint.getInternalEdgeId()));
                 send(msg);
             }
 
-            private void sendMessageAboutTroubleStopToVehicle(OptimizationResult result, String nameOfAgent) throws Exception {
+           /* private void sendMessageAboutTroubleStopToVehicle(OptimizationResult result, String nameOfAgent) throws Exception {
             	ACLMessage msg = createMessage(ACLMessage.CANCEL, nameOfAgent);
                 Properties properties = createProperties(MessageParameter.LIGHT);
                 properties.setProperty(MessageParameter.TYPEOFTROUBLE, MessageParameter.TRAFFIC_JAMS);
@@ -122,7 +126,7 @@ public class LightManagerAgent extends AbstractAgent {
                 logger.info("Send message to " + nameOfAgent + " for request of EdgeID when stopping traffic jam");
                 //print(" send message about trouble on " + Long.toString(troublePoint.getInternalEdgeId()));
                 send(msg);
-			}
+			}*/
 
             private void answerCanProceed(String carName) {
                 print(carName + " can proceed.");
@@ -190,7 +194,7 @@ public class LightManagerAgent extends AbstractAgent {
                         crossroad.removeCarFromFarAwayQueue(getIntParameter(rcv, MessageParameter.ADJACENT_OSM_WAY_ID), agentName);
                     }
                     case ACLMessage.CONFIRM -> {
-                    	trafficJammedEdgeSet.add(rcv.getUserDefinedParameter(MessageParameter.EDGE_ID));
+                    	trafficJammedEdgeSet.put(rcv.getUserDefinedParameter(MessageParameter.ADJACENT_OSM_WAY_ID),rcv.getUserDefinedParameter(MessageParameter.EDGE_ID));
                     }
                     default -> logger.info("Wait");
                 }

@@ -46,21 +46,22 @@ public class TroubleManagerAgent extends Agent {
         logger.info("Sent broadcast");
     }
     
-    private ACLMessage generateMessageAboutTrouble(ACLMessage rcv, String typeOfTrouble) {
+    private ACLMessage generateMessageAboutTrouble(ACLMessage rcv, String typeOfTrouble, String showOrStop) {
         int edgeId = Integer.parseInt(rcv.getUserDefinedParameter(MessageParameter.EDGE_ID));
         String lengthOfJam = null;
         if (rcv.getAllUserDefinedParameters().contains(MessageParameter.LENGTH_OF_JAM)) {
             lengthOfJam = rcv.getUserDefinedParameter(MessageParameter.LENGTH_OF_JAM);
         }
-        return generateMessageAboutTrafficJam(edgeId, lengthOfJam, typeOfTrouble);
+        return generateMessageAboutTrafficJam(edgeId, lengthOfJam, typeOfTrouble,showOrStop);
     }
     
-    private ACLMessage generateMessageAboutTrafficJam(int edgeId, String lengthOfJam, String typeOfTrouble) {
+    private ACLMessage generateMessageAboutTrafficJam(int edgeId, String lengthOfJam, String typeOfTrouble, String showOrStop) {
         logger.info("Got message about trouble on edge: " + edgeId); // broadcasting to everybody
         ACLMessage response = new ACLMessage(ACLMessage.PROPOSE);
         Properties properties = createProperties(MessageParameter.TROUBLE_MANAGER);
         properties.setProperty(MessageParameter.EDGE_ID, Long.toString(edgeId));
         properties.setProperty(MessageParameter.TYPEOFTROUBLE, typeOfTrouble);
+        properties.setProperty(MessageParameter.TROUBLE,showOrStop);
         if (lengthOfJam != null) {
         	properties.setProperty(MessageParameter.LENGTH_OF_JAM, lengthOfJam);
         }
@@ -80,7 +81,7 @@ public class TroubleManagerAgent extends Agent {
         	mapOfConstructionSiteBlockedEdges.put(edgeId, rcv.getUserDefinedParameter(MessageParameter.LENGTH_OF_JAM));
             ExtendedGraphHopper.addForbiddenEdges(Arrays.asList(edgeId));
         }
-        sendBroadcast(generateMessageAboutTrouble(rcv, MessageParameter.CONSTRUCTION));
+        sendBroadcast(generateMessageAboutTrouble(rcv, MessageParameter.CONSTRUCTION,MessageParameter.SHOW));
     }
     
     private void trafficJamsAppearedHandle(ACLMessage rcv) {
@@ -93,7 +94,7 @@ public class TroubleManagerAgent extends Agent {
         	mapOfLightTrafficJamBlockedEdges.put(edgeId, rcv.getUserDefinedParameter(MessageParameter.LENGTH_OF_JAM));
             ExtendedGraphHopper.addForbiddenEdges(Arrays.asList(edgeId));
         }
-        sendBroadcast(generateMessageAboutTrouble(rcv, MessageParameter.TRAFFIC_JAMS));
+        sendBroadcast(generateMessageAboutTrouble(rcv, MessageParameter.TRAFFIC_JAMS,MessageParameter.SHOW));
         // }
     }
 
@@ -107,7 +108,7 @@ public class TroubleManagerAgent extends Agent {
         	mapOfLightTrafficJamBlockedEdges.remove(edgeId);
             ExtendedGraphHopper.removeForbiddenEdges(Arrays.asList(edgeId));
         }
-        sendBroadcast(generateMessageAboutTrouble(rcv, MessageParameter.TRAFFIC_JAMS));
+        sendBroadcast(generateMessageAboutTrouble(rcv, MessageParameter.TRAFFIC_JAMS,MessageParameter.STOP));
 	}
     
     @Override
@@ -139,11 +140,12 @@ public class TroubleManagerAgent extends Agent {
             }
         };
         
-        var sayAboutJam = new TickerBehaviour(this, 1000) {//100 / TimeProvider.TIME_SCALE) {
+        var sayAboutJam = new TickerBehaviour(this, 2000) {//100 / TimeProvider.TIME_SCALE) {
             @Override
             protected void onTick() {
                 for (Map.Entry<Integer, String> entry : mapOfLightTrafficJamBlockedEdges.entrySet()) {
-                    sendBroadcast(generateMessageAboutTrafficJam(entry.getKey(), entry.getValue(), MessageParameter.TRAFFIC_JAMS));
+                    sendBroadcast(generateMessageAboutTrafficJam(entry.getKey(), entry.getValue(),
+                                                                    MessageParameter.TRAFFIC_JAMS,MessageParameter.SHOW));
                 }
             }
         };

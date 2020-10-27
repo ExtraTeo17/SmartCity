@@ -212,22 +212,28 @@ public class VehicleAgent extends AbstractAgent {
                 logger.info("Internal edge ID when light manager asked: " + currentInternalID);
                 Position positionOfTroubleLight = Position.of(rcv.getUserDefinedParameter(MessageParameter.TROUBLE_LAT),
                                                               rcv.getUserDefinedParameter(MessageParameter.TROUBLE_LON));
+
                 sendMessageAboutTrafficJamTrouble(currentInternalID, positionOfTroubleLight,
                         Double.parseDouble(rcv.getAllUserDefinedParameters().containsKey(MessageParameter.LENGTH_OF_JAM) ?
                       		  rcv.getUserDefinedParameter(MessageParameter.LENGTH_OF_JAM) : null),
-                        showOrStop, TroubleManagerAgent.name, ACLMessage.INFORM);
+                        showOrStop, TroubleManagerAgent.name, ACLMessage.INFORM,
+                        rcv.getUserDefinedParameter(MessageParameter.ADJACENT_OSM_WAY_ID));
+
+
                 sendMessageAboutTrafficJamTrouble(currentInternalID, positionOfTroubleLight,
 	                      Double.parseDouble(rcv.getAllUserDefinedParameters().containsKey(MessageParameter.LENGTH_OF_JAM) ?
 	                    		  rcv.getUserDefinedParameter(MessageParameter.LENGTH_OF_JAM) : null),
-	                      showOrStop, rcv.getSender().getLocalName(), ACLMessage.CONFIRM);
+	                      showOrStop, rcv.getSender().getLocalName(), ACLMessage.CONFIRM,
+                          rcv.getUserDefinedParameter(MessageParameter.ADJACENT_OSM_WAY_ID));
             }
 
             private void sendMessageAboutTrafficJamTrouble(int currentInternalID, Position positionOfTroubleLight,
-            		Double lengthOfJam, String showOrStop, String name, int performative) {
+            		Double lengthOfJam, String showOrStop, String name, int performative, String adjOsmWayId) {
                 ACLMessage msg = createMessage(performative, name);
                 Properties properties = createProperties(MessageParameter.VEHICLE);
                 properties.setProperty(MessageParameter.TYPEOFTROUBLE, MessageParameter.TRAFFIC_JAMS);
                 properties.setProperty(MessageParameter.TROUBLE, showOrStop);
+                properties.setProperty(MessageParameter.ADJACENT_OSM_WAY_ID, adjOsmWayId);
                 properties.setProperty(MessageParameter.TROUBLE_LAT, String.valueOf(positionOfTroubleLight.getLat()));
                 properties.setProperty(MessageParameter.TROUBLE_LON, String.valueOf(positionOfTroubleLight.getLng()));
                 if (lengthOfJam != null) {
@@ -240,12 +246,29 @@ public class VehicleAgent extends AbstractAgent {
             }
 
             private void handleTrafficJamsFromTroubleManager(ACLMessage rcv) {
-                int edgeId = Integer.parseInt(rcv.getUserDefinedParameter(MessageParameter.EDGE_ID));
-                if (trafficJamsEdgeId.contains(edgeId)) {
-                    logger.info("I'm already notified about traffic jam on edge: " + edgeId);
+
+                if(vehicle.isAtTrafficLights())
+                {
+                    logger.info("I'm already on the light. I can't change route");
                     return;
                 }
-                trafficJamsEdgeId.add(edgeId);
+
+
+                int edgeId = Integer.parseInt(rcv.getUserDefinedParameter(MessageParameter.EDGE_ID));
+                String showOrStop =  rcv.getUserDefinedParameter(MessageParameter.TROUBLE);
+                if(showOrStop.equals(MessageParameter.SHOW))
+                {
+                    if (trafficJamsEdgeId.contains(edgeId)) {
+                    logger.info("I'm already notified about traffic jam on edge: " + edgeId);
+                    return;
+                    }
+                    trafficJamsEdgeId.add(edgeId);
+                }
+                else{
+                    logger.info("-------------------TRAFFIC JAM ENDED------------: " + edgeId);
+                    trafficJamsEdgeId.remove(edgeId);
+                }
+
                 double howLongTakesJam = 0;
                 if (rcv.getAllUserDefinedParameters().containsKey(MessageParameter.LENGTH_OF_JAM)) {
                     howLongTakesJam = 1000 * Double.parseDouble(rcv.getUserDefinedParameter(MessageParameter.LENGTH_OF_JAM));
