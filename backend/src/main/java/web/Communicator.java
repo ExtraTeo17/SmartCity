@@ -63,7 +63,7 @@ class Communicator {
     @Subscribe
     public void handle(VehicleAgentDeadEvent e) {
         onHandle(e);
-        webService.killCar(e.id);
+        webService.killCar(e.id, e.travelDistance, e.travelTime);
     }
 
     @Subscribe

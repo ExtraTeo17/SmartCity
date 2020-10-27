@@ -1,4 +1,4 @@
-import { CENTER_UPDATED, SHOULD_START_SIMULATION, START_SIMULATION_DATA_UPDATED } from "../constants";
+import { CENTER_UPDATED, SHOULD_START_SIMULATION, START_SIMULATION_DATA_UPDATED } from "../core/constants";
 import { StartState } from "../models/startState";
 
 // Just for reference - defined in store.js

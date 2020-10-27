@@ -51,7 +51,7 @@ export default {
         break;
 
       case KILL_CAR_INFO:
-        Dispatcher.killCar(payload.id);
+        Dispatcher.killCar(payload);
         break;
 
       case UPDATE_CAR_ROUTE_INFO:

@@ -34,14 +34,21 @@ const initialState = {
   },
   message: {
     lights: [],
-    cars: [],
     stations: [],
-    buses: [],
-    pedestrians: [],
     troublePoints: [],
     wasPrepared: false,
     wasStarted: false,
     timeScale: 10,
+    timeResults: [],
+  },
+  bus: {
+    buses: [],
+  },
+  pedestrian: {
+    pedestrians: [],
+  },
+  car: {
+    cars: [],
   },
 };
 

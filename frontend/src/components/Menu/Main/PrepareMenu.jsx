@@ -2,7 +2,7 @@
 import { connect } from "react-redux";
 import React, { useState, useEffect } from "react";
 import ApiManager from "../../../web/ApiManager";
-import { centerUpdated, startSimulationDataUpdated } from "../../../redux/actions";
+import { centerUpdated, startSimulationDataUpdated } from "../../../redux/core/actions";
 import { dispatch } from "../../../redux/store";
 import { StartState } from "../../../redux/models/startState";
 

@@ -8,7 +8,7 @@ import vehicles.enums.VehicleType;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 
-public class TestCar extends Car {
+public class TestCar extends Car implements ITestable {
     private final ITimeProvider timeProvider;
 
     private LocalDateTime start;
@@ -44,10 +44,12 @@ public class TestCar extends Car {
         return VehicleType.TEST_CAR.toString();
     }
 
+    @Override
     public LocalDateTime getStart() {
         return start;
     }
 
+    @Override
     public LocalDateTime getEnd() {
         return end;
     }

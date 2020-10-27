@@ -1,4 +1,10 @@
-import { PEDESTRIAN_CREATED, PEDESTRIAN_UPDATED, PEDESTRIAN_KILLED, PEDESTRIAN_PUSHED, PEDESTRIAN_PULLED } from "../constants";
+import {
+  PEDESTRIAN_CREATED,
+  PEDESTRIAN_UPDATED,
+  PEDESTRIAN_KILLED,
+  PEDESTRIAN_PUSHED,
+  PEDESTRIAN_PULLED,
+} from "../core/constants";
 
 // Just for reference - defined in store.js
 const initialState = {

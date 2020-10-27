@@ -1,11 +1,13 @@
 import React from "react";
+import { connect } from "react-redux";
 import Tabs from "react-bootstrap/Tabs";
 import Tab from "react-bootstrap/Tab";
 import Menu from "./Main/Menu";
 import StrategyMenu from "./StrategyMenu";
+import ResultsMenu from "./ResultsMenu";
 import "../../styles/MenusContainer.css";
 
-const MenusContainer = props => {
+const MenusContainer = ({ timeResults }) => {
   return (
     <Tabs defaultActiveKey="main" variant="tabs" id="tabbed-menu">
       <Tab eventKey="main" title="Main">
@@ -17,11 +19,18 @@ const MenusContainer = props => {
       <Tab eventKey="contact" title="Setups" disabled>
         <div className="form-border">Predefined setups (ex. Test Bus Zone) will be here.</div>
       </Tab>
-      <Tab eventKey="results" title="Results">
-        <div className="form-border">List of test results will be here.</div>
+      <Tab eventKey="results" title="Results" disabled={timeResults.length === 0}>
+        <ResultsMenu />
       </Tab>
     </Tabs>
   );
 };
 
-export default MenusContainer;
+const mapStateToProps = (state /* , ownProps */) => {
+  const { timeResults } = state.message;
+  return {
+    timeResults,
+  };
+};
+
+export default connect(mapStateToProps)(React.memo(MenusContainer));

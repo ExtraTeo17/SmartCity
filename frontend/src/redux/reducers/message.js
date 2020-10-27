@@ -1,11 +1,15 @@
+import { notify } from "react-notify-toast";
+import { NOTIFY_SHOW_MS } from "../../utils/constants";
 import { LightColor } from "../../components/Models/LightColor";
+import { getResultObj } from "../dataUtils/helpers";
 import {
   SIMULATION_PREPARED,
   LIGHTS_SWITCHED,
   TROUBLE_POINT_CREATED,
   SIMULATION_STARTED,
   TROUBLE_POINT_VANISHED,
-} from "../constants";
+  CAR_KILLED,
+} from "../core/constants";
 
 // Just for reference - defined in store.js
 const initialState = {
@@ -15,7 +19,18 @@ const initialState = {
   wasPrepared: false,
   wasStarted: false,
   timeScale: 10,
+  timeResults: [],
 };
+
+function onKilled(state, data, type) {
+  if (data.travelTime) {
+    notify.show(`New result for ${type}!`, "success", NOTIFY_SHOW_MS);
+    const resultObj = getResultObj(type, data);
+    return { ...state, timeResults: [...state.timeResults, resultObj] };
+  }
+
+  return state;
+}
 
 const message = (state = initialState, action) => {
   switch (action.type) {
@@ -63,6 +78,10 @@ const message = (state = initialState, action) => {
 
       console.log(`Handling tp-hide: ${id}`);
       return { ...state, troublePoints: state.troublePoints.filter(tp => tp.id !== id) };
+    }
+
+    case CAR_KILLED: {
+      return onKilled(state, action.payload, "car");
     }
 
     default:

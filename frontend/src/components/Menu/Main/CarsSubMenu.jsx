@@ -2,7 +2,7 @@
 import { connect } from "react-redux";
 import React, { useEffect, useState } from "react";
 import { dispatch } from "../../../redux/store";
-import { startSimulationDataUpdated } from "../../../redux/actions";
+import { startSimulationDataUpdated } from "../../../redux/core/actions";
 
 import "../../../styles/Menu.css";
 import { StartState } from "../../../redux/models/startState";

@@ -28,7 +28,6 @@ class TestCarTests {
         assertEquals(time, start);
     }
 
-
     @Test
     void setState_onFinalState_shouldSetStartAndEnd() {
         // Arrange

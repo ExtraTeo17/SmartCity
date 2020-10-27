@@ -44,6 +44,8 @@ public abstract class MovingObject {
         this.state = DrivingState.STARTING;
     }
 
+    public abstract String getVehicleType();
+
     public int getAgentId() {
         return agentId;
     }
@@ -129,10 +131,9 @@ public abstract class MovingObject {
         return null;
     }
 
-
     public List<RouteNode> getUniformRoute() { return uniformRoute; }
 
-    public abstract String getVehicleType();
+    public int getUniformRouteSize() {return uniformRoute.size();}
 
     public LightManagerNode switchToNextTrafficLight() {
         for (int i = moveIndex + 1; i < uniformRoute.size(); ++i) {
@@ -205,5 +206,4 @@ public abstract class MovingObject {
     public boolean currentTrafficLightNodeWithinAlternativeRouteThreshold(int thresholdUntilIndexChange) {
         return moveIndex + thresholdUntilIndexChange >= closestLightIndex;
     }
-
 }

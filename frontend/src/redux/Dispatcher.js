@@ -18,7 +18,7 @@ import {
   pedestrianPushedIntoBus,
   pedestrianPulledFromBus,
   pedestrianKilled,
-} from "./actions";
+} from "./core/actions";
 
 const fps = 15;
 const fpsInterval = 1000 / fps;
@@ -98,8 +98,8 @@ const Dispatcher = {
     carUpdateQueue.set(car.id, carUpdated(car));
   },
 
-  killCar(id) {
-    dispatch(carKilled(id));
+  killCar(data) {
+    dispatch(carKilled(data));
   },
 
   updateCarRoute(routeInfo) {

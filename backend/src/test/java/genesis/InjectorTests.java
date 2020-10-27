@@ -114,7 +114,7 @@ class InjectorTests {
         eventBus.post(new VehicleAgentCreatedEvent(1, null, null, false));
         eventBus.post(new VehicleAgentUpdatedEvent(1, null));
         eventBus.post(new VehicleAgentRouteChangedEvent(1, new ArrayList<>(), null, new ArrayList<>()));
-        eventBus.post(new VehicleAgentDeadEvent(1));
+        eventBus.post(new VehicleAgentDeadEvent(1,0, null));
 
         eventBus.post("Test"); // Dead event
 

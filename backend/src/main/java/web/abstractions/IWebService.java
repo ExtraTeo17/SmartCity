@@ -21,7 +21,7 @@ public interface IWebService extends IStartable {
 
     void updateCar(int id, IGeoPosition position);
 
-    void killCar(int id);
+    void killCar(int id, int travelDistance, Long travelTime);
 
     void updateLights(long lightGroupId);
 

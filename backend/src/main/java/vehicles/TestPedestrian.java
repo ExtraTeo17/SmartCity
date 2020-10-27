@@ -7,7 +7,7 @@ import vehicles.enums.VehicleType;
 
 import java.time.LocalDateTime;
 
-public class TestPedestrian extends Pedestrian {
+public class TestPedestrian extends Pedestrian implements ITestable {
     private final ITimeProvider timeProvider;
 
     private LocalDateTime start;
@@ -42,10 +42,12 @@ public class TestPedestrian extends Pedestrian {
         return VehicleType.TEST_PEDESTRIAN.toString();
     }
 
+    @Override
     public LocalDateTime getStart() {
         return start;
     }
 
+    @Override
     public LocalDateTime getEnd() {
         return end;
     }

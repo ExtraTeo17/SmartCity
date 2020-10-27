@@ -3,7 +3,7 @@ import { Circle, Map as LeafletMap, Marker, Popup, TileLayer } from "react-leafl
 import { connect } from "react-redux";
 import { notify } from "react-notify-toast";
 import { dispatch } from "../redux/store";
-import { centerUpdated } from "../redux/actions";
+import { centerUpdated } from "../redux/core/actions";
 
 import "../styles/CityMap.css";
 import LightsLayer from "./Layers/LightsLayer";

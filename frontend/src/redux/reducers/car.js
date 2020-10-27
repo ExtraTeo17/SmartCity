@@ -1,4 +1,4 @@
-import { CAR_KILLED, CAR_CREATED, CAR_UPDATED, CAR_ROUTE_CHANGED } from "../constants";
+import { CAR_KILLED, CAR_CREATED, CAR_UPDATED, CAR_ROUTE_CHANGED } from "../core/constants";
 
 // Just for reference - defined in store.js
 const initialState = {
@@ -35,7 +35,7 @@ const car = (state = initialState, action) => {
     }
 
     case CAR_KILLED: {
-      const id = action.payload;
+      const { id } = action.payload;
       const newCars = state.cars.filter(c => c.id !== id);
       deletedCarIds.push(id);
 

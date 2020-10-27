@@ -16,11 +16,13 @@ import jade.core.behaviours.CyclicBehaviour;
 import jade.lang.acl.ACLMessage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import vehicles.TestCar;
+import routing.RoutingConstants;
+import vehicles.ITestable;
+import vehicles.MovingObject;
 import vehicles.TestPedestrian;
 
-import java.time.Duration;
 import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 
 public class SmartCityAgent extends Agent {
     public static final String name = SmartCityAgent.class.getSimpleName().replace("Agent", "");
@@ -80,9 +82,9 @@ public class SmartCityAgent extends Agent {
         if (agentOpt.isPresent()) {
             var agent = agentOpt.get();
             var pedestrian = agent.getPedestrian();
-            if (pedestrian instanceof TestPedestrian) {
-                var testPedestrian = (TestPedestrian) pedestrian;
-                setResultTime(testPedestrian.getStart(), testPedestrian.getEnd());
+            if (pedestrian instanceof ITestable) {
+                var testPedestrian = (ITestable) pedestrian;
+                // getTimeIfTestable(testPedestrian.getStart(), testPedestrian.getEnd());
             }
 
             if (agentsContainer.remove(agent)) {
@@ -91,16 +93,6 @@ public class SmartCityAgent extends Agent {
         }
     }
 
-    private void setResultTime(LocalDateTime start, LocalDateTime end) {
-        long seconds = Duration.between(start, end).getSeconds();
-        String time = String.format(
-                "%d:%02d:%02d",
-                seconds / 3600,
-                (seconds % 3600) / 60,
-                seconds % 60);
-        // TODO: Push message to gui
-        window.setResultTime(time);
-    }
 
     private void onReceiveVehicle(ACLMessage rcv) {
         var name = rcv.getSender().getLocalName();
@@ -108,15 +100,21 @@ public class SmartCityAgent extends Agent {
         if (agentOpt.isPresent()) {
             var agent = agentOpt.get();
             var vehicle = agent.getVehicle();
-            if (vehicle instanceof TestCar) {
-                var testVehicle = (TestCar) vehicle;
-                setResultTime(testVehicle.getStart(), testVehicle.getEnd());
-            }
 
+            Long resultTime = getTimeIfTestable(vehicle);
+            int distance = vehicle.getUniformRouteSize() * RoutingConstants.STEP_SIZE_METERS;
             if (agentsContainer.remove(agent)) {
-                eventBus.post(new VehicleAgentDeadEvent(agent.getId()));
+                eventBus.post(new VehicleAgentDeadEvent(agent.getId(), distance, resultTime));
             }
         }
+    }
+
+    private Long getTimeIfTestable(MovingObject movingObject) {
+        if (movingObject instanceof ITestable) {
+            var testable = (ITestable) movingObject;
+            return ChronoUnit.SECONDS.between(testable.getStart(), testable.getEnd());
+        }
+        return null;
     }
 
     private void onReceiveBus(ACLMessage rcv) {

@@ -3,7 +3,7 @@ import { connect } from "react-redux";
 import React, { useState, useEffect } from "react";
 import { StartState } from "../../redux/models/startState";
 import { dispatch } from "../../redux/store";
-import { startSimulationDataUpdated } from "../../redux/actions";
+import { startSimulationDataUpdated } from "../../redux/core/actions";
 import "../../styles/Menu.css";
 
 const StrategyMenu = props => {
