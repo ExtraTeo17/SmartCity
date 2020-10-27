@@ -44,26 +44,15 @@ class SimpleCrossroad implements ICrossroad {
 
     @Override
     public OptimizationResult requestOptimizations() {
-        return allCarsOnGreen();
-    }
-
-    private OptimizationResult allCarsOnGreen() {
-        var result = new OptimizationResult();
+    	final OptimizationResult result = new OptimizationResult();
         for (Light light : wayIdToLightMap.values()) {
+        	light.checkForTrafficJams(result);
             if (light.isGreen()) {
                 for (String carName : light.carQueue) {
                     result.addCarGrantedPassthrough(carName);
-                    if (light.trafficJamEmerged()) {
-                        logger.info("Jam has been detected during crossroad optimizations on light: " + light.getOsmLightId());
-                    	result.setShouldNotifyCarAboutStartOfTrafficJamOnThisLight(light.getLat(), light.getLng(), light.carQueue.size(),light.getOsmLightId());
-                    } else if (light.trafficJamDisappeared()) {
-                    	logger.info("No jams have been detected right now on light: " + light.getOsmLightId());
-                    	result.setShouldNotifyCarAboutEndOfTrafficJamOnThisLight(light.getLat(), light.getLng(),light.getOsmLightId());
-                    }
                     break;
                 }
-            }
-            else {
+            } else {
                 for (String pedestrianName : light.pedestrianQueue) {
                     result.addCarGrantedPassthrough(pedestrianName);
                     break;
@@ -72,8 +61,6 @@ class SimpleCrossroad implements ICrossroad {
         }
         return result;
     }
-
-
 
     @Override
     public void draw(List<Painter<JXMapViewer>> painters) {

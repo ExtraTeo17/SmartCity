@@ -81,7 +81,7 @@ public class TroubleManagerAgent extends Agent {
         	mapOfConstructionSiteBlockedEdges.put(edgeId, rcv.getUserDefinedParameter(MessageParameter.LENGTH_OF_JAM));
             ExtendedGraphHopper.addForbiddenEdges(Arrays.asList(edgeId));
         }
-        sendBroadcast(generateMessageAboutTrouble(rcv, MessageParameter.CONSTRUCTION,MessageParameter.SHOW));
+        sendBroadcast(generateMessageAboutTrouble(rcv, MessageParameter.CONSTRUCTION, MessageParameter.SHOW));
     }
     
     private void trafficJamsAppearedHandle(ACLMessage rcv) {
@@ -93,8 +93,10 @@ public class TroubleManagerAgent extends Agent {
         if (!mapOfLightTrafficJamBlockedEdges.containsKey(edgeId)) {
         	mapOfLightTrafficJamBlockedEdges.put(edgeId, rcv.getUserDefinedParameter(MessageParameter.LENGTH_OF_JAM));
             ExtendedGraphHopper.addForbiddenEdges(Arrays.asList(edgeId));
+        } else {
+        	mapOfLightTrafficJamBlockedEdges.replace(edgeId, rcv.getUserDefinedParameter(MessageParameter.LENGTH_OF_JAM));
         }
-        sendBroadcast(generateMessageAboutTrouble(rcv, MessageParameter.TRAFFIC_JAMS,MessageParameter.SHOW));
+        sendBroadcast(generateMessageAboutTrouble(rcv, MessageParameter.TRAFFIC_JAMS, MessageParameter.SHOW));
         // }
     }
 
@@ -104,17 +106,17 @@ public class TroubleManagerAgent extends Agent {
                 rcv.getUserDefinedParameter(MessageParameter.TROUBLE_LON));
         int edgeId = Integer.parseInt(rcv.getUserDefinedParameter(MessageParameter.EDGE_ID));
         logger.info("Got message about light traffic jam stop on: " + edgeId);
-        if (!mapOfLightTrafficJamBlockedEdges.containsKey(edgeId)) {
+        if (mapOfLightTrafficJamBlockedEdges.containsKey(edgeId)) {
         	mapOfLightTrafficJamBlockedEdges.remove(edgeId);
             ExtendedGraphHopper.removeForbiddenEdges(Arrays.asList(edgeId));
         }
-        sendBroadcast(generateMessageAboutTrouble(rcv, MessageParameter.TRAFFIC_JAMS,MessageParameter.STOP));
+        sendBroadcast(generateMessageAboutTrouble(rcv, MessageParameter.TRAFFIC_JAMS, MessageParameter.STOP));
 	}
     
     @Override
     protected void setup() { // TODO: wysłać broadcact kiedy trouble się skończy
     	
-        Behaviour communication = new CyclicBehaviour() {
+        final Behaviour communication = new CyclicBehaviour() {
         	
             @Override
             public void action() {
@@ -140,7 +142,8 @@ public class TroubleManagerAgent extends Agent {
             }
         };
         
-        var sayAboutJam = new TickerBehaviour(this, 2000) {//100 / TimeProvider.TIME_SCALE) {
+        final Behaviour sayAboutJam = new TickerBehaviour(this, 2000) {//100 / TimeProvider.TIME_SCALE) {
+        	
             @Override
             protected void onTick() {
                 for (Map.Entry<Integer, String> entry : mapOfLightTrafficJamBlockedEdges.entrySet()) {
@@ -149,6 +152,7 @@ public class TroubleManagerAgent extends Agent {
                 }
             }
         };
+        
         addBehaviour(communication);
         addBehaviour(sayAboutJam);
     }

@@ -16,6 +16,7 @@ public class OptimizationResult {
     private double lengthOfJam = 0;
     private long osmWayId =0;
 	private Position jammedLightPosition = null;
+	private String agentStuckInJam = null;
 
 	public long getOsmWayId(){return  osmWayId;}
     public static OptimizationResult empty() {
@@ -28,6 +29,10 @@ public class OptimizationResult {
 
     public void addCarGrantedPassthrough(String carName) {
         carsFreeToProceedNames.add(carName);
+    }
+    
+    public void setCarStuckInJam(final String carStuckInJam) {
+    	agentStuckInJam = carStuckInJam;
     }
 
     public void addBusAndPedestrianGrantedPassthrough(String busAgentName, List<String> pedestrians) {
@@ -71,5 +76,8 @@ public class OptimizationResult {
 		shouldNotifyCarAboutStopOfTrafficJamOnThisLight = true;
 		jammedLightPosition = Position.of(jammedLightLat, jammedLightLon);
 		this.osmWayId = osmWayId ;
+	}
+	public String getAgentStuckInJam() {
+		return agentStuckInJam;
 	}
 }

@@ -14,11 +14,11 @@ public class ConfigContainer extends ConfigMutator
     private SimulationState simulationState = SimulationState.INITIAL;
     private boolean shouldGeneratePedestriansAndBuses = false;
     private boolean shouldGenerateCars = true;
-    private boolean lightManagersLock = false;
-    private boolean isLightStrategyActive = true;
+    private boolean isLightStrategyActive = false;
     private boolean isConstructionSiteStrategyActive = false;
 	private boolean isConstructionSiteGenerationActive = false;
-    private int extendTimeSeconds = 30;
+    private boolean lightManagersLock = false;
+    private int extendTimeSeconds = 3000; // TODO: change back to 30
 
     private final IZone zone;
     private final ObjectsConfig carsConfig;

@@ -5,9 +5,9 @@ import appReducer from "./reducers/index";
 const initialState = {
   interaction: {
     center: {
-      lat: 52.203,
-      lng: 20.861,
-      rad: 350,
+      lat: 52.237,
+      lng: 21.018,
+      rad: 190,
     },
   },
   message: {

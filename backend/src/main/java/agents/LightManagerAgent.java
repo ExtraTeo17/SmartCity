@@ -62,18 +62,16 @@ public class LightManagerAgent extends AbstractAgent {
 
             private void handleOptimizationResult(OptimizationResult result) throws Exception {
                 //Expected one agent in the list
-                List<String> agents = result.carsFreeToProceed();
-                if (agents.size() != 0 && result.shouldNotifyCarAboutStartOfTrafficJamOnThisLight()) {
-                    handleTrafficJams(result, agents.get(0)); // TODO: Add toggle for this feature
-                    for (String agentName : agents) {
-                        answerCanProceed(agentName);
-                    }
-                } else if (result.shouldNotifyCarAboutStopOfTrafficJamOnThisLight()) {
+                final List<String> agentsFreeToProceed = result.carsFreeToProceed();
+                final String agentStuckInJam = result.getAgentStuckInJam();
+                if (result.shouldNotifyCarAboutStartOfTrafficJamOnThisLight()) {
+                    handleTrafficJams(result, agentStuckInJam);
+                }
+                if (result.shouldNotifyCarAboutStopOfTrafficJamOnThisLight()) {
                 	sendMessageAboutTroubleStopToTroubleManager(result);
                 }
-                else if(agents.size() != 0)
-                {
-                    for (String agentName : agents) {
+                if (agentsFreeToProceed.size() != 0) {
+                    for (String agentName : agentsFreeToProceed) {
                         answerCanProceed(agentName);
                     }
                 }

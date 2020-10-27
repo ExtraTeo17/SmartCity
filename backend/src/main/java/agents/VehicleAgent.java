@@ -246,29 +246,22 @@ public class VehicleAgent extends AbstractAgent {
             }
 
             private void handleTrafficJamsFromTroubleManager(ACLMessage rcv) {
-
-                if(vehicle.isAtTrafficLights())
-                {
+                if (vehicle.isAtTrafficLights()) {
                     logger.info("I'm already on the light. I can't change route");
                     return;
                 }
-
-
                 int edgeId = Integer.parseInt(rcv.getUserDefinedParameter(MessageParameter.EDGE_ID));
                 String showOrStop =  rcv.getUserDefinedParameter(MessageParameter.TROUBLE);
-                if(showOrStop.equals(MessageParameter.SHOW))
-                {
+                if (showOrStop.equals(MessageParameter.SHOW)) {
                     if (trafficJamsEdgeId.contains(edgeId)) {
-                    logger.info("I'm already notified about traffic jam on edge: " + edgeId);
-                    return;
+                    	logger.info("I'm already notified about traffic jam on edge: " + edgeId);
+                    	return;
                     }
                     trafficJamsEdgeId.add(edgeId);
-                }
-                else{
-                    logger.info("-------------------TRAFFIC JAM ENDED------------: " + edgeId);
+                } else {
+                    logger.info("Traffic jam has ended on edge: " + edgeId);
                     trafficJamsEdgeId.remove(edgeId);
                 }
-
                 double howLongTakesJam = 0;
                 if (rcv.getAllUserDefinedParameters().containsKey(MessageParameter.LENGTH_OF_JAM)) {
                     howLongTakesJam = 1000 * Double.parseDouble(rcv.getUserDefinedParameter(MessageParameter.LENGTH_OF_JAM));

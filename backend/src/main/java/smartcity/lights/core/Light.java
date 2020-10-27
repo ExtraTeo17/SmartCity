@@ -7,13 +7,14 @@ import org.jxmapviewer.viewer.Waypoint;
 import org.jxmapviewer.viewer.WaypointPainter;
 import routing.core.Position;
 import smartcity.lights.LightColor;
+import smartcity.lights.OptimizationResult;
 import smartcity.stations.ArrivalInfo;
 
 import java.time.LocalDateTime;
 import java.util.*;
 
 public class Light extends Position {
-    private static final int TRAFFIC_JAM_THRESHOLD = 1;
+    private static final int TRAFFIC_JAM_THRESHOLD = 0;
 	
     private LightColor carLightColor;
     private final long adjacentOsmWayId;
@@ -138,7 +139,7 @@ public class Light extends Position {
         }
     }
 
-	public boolean trafficJamEmerged() {
+	private final boolean trafficJamEmerged() {
 		if (carQueue.size() > TRAFFIC_JAM_THRESHOLD && !trafficJamOngoing) {
 			trafficJamOngoing = true;
 			return true;
@@ -146,11 +147,20 @@ public class Light extends Position {
 		return false;
 	}
 
-	public boolean trafficJamDisappeared() {
+	private final boolean trafficJamDisappeared() {
 		if (carQueue.size() <= TRAFFIC_JAM_THRESHOLD && trafficJamOngoing) {
 			trafficJamOngoing = false;
 			return true;
 		}
 		return false;
+	}
+
+	public final void checkForTrafficJams(final OptimizationResult result) {
+        if (trafficJamEmerged()) {
+        	result.setShouldNotifyCarAboutStartOfTrafficJamOnThisLight(getLat(), getLng(), carQueue.size(), getOsmLightId());
+        	result.setCarStuckInJam(carQueue.peek());
+        } else if (trafficJamDisappeared()) {
+        	result.setShouldNotifyCarAboutEndOfTrafficJamOnThisLight(getLat(), getLng(), getOsmLightId());
+        }
 	}
 }
