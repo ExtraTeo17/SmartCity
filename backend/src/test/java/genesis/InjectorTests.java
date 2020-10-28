@@ -53,13 +53,6 @@ class InjectorTests {
                         new SharedModule(),
                         new LightsModule(),
                         new AgentsModule(),
-                        new AbstractModule() {
-                            @Override
-                            public void configure(Binder binder) {
-                                super.configure(binder);
-                                binder.bind(MapWindow.class).toInstance(mock(MapWindow.class));
-                            }
-                        },
                         new WebModule(4002),
                         new BusModule(),
                         new OsmModule(),

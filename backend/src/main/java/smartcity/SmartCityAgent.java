@@ -26,22 +26,18 @@ public class SmartCityAgent extends Agent {
     public static final String name = SmartCityAgent.class.getSimpleName().replace("Agent", "");
     private static final Logger logger = LoggerFactory.getLogger(SmartCityAgent.class);
 
-    private final MapWindow window;
     private final IAgentsContainer agentsContainer;
     private final EventBus eventBus;
 
     @Inject
     SmartCityAgent(IAgentsContainer agentsContainer,
-                   MapWindow window,
                    EventBus eventBus) {
         this.agentsContainer = agentsContainer;
-        this.window = window;
         this.eventBus = eventBus;
     }
 
     @Override
     protected void setup() {
-        window.display();
         addBehaviour(getReceiveMessageBehaviour());
     }
 

@@ -42,8 +42,8 @@ const createSocket = () => {
   socket.onclose = e => {
     if (!socketContainer.reconnecting) {
       console.warn(`Socket is closed. Reconnect will be attempted in ${RECONNECT_INTERVAL_SEC} seconds`, e.reason);
+      notify.show("Error encountered, trying to reconnect...", "error", -1);
     }
-    notify.show("Error encountered, trying to reconnect...", "error", -1);
 
     setTimeout(() => {
       socketContainer.reconnecting = true;

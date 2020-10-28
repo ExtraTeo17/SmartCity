@@ -59,6 +59,7 @@ const StrategyMenu = props => {
             <label htmlFor="extendLightTime">Green lights extension time</label>
             <input
               type="number"
+              disabled={wasStarted}
               defaultValue={extendLightTime}
               className="form-control"
               id="extendLightTime"

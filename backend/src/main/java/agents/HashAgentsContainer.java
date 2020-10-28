@@ -50,7 +50,7 @@ class HashAgentsContainer implements IAgentsContainer {
         try {
             agentController = controller.acceptNewAgent(agent.getPredictedName(), agent);
         } catch (StaleProxyException e) {
-            logger.warn("Error adding agent", e);
+            logger.warn("Error adding agent: " + agent.getLocalName(), e);
             return false;
         }
 

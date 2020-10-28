@@ -1,6 +1,5 @@
 import agents.AgentsModule;
 import com.google.inject.Guice;
-import genesis.GuiModule;
 import genesis.MainModule;
 import genesis.SharedModule;
 import org.slf4j.Logger;
@@ -28,7 +27,6 @@ public class SmartCity {
                 new SharedModule(),
                 new LightsModule(),
                 new AgentsModule(),
-                new GuiModule(),
                 new WebModule(),
                 new BusModule(),
                 new OsmModule(),
