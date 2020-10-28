@@ -29,7 +29,7 @@ public interface ICrossroad {
 
     boolean removePedestrianFromFarAwayQueue(long adjacentWayId, String agentName);
 
-    OptimizationResult requestOptimizations();
+    OptimizationResult requestOptimizations(int extendTimeSeconds);
 
     void draw(List<Painter<JXMapViewer>> painter);
 

@@ -14,6 +14,8 @@ import osmproxy.ExtendedGraphHopper;
 import routing.abstractions.IRouteGenerator;
 import routing.abstractions.IRouteTransformer;
 import routing.core.IGeoPosition;
+import routing.core.Position;
+import routing.data.RouteMergeInfo;
 import routing.nodes.LightManagerNode;
 import routing.nodes.RouteNode;
 import smartcity.ITimeProvider;
@@ -22,9 +24,7 @@ import smartcity.config.abstractions.ITroublePointsConfigContainer;
 import vehicles.MovingObject;
 import vehicles.enums.DrivingState;
 
-import java.util.Arrays;
-import java.util.List;
-import java.util.Random;
+import java.util.*;
 
 import static agents.message.MessageManager.createMessage;
 import static agents.message.MessageManager.createProperties;
@@ -33,7 +33,7 @@ import static routing.RoutingConstants.STEP_CONSTANT;
 @SuppressWarnings("serial")
 public class VehicleAgent extends AbstractAgent {
     private static final Random random = new Random();
-    private static final int THRESHOLD_UNTIL_INDEX_CHANGE = 3;
+    private static final int THRESHOLD_UNTIL_INDEX_CHANGE = 20;
     protected static final int NO_CONSTRUCTION_SITE_STRATEGY_FACTOR = 20;
 
     private final MovingObject vehicle;
@@ -41,6 +41,7 @@ public class VehicleAgent extends AbstractAgent {
     private final IRouteTransformer routeTransformer;
     private final ITroublePointsConfigContainer configContainer;
     private RouteNode troublePoint;
+    private final Set<Integer> trafficJamsEdgeId = new HashSet<>();
 
     VehicleAgent(int id, MovingObject vehicle,
                  ITimeProvider timeProvider,
@@ -83,7 +84,6 @@ public class VehicleAgent extends AbstractAgent {
                             print("Asking LightManager" + light.getLightManagerId() + " for right to passage.");
                             break;
                         case WAITING_AT_LIGHT:
-
                             break;
                         case PASSING_LIGHT:
                             print("Passing");
@@ -108,6 +108,7 @@ public class VehicleAgent extends AbstractAgent {
                 }
             }
         };
+
         Behaviour communication = new CyclicBehaviour() {
             @Override
             public void action() {
@@ -128,15 +129,24 @@ public class VehicleAgent extends AbstractAgent {
                         case ACLMessage.AGREE -> vehicle.setState(DrivingState.WAITING_AT_LIGHT);
                         case ACLMessage.PROPOSE -> {
                             if (rcv.getUserDefinedParameter(MessageParameter.TYPEOFTROUBLE).equals(MessageParameter.CONSTRUCTION)) {
+                                logger.info("Handle construction jam");
                                 handleConstructionJam(rcv);
                             }
                             else if (rcv.getUserDefinedParameter(MessageParameter.TYPEOFTROUBLE).equals(MessageParameter.TRAFFIC_JAMS)) {
-                                if (rcv.getSender().getLocalName().equals(MessageParameter.TROUBLE_MANAGER)) {
+                                if (rcv.getSender().getLocalName().equals(TroubleManagerAgent.name)) {
+                                    logger.info("Handle traffic jams from trouble manager");
                                     handleTrafficJamsFromTroubleManager(rcv);
                                 }
                                 else {
-                                    handleTrafficJamsFromLightManager(rcv);
+                                    logger.info("Handle traffic jams from light manager");
+                                    handleTrafficJamsFromLightManager(rcv, MessageParameter.SHOW);
                                 }
+                            }
+                        }
+                        case ACLMessage.CANCEL -> {
+                            if (rcv.getUserDefinedParameter(MessageParameter.TYPEOFTROUBLE).equals(MessageParameter.TRAFFIC_JAMS)) {
+                                logger.info("Handle traffic jam stop from light manager");
+                                handleTrafficJamsFromLightManager(rcv, MessageParameter.STOP);
                             }
                         }
                     }
@@ -146,15 +156,15 @@ public class VehicleAgent extends AbstractAgent {
 
             private void handleConstructionJam(ACLMessage rcv) {
                 Long edgeId = Long.parseLong(rcv.getUserDefinedParameter(MessageParameter.EDGE_ID));
-                logger.info("  GOT PROPOSE TO CHANGE THE ROUTE. AND EXCLUDE: " + edgeId);
+                logger.info("Got propose to change the route and exclude: " + edgeId);
                 final Integer indexOfRouteNodeWithEdge = vehicle.findIndexOfEdgeOnRoute(edgeId,
                         THRESHOLD_UNTIL_INDEX_CHANGE);
                 if (indexOfRouteNodeWithEdge != null) {
-                    handleRouteChange(indexOfRouteNodeWithEdge);
+                    handleConstructionSiteRouteChange(indexOfRouteNodeWithEdge);
                 }
             }
 
-            private void handleRouteChange(final int indexOfRouteNodeWithEdge) {
+            private void handleConstructionSiteRouteChange(final int indexOfRouteNodeWithEdge) {
                 int indexAfterWhichRouteChanges;
                 if (configContainer.isChangeRouteStrategyActive()) {
                     indexAfterWhichRouteChanges = vehicle.getFarOnIndex(THRESHOLD_UNTIL_INDEX_CHANGE);
@@ -163,94 +173,141 @@ public class VehicleAgent extends AbstractAgent {
                     indexAfterWhichRouteChanges = Math.max(indexOfRouteNodeWithEdge -
                             (NO_CONSTRUCTION_SITE_STRATEGY_FACTOR * THRESHOLD_UNTIL_INDEX_CHANGE), 0);
                 }
-                updateRouteFromIndex(indexAfterWhichRouteChanges);
+                final RouteMergeInfo mergeResult =
+                        createMergedWithOldRouteAlternativeRouteFromIndex(indexAfterWhichRouteChanges, true);
+                updateVehicleRouteAfterMerge(indexAfterWhichRouteChanges, mergeResult);
             }
 
-            private void updateRouteFromIndex(final int indexAfterWhichRouteChanges) {
+            private RouteMergeInfo createMergedWithOldRouteAlternativeRouteFromIndex(final int indexAfterWhichRouteChanges,
+                                                                                     boolean bewareOfJammedEdge) {
+                final IGeoPosition positionAfterWhichRouteChanges = vehicle
+                        .getPositionOnIndex(indexAfterWhichRouteChanges);
+                var oldUniformRoute = vehicle.getUniformRoute();
+                var newSimpleRouteEnd = routeGenerator.generateRouteInfo(positionAfterWhichRouteChanges,
+                        oldUniformRoute.get(oldUniformRoute.size() - 1), bewareOfJammedEdge);
+                var newRouteAfterChangeIndex = routeTransformer.uniformRoute(newSimpleRouteEnd);
+                var route = oldUniformRoute.subList(0, indexAfterWhichRouteChanges);
+                route.addAll(newRouteAfterChangeIndex);
+                final RouteMergeInfo mergeResult = routeTransformer.mergeByDistance(vehicle.getSimpleRoute(),
+                        newSimpleRouteEnd);
+                mergeResult.newUniformRoute = route;
+                return mergeResult;
+            }
+
+            private void updateVehicleRouteAfterMerge(final int indexAfterWhichRouteChanges,
+                                                      final RouteMergeInfo mergeResult) {
                 final IGeoPosition positionAfterWhichRouteChanges = vehicle
                         .getPositionOnIndex(indexAfterWhichRouteChanges);
                 if (!vehicle.currentTrafficLightNodeWithinAlternativeRouteThreshold(indexAfterWhichRouteChanges)) {
                     sendRefusalMessageToLightManagerAfterRouteChange();
                 }
-                var oldUniformRoute = vehicle.getUniformRoute();
-                var newSimpleRouteEnd = routeGenerator.generateRouteInfo(positionAfterWhichRouteChanges,
-                        oldUniformRoute.get(oldUniformRoute.size() - 1));
-                var newRouteAfterChangeIndex = routeTransformer.uniformRoute(newSimpleRouteEnd);
-                var route = oldUniformRoute.subList(0, indexAfterWhichRouteChanges);
-                route.addAll(newRouteAfterChangeIndex);
-                var mergeResult = routeTransformer.mergeByDistance(vehicle.getSimpleRoute(),
-                        newSimpleRouteEnd);
-                vehicle.setRoutes(mergeResult.mergedRoute, route);
+                vehicle.setRoutes(mergeResult.mergedRoute, mergeResult.newUniformRoute);
                 vehicle.switchToNextTrafficLight();
                 eventBus.post(new VehicleAgentRouteChangedEvent(getId(), mergeResult.startNodes,
-                        positionAfterWhichRouteChanges, newSimpleRouteEnd));
+                        positionAfterWhichRouteChanges, mergeResult.newSimpleRouteEnd));
             }
 
-            private void handleTrafficJamsFromLightManager(ACLMessage rcv) {
-                int currentInternalID = vehicle.getCurrentRouteNode().getInternalEdgeId();
-                logger.info("INTERNAL EDGE ID WHEN light manger asked" + currentInternalID);
-                sendMessageAboutTrafficJamTrouble(currentInternalID);
+            private void handleTrafficJamsFromLightManager(ACLMessage rcv, String showOrStop) {
+                int currentInternalID = vehicle.getRouteNodeBeforeLight().getInternalEdgeId();
+                logger.info("Internal edge ID when light manager asked: " + currentInternalID);
+                Position positionOfTroubleLight = Position.of(rcv.getUserDefinedParameter(MessageParameter.TROUBLE_LAT),
+                        rcv.getUserDefinedParameter(MessageParameter.TROUBLE_LON));
+
+                sendMessageAboutTrafficJamTrouble(currentInternalID, positionOfTroubleLight,
+                        rcv.getAllUserDefinedParameters().containsKey(MessageParameter.LENGTH_OF_JAM) ? Double.parseDouble(
+                                rcv.getUserDefinedParameter(MessageParameter.LENGTH_OF_JAM)) : null,
+                        showOrStop, TroubleManagerAgent.name, ACLMessage.INFORM,
+                        rcv.getUserDefinedParameter(MessageParameter.ADJACENT_OSM_WAY_ID));
+
+
+                sendMessageAboutTrafficJamTrouble(currentInternalID, positionOfTroubleLight,
+                        rcv.getAllUserDefinedParameters().containsKey(MessageParameter.LENGTH_OF_JAM) ? Double.parseDouble(
+                                rcv.getUserDefinedParameter(MessageParameter.LENGTH_OF_JAM)) : null,
+                        showOrStop, rcv.getSender().getLocalName(), ACLMessage.CONFIRM,
+                        rcv.getUserDefinedParameter(MessageParameter.ADJACENT_OSM_WAY_ID));
             }
 
-            private void sendMessageAboutTrafficJamTrouble(int currentInternalID) {
-                ACLMessage msg = createMessage(ACLMessage.INFORM, TroubleManagerAgent.name);
+            private void sendMessageAboutTrafficJamTrouble(int currentInternalID, Position positionOfTroubleLight,
+                                                           Double lengthOfJam, String showOrStop, String name, int performative,
+                                                           String adjOsmWayId) {
+                ACLMessage msg = createMessage(performative, name);
                 Properties properties = createProperties(MessageParameter.VEHICLE);
                 properties.setProperty(MessageParameter.TYPEOFTROUBLE, MessageParameter.TRAFFIC_JAMS);
-                properties.setProperty(MessageParameter.TROUBLE, MessageParameter.SHOW);
+                properties.setProperty(MessageParameter.TROUBLE, showOrStop);
+                properties.setProperty(MessageParameter.ADJACENT_OSM_WAY_ID, adjOsmWayId);
+                properties.setProperty(MessageParameter.TROUBLE_LAT, String.valueOf(positionOfTroubleLight.getLat()));
+                properties.setProperty(MessageParameter.TROUBLE_LON, String.valueOf(positionOfTroubleLight.getLng()));
+                if (lengthOfJam != null) {
+                    properties.setProperty(MessageParameter.LENGTH_OF_JAM, String.valueOf(lengthOfJam));
+                }
                 properties.setProperty(MessageParameter.EDGE_ID, Long.toString(currentInternalID));
                 msg.setAllUserDefinedParameters(properties);
-                print(" send message about trouble on " + Long.toString(currentInternalID));
+                print("Send message about trouble on edge " + Long.toString(currentInternalID) + " with position: " + positionOfTroubleLight.toString());
                 send(msg);
             }
 
             private void handleTrafficJamsFromTroubleManager(ACLMessage rcv) {
-                int howLongTakesJam = Integer.parseInt(rcv.getUserDefinedParameter(MessageParameter.LENGTH_OF_JAM));
-                int timeForTheEndWithoutJam = vehicle.getMillisecondsFromAToB(vehicle.getMoveIndex(), vehicle.getUniformRoute().size() - 1);
-                int timeForTheEndWithJam = timeForTheEndWithoutJam + howLongTakesJam;
-                Long edgeId = Long.parseLong(rcv.getUserDefinedParameter(MessageParameter.EDGE_ID));
-                logger.info("  GOT PROPOSE TO CHANGE THE ROUTE. AND EXCLUDE: " + edgeId);
-                int timeForOfDynamicRoute;
-                final Integer indexOfRouteNodeWithEdge = vehicle.findIndexOfEdgeOnRoute(edgeId,
-                        THRESHOLD_UNTIL_INDEX_CHANGE);
-                if (indexOfRouteNodeWithEdge != null) {
-                    int indexAfterWhichRouteChange = vehicle.getFarOnIndex(THRESHOLD_UNTIL_INDEX_CHANGE);
-                    IGeoPosition routeCarOnThreshold = vehicle.getPositionOnIndex(indexAfterWhichRouteChange);
-
-                    var oldUniformRoute = vehicle.getUniformRoute();
-                    var newSimpleRouteEnd = routeGenerator.generateRouteInfo(routeCarOnThreshold,
-                            oldUniformRoute.get(oldUniformRoute.size() - 1));
-                    var newRouteAfterChangeIndex = routeTransformer.uniformRoute(newSimpleRouteEnd);
-                    var route = oldUniformRoute.subList(0, indexAfterWhichRouteChange);
-                    route.addAll(newRouteAfterChangeIndex);
-                    timeForOfDynamicRoute = vehicle.getMillisecondsFromAToB(vehicle.getMoveIndex(), route.size() - 1);
-                    logger.info("TIME of route with jam: " + timeForTheEndWithJam + " TIME of dynamic route:" + timeForOfDynamicRoute);
-
-                    if (timeForTheEndWithJam > timeForOfDynamicRoute) {
-                        logger.info("time WITH jam was LONGER, so CHANGE route");
-                        //TODO: CHECK IF send refusal is on place
-                        if (!vehicle.currentTrafficLightNodeWithinAlternativeRouteThreshold(THRESHOLD_UNTIL_INDEX_CHANGE)) {
-                            sendRefusalMessageToLightManagerAfterRouteChange();
-                        }
-                        var mergeResult = routeTransformer.mergeByDistance(vehicle.getSimpleRoute(),
-                                newSimpleRouteEnd);
-                        vehicle.setRoutes(mergeResult.mergedRoute, route);
-                        vehicle.switchToNextTrafficLight();
-                        eventBus.post(new VehicleAgentRouteChangedEvent(getId(), mergeResult.startNodes, routeCarOnThreshold,
-                                newSimpleRouteEnd));
-                    }
+                if (vehicle.isAtTrafficLights()) {
+                    logger.info("I'm already on the light. I can't change route");
+                    return;
                 }
+                int edgeId = Integer.parseInt(rcv.getUserDefinedParameter(MessageParameter.EDGE_ID));
+                String showOrStop = rcv.getUserDefinedParameter(MessageParameter.TROUBLE);
+                boolean jamStart;
+                if (showOrStop.equals(MessageParameter.SHOW)) {
+                    if (trafficJamsEdgeId.contains(edgeId)) {
+                        logger.info("I'm already notified about traffic jam on edge: " + edgeId);
+                        return;
+                    }
+                    trafficJamsEdgeId.add(edgeId);
+                    jamStart = true;
+                }
+                else {
+                    logger.info("Traffic jam has ended on edge: " + edgeId);
+                    trafficJamsEdgeId.remove(edgeId);
+                    jamStart = false;
+                }
+                double howLongTakesJam = 0;
+                if (rcv.getAllUserDefinedParameters().containsKey(MessageParameter.LENGTH_OF_JAM)) {
+                    howLongTakesJam = 1000 * Double.parseDouble(rcv.getUserDefinedParameter(MessageParameter.LENGTH_OF_JAM));
+                }
+                double timeForTheEndWithoutJam = vehicle.getMillisecondsFromAToB(vehicle.getMoveIndex(), vehicle.getUniformRoute().size() - 1);
+                double timeForTheEndWithJam = timeForTheEndWithoutJam + howLongTakesJam;
+                final Integer indexOfRouteNodeWithEdge = vehicle.findIndexOfEdgeOnRoute((long) edgeId,
+                        THRESHOLD_UNTIL_INDEX_CHANGE);
+                int indexAfterWhichRouteChanges;
+                if (indexOfRouteNodeWithEdge != null || !jamStart) {
+                    indexAfterWhichRouteChanges = vehicle.getFarOnIndex(THRESHOLD_UNTIL_INDEX_CHANGE);
+                    handleLightTrafficJamRouteChange(indexAfterWhichRouteChanges, timeForTheEndWithJam, jamStart);
+                }
+            }
 
+            private void handleLightTrafficJamRouteChange(final int indexAfterWhichRouteChanges,
+                                                          final double timeForTheEndWithJam, boolean bewareOfJammedEdge) {
+                logger.info("The traffic light with the jam is on my route, handle it");
+                double timeForOfDynamicRoute = 0; // refuse after this line normally
+                final RouteMergeInfo mergeResult = createMergedWithOldRouteAlternativeRouteFromIndex(indexAfterWhichRouteChanges,
+                        bewareOfJammedEdge);    //logger.info("THE SIZE OF NEW ROUTE TO CHECK IS " + route.size() + "------------------------");
+                timeForOfDynamicRoute = vehicle.getMillisecondsFromAToB(vehicle.getMoveIndex(), mergeResult.newUniformRoute.size() - 1);    //logger.info("TIME of route with jam: " + timeForTheEndWithJam + " TIME of dynamic route:" + timeForOfDynamicRoute );
+
+
+                if (true) { // timeForTheEndWithJam > timeForOfDynamicRoute)
+                    logger.info("Trip time through the jam: " + timeForTheEndWithJam + " is longer than alternative route time: " + timeForOfDynamicRoute + ", so route will be changed"); // TODO: CHECK IF send refusal is on place // switchToNextLight was after this line
+                    updateVehicleRouteAfterMerge(indexAfterWhichRouteChanges, mergeResult);
+                }
+                else {
+                    logger.info("Trip time through the jam: " + timeForTheEndWithJam + " is shorter than alternative route time: " + timeForOfDynamicRoute + ", so route won't be changed");
+                }
             }
 
             private void sendRefusalMessageToLightManagerAfterRouteChange() {
-                //change route, that is why send stop
-                LightManagerNode currentManager = vehicle.getCurrentTrafficLightNode();
+                LightManagerNode currentManager = vehicle.getCurrentTrafficLightNode(); //change route, that is why send stop
                 if (currentManager != null) {
                     ACLMessage msg = createMessage(ACLMessage.REFUSE, LightManagerAgent.name + currentManager.getLightManagerId());
                     Properties properties = createProperties(MessageParameter.VEHICLE);
                     properties.setProperty(MessageParameter.ADJACENT_OSM_WAY_ID, Long.toString(currentManager.getAdjacentWayId()));
                     send(msg);
-                    print("Send REFUSE to LightManager" + currentManager.getLightManagerId() + ".");
+                    print("Send REFUSE to LightManager" + currentManager.getLightManagerId());
                 }
             }
         };
@@ -261,26 +318,18 @@ public class VehicleAgent extends AbstractAgent {
         if (configContainer.shouldGenerateConstructionSites()) {
             var timeBeforeTroubleMs = this.configContainer.getTimeBeforeTrouble() * 1000;
             Behaviour troubleGenerator = new TickerBehaviour(this, timeBeforeTroubleMs) {
+
                 @Override
                 public void onTick() {
                     var route = vehicle.getUniformRoute();
-
-                    //TODO: from current index
-                    //choose trouble EdgeId
-                    var el = random.nextInt(route.size());
+                    var el = random.nextInt(route.size()); // TODO: from current index //choose trouble EdgeId
                     RouteNode troublePointTmp = route.get(el);
-                    troublePoint = new RouteNode(troublePointTmp.getLat(), troublePointTmp.getLng(),
-                            troublePointTmp.getInternalEdgeId());
-
-                    //send message to boss Agent
-                    sendMessageAboutConstructionTrouble();
-
-                    ExtendedGraphHopper.addForbiddenEdges(Arrays.asList(troublePoint.getInternalEdgeId()));
+                    troublePoint = new RouteNode(troublePointTmp.getLat(), troublePointTmp.getLng(), troublePointTmp.getInternalEdgeId());
+                    sendMessageAboutConstructionTrouble(); //send message to boss Agent
                     stop();
                 }
 
                 private void sendMessageAboutConstructionTrouble() {
-
                     ACLMessage msg = createMessage(ACLMessage.INFORM, TroubleManagerAgent.name);
                     Properties properties = createProperties(MessageParameter.VEHICLE);
                     properties.setProperty(MessageParameter.TYPEOFTROUBLE, MessageParameter.CONSTRUCTION);
@@ -294,20 +343,19 @@ public class VehicleAgent extends AbstractAgent {
                     send(msg);
                 }
 
-
             };
 
+
             Behaviour troubleStopper = new TickerBehaviour(this, 3 * timeBeforeTroubleMs) {
+
                 @Override
                 public void onTick() {
-
                     sendMessageAboutTroubleStop(MessageParameter.CONSTRUCTION);
                     ExtendedGraphHopper.removeForbiddenEdges(Arrays.asList(troublePoint.getInternalEdgeId()));
                     stop();
                 }
 
                 private void sendMessageAboutTroubleStop(String type) {
-
                     ACLMessage msg = createMessage(ACLMessage.INFORM, TroubleManagerAgent.name);
                     Properties properties = createProperties(MessageParameter.VEHICLE);
                     properties.setProperty(MessageParameter.TROUBLE, MessageParameter.STOP);
@@ -316,15 +364,15 @@ public class VehicleAgent extends AbstractAgent {
                     properties.setProperty(MessageParameter.TROUBLE_LON, Double.toString(troublePoint.getLng()));
                     properties.setProperty(MessageParameter.EDGE_ID, Long.toString(troublePoint.getInternalEdgeId()));
                     msg.setAllUserDefinedParameters(properties);
-                    print(" send message about trouble stop on " + Long.toString(troublePoint.getInternalEdgeId()));
+                    print("Send message about trouble stop on " + Long.toString(troublePoint.getInternalEdgeId()));
                     send(msg);
                 }
-
             };
             addBehaviour(troubleGenerator);
             addBehaviour(troubleStopper);
         }
     }
+
 
     private void displayRouteDebug(List<RouteNode> route) {
         for (RouteNode node : route) {

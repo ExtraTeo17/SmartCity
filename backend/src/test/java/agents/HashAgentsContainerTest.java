@@ -105,7 +105,7 @@ class HashAgentsContainerTest {
 
     LightManagerAgent getLightManagerAgent() {
         return new LightManagerAgent(idGenerator.get(LightManagerAgent.class), mock(ICrossroad.class),
-                createTimeProvider(), createEventBus());
+                createTimeProvider(), createEventBus(), mock(ConfigContainer.class));
     }
 
     BusAgent getBusAgent() {

@@ -7,17 +7,21 @@ import org.jxmapviewer.viewer.Waypoint;
 import org.jxmapviewer.viewer.WaypointPainter;
 import routing.core.Position;
 import smartcity.lights.LightColor;
+import smartcity.lights.OptimizationResult;
 import smartcity.stations.ArrivalInfo;
 
 import java.time.LocalDateTime;
 import java.util.*;
 
 public class Light extends Position {
+    private static final int TRAFFIC_JAM_THRESHOLD = 0;
+	
     private LightColor carLightColor;
     private final long adjacentOsmWayId;
     private final String adjacentCrossingOsmId1;
     private final String adjacentCrossingOsmId2;
     private final long osmLightId;
+    private boolean trafficJamOngoing;
 
     private final Map<String, LocalDateTime> farAwayCarMap = new HashMap<>();
     private final Map<String, LocalDateTime> farAwayPedestrianMap = new HashMap<>();
@@ -31,6 +35,7 @@ public class Light extends Position {
         this.adjacentCrossingOsmId1 = info.adjacentCrossingOsmId1;
         this.adjacentCrossingOsmId2 = info.adjacentCrossingOsmId2;
         this.carLightColor = color;
+        this.trafficJamOngoing = false;
     }
 
     public long getOsmLightId() {
@@ -133,4 +138,29 @@ public class Light extends Position {
             pedestrianQueue.remove();
         }
     }
+
+	private final boolean trafficJamEmerged() {
+		if (carQueue.size() > TRAFFIC_JAM_THRESHOLD && !trafficJamOngoing) {
+			trafficJamOngoing = true;
+			return true;
+		}
+		return false;
+	}
+
+	private final boolean trafficJamDisappeared() {
+		if (carQueue.size() <= TRAFFIC_JAM_THRESHOLD && trafficJamOngoing) {
+			trafficJamOngoing = false;
+			return true;
+		}
+		return false;
+	}
+
+	public final void checkForTrafficJams(final OptimizationResult result) {
+        if (trafficJamEmerged()) {
+        	result.setShouldNotifyCarAboutStartOfTrafficJamOnThisLight(getLat(), getLng(), carQueue.size(), getOsmLightId());
+        	result.setCarStuckInJam(carQueue.peek());
+        } else if (trafficJamDisappeared()) {
+        	result.setShouldNotifyCarAboutEndOfTrafficJamOnThisLight(getLat(), getLng(), getOsmLightId());
+        }
+	}
 }

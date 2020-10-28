@@ -54,14 +54,17 @@ public class HighwayAccessor {
     // TODO: tested manually, but add unit tests / integration tests
 
     public static Pair<List<Long>, List<RouteNode>> getOsmWayIdsAndPointList(double fromLat, double fromLon,
-                                                                             double toLat, double toLon, boolean onFoot) {
+                                                                             double toLat, double toLon, boolean onFoot,
+                                                                             boolean bewareOfJammedRoutes) {
         List<Long> osmWayIds = new ArrayList<>();
         List<RouteNode> pointList = new ArrayList<>();
+        
+        final String weighting = bewareOfJammedRoutes ? AvoidEdgesRemovableWeighting.NAME : "fastest";
 
         GHResponse response = new GHResponse();
         GHRequest request = new GHRequest(fromLat, fromLon, toLat, toLon)
                 .setVehicle(onFoot ? "foot" : "car")
-                .setWeighting(AvoidEdgesRemovableWeighting.NAME);
+                .setWeighting(weighting);
         List<Path> paths = graphHopper.calcPaths(request, response);
         Path path0 = paths.get(0);
 
@@ -73,17 +76,14 @@ public class HighwayAccessor {
                 VirtualEdgeIteratorState vEdge = (VirtualEdgeIteratorState) edge;
                 edgeId = vEdge.getOriginalTraversalKey() / 2;
             }
-
             long osmWayIdToAdd = graphHopper.getOSMWay(edgeId);
             // deleting duplicates
             if (osmWayIdToAdd != previousWayId) {
                 osmWayIds.add(osmWayIdToAdd);
                 previousWayId = osmWayIdToAdd;
             }
-
             pointList.addAll(getRouteNodeList(edgeId, edge.fetchWayGeometry(2)));
         }
-
         return new Pair<>(osmWayIds, pointList);
     }
 

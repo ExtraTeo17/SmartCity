@@ -88,14 +88,14 @@ class AgentsFactory implements IAgentsFactory {
     public LightManagerAgent create(Node crossroadNode) {
         var id = idGenerator.get(LightManagerAgent.class);
         var crossroad = crossroadFactory.create(id, crossroadNode);
-        return new LightManagerAgent(id, crossroad, timeProvider, eventBus);
+        return new LightManagerAgent(id, crossroad, timeProvider, eventBus, configContainer);
     }
 
     @Override
     public LightManagerAgent create(OSMNode centerCrossroad) {
         var id = idGenerator.get(LightManagerAgent.class);
         var crossroad = crossroadFactory.create(id, centerCrossroad);
-        return new LightManagerAgent(id, crossroad, timeProvider, eventBus);
+        return new LightManagerAgent(id, crossroad, timeProvider, eventBus, configContainer);
     }
 
     // TODO: Simplify to avoid 6 arguments

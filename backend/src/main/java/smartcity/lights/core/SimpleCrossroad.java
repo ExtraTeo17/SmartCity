@@ -18,7 +18,6 @@ import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 class SimpleCrossroad implements ICrossroad {
-    private static final int TRAFFIC_JAM_THRESHOLD = 3;
 	private final Logger logger;
     private final EventBus eventBus;
     private final int managerId;
@@ -44,23 +43,16 @@ class SimpleCrossroad implements ICrossroad {
     }
 
     @Override
-    public OptimizationResult requestOptimizations() {
-        return allCarsOnGreen();
-    }
-
-    private OptimizationResult allCarsOnGreen() {
-        var result = new OptimizationResult();
+    public OptimizationResult requestOptimizations(int extendTimeSeconds) {
+    	final OptimizationResult result = new OptimizationResult(extendTimeSeconds);
         for (Light light : wayIdToLightMap.values()) {
+        	light.checkForTrafficJams(result);
             if (light.isGreen()) {
                 for (String carName : light.carQueue) {
                     result.addCarGrantedPassthrough(carName);
-                    if (light.carQueue.size() > TRAFFIC_JAM_THRESHOLD) {
-                    	result.setShouldNotifyCarAboutTrafficJamOnThisLight(light.getLat(), light.getLng());
-                    }
                     break;
                 }
-            }
-            else {
+            } else {
                 for (String pedestrianName : light.pedestrianQueue) {
                     result.addCarGrantedPassthrough(pedestrianName);
                     break;
@@ -69,8 +61,6 @@ class SimpleCrossroad implements ICrossroad {
         }
         return result;
     }
-
-
 
     @Override
     public void draw(List<Painter<JXMapViewer>> painters) {

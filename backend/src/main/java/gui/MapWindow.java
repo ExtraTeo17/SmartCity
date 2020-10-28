@@ -154,9 +154,9 @@ public class MapWindow {
         });
 
         testBusZoneButton.addActionListener(e -> {
-            latSpinner.setValue(52.203342);
-            lonSpinner.setValue(20.861213);
-            radiusSpinner.setValue(300);
+            latSpinner.setValue(52.237037);
+            lonSpinner.setValue(21.017928);
+            radiusSpinner.setValue(190);
             if (!configContainer.shouldGeneratePedestriansAndBuses()) {
                 logger.warn("Pedestrians won't be generated");
             }
