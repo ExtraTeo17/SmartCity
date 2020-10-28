@@ -103,7 +103,6 @@ public class TroubleManagerAgent extends Agent {
             mapOfLightTrafficJamBlockedEdges.replace(edgeId, rcv.getUserDefinedParameter(MessageParameter.LENGTH_OF_JAM));
         }
         sendBroadcast(generateMessageAboutTrouble(rcv, MessageParameter.TRAFFIC_JAMS, MessageParameter.SHOW));
-        // }
     }
 
     private void trafficJamsDisappearedHandle(ACLMessage rcv) {

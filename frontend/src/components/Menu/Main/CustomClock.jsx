@@ -11,23 +11,26 @@ const CustomClock = props => {
   const requestRef = React.useRef();
   const previousTimeRef = React.useRef();
 
-  const animate = time => {
-    if (previousTimeRef.current !== undefined) {
-      const deltaTime = time - previousTimeRef.current;
-      setCurrTime(prevTime => new Date(prevTime.getTime() + timeScale * deltaTime));
-    }
-    previousTimeRef.current = time;
-    requestRef.current = requestAnimationFrame(animate);
-  };
+  useEffect(() => {
+    setCurrTime(time);
+  }, [time]);
 
   useEffect(() => {
     if (wasStarted) {
-      setCurrTime(time);
+      const animate = time => {
+        if (previousTimeRef.current !== undefined) {
+          const deltaTime = time - previousTimeRef.current;
+          setCurrTime(prevTime => new Date(prevTime.getTime() + timeScale * deltaTime));
+        }
+        previousTimeRef.current = time;
+        requestRef.current = requestAnimationFrame(animate);
+      };
       requestRef.current = requestAnimationFrame(animate);
+
       return () => cancelAnimationFrame(requestRef.current);
     }
     return () => {};
-  }, [wasStarted]); // Make sure the effect runs only once
+  }, [wasStarted, timeScale]); // Make sure the effect runs only once
 
   return (
     <div className="center-wrapper mt-4">
