@@ -3,9 +3,11 @@ package agents;
 import agents.abstractions.IAgentsContainer;
 import agents.utilities.MessageParameter;
 import com.google.common.eventbus.EventBus;
+import com.google.common.eventbus.Subscribe;
 import com.google.inject.Inject;
-import events.web.TroublePointCreatedEvent;
-import events.web.TroublePointVanishedEvent;
+import events.web.DebugEvent;
+import events.web.roadblocks.TroublePointCreatedEvent;
+import events.web.roadblocks.TroublePointVanishedEvent;
 import jade.core.Agent;
 import jade.core.behaviours.Behaviour;
 import jade.core.behaviours.CyclicBehaviour;
@@ -195,6 +197,10 @@ public class TroubleManagerAgent extends Agent {
             }
         };
         addBehaviour(sayAboutJam);
+    }
+
+    @Subscribe
+    void handle(DebugEvent e) {
 
     }
 }

@@ -3,7 +3,7 @@ package smartcity.task.functional;
 import com.google.common.eventbus.EventBus;
 import com.google.inject.Inject;
 import com.google.inject.assistedinject.Assisted;
-import events.web.SwitchLightsEvent;
+import events.web.SimulationPreparedEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import smartcity.ITimeProvider;
@@ -71,7 +71,7 @@ class LightSwitcher implements Function<ISwitchLightsContext, Integer> {
         // TODO: Can include yellow somehow?
         lights.forEach(Light::switchLight);
         logger.debug("Switched light at: " + timeProvider.getCurrentSimulationTime());
-        lightsOsmIds.forEach(id -> eventBus.post(new SwitchLightsEvent(id)));
+        lightsOsmIds.forEach(id -> eventBus.post(new SimulationPreparedEvent.SwitchLightsEvent(id)));
 
         return defaultExecutionDelay;
     }

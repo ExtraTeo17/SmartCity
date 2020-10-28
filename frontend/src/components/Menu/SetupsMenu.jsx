@@ -5,6 +5,7 @@ import { centerUpdated, generatePedestriansUpdated } from "../../redux/core/acti
 import { dispatch } from "../../redux/store";
 import ApiManager from "../../web/ApiManager";
 import "../../styles/Menu.css";
+import { IS_DEBUG } from "../../constants/global";
 
 const prepareSimulation = data => {
   batch(() => {
@@ -31,6 +32,11 @@ const SetupsMenu = () => {
       <button className="btn btn-primary btn-block mt-5" type="button" onClick={prepareBusZone}>
         Prepare bus zone
       </button>
+      {IS_DEBUG && (
+        <button className="btn btn-primary btn-block mt-5" type="button" onClick={ApiManager.debug}>
+          Debug
+        </button>
+      )}
     </div>
   );
 };

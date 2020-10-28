@@ -2,12 +2,15 @@ package web;
 
 import com.google.common.eventbus.Subscribe;
 import com.google.inject.Inject;
-import events.web.*;
+import events.web.SimulationPreparedEvent;
+import events.web.SimulationStartedEvent;
 import events.web.bus.BusAgentDeadEvent;
 import events.web.bus.BusAgentFillStateUpdatedEvent;
 import events.web.bus.BusAgentStartedEvent;
 import events.web.bus.BusAgentUpdatedEvent;
 import events.web.pedestrian.*;
+import events.web.roadblocks.TroublePointCreatedEvent;
+import events.web.roadblocks.TroublePointVanishedEvent;
 import events.web.vehicle.VehicleAgentCreatedEvent;
 import events.web.vehicle.VehicleAgentDeadEvent;
 import events.web.vehicle.VehicleAgentRouteChangedEvent;
@@ -56,7 +59,7 @@ class Communicator {
     }
 
     @Subscribe
-    public void handle(SwitchLightsEvent e) {
+    public void handle(SimulationPreparedEvent.SwitchLightsEvent e) {
         webService.updateLights(e.osmLightId);
     }
 

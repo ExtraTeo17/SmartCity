@@ -3,8 +3,10 @@ package web;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.eventbus.EventBus;
 import com.google.inject.Inject;
+import events.web.DebugEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import smartcity.config.StaticConfig;
 import web.message.MessageDto;
 import web.message.payloads.requests.PrepareSimulationRequest;
 import web.message.payloads.requests.StartSimulationRequest;
@@ -53,6 +55,12 @@ class MessageHandler {
                     var event = Converter.convert(pVal);
                     logger.info("Starting simulation request with time: " + event.startTime);
                     eventBus.post(event);
+                }
+            }
+            case DEBUG_REQUEST -> {
+                if (StaticConfig.DEBUG) {
+                    logger.info("Debug request occurred");
+                    eventBus.post(new DebugEvent());
                 }
             }
         }

@@ -16,4 +16,10 @@ public class SimulationPreparedEvent {
         this.stations = stations;
         this.buses = buses;
     }
+
+    public static class SwitchLightsEvent {
+        public final long osmLightId;
+
+        public SwitchLightsEvent(long osmLightId) {this.osmLightId = osmLightId;}
+    }
 }

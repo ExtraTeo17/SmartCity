@@ -1,4 +1,4 @@
-import { PREPARE_SIMULATION_REQUEST, START_SIMULATION_REQUEST } from "./MessageType";
+import { PREPARE_SIMULATION_REQUEST, START_SIMULATION_REQUEST, DEBUG_REQUEST } from "./MessageType";
 import WebServer from "./WebServer";
 
 /** PUBLIC INTERFACE ---------------------------------------------------------- */
@@ -51,6 +51,14 @@ export default {
         pedLimit,
         testPedId,
       },
+    };
+    WebServer.send(msg);
+  },
+
+  debug() {
+    const msg = {
+      type: DEBUG_REQUEST,
+      payload: {},
     };
     WebServer.send(msg);
   },
