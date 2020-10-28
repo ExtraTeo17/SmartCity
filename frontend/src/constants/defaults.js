@@ -5,6 +5,7 @@ export const D_START_TIME = new Date();
 
 export const D_GENERATE_CARS = true;
 export const D_GENERATE_TP = false;
+export const D_GENERATE_TJ = false;
 export const D_CARS_NUM = 4;
 export const D_TEST_CAR = 2;
 export const D_TIME_BEFORE_TROUBLE = 5;

@@ -10,7 +10,6 @@ public interface ITroublePointsConfigContainer {
 
     void setShouldGenerateConstructionSites(boolean constructionSiteGenerationActive);
 
-
     /**
      * @return time before accident in seconds
      */
@@ -20,4 +19,8 @@ public interface ITroublePointsConfigContainer {
      * @param timeBeforeTrouble time before accident in seconds
      */
     void setTimeBeforeTrouble(int timeBeforeTrouble);
+
+    boolean shouldGenerateTrafficJams();
+
+    void setShouldGenerateTrafficJams(boolean value);
 }

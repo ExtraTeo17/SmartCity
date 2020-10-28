@@ -233,17 +233,10 @@ public class AgentsCreator {
 
 
     private boolean prepareLightManagers() {
-        if (!configContainer.tryLockLightManagers()) {
-            logger.error("Light managers are locked, cannot prepare.");
-            return false;
-        }
-
         logger.info("LightManagers construction started.");
         long time = System.nanoTime();
         boolean result = tryConstructLightManagers();
         logger.info("LightManagers construction finished! Took: " + TimeProvider.getTimeInMs(time) + "ms");
-
-        configContainer.unlockLightManagers();
 
         if (result) {
             var lightManagers = ImmutableList.copyOf(agentsContainer.iterator(LightManagerAgent.class));

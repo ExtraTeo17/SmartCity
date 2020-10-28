@@ -71,13 +71,19 @@ public class Converter {
     public static StartSimulationEvent convert(StartSimulationRequest req) {
         var timeLocal = TimeProvider.convertFromUtcToLocal(req.startTime).toLocalDateTime();
 
-        return new StartSimulationEvent(req.generateCars, req.carsLimit,
+        return new StartSimulationEvent(req.generateCars,
+                req.carsLimit,
                 req.testCarId,
-                req.generateTroublePoints, req.timeBeforeTrouble,
-                req.pedestriansLimit, req.testPedestrianId,
+                req.generateTrafficJams,
+                req.generateTroublePoints,
+                req.timeBeforeTrouble,
+                req.pedestriansLimit,
+                req.testPedestrianId,
                 timeLocal,
-                req.lightStrategyActive, req.extendLightTime,
-                req.stationStrategyActive, req.extendWaitTime,
+                req.lightStrategyActive,
+                req.extendLightTime,
+                req.stationStrategyActive,
+                req.extendWaitTime,
                 req.changeRouteStrategyActive);
     }
 }

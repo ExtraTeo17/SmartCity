@@ -3,11 +3,8 @@ package gui;
 import agents.*;
 import agents.abstractions.IAgentsContainer;
 import com.google.common.eventbus.EventBus;
-import com.google.common.eventbus.Subscribe;
 import com.google.inject.Inject;
 import events.web.PrepareSimulationEvent;
-import events.web.SimulationPreparedEvent;
-import events.web.StartSimulationEvent;
 import org.jxmapviewer.JXMapViewer;
 import org.jxmapviewer.OSMTileFactoryInfo;
 import org.jxmapviewer.input.MapClickListener;
@@ -190,7 +187,6 @@ public class MapWindow {
                             break;
                         }
                         pointB = Position.of(lat, lng);
-                        taskProvider.getCreateCarTask(pointA, pointB, false).run();
                         logger.info("Vehicles: " + agentsContainer.size(VehicleAgent.class));
                         logger.info("Lights: " + agentsContainer.size(LightManagerAgent.class));
                         pointA = pointB = null;
@@ -209,46 +205,8 @@ public class MapWindow {
 
         MapPanel.add(MapViewer);
         MapPanel.revalidate();
-        StartRouteButton.addActionListener(e -> eventBus.post(new StartSimulationEvent(configContainer.shouldGenerateCars(), (int) carLimitSpinner.getValue(),
-                (int) testCarIdSpinner.getValue(),
-                configContainer.shouldGenerateConstructionSites(), 5000, 20, 5,
-                ((Date) setTimeSpinner.getValue()).toInstant()
-                        .atZone(ZoneId.systemDefault())
-                        .toLocalDateTime(), true, 30, true, 60, true)));
-        refreshTimer.scheduleAtFixedRate(new RefreshTask(), 0, REFRESH_MAP_INTERVAL_MILLISECONDS);
     }
 
-    @Subscribe
-    public void handle(SimulationPreparedEvent e) {
-        refreshTimer.cancel();
-        refreshTimer = new Timer(true);
-        refreshTimer.scheduleAtFixedRate(new RefreshTask(), 10, REFRESH_MAP_INTERVAL_MILLISECONDS);
-        simulationReadyCallback.run();
-    }
-
-    @Subscribe
-    public void handle(StartSimulationEvent e) {
-        logger.info("Handling " + e.getClass().getSimpleName());
-        carLimitSpinner.setValue(e.carsNum);
-        testCarIdSpinner.setValue(e.testCarId);
-        startSimulation();
-    }
-
-    // WARNING: This function will be replaced by new GUI
-    @Deprecated(forRemoval = true, since = "When new GUI will replace this one")
-    private void startSimulation() {
-        var state = configContainer.getSimulationState();
-        if (state.isOneOf(SimulationState.INITIAL, SimulationState.IN_PREPARATION, SimulationState.FINISHED)) {
-            return;
-        }
-
-        setInputEnabled(false);
-        currentTimeTitle.setVisible(true);
-        currentTimeLabel.setVisible(true);
-        ResultTimeLabel.setVisible(true);
-        ResultTimeTitle.setVisible(true);
-        random.setSeed(getSeed());
-    }
 
     private int getZoneRadius() {
         return zone.getRadius();
@@ -398,15 +356,6 @@ public class MapWindow {
         currentTimeLabel.setText(dateFormat.format(date));
     }
 
-    private void drawLights(List<Painter<JXMapViewer>> painters) {
-        if (!configContainer.tryLockLightManagers()) {
-            return;
-        }
-
-        agentsContainer.forEach(LightManagerAgent.class, man -> man.draw(painters));
-
-        configContainer.unlockLightManagers();
-    }
 
     private void drawVehicles(List<Painter<JXMapViewer>> painters) {
         try {
@@ -850,9 +799,6 @@ public class MapWindow {
                     }
                     if (renderStations) {
                         drawStations(painters);
-                    }
-                    if (renderLights) {
-                        drawLights(painters);
                     }
                     if (renderCars && configContainer.shouldGenerateCars()) {
                         drawVehicles(painters);

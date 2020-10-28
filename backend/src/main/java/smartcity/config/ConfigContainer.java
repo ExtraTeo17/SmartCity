@@ -21,11 +21,13 @@ public class ConfigContainer extends ConfigMutator
     private SimulationState simulationState = SimulationState.INITIAL;
     private boolean shouldGeneratePedestriansAndBuses = false;
     private boolean shouldGenerateCars = true;
-    private boolean lightManagersLock = false;
+    private boolean shouldGenerateConstructionSites = false;
+    private boolean shouldGenerateTrafficJams = false;
+
     private boolean isLightStrategyActive = true;
     private boolean isConstructionSiteStrategyActive = false;
-    private boolean isConstructionSiteGenerationActive = false;
     private boolean isStationStrategyActive = true;
+
     private int lightExtendTime = 30;
     private int extendWaitTime = 60;
     private int timeBeforeTrouble = 5000;
@@ -53,21 +55,6 @@ public class ConfigContainer extends ConfigMutator
 
     public void setGeneratePedestriansAndBuses(boolean value) {
         this.shouldGeneratePedestriansAndBuses = value;
-    }
-
-    @Override
-    public synchronized boolean tryLockLightManagers() {
-        if (lightManagersLock) {
-            return false;
-        }
-
-        lightManagersLock = true;
-        return true;
-    }
-
-    @Override
-    public synchronized void unlockLightManagers() {
-        lightManagersLock = false;
     }
 
     public IZone getZone() {
@@ -131,12 +118,12 @@ public class ConfigContainer extends ConfigMutator
 
     @Override
     public boolean shouldGenerateConstructionSites() {
-        return isConstructionSiteGenerationActive;
+        return shouldGenerateConstructionSites;
     }
 
     @Override
     public void setShouldGenerateConstructionSites(boolean constructionSiteGenerationActive) {
-        isConstructionSiteGenerationActive = constructionSiteGenerationActive;
+        shouldGenerateConstructionSites = constructionSiteGenerationActive;
     }
 
     @Override
@@ -158,4 +145,15 @@ public class ConfigContainer extends ConfigMutator
     public void setTimeBeforeTrouble(int timeBeforeTrouble) {
         this.timeBeforeTrouble = timeBeforeTrouble;
     }
+
+    @Override
+    public boolean shouldGenerateTrafficJams() {
+        return shouldGenerateTrafficJams;
+    }
+
+    @Override
+    public void setShouldGenerateTrafficJams(boolean value) {
+        shouldGenerateTrafficJams = value;
+    }
+
 }

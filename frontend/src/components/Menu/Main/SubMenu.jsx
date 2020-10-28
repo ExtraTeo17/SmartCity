@@ -12,6 +12,7 @@ import {
   D_TIME_BEFORE_TROUBLE,
   D_GENERATE_CARS,
   D_GENERATE_TP,
+  D_GENERATE_TJ,
 } from "../../../constants/defaults";
 
 import { PED_MIN, PED_MAX, CAR_MIN, CAR_MAX } from "../../../constants/minMax";
@@ -27,6 +28,7 @@ const SubMenu = props => {
   const [testCarId, setTestCarId] = useState(D_TEST_CAR);
   const [generateCars, setGenerateCars] = useState(D_GENERATE_CARS);
   const [generateTroublePoints, setGenerateTroublePoints] = useState(D_GENERATE_TP);
+  const [generateTrafficJams, setGenerateTrafficJams] = useState(D_GENERATE_TJ);
   const [timeBeforeTrouble, setTimeBeforeTrouble] = useState(D_TIME_BEFORE_TROUBLE);
 
   function onStart() {
@@ -37,6 +39,7 @@ const SubMenu = props => {
           testCarId,
           generateCars,
           generateTroublePoints,
+          generateTrafficJams,
           timeBeforeTrouble,
           pedLimit,
           testPedId,
@@ -73,6 +76,10 @@ const SubMenu = props => {
     if (!isNaN(val)) {
       setTimeBeforeTrouble(val);
     }
+  }
+
+  function evSetGenerateTrafficJams(e) {
+    setGenerateTrafficJams(e.target.checked);
   }
 
   return (
@@ -187,6 +194,19 @@ const SubMenu = props => {
           </div>
         </div>
       )}
+      <div className="form-check user-select-none">
+        <input
+          type="checkbox"
+          defaultChecked={generateTrafficJams}
+          disabled={wasStarted}
+          className="form-check-input"
+          id="generateTrafficJams"
+          onChange={evSetGenerateTrafficJams}
+        />
+        <label htmlFor="generateTrafficJams" className="form-check-label">
+          Generate traffic jams
+        </label>
+      </div>
     </>
   );
 };
@@ -194,7 +214,7 @@ const SubMenu = props => {
 const mapStateToProps = (state /* ownProps */) => {
   const { wasPrepared, wasStarted } = state.message;
   const {
-    startSimulationData: { carsNum, testCarNum, generateCars, generateTroublePoints, timeBeforeTrouble },
+    startSimulationData: { carsNum, testCarNum, generateCars, generateTrafficJams, generateTroublePoints, timeBeforeTrouble },
     shouldStart,
     generatePedestrians,
   } = state.interaction;
@@ -206,6 +226,7 @@ const mapStateToProps = (state /* ownProps */) => {
     testCarNum,
     generateCars,
     generatePedestrians,
+    generateTrafficJams,
     generateTroublePoints,
     timeBeforeTrouble,
   };

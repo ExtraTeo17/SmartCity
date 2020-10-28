@@ -60,16 +60,20 @@ public class LightManagerAgent extends AbstractAgent {
                 }
             }
 
-            private void handleOptimizationResult(OptimizationResult result) throws Exception {
+            private void handleOptimizationResult(OptimizationResult result) {
                 //Expected one agent in the list
                 final List<String> agentsFreeToProceed = result.carsFreeToProceed();
-                final String agentStuckInJam = result.getAgentStuckInJam();
-                if (result.shouldNotifyCarAboutStartOfTrafficJamOnThisLight()) {
-                    handleTrafficJams(result, agentStuckInJam);
+
+                if (configContainer.shouldGenerateTrafficJams()) {
+                    final String agentStuckInJam = result.getAgentStuckInJam();
+                    if (result.shouldNotifyCarAboutStartOfTrafficJamOnThisLight()) {
+                        handleTrafficJams(result, agentStuckInJam);
+                    }
+                    if (result.shouldNotifyCarAboutStopOfTrafficJamOnThisLight()) {
+                        sendMessageAboutTroubleStopToTroubleManager(result);
+                    }
                 }
-                if (result.shouldNotifyCarAboutStopOfTrafficJamOnThisLight()) {
-                    sendMessageAboutTroubleStopToTroubleManager(result);
-                }
+
                 if (agentsFreeToProceed.size() != 0) {
                     for (String agentName : agentsFreeToProceed) {
                         answerCanProceed(agentName);
@@ -77,7 +81,7 @@ public class LightManagerAgent extends AbstractAgent {
                 }
             }
 
-            private synchronized void sendMessageAboutTroubleStopToTroubleManager(OptimizationResult result) throws Exception {
+            private synchronized void sendMessageAboutTroubleStopToTroubleManager(OptimizationResult result) {
                 ACLMessage msg = createMessage(ACLMessage.INFORM, TroubleManagerAgent.name); // Remember that this solution is based on different agents expected to return the same graphhopper edge ID when traffic jam starts and stops
                 Properties properties = createProperties(MessageParameter.LIGHT);
                 properties.setProperty(MessageParameter.TYPEOFTROUBLE, MessageParameter.TRAFFIC_JAMS);
@@ -91,14 +95,16 @@ public class LightManagerAgent extends AbstractAgent {
                 send(msg);
             }
 
-            private void handleTrafficJams(OptimizationResult result, String nameOfAgent) throws Exception {
+            private void handleTrafficJams(OptimizationResult result, String nameOfAgent) {
                 // TODO shouldNotifyCarAboutTrafficJamOnThisLight have an old state to stop the jam
                 // TODO: use result.getJammedLight(...)
                 sendMessageAboutTroubleToVehicle(result, nameOfAgent);
             }
 
             private void sendMessageAboutTroubleToVehicle(OptimizationResult result, String nameOfAgent) {
-                ACLMessage msg = createMessage(ACLMessage.PROPOSE, nameOfAgent); // Remember that this solution is based on different agents expected to return the same graphhopper edge ID when traffic jam starts and stops
+                // Remember that this solution is based on different agents expected
+                //  to return the same graphhopper edge ID when traffic jam starts and stops
+                ACLMessage msg = createMessage(ACLMessage.PROPOSE, nameOfAgent);
                 Properties properties = createProperties(MessageParameter.LIGHT);
                 properties.setProperty(MessageParameter.TYPEOFTROUBLE, MessageParameter.TRAFFIC_JAMS);
                 properties.setProperty(MessageParameter.TROUBLE, MessageParameter.SHOW);

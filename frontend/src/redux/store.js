@@ -9,6 +9,7 @@ import {
   D_TEST_CAR,
   D_GENERATE_CARS,
   D_GENERATE_TP,
+  D_GENERATE_TJ,
   D_TIME_BEFORE_TROUBLE,
   D_LIGHT_STRATEGY_ACTIVE,
   D_EXTEND_LIGHT_TIME,
@@ -35,6 +36,7 @@ const initialState = {
       testCarId: D_TEST_CAR,
       generateCars: D_GENERATE_CARS,
       generateTroublePoints: D_GENERATE_TP,
+      generateTrafficJams: D_GENERATE_TJ,
       timeBeforeTrouble: D_TIME_BEFORE_TROUBLE,
 
       startTime: D_START_TIME,

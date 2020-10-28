@@ -22,7 +22,7 @@
 
     <appender name="stdout" class="org.apache.log4j.ConsoleAppender">
         <param name="Target" value="System.out"/>
-        <param name="threshold" value="INFO"/>
+        <param name="threshold" value="WARN"/>
         <layout class="com.jcabi.log.MulticolorLayout">
             <param name="ConversionPattern" value="%d{HH:mm:ss.SSS} [%color{%-p}] [%c] - %m%n"/>
         </layout>

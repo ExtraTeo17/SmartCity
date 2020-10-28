@@ -52,7 +52,8 @@ public class OptimizationResult {
         return busesAndPedestriansFreeToProceedNames;
     }
 
-    public void setShouldNotifyCarAboutStartOfTrafficJamOnThisLight(double jammedLightLat, double jammedLightLon, int numerOfCarsInTheQueue, long osmWayId) {
+    public void setShouldNotifyCarAboutStartOfTrafficJamOnThisLight(double jammedLightLat, double jammedLightLon,
+                                                                    int numerOfCarsInTheQueue, long osmWayId) {
         shouldNotifyCarAboutStartOfTrafficJamOnThisLight = true;
         jammedLightPosition = Position.of(jammedLightLat, jammedLightLon);
         this.osmWayId = osmWayId;

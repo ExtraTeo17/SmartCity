@@ -1,5 +1,6 @@
 package smartcity.task;
 
+import agents.LightManagerAgent;
 import agents.abstractions.IAgentsContainer;
 import events.SwitchLightsStartEvent;
 import events.web.StartSimulationEvent;
@@ -20,8 +21,7 @@ import static mocks.TestInstanceCreator.createLight;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.doAnswer;
-import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.*;
 
 @SuppressWarnings("ConstantConditions")
 class SchedulerTests {
@@ -83,6 +83,7 @@ class SchedulerTests {
         var testCarId = 112;
         var shouldGenerateCars = true;
         var shouldGenerateTP = true;
+        var shouldGenerateTrafficJams = true;
         var timeBeforeTrouble = 5006;
 
         int pedestriansLimit = 155;
@@ -96,7 +97,7 @@ class SchedulerTests {
         var extendWaitTime = 354;
         var changeRouteStrategyActive = false;
 
-        var event = new StartSimulationEvent(shouldGenerateCars, carsNum, testCarId, shouldGenerateTP, timeBeforeTrouble, pedestriansLimit, testPedestrianId, startTime,
+        var event = new StartSimulationEvent(shouldGenerateCars, carsNum, testCarId, shouldGenerateTrafficJams, shouldGenerateTP, timeBeforeTrouble, pedestriansLimit, testPedestrianId, startTime,
                 lightStrategyActive, extendLightTime, stationStrategyActive, extendWaitTime, changeRouteStrategyActive);
 
         // Act
@@ -108,7 +109,8 @@ class SchedulerTests {
         assertEquals(shouldGenerateCars, configContainer.shouldGenerateCars());
         assertEquals(shouldGenerateTP, configContainer.shouldGenerateConstructionSites());
         assertEquals(timeBeforeTrouble, configContainer.getTimeBeforeTrouble());
-        
+        assertEquals(shouldGenerateTrafficJams, configContainer.shouldGenerateTrafficJams());
+
         assertEquals(pedestriansLimit, ref.pedLimit);
         assertEquals(testPedestrianId, ref.testPedId);
         assertEquals(lightStrategyActive, configContainer.isLightStrategyActive());
@@ -143,11 +145,12 @@ class SchedulerTests {
 
     private Scheduler createScheduler(ConfigContainer configContainer, ITaskManager taskManager) {
         var agentsContainer = mock(IAgentsContainer.class);
+        when(agentsContainer.size(LightManagerAgent.class)).thenReturn(1);
         return new Scheduler(taskManager, configContainer, agentsContainer, createEventBus());
     }
 
     private StartSimulationEvent prepareSimulationEvent(LocalDateTime startTime) {
-        return new StartSimulationEvent(false, 111, 112, true,
+        return new StartSimulationEvent(false, 111, 112, false, true,
                 5005, 222, 223, startTime,
                 false, 333, false, 354, false);
     }

@@ -38,6 +38,10 @@ public class Scheduler {
         configContainer.setLightStrategyActive(e.lightStrategyActive);
 
         activateLightManagerAgents();
+        configContainer.setShouldGenerateTrafficJams(
+                agentsContainer.size(LightManagerAgent.class) > 0 &&
+                e.shouldGenerateTrafficJams);
+
         if (e.shouldGenerateCars) {
             configContainer.setShouldGenerateConstructionSites(e.shouldGenerateTroublePoints);
             configContainer.setTimeBeforeTrouble(e.timeBeforeTrouble);

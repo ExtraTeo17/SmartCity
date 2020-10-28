@@ -11,6 +11,7 @@ public class StartSimulationRequest extends AbstractPayload {
     public final int carsLimit;
     public final int testCarId;
 
+    public final boolean generateTrafficJams;
     public final boolean generateTroublePoints;
     public final int timeBeforeTrouble;
 
@@ -32,6 +33,7 @@ public class StartSimulationRequest extends AbstractPayload {
     public StartSimulationRequest(@JsonProperty("carsLimit") int carsLimit,
                                   @JsonProperty("testCarId") int testCarId,
                                   @JsonProperty("generateCars") boolean generateCars,
+                                  @JsonProperty("generateTrafficJams") boolean generateTrafficJams,
                                   @JsonProperty("generateTroublePoints") boolean generateTroublePoints,
                                   @JsonProperty("timeBeforeTrouble") int timeBeforeTrouble,
                                   @JsonProperty("pedLimit") int pedestriansLimit,
@@ -46,6 +48,7 @@ public class StartSimulationRequest extends AbstractPayload {
         this.carsLimit = carsLimit;
         this.testCarId = testCarId;
         this.generateCars = generateCars;
+        this.generateTrafficJams = generateTrafficJams;
         this.generateTroublePoints = generateTroublePoints;
         this.timeBeforeTrouble = timeBeforeTrouble;
         this.pedestriansLimit = pedestriansLimit;

@@ -1,10 +1,6 @@
 package smartcity.config.abstractions;
 
 public interface ILightConfigContainer {
-    boolean tryLockLightManagers();
-
-    void unlockLightManagers();
-
     boolean isLightStrategyActive();
 
     void setLightStrategyActive(boolean lightStrategyActive);

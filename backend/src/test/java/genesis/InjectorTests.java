@@ -4,7 +4,6 @@ import agents.AgentsModule;
 import com.google.common.eventbus.DeadEvent;
 import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
-import com.google.inject.Binder;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
 import events.ClearSimulationEvent;
@@ -20,7 +19,6 @@ import events.web.vehicle.VehicleAgentCreatedEvent;
 import events.web.vehicle.VehicleAgentDeadEvent;
 import events.web.vehicle.VehicleAgentRouteChangedEvent;
 import events.web.vehicle.VehicleAgentUpdatedEvent;
-import gui.MapWindow;
 import jade.wrapper.ContainerController;
 import jade.wrapper.StaleProxyException;
 import org.junit.jupiter.api.Test;
@@ -39,7 +37,6 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.mockito.Mockito.mock;
 
 @SuppressWarnings("OverlyCoupledClass")
 class InjectorTests {
@@ -94,7 +91,7 @@ class InjectorTests {
         eventBus.post(new LightManagersReadyEvent(null));
         eventBus.post(new SimulationPreparedEvent(new ArrayList<>(), new ArrayList<>(), new ArrayList<>()));
         eventBus.post("Test"); // Dead event
-        eventBus.post(new StartSimulationEvent(false, 0, 0, false,
+        eventBus.post(new StartSimulationEvent(false, 0, 0, false, false,
                 5000, 0, 1, LocalDateTime.now(), false, 30, false, 60, false));
         eventBus.post(new SimulationStartedEvent());
         eventBus.post(new ClearSimulationEvent());
