@@ -18,7 +18,7 @@ import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 class SimpleCrossroad implements ICrossroad {
-	private final Logger logger;
+    private final Logger logger;
     private final EventBus eventBus;
     private final int managerId;
 
@@ -44,15 +44,16 @@ class SimpleCrossroad implements ICrossroad {
 
     @Override
     public OptimizationResult requestOptimizations(int extendTimeSeconds) {
-    	final OptimizationResult result = new OptimizationResult(extendTimeSeconds);
+        final OptimizationResult result = new OptimizationResult(extendTimeSeconds);
         for (Light light : wayIdToLightMap.values()) {
-        	light.checkForTrafficJams(result);
+            light.checkForTrafficJams(result);
             if (light.isGreen()) {
                 for (String carName : light.carQueue) {
                     result.addCarGrantedPassthrough(carName);
                     break;
                 }
-            } else {
+            }
+            else {
                 for (String pedestrianName : light.pedestrianQueue) {
                     result.addCarGrantedPassthrough(pedestrianName);
                     break;

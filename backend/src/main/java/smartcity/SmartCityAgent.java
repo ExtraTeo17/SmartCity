@@ -10,7 +10,6 @@ import com.google.inject.Inject;
 import events.web.bus.BusAgentDeadEvent;
 import events.web.pedestrian.PedestrianAgentDeadEvent;
 import events.web.vehicle.VehicleAgentDeadEvent;
-import gui.MapWindow;
 import jade.core.Agent;
 import jade.core.behaviours.CyclicBehaviour;
 import jade.lang.acl.ACLMessage;

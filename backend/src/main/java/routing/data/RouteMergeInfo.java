@@ -11,7 +11,7 @@ public class RouteMergeInfo {
     public List<RouteNode> newUniformRoute;
 
     public RouteMergeInfo(List<RouteNode> startNodes, List<RouteNode> mergedRoute,
-    		List<RouteNode> newSimpleRouteEnd) {
+                          List<RouteNode> newSimpleRouteEnd) {
         this.startNodes = startNodes;
         this.mergedRoute = mergedRoute;
         this.newSimpleRouteEnd = newSimpleRouteEnd;

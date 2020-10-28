@@ -3,7 +3,6 @@ package web;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.eventbus.EventBus;
 import com.google.inject.Inject;
-import events.web.PrepareSimulationEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import web.message.MessageDto;

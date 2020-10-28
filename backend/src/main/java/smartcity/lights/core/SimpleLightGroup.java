@@ -1,8 +1,8 @@
 package smartcity.lights.core;
 
-import smartcity.lights.LightColor;
 import org.jxmapviewer.viewer.Waypoint;
 import org.jxmapviewer.viewer.WaypointPainter;
+import smartcity.lights.LightColor;
 
 import java.util.*;
 

@@ -1,10 +1,10 @@
 package smartcity.lights.core;
 
-import smartcity.lights.LightColor;
 import com.google.common.eventbus.EventBus;
 import com.google.inject.Inject;
 import org.w3c.dom.Node;
 import osmproxy.elements.OSMNode;
+import smartcity.lights.LightColor;
 import smartcity.lights.abstractions.ICrossroad;
 import smartcity.lights.abstractions.ICrossroadFactory;
 import utilities.Siblings;

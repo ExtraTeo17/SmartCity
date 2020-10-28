@@ -119,7 +119,7 @@ final class Router implements
                                                      List<StationNode> stationNodes) {
         var data = cacheWrapper.getBusRoute(route, stationNodes);
         if (data.size() > 0) {
-            if(updateCacheDataAgentId(data, stationNodes)) {
+            if (updateCacheDataAgentId(data, stationNodes)) {
                 return data;
             }
         }
@@ -139,7 +139,7 @@ final class Router implements
     //  HELPERS - Most are abominable :(
     /////////////////////////////////////////////////////////////
 
-    private boolean updateCacheDataAgentId(List<RouteNode> data, List<StationNode> stationNodes){
+    private boolean updateCacheDataAgentId(List<RouteNode> data, List<StationNode> stationNodes) {
         for (RouteNode node : data) {
             if (node instanceof StationNode) {
                 var st = (StationNode) node;
@@ -159,7 +159,7 @@ final class Router implements
 
 
     private static Pair<List<Long>, List<RouteNode>> findRoute(IGeoPosition pointA, IGeoPosition pointB,
-    		boolean onFoot, boolean bewareOfJammedRoutes) {
+                                                               boolean onFoot, boolean bewareOfJammedRoutes) {
         return osmproxy.HighwayAccessor.getOsmWayIdsAndPointList(pointA.getLat(), pointA.getLng(), pointB.getLat(),
                 pointB.getLng(), onFoot, bewareOfJammedRoutes);
     }

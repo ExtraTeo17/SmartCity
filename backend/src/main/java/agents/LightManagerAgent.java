@@ -97,7 +97,7 @@ public class LightManagerAgent extends AbstractAgent {
                 sendMessageAboutTroubleToVehicle(result, nameOfAgent);
             }
 
-            private void sendMessageAboutTroubleToVehicle(OptimizationResult result, String nameOfAgent) throws Exception {
+            private void sendMessageAboutTroubleToVehicle(OptimizationResult result, String nameOfAgent) {
                 ACLMessage msg = createMessage(ACLMessage.PROPOSE, nameOfAgent); // Remember that this solution is based on different agents expected to return the same graphhopper edge ID when traffic jam starts and stops
                 Properties properties = createProperties(MessageParameter.LIGHT);
                 properties.setProperty(MessageParameter.TYPEOFTROUBLE, MessageParameter.TRAFFIC_JAMS);

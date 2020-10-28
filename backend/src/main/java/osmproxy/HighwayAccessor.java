@@ -58,7 +58,7 @@ public class HighwayAccessor {
                                                                              boolean bewareOfJammedRoutes) {
         List<Long> osmWayIds = new ArrayList<>();
         List<RouteNode> pointList = new ArrayList<>();
-        
+
         final String weighting = bewareOfJammedRoutes ? AvoidEdgesRemovableWeighting.NAME : "fastest";
 
         GHResponse response = new GHResponse();
