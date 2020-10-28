@@ -40,7 +40,7 @@ public class Scheduler {
         activateLightManagerAgents();
         configContainer.setShouldGenerateTrafficJams(
                 agentsContainer.size(LightManagerAgent.class) > 0 &&
-                e.shouldGenerateTrafficJams);
+                        e.shouldGenerateTrafficJams);
 
         if (e.shouldGenerateCars) {
             configContainer.setShouldGenerateConstructionSites(e.shouldGenerateTroublePoints);

@@ -1,6 +1,7 @@
 package smartcity.lights;
 
 import org.javatuples.Pair;
+import routing.core.IGeoPosition;
 import routing.core.Position;
 import smartcity.TimeProvider;
 
@@ -14,7 +15,7 @@ public class OptimizationResult {
     private boolean shouldNotifyCarAboutStopOfTrafficJamOnThisLight = false;
     private double lengthOfJam = 0;
     private long osmWayId = 0;
-    private Position jammedLightPosition = null;
+    private IGeoPosition jammedLightPosition = null;
     private String agentStuckInJam = null;
     private final int extendTimeSeconds;
     private final int defaultExecutionDelay;
@@ -52,13 +53,13 @@ public class OptimizationResult {
         return busesAndPedestriansFreeToProceedNames;
     }
 
-    public void setShouldNotifyCarAboutStartOfTrafficJamOnThisLight(double jammedLightLat, double jammedLightLon,
-                                                                    int numerOfCarsInTheQueue, long osmWayId) {
+    public void setShouldNotifyCarAboutStartOfTrafficJamOnThisLight(IGeoPosition position,
+                                                                    int numberOfCarsInTheQueue, long osmWayId) {
         shouldNotifyCarAboutStartOfTrafficJamOnThisLight = true;
-        jammedLightPosition = Position.of(jammedLightLat, jammedLightLon);
+        jammedLightPosition = position;
         this.osmWayId = osmWayId;
         //TODO: change 2 na liczbé samochodów które przejzdzaja podczas jednego swiatla. Oraz change how long is green and red
-        lengthOfJam = Math.floor(Math.floor(numerOfCarsInTheQueue / defaultExecutionDelay) *
+        lengthOfJam = Math.floor(Math.floor(numberOfCarsInTheQueue / defaultExecutionDelay) *
                 ((defaultExecutionDelay + defaultExecutionDelay) +
                         (defaultExecutionDelay + defaultExecutionDelay + extendTimeSeconds)) / 2); // TODO: Magic numbers
 
@@ -68,7 +69,7 @@ public class OptimizationResult {
         return lengthOfJam;
     }
 
-    public final Position getJammedLightPosition() {
+    public final IGeoPosition getJammedLightPosition() {
         if (jammedLightPosition == null) {
             throw new RuntimeException("No light has been reported as jammed!");
         }

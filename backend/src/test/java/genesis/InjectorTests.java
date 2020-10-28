@@ -18,7 +18,10 @@ import events.web.bus.BusAgentFillStateUpdatedEvent;
 import events.web.bus.BusAgentStartedEvent;
 import events.web.bus.BusAgentUpdatedEvent;
 import events.web.pedestrian.*;
+import events.web.roadblocks.TrafficJamFinishedEvent;
+import events.web.roadblocks.TrafficJamStartedEvent;
 import events.web.roadblocks.TroublePointCreatedEvent;
+import events.web.roadblocks.TroublePointVanishedEvent;
 import events.web.vehicle.VehicleAgentCreatedEvent;
 import events.web.vehicle.VehicleAgentDeadEvent;
 import events.web.vehicle.VehicleAgentRouteChangedEvent;
@@ -102,7 +105,10 @@ class InjectorTests {
 
         // other
         eventBus.post(new TroublePointCreatedEvent(1, null));
+        eventBus.post(new TroublePointVanishedEvent(1));
         eventBus.post(new SwitchLightsStartEvent(1, null));
+        eventBus.post(new TrafficJamStartedEvent(1));
+        eventBus.post(new TrafficJamFinishedEvent(1));
 
         // vehicle
         eventBus.post(new VehicleAgentCreatedEvent(1, null, null, false));

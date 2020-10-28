@@ -1,7 +1,5 @@
 package smartcity.lights.core;
 
-import org.jxmapviewer.viewer.Waypoint;
-import org.jxmapviewer.viewer.WaypointPainter;
 import smartcity.lights.LightColor;
 
 import java.util.*;
@@ -14,15 +12,6 @@ class SimpleLightGroup {
         for (LightInfo info : infoList) {
             lights.add(new Light(info, color));
         }
-    }
-
-    void drawLights(WaypointPainter<Waypoint> painter) {
-        HashSet<Waypoint> set = new HashSet<>();
-        for (Light light : lights) {
-            light.draw(set, painter);
-        }
-
-        painter.setWaypoints(set);
     }
 
     void switchLights() {

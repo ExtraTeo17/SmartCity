@@ -14,15 +14,13 @@ import web.message.payloads.models.*;
 import web.message.payloads.requests.PrepareSimulationRequest;
 import web.message.payloads.requests.StartSimulationRequest;
 
-import java.util.Objects;
-
 public class Converter {
     public static Location convert(IGeoPosition geoPosition) {
         return new Location(geoPosition.getLat(), geoPosition.getLng());
     }
 
     public static LightDto convert(Light light) {
-        var id = Objects.hash(light.getAdjacentWayId(), light.getOsmLightId());
+        var id = light.uniqueId();
         var lightGroupId = light.getOsmLightId();
         var location = convert((IGeoPosition) light);
         var color = light.isGreen() ? LightColorDto.GREEN : LightColorDto.RED;

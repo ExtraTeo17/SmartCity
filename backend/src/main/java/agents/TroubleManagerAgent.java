@@ -6,6 +6,8 @@ import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
 import com.google.inject.Inject;
 import events.web.DebugEvent;
+import events.web.roadblocks.TrafficJamFinishedEvent;
+import events.web.roadblocks.TrafficJamStartedEvent;
 import events.web.roadblocks.TroublePointCreatedEvent;
 import events.web.roadblocks.TroublePointVanishedEvent;
 import jade.core.Agent;
@@ -26,6 +28,7 @@ import smartcity.config.ConfigContainer;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 
 import static agents.message.MessageManager.createProperties;
 
@@ -103,9 +106,10 @@ public class TroubleManagerAgent extends Agent {
     }
 
     private void trafficJamsAppearedHandle(ACLMessage rcv) {
-        //TODO: Rysowanie w LightManager - Przemek
-        Position positionOfTroubleLight = Position.of(rcv.getUserDefinedParameter(MessageParameter.TROUBLE_LAT),
-                rcv.getUserDefinedParameter(MessageParameter.TROUBLE_LON));
+        var lat = rcv.getUserDefinedParameter(MessageParameter.TROUBLE_LAT);
+        var lng = rcv.getUserDefinedParameter(MessageParameter.TROUBLE_LON);
+        eventBus.post(new TrafficJamStartedEvent(Objects.hash(lat, lng)));
+
         int edgeId = Integer.parseInt(rcv.getUserDefinedParameter(MessageParameter.EDGE_ID));
         logger.info("Got message about light traffic jam start on: " + edgeId);
         if (!mapOfLightTrafficJamBlockedEdges.containsKey(edgeId)) {
@@ -119,9 +123,10 @@ public class TroubleManagerAgent extends Agent {
     }
 
     private void trafficJamsDisappearedHandle(ACLMessage rcv) {
-        //TODO: Rysowanie w LightManager - Przemek
-        Position positionOfTroubleLight = Position.of(rcv.getUserDefinedParameter(MessageParameter.TROUBLE_LAT),
-                rcv.getUserDefinedParameter(MessageParameter.TROUBLE_LON));
+        var lat = rcv.getUserDefinedParameter(MessageParameter.TROUBLE_LAT);
+        var lng = rcv.getUserDefinedParameter(MessageParameter.TROUBLE_LON);
+        eventBus.post(new TrafficJamFinishedEvent(Objects.hash(lat, lng)));
+
         int edgeId = Integer.parseInt(rcv.getUserDefinedParameter(MessageParameter.EDGE_ID));
         logger.info("Got message about light traffic jam stop on: " + edgeId);
         if (mapOfLightTrafficJamBlockedEdges.containsKey(edgeId)) {
@@ -199,8 +204,15 @@ public class TroubleManagerAgent extends Agent {
         addBehaviour(sayAboutJam);
     }
 
+    private boolean de;
+
     @Subscribe
     void handle(DebugEvent e) {
+        if (de) {
+            eventBus.post(new TrafficJamFinishedEvent(1));
+        }
 
+        eventBus.post(new TrafficJamStartedEvent(1));
+        de = true;
     }
 }

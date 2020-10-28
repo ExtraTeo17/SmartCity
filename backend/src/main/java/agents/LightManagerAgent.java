@@ -7,8 +7,6 @@ import jade.core.behaviours.CyclicBehaviour;
 import jade.core.behaviours.TickerBehaviour;
 import jade.lang.acl.ACLMessage;
 import jade.util.leap.Properties;
-import org.jxmapviewer.JXMapViewer;
-import org.jxmapviewer.painter.Painter;
 import smartcity.ITimeProvider;
 import smartcity.config.ConfigContainer;
 import smartcity.lights.OptimizationResult;
@@ -82,12 +80,15 @@ public class LightManagerAgent extends AbstractAgent {
             }
 
             private synchronized void sendMessageAboutTroubleStopToTroubleManager(OptimizationResult result) {
-                ACLMessage msg = createMessage(ACLMessage.INFORM, TroubleManagerAgent.name); // Remember that this solution is based on different agents expected to return the same graphhopper edge ID when traffic jam starts and stops
+                // Remember that this solution is based on different agents expected to return the
+                //  same graphhopper edge ID when traffic jam starts and stops
+                ACLMessage msg = createMessage(ACLMessage.INFORM, TroubleManagerAgent.name);
                 Properties properties = createProperties(MessageParameter.LIGHT);
                 properties.setProperty(MessageParameter.TYPEOFTROUBLE, MessageParameter.TRAFFIC_JAMS);
                 properties.setProperty(MessageParameter.TROUBLE, MessageParameter.STOP);
-                properties.setProperty(MessageParameter.TROUBLE_LAT, Double.toString(result.getJammedLightPosition().getLat()));
-                properties.setProperty(MessageParameter.TROUBLE_LON, Double.toString(result.getJammedLightPosition().getLng()));
+                var jammedLight = result.getJammedLightPosition();
+                properties.setProperty(MessageParameter.TROUBLE_LAT, Double.toString(jammedLight.getLat()));
+                properties.setProperty(MessageParameter.TROUBLE_LON, Double.toString(jammedLight.getLng()));
                 properties.setProperty(MessageParameter.EDGE_ID, trafficJammedEdgeSet.get(String.valueOf(result.getOsmWayId())));
                 trafficJammedEdgeSet.remove(Long.toString(result.getOsmWayId()));
                 msg.setAllUserDefinedParameters(properties);
@@ -216,9 +217,5 @@ public class LightManagerAgent extends AbstractAgent {
 
     public List<Light> getLights() {
         return crossroad.getLights();
-    }
-
-    public void draw(List<Painter<JXMapViewer>> waypointPainter) {
-        crossroad.draw(waypointPainter);
     }
 }

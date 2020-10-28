@@ -46,6 +46,10 @@ public class Light extends Position {
         return adjacentOsmWayId;
     }
 
+    public long uniqueId() {
+        return super.hashCode();
+    }
+
     @NotNull
     public String getAdjacentCrossingOsmId1() {
         return adjacentCrossingOsmId1;
@@ -139,7 +143,7 @@ public class Light extends Position {
         }
     }
 
-    private final boolean trafficJamEmerged() {
+    private boolean trafficJamEmerged() {
         if (carQueue.size() > TRAFFIC_JAM_THRESHOLD && !trafficJamOngoing) {
             trafficJamOngoing = true;
             return true;
@@ -147,7 +151,7 @@ public class Light extends Position {
         return false;
     }
 
-    private final boolean trafficJamDisappeared() {
+    private boolean trafficJamDisappeared() {
         if (carQueue.size() <= TRAFFIC_JAM_THRESHOLD && trafficJamOngoing) {
             trafficJamOngoing = false;
             return true;
@@ -155,9 +159,9 @@ public class Light extends Position {
         return false;
     }
 
-    public final void checkForTrafficJams(final OptimizationResult result) {
+    final void checkForTrafficJams(final OptimizationResult result) {
         if (trafficJamEmerged()) {
-            result.setShouldNotifyCarAboutStartOfTrafficJamOnThisLight(getLat(), getLng(), carQueue.size(), getOsmLightId());
+            result.setShouldNotifyCarAboutStartOfTrafficJamOnThisLight(this, carQueue.size(), getOsmLightId());
             result.setCarStuckInJam(carQueue.peek());
         }
         else if (trafficJamDisappeared()) {

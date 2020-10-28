@@ -4,11 +4,14 @@ import com.google.common.eventbus.Subscribe;
 import com.google.inject.Inject;
 import events.web.SimulationPreparedEvent;
 import events.web.SimulationStartedEvent;
+import events.web.SwitchLightsEvent;
 import events.web.bus.BusAgentDeadEvent;
 import events.web.bus.BusAgentFillStateUpdatedEvent;
 import events.web.bus.BusAgentStartedEvent;
 import events.web.bus.BusAgentUpdatedEvent;
 import events.web.pedestrian.*;
+import events.web.roadblocks.TrafficJamFinishedEvent;
+import events.web.roadblocks.TrafficJamStartedEvent;
 import events.web.roadblocks.TroublePointCreatedEvent;
 import events.web.roadblocks.TroublePointVanishedEvent;
 import events.web.vehicle.VehicleAgentCreatedEvent;
@@ -59,7 +62,7 @@ class Communicator {
     }
 
     @Subscribe
-    public void handle(SimulationPreparedEvent.SwitchLightsEvent e) {
+    public void handle(SwitchLightsEvent e) {
         webService.updateLights(e.osmLightId);
     }
 
@@ -128,6 +131,18 @@ class Communicator {
     public void handle(PedestrianAgentDeadEvent e) {
         onHandle(e);
         webService.killPedestrian(e.id, e.travelDistance, e.travelTime);
+    }
+
+    @Subscribe
+    public void handle(TrafficJamStartedEvent e) {
+        onHandle(e);
+        webService.startTrafficJam(e.lightId);
+    }
+
+    @Subscribe
+    public void handle(TrafficJamFinishedEvent e) {
+        onHandle(e);
+        webService.endTrafficJam(e.lightId);
     }
 
     private void onHandle(Object obj) {

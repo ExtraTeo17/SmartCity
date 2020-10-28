@@ -20,6 +20,7 @@ public interface IAgentsFactory {
     BusAgent create(List<RouteNode> route, Timetable timetable, String busLine,
                     String brigadeNr);
 
+    @Deprecated
     LightManagerAgent create(Node crossroad);
 
     LightManagerAgent create(OSMNode centerCrossroad);

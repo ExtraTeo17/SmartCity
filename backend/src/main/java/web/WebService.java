@@ -11,10 +11,8 @@ import web.message.MessageType;
 import web.message.payloads.infos.create.CreateCarInfo;
 import web.message.payloads.infos.create.CreatePedestrianInfo;
 import web.message.payloads.infos.create.CreateTroublePointInfo;
-import web.message.payloads.infos.kill.HideTroublePointInfo;
-import web.message.payloads.infos.kill.KillBusInfo;
-import web.message.payloads.infos.kill.KillCarInfo;
-import web.message.payloads.infos.kill.KillPedestrianInfo;
+import web.message.payloads.infos.create.StartTrafficJamInfo;
+import web.message.payloads.infos.kill.*;
 import web.message.payloads.infos.update.*;
 import web.message.payloads.models.BusDto;
 import web.message.payloads.models.LightDto;
@@ -186,5 +184,19 @@ class WebService implements IWebService {
         var payload = new KillPedestrianInfo(id, travelDistance, travelTime);
 
         webConnector.broadcastMessage(MessageType.KILL_PEDESTRIAN_INFO, payload);
+    }
+
+    @Override
+    public void startTrafficJam(int id) {
+        var payload = new StartTrafficJamInfo(id);
+
+        webConnector.broadcastMessage(MessageType.START_TRAFFIC_JAM_INFO, payload);
+    }
+
+    @Override
+    public void endTrafficJam(int id) {
+        var payload = new EndTrafficJamInfo(id);
+
+        webConnector.broadcastMessage(MessageType.END_TRAFFIC_JAM_INFO, payload);
     }
 }
