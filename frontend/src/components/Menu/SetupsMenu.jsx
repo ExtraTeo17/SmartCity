@@ -1,5 +1,5 @@
 import React from "react";
-import { batch } from "react-redux";
+import { batch, connect } from "react-redux";
 
 import { centerUpdated, generatePedestriansUpdated } from "../../redux/core/actions";
 import { dispatch } from "../../redux/store";
@@ -23,13 +23,13 @@ const prepareBusZone = () => {
   prepareSimulation({ lat: 52.203342, lng: 20.861213, rad: 300, generatePedestrians: true });
 };
 
-const SetupsMenu = () => {
+const SetupsMenu = ({ wasStarted }) => {
   return (
     <div className="form-border">
-      <button className="btn btn-primary btn-block" type="button" onClick={prepareCarZone}>
+      <button className="btn btn-primary btn-block" type="button" disabled={wasStarted} onClick={prepareCarZone}>
         Prepare car zone
       </button>
-      <button className="btn btn-primary btn-block mt-5" type="button" onClick={prepareBusZone}>
+      <button className="btn btn-primary btn-block mt-5" type="button" disabled={wasStarted} onClick={prepareBusZone}>
         Prepare bus zone
       </button>
       {IS_DEBUG && (
@@ -41,4 +41,11 @@ const SetupsMenu = () => {
   );
 };
 
-export default SetupsMenu;
+const mapStateToProps = (state /* , ownProps */) => {
+  const { wasStarted } = state.message;
+  return {
+    wasStarted,
+  };
+};
+
+export default connect(mapStateToProps)(React.memo(SetupsMenu));
