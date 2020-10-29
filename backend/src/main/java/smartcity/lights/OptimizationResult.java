@@ -53,15 +53,15 @@ public class OptimizationResult {
         return busesAndPedestriansFreeToProceedNames;
     }
 
-    public void setShouldNotifyCarAboutStartOfTrafficJamOnThisLight(IGeoPosition position,
-                                                                    int numberOfCarsInTheQueue, long osmWayId) {
-        shouldNotifyCarAboutStartOfTrafficJamOnThisLight = true;
-        jammedLightPosition = position;
-        this.osmWayId = osmWayId;
-        //TODO: change 2 na liczbé samochodów które przejzdzaja podczas jednego swiatla. Oraz change how long is green and red
-        lengthOfJam = Math.floor(Math.floor(numberOfCarsInTheQueue / defaultExecutionDelay) *
-                ((defaultExecutionDelay + defaultExecutionDelay) +
-                        (defaultExecutionDelay + defaultExecutionDelay + extendTimeSeconds)) / 2); // TODO: Magic numbers
+	public void setShouldNotifyCarAboutStartOfTrafficJamOnThisLight(IGeoPosition jammedLightPosition,  int numerOfCarsInTheQueue,
+																	long osmWayId) {
+		shouldNotifyCarAboutStartOfTrafficJamOnThisLight = true;
+		this.osmWayId = osmWayId;
+		//TODO: change 2 na liczbé samochodów które przejzdzaja podczas jednego swiatla. Oraz change how long is green and red
+		lengthOfJam = Math.floor((numerOfCarsInTheQueue * 1000.0 /defaultExecutionDelay)  *
+				((defaultExecutionDelay + defaultExecutionDelay) +
+						(defaultExecutionDelay + defaultExecutionDelay + extendTimeSeconds)) / 2); // TODO: Magic numbers
+
 
     }
 

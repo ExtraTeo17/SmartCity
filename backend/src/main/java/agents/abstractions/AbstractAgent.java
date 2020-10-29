@@ -115,14 +115,14 @@ public abstract class AbstractAgent extends Agent {
         return LocalDateTime.parse(paramValue);
     }
 
-    protected int getIntParameter(ACLMessage rcv, String param) {
+    protected long getIntParameter(ACLMessage rcv, String param) {
         var paramValue = rcv.getUserDefinedParameter(param);
         if (paramValue == null) {
             print("Did not receive " + param + " from " + rcv.getSender(), LoggerLevel.ERROR);
             return 0;
         }
 
-        return Integer.parseInt(rcv.getUserDefinedParameter(param));
+        return Long.parseLong(rcv.getUserDefinedParameter(param));
     }
 
     protected void logTypeError(ACLMessage rcv) {
