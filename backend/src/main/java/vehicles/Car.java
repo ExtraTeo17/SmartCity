@@ -7,7 +7,7 @@ import java.util.List;
 
 public class Car extends MovingObject {
     public Car(int agentId, List<RouteNode> displayRoute, List<RouteNode> uniformRoute) {
-        super(agentId, 50, uniformRoute, displayRoute);
+        super(agentId, 17, uniformRoute, displayRoute);
     }
 
     Car(Car car) {
