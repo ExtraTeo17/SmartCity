@@ -60,9 +60,10 @@ public class OptimizationResult {
 		jammedLightPosition = Position.of(jammedLightLat, jammedLightLon);
 		this.osmWayId = osmWayId;
 		//TODO: change 2 na liczbé samochodów które przejzdzaja podczas jednego swiatla. Oraz change how long is green and red
-		lengthOfJam = Math.floor(Math.floor(numerOfCarsInTheQueue / defaultExecutionDelay) *
+		lengthOfJam = Math.floor((numerOfCarsInTheQueue * 1000.0 /defaultExecutionDelay)  *
 				((defaultExecutionDelay + defaultExecutionDelay) +
 						(defaultExecutionDelay + defaultExecutionDelay + extendTimeSeconds)) / 2); // TODO: Magic numbers
+	
 
 	}
 	
