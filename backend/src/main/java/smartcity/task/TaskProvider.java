@@ -11,7 +11,6 @@ import com.google.common.collect.Table;
 import com.google.common.eventbus.EventBus;
 import com.google.inject.Inject;
 import events.web.bike.BikeAgentCreatedEvent;
-import events.web.bike.BikeAgentUpdatedEvent;
 import events.web.bus.BusAgentStartedEvent;
 import events.web.pedestrian.PedestrianAgentCreatedEvent;
 import events.web.vehicle.VehicleAgentCreatedEvent;

@@ -141,7 +141,7 @@ public class MapWindow {
         MapPanel.add(MapViewer);
         MapPanel.revalidate();
     }
-    
+
     public void display() {
         var mapViewer = this.MapViewer;
         JFrame frame = new JFrame("Smart City by Katherine & Przemyslaw & Robert");
