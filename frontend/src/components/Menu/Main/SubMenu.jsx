@@ -18,10 +18,20 @@ import {
   D_GENERATE_TJ,
 } from "../../../constants/defaults";
 
-import { PED_MIN, PED_MAX, CAR_MIN, CAR_MAX, BIKE_MIN, BIKE_MAX } from "../../../constants/minMax";
+import {
+  PED_MIN,
+  PED_MAX,
+  CAR_MIN,
+  CAR_MAX,
+  BIKE_MIN,
+  BIKE_MAX,
+  TIME_BEFORE_TP_MIN,
+  TIME_BEFORE_TP_MAX,
+} from "../../../constants/minMax";
 
 import { StartState } from "../../../redux/models/startState";
 import "../../../styles/Menu.css";
+import { setIfValidInt } from "../../../utils/helpers";
 
 const SubMenu = props => {
   const { shouldStart, wasStarted, generatePedestrians } = props;
@@ -68,17 +78,11 @@ const SubMenu = props => {
   }
 
   function evSetCarsLimit(e) {
-    const val = parseInt(e.target.value);
-    if (!isNaN(val)) {
-      setCarsLimit(val);
-    }
+    setIfValidInt(e, CAR_MIN, CAR_MAX, setCarsLimit);
   }
 
   function evSetTestCarId(e) {
-    const val = parseInt(e.target.value);
-    if (!isNaN(val)) {
-      setTestCarId(val);
-    }
+    setIfValidInt(e, 1, 1000, setTestCarId);
   }
 
   function evSetGenerateBikes(e) {
@@ -86,17 +90,11 @@ const SubMenu = props => {
   }
 
   function evSetBikesLimit(e) {
-    const val = parseInt(e.target.value);
-    if (!isNaN(val)) {
-      setBikesLimit(val);
-    }
+    setIfValidInt(e, BIKE_MIN, BIKE_MAX, setBikesLimit);
   }
 
   function evSetTestBikeId(e) {
-    const val = parseInt(e.target.value);
-    if (!isNaN(val)) {
-      setTestBikeId(val);
-    }
+    setIfValidInt(e, 1, 1000, setTestBikeId);
   }
 
   function evSetGenerateTroublePoints(e) {
@@ -104,10 +102,7 @@ const SubMenu = props => {
   }
 
   function evSetTimeBeforeTrouble(e) {
-    const val = parseInt(e.target.value);
-    if (!isNaN(val)) {
-      setTimeBeforeTrouble(val);
-    }
+    setIfValidInt(e, TIME_BEFORE_TP_MIN, TIME_BEFORE_TP_MAX, setTimeBeforeTrouble);
   }
 
   function evSetGenerateTrafficJams(e) {
@@ -261,6 +256,8 @@ const SubMenu = props => {
               type="number"
               defaultValue={timeBeforeTrouble}
               disabled={wasStarted}
+              min={TIME_BEFORE_TP_MIN}
+              max={TIME_BEFORE_TP_MAX}
               className="form-control"
               id="timeBeforeTrouble"
               placeholder="Enter time before road trouble occurs"

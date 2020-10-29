@@ -1,3 +1,4 @@
+/* eslint-disable no-restricted-globals */
 function getRandomInt(min, max) {
   // eslint-disable-next-line no-bitwise
   return (Math.random() * (max - min + 1) + min) | 0;
@@ -25,4 +26,30 @@ const latOffset = 1000; // Anithing above 180 would do
 
 export const getLocationHash = loc => {
   return Number(loc.lat * precision * latOffset) + Number(loc.lng * precision);
+};
+
+export const setInvalid = htmlELem => {
+  htmlELem.classList.add("invalid-input");
+};
+
+export const setValid = htmlELem => {
+  htmlELem.classList.remove("invalid-input");
+};
+
+function setIfValid(elem, parseFunc, min, max, setFunc) {
+  const val = parseFunc(elem.value);
+  if (!isNaN(val) && val >= min && val <= max) {
+    setValid(elem);
+    setFunc(val);
+  } else {
+    setInvalid(elem);
+  }
+}
+
+export const setIfValidInt = (e, min, max, setFunc) => {
+  setIfValid(e.target, parseInt, min, max, setFunc);
+};
+
+export const setIfValidFloat = (e, min, max, setFunc) => {
+  setIfValid(e.target, parseFloat, min, max, setFunc);
 };

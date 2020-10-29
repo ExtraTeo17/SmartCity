@@ -5,6 +5,8 @@ import { StartState } from "../../redux/models/startState";
 import { dispatch } from "../../redux/store";
 import { startSimulationDataUpdated } from "../../redux/core/actions";
 import "../../styles/Menu.css";
+import { setIfValidInt } from "../../utils/helpers";
+import { LIGHT_EXTEND_MIN, LIGHT_EXTEND_MAX, STATION_EXTEND_MAX, STATION_EXTEND_MIN } from "../../constants/minMax";
 import {
   D_EXTEND_WAIT_TIME,
   D_LIGHT_STRATEGY_ACTIVE,
@@ -38,6 +40,14 @@ const StrategyMenu = props => {
   };
   useEffect(onStart, [shouldStart]);
 
+  function evSetLightExtend(e) {
+    setIfValidInt(e, LIGHT_EXTEND_MIN, LIGHT_EXTEND_MAX, setExtendLightTime);
+  }
+
+  function evSetWaitExtend(e) {
+    setIfValidInt(e, STATION_EXTEND_MIN, STATION_EXTEND_MAX, setExtendWaitTime);
+  }
+
   return (
     <>
       <div className="mb-4 form-border">
@@ -61,10 +71,12 @@ const StrategyMenu = props => {
               type="number"
               disabled={wasStarted}
               defaultValue={extendLightTime}
+              min={LIGHT_EXTEND_MIN}
+              max={LIGHT_EXTEND_MAX}
               className="form-control"
               id="extendLightTime"
               placeholder="Enter green lights extension time"
-              onChange={e => setExtendLightTime(e.target.value)}
+              onChange={evSetLightExtend}
             />
           </div>
         )}
@@ -93,7 +105,7 @@ const StrategyMenu = props => {
               className="form-control"
               id="extendWaitTime"
               placeholder="Enter bus extension wait time"
-              onChange={e => setExtendWaitTime(e.target.value)}
+              onChange={evSetWaitExtend}
             />
           </div>
         )}
