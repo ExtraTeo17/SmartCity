@@ -11,6 +11,7 @@ import web.message.MessageType;
 import web.message.payloads.infos.create.CreateCarInfo;
 import web.message.payloads.infos.create.CreatePedestrianInfo;
 import web.message.payloads.infos.create.CreateTroublePointInfo;
+import web.message.payloads.infos.kill.HideTroublePointInfo;
 import web.message.payloads.infos.kill.KillBusInfo;
 import web.message.payloads.infos.kill.KillCarInfo;
 import web.message.payloads.infos.kill.KillPedestrianInfo;
@@ -84,8 +85,8 @@ class WebService implements IWebService {
     }
 
     @Override
-    public void killCar(int id) {
-        var payload = new KillCarInfo(id);
+    public void killCar(int id, int travelDistance, Long travelTime) {
+        var payload = new KillCarInfo(id, travelDistance, travelTime);
 
         webConnector.broadcastMessage(MessageType.KILL_CAR_INFO, payload);
     }
@@ -96,6 +97,13 @@ class WebService implements IWebService {
         var payload = new CreateTroublePointInfo(id, location);
 
         webConnector.broadcastMessage(MessageType.CREATE_TROUBLE_POINT_INFO, payload);
+    }
+
+    @Override
+    public void hideTroublePoint(int id) {
+        var payload = new HideTroublePointInfo(id);
+
+        webConnector.broadcastMessage(MessageType.HIDE_TROUBLE_POINT_INFO, payload);
     }
 
     @Override
@@ -168,14 +176,14 @@ class WebService implements IWebService {
     @Override
     public void pullPedestrianFromBus(int id, IGeoPosition position) {
         var location = Converter.convert(position);
-        var payload = new UpdatePedestrianInfo(id, location);
+        var payload = new PullPedestrianInfo(id, location);
 
         webConnector.broadcastMessage(MessageType.PULL_PEDESTRIAN_FROM_BUS_INFO, payload);
     }
 
     @Override
-    public void killPedestrian(int id) {
-        var payload = new KillPedestrianInfo(id);
+    public void killPedestrian(int id, int travelDistance, Long travelTime) {
+        var payload = new KillPedestrianInfo(id, travelDistance, travelTime);
 
         webConnector.broadcastMessage(MessageType.KILL_PEDESTRIAN_INFO, payload);
     }

@@ -5,7 +5,6 @@ import agents.abstractions.IAgentsContainer;
 import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
 import com.google.inject.Inject;
-import events.StartTimeEvent;
 import events.web.PrepareSimulationEvent;
 import events.web.SimulationPreparedEvent;
 import events.web.StartSimulationEvent;
@@ -121,7 +120,6 @@ public class MapWindow {
             if (getTestCarId() > value) {
                 testCarIdSpinner.setValue(value);
             }
-            configContainer.setCarsNumber(value);
         });
 
         UseStrategyCheckBox.addItemListener(e -> configContainer.setLightStrategyActive(UseStrategyCheckBox.isSelected()));
@@ -138,13 +136,12 @@ public class MapWindow {
                 value = limit;
                 testCarIdSpinner.setValue(value);
             }
-            configContainer.setTestCarId(value);
         });
         setZoneButton.addActionListener(e -> eventBus.post(
                 new PrepareSimulationEvent(
                         (double) latSpinner.getValue(),
                         (double) lonSpinner.getValue(),
-                        (int) radiusSpinner.getValue())
+                        (int) radiusSpinner.getValue(), configContainer.shouldGeneratePedestriansAndBuses())
         ));
 
         testCarZoneButton.addActionListener(e -> {
@@ -153,7 +150,7 @@ public class MapWindow {
             seedSpinner.setValue(34);
             radiusSpinner.setValue(600);
             eventBus.post(new PrepareSimulationEvent(52.23682, 21.01681,
-                    600));
+                    600, configContainer.shouldGeneratePedestriansAndBuses()));
         });
 
         testBusZoneButton.addActionListener(e -> {
@@ -163,8 +160,8 @@ public class MapWindow {
             if (!configContainer.shouldGeneratePedestriansAndBuses()) {
                 logger.warn("Pedestrians won't be generated");
             }
-            eventBus.post(new PrepareSimulationEvent(52.237037, 21.017928,
-                    190));
+            eventBus.post(new PrepareSimulationEvent(52.203342, 20.861213,
+                    300, configContainer.shouldGeneratePedestriansAndBuses()));
         });
 
         setTimeSpinner.setModel(new SpinnerDateModel());
@@ -212,8 +209,12 @@ public class MapWindow {
 
         MapPanel.add(MapViewer);
         MapPanel.revalidate();
-        StartRouteButton.addActionListener(e -> eventBus.post(new StartSimulationEvent((int) carLimitSpinner.getValue(),
-                (int) testCarIdSpinner.getValue())));
+        StartRouteButton.addActionListener(e -> eventBus.post(new StartSimulationEvent(configContainer.shouldGenerateCars(), (int) carLimitSpinner.getValue(),
+                (int) testCarIdSpinner.getValue(),
+                configContainer.shouldGenerateConstructionSites(), 5000, 20, 5,
+                ((Date) setTimeSpinner.getValue()).toInstant()
+                        .atZone(ZoneId.systemDefault())
+                        .toLocalDateTime(), true, 30, true, 60, true)));
         refreshTimer.scheduleAtFixedRate(new RefreshTask(), 0, REFRESH_MAP_INTERVAL_MILLISECONDS);
     }
 
@@ -247,13 +248,6 @@ public class MapWindow {
         ResultTimeLabel.setVisible(true);
         ResultTimeTitle.setVisible(true);
         random.setSeed(getSeed());
-
-        // TODO: This time will be received from web-gui and set via event
-        var simulationTime = ((Date) setTimeSpinner.getValue()).toInstant().atZone(ZoneId.systemDefault())
-                .toLocalDateTime();
-        timeProvider.setSimulationStartTime(simulationTime);
-        // TODO: Temporary until not set from web-gui and
-        eventBus.post(new StartTimeEvent(System.nanoTime()));
     }
 
     private int getZoneRadius() {
@@ -315,7 +309,8 @@ public class MapWindow {
             double lng = 21.017934679985046;
             mapViewer.setAddressLocation(new GeoPosition(lat, lng));
             mapViewer.setZoom(1);
-            eventBus.post(new PrepareSimulationEvent(lat, lng, 100));
+            eventBus.post(new PrepareSimulationEvent(lat, lng, 100, configContainer.shouldGeneratePedestriansAndBuses()
+            ));
 
             simulationReadyCallback = () -> {
                 IGeoPosition N = Position.of(52.23758683540269, 21.017720103263855);
@@ -385,11 +380,11 @@ public class MapWindow {
     }
 
     private int getCarLimit() {
-        return configContainer.getCarsNumber();
+        return 8;
     }
 
     private int getTestCarId() {
-        return configContainer.getTestCarId();
+        return 4;
     }
 
     private int getSeed() {

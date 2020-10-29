@@ -17,12 +17,22 @@ import {
   PEDESTRIAN_PUSHED,
   PEDESTRIAN_PULLED,
   PEDESTRIAN_KILLED,
+  TROUBLE_POINT_VANISHED,
+  START_SIMULATION_DATA_UPDATED,
+  SHOULD_START_SIMULATION,
+  GENERATE_PEDESTRIANS_UPDATED,
 } from "./constants";
 
 /**
  * @param {{ lat: number; lng:number; rad:number }} center
  */
 export const centerUpdated = createAction(CENTER_UPDATED);
+
+export const startSimulationDataUpdated = createAction(START_SIMULATION_DATA_UPDATED);
+
+export const shouldStartSimulation = createAction(SHOULD_START_SIMULATION);
+
+export const generatePedestriansUpdated = createAction(GENERATE_PEDESTRIANS_UPDATED);
 
 export const simulationPrepared = createAction(
   SIMULATION_PREPARED,
@@ -51,6 +61,7 @@ export const carRouteChanged = createAction(CAR_ROUTE_CHANGED);
 
 export const lightsSwitched = createAction(LIGHTS_SWITCHED);
 export const troublePointCreated = createAction(TROUBLE_POINT_CREATED);
+export const troublePointVanished = createAction(TROUBLE_POINT_VANISHED);
 
 export const busUpdated = createAction(BUS_UPDATED);
 export const busFillStateUpdated = createAction(BUS_FILL_STATE_UPDATED);

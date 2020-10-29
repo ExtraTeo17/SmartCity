@@ -1,7 +1,7 @@
 package events.web.bus;
 
-public class BusAgentDeadEvent {
-    public final int id;
+import events.web.abstractions.AbstractAgentDeadEvent;
 
-    public BusAgentDeadEvent(int id) {this.id = id;}
+public class BusAgentDeadEvent extends AbstractAgentDeadEvent {
+    public BusAgentDeadEvent(int id) {super(id);}
 }

@@ -7,7 +7,6 @@ import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
 import com.google.inject.Inject;
 import events.ClearSimulationEvent;
-import events.StartTimeEvent;
 import events.SwitchLightsStartEvent;
 import events.web.SimulationStartedEvent;
 import events.web.StartSimulationEvent;
@@ -35,17 +34,27 @@ public class Scheduler {
     @SuppressWarnings("FeatureEnvy")
     @Subscribe
     public void handle(StartSimulationEvent e) {
+        configContainer.setExtendLightTime(e.extendLightTime);
+        configContainer.setLightStrategyActive(e.lightStrategyActive);
+
         activateLightManagerAgents();
-        if (configContainer.shouldGenerateCars()) {
+        if (e.shouldGenerateCars) {
+            configContainer.setShouldGenerateConstructionSites(e.shouldGenerateTroublePoints);
+            configContainer.setTimeBeforeTrouble(e.timeBeforeTrouble);
+            configContainer.setChangeRouteStrategyActive(e.changeRouteStrategyActive);
             taskManager.scheduleCarCreation(e.carsNum, e.testCarId);
         }
         if (configContainer.shouldGeneratePedestriansAndBuses()) {
-            // TODO: Add pedestrians limit and testPedestrianID
-            taskManager.schedulePedestrianCreation(50, e.testCarId);
+            configContainer.setStationStrategyActive(e.stationStrategyActive);
+            configContainer.setExtendWaitTime(e.extendWaitTime);
+
+            taskManager.schedulePedestrianCreation(e.pedestriansLimit, e.testPedestrianId);
             taskManager.scheduleBusControl(() -> configContainer.getSimulationState() == SimulationState.RUNNING);
         }
 
         configContainer.setSimulationState(SimulationState.RUNNING);
+        taskManager.scheduleSimulationControl(() -> configContainer.getSimulationState() == SimulationState.RUNNING,
+                e.startTime);
         eventBus.post(new SimulationStartedEvent());
     }
 
@@ -59,13 +68,7 @@ public class Scheduler {
     }
 
     @Subscribe
-    public void handle(StartTimeEvent e) {
-        taskManager.scheduleSimulationControl(() -> configContainer.getSimulationState() == SimulationState.RUNNING,
-                e.timePosted);
-    }
-
-    @Subscribe
-    public void handle(ClearSimulationEvent e){
+    public void handle(ClearSimulationEvent e) {
         taskManager.cancelAll();
     }
 }

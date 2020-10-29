@@ -1,7 +1,11 @@
 package events.web.vehicle;
 
-public class VehicleAgentDeadEvent {
-    public final int id;
+import events.web.abstractions.AbstractAgentDeadWithTravelDataEvent;
 
-    public VehicleAgentDeadEvent(int id) {this.id = id;}
+import javax.annotation.Nullable;
+
+public class VehicleAgentDeadEvent extends AbstractAgentDeadWithTravelDataEvent {
+    public VehicleAgentDeadEvent(int id, int travelDistance, @Nullable Long travelTime) {
+        super(id, travelDistance, travelTime);
+    }
 }

@@ -46,6 +46,8 @@ public abstract class MovingObject {
         this.state = DrivingState.STARTING;
     }
 
+    public abstract String getVehicleType();
+
 
     public int getMoveIndex(){return moveIndex;}
 
@@ -81,7 +83,7 @@ public abstract class MovingObject {
     public IGeoPosition getEndPosition() {
         return uniformRoute.get(uniformRoute.size() - 1);
     }
-    
+
     public IGeoPosition getPositionOnIndex(int index) {
         if (index >= uniformRoute.size()) {
             return uniformRoute.get(uniformRoute.size() - 1);
@@ -90,7 +92,7 @@ public abstract class MovingObject {
         return uniformRoute.get(index);
     }
 
-    //TODO: RETURN TO NORMAL  return uniformRoute.get(moveIndex-1);
+//TODO: RETURN TO NORMAL  return uniformRoute.get(moveIndex-1);
     public RouteNode getRouteNodeBeforeLight() {
         if (moveIndex - 1 <= 0 ) {
             return uniformRoute.get(0);
@@ -102,7 +104,7 @@ public abstract class MovingObject {
     }
 
     public IGeoPosition getPosition() {
-    	return getPositionOnIndex(moveIndex);
+        return getPositionOnIndex(moveIndex);
     }
 
     public IGeoPosition getPositionFarOnIndex(int index) {
@@ -119,6 +121,7 @@ public abstract class MovingObject {
 
     /**
      * Checks whether an edge exists on the uniformRoute
+     *
      * @param ID of the edge checked for existence
      * @return Index of the RouteNode on uniformRoute
      * which contains the edge if edge is found, otherwise null
@@ -134,10 +137,9 @@ public abstract class MovingObject {
         return null;
     }
 
-
     public List<RouteNode> getUniformRoute() { return new ArrayList<>(uniformRoute); }
 
-    public abstract String getVehicleType();
+    public int getUniformRouteSize() {return uniformRoute.size();}
 
     public LightManagerNode switchToNextTrafficLight() {
     	logger.debug("Switch to next traffic light");
@@ -154,7 +156,7 @@ public abstract class MovingObject {
         closestLightIndex = Integer.MAX_VALUE;
         return null;
     }
-    
+
 	private void displayRouteDebug(List<RouteNode> route) {
 		logger.debug("Display route debug of size: " + route.size());
 		StringBuilder builder = new StringBuilder();
@@ -180,16 +182,21 @@ public abstract class MovingObject {
         return (LightManagerNode) (uniformRoute.get(closestLightIndex));
     }
 
+    // TODO: Sometimes index goes to 0
     public long getAdjacentOsmWayId(int indexFar) {
         int index = moveIndex + indexFar;
-        while (!(uniformRoute.get(index) instanceof LightManagerNode)) {
+        while (index >= 0 && !(uniformRoute.get(index) instanceof LightManagerNode)) {
             --index;
+        }
+
+        if (index < 0) {
+            return -1;
         }
 
         return ((LightManagerNode) uniformRoute.get(index)).getAdjacentWayId();
     }
 
-    public long getAdjacentOsmWayId(){
+    public long getAdjacentOsmWayId() {
         return getAdjacentOsmWayId(0);
     }
 
@@ -212,10 +219,10 @@ public abstract class MovingObject {
     public int getMillisecondsFromAToB(int startIndex, int finishIndex) {
         return ((finishIndex - startIndex) * RoutingConstants.STEP_CONSTANT) / getSpeed();
     }
+
     public List<RouteNode> getSimpleRoute() { return simpleRoute; }
 
-	public boolean currentTrafficLightNodeWithinAlternativeRouteThreshold(int thresholdUntilIndexChange) {
-		return moveIndex + thresholdUntilIndexChange >= closestLightIndex;
-	}
-
+    public boolean currentTrafficLightNodeWithinAlternativeRouteThreshold(int thresholdUntilIndexChange) {
+        return moveIndex + thresholdUntilIndexChange >= closestLightIndex;
+    }
 }

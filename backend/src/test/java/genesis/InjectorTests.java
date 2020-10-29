@@ -7,12 +7,19 @@ import com.google.common.eventbus.Subscribe;
 import com.google.inject.Binder;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
-import com.google.inject.Singleton;
-import events.*;
+import events.ClearSimulationEvent;
+import events.LightManagersReadyEvent;
+import events.SwitchLightsStartEvent;
 import events.web.*;
-import events.web.bus.*;
+import events.web.bus.BusAgentDeadEvent;
+import events.web.bus.BusAgentFillStateUpdatedEvent;
+import events.web.bus.BusAgentStartedEvent;
+import events.web.bus.BusAgentUpdatedEvent;
 import events.web.pedestrian.*;
-import events.web.vehicle.*;
+import events.web.vehicle.VehicleAgentCreatedEvent;
+import events.web.vehicle.VehicleAgentDeadEvent;
+import events.web.vehicle.VehicleAgentRouteChangedEvent;
+import events.web.vehicle.VehicleAgentUpdatedEvent;
 import gui.MapWindow;
 import jade.wrapper.ContainerController;
 import jade.wrapper.StaleProxyException;
@@ -26,6 +33,7 @@ import smartcity.lights.core.LightsModule;
 import testutils.ReflectionHelper;
 import web.WebModule;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -45,13 +53,6 @@ class InjectorTests {
                         new SharedModule(),
                         new LightsModule(),
                         new AgentsModule(),
-                        new AbstractModule() {
-                            @Override
-                            public void configure(Binder binder) {
-                                super.configure(binder);
-                                binder.bind(MapWindow.class).toInstance(mock(MapWindow.class));
-                            }
-                        },
                         new WebModule(4002),
                         new BusModule(),
                         new OsmModule(),
@@ -89,13 +90,13 @@ class InjectorTests {
         // Some events will throw but we are testing handle-invoke
 
         //  Simulation-related
-        eventBus.post(new PrepareSimulationEvent(null));
+        eventBus.post(new PrepareSimulationEvent(null, false));
         eventBus.post(new LightManagersReadyEvent(null));
         eventBus.post(new SimulationPreparedEvent(new ArrayList<>(), new ArrayList<>(), new ArrayList<>()));
         eventBus.post("Test"); // Dead event
-        eventBus.post(new StartSimulationEvent(0, 0));
+        eventBus.post(new StartSimulationEvent(false, 0, 0, false,
+                5000, 0, 1, LocalDateTime.now(), false, 30, false, 60, false));
         eventBus.post(new SimulationStartedEvent());
-        eventBus.post(new StartTimeEvent(0));
         eventBus.post(new ClearSimulationEvent());
 
         // other
@@ -106,7 +107,7 @@ class InjectorTests {
         eventBus.post(new VehicleAgentCreatedEvent(1, null, null, false));
         eventBus.post(new VehicleAgentUpdatedEvent(1, null));
         eventBus.post(new VehicleAgentRouteChangedEvent(1, new ArrayList<>(), null, new ArrayList<>()));
-        eventBus.post(new VehicleAgentDeadEvent(1));
+        eventBus.post(new VehicleAgentDeadEvent(1, 0, null));
 
         eventBus.post("Test"); // Dead event
 
@@ -122,7 +123,7 @@ class InjectorTests {
         eventBus.post(new PedestrianAgentUpdatedEvent(1, null));
         eventBus.post(new PedestrianAgentEnteredBusEvent(1));
         eventBus.post(new PedestrianAgentLeftBusEvent(1, null));
-        eventBus.post(new PedestrianAgentDeadEvent(1));
+        eventBus.post(new PedestrianAgentDeadEvent(1, 0, null));
 
         int expectedDeadEvents = 3;
         assertEquals(expectedDeadEvents, counter.get(), "All events should be handled somewhere");

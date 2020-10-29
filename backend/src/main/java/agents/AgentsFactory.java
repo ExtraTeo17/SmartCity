@@ -30,9 +30,7 @@ class AgentsFactory implements IAgentsFactory {
     private final IRouteGenerator routeGenerator;
     private final ICrossroadFactory crossroadFactory;
     private final EventBus eventBus;
-	private final ConfigContainer configContainer;
-    //TODO: GET from GUI;
-    private final int timeBeforeTrouble = 5000;
+    private final ConfigContainer configContainer;
 
     @Inject
     public AgentsFactory(IdGenerator idGenerator,
@@ -61,8 +59,8 @@ class AgentsFactory implements IAgentsFactory {
             car = new TestCar(car, timeProvider);
         }
 
-        return new VehicleAgent(id, car, timeBeforeTrouble, timeProvider,
-        		routeGenerator, routeTransformer, eventBus, configContainer);
+        return new VehicleAgent(id, car, timeProvider,
+                routeGenerator, routeTransformer, eventBus, configContainer);
     }
 
     @Override
@@ -73,7 +71,7 @@ class AgentsFactory implements IAgentsFactory {
     @Override
     public StationAgent create(OSMStation station) {
         var id = idGenerator.get(StationAgent.class);
-        var stationStrategy = new StationStrategy(id);
+        var stationStrategy = new StationStrategy(id, configContainer);
         return new StationAgent(id, station, stationStrategy, timeProvider, eventBus);
     }
 

@@ -1,100 +1,54 @@
-import { BusFillState } from "../../components/Models/BusFillState";
+import { notify } from "react-notify-toast";
+import { NOTIFY_SHOW_MS } from "../../constants/global";
 import { LightColor } from "../../components/Models/LightColor";
+import { getResultObj } from "../dataUtils/helpers";
 import {
-  CAR_KILLED,
-  CAR_CREATED,
-  CAR_UPDATED,
   SIMULATION_PREPARED,
   LIGHTS_SWITCHED,
   TROUBLE_POINT_CREATED,
   SIMULATION_STARTED,
-  CAR_ROUTE_CHANGED,
-  BUS_UPDATED,
-  BUS_FILL_STATE_UPDATED,
-  BUS_KILLED,
-  PEDESTRIAN_CREATED,
-  PEDESTRIAN_UPDATED,
+  TROUBLE_POINT_VANISHED,
+  CAR_KILLED,
   PEDESTRIAN_KILLED,
-  PEDESTRIAN_PUSHED,
-  PEDESTRIAN_PULLED,
-} from "../constants";
+} from "../core/constants";
 
 // Just for reference - defined in store.js
 const initialState = {
   lights: [],
-  cars: [],
   stations: [],
-  buses: [],
-  pedestrians: [],
   troublePoints: [],
-  wasPrepared: false,
+  wasPrepared: 0,
   wasStarted: false,
+  timeScale: 10,
+  timeResults: [],
 };
 
-const deletedCarIds = [];
-const deletedBusIds = [];
-const deletedPedestrianIds = [];
+function onKilled(state, data, type) {
+  if (data.travelTime) {
+    notify.show(`New result for ${type}!`, "success", NOTIFY_SHOW_MS);
+    const resultObj = getResultObj(type, data);
+    return { ...state, timeResults: [...state.timeResults, resultObj] };
+  }
+
+  return state;
+}
 
 const message = (state = initialState, action) => {
-  const { payload } = action;
   switch (action.type) {
     case SIMULATION_PREPARED: {
-      const { lights, stations, buses } = action.payload;
+      const { lights, stations } = action.payload;
       return {
         ...state,
         lights,
         stations,
-        buses,
-        wasPrepared: true,
+        wasPrepared: state.wasPrepared + 1,
+        wasStarted: false,
       };
     }
 
     case SIMULATION_STARTED: {
-      return { ...state, wasStarted: true };
-    }
-
-    case CAR_CREATED: {
-      const { car } = action.payload;
-      return { ...state, cars: [...state.cars, car] };
-    }
-
-    case CAR_UPDATED: {
-      const car = action.payload;
-
-      let unrecognized = true;
-      const newCars = state.cars.map(c => {
-        if (c.id === car.id) {
-          unrecognized = false;
-          return { ...c, location: car.location };
-        }
-        return c;
-      });
-
-      if (unrecognized === true && !deletedCarIds.includes(car.id)) {
-        newCars.push(car);
-      }
-
-      return { ...state, cars: newCars };
-    }
-
-    case CAR_KILLED: {
-      const id = action.payload;
-      const newCars = state.cars.filter(c => c.id !== id);
-      deletedCarIds.push(id);
-
-      return { ...state, cars: newCars };
-    }
-
-    case CAR_ROUTE_CHANGED: {
-      const { id, routeStart, routeEnd, location } = payload;
-      const newCars = state.cars.map(c => {
-        if (c.id === id) {
-          return { ...c, route: [...routeStart, ...routeEnd], routeChangePoint: location };
-        }
-        return c;
-      });
-
-      return { ...state, cars: newCars };
+      const timeScale = action.payload;
+      return { ...state, wasStarted: true, timeScale };
     }
 
     case LIGHTS_SWITCHED: {
@@ -120,102 +74,18 @@ const message = (state = initialState, action) => {
       return { ...state, troublePoints: [...state.troublePoints, troublePoint] };
     }
 
-    case BUS_UPDATED: {
-      const bus = action.payload;
+    case TROUBLE_POINT_VANISHED: {
+      const id = action.payload;
 
-      let unrecognized = true;
-      const newBuses = state.buses.map(b => {
-        if (b.id === bus.id) {
-          unrecognized = false;
-          return { ...b, location: bus.location };
-        }
-        return b;
-      });
-
-      if (unrecognized === true && !deletedBusIds.includes(bus.id)) {
-        newBuses.push({ ...bus, fillState: BusFillState.LOW });
-      }
-
-      return { ...state, buses: newBuses };
+      console.log(`Handling tp-hide: ${id}`);
+      return { ...state, troublePoints: state.troublePoints.filter(tp => tp.id !== id) };
     }
 
-    case BUS_FILL_STATE_UPDATED: {
-      const busData = payload;
-      console.groupCollapsed(`Update bus fill-${busData.id}`);
-      console.info(busData);
-      console.groupEnd();
-      const newBuses = state.buses.map(b => {
-        if (b.id === busData.id) {
-          return { ...b, fillState: busData.fillState };
-        }
-        return b;
-      });
-
-      return { ...state, buses: newBuses };
+    case CAR_KILLED: {
+      return onKilled(state, action.payload, "Car");
     }
-
-    case BUS_KILLED: {
-      console.info(`Killed bus: ${payload}`);
-      const id = payload;
-      const newBuses = state.buses.filter(b => b.id !== id);
-      deletedBusIds.push(id);
-
-      return { ...state, buses: newBuses };
-    }
-
-    case PEDESTRIAN_CREATED: {
-      const pedestrian = { ...payload, route: payload.routeToStation };
-      return { ...state, pedestrians: [...state.pedestrians, pedestrian] };
-    }
-
-    case PEDESTRIAN_UPDATED: {
-      const ped = payload;
-
-      const newPedestrians = state.pedestrians.map(p => {
-        if (p.id === ped.id) {
-          return { ...p, location: ped.location };
-        }
-        return p;
-      });
-
-      return { ...state, pedestrians: newPedestrians };
-    }
-
-    case PEDESTRIAN_PUSHED: {
-      const id = payload;
-      const newPedestrians = state.pedestrians.map(p => {
-        if (p.id === id) {
-          return { ...p, hidden: true };
-        }
-        return p;
-      });
-
-      return { ...state, pedestrians: newPedestrians };
-    }
-
-    case PEDESTRIAN_PULLED: {
-      const pedData = payload;
-      if (deletedPedestrianIds.includes(pedData.id)) {
-        return state;
-      }
-
-      const newPedestrians = state.pedestrians.map(p => {
-        if (p.id === pedData.id) {
-          return { ...p, location: pedData.location, hidden: false, route: p.routeFromStation };
-        }
-        return p;
-      });
-
-      return { ...state, pedestrians: newPedestrians };
-    }
-
     case PEDESTRIAN_KILLED: {
-      const id = payload;
-
-      const newPedestrians = state.pedestrians.filter(p => p.id !== id);
-      deletedPedestrianIds.push(id);
-
-      return { ...state, pedestrians: newPedestrians };
+      return onKilled(state, action.payload, "Pedestrian");
     }
 
     default:

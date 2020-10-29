@@ -13,4 +13,18 @@ public interface ITimeProvider {
     long getTicks();
 
     Runnable getUpdateTimeTask(long initialTicks);
+
+    default Runnable getUpdateTimeTask() {
+        return getUpdateTimeTask(0);
+    }
+
+    default Runnable getUpdateTimeTask(LocalDateTime simulationStartTime){
+        setSimulationStartTime(simulationStartTime);
+        return getUpdateTimeTask();
+    }
+
+    default Runnable getUpdateTimeTask(LocalDateTime simulationStartTime, long initialTicks){
+        setSimulationStartTime(simulationStartTime);
+        return getUpdateTimeTask(initialTicks);
+    }
 }

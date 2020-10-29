@@ -1,13 +1,20 @@
 package web.serialization;
 
 
-import smartcity.lights.LightColor;
+import events.web.PrepareSimulationEvent;
+import events.web.StartSimulationEvent;
 import osmproxy.elements.OSMNode;
 import routing.core.IGeoPosition;
+import smartcity.TimeProvider;
+import smartcity.lights.LightColor;
 import smartcity.lights.core.Light;
 import vehicles.Bus;
 import vehicles.enums.BusFillState;
 import web.message.payloads.models.*;
+import web.message.payloads.requests.PrepareSimulationRequest;
+import web.message.payloads.requests.StartSimulationRequest;
+
+import java.util.Objects;
 
 public class Converter {
     public static Location convert(IGeoPosition geoPosition) {
@@ -15,11 +22,12 @@ public class Converter {
     }
 
     public static LightDto convert(Light light) {
+        var id = Objects.hash(light.getAdjacentWayId(), light.getOsmLightId());
         var lightGroupId = light.getOsmLightId();
         var location = convert((IGeoPosition) light);
         var color = light.isGreen() ? LightColorDto.GREEN : LightColorDto.RED;
 
-        return new LightDto(lightGroupId, location, color);
+        return new LightDto(id, lightGroupId, location, color);
     }
 
     public static LightColorDto convert(LightColor lightColor) {
@@ -52,5 +60,24 @@ public class Converter {
             case MID -> BusFillStateDto.MID;
             case HIGH -> BusFillStateDto.HIGH;
         };
+    }
+
+    public static PrepareSimulationEvent convert(PrepareSimulationRequest req) {
+
+        return new PrepareSimulationEvent(req.latitude, req.longitude, req.radius,
+                req.generatePedestrians);
+    }
+
+    public static StartSimulationEvent convert(StartSimulationRequest req) {
+        var timeLocal = TimeProvider.convertFromUtcToLocal(req.startTime).toLocalDateTime();
+
+        return new StartSimulationEvent(req.generateCars, req.carsLimit,
+                req.testCarId,
+                req.generateTroublePoints, req.timeBeforeTrouble,
+                req.pedestriansLimit, req.testPedestrianId,
+                timeLocal,
+                req.lightStrategyActive, req.extendLightTime,
+                req.stationStrategyActive, req.extendWaitTime,
+                req.changeRouteStrategyActive);
     }
 }

@@ -7,6 +7,7 @@ import {
   KILL_CAR_INFO,
   SWITCH_LIGHTS_INFO,
   CREATE_TROUBLE_POINT_INFO,
+  HIDE_TROUBLE_POINT_INFO,
   UPDATE_CAR_ROUTE_INFO,
   UPDATE_BUS_INFO,
   UPDATE_BUS_FILL_STATE_INFO,
@@ -17,7 +18,7 @@ import {
   PULL_PEDESTRIAN_FROM_BUS_INFO,
   KILL_PEDESTRIAN_INFO,
 } from "./MessageType";
-import { NOTIFY_SHOW_MS } from "../utils/constants";
+import { NOTIFY_SHOW_MS } from "../constants/global";
 import Dispatcher from "../redux/Dispatcher";
 import { BusFillState } from "../components/Models/BusFillState";
 
@@ -50,7 +51,7 @@ export default {
         break;
 
       case KILL_CAR_INFO:
-        Dispatcher.killCar(payload.id);
+        Dispatcher.killCar(payload);
         break;
 
       case UPDATE_CAR_ROUTE_INFO:
@@ -64,6 +65,11 @@ export default {
 
       case CREATE_TROUBLE_POINT_INFO: {
         Dispatcher.createTroublePoint(payload);
+        break;
+      }
+
+      case HIDE_TROUBLE_POINT_INFO: {
+        Dispatcher.hideTroublePoint(payload.id);
         break;
       }
 
@@ -106,7 +112,7 @@ export default {
       }
 
       case KILL_PEDESTRIAN_INFO: {
-        Dispatcher.killPedestrian(payload.id);
+        Dispatcher.killPedestrian(payload);
         break;
       }
 

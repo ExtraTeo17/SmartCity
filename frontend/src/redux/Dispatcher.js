@@ -7,6 +7,7 @@ import {
   carKilled,
   lightsSwitched,
   troublePointCreated,
+  troublePointVanished,
   simulationStarted,
   carRouteChanged,
   busUpdated,
@@ -17,7 +18,7 @@ import {
   pedestrianPushedIntoBus,
   pedestrianPulledFromBus,
   pedestrianKilled,
-} from "./actions";
+} from "./core/actions";
 
 const fps = 15;
 const fpsInterval = 1000 / fps;
@@ -66,7 +67,13 @@ function update(now) {
   window.requestAnimationFrame(update);
 }
 
+let localWasPrepared = false;
+
 function onDetectStartedSimulation() {
+  if (localWasPrepared === true) {
+    return;
+  }
+
   batch(() => {
     // eslint-disable-next-line no-use-before-define
     Dispatcher.prepareSimulation([], [], []);
@@ -77,13 +84,15 @@ function onDetectStartedSimulation() {
 
 const Dispatcher = {
   prepareSimulation(lights, stations, buses) {
+    localWasPrepared = true;
     dispatch(simulationPrepared({ lights, stations, buses }));
   },
 
   startSimulation(newTimeScale) {
+    localWasPrepared = false;
     timeScale = newTimeScale;
     timer = update(window.performance.now());
-    dispatch(simulationStarted());
+    dispatch(simulationStarted(timeScale));
   },
 
   createCar(car) {
@@ -97,8 +106,8 @@ const Dispatcher = {
     carUpdateQueue.set(car.id, carUpdated(car));
   },
 
-  killCar(id) {
-    dispatch(carKilled(id));
+  killCar(data) {
+    dispatch(carKilled(data));
   },
 
   updateCarRoute(routeInfo) {
@@ -116,6 +125,10 @@ const Dispatcher = {
 
   createTroublePoint(troublePoint) {
     dispatch(troublePointCreated(troublePoint));
+  },
+
+  hideTroublePoint(id) {
+    dispatch(troublePointVanished(id));
   },
 
   updateBus(bus) {
@@ -153,8 +166,8 @@ const Dispatcher = {
     pullKillPedQueue.push(pedestrianPulledFromBus(pedData));
   },
 
-  killPedestrian(id) {
-    pullKillPedQueue.push(pedestrianKilled(id));
+  killPedestrian(pedData) {
+    pullKillPedQueue.push(pedestrianKilled(pedData));
   },
 };
 

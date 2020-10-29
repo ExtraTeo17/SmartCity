@@ -32,7 +32,7 @@ public class PedestrianAgent extends AbstractAgent {
                     Pedestrian pedestrian,
                     ITimeProvider timeProvider,
                     EventBus eventBus) {
-        super(agentId, name, timeProvider, eventBus);
+        super(agentId, pedestrian.getVehicleType(), timeProvider, eventBus);
         this.pedestrian = pedestrian;
     }
 

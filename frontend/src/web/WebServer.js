@@ -1,16 +1,18 @@
 import { notify } from "react-notify-toast";
-import { SERVER_ADDRESS, RECONNECT_INTERVAL_SEC, NOTIFY_SHOW_MS } from "../utils/constants";
+import { SERVER_ADDRESS, RECONNECT_INTERVAL_SEC, NOTIFY_SHOW_MS } from "../constants/global";
 import MessageHandler from "./MessageHandler";
 
 const socketContainer = {
   socket: {},
+  reconnecting: false,
 };
 
 const createSocket = () => {
   const socket = new WebSocket(SERVER_ADDRESS);
   socket.onopen = () => {
     console.info("Connected !!!");
-
+    socketContainer.reconnecting = false;
+    notify.hide();
     notify.show("Sucessfully connected", "success", NOTIFY_SHOW_MS);
   };
 
@@ -30,15 +32,21 @@ const createSocket = () => {
     console.groupEnd();
   }
 
-  socket.onerror = err => {
-    console.error("Socket encountered error: ", err, "Closing socket");
+  socket.onerror = () => {
+    if (!socketContainer.reconnecting) {
+      console.error("Socket encountered error: ", "Closing socket");
+    }
     socket.close();
   };
 
   socket.onclose = e => {
-    console.warn(`Socket is closed. Reconnect will be attempted in ${RECONNECT_INTERVAL_SEC} seconds`, e.reason);
-    notify.show("Error encountered, trying to reconnect...", "error", RECONNECT_INTERVAL_SEC * 1000);
+    if (!socketContainer.reconnecting) {
+      console.warn(`Socket is closed. Reconnect will be attempted in ${RECONNECT_INTERVAL_SEC} seconds`, e.reason);
+      notify.show("Error encountered, trying to reconnect...", "error", -1);
+    }
+
     setTimeout(() => {
+      socketContainer.reconnecting = true;
       socketContainer.socket = createSocket();
     }, RECONNECT_INTERVAL_SEC * 1000);
   };

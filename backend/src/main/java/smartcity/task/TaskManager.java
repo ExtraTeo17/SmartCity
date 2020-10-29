@@ -15,6 +15,7 @@ import smartcity.task.abstractions.ITaskManager;
 import smartcity.task.abstractions.ITaskProvider;
 import smartcity.task.runnable.abstractions.IRunnableFactory;
 
+import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.Optional;
 import java.util.Random;
@@ -75,9 +76,13 @@ public class TaskManager implements ITaskManager {
                 return;
             }
             var busAgent = busAgentOpt.get();
-            var stations = busAgent.getTwoSubsequentStations(random);
+            var stationsOpt = busAgent.getTwoSubsequentStations(random);
+            if (stationsOpt.isEmpty()) {
+                logger.warn("Failed to get stations for pedestrian");
+                return;
+            }
 
-            // TODO: Move more logic here
+            var stations = stationsOpt.get();
             taskProvider.getCreatePedestrianTask(stations.first, stations.second, busAgent.getLine(),
                     runCount == testPedestrianId).run();
         };
@@ -102,8 +107,8 @@ public class TaskManager implements ITaskManager {
     }
 
     @Override
-    public void scheduleSimulationControl(BooleanSupplier testSimulationState, long nanoStartTime) {
-        var simulationControlTask = taskProvider.getSimulationControlTask(nanoStartTime);
+    public void scheduleSimulationControl(BooleanSupplier testSimulationState, LocalDateTime simulationStartTime) {
+        var simulationControlTask = taskProvider.getSimulationControlTask(simulationStartTime);
         runWhile(testSimulationState, simulationControlTask, TimeProvider.MS_PER_TICK);
     }
 

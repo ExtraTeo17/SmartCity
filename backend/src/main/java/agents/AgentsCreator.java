@@ -74,12 +74,14 @@ public class AgentsCreator {
     @SuppressWarnings("FeatureEnvy")
     @Subscribe
     public void handle(PrepareSimulationEvent e) {
-        logger.info("Set zone event occurred: " + e.toString());
+        logger.info(PrepareSimulationEvent.class.getSimpleName() + " event occurred: " + e.toString());
         var state = configContainer.getSimulationState();
         if (state == SimulationState.READY_TO_RUN || state == SimulationState.RUNNING) {
             clear();
         }
+
         configContainer.setZone(e.zone);
+        configContainer.setGeneratePedestriansAndBuses(e.shouldGeneratePedestriansAndBuses);
         configContainer.setSimulationState(SimulationState.IN_PREPARATION);
 
         if (prepareAgents()) {
@@ -96,7 +98,6 @@ public class AgentsCreator {
         }
     }
 
-    // TODO: Send clearSimulationEvent and handle simulationClearedEvent to continue - tasks should be cancelled
     private void clear() {
         eventBus.post(new ClearSimulationEvent());
         agentsContainer.clearAll();

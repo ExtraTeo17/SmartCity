@@ -24,6 +24,7 @@ import vehicles.enums.DrivingState;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 import java.util.Random;
 
 import static agents.message.MessageManager.createMessage;
@@ -294,11 +295,15 @@ public class BusAgent extends AbstractAgent {
     }
 
     // TODO: Fix situation where bus route contains only one station and pedestrians tries to choose two
-    public final Siblings<StationNode> getTwoSubsequentStations(final Random random) {
+    public final Optional<Siblings<StationNode>> getTwoSubsequentStations(final Random random) {
         List<StationNode> stationsOnRoute = bus.getStationNodesOnRoute();
-        final int halfIndex = stationsOnRoute.size() / 2;
-        return Siblings.of(stationsOnRoute.get(random.nextInt(halfIndex)),
-                stationsOnRoute.get(halfIndex + random.nextInt(halfIndex)));
+        int halfIndex = stationsOnRoute.size() / 2;
+        if(halfIndex < 1){
+            return Optional.empty();
+        }
+
+        return Optional.of(Siblings.of(stationsOnRoute.get(random.nextInt(halfIndex)),
+                stationsOnRoute.get(halfIndex + random.nextInt(halfIndex))));
     }
 
     /**

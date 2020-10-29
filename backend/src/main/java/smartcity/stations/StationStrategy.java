@@ -2,6 +2,7 @@ package smartcity.stations;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import smartcity.config.abstractions.IStationConfigContainer;
 import smartcity.lights.OptimizationResult;
 
 import java.time.LocalDateTime;
@@ -13,12 +14,14 @@ import java.util.stream.Collectors;
 
 @SuppressWarnings("UnusedReturnValue")
 public class StationStrategy {
-    private final static boolean SHOULD_USE_STRATEGY = true;
-    private final static int WAIT_PERIOD_SECONDS = 60;
     private final Logger logger;
+    private final int waitPeriodSeconds;
+    private final IStationConfigContainer configContainer;
 
-    public StationStrategy(int managerId) {
+    public StationStrategy(int managerId, IStationConfigContainer configContainer) {
         this.logger = LoggerFactory.getLogger(this.getClass().getSimpleName() + managerId);
+        this.waitPeriodSeconds = configContainer.getExtendWaitTime();
+        this.configContainer = configContainer;
     }
 
     // AgentName - Schedule Arrival Time / Arrival Time
@@ -90,8 +93,8 @@ public class StationStrategy {
             var scheduledArrival = entry.getValue();
 
             var scheduledTime = scheduledArrival.scheduled;
-            var scheduledTimePlusWait = scheduledTime.plusSeconds(WAIT_PERIOD_SECONDS);
-            var scheduledTimeMinusWait = scheduledTime.minusSeconds(WAIT_PERIOD_SECONDS);
+            var scheduledTimePlusWait = scheduledTime.plusSeconds(waitPeriodSeconds);
+            var scheduledTimeMinusWait = scheduledTime.minusSeconds(waitPeriodSeconds);
             var actualTime = scheduledArrival.actual;
 
             if (actualTime.isAfter(scheduledTimePlusWait)) {
@@ -103,8 +106,8 @@ public class StationStrategy {
                     actualTime.isBefore(scheduledTimePlusWait)) {
                 logger.debug("------------------BUS WAS ON TIME-----------------------");
                 List<String> passengersThatCanLeave = getPassengersWhoAreReadyToGo(busLine);
-                if (SHOULD_USE_STRATEGY) {
-                    var farPassengers = getPassengersWhoAreFar(busLine, scheduledTime.plusSeconds(WAIT_PERIOD_SECONDS));
+                if (configContainer.isStationStrategyActive()) {
+                    var farPassengers = getPassengersWhoAreFar(busLine, scheduledTime.plusSeconds(waitPeriodSeconds));
                     passengersThatCanLeave.addAll(farPassengers);
                     logger.debug("-----------------WAITING FOR: " + farPassengers.size() + " PASSENGERS------------------");
                 }

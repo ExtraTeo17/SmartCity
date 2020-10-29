@@ -3,31 +3,25 @@ import { Circle, Map as LeafletMap, Marker, Popup, TileLayer } from "react-leafl
 import { connect } from "react-redux";
 import { notify } from "react-notify-toast";
 import { dispatch } from "../redux/store";
-import { centerUpdated } from "../redux/actions";
+import { centerUpdated } from "../redux/core/actions";
 
 import "../styles/CityMap.css";
 import LightsLayer from "./Layers/LightsLayer";
 import StationsLayer from "./Layers/StationsLayer";
 import TroublePointsLayer from "./Layers/TroublePointsLayer";
 import CarsLayer from "./Layers/CarsLayer";
-import { NOTIFY_SHOW_MS } from "../utils/constants";
 import BusesLayer from "./Layers/BusesLayer";
 import PedestriansLayer from "./Layers/PedestriansLayer";
+import { NOTIFY_SHOW_MS } from "../constants/global";
+import { D_ZOOM } from "../constants/defaults";
+import { MAX_NATIVE_ZOOM, MAX_ZOOM } from "../constants/minMax";
 
-const DEFAULT_ZOOM = 15;
-const MAX_ZOOM = 20;
-const MAX_NATIVE_ZOOM = 19;
-
-const CityMap = props => {
-  const [zoom, setZoom] = useState(DEFAULT_ZOOM);
-  const {
-    center: { lat, lng, rad },
-  } = props;
-  const { wasStarted } = props;
+const CityMap = ({ center, wasStarted }) => {
+  const [zoom, setZoom] = useState(D_ZOOM);
 
   function setCenter(latlng) {
     const { lat, lng } = latlng;
-    dispatch(centerUpdated({ lat, lng, rad }));
+    dispatch(centerUpdated({ lat, lng, rad: center.rad }));
   }
 
   function rightClickOnMap(e) {
@@ -43,7 +37,7 @@ const CityMap = props => {
   }
 
   return (
-    <LeafletMap center={{ lat, lng }} zoom={zoom} preferCanvas onzoomanim={onZoom} oncontextmenu={rightClickOnMap}>
+    <LeafletMap center={center} zoom={zoom} preferCanvas onzoomanim={onZoom} oncontextmenu={rightClickOnMap}>
       <TileLayer
         attribution='&amp;copy <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
         url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
@@ -51,8 +45,8 @@ const CityMap = props => {
         maxNativeZoom={MAX_NATIVE_ZOOM}
       />
 
-      <Circle center={{ lat, lng }} radius={rad}>
-        <Marker position={{ lat, lng }}>
+      <Circle center={center} radius={center.rad}>
+        <Marker position={center}>
           <Popup>Zone center</Popup>
         </Marker>
       </Circle>
@@ -74,4 +68,4 @@ const mapStateToProps = (state /* , ownProps */) => {
   };
 };
 
-export default connect(mapStateToProps)(CityMap);
+export default connect(mapStateToProps)(React.memo(CityMap));

@@ -1,4 +1,4 @@
-package smartcity.config;
+package smartcity.config.abstractions;
 
 import routing.core.IGeoPosition;
 import routing.core.IZone;

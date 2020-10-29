@@ -20,6 +20,7 @@ import smartcity.stations.StationStrategy;
 import vehicles.Bus;
 import vehicles.MovingObject;
 import vehicles.Pedestrian;
+import vehicles.enums.VehicleType;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -29,6 +30,7 @@ import static mocks.TestInstanceCreator.createEventBus;
 import static mocks.TestInstanceCreator.createTimeProvider;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 @RunWith(MockitoJUnitRunner.class)
 class HashAgentsContainerTest {
@@ -82,13 +84,17 @@ class HashAgentsContainerTest {
     }
 
     PedestrianAgent getPedestrianAgent() {
-        return new PedestrianAgent(idGenerator.get(PedestrianAgent.class), mock(Pedestrian.class),
+        var ped = mock(Pedestrian.class);
+        when(ped.getVehicleType()).thenReturn(VehicleType.PEDESTRIAN.toString());
+        return new PedestrianAgent(idGenerator.get(PedestrianAgent.class), ped,
                 createTimeProvider(), createEventBus());
     }
 
     VehicleAgent getVehicleAgent() {
-        return new VehicleAgent(idGenerator.get(VehicleAgent.class), mock(MovingObject.class),
-                5000, createTimeProvider(), mock(IRouteGenerator.class), mock(IRouteTransformer.class),
+        var mov = mock(MovingObject.class);
+        when(mov.getVehicleType()).thenReturn(VehicleType.REGULAR_CAR.toString());
+        return new VehicleAgent(idGenerator.get(VehicleAgent.class), mov,
+                createTimeProvider(), mock(IRouteGenerator.class), mock(IRouteTransformer.class),
                 createEventBus(), mock(ConfigContainer.class));
     }
 

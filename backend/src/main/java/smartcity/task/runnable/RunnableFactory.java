@@ -57,8 +57,8 @@ class RunnableFactory implements IRunnableFactory {
      */
     @Override
     public List<ScheduledExecutorService> clearAllExecutors() {
-        this.mainExecutor = Executors.newSingleThreadScheduledExecutor();
         var oldExecutors = executors;
+        this.mainExecutor = Executors.newSingleThreadScheduledExecutor();
         this.executors = new ArrayList<>();
         this.executors.add(mainExecutor);
 

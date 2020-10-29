@@ -27,9 +27,9 @@ const CarsLayer = props => {
 };
 
 const mapStateToProps = (state /* , ownProps */) => {
-  const { message } = state;
+  const { car } = state;
   return {
-    cars: message.cars,
+    cars: car.cars,
   };
 };
 

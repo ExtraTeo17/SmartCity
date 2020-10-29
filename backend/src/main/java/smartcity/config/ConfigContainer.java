@@ -6,32 +6,37 @@ import routing.core.IZone;
 import routing.core.Position;
 import routing.core.Zone;
 import smartcity.SimulationState;
+import smartcity.config.abstractions.ILightConfigContainer;
+import smartcity.config.abstractions.IStationConfigContainer;
+import smartcity.config.abstractions.ITroublePointsConfigContainer;
+import smartcity.config.abstractions.IZoneMutator;
 
 
+@SuppressWarnings("ClassWithTooManyFields")
 public class ConfigContainer extends ConfigMutator
-        implements IZoneMutator, ILightConfigContainer,
-        IConstructionSiteConfigContainer {
+        implements IZoneMutator,
+        ILightConfigContainer,
+        ITroublePointsConfigContainer,
+        IStationConfigContainer {
     private SimulationState simulationState = SimulationState.INITIAL;
     private boolean shouldGeneratePedestriansAndBuses = false;
     private boolean shouldGenerateCars = true;
-    private boolean isLightStrategyActive = false;
-    private boolean isConstructionSiteStrategyActive = false;
-	private boolean isConstructionSiteGenerationActive = false;
     private boolean lightManagersLock = false;
-    private int extendTimeSeconds = 30;
+    private boolean isLightStrategyActive = true;
+    private boolean isConstructionSiteStrategyActive = false;
+    private boolean isConstructionSiteGenerationActive = false;
+    private boolean isStationStrategyActive = true;
+    private int lightExtendTime = 30;
+    private int extendWaitTime = 60;
+    private int timeBeforeTrouble = 5000;
 
     private final IZone zone;
-    private final ObjectsConfig carsConfig;
 
     @Inject
     public ConfigContainer() {
         IGeoPosition warsawPos = Position.of(52.23682, 21.01681);
         int defaultRadius = 600;
         this.zone = Zone.of(warsawPos, defaultRadius);
-
-        int defaultTestCarId = 2;
-        int defaultCarsNum = 4;
-        this.carsConfig = CarsConfig.of(defaultCarsNum, defaultTestCarId);
     }
 
     public boolean shouldGenerateCars() {
@@ -84,23 +89,6 @@ public class ConfigContainer extends ConfigMutator
         }
     }
 
-    public int getTestCarId() {
-        return carsConfig.getTestObjectNumber();
-    }
-
-    public void setTestCarId(int id) {
-        carsConfig.setTestObjectNumber(mutation, id);
-    }
-
-    public int getCarsNumber() {
-        return carsConfig.getNumber();
-    }
-
-    public void setCarsNumber(int num) {
-        carsConfig.setNumber(mutation, num);
-    }
-
-    // TODO: Why the override is here, Przemek?
     @Override
     public boolean isLightStrategyActive() {
         return isLightStrategyActive;
@@ -110,28 +98,64 @@ public class ConfigContainer extends ConfigMutator
     public void setLightStrategyActive(boolean lightStrategyActive) {
         isLightStrategyActive = lightStrategyActive;
     }
-    
+
     @Override
-    public boolean isConstructionSiteStrategyActive() {
-    	return isConstructionSiteStrategyActive;
+    public int getExtendWaitTime() {
+        return extendWaitTime;
     }
-    
+
     @Override
-    public void setConstructionSiteStrategyActive(boolean constructionSiteStrategyActive) {
-    	isConstructionSiteStrategyActive = constructionSiteStrategyActive;
+    public void setExtendWaitTime(int extendWaitTime) {
+        this.extendWaitTime = extendWaitTime;
     }
 
-    public int getExtendTimeSeconds() {
-        return extendTimeSeconds;
+    @Override
+    public int getExtendLightTime() {
+        return lightExtendTime;
     }
 
-	@Override
-	public boolean isConstructionSiteGenerationActive() {
-		return isConstructionSiteGenerationActive;
-	}
+    @Override
+    public void setExtendLightTime(int lightExtendTime) {
+        this.lightExtendTime = lightExtendTime;
+    }
 
-	@Override
-	public void setConstructionSiteGenerationActive(boolean constructionSiteGenerationActive) {
-		isConstructionSiteGenerationActive = constructionSiteGenerationActive;
-	}
+    @Override
+    public boolean isChangeRouteStrategyActive() {
+        return isConstructionSiteStrategyActive;
+    }
+
+    @Override
+    public void setChangeRouteStrategyActive(boolean constructionSiteStrategyActive) {
+        isConstructionSiteStrategyActive = constructionSiteStrategyActive;
+    }
+
+    @Override
+    public boolean shouldGenerateConstructionSites() {
+        return isConstructionSiteGenerationActive;
+    }
+
+    @Override
+    public void setShouldGenerateConstructionSites(boolean constructionSiteGenerationActive) {
+        isConstructionSiteGenerationActive = constructionSiteGenerationActive;
+    }
+
+    @Override
+    public boolean isStationStrategyActive() {
+        return isStationStrategyActive;
+    }
+
+    @Override
+    public void setStationStrategyActive(boolean stationStrategyActive) {
+        isStationStrategyActive = stationStrategyActive;
+    }
+
+    @Override
+    public int getTimeBeforeTrouble() {
+        return timeBeforeTrouble;
+    }
+
+    @Override
+    public void setTimeBeforeTrouble(int timeBeforeTrouble) {
+        this.timeBeforeTrouble = timeBeforeTrouble;
+    }
 }

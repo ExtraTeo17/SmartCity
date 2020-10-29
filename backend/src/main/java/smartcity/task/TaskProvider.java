@@ -20,13 +20,13 @@ import routing.core.IGeoPosition;
 import routing.nodes.RouteNode;
 import routing.nodes.StationNode;
 import smartcity.ITimeProvider;
-import smartcity.TimeProvider;
 import smartcity.config.ConfigContainer;
 import smartcity.lights.core.Light;
 import smartcity.task.abstractions.ITaskProvider;
 import smartcity.task.data.ISwitchLightsContext;
 import smartcity.task.functional.IFunctionalTaskFactory;
 
+import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.List;
 import java.util.function.Supplier;
@@ -149,7 +149,7 @@ public class TaskProvider implements ITaskProvider {
     @Override
     public Supplier<Integer> getSwitchLightsTask(int managerId, Collection<Light> lights) {
         var switchLights = functionalTaskFactory
-                .createLightSwitcher(managerId, configContainer.getExtendTimeSeconds(), lights);
+                .createLightSwitcher(managerId, configContainer.getExtendWaitTime(), lights);
         // Can be moved somewhere else if needed and passed as parameter
         var switchLightsContext = new ISwitchLightsContext() {
             private boolean alreadyExtendedGreen = false;
@@ -169,12 +169,8 @@ public class TaskProvider implements ITaskProvider {
     }
 
     @Override
-    public Runnable getSimulationControlTask(long nanoStartTime) {
-        var updateTimeTask = timeProvider.getUpdateTimeTask((System.nanoTime() - nanoStartTime) /
-                (1_000_000 * TimeProvider.MS_PER_TICK));
-        return () -> {
-            updateTimeTask.run();
-            // TODO: Batch update of cars positions: eventBus.post();
-        };
+    public Runnable getSimulationControlTask(LocalDateTime simulationStartTime) {
+        // TODO: Batch update of cars positions: eventBus.post();
+        return timeProvider.getUpdateTimeTask(simulationStartTime);
     }
 }
