@@ -194,6 +194,7 @@ public class LightManagerAgent extends AbstractAgent {
                         var arrivalInfo = ArrivalInfo.of(agentName, time);
                         crossroad.addPedestrianToFarAwayQueue(getIntParameter(rcv, MessageParameter.ADJACENT_OSM_WAY_ID),
                                 arrivalInfo);
+                        logger.info("Got inform from pedestrian" + rcv.getSender().getLocalName());
                     }
                     case ACLMessage.REQUEST_WHEN -> {
                         crossroad.removePedestrianFromFarAwayQueue(getIntParameter(rcv, MessageParameter.ADJACENT_OSM_WAY_ID),
@@ -203,8 +204,10 @@ public class LightManagerAgent extends AbstractAgent {
                         agree.setAllUserDefinedParameters(properties);
                         send(agree);
                         crossroad.addPedestrianToQueue(getIntParameter(rcv, MessageParameter.ADJACENT_OSM_WAY_ID), agentName);
+                        logger.info("Got request_when from pedestrian" + rcv.getSender().getLocalName());
                     }
                     case ACLMessage.AGREE -> {
+                        logger.info("Got agree from pedestrian" + rcv.getSender().getLocalName());
                         crossroad.removePedestrianFromQueue(getIntParameter(rcv, MessageParameter.ADJACENT_OSM_WAY_ID));
                     }
                     default -> print("Wait");

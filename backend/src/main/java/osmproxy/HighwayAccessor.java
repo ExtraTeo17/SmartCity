@@ -84,6 +84,7 @@ public class HighwayAccessor {
 
         long previousWayId = 0;
         for (EdgeIteratorState edge : path0.calcEdges()) {
+
             int edgeId = edge.getEdge();
             if (edge instanceof VirtualEdgeIteratorState) {
                 // first, via and last edges can be virtual

@@ -293,8 +293,9 @@ public class VehicleAgent extends AbstractAgent {
                         bewareOfJammedEdge);
                 timeForOfDynamicRoute = vehicle.getMillisecondsFromAToB(vehicle.getMoveIndex(),
                         mergeResult.newUniformRoute.size() - 1);
-
-                if (true) { // timeForTheEndWithJam > timeForOfDynamicRoute)
+                logger.info("=======================timeForOfDynamicRoute" + timeForOfDynamicRoute);
+                logger.info("-----------------------timeForTheEndWithJam" + timeForTheEndWithJam);
+                if ( timeForTheEndWithJam > timeForOfDynamicRoute){
                     logger.info("Trip time through the jam: " + timeForTheEndWithJam + " is longer than alternative route time: "
                             + timeForOfDynamicRoute + ", so route will be changed");
                     // TODO: CHECK IF send refusal is on place // switchToNextLight was after this line
