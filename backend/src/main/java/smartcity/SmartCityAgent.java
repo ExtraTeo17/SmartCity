@@ -1,5 +1,6 @@
 package smartcity;
 
+import agents.BikeAgent;
 import agents.BusAgent;
 import agents.PedestrianAgent;
 import agents.VehicleAgent;
@@ -7,6 +8,7 @@ import agents.abstractions.IAgentsContainer;
 import agents.utilities.MessageParameter;
 import com.google.common.eventbus.EventBus;
 import com.google.inject.Inject;
+import events.web.bike.BikeAgentDeadEvent;
 import events.web.bus.BusAgentDeadEvent;
 import events.web.pedestrian.PedestrianAgentDeadEvent;
 import events.web.vehicle.VehicleAgentDeadEvent;
@@ -23,7 +25,7 @@ import java.time.temporal.ChronoUnit;
 
 public class SmartCityAgent extends Agent {
     public static final String name = SmartCityAgent.class.getSimpleName().replace("Agent", "");
-    private static final Logger logger = LoggerFactory.getLogger(SmartCityAgent.class);
+    private static final Logger logger = LoggerFactory.getLogger(name);
 
     private final IAgentsContainer agentsContainer;
     private final EventBus eventBus;
@@ -56,6 +58,7 @@ public class SmartCityAgent extends Agent {
                     try {
                         switch (type) {
                             case MessageParameter.VEHICLE -> onReceiveVehicle(rcv);
+                            case MessageParameter.BIKE -> onReceiveBike(rcv);
                             case MessageParameter.PEDESTRIAN -> onReceivePedestrian(rcv);
                             case MessageParameter.BUS -> onReceiveBus(rcv);
                         }
@@ -79,6 +82,21 @@ public class SmartCityAgent extends Agent {
             int distance = pedestrian.getUniformRouteSize() * RoutingConstants.STEP_SIZE_METERS;
             if (agentsContainer.remove(agent)) {
                 eventBus.post(new PedestrianAgentDeadEvent(agent.getId(), distance, resultTime));
+            }
+        }
+    }
+
+    private void onReceiveBike(ACLMessage rcv) {
+        var name = rcv.getSender().getLocalName();
+        var agentOpt = agentsContainer.get(BikeAgent.class, (v) -> v.getLocalName().equals(name));
+        if (agentOpt.isPresent()) {
+            var agent = agentOpt.get();
+            var vehicle = agent.getVehicle();
+
+            Long resultTime = getTimeIfTestable(vehicle);
+            int distance = vehicle.getUniformRouteSize() * RoutingConstants.STEP_SIZE_METERS;
+            if (agentsContainer.remove(agent)) {
+                eventBus.post(new BikeAgentDeadEvent(agent.getId(), distance, resultTime));
             }
         }
     }

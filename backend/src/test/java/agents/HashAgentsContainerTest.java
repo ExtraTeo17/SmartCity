@@ -65,6 +65,7 @@ class HashAgentsContainerTest {
             agents.add(getBusAgent());
             agents.add(getStationAgent());
             agents.add(getVehicleAgent());
+            agents.add(getBikeAgent());
             agents.add(getLightManagerAgent());
         }
         int agentTypes = agents.size() / agentsPerTypeCount;
@@ -87,6 +88,13 @@ class HashAgentsContainerTest {
         var ped = mock(Pedestrian.class);
         when(ped.getVehicleType()).thenReturn(VehicleType.PEDESTRIAN.toString());
         return new PedestrianAgent(idGenerator.get(PedestrianAgent.class), ped,
+                createTimeProvider(), createEventBus());
+    }
+
+    BikeAgent getBikeAgent() {
+        var mov = mock(MovingObject.class);
+        when(mov.getVehicleType()).thenReturn(VehicleType.BIKE.toString());
+        return new BikeAgent(idGenerator.get(BikeAgent.class), mov,
                 createTimeProvider(), createEventBus());
     }
 

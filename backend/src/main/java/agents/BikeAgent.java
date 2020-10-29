@@ -50,7 +50,7 @@ public class BikeAgent extends AbstractAgent {
                             LightManagerNode light = vehicle.getCurrentTrafficLightNode();
                             ACLMessage msg = createMessageById(ACLMessage.REQUEST_WHEN, LightManagerAgent.name,
                                     light.getLightManagerId());
-                            Properties properties = createProperties(MessageParameter.VEHICLE);
+                            Properties properties = createProperties(MessageParameter.BIKE);
                             properties.setProperty(MessageParameter.ADJACENT_OSM_WAY_ID, Long.toString(vehicle.getAdjacentOsmWayId()));
                             msg.setAllUserDefinedParameters(properties);
                             send(msg);
@@ -71,7 +71,7 @@ public class BikeAgent extends AbstractAgent {
                     print("Reached destination.");
 
                     ACLMessage msg = createMessage(ACLMessage.INFORM, SmartCityAgent.name);
-                    var prop = createProperties(MessageParameter.VEHICLE);
+                    var prop = createProperties(MessageParameter.BIKE);
                     prop.setProperty(MessageParameter.AT_DESTINATION, String.valueOf(Boolean.TRUE));
                     msg.setAllUserDefinedParameters(prop);
                     send(msg);
@@ -91,7 +91,7 @@ public class BikeAgent extends AbstractAgent {
                     switch (rcv.getPerformative()) {
                         case ACLMessage.REQUEST -> {
                             ACLMessage response = createMessage(ACLMessage.AGREE, rcv.getSender());
-                            Properties properties = createProperties(MessageParameter.VEHICLE);
+                            Properties properties = createProperties(MessageParameter.BIKE);
                             properties.setProperty(MessageParameter.ADJACENT_OSM_WAY_ID,
                                     Long.toString(vehicle.getAdjacentOsmWayId()));
                             response.setAllUserDefinedParameters(properties);

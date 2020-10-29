@@ -1,10 +1,10 @@
-package web.message.payloads.infos.update;
+package web.message.payloads.infos.other;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import web.message.payloads.AbstractPayload;
 import web.message.payloads.models.Location;
 
-public class ChangeCarRouteInfo extends AbstractPayload {
+public class ChangeBikeRouteInfo extends AbstractPayload {
     @JsonProperty("id")
     private final int id;
     @JsonProperty("routeStart")
@@ -14,7 +14,7 @@ public class ChangeCarRouteInfo extends AbstractPayload {
     @JsonProperty("location")
     private final Location changeLocation;
 
-    public ChangeCarRouteInfo(int id, Location[] routeStart, Location changeLocation, Location[] routeEnd) {
+    public ChangeBikeRouteInfo(int id, Location[] routeStart, Location changeLocation, Location[] routeEnd) {
         this.id = id;
         this.routeStart = routeStart;
         this.routeEnd = routeEnd;

@@ -13,6 +13,10 @@ import events.web.PrepareSimulationEvent;
 import events.web.SimulationPreparedEvent;
 import events.web.SimulationStartedEvent;
 import events.web.StartSimulationEvent;
+import events.web.bike.BikeAgentCreatedEvent;
+import events.web.bike.BikeAgentDeadEvent;
+import events.web.bike.BikeAgentRouteChangedEvent;
+import events.web.bike.BikeAgentUpdatedEvent;
 import events.web.bus.BusAgentDeadEvent;
 import events.web.bus.BusAgentFillStateUpdatedEvent;
 import events.web.bus.BusAgentStartedEvent;
@@ -115,6 +119,12 @@ class InjectorTests {
         eventBus.post(new VehicleAgentUpdatedEvent(1, null));
         eventBus.post(new VehicleAgentRouteChangedEvent(1, new ArrayList<>(), null, new ArrayList<>()));
         eventBus.post(new VehicleAgentDeadEvent(1, 0, null));
+
+        // bike
+        eventBus.post(new BikeAgentCreatedEvent(1, null, null, false));
+        eventBus.post(new BikeAgentUpdatedEvent(1, null));
+        eventBus.post(new BikeAgentRouteChangedEvent(1, new ArrayList<>(), null, new ArrayList<>()));
+        eventBus.post(new BikeAgentDeadEvent(1, 0, null));
 
         eventBus.post("Test"); // Dead event
 

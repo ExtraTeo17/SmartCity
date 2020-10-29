@@ -8,11 +8,11 @@ import vehicles.Bus;
 import vehicles.enums.BusFillState;
 import web.abstractions.IWebService;
 import web.message.MessageType;
-import web.message.payloads.infos.create.CreateCarInfo;
-import web.message.payloads.infos.create.CreatePedestrianInfo;
-import web.message.payloads.infos.create.CreateTroublePointInfo;
-import web.message.payloads.infos.create.StartTrafficJamInfo;
+import web.message.payloads.infos.create.*;
 import web.message.payloads.infos.kill.*;
+import web.message.payloads.infos.other.ChangeBikeRouteInfo;
+import web.message.payloads.infos.other.ChangeCarRouteInfo;
+import web.message.payloads.infos.other.SwitchLightsInfo;
 import web.message.payloads.infos.update.*;
 import web.message.payloads.models.BusDto;
 import web.message.payloads.models.LightDto;
@@ -105,10 +105,10 @@ class WebService implements IWebService {
     }
 
     @Override
-    public void changeRoute(int agentId,
-                            List<? extends IGeoPosition> routeStart,
-                            IGeoPosition changePosition,
-                            List<? extends IGeoPosition> routeEnd) {
+    public void changeCarRoute(int agentId,
+                               List<? extends IGeoPosition> routeStart,
+                               IGeoPosition changePosition,
+                               List<? extends IGeoPosition> routeEnd) {
         var changeLocation = Converter.convert(changePosition);
         var routeStartLocations = routeStart.stream().map(Converter::convert).toArray(Location[]::new);
         var routeEndLocations = routeEnd.stream().map(Converter::convert).toArray(Location[]::new);
@@ -198,5 +198,40 @@ class WebService implements IWebService {
         var payload = new EndTrafficJamInfo(id);
 
         webConnector.broadcastMessage(MessageType.END_TRAFFIC_JAM_INFO, payload);
+    }
+
+    @Override
+    public void createBike(int id, IGeoPosition position, List<? extends IGeoPosition> route, boolean isTestBike) {
+        var location = Converter.convert(position);
+        var routeLocations = route.stream().map(Converter::convert).toArray(Location[]::new);
+        var payload = new CreateBikeInfo(id, location, routeLocations, isTestBike);
+
+        webConnector.broadcastMessage(MessageType.CREATE_BIKE_INFO, payload);
+    }
+
+    @Override
+    public void updateBike(int id, IGeoPosition position) {
+        var location = Converter.convert(position);
+        var payload = new UpdateBikeInfo(id, location);
+
+        webConnector.broadcastMessage(MessageType.UPDATE_BIKE_INFO, payload);
+    }
+
+    @Override
+    public void killBike(int id, int travelDistance, Long travelTime) {
+        var payload = new KillBikeInfo(id, travelDistance, travelTime);
+
+        webConnector.broadcastMessage(MessageType.KILL_BIKE_INFO, payload);
+    }
+
+    @Override
+    public void changeBikeRoute(int agentId, List<? extends IGeoPosition> routeStart, IGeoPosition changePosition,
+                                List<? extends IGeoPosition> routeEnd) {
+        var changeLocation = Converter.convert(changePosition);
+        var routeStartLocations = routeStart.stream().map(Converter::convert).toArray(Location[]::new);
+        var routeEndLocations = routeEnd.stream().map(Converter::convert).toArray(Location[]::new);
+        var payload = new ChangeBikeRouteInfo(agentId, routeStartLocations, changeLocation, routeEndLocations);
+
+        webConnector.broadcastMessage(MessageType.UPDATE_BIKE_ROUTE_INFO, payload);
     }
 }
