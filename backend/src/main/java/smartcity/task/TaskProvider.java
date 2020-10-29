@@ -10,6 +10,8 @@ import com.google.common.collect.HashBasedTable;
 import com.google.common.collect.Table;
 import com.google.common.eventbus.EventBus;
 import com.google.inject.Inject;
+import events.web.bike.BikeAgentCreatedEvent;
+import events.web.bike.BikeAgentUpdatedEvent;
 import events.web.bus.BusAgentStartedEvent;
 import events.web.pedestrian.PedestrianAgentCreatedEvent;
 import events.web.vehicle.VehicleAgentCreatedEvent;
@@ -106,8 +108,8 @@ public class TaskProvider implements ITaskProvider {
             BikeAgent agent = agentsFactory.create(route, testBike, "");
             if (agentsContainer.tryAdd(agent)) {
                 agent.start();
-                System.out.println("+++++++++++" + agent.getLocalName());
-                //   eventBus.post(new VehicleAgentCreatedEvent(agent.getId(), agent.getPosition(), route, testBike));
+                logger.info("Started: " + agent.getLocalName());
+                eventBus.post(new BikeAgentCreatedEvent(agent.getId(), agent.getPosition(), route, testBike));
             }
         };
     }

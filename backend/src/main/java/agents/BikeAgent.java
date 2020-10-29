@@ -3,6 +3,8 @@ package agents;
 import agents.abstractions.AbstractAgent;
 import agents.utilities.MessageParameter;
 import com.google.common.eventbus.EventBus;
+import events.web.bike.BikeAgentCreatedEvent;
+import events.web.bike.BikeAgentUpdatedEvent;
 import events.web.vehicle.VehicleAgentUpdatedEvent;
 import jade.core.behaviours.Behaviour;
 import jade.core.behaviours.CyclicBehaviour;
@@ -122,7 +124,7 @@ public class BikeAgent extends AbstractAgent {
 
     public void move() {
         vehicle.move();
-        eventBus.post(new VehicleAgentUpdatedEvent(this.getId(), vehicle.getPosition()));
+        eventBus.post(new BikeAgentUpdatedEvent(this.getId(), vehicle.getPosition()));
     }
 
     public IGeoPosition getPosition() {

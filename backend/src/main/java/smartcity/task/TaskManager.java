@@ -6,7 +6,6 @@ import agents.PedestrianAgent;
 import agents.VehicleAgent;
 import agents.abstractions.IAgentsContainer;
 import com.google.inject.Inject;
-import org.javatuples.Pair;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import routing.abstractions.IRoutingHelper;
@@ -17,6 +16,7 @@ import smartcity.lights.core.Light;
 import smartcity.task.abstractions.ITaskManager;
 import smartcity.task.abstractions.ITaskProvider;
 import smartcity.task.runnable.abstractions.IRunnableFactory;
+import utilities.Siblings;
 
 import java.time.LocalDateTime;
 import java.util.Collection;
@@ -30,6 +30,7 @@ public class TaskManager implements ITaskManager {
     private static final Logger logger = LoggerFactory.getLogger(TaskManager.class);
     private static final TimeUnit TIME_UNIT = TimeUnit.MILLISECONDS;
     private static final int CREATE_CAR_INTERVAL = 500;
+    private static final int CREATE_BIKE_INTERVAL = 500;
     private static final int CREATE_PEDESTRIAN_INTERVAL = 120;
     private static final int BUS_CONTROL_INTERVAL = 2000;
 
@@ -59,30 +60,30 @@ public class TaskManager implements ITaskManager {
     @Override
     public void scheduleCarCreation(int carsLimit, int testCarId) {
         Consumer<Integer> createCars = (runCount) -> {
-            var posAandB = geographicalPositioning();
+            var posAandB = getRandomPositions();
 
-            taskProvider.getCreateCarTask(posAandB.getValue0(), posAandB.getValue1(), runCount == testCarId).run();
+            taskProvider.getCreateCarTask(posAandB.first, posAandB.second, runCount == testCarId).run();
         };
 
         runIf(() -> agentsContainer.size(VehicleAgent.class) < carsLimit, createCars, CREATE_CAR_INTERVAL, true);
     }
 
-    Pair<IGeoPosition, IGeoPosition> geographicalPositioning() {
+    private Siblings<IGeoPosition> getRandomPositions() {
         var zoneCenter = zone.getCenter();
         var geoPosInZoneCircle = routingHelper.generateRandomOffset(zone.getRadius());
         var posA = zoneCenter.sum(geoPosInZoneCircle);
         var posB = zoneCenter.diff(geoPosInZoneCircle);
-        return new Pair<>(posA, posB);
+        return Siblings.of(posA, posB);
     }
 
     @Override
     public void scheduleBikeCreation(int bikeLimit, int testBikeId) {
         Consumer<Integer> createBikes = (runCount) -> {
-            var posAandB = geographicalPositioning();
-            taskProvider.getCreateBikeTask(posAandB.getValue0(), posAandB.getValue1(), runCount == testBikeId).run();
+            var positions = getRandomPositions();
+            taskProvider.getCreateBikeTask(positions.first, positions.second, runCount == testBikeId).run();
         };
 
-        runIf(() -> agentsContainer.size(BikeAgent.class) < bikeLimit, createBikes, CREATE_CAR_INTERVAL, true);
+        runIf(() -> agentsContainer.size(BikeAgent.class) < bikeLimit, createBikes, CREATE_BIKE_INTERVAL, true);
     }
 
 
