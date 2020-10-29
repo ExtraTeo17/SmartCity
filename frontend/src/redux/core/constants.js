@@ -28,3 +28,7 @@ export const PEDESTRIAN_UPDATED = "Ped/UPDATED";
 export const PEDESTRIAN_PUSHED = "Ped/PUSHED";
 export const PEDESTRIAN_PULLED = "Ped/PULLED";
 export const PEDESTRIAN_KILLED = "Ped/KILLED";
+
+export const BIKE_CREATED = "Bike/CREATED";
+export const BIKE_UPDATED = "Bike/UPDATED";
+export const BIKE_KILLED = "Bike/KILLED";

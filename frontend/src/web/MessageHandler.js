@@ -19,6 +19,9 @@ import {
   PUSH_PEDESTRIAN_INTO_BUS_INFO,
   PULL_PEDESTRIAN_FROM_BUS_INFO,
   KILL_PEDESTRIAN_INFO,
+  CREATE_BIKE_INFO,
+  UPDATE_BIKE_INFO,
+  KILL_BIKE_INFO,
 } from "./MessageType";
 import { NOTIFY_SHOW_MS } from "../constants/global";
 import Dispatcher from "../redux/Dispatcher";
@@ -127,6 +130,18 @@ export default {
         Dispatcher.killPedestrian(payload);
         break;
       }
+
+      case CREATE_BIKE_INFO:
+        Dispatcher.createBike(payload);
+        break;
+
+      case UPDATE_BIKE_INFO:
+        Dispatcher.updateBike(payload);
+        break;
+
+      case KILL_BIKE_INFO:
+        Dispatcher.killBike(payload);
+        break;
 
       default:
         console.group("Unrecognized-message");

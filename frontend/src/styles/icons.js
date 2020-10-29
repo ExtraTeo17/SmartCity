@@ -103,3 +103,20 @@ export const goldMarkerIcon = new L.Icon({
   popupAnchor: [1, -34],
   iconAnchor: [12, 41],
 });
+
+export const bikeIcon = new L.Icon({
+  iconUrl: "/images/bike.png",
+  iconRetinaUrl: "/images/bike.png",
+  iconAnchor: [16, 16],
+  popupAnchor: [8, 8],
+  iconSize: [32, 32],
+});
+
+// TODO: Different icon/style
+export const testBikeIcon = new L.Icon({
+  iconUrl: "/images/bike.png",
+  iconRetinaUrl: "/images/bike.png",
+  iconAnchor: [16, 16],
+  popupAnchor: [8, 8],
+  iconSize: [32, 32],
+});

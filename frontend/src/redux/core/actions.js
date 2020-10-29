@@ -23,6 +23,9 @@ import {
   GENERATE_PEDESTRIANS_UPDATED,
   TRAFFIC_JAM_STARTED,
   TRAFFIC_JAM_ENDED,
+  BIKE_KILLED,
+  BIKE_UPDATED,
+  BIKE_CREATED,
 } from "./constants";
 
 /**
@@ -47,16 +50,7 @@ export const simulationStarted = createAction(SIMULATION_STARTED);
 /**
  * @param {{id:number; location:{lat:number; lng:number;}; route:Array<> isTestCar:boolean; }} car
  */
-export const carCreated = car => ({
-  type: CAR_CREATED,
-  payload: {
-    car,
-  },
-});
-
-/**
- * @param {{id:number; location:{lat:number; lng:number;}; }} car
- */
+export const carCreated = createAction(CAR_CREATED);
 export const carUpdated = createAction(CAR_UPDATED);
 export const carKilled = createAction(CAR_KILLED);
 export const carRouteChanged = createAction(CAR_ROUTE_CHANGED);
@@ -76,3 +70,7 @@ export const pedestrianUpdated = createAction(PEDESTRIAN_UPDATED);
 export const pedestrianPushedIntoBus = createAction(PEDESTRIAN_PUSHED);
 export const pedestrianPulledFromBus = createAction(PEDESTRIAN_PULLED);
 export const pedestrianKilled = createAction(PEDESTRIAN_KILLED);
+
+export const bikeCreated = createAction(BIKE_CREATED);
+export const bikeUpdated = createAction(BIKE_UPDATED);
+export const bikeKilled = createAction(BIKE_KILLED);

@@ -11,7 +11,7 @@ const car = (state = initialState, action) => {
   const { payload } = action;
   switch (action.type) {
     case CAR_CREATED: {
-      const { car } = action.payload;
+      const car = action.payload;
       return { ...state, cars: [...state.cars, car] };
     }
 

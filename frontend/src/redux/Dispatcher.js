@@ -20,6 +20,9 @@ import {
   pedestrianKilled,
   trafficJamStarted,
   trafficJamEnded,
+  bikeUpdated,
+  bikeCreated,
+  bikeKilled,
 } from "./core/actions";
 
 const fps = 15;
@@ -31,6 +34,7 @@ const carUpdateQueue = new Map();
 const switchLightsQueue = new Map();
 const busUpdateQueue = new Map();
 const pedestrianUpdateQueue = new Map();
+const bikeUpdateQueue = new Map();
 
 const pushPullCount = 10;
 const pullKillPedQueue = [];
@@ -54,6 +58,7 @@ function update(now) {
       switchLightsQueue.forEach(dispatchFromMap);
       busUpdateQueue.forEach(dispatchFromMap);
       pedestrianUpdateQueue.forEach(dispatchFromMap);
+      bikeUpdateQueue.forEach(dispatchFromMap);
       pushPedQueue.forEach(a => dispatch(a));
       if (pullKillPedQueue.length > 0) {
         const end = Math.min(pullKillPedQueue.length, pushPullCount);
@@ -178,6 +183,21 @@ const Dispatcher = {
 
   killPedestrian(pedData) {
     pullKillPedQueue.push(pedestrianKilled(pedData));
+  },
+
+  createBike(bike) {
+    dispatch(bikeCreated(bike));
+    if (timer === null) {
+      onDetectStartedSimulation();
+    }
+  },
+
+  updateBike(bike) {
+    bikeUpdateQueue.set(bike.id, bikeUpdated(bike));
+  },
+
+  killBike(data) {
+    dispatch(bikeKilled(data));
   },
 };
 

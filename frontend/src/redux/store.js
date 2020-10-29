@@ -68,6 +68,9 @@ const initialState = {
   car: {
     cars: [],
   },
+  bike: {
+    bikes: [],
+  },
 };
 
 const store = createStore(appReducer, initialState, composeWithDevTools());
