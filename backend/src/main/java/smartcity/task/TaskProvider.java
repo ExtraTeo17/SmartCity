@@ -1,5 +1,6 @@
 package smartcity.task;
 
+import agents.BikeAgent;
 import agents.BusAgent;
 import agents.PedestrianAgent;
 import agents.VehicleAgent;
@@ -71,7 +72,7 @@ public class TaskProvider implements ITaskProvider {
             try {
                 route = routeInfoCache.get(start, end);
                 if (route == null) {
-                    route = routeGenerator.generateRouteInfo(start, end, false);
+                    route = routeGenerator.generateRouteInfoWithJams(start, end, false);
                     routeInfoCache.put(start, end, route);
                 }
             } catch (Exception e) {
@@ -86,6 +87,33 @@ public class TaskProvider implements ITaskProvider {
             }
         };
     }
+
+
+    public Runnable getCreateBikeTask(IGeoPosition start, IGeoPosition end, boolean testBike) {
+        return () -> {
+            List<RouteNode> route;
+            try {
+                route = routeInfoCache.get(start, end);
+                if (route == null) {
+                    route = routeGenerator.generateRouteInfo(start, end,"bike");
+                    routeInfoCache.put(start, end, route);
+                }
+            } catch (Exception e) {
+                logger.warn("Error generating route info", e);
+                return;
+            }
+
+            BikeAgent agent = agentsFactory.create(route, testBike,"");
+            if (agentsContainer.tryAdd(agent)) {
+                agent.start();
+                System.out.println("+++++++++++"+agent.getLocalName());
+             //   eventBus.post(new VehicleAgentCreatedEvent(agent.getId(), agent.getPosition(), route, testBike));
+            }
+        };
+    }
+
+
+
 
     @Override
     public Runnable getCreatePedestrianTask(StationNode startStation, StationNode endStation,

@@ -8,6 +8,7 @@ public class MessageParameter {
     public static final String VEHICLE = "vehicle";
     public static final String TROUBLE_MANAGER = "trouble_manager";
     public static final String BUS = "bus";
+    public static final String BIKE = "bike";
     public static final String STATION = "station";
     public static final String LIGHT = "light";
     public static final String PEDESTRIAN = "pedestrian";
@@ -36,6 +37,7 @@ public class MessageParameter {
         var type = movingObject.getVehicleType();
         var value = VehicleType.getValue(type);
         return switch (value) {
+            case BIKE -> BIKE;
             case BUS -> BUS;
             case PEDESTRIAN, TEST_PEDESTRIAN -> PEDESTRIAN;
             case REGULAR_CAR, TEST_CAR -> VEHICLE;

@@ -21,9 +21,9 @@ public class ConfigContainer extends ConfigMutator
     private SimulationState simulationState = SimulationState.INITIAL;
     private boolean shouldGeneratePedestriansAndBuses = false;
     private boolean shouldGenerateCars = true;
+    private boolean shouldGenerateBikes = true;
     private boolean shouldGenerateConstructionSites = false;
     private boolean shouldGenerateTrafficJams = false;
-
     private boolean isLightStrategyActive = true;
     private boolean isConstructionSiteStrategyActive = false;
     private boolean isStationStrategyActive = true;
@@ -44,7 +44,9 @@ public class ConfigContainer extends ConfigMutator
     public boolean shouldGenerateCars() {
         return shouldGenerateCars;
     }
-
+    public boolean shouldGenerateBikes() {
+        return shouldGenerateBikes;
+    }
     public void setGenerateCars(boolean value) {
         this.shouldGenerateCars = value;
     }

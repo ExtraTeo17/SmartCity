@@ -10,6 +10,8 @@ import java.util.function.Supplier;
 
 public interface ITaskProvider {
     Runnable getCreateCarTask(IGeoPosition start, IGeoPosition end, boolean testCar);
+    Runnable getCreateBikeTask(IGeoPosition start, IGeoPosition end, boolean testBike);
+
 
     Runnable getCreatePedestrianTask(StationNode startStation, StationNode endStation,
                                      String busLine, boolean testPedestrian);
