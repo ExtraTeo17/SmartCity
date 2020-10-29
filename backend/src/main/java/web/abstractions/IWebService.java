@@ -54,7 +54,7 @@ public interface IWebService extends IStartable {
 
     void killPedestrian(int id, int travelDistance, Long travelTime);
 
-    void startTrafficJam(int id);
+    void startTrafficJam(long id);
 
-    void endTrafficJam(int id);
+    void endTrafficJam(long id);
 }

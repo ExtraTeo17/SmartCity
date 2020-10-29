@@ -43,11 +43,11 @@ public class Light extends Position {
     }
 
     public long getAdjacentWayId() {
-        return adjacentOsmWayId;
+        return adjacentOsmWayId + adjacentOsmWayId;
     }
 
     public long uniqueId() {
-        return super.hashCode();
+        return super.longHash();
     }
 
     @NotNull

@@ -18,6 +18,8 @@ import {
   pedestrianPushedIntoBus,
   pedestrianPulledFromBus,
   pedestrianKilled,
+  trafficJamStarted,
+  trafficJamEnded,
 } from "./core/actions";
 
 const fps = 15;
@@ -129,6 +131,14 @@ const Dispatcher = {
 
   hideTroublePoint(id) {
     dispatch(troublePointVanished(id));
+  },
+
+  startTrafficJam(id) {
+    dispatch(trafficJamStarted(id));
+  },
+
+  endTrafficJam(id) {
+    dispatch(trafficJamEnded(id));
   },
 
   updateBus(bus) {

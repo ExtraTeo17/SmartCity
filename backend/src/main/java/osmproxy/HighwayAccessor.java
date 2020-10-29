@@ -24,9 +24,11 @@ import com.graphhopper.routing.VirtualEdgeIteratorState;
 import com.graphhopper.util.CmdArgs;
 import com.graphhopper.util.EdgeIteratorState;
 import com.graphhopper.util.PointList;
+import com.graphhopper.util.shapes.GHPoint;
 import org.javatuples.Pair;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import routing.core.IGeoPosition;
 import routing.nodes.RouteNode;
 
 import java.util.ArrayList;
@@ -94,5 +96,4 @@ public class HighwayAccessor {
         }
         return nodeList;
     }
-
 }

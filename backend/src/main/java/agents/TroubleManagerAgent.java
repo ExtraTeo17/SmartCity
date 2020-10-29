@@ -19,7 +19,6 @@ import jade.util.leap.Properties;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import osmproxy.ExtendedGraphHopper;
-import routing.core.IGeoPosition;
 import routing.core.Position;
 import smartcity.SimulationState;
 import smartcity.TimeProvider;
@@ -28,7 +27,6 @@ import smartcity.config.ConfigContainer;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Objects;
 
 import static agents.message.MessageManager.createProperties;
 
@@ -42,7 +40,7 @@ public class TroubleManagerAgent extends Agent {
 
     private final Map<Integer, String> mapOfLightTrafficJamBlockedEdges;
     private final Map<Integer, String> mapOfConstructionSiteBlockedEdges;
-    private final HashMap<IGeoPosition, Integer> troublePointsMap;
+    private final HashMap<Long, Integer> troublePointsMap;
     private int latestTroublePointId;
 
     @Inject
@@ -94,7 +92,7 @@ public class TroubleManagerAgent extends Agent {
         var troublePoint = Position.of(Double.parseDouble(rcv.getUserDefinedParameter(MessageParameter.TROUBLE_LAT)),
                 Double.parseDouble(rcv.getUserDefinedParameter(MessageParameter.TROUBLE_LON)));
 
-        troublePointsMap.put(troublePoint, ++latestTroublePointId);
+        troublePointsMap.put(troublePoint.longHash(), ++latestTroublePointId);
         eventBus.post(new TroublePointCreatedEvent(latestTroublePointId, troublePoint));
         logger.info("Got message about trouble - CONSTRUCTION");
         logger.info("troublePoint: " + troublePoint.getLat() + "  " + troublePoint.getLng());
@@ -106,9 +104,9 @@ public class TroubleManagerAgent extends Agent {
     }
 
     private void trafficJamsAppearedHandle(ACLMessage rcv) {
-        var lat = rcv.getUserDefinedParameter(MessageParameter.TROUBLE_LAT);
-        var lng = rcv.getUserDefinedParameter(MessageParameter.TROUBLE_LON);
-        eventBus.post(new TrafficJamStartedEvent(Objects.hash(lat, lng)));
+        var lat = Double.parseDouble(rcv.getUserDefinedParameter(MessageParameter.TROUBLE_LAT));
+        var lng = Double.parseDouble(rcv.getUserDefinedParameter(MessageParameter.TROUBLE_LON));
+        eventBus.post(new TrafficJamStartedEvent(Position.longHash(lat, lng)));
 
         int edgeId = Integer.parseInt(rcv.getUserDefinedParameter(MessageParameter.EDGE_ID));
         logger.info("Got message about light traffic jam start on: " + edgeId);
@@ -123,9 +121,9 @@ public class TroubleManagerAgent extends Agent {
     }
 
     private void trafficJamsDisappearedHandle(ACLMessage rcv) {
-        var lat = rcv.getUserDefinedParameter(MessageParameter.TROUBLE_LAT);
-        var lng = rcv.getUserDefinedParameter(MessageParameter.TROUBLE_LON);
-        eventBus.post(new TrafficJamFinishedEvent(Objects.hash(lat, lng)));
+        var lat = Double.parseDouble(rcv.getUserDefinedParameter(MessageParameter.TROUBLE_LAT));
+        var lng = Double.parseDouble(rcv.getUserDefinedParameter(MessageParameter.TROUBLE_LON));
+        eventBus.post(new TrafficJamFinishedEvent(Position.longHash(lat, lng)));
 
         int edgeId = Integer.parseInt(rcv.getUserDefinedParameter(MessageParameter.EDGE_ID));
         logger.info("Got message about light traffic jam stop on: " + edgeId);
@@ -174,7 +172,7 @@ public class TroubleManagerAgent extends Agent {
             private void constructionHideHandle(ACLMessage rcv) {
                 var troublePoint = Position.of(Double.parseDouble(rcv.getUserDefinedParameter(MessageParameter.TROUBLE_LAT)),
                         Double.parseDouble(rcv.getUserDefinedParameter(MessageParameter.TROUBLE_LON)));
-                var id = troublePointsMap.remove(troublePoint);
+                var id = troublePointsMap.remove(troublePoint.longHash());
 
                 eventBus.post(new TroublePointVanishedEvent(id));
                 logger.info("Hiding construction" + id);
@@ -209,10 +207,10 @@ public class TroubleManagerAgent extends Agent {
     @Subscribe
     void handle(DebugEvent e) {
         if (de) {
-            eventBus.post(new TrafficJamFinishedEvent(1));
+            eventBus.post(new TrafficJamFinishedEvent(70164322463723L));
         }
 
-        eventBus.post(new TrafficJamStartedEvent(1));
+        eventBus.post(new TrafficJamStartedEvent(70164322463723L));
         de = true;
     }
 }

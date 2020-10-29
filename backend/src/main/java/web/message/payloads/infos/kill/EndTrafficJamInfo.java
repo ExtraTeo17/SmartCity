@@ -5,9 +5,9 @@ import web.message.payloads.AbstractPayload;
 
 public class EndTrafficJamInfo extends AbstractPayload {
     @JsonProperty("lightId")
-    private final int lightId;
+    private final long lightId;
 
-    public EndTrafficJamInfo(int id) {
+    public EndTrafficJamInfo(long id) {
         this.lightId = id;
     }
 }

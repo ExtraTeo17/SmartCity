@@ -21,6 +21,8 @@ import {
   START_SIMULATION_DATA_UPDATED,
   SHOULD_START_SIMULATION,
   GENERATE_PEDESTRIANS_UPDATED,
+  TRAFFIC_JAM_STARTED,
+  TRAFFIC_JAM_ENDED,
 } from "./constants";
 
 /**
@@ -62,6 +64,8 @@ export const carRouteChanged = createAction(CAR_ROUTE_CHANGED);
 export const lightsSwitched = createAction(LIGHTS_SWITCHED);
 export const troublePointCreated = createAction(TROUBLE_POINT_CREATED);
 export const troublePointVanished = createAction(TROUBLE_POINT_VANISHED);
+export const trafficJamStarted = createAction(TRAFFIC_JAM_STARTED);
+export const trafficJamEnded = createAction(TRAFFIC_JAM_ENDED);
 
 export const busUpdated = createAction(BUS_UPDATED);
 export const busFillStateUpdated = createAction(BUS_FILL_STATE_UPDATED);

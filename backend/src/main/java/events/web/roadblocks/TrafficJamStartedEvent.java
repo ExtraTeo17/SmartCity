@@ -1,7 +1,7 @@
 package events.web.roadblocks;
 
 public class TrafficJamStartedEvent {
-    public final int lightId;
+    public final long lightId;
 
-    public TrafficJamStartedEvent(int lightId) {this.lightId = lightId;}
+    public TrafficJamStartedEvent(long lightId) {this.lightId = lightId;}
 }

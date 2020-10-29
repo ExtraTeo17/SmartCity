@@ -10,6 +10,8 @@ import {
   TROUBLE_POINT_VANISHED,
   CAR_KILLED,
   PEDESTRIAN_KILLED,
+  TRAFFIC_JAM_STARTED,
+  TRAFFIC_JAM_ENDED,
 } from "../core/constants";
 
 // Just for reference - defined in store.js
@@ -79,6 +81,33 @@ const message = (state = initialState, action) => {
 
       console.log(`Handling tp-hide: ${id}`);
       return { ...state, troublePoints: state.troublePoints.filter(tp => tp.id !== id) };
+    }
+
+    case TRAFFIC_JAM_STARTED: {
+      const id = action.payload;
+      console.info(`Jam with ${id} started`);
+
+      const newLights = state.lights.map(l => {
+        if (l.id === id) {
+          return { ...l, jammed: true };
+        }
+        return l;
+      });
+
+      return { ...state, lights: newLights };
+    }
+
+    case TRAFFIC_JAM_ENDED: {
+      const id = action.payload;
+
+      const newLights = state.lights.map(l => {
+        if (l.id === id) {
+          return { ...l, jammed: false };
+        }
+        return l;
+      });
+
+      return { ...state, lights: newLights };
     }
 
     case CAR_KILLED: {

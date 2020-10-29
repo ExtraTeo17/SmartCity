@@ -8,6 +8,8 @@ import {
   SWITCH_LIGHTS_INFO,
   CREATE_TROUBLE_POINT_INFO,
   HIDE_TROUBLE_POINT_INFO,
+  START_TRAFFIC_JAM_INFO,
+  END_TRAFFIC_JAM_INFO,
   UPDATE_CAR_ROUTE_INFO,
   UPDATE_BUS_INFO,
   UPDATE_BUS_FILL_STATE_INFO,
@@ -70,6 +72,16 @@ export default {
 
       case HIDE_TROUBLE_POINT_INFO: {
         Dispatcher.hideTroublePoint(payload.id);
+        break;
+      }
+
+      case START_TRAFFIC_JAM_INFO: {
+        Dispatcher.startTrafficJam(payload.id);
+        break;
+      }
+
+      case END_TRAFFIC_JAM_INFO: {
+        Dispatcher.endTrafficJam(payload.id);
         break;
       }
 

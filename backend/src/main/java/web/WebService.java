@@ -187,14 +187,14 @@ class WebService implements IWebService {
     }
 
     @Override
-    public void startTrafficJam(int id) {
+    public void startTrafficJam(long id) {
         var payload = new StartTrafficJamInfo(id);
 
         webConnector.broadcastMessage(MessageType.START_TRAFFIC_JAM_INFO, payload);
     }
 
     @Override
-    public void endTrafficJam(int id) {
+    public void endTrafficJam(long id) {
         var payload = new EndTrafficJamInfo(id);
 
         webConnector.broadcastMessage(MessageType.END_TRAFFIC_JAM_INFO, payload);

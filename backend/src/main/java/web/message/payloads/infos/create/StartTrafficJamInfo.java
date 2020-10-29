@@ -5,7 +5,7 @@ import web.message.payloads.AbstractPayload;
 
 public class StartTrafficJamInfo extends AbstractPayload {
     @JsonProperty("lightId")
-    private final int lightId;
+    private final long lightId;
 
-    public StartTrafficJamInfo(int lightId) {this.lightId = lightId;}
+    public StartTrafficJamInfo(long lightId) {this.lightId = lightId;}
 }
