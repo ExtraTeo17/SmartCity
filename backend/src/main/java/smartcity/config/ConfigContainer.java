@@ -41,18 +41,6 @@ public class ConfigContainer extends ConfigMutator
         this.zone = Zone.of(warsawPos, defaultRadius);
     }
 
-    public boolean shouldGenerateCars() {
-        return shouldGenerateCars;
-    }
-
-    public boolean shouldGenerateBikes() {
-        return shouldGenerateBikes;
-    }
-
-    public void setGenerateCars(boolean value) {
-        this.shouldGenerateCars = value;
-    }
-
     public boolean shouldGeneratePedestriansAndBuses() {
         return shouldGeneratePedestriansAndBuses;
     }

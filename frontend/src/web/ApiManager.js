@@ -18,38 +18,58 @@ export default {
   },
 
   startSimulation({
+    pedLimit,
+    testPedId,
+
+    generateCars,
     carsLimit,
     testCarId,
-    generateCars,
+
+    generateBikes,
+    bikesLimit,
+    testBikeId,
+
     generateTrafficJams,
     generateTroublePoints,
     timeBeforeTrouble,
+
     startTime,
+
     lightStrategyActive,
     extendLightTime,
+
     stationStrategyActive,
     extendWaitTime,
+
     changeRouteStrategyActive,
-    pedLimit,
-    testPedId,
   }) {
     const msg = {
       type: START_SIMULATION_REQUEST,
       payload: {
+        pedLimit,
+        testPedId,
+
+        generateCars,
         carsLimit,
         testCarId,
-        generateCars,
+
+        generateBikes,
+        bikesLimit,
+        testBikeId,
+
         generateTrafficJams,
         generateTroublePoints,
         timeBeforeTrouble,
+
         startTime,
+
         lightStrategyActive,
         extendLightTime,
+
         stationStrategyActive,
         extendWaitTime,
+
         changeRouteStrategyActive,
-        pedLimit,
-        testPedId,
       },
     };
     WebServer.send(msg);

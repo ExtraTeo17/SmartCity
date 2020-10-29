@@ -7,6 +7,9 @@ export const PED_MAX = 200;
 export const CAR_MIN = 1;
 export const CAR_MAX = 50;
 
+export const BIKE_MIN = 1;
+export const BIKE_MAX = 100;
+
 export const LAT_MIN = -90;
 export const LAT_MAX = 90;
 export const LNG_MIN = -180;

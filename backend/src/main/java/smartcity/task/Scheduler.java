@@ -48,10 +48,10 @@ public class Scheduler {
             configContainer.setChangeRouteStrategyActive(e.changeRouteStrategyActive);
             taskManager.scheduleCarCreation(e.carsNum, e.testCarId);
         }
-        
+
         // TODO: Add bikes limit and testBikeID
-        if (configContainer.shouldGenerateBikes()) {
-            taskManager.scheduleBikeCreation(20, 10);
+        if (e.shouldGenerateBikes) {
+            taskManager.scheduleBikeCreation(e.bikesNum, e.testBikeId);
         }
 
         if (configContainer.shouldGeneratePedestriansAndBuses()) {

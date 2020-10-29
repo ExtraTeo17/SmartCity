@@ -7,15 +7,18 @@ import { startSimulationDataUpdated } from "../../../redux/core/actions";
 import {
   D_PEDS_NUM,
   D_TEST_PED,
+  D_GENERATE_CARS,
   D_CARS_NUM,
   D_TEST_CAR,
-  D_TIME_BEFORE_TROUBLE,
-  D_GENERATE_CARS,
+  D_GENERATE_BIKES,
+  D_BIKES_NUM,
+  D_TEST_BIKE,
   D_GENERATE_TP,
+  D_TIME_BEFORE_TROUBLE,
   D_GENERATE_TJ,
 } from "../../../constants/defaults";
 
-import { PED_MIN, PED_MAX, CAR_MIN, CAR_MAX } from "../../../constants/minMax";
+import { PED_MIN, PED_MAX, CAR_MIN, CAR_MAX, BIKE_MIN, BIKE_MAX } from "../../../constants/minMax";
 
 import { StartState } from "../../../redux/models/startState";
 import "../../../styles/Menu.css";
@@ -24,9 +27,15 @@ const SubMenu = props => {
   const { shouldStart, wasStarted, generatePedestrians } = props;
   const [pedLimit, setPedLimit] = useState(D_PEDS_NUM);
   const [testPedId, setTestPedId] = useState(D_TEST_PED);
+
+  const [generateCars, setGenerateCars] = useState(D_GENERATE_CARS);
   const [carsLimit, setCarsLimit] = useState(D_CARS_NUM);
   const [testCarId, setTestCarId] = useState(D_TEST_CAR);
-  const [generateCars, setGenerateCars] = useState(D_GENERATE_CARS);
+
+  const [generateBikes, setGenerateBikes] = useState(D_GENERATE_BIKES);
+  const [bikesLimit, setBikesLimit] = useState(D_BIKES_NUM);
+  const [testBikeId, setTestBikeId] = useState(D_TEST_BIKE);
+
   const [generateTroublePoints, setGenerateTroublePoints] = useState(D_GENERATE_TP);
   const [generateTrafficJams, setGenerateTrafficJams] = useState(D_GENERATE_TJ);
   const [timeBeforeTrouble, setTimeBeforeTrouble] = useState(D_TIME_BEFORE_TROUBLE);
@@ -35,9 +44,14 @@ const SubMenu = props => {
     if (shouldStart === StartState.Invoke) {
       dispatch(
         startSimulationDataUpdated({
+          generateCars,
           carsLimit,
           testCarId,
-          generateCars,
+
+          generateBikes,
+          bikesLimit,
+          testBikeId,
+
           generateTroublePoints,
           generateTrafficJams,
           timeBeforeTrouble,
@@ -48,6 +62,10 @@ const SubMenu = props => {
     }
   }
   useEffect(onStart, [shouldStart]);
+
+  function evSetGenerateCars(e) {
+    setGenerateCars(e.target.checked);
+  }
 
   function evSetCarsLimit(e) {
     const val = parseInt(e.target.value);
@@ -63,8 +81,22 @@ const SubMenu = props => {
     }
   }
 
-  function evSetGenerateCars(e) {
-    setGenerateCars(e.target.checked);
+  function evSetGenerateBikes(e) {
+    setGenerateBikes(e.target.checked);
+  }
+
+  function evSetBikesLimit(e) {
+    const val = parseInt(e.target.value);
+    if (!isNaN(val)) {
+      setBikesLimit(val);
+    }
+  }
+
+  function evSetTestBikeId(e) {
+    const val = parseInt(e.target.value);
+    if (!isNaN(val)) {
+      setTestBikeId(val);
+    }
   }
 
   function evSetGenerateTroublePoints(e) {
@@ -157,6 +189,52 @@ const SubMenu = props => {
               defaultValue={testCarId}
               placeholder="Enter test car number"
               onChange={evSetTestCarId}
+            />
+          </div>
+        </div>
+      )}
+
+      <div className="form-check user-select-none">
+        <input
+          type="checkbox"
+          disabled={wasStarted}
+          checked={generateBikes}
+          className="form-check-input"
+          id="generateBikes"
+          onChange={evSetGenerateBikes}
+        />
+        <label htmlFor="generateBikes" className="form-check-label">
+          Generate bikes
+        </label>
+      </div>
+      {generateBikes && (
+        <div className="form-row  mt-2 align-items-end">
+          <div className="form-group col-md-5">
+            <label htmlFor="carsNum">Bikes limit</label>
+            <input
+              type="number"
+              defaultValue={bikesLimit}
+              className="form-control"
+              id="bikesNum"
+              disabled={wasStarted}
+              min={BIKE_MIN}
+              max={BIKE_MAX}
+              placeholder="Enter limit for bikes"
+              onChange={evSetBikesLimit}
+            />
+          </div>
+          <div className="form-group col-md-7">
+            <label htmlFor="testBikeId">Test bike number</label>
+            <input
+              type="number"
+              className="form-control"
+              id="testBikeId"
+              disabled={wasStarted}
+              min={1}
+              max={1000}
+              defaultValue={testBikeId}
+              placeholder="Enter test bike number"
+              onChange={evSetTestBikeId}
             />
           </div>
         </div>

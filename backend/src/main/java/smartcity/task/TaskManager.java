@@ -60,9 +60,9 @@ public class TaskManager implements ITaskManager {
     @Override
     public void scheduleCarCreation(int carsLimit, int testCarId) {
         Consumer<Integer> createCars = (runCount) -> {
-            var posAandB = getRandomPositions();
+            var randomPositions = getRandomPositions();
 
-            taskProvider.getCreateCarTask(posAandB.first, posAandB.second, runCount == testCarId).run();
+            taskProvider.getCreateCarTask(randomPositions.first, randomPositions.second, runCount == testCarId).run();
         };
 
         runIf(() -> agentsContainer.size(VehicleAgent.class) < carsLimit, createCars, CREATE_CAR_INTERVAL, true);
