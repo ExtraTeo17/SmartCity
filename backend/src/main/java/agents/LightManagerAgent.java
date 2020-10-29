@@ -8,6 +8,7 @@ import jade.core.behaviours.TickerBehaviour;
 import jade.lang.acl.ACLMessage;
 import jade.util.leap.Properties;
 import smartcity.ITimeProvider;
+import smartcity.TimeProvider;
 import smartcity.config.ConfigContainer;
 import smartcity.lights.OptimizationResult;
 import smartcity.lights.abstractions.ICrossroad;
@@ -39,7 +40,7 @@ public class LightManagerAgent extends AbstractAgent {
         print("I'm a traffic manager.");
         crossroad.startLifetime();
 
-        var notifyCarAboutGreen = new TickerBehaviour(this, 1000) {//100 / TimeProvider.TIME_SCALE) {
+        var notifyCarAboutGreen = new TickerBehaviour(this, 10_000/ TimeProvider.TIME_SCALE) {
             @Override
             protected void onTick() {
                 //for all Light check

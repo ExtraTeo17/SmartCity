@@ -76,12 +76,12 @@ export default {
       }
 
       case START_TRAFFIC_JAM_INFO: {
-        Dispatcher.startTrafficJam(payload.id);
+        Dispatcher.startTrafficJam(payload.lightId);
         break;
       }
 
       case END_TRAFFIC_JAM_INFO: {
-        Dispatcher.endTrafficJam(payload.id);
+        Dispatcher.endTrafficJam(payload.lightId);
         break;
       }
 

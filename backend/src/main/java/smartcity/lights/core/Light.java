@@ -43,7 +43,7 @@ public class Light extends Position {
     }
 
     public long getAdjacentWayId() {
-        return adjacentOsmWayId + adjacentOsmWayId;
+        return adjacentOsmWayId;
     }
 
     public long uniqueId() {

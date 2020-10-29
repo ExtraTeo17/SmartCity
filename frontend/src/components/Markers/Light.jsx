@@ -9,9 +9,12 @@ const Light = props => {
   const initMarker = ref => {
     if (ref && light.jammed) {
       const elem = ref.leafletElement;
-      const htmlElem = elem.getPane();
+      const htmlElem = elem.getElement();
       htmlElem.classList.add("jammed");
-      console.log(htmlElem);
+    } else if (ref) {
+      const elem = ref.leafletElement;
+      const htmlElem = elem.getElement();
+      htmlElem.classList.remove("jammed");
     }
   };
 

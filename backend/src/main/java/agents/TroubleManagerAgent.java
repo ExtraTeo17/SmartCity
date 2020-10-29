@@ -182,7 +182,7 @@ public class TroubleManagerAgent extends Agent {
         addBehaviour(communication);
 
 
-        Behaviour sayAboutJam = new TickerBehaviour(this, 20_000 / TimeProvider.TIME_SCALE) {
+        Behaviour sayAboutJam = new TickerBehaviour(this, 2_000 / TimeProvider.TIME_SCALE) {
             @Override
             protected void onTick() {
                 if (configContainer.getSimulationState() != SimulationState.RUNNING) {
@@ -190,6 +190,7 @@ public class TroubleManagerAgent extends Agent {
                 }
 
                 if (!configContainer.shouldGenerateTrafficJams()) {
+                    logger.warn("Stopping sayAboutJam");
                     stop();
                 }
 
@@ -202,15 +203,8 @@ public class TroubleManagerAgent extends Agent {
         addBehaviour(sayAboutJam);
     }
 
-    private boolean de;
-
     @Subscribe
     void handle(DebugEvent e) {
-        if (de) {
-            eventBus.post(new TrafficJamFinishedEvent(70164322463723L));
-        }
 
-        eventBus.post(new TrafficJamStartedEvent(70164322463723L));
-        de = true;
     }
 }
