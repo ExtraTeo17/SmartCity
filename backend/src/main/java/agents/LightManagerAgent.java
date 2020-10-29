@@ -40,7 +40,7 @@ public class LightManagerAgent extends AbstractAgent {
         print("I'm a traffic manager.");
         crossroad.startLifetime();
 
-        var notifyCarAboutGreen = new TickerBehaviour(this, 10_000/ TimeProvider.TIME_SCALE) {
+        var notifyCarAboutGreen = new TickerBehaviour(this, 10_000 / TimeProvider.TIME_SCALE) {
             @Override
             protected void onTick() {
                 //for all Light check

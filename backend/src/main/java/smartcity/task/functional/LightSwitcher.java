@@ -44,7 +44,6 @@ class LightSwitcher implements Function<ISwitchLightsContext, Integer> {
         this.lights = lights;
         this.lightOsmId = lights.iterator().next().getOsmLightId();
         this.logger = LoggerFactory.getLogger("LightSwitcher" + managerId);
-        ;
     }
 
     @Override

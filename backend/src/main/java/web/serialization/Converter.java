@@ -45,7 +45,7 @@ public class Converter {
 
     public static BusDto convert(Bus bus) {
         var id = bus.getAgentId();
-        var location = convert((IGeoPosition) bus.getPosition());
+        var location = convert(bus.getPosition());
         var routeLocations = bus.getSimpleRoute().stream().map(Converter::convert).toArray(Location[]::new);
         var fillState = convert(bus.getFillState());
 

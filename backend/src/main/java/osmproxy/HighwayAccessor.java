@@ -56,7 +56,6 @@ public class HighwayAccessor {
     public static Pair<List<Long>, List<RouteNode>> getOsmWayIdsAndPointList(double fromLat, double fromLon,
                                                                              double toLat, double toLon,
                                                                              boolean bewareOfJammedRoutes) {
-        ;
 
         GHResponse response = new GHResponse();
         GHRequest request = new GHRequest(fromLat, fromLon, toLat, toLon).setVehicle("car");

@@ -9,7 +9,7 @@ import routing.nodes.StationNode;
 import java.util.List;
 
 public interface IRouteGenerator {
-    List<RouteNode> generateRouteInfo(IGeoPosition pointA, IGeoPosition pointB,String typeOfVehicle);
+    List<RouteNode> generateRouteInfo(IGeoPosition pointA, IGeoPosition pointB, String typeOfVehicle);
 
     List<RouteNode> generateRouteInfoWithJams(IGeoPosition pointA, IGeoPosition pointB, boolean bewareOfJammedEdge);
 

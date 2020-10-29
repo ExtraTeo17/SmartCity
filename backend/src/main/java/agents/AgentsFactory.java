@@ -80,8 +80,8 @@ class AgentsFactory implements IAgentsFactory {
             //  bike = new Bike(bike, timeProvider);
         }
 
-        return new BikeAgent(id, bike, configContainer.getTimeBeforeTrouble(), timeProvider,
-                routeGenerator, routeTransformer, eventBus, configContainer);
+        return new BikeAgent(id, bike, timeProvider,
+                eventBus);
     }
 
     @Override

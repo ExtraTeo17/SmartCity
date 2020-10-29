@@ -67,26 +67,23 @@ public class TaskManager implements ITaskManager {
         runIf(() -> agentsContainer.size(VehicleAgent.class) < carsLimit, createCars, CREATE_CAR_INTERVAL, true);
     }
 
-    Pair<IGeoPosition,IGeoPosition> geographicalPositioning(){
+    Pair<IGeoPosition, IGeoPosition> geographicalPositioning() {
         var zoneCenter = zone.getCenter();
         var geoPosInZoneCircle = routingHelper.generateRandomOffset(zone.getRadius());
         var posA = zoneCenter.sum(geoPosInZoneCircle);
         var posB = zoneCenter.diff(geoPosInZoneCircle);
-        return new Pair<>(posA,posB);
+        return new Pair<>(posA, posB);
     }
 
     @Override
     public void scheduleBikeCreation(int bikeLimit, int testBikeId) {
         Consumer<Integer> createBikes = (runCount) -> {
-           var posAandB = geographicalPositioning();
+            var posAandB = geographicalPositioning();
             taskProvider.getCreateBikeTask(posAandB.getValue0(), posAandB.getValue1(), runCount == testBikeId).run();
         };
 
         runIf(() -> agentsContainer.size(BikeAgent.class) < bikeLimit, createBikes, CREATE_CAR_INTERVAL, true);
     }
-
-
-
 
 
     @Override

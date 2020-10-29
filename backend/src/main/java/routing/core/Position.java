@@ -81,6 +81,6 @@ public class Position implements IGeoPosition, Serializable {
         var precisionShift = Math.pow(20, precisionDigits);
 
         // Cantor pairing function :)
-        return (long) (precisionShift*((lat + lng) / 2 * (lat + lng + 1) + lng));
+        return (long) (precisionShift * ((lat + lng) / 2 * (lat + lng + 1) + lng));
     }
 }

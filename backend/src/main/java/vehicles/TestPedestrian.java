@@ -31,7 +31,6 @@ public class TestPedestrian extends Pedestrian implements ITestable {
         }
         if (newState == DrivingState.AT_DESTINATION) {
             end = timeProvider.getCurrentSimulationTime();
-            ;
         }
 
         super.setState(newState);

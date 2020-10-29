@@ -1,29 +1,17 @@
 package gui;
 
-import agents.*;
-import agents.abstractions.IAgentsContainer;
-import com.google.common.eventbus.EventBus;
 import com.google.inject.Inject;
-import events.web.PrepareSimulationEvent;
 import org.jxmapviewer.JXMapViewer;
 import org.jxmapviewer.OSMTileFactoryInfo;
 import org.jxmapviewer.input.MapClickListener;
 import org.jxmapviewer.input.ZoomMouseWheelListenerCursor;
-import org.jxmapviewer.painter.CompoundPainter;
 import org.jxmapviewer.painter.Painter;
-import org.jxmapviewer.viewer.*;
+import org.jxmapviewer.viewer.DefaultTileFactory;
+import org.jxmapviewer.viewer.GeoPosition;
+import org.jxmapviewer.viewer.TileFactoryInfo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import routing.core.IGeoPosition;
-import routing.core.IZone;
-import routing.core.Position;
-import smartcity.ITimeProvider;
-import smartcity.SimulationState;
 import smartcity.config.ConfigContainer;
-import smartcity.task.abstractions.ITaskProvider;
-import vehicles.Bus;
-import vehicles.TestCar;
-import vehicles.TestPedestrian;
 
 import javax.swing.*;
 import javax.swing.border.TitledBorder;
@@ -31,7 +19,6 @@ import javax.swing.event.MouseInputListener;
 import java.awt.*;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-import java.time.ZoneId;
 import java.util.List;
 import java.util.Timer;
 import java.util.*;
@@ -40,11 +27,7 @@ import java.util.*;
 public class MapWindow {
     private static final Logger logger = LoggerFactory.getLogger(MapWindow.class);
     private static final int REFRESH_MAP_INTERVAL_MILLISECONDS = 100;
-    private final EventBus eventBus;
-    private final IAgentsContainer agentsContainer;
     private final ConfigContainer configContainer;
-    private final ITaskProvider taskProvider;
-    private final ITimeProvider timeProvider;
 
     public JPanel MainPanel;
     private final JXMapViewer MapViewer;
@@ -75,28 +58,13 @@ public class MapWindow {
     private JLabel ResultTimeTitle;
     private JButton testBusZoneButton;
     private JButton testCarZoneButton;
-    private Timer refreshTimer = new Timer(true);
-    private IGeoPosition pointA;
-    private IGeoPosition pointB;
+    private final Timer refreshTimer = new Timer(true);
     private final Random random = new Random();
     private static final DateFormat dateFormat = new SimpleDateFormat("kk:mm:ss dd-MM-yyyy");
-    private final IZone zone;
-    // TODO: Temporary solution to make it work with old gui
-    private Runnable simulationReadyCallback = () -> {
-    };
 
     @Inject
-    public MapWindow(EventBus eventBus,
-                     IAgentsContainer agentsContainer,
-                     ConfigContainer configContainer,
-                     ITaskProvider taskProvider,
-                     ITimeProvider timeProvider) {
-        this.eventBus = eventBus;
-        this.agentsContainer = agentsContainer;
+    public MapWindow(ConfigContainer configContainer) {
         this.configContainer = configContainer;
-        this.zone = configContainer.getZone();
-        this.taskProvider = taskProvider;
-        this.timeProvider = timeProvider;
 
         MapViewer = new JXMapViewer();
         currentTimeLabel.setVisible(false);
@@ -119,7 +87,6 @@ public class MapWindow {
             }
         });
 
-        UseStrategyCheckBox.addItemListener(e -> configContainer.setLightStrategyActive(UseStrategyCheckBox.isSelected()));
 
         seedSpinner.setModel(new SpinnerNumberModel(69, 0, 999999, 1));
         latSpinner.setModel(new SpinnerNumberModel(52.23682, -90, 90, 1));
@@ -134,31 +101,19 @@ public class MapWindow {
                 testCarIdSpinner.setValue(value);
             }
         });
-        setZoneButton.addActionListener(e -> eventBus.post(
-                new PrepareSimulationEvent(
-                        (double) latSpinner.getValue(),
-                        (double) lonSpinner.getValue(),
-                        (int) radiusSpinner.getValue(), configContainer.shouldGeneratePedestriansAndBuses())
-        ));
 
         testCarZoneButton.addActionListener(e -> {
             latSpinner.setValue(52.23682);
             lonSpinner.setValue(21.01681);
             seedSpinner.setValue(34);
             radiusSpinner.setValue(600);
-            eventBus.post(new PrepareSimulationEvent(52.23682, 21.01681,
-                    600, configContainer.shouldGeneratePedestriansAndBuses()));
         });
 
         testBusZoneButton.addActionListener(e -> {
             latSpinner.setValue(52.237037);
             lonSpinner.setValue(21.017928);
             radiusSpinner.setValue(190);
-            if (!configContainer.shouldGeneratePedestriansAndBuses()) {
-                logger.warn("Pedestrians won't be generated");
-            }
-            eventBus.post(new PrepareSimulationEvent(52.203342, 20.861213,
-                    300, configContainer.shouldGeneratePedestriansAndBuses()));
+
         });
 
         setTimeSpinner.setModel(new SpinnerDateModel());
@@ -172,26 +127,6 @@ public class MapWindow {
             @Override
             public void mapClicked(GeoPosition geoPosition) {
 
-                // TODO: Move this logic to frontend and send message when simulation running
-                var lat = geoPosition.getLatitude();
-                var lng = geoPosition.getLongitude();
-                logger.info("Lat: " + lat + " Lon: " + lng);
-                switch (configContainer.getSimulationState()) {
-                    case INITIAL, READY_TO_RUN -> {
-                        latSpinner.setValue(lat);
-                        lonSpinner.setValue(lng);
-                    }
-                    case RUNNING -> {
-                        if (pointA == null) {
-                            pointA = Position.of(lat, lng);
-                            break;
-                        }
-                        pointB = Position.of(lat, lng);
-                        logger.info("Vehicles: " + agentsContainer.size(VehicleAgent.class));
-                        logger.info("Lights: " + agentsContainer.size(LightManagerAgent.class));
-                        pointA = pointB = null;
-                    }
-                }
             }
         });
 
@@ -206,12 +141,7 @@ public class MapWindow {
         MapPanel.add(MapViewer);
         MapPanel.revalidate();
     }
-
-
-    private int getZoneRadius() {
-        return zone.getRadius();
-    }
-
+    
     public void display() {
         var mapViewer = this.MapViewer;
         JFrame frame = new JFrame("Smart City by Katherine & Przemyslaw & Robert");
@@ -267,21 +197,7 @@ public class MapWindow {
             double lng = 21.017934679985046;
             mapViewer.setAddressLocation(new GeoPosition(lat, lng));
             mapViewer.setZoom(1);
-            eventBus.post(new PrepareSimulationEvent(lat, lng, 100, configContainer.shouldGeneratePedestriansAndBuses()
-            ));
 
-            simulationReadyCallback = () -> {
-                IGeoPosition N = Position.of(52.23758683540269, 21.017720103263855);
-                IGeoPosition S = Position.of(52.23627934304847, 21.018092930316925);
-                IGeoPosition E = Position.of(52.237225472020704, 21.019399166107178);
-                IGeoPosition W = Position.of(52.23678526174392, 21.016663312911987);
-
-                createCars(N, S);
-                createCars(S, N);
-                createCars(E, W);
-                createCars(W, E);
-                // WARNING: Do not post SimulationStartEvent here - it will result in additional cars creation
-            };
         });
         debug.add(runTest);
         menuBar.add(debug);
@@ -293,28 +209,13 @@ public class MapWindow {
         frame.setVisible(true);
     }
 
-    private void createCars(IGeoPosition start, IGeoPosition end) {
-        try {
-            var createCar = taskProvider.getCreateCarTask(start, end, false);
-            for (int i = 0; i < 5; ++i) {
-                createCar.run();
-            }
-        } catch (Exception ex) {
-            logger.warn("Error creating car", ex);
-        }
-    }
 
     private void addGenerationMenu(JMenuBar menuBar) {
         JMenu generation = new JMenu("Generation");
 
-        final JCheckBoxMenuItem car_gen = new JCheckBoxMenuItem("Cars", configContainer.shouldGenerateCars());
-        car_gen.addItemListener(e -> configContainer.setGenerateCars(car_gen.getState()));
+        final JCheckBoxMenuItem car_gen = new JCheckBoxMenuItem("Cars");
         generation.add(car_gen);
 
-        final JCheckBoxMenuItem pedestrians = new JCheckBoxMenuItem("Pedestrians and buses",
-                configContainer.shouldGeneratePedestriansAndBuses());
-        pedestrians.addItemListener(e -> configContainer.setGeneratePedestriansAndBuses(pedestrians.getState()));
-        generation.add(pedestrians);
 
         menuBar.add(generation);
     }
@@ -350,183 +251,32 @@ public class MapWindow {
     }
 
     private void refreshTime() {
-        var simulationTime = timeProvider.getCurrentSimulationTime();
-        var instant = simulationTime.atZone(ZoneId.systemDefault()).toInstant();
-        var date = Date.from(instant);
-        currentTimeLabel.setText(dateFormat.format(date));
     }
 
 
     private void drawVehicles(List<Painter<JXMapViewer>> painters) {
-        try {
-            Set<Waypoint> set = new HashSet<>();
-            agentsContainer.forEach(VehicleAgent.class, a -> {
-                var vehicle = a.getVehicle();
-                if (vehicle.isAtDestination()) {
-                    return;
-                }
-                var waypoint = new DefaultWaypoint(vehicle.getPosition().toMapGeoPosition());
-                if (a.getVehicle() instanceof TestCar) {
-                    Set<Waypoint> testCarWaypoint = new HashSet<>();
-                    testCarWaypoint.add(waypoint);
-
-                    WaypointPainter<Waypoint> testPainter = new WaypointPainter<>();
-                    testPainter.setWaypoints(testCarWaypoint);
-                    testPainter.setRenderer(new CustomWaypointRenderer("test_car.png"));
-                    painters.add(testPainter);
-                }
-                else {
-                    set.add(waypoint);
-                }
-            });
-            WaypointPainter<Waypoint> waypointPainter = new WaypointPainter<>();
-            waypointPainter.setWaypoints(set);
-            waypointPainter.setRenderer(new CustomWaypointRenderer("cabriolet.png"));
-            painters.add(waypointPainter);
-        } catch (Exception e) {
-            logger.warn("Error drawing vehicles", e);
-        }
     }
 
     private void drawRoutes(List<Painter<JXMapViewer>> painters) {
-        try {
-            agentsContainer.forEach(VehicleAgent.class, veh -> {
-                List<IGeoPosition> track = new ArrayList<>(veh.getVehicle().getSimpleRoute());
-
-                Random r = new Random(veh.hashCode());
-                RoutePainter routePainter = new RoutePainter(track, new Color(r.nextInt(255), r.nextInt(255), r.nextInt(255)));
-                painters.add(routePainter);
-            });
-        } catch (Exception e) {
-            logger.warn("Error drawing routes", e);
-        }
     }
 
     private void drawPedestrians(List<Painter<JXMapViewer>> painters) {
-        try {
-            Set<Waypoint> set = new HashSet<>();
-            agentsContainer.forEach(PedestrianAgent.class, (ped) -> {
-                if (!ped.isInBus()) {
-                    var waypoint = new DefaultWaypoint(ped.getPedestrian().getPosition().toMapGeoPosition());
-                    if (ped.getPedestrian() instanceof TestPedestrian) {
-                        Set<Waypoint> testPedestrianWaypoint = new HashSet<>();
-                        testPedestrianWaypoint.add(waypoint);
-
-                        WaypointPainter<Waypoint> testPainter = new WaypointPainter<>();
-                        testPainter.setWaypoints(testPedestrianWaypoint);
-                        testPainter.setRenderer(new CustomWaypointRenderer("pedestrian_blue.png"));
-                        painters.add(testPainter);
-                    }
-                    else {
-                        set.add(waypoint);
-                    }
-                }
-            });
-            WaypointPainter<Waypoint> waypointPainter = new WaypointPainter<>();
-            waypointPainter.setWaypoints(set);
-            waypointPainter.setRenderer(new CustomWaypointRenderer("pedestrian_small.png"));
-            painters.add(waypointPainter);
-        } catch (Exception e) {
-            logger.warn("Error drawing pedestrians", e);
-        }
     }
 
     private void drawPedestrianRoutes(List<Painter<JXMapViewer>> painters) {
-        try {
-            agentsContainer.forEach(PedestrianAgent.class, (a) -> {
-                List<IGeoPosition> trackBefore = new ArrayList<>(a.getPedestrian().getDisplayRouteBeforeBus());
-                List<IGeoPosition> trackAfter = new ArrayList<>(a.getPedestrian().getDisplayRouteAfterBus());
-
-                Random r = new Random(a.hashCode());
-                Color c = new Color(r.nextInt(255), r.nextInt(255), r.nextInt(255));
-                RoutePainter routePainterBefore = new RoutePainter(trackBefore, c);
-                RoutePainter routePainterAfter = new RoutePainter(trackAfter, c);
-                painters.add(routePainterBefore);
-                painters.add(routePainterAfter);
-            });
-        } catch (Exception e) {
-            logger.warn("Error drawing pedestrian routes", e);
-        }
     }
 
     private void drawBuses(List<Painter<JXMapViewer>> painters) {
-        try {
-            Set<Waypoint> set_low = new HashSet<>();
-            Set<Waypoint> set_mid = new HashSet<>();
-            Set<Waypoint> set_high = new HashSet<>();
-            agentsContainer.forEach(BusAgent.class, busAgent -> {
-                var bus = busAgent.getBus();
-                int count = bus.getPassengersCount();
-                var pos = bus.getPosition().toMapGeoPosition();
-                if (count > Bus.CAPACITY_HIGH) {
-                    set_high.add(new DefaultWaypoint(pos));
-                }
-                else if (count > Bus.CAPACITY_MID) {
-                    set_mid.add(new DefaultWaypoint(pos));
-                }
-                else {
-                    set_low.add(new DefaultWaypoint(pos));
-                }
-            });
-
-            WaypointPainter<Waypoint> painter_low = new WaypointPainter<>();
-            painter_low.setWaypoints(set_low);
-            painter_low.setRenderer(new CustomWaypointRenderer("bus_low.png"));
-            painters.add(painter_low);
-
-            WaypointPainter<Waypoint> painter_mid = new WaypointPainter<>();
-            painter_mid.setWaypoints(set_mid);
-            painter_mid.setRenderer(new CustomWaypointRenderer("bus.png"));
-            painters.add(painter_mid);
-
-            WaypointPainter<Waypoint> painter_high = new WaypointPainter<>();
-            painter_high.setWaypoints(set_high);
-            painter_high.setRenderer(new CustomWaypointRenderer("bus_high.png"));
-            painters.add(painter_high);
-        } catch (Exception e) {
-            logger.warn("Error drawing buses", e);
-        }
     }
 
     private void drawBusRoutes(List<Painter<JXMapViewer>> painters) {
-        try {
-            agentsContainer.forEach(BusAgent.class, busAgent -> {
-                var bus = busAgent.getBus();
-                List<IGeoPosition> track = new ArrayList<>(bus.getSimpleRoute());
-
-                Random r = new Random(busAgent.hashCode());
-                RoutePainter routePainter = new RoutePainter(track, new Color(r.nextInt(255), r.nextInt(255), r.nextInt(255)));
-                painters.add(routePainter);
-
-            });
-        } catch (Exception e) {
-            logger.error("Error drawing bus routes", e);
-            renderBusRoutes = false;
-        }
     }
 
     private void drawZones(Collection<Painter<JXMapViewer>> painters) {
-        if (zone != null) {
-            Set<Waypoint> set = new HashSet<>();
-            set.add(new DefaultWaypoint(zone.getCenter().toMapGeoPosition()));
-            WaypointPainter<Waypoint> waypointPainter = new WaypointPainter<>();
-            waypointPainter.setWaypoints(set);
-            waypointPainter.setRenderer(new CustomWaypointRenderer("blue_waypoint.png"));
-            painters.add(waypointPainter);
 
-            painters.add(new ZonePainter(zone.getCenter(), getZoneRadius(), Color.BLUE));
-        }
     }
 
     private void drawStations(List<Painter<JXMapViewer>> painters) {
-        Set<Waypoint> set = new HashSet<>();
-        agentsContainer.forEach(StationAgent.class, ag -> {
-            set.add(new DefaultWaypoint(ag.getStation().toMapGeoPosition()));
-        });
-        WaypointPainter<Waypoint> waypointPainter = new WaypointPainter<>();
-        waypointPainter.setWaypoints(set);
-        waypointPainter.setRenderer(new CustomWaypointRenderer("bus_stop.png"));
-        painters.add(waypointPainter);
     }
 
     {
@@ -783,38 +533,7 @@ public class MapWindow {
         @Override
         public void run() {
             try {
-                List<Painter<JXMapViewer>> painters = new ArrayList<>();
-                if (renderZone) {
-                    drawZones(painters);
-                }
-                if (configContainer.getSimulationState() != SimulationState.INITIAL) {
-                    if (renderBusRoutes && configContainer.shouldGeneratePedestriansAndBuses()) {
-                        drawBusRoutes(painters);
-                    }
-                    if (renderCarRoutes && configContainer.shouldGenerateCars()) {
-                        drawRoutes(painters);
-                    }
-                    if (renderPedestrianRoutes && configContainer.shouldGeneratePedestriansAndBuses()) {
-                        drawPedestrianRoutes(painters);
-                    }
-                    if (renderStations) {
-                        drawStations(painters);
-                    }
-                    if (renderCars && configContainer.shouldGenerateCars()) {
-                        drawVehicles(painters);
-                    }
-                    if (renderBuses && configContainer.shouldGeneratePedestriansAndBuses()) {
-                        drawBuses(painters);
-                    }
-                    if (renderPedestrians && configContainer.shouldGeneratePedestriansAndBuses()) {
-                        drawPedestrians(painters);
-                    }
-                }
-                CompoundPainter<JXMapViewer> painter = new CompoundPainter<>(painters);
-                MapViewer.setOverlayPainter(painter);
-                if (configContainer.getSimulationState() == SimulationState.RUNNING) {
-                    refreshTime();
-                }
+
             } catch (Exception e) {
                 logger.error("Error refreshing simulation", e);
             }

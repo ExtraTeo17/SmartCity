@@ -1,10 +1,6 @@
 package smartcity.lights.core;
 
-import gui.CustomWaypointRenderer;
 import org.jetbrains.annotations.NotNull;
-import org.jxmapviewer.viewer.DefaultWaypoint;
-import org.jxmapviewer.viewer.Waypoint;
-import org.jxmapviewer.viewer.WaypointPainter;
 import routing.core.Position;
 import smartcity.lights.LightColor;
 import smartcity.lights.OptimizationResult;
@@ -85,15 +81,6 @@ public class Light extends Position {
 
     public boolean isGreen() {
         return carLightColor == LightColor.GREEN;
-    }
-
-    void draw(Collection<Waypoint> lightSet, WaypointPainter<Waypoint> painter) {
-        lightSet.add(new DefaultWaypoint(getLat(), getLng()));
-        switch (carLightColor) {
-            case RED -> painter.setRenderer(new CustomWaypointRenderer("light_red.png"));
-            case YELLOW -> painter.setRenderer(new CustomWaypointRenderer("light_yellow.png"));
-            case GREEN -> painter.setRenderer(new CustomWaypointRenderer("light_green.png"));
-        }
     }
 
     public void switchLight() {

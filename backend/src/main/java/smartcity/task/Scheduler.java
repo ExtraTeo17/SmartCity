@@ -49,7 +49,7 @@ public class Scheduler {
             taskManager.scheduleCarCreation(e.carsNum, e.testCarId);
         }
         // TODO: Add bikes limit and testBikeID
-        if(configContainer.shouldGenerateBikes()){
+        if (configContainer.shouldGenerateBikes()) {
             taskManager.scheduleBikeCreation(20, 10);
         }
         if (configContainer.shouldGeneratePedestriansAndBuses()) {

@@ -9,44 +9,25 @@ import jade.core.behaviours.CyclicBehaviour;
 import jade.core.behaviours.TickerBehaviour;
 import jade.lang.acl.ACLMessage;
 import jade.util.leap.Properties;
-import routing.abstractions.IRouteGenerator;
-import routing.abstractions.IRouteTransformer;
 import routing.core.IGeoPosition;
 import routing.nodes.LightManagerNode;
 import smartcity.ITimeProvider;
 import smartcity.SmartCityAgent;
-import smartcity.config.ConfigContainer;
 import vehicles.MovingObject;
 import vehicles.enums.DrivingState;
-
-import java.util.Random;
 
 import static agents.message.MessageManager.createMessage;
 import static agents.message.MessageManager.createProperties;
 import static routing.RoutingConstants.STEP_CONSTANT;
 
 public class BikeAgent extends AbstractAgent {
-    private static final Random random = new Random();
-
     private final MovingObject vehicle;
-    private final int timeBeforeAccident;
-    private final IRouteGenerator routeGenerator;
-    private final IRouteTransformer routeTransformer;
-    private final ConfigContainer configContainer;
 
-
-    BikeAgent(int id, MovingObject vehicle, int timeBeforeAccident,
-                 ITimeProvider timeProvider,
-                 IRouteGenerator routeGenerator,
-                 IRouteTransformer routeTransformer,
-                 EventBus eventBus,
-                 ConfigContainer configContainer) {
+    BikeAgent(int id, MovingObject vehicle,
+              ITimeProvider timeProvider,
+              EventBus eventBus) {
         super(id, vehicle.getVehicleType(), timeProvider, eventBus);
         this.vehicle = vehicle;
-        this.timeBeforeAccident = timeBeforeAccident;
-        this.routeGenerator = routeGenerator;
-        this.routeTransformer = routeTransformer;
-        this.configContainer = configContainer;
     }
 
     @Override
@@ -125,10 +106,6 @@ public class BikeAgent extends AbstractAgent {
                 }
                 block(100);
             }
-
-
-
-
 
 
         };
