@@ -20,7 +20,6 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 
-// TODO: Interface
 @Beta
 public class LightAccessManager implements ILightAccessManager {
     private static final Logger logger = LoggerFactory.getLogger(LightAccessManager.class);

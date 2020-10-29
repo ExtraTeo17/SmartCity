@@ -5,8 +5,7 @@ import Light from "../Markers/Light";
 
 const LightsLayer = props => {
   const { lights = [] } = props;
-  // eslint-disable-next-line react/no-array-index-key
-  const lightMarkers = lights.map(light => <Light key={`$light${light.id}`} light={light} />);
+  const lightMarkers = lights.map((light, ind) => <Light key={`$light${light.id + ind}`} light={light} />);
 
   return <>{lightMarkers}</>;
 };

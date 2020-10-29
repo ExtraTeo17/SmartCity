@@ -7,6 +7,11 @@ public class StartSimulationEvent {
     public final int carsNum;
     public final int testCarId;
 
+    public final boolean shouldGenerateBikes;
+    public final int bikesNum;
+    public final int testBikeId;
+
+    public final boolean shouldGenerateTrafficJams;
     public final boolean shouldGenerateTroublePoints;
     public final int timeBeforeTrouble;
 
@@ -25,16 +30,29 @@ public class StartSimulationEvent {
     public final boolean changeRouteStrategyActive;
 
     public StartSimulationEvent(boolean shouldGenerateCars,
-                                int carsNum, int testCarId,
-                                boolean generateTroublePoints, int timeBeforeTrouble,
-                                int pedestriansLimit, int testPedestrianId,
+                                int carsNum,
+                                int testCarId,
+                                boolean shouldGenerateBikes,
+                                int bikesNum,
+                                int testBikeId,
+                                boolean generateTrafficJams,
+                                boolean generateTroublePoints,
+                                int timeBeforeTrouble,
+                                int pedestriansLimit,
+                                int testPedestrianId,
                                 LocalDateTime startTime,
-                                boolean lightStrategyActive, int extendLightTime,
-                                boolean stationStrategyActive, int extendWaitTime,
+                                boolean lightStrategyActive,
+                                int extendLightTime,
+                                boolean stationStrategyActive,
+                                int extendWaitTime,
                                 boolean changeRouteStrategyActive) {
         this.carsNum = carsNum;
         this.testCarId = testCarId;
         this.shouldGenerateCars = shouldGenerateCars;
+        this.shouldGenerateBikes = shouldGenerateBikes;
+        this.bikesNum = bikesNum;
+        this.testBikeId = testBikeId;
+        this.shouldGenerateTrafficJams = generateTrafficJams;
         this.shouldGenerateTroublePoints = generateTroublePoints;
         this.timeBeforeTrouble = timeBeforeTrouble;
         this.pedestriansLimit = pedestriansLimit;

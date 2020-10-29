@@ -4,23 +4,31 @@ import agents.AgentsModule;
 import com.google.common.eventbus.DeadEvent;
 import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
-import com.google.inject.Binder;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
 import events.ClearSimulationEvent;
 import events.LightManagersReadyEvent;
 import events.SwitchLightsStartEvent;
-import events.web.*;
+import events.web.PrepareSimulationEvent;
+import events.web.SimulationPreparedEvent;
+import events.web.SimulationStartedEvent;
+import events.web.StartSimulationEvent;
+import events.web.bike.BikeAgentCreatedEvent;
+import events.web.bike.BikeAgentDeadEvent;
+import events.web.bike.BikeAgentUpdatedEvent;
 import events.web.bus.BusAgentDeadEvent;
 import events.web.bus.BusAgentFillStateUpdatedEvent;
 import events.web.bus.BusAgentStartedEvent;
 import events.web.bus.BusAgentUpdatedEvent;
 import events.web.pedestrian.*;
+import events.web.roadblocks.TrafficJamFinishedEvent;
+import events.web.roadblocks.TrafficJamStartedEvent;
+import events.web.roadblocks.TroublePointCreatedEvent;
+import events.web.roadblocks.TroublePointVanishedEvent;
 import events.web.vehicle.VehicleAgentCreatedEvent;
 import events.web.vehicle.VehicleAgentDeadEvent;
 import events.web.vehicle.VehicleAgentRouteChangedEvent;
 import events.web.vehicle.VehicleAgentUpdatedEvent;
-import gui.MapWindow;
 import jade.wrapper.ContainerController;
 import jade.wrapper.StaleProxyException;
 import org.junit.jupiter.api.Test;
@@ -39,7 +47,6 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.mockito.Mockito.mock;
 
 @SuppressWarnings("OverlyCoupledClass")
 class InjectorTests {
@@ -95,19 +102,29 @@ class InjectorTests {
         eventBus.post(new SimulationPreparedEvent(new ArrayList<>(), new ArrayList<>(), new ArrayList<>()));
         eventBus.post("Test"); // Dead event
         eventBus.post(new StartSimulationEvent(false, 0, 0, false,
-                5000, 0, 1, LocalDateTime.now(), false, 30, false, 60, false));
+                0, 0, false, false,
+                5000, 0, 1, LocalDateTime.now(), false,
+                30, false, 60, false));
         eventBus.post(new SimulationStartedEvent());
         eventBus.post(new ClearSimulationEvent());
 
         // other
         eventBus.post(new TroublePointCreatedEvent(1, null));
+        eventBus.post(new TroublePointVanishedEvent(1));
         eventBus.post(new SwitchLightsStartEvent(1, null));
+        eventBus.post(new TrafficJamStartedEvent(1));
+        eventBus.post(new TrafficJamFinishedEvent(1));
 
         // vehicle
         eventBus.post(new VehicleAgentCreatedEvent(1, null, null, false));
         eventBus.post(new VehicleAgentUpdatedEvent(1, null));
         eventBus.post(new VehicleAgentRouteChangedEvent(1, new ArrayList<>(), null, new ArrayList<>()));
         eventBus.post(new VehicleAgentDeadEvent(1, 0, null));
+
+        // bike
+        eventBus.post(new BikeAgentCreatedEvent(1, null, null, false));
+        eventBus.post(new BikeAgentUpdatedEvent(1, null));
+        eventBus.post(new BikeAgentDeadEvent(1, 0, null));
 
         eventBus.post("Test"); // Dead event
 

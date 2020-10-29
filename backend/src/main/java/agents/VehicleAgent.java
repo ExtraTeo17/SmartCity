@@ -183,8 +183,9 @@ public class VehicleAgent extends AbstractAgent {
                 final IGeoPosition positionAfterWhichRouteChanges = vehicle
                         .getPositionOnIndex(indexAfterWhichRouteChanges);
                 var oldUniformRoute = vehicle.getUniformRoute();
-                var newSimpleRouteEnd = routeGenerator.generateRouteInfo(positionAfterWhichRouteChanges,
-                        oldUniformRoute.get(oldUniformRoute.size() - 1), bewareOfJammedEdge);
+                var newSimpleRouteEnd = routeGenerator.generateRouteInfoWithJams(positionAfterWhichRouteChanges,
+                        oldUniformRoute.get(oldUniformRoute.size() - 1),
+                        bewareOfJammedEdge);
                 var newRouteAfterChangeIndex = routeTransformer.uniformRoute(newSimpleRouteEnd);
                 var route = oldUniformRoute.subList(0, indexAfterWhichRouteChanges);
                 route.addAll(newRouteAfterChangeIndex);
@@ -242,7 +243,8 @@ public class VehicleAgent extends AbstractAgent {
                 }
                 properties.setProperty(MessageParameter.EDGE_ID, Long.toString(currentInternalID));
                 msg.setAllUserDefinedParameters(properties);
-                print("Send message about trouble on edge " + Long.toString(currentInternalID) + " with position: " + positionOfTroubleLight.toString());
+                print("Send message about trouble on edge " + Long.toString(currentInternalID) + " with position: " +
+                        positionOfTroubleLight.toString());
                 send(msg);
             }
 
@@ -271,7 +273,8 @@ public class VehicleAgent extends AbstractAgent {
                 if (rcv.getAllUserDefinedParameters().containsKey(MessageParameter.LENGTH_OF_JAM)) {
                     howLongTakesJam = 1000 * Double.parseDouble(rcv.getUserDefinedParameter(MessageParameter.LENGTH_OF_JAM));
                 }
-                double timeForTheEndWithoutJam = vehicle.getMillisecondsFromAToB(vehicle.getMoveIndex(), vehicle.getUniformRoute().size() - 1);
+                double timeForTheEndWithoutJam = vehicle.getMillisecondsFromAToB(vehicle.getMoveIndex(),
+                        vehicle.getUniformRoute().size() - 1);
                 double timeForTheEndWithJam = timeForTheEndWithoutJam + howLongTakesJam;
                 final Integer indexOfRouteNodeWithEdge = vehicle.findIndexOfEdgeOnRoute((long) edgeId,
                         THRESHOLD_UNTIL_INDEX_CHANGE);
@@ -285,26 +288,30 @@ public class VehicleAgent extends AbstractAgent {
             private void handleLightTrafficJamRouteChange(final int indexAfterWhichRouteChanges,
                                                           final double timeForTheEndWithJam, boolean bewareOfJammedEdge) {
                 logger.info("The traffic light with the jam is on my route, handle it");
-                double timeForOfDynamicRoute = 0; // refuse after this line normally
+                double timeForOfDynamicRoute = 0;
                 final RouteMergeInfo mergeResult = createMergedWithOldRouteAlternativeRouteFromIndex(indexAfterWhichRouteChanges,
-                        bewareOfJammedEdge);    //logger.info("THE SIZE OF NEW ROUTE TO CHECK IS " + route.size() + "------------------------");
-                timeForOfDynamicRoute = vehicle.getMillisecondsFromAToB(vehicle.getMoveIndex(), mergeResult.newUniformRoute.size() - 1);    //logger.info("TIME of route with jam: " + timeForTheEndWithJam + " TIME of dynamic route:" + timeForOfDynamicRoute );
-
+                        bewareOfJammedEdge);
+                timeForOfDynamicRoute = vehicle.getMillisecondsFromAToB(vehicle.getMoveIndex(),
+                        mergeResult.newUniformRoute.size() - 1);
                 logger.info("=======================timeForOfDynamicRoute" + timeForOfDynamicRoute);
                 logger.info("-----------------------timeForTheEndWithJam" + timeForTheEndWithJam);
                 if ( timeForTheEndWithJam > timeForOfDynamicRoute){
-                    logger.info("Trip time through the jam: " + timeForTheEndWithJam + " is longer than alternative route time: " + timeForOfDynamicRoute + ", so route will be changed"); // TODO: CHECK IF send refusal is on place // switchToNextLight was after this line
+                    logger.info("Trip time through the jam: " + timeForTheEndWithJam + " is longer than alternative route time: "
+                            + timeForOfDynamicRoute + ", so route will be changed");
+                    // TODO: CHECK IF send refusal is on place // switchToNextLight was after this line
                     updateVehicleRouteAfterMerge(indexAfterWhichRouteChanges, mergeResult);
                 }
                 else {
-                    logger.info("Trip time through the jam: " + timeForTheEndWithJam + " is shorter than alternative route time: " + timeForOfDynamicRoute + ", so route won't be changed");
+                    logger.info("Trip time through the jam: " + timeForTheEndWithJam + " is shorter than alternative route time: "
+                            + timeForOfDynamicRoute + ", so route won't be changed");
                 }
             }
 
             private void sendRefusalMessageToLightManagerAfterRouteChange() {
                 LightManagerNode currentManager = vehicle.getCurrentTrafficLightNode(); //change route, that is why send stop
                 if (currentManager != null) {
-                    ACLMessage msg = createMessage(ACLMessage.REFUSE, LightManagerAgent.name + currentManager.getLightManagerId());
+                    ACLMessage msg = createMessage(ACLMessage.REFUSE, LightManagerAgent.name +
+                            currentManager.getLightManagerId());
                     Properties properties = createProperties(MessageParameter.VEHICLE);
                     properties.setProperty(MessageParameter.ADJACENT_OSM_WAY_ID, Long.toString(currentManager.getAdjacentWayId()));
                     send(msg);
@@ -325,7 +332,8 @@ public class VehicleAgent extends AbstractAgent {
                     var route = vehicle.getUniformRoute();
                     var el = random.nextInt(route.size()); // TODO: from current index //choose trouble EdgeId
                     RouteNode troublePointTmp = route.get(el);
-                    troublePoint = new RouteNode(troublePointTmp.getLat(), troublePointTmp.getLng(), troublePointTmp.getInternalEdgeId());
+                    troublePoint = new RouteNode(troublePointTmp.getLat(), troublePointTmp.getLng(),
+                            troublePointTmp.getInternalEdgeId());
                     sendMessageAboutConstructionTrouble(); //send message to boss Agent
                     stop();
                 }

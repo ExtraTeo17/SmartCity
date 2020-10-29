@@ -1,4 +1,4 @@
-import { PREPARE_SIMULATION_REQUEST, START_SIMULATION_REQUEST } from "./MessageType";
+import { PREPARE_SIMULATION_REQUEST, START_SIMULATION_REQUEST, DEBUG_REQUEST } from "./MessageType";
 import WebServer from "./WebServer";
 
 /** PUBLIC INTERFACE ---------------------------------------------------------- */
@@ -18,37 +18,67 @@ export default {
   },
 
   startSimulation({
-    carsLimit,
-    testCarId,
-    generateCars,
-    generateTroublePoints,
-    timeBeforeTrouble,
-    startTime,
-    lightStrategyActive,
-    extendLightTime,
-    stationStrategyActive,
-    extendWaitTime,
-    changeRouteStrategyActive,
     pedLimit,
     testPedId,
+
+    generateCars,
+    carsLimit,
+    testCarId,
+
+    generateBikes,
+    bikesLimit,
+    testBikeId,
+
+    generateTrafficJams,
+    generateTroublePoints,
+    timeBeforeTrouble,
+
+    startTime,
+
+    lightStrategyActive,
+    extendLightTime,
+
+    stationStrategyActive,
+    extendWaitTime,
+
+    changeRouteStrategyActive,
   }) {
     const msg = {
       type: START_SIMULATION_REQUEST,
       payload: {
-        carsLimit,
-        testCarId,
-        generateCars,
-        generateTroublePoints,
-        timeBeforeTrouble,
-        startTime,
-        lightStrategyActive,
-        extendLightTime,
-        stationStrategyActive,
-        extendWaitTime,
-        changeRouteStrategyActive,
         pedLimit,
         testPedId,
+
+        generateCars,
+        carsLimit,
+        testCarId,
+
+        generateBikes,
+        bikesLimit,
+        testBikeId,
+
+        generateTrafficJams,
+        generateTroublePoints,
+        timeBeforeTrouble,
+
+        startTime,
+
+        lightStrategyActive,
+        extendLightTime,
+
+        stationStrategyActive,
+        extendWaitTime,
+
+        changeRouteStrategyActive,
       },
+    };
+    WebServer.send(msg);
+  },
+
+  debug() {
+    const msg = {
+      type: DEBUG_REQUEST,
+      payload: {},
     };
     WebServer.send(msg);
   },

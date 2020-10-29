@@ -8,6 +8,8 @@ import {
   SWITCH_LIGHTS_INFO,
   CREATE_TROUBLE_POINT_INFO,
   HIDE_TROUBLE_POINT_INFO,
+  START_TRAFFIC_JAM_INFO,
+  END_TRAFFIC_JAM_INFO,
   UPDATE_CAR_ROUTE_INFO,
   UPDATE_BUS_INFO,
   UPDATE_BUS_FILL_STATE_INFO,
@@ -17,10 +19,20 @@ import {
   PUSH_PEDESTRIAN_INTO_BUS_INFO,
   PULL_PEDESTRIAN_FROM_BUS_INFO,
   KILL_PEDESTRIAN_INFO,
+  CREATE_BIKE_INFO,
+  UPDATE_BIKE_INFO,
+  KILL_BIKE_INFO,
 } from "./MessageType";
 import { NOTIFY_SHOW_MS } from "../constants/global";
 import Dispatcher from "../redux/Dispatcher";
 import { BusFillState } from "../components/Models/BusFillState";
+
+function logMessage(payload) {
+  console.groupCollapsed("HandledMessage");
+  console.log("Message received.");
+  console.log(payload);
+  console.groupEnd();
+}
 
 export default {
   handle(msg) {
@@ -73,6 +85,16 @@ export default {
         break;
       }
 
+      case START_TRAFFIC_JAM_INFO: {
+        Dispatcher.startTrafficJam(payload.lightId);
+        break;
+      }
+
+      case END_TRAFFIC_JAM_INFO: {
+        Dispatcher.endTrafficJam(payload.lightId);
+        break;
+      }
+
       case UPDATE_BUS_INFO: {
         Dispatcher.updateBus(payload);
         break;
@@ -115,6 +137,19 @@ export default {
         Dispatcher.killPedestrian(payload);
         break;
       }
+
+      case CREATE_BIKE_INFO:
+        logMessage(payload);
+        Dispatcher.createBike(payload);
+        break;
+
+      case UPDATE_BIKE_INFO:
+        Dispatcher.updateBike(payload);
+        break;
+
+      case KILL_BIKE_INFO:
+        Dispatcher.killBike(payload);
+        break;
 
       default:
         console.group("Unrecognized-message");

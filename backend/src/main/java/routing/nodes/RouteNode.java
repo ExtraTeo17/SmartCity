@@ -27,13 +27,13 @@ public class RouteNode extends Position {
         return "(" + getLat() + ", " + getLng() + ")\n";
     }
 
-	public final String getDebugString(boolean isLightManager) {
-		final StringBuilder builder = new StringBuilder();
-		builder.append("[");
-		builder.append(isLightManager ? "LMN" : "RN");
-		builder.append(": ");
-		builder.append("(" + getLat() + ", " + getLng() + ")");
-		builder.append("]");
-		return builder.toString();
-	}
+    public final String getDebugString(boolean isLightManager) {
+        final StringBuilder builder = new StringBuilder();
+        builder.append("[");
+        builder.append(isLightManager ? "LMN" : "RN");
+        builder.append(": ");
+        builder.append("(" + getLat() + ", " + getLng() + ")");
+        builder.append("]");
+        return builder.toString();
+    }
 }

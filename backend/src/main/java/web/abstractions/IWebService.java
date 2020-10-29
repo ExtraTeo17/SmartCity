@@ -29,10 +29,10 @@ public interface IWebService extends IStartable {
 
     void hideTroublePoint(int id);
 
-    void changeRoute(int agentId,
-                     List<? extends IGeoPosition> routeStart,
-                     IGeoPosition changePosition,
-                     List<? extends IGeoPosition> routeEnd);
+    void changeCarRoute(int agentId,
+                        List<? extends IGeoPosition> routeStart,
+                        IGeoPosition changePosition,
+                        List<? extends IGeoPosition> routeEnd);
 
     void updateBus(int id, IGeoPosition position);
 
@@ -53,4 +53,14 @@ public interface IWebService extends IStartable {
     void pullPedestrianFromBus(int id, IGeoPosition position);
 
     void killPedestrian(int id, int travelDistance, Long travelTime);
+
+    void startTrafficJam(long id);
+
+    void endTrafficJam(long id);
+
+    void createBike(int id, IGeoPosition position, List<? extends IGeoPosition> route, boolean isTestBike);
+
+    void updateBike(int id, IGeoPosition position);
+
+    void killBike(int id, int travelDistance, Long travelTime);
 }

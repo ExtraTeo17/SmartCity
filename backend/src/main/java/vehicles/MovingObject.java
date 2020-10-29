@@ -11,7 +11,6 @@ import smartcity.TimeProvider;
 import vehicles.enums.DrivingState;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 // TODO: Change name to IVehicle/AbstractVehicle
@@ -49,7 +48,7 @@ public abstract class MovingObject {
     public abstract String getVehicleType();
 
 
-    public int getMoveIndex(){return moveIndex;}
+    public int getMoveIndex() {return moveIndex;}
 
     public int getAgentId() {
         return agentId;
@@ -71,7 +70,7 @@ public abstract class MovingObject {
     }
 
     public void setRoutes(final List<RouteNode> simpleRoute, final List<RouteNode> uniformRoute) {
-    	logger.debug("Set simple route and uniform route");
+        logger.debug("Set simple route and uniform route");
         this.simpleRoute = simpleRoute;
         this.uniformRoute = uniformRoute;
     }
@@ -92,9 +91,9 @@ public abstract class MovingObject {
         return uniformRoute.get(index);
     }
 
-//TODO: RETURN TO NORMAL  return uniformRoute.get(moveIndex-1);
+    //TODO: RETURN TO NORMAL  return uniformRoute.get(moveIndex-1);
     public RouteNode getRouteNodeBeforeLight() {
-        if (moveIndex - 1 <= 0 ) {
+        if (moveIndex - 1 <= 0) {
             return uniformRoute.get(0);
         }
         if (moveIndex >= uniformRoute.size()) {
@@ -142,11 +141,11 @@ public abstract class MovingObject {
     public int getUniformRouteSize() {return uniformRoute.size();}
 
     public LightManagerNode switchToNextTrafficLight() {
-    	logger.debug("Switch to next traffic light");
+        logger.debug("Switch to next traffic light");
         for (int i = moveIndex + 1; i < uniformRoute.size(); ++i) {
             var node = uniformRoute.get(i);
             if (node instanceof LightManagerNode) {
-            	logger.debug("Next traffic light found at uniform route index: " + i);
+                logger.debug("Next traffic light found at uniform route index: " + i);
                 closestLightIndex = i;
                 return (LightManagerNode) node;
             }
@@ -157,14 +156,14 @@ public abstract class MovingObject {
         return null;
     }
 
-	private void displayRouteDebug(List<RouteNode> route) {
-		logger.debug("Display route debug of size: " + route.size());
-		StringBuilder builder = new StringBuilder();
-		for (int i = 0; i < route.size(); ++i) {
-			builder.append("R[" + i + "]: " + route.get(i).getDebugString(route.get(i) instanceof LightManagerNode) + "; ");
-		}
-		logger.debug(builder.toString());
-	}
+    private void displayRouteDebug(List<RouteNode> route) {
+        logger.debug("Display route debug of size: " + route.size());
+        StringBuilder builder = new StringBuilder();
+        for (int i = 0; i < route.size(); ++i) {
+            builder.append("R[" + i + "]: " + route.get(i).getDebugString(route.get(i) instanceof LightManagerNode) + "; ");
+        }
+        logger.debug(builder.toString());
+    }
 
     public boolean isAtTrafficLights() {
         if (isAtDestination()) {

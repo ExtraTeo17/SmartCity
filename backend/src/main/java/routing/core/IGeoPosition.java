@@ -1,7 +1,6 @@
 package routing.core;
 
 import org.jetbrains.annotations.NotNull;
-import org.jxmapviewer.viewer.GeoPosition;
 import utilities.NumericHelper;
 
 public interface IGeoPosition extends Comparable<IGeoPosition> {
@@ -117,10 +116,5 @@ public interface IGeoPosition extends Comparable<IGeoPosition> {
 
     default String pointText() {
         return "(" + getLat() + ", " + getLng() + ')';
-    }
-
-    @Deprecated
-    default GeoPosition toMapGeoPosition() {
-        return new GeoPosition(getLat(), getLng());
     }
 }

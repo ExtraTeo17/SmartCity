@@ -2,33 +2,39 @@ package web;
 
 import com.google.common.eventbus.Subscribe;
 import com.google.inject.Inject;
-import events.web.*;
+import events.web.SimulationPreparedEvent;
+import events.web.SimulationStartedEvent;
+import events.web.SwitchLightsEvent;
+import events.web.bike.BikeAgentCreatedEvent;
+import events.web.bike.BikeAgentDeadEvent;
+import events.web.bike.BikeAgentUpdatedEvent;
 import events.web.bus.BusAgentDeadEvent;
 import events.web.bus.BusAgentFillStateUpdatedEvent;
 import events.web.bus.BusAgentStartedEvent;
 import events.web.bus.BusAgentUpdatedEvent;
 import events.web.pedestrian.*;
+import events.web.roadblocks.TrafficJamFinishedEvent;
+import events.web.roadblocks.TrafficJamStartedEvent;
+import events.web.roadblocks.TroublePointCreatedEvent;
+import events.web.roadblocks.TroublePointVanishedEvent;
 import events.web.vehicle.VehicleAgentCreatedEvent;
 import events.web.vehicle.VehicleAgentDeadEvent;
 import events.web.vehicle.VehicleAgentRouteChangedEvent;
 import events.web.vehicle.VehicleAgentUpdatedEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import smartcity.ITimeProvider;
 import smartcity.TimeProvider;
 import web.abstractions.IWebService;
 
+@SuppressWarnings("OverlyCoupledClass")
 class Communicator {
     private static final Logger logger = LoggerFactory.getLogger(Communicator.class);
 
     private final IWebService webService;
-    private final ITimeProvider timeProvider;
 
     @Inject
-    public Communicator(IWebService webService,
-                        ITimeProvider timeProvider) {
+    public Communicator(IWebService webService) {
         this.webService = webService;
-        this.timeProvider = timeProvider;
     }
 
     @Subscribe
@@ -68,7 +74,7 @@ class Communicator {
 
     @Subscribe
     public void handle(VehicleAgentRouteChangedEvent e) {
-        webService.changeRoute(e.agentId, e.routeStart, e.changePosition, e.routeEnd);
+        webService.changeCarRoute(e.agentId, e.routeStart, e.changePosition, e.routeEnd);
     }
 
     @Subscribe
@@ -125,6 +131,36 @@ class Communicator {
     public void handle(PedestrianAgentDeadEvent e) {
         onHandle(e);
         webService.killPedestrian(e.id, e.travelDistance, e.travelTime);
+    }
+
+    @Subscribe
+    public void handle(TrafficJamStartedEvent e) {
+        onHandle(e);
+        webService.startTrafficJam(e.lightId);
+    }
+
+    @Subscribe
+    public void handle(TrafficJamFinishedEvent e) {
+        onHandle(e);
+        webService.endTrafficJam(e.lightId);
+    }
+
+    @Subscribe
+    public void handle(BikeAgentCreatedEvent e) {
+        onHandle(e);
+        webService.createBike(e.agentId, e.agentPosition, e.route, e.isTestBike);
+    }
+
+    @Subscribe
+    public void handle(BikeAgentUpdatedEvent e) {
+        webService.updateBike(e.id, e.position);
+    }
+
+
+    @Subscribe
+    public void handle(BikeAgentDeadEvent e) {
+        onHandle(e);
+        webService.killBike(e.id, e.travelDistance, e.travelTime);
     }
 
     private void onHandle(Object obj) {

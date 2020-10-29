@@ -1,4 +1,4 @@
-package events.web;
+package events.web.roadblocks;
 
 public class TroublePointVanishedEvent {
     public final int id;

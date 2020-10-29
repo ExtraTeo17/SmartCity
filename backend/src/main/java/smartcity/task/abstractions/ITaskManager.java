@@ -9,6 +9,8 @@ import java.util.function.BooleanSupplier;
 public interface ITaskManager {
     void scheduleCarCreation(int carsLimit, int testCarId);
 
+    void scheduleBikeCreation(int bikesLimit, int testBikeId);
+
     void schedulePedestrianCreation(int pedestriansLimit, int testPedestrianId);
 
     void scheduleBusControl(BooleanSupplier testSimulationState);

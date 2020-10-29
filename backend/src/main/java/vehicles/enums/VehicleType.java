@@ -2,6 +2,7 @@ package vehicles.enums;
 
 public enum VehicleType {
     REGULAR_CAR("RegularCar"),
+    BIKE("Bike"),
     TEST_CAR("TestCar"),
     BUS("Bus"),
     PEDESTRIAN("Pedestrian"),

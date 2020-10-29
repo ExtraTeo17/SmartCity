@@ -4,7 +4,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import routing.abstractions.IRouteTransformer;
 import routing.data.RouteMergeInfo;
-import routing.nodes.LightManagerNode;
 import routing.nodes.RouteNode;
 
 import java.util.ArrayList;

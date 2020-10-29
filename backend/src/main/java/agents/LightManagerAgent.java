@@ -7,9 +7,8 @@ import jade.core.behaviours.CyclicBehaviour;
 import jade.core.behaviours.TickerBehaviour;
 import jade.lang.acl.ACLMessage;
 import jade.util.leap.Properties;
-import org.jxmapviewer.JXMapViewer;
-import org.jxmapviewer.painter.Painter;
 import smartcity.ITimeProvider;
+import smartcity.TimeProvider;
 import smartcity.config.ConfigContainer;
 import smartcity.lights.OptimizationResult;
 import smartcity.lights.abstractions.ICrossroad;
@@ -41,7 +40,7 @@ public class LightManagerAgent extends AbstractAgent {
         print("I'm a traffic manager.");
         crossroad.startLifetime();
 
-        var notifyCarAboutGreen = new TickerBehaviour(this, 1000) {//100 / TimeProvider.TIME_SCALE) {
+        var notifyCarAboutGreen = new TickerBehaviour(this, 10_000 / TimeProvider.TIME_SCALE) {
             @Override
             protected void onTick() {
                 //for all Light check
@@ -60,16 +59,20 @@ public class LightManagerAgent extends AbstractAgent {
                 }
             }
 
-            private void handleOptimizationResult(OptimizationResult result) throws Exception {
+            private void handleOptimizationResult(OptimizationResult result) {
                 //Expected one agent in the list
                 final List<String> agentsFreeToProceed = result.carsFreeToProceed();
-                final String agentStuckInJam = result.getAgentStuckInJam();
-                if (result.shouldNotifyCarAboutStartOfTrafficJamOnThisLight()) {
-                    handleTrafficJams(result, agentStuckInJam);
+
+                if (configContainer.shouldGenerateTrafficJams()) {
+                    final String agentStuckInJam = result.getAgentStuckInJam();
+                    if (result.shouldNotifyCarAboutStartOfTrafficJamOnThisLight()) {
+                        handleTrafficJams(result, agentStuckInJam);
+                    }
+                    if (result.shouldNotifyCarAboutStopOfTrafficJamOnThisLight()) {
+                        sendMessageAboutTroubleStopToTroubleManager(result);
+                    }
                 }
-                if (result.shouldNotifyCarAboutStopOfTrafficJamOnThisLight()) {
-                    sendMessageAboutTroubleStopToTroubleManager(result);
-                }
+
                 if (agentsFreeToProceed.size() != 0) {
                     for (String agentName : agentsFreeToProceed) {
                         answerCanProceed(agentName);
@@ -77,13 +80,16 @@ public class LightManagerAgent extends AbstractAgent {
                 }
             }
 
-            private synchronized void sendMessageAboutTroubleStopToTroubleManager(OptimizationResult result) throws Exception {
-                ACLMessage msg = createMessage(ACLMessage.INFORM, TroubleManagerAgent.name); // Remember that this solution is based on different agents expected to return the same graphhopper edge ID when traffic jam starts and stops
+            private synchronized void sendMessageAboutTroubleStopToTroubleManager(OptimizationResult result) {
+                // Remember that this solution is based on different agents expected to return the
+                //  same graphhopper edge ID when traffic jam starts and stops
+                ACLMessage msg = createMessage(ACLMessage.INFORM, TroubleManagerAgent.name);
                 Properties properties = createProperties(MessageParameter.LIGHT);
                 properties.setProperty(MessageParameter.TYPEOFTROUBLE, MessageParameter.TRAFFIC_JAMS);
                 properties.setProperty(MessageParameter.TROUBLE, MessageParameter.STOP);
-                properties.setProperty(MessageParameter.TROUBLE_LAT, Double.toString(result.getJammedLightPosition().getLat()));
-                properties.setProperty(MessageParameter.TROUBLE_LON, Double.toString(result.getJammedLightPosition().getLng()));
+                var jammedLight = result.getJammedLightPosition();
+                properties.setProperty(MessageParameter.TROUBLE_LAT, Double.toString(jammedLight.getLat()));
+                properties.setProperty(MessageParameter.TROUBLE_LON, Double.toString(jammedLight.getLng()));
                 properties.setProperty(MessageParameter.EDGE_ID, trafficJammedEdgeSet.get(String.valueOf(result.getOsmWayId())));
                 trafficJammedEdgeSet.remove(Long.toString(result.getOsmWayId()));
                 msg.setAllUserDefinedParameters(properties);
@@ -91,14 +97,16 @@ public class LightManagerAgent extends AbstractAgent {
                 send(msg);
             }
 
-            private void handleTrafficJams(OptimizationResult result, String nameOfAgent) throws Exception {
+            private void handleTrafficJams(OptimizationResult result, String nameOfAgent) {
                 // TODO shouldNotifyCarAboutTrafficJamOnThisLight have an old state to stop the jam
                 // TODO: use result.getJammedLight(...)
                 sendMessageAboutTroubleToVehicle(result, nameOfAgent);
             }
 
-            private void sendMessageAboutTroubleToVehicle(OptimizationResult result, String nameOfAgent) throws Exception {
-                ACLMessage msg = createMessage(ACLMessage.PROPOSE, nameOfAgent); // Remember that this solution is based on different agents expected to return the same graphhopper edge ID when traffic jam starts and stops
+            private void sendMessageAboutTroubleToVehicle(OptimizationResult result, String nameOfAgent) {
+                // Remember that this solution is based on different agents expected
+                //  to return the same graphhopper edge ID when traffic jam starts and stops
+                ACLMessage msg = createMessage(ACLMessage.PROPOSE, nameOfAgent);
                 Properties properties = createProperties(MessageParameter.LIGHT);
                 properties.setProperty(MessageParameter.TYPEOFTROUBLE, MessageParameter.TRAFFIC_JAMS);
                 properties.setProperty(MessageParameter.TROUBLE, MessageParameter.SHOW);
@@ -213,9 +221,5 @@ public class LightManagerAgent extends AbstractAgent {
 
     public List<Light> getLights() {
         return crossroad.getLights();
-    }
-
-    public void draw(List<Painter<JXMapViewer>> waypointPainter) {
-        crossroad.draw(waypointPainter);
     }
 }

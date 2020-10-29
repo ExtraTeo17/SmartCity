@@ -298,7 +298,7 @@ public class BusAgent extends AbstractAgent {
     public final Optional<Siblings<StationNode>> getTwoSubsequentStations(final Random random) {
         List<StationNode> stationsOnRoute = bus.getStationNodesOnRoute();
         int halfIndex = stationsOnRoute.size() / 2;
-        if(halfIndex < 1){
+        if (halfIndex < 1) {
             return Optional.empty();
         }
 

@@ -10,6 +10,7 @@ import LightsLayer from "./Layers/LightsLayer";
 import StationsLayer from "./Layers/StationsLayer";
 import TroublePointsLayer from "./Layers/TroublePointsLayer";
 import CarsLayer from "./Layers/CarsLayer";
+import BikesLayer from "./Layers/BikesLayer";
 import BusesLayer from "./Layers/BusesLayer";
 import PedestriansLayer from "./Layers/PedestriansLayer";
 import { NOTIFY_SHOW_MS } from "../constants/global";
@@ -51,6 +52,7 @@ const CityMap = ({ center, wasStarted }) => {
         </Marker>
       </Circle>
       <CarsLayer />
+      <BikesLayer />
       <LightsLayer />
       <StationsLayer />
       <BusesLayer />

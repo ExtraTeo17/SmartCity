@@ -13,9 +13,7 @@ import smartcity.lights.core.Light;
 import smartcity.task.data.ISwitchLightsContext;
 
 import java.util.Collection;
-import java.util.Set;
 import java.util.function.Function;
-import java.util.stream.Collectors;
 
 class LightSwitcher implements Function<ISwitchLightsContext, Integer> {
     private final Logger logger;
@@ -27,7 +25,7 @@ class LightSwitcher implements Function<ISwitchLightsContext, Integer> {
     private final int extendTimeSeconds;
     private final int defaultExecutionDelay;
     private final Collection<Light> lights;
-    private final Set<Long> lightsOsmIds;
+    private final Long lightOsmId;
 
     @Inject
     LightSwitcher(ITimeProvider timeProvider,
@@ -44,7 +42,7 @@ class LightSwitcher implements Function<ISwitchLightsContext, Integer> {
 
         this.defaultExecutionDelay = extendTimeSeconds * 1000 / TimeProvider.TIME_SCALE;
         this.lights = lights;
-        this.lightsOsmIds = lights.stream().map(Light::getOsmLightId).collect(Collectors.toSet());
+        this.lightOsmId = lights.iterator().next().getOsmLightId();
         this.logger = LoggerFactory.getLogger("LightSwitcher" + managerId);
     }
 
@@ -71,7 +69,7 @@ class LightSwitcher implements Function<ISwitchLightsContext, Integer> {
         // TODO: Can include yellow somehow?
         lights.forEach(Light::switchLight);
         logger.debug("Switched light at: " + timeProvider.getCurrentSimulationTime());
-        lightsOsmIds.forEach(id -> eventBus.post(new SwitchLightsEvent(id)));
+        eventBus.post(new SwitchLightsEvent(lightOsmId));
 
         return defaultExecutionDelay;
     }

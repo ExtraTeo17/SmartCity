@@ -54,18 +54,32 @@ public class HighwayAccessor {
     // TODO: tested manually, but add unit tests / integration tests
 
     public static Pair<List<Long>, List<RouteNode>> getOsmWayIdsAndPointList(double fromLat, double fromLon,
-                                                                             double toLat, double toLon, boolean onFoot,
+                                                                             double toLat, double toLon,
                                                                              boolean bewareOfJammedRoutes) {
-        List<Long> osmWayIds = new ArrayList<>();
-        List<RouteNode> pointList = new ArrayList<>();
-        
-        final String weighting = bewareOfJammedRoutes ? AvoidEdgesRemovableWeighting.NAME : "fastest";
 
         GHResponse response = new GHResponse();
-        GHRequest request = new GHRequest(fromLat, fromLon, toLat, toLon)
-                .setVehicle(onFoot ? "foot" : "car")
-                .setWeighting(weighting);
-        List<Path> paths = graphHopper.calcPaths(request, response);
+        GHRequest request = new GHRequest(fromLat, fromLon, toLat, toLon).setVehicle("car");
+        String weighting = bewareOfJammedRoutes ? AvoidEdgesRemovableWeighting.NAME : "fastest";
+        request = request.setWeighting(weighting);
+
+        return calculatePaths(request, response);
+    }
+
+    public static Pair<List<Long>, List<RouteNode>> getOsmWayIdsAndPointList(double fromLat, double fromLon,
+                                                                             double toLat, double toLon,
+                                                                             String typeOfVehicle) {
+        GHResponse response = new GHResponse();
+        GHRequest request = new GHRequest(fromLat, fromLon, toLat, toLon).setVehicle(typeOfVehicle);
+        request = request.setWeighting("fastest");
+
+
+        return calculatePaths(request, response);
+    }
+
+    private static Pair<List<Long>, List<RouteNode>> calculatePaths(GHRequest req, GHResponse resp) {
+        List<Long> osmWayIds = new ArrayList<>();
+        List<RouteNode> pointList = new ArrayList<>();
+        List<Path> paths = graphHopper.calcPaths(req, resp);
         Path path0 = paths.get(0);
 
         long previousWayId = 0;
@@ -85,6 +99,7 @@ public class HighwayAccessor {
             }
             pointList.addAll(getRouteNodeList(edgeId, edge.fetchWayGeometry(2)));
         }
+
         return new Pair<>(osmWayIds, pointList);
     }
 
@@ -95,5 +110,4 @@ public class HighwayAccessor {
         }
         return nodeList;
     }
-
 }
