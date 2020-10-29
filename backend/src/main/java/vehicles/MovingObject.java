@@ -1,6 +1,5 @@
 package vehicles;
 
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import routing.RoutingConstants;
@@ -11,7 +10,6 @@ import smartcity.TimeProvider;
 import vehicles.enums.DrivingState;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 // TODO: Change name to IVehicle/AbstractVehicle
@@ -49,7 +47,9 @@ public abstract class MovingObject {
     public abstract String getVehicleType();
 
 
-    public int getMoveIndex(){return moveIndex;}
+    public int getMoveIndex() {
+    	return moveIndex;
+    }
 
     public int getAgentId() {
         return agentId;
