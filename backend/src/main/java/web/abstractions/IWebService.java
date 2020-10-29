@@ -63,9 +63,4 @@ public interface IWebService extends IStartable {
     void updateBike(int id, IGeoPosition position);
 
     void killBike(int id, int travelDistance, Long travelTime);
-
-    void changeBikeRoute(int agentId,
-                        List<? extends IGeoPosition> routeStart,
-                        IGeoPosition changePosition,
-                        List<? extends IGeoPosition> routeEnd);
 }

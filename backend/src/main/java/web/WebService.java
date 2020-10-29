@@ -10,7 +10,6 @@ import web.abstractions.IWebService;
 import web.message.MessageType;
 import web.message.payloads.infos.create.*;
 import web.message.payloads.infos.kill.*;
-import web.message.payloads.infos.other.ChangeBikeRouteInfo;
 import web.message.payloads.infos.other.ChangeCarRouteInfo;
 import web.message.payloads.infos.other.SwitchLightsInfo;
 import web.message.payloads.infos.update.*;
@@ -222,16 +221,5 @@ class WebService implements IWebService {
         var payload = new KillBikeInfo(id, travelDistance, travelTime);
 
         webConnector.broadcastMessage(MessageType.KILL_BIKE_INFO, payload);
-    }
-
-    @Override
-    public void changeBikeRoute(int agentId, List<? extends IGeoPosition> routeStart, IGeoPosition changePosition,
-                                List<? extends IGeoPosition> routeEnd) {
-        var changeLocation = Converter.convert(changePosition);
-        var routeStartLocations = routeStart.stream().map(Converter::convert).toArray(Location[]::new);
-        var routeEndLocations = routeEnd.stream().map(Converter::convert).toArray(Location[]::new);
-        var payload = new ChangeBikeRouteInfo(agentId, routeStartLocations, changeLocation, routeEndLocations);
-
-        webConnector.broadcastMessage(MessageType.UPDATE_BIKE_ROUTE_INFO, payload);
     }
 }

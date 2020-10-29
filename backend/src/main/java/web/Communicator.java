@@ -7,7 +7,6 @@ import events.web.SimulationStartedEvent;
 import events.web.SwitchLightsEvent;
 import events.web.bike.BikeAgentCreatedEvent;
 import events.web.bike.BikeAgentDeadEvent;
-import events.web.bike.BikeAgentRouteChangedEvent;
 import events.web.bike.BikeAgentUpdatedEvent;
 import events.web.bus.BusAgentDeadEvent;
 import events.web.bus.BusAgentFillStateUpdatedEvent;
@@ -162,11 +161,6 @@ class Communicator {
     public void handle(BikeAgentDeadEvent e) {
         onHandle(e);
         webService.killBike(e.id, e.travelDistance, e.travelTime);
-    }
-
-    @Subscribe
-    public void handle(BikeAgentRouteChangedEvent e) {
-        webService.changeBikeRoute(e.agentId, e.routeStart, e.changePosition, e.routeEnd);
     }
 
     private void onHandle(Object obj) {
