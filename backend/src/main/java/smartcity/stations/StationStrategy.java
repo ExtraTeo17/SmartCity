@@ -87,7 +87,9 @@ public class StationStrategy {
     }
 
     public OptimizationResult requestBusesAndPeopleFreeToGo() {
-        var result = new OptimizationResult(0); // TODO: Inject config container
+        // TODO: Inject config container
+        //  #Przemek: What to inject here? waitTimeExtend is already in configContainer
+        var result = new OptimizationResult(0);
         for (var entry : busAgentOnStationToArrivalTime.entrySet()) {
             var busLine = entry.getKey();
             var scheduledArrival = entry.getValue();

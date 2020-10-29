@@ -1,5 +1,6 @@
 package smartcity.task;
 
+import agents.LightManagerAgent;
 import agents.abstractions.IAgentsContainer;
 import events.SwitchLightsStartEvent;
 import events.web.StartSimulationEvent;
@@ -20,8 +21,7 @@ import static mocks.TestInstanceCreator.createLight;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.doAnswer;
-import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.*;
 
 @SuppressWarnings("ConstantConditions")
 class SchedulerTests {
@@ -62,6 +62,8 @@ class SchedulerTests {
         var ref = new Object() {
             int carsLimit = 0;
             int testCarId = 0;
+            int bikesLimit = 0;
+            int testBikeId = 0;
             int pedLimit = 0;
             int testPedId = 0;
         };
@@ -76,13 +78,24 @@ class SchedulerTests {
             ref.testPedId = invocationOnMock.getArgument(1);
             return null;
         }).when(taskManager).schedulePedestrianCreation(any(int.class), any(int.class));
+        doAnswer(invocationOnMock -> {
+            ref.bikesLimit = invocationOnMock.getArgument(0);
+            ref.testBikeId = invocationOnMock.getArgument(1);
+            return null;
+        }).when(taskManager).scheduleBikeCreation(any(int.class), any(int.class));
 
         var scheduler = createScheduler(configContainer, taskManager);
 
+        var shouldGenerateCars = true;
         var carsNum = 111;
         var testCarId = 112;
-        var shouldGenerateCars = true;
+
+        var shouldGenerateBikes = true;
+        var bikesNum = 116;
+        var testBikeId = 142;
+
         var shouldGenerateTP = true;
+        var shouldGenerateTrafficJams = true;
         var timeBeforeTrouble = 5006;
 
         int pedestriansLimit = 155;
@@ -96,7 +109,9 @@ class SchedulerTests {
         var extendWaitTime = 354;
         var changeRouteStrategyActive = false;
 
-        var event = new StartSimulationEvent(shouldGenerateCars, carsNum, testCarId, shouldGenerateTP, timeBeforeTrouble, pedestriansLimit, testPedestrianId, startTime,
+        var event = new StartSimulationEvent(shouldGenerateCars, carsNum, testCarId,
+                shouldGenerateBikes, bikesNum, testBikeId, shouldGenerateTrafficJams,
+                shouldGenerateTP, timeBeforeTrouble, pedestriansLimit, testPedestrianId, startTime,
                 lightStrategyActive, extendLightTime, stationStrategyActive, extendWaitTime, changeRouteStrategyActive);
 
         // Act
@@ -105,10 +120,14 @@ class SchedulerTests {
         // Assert
         assertEquals(carsNum, ref.carsLimit);
         assertEquals(testCarId, ref.testCarId);
-        assertEquals(shouldGenerateCars, configContainer.shouldGenerateCars());
+
+        assertEquals(bikesNum, ref.bikesLimit);
+        assertEquals(testBikeId, ref.testBikeId);
+
         assertEquals(shouldGenerateTP, configContainer.shouldGenerateConstructionSites());
         assertEquals(timeBeforeTrouble, configContainer.getTimeBeforeTrouble());
-        
+        assertEquals(shouldGenerateTrafficJams, configContainer.shouldGenerateTrafficJams());
+
         assertEquals(pedestriansLimit, ref.pedLimit);
         assertEquals(testPedestrianId, ref.testPedId);
         assertEquals(lightStrategyActive, configContainer.isLightStrategyActive());
@@ -143,11 +162,13 @@ class SchedulerTests {
 
     private Scheduler createScheduler(ConfigContainer configContainer, ITaskManager taskManager) {
         var agentsContainer = mock(IAgentsContainer.class);
+        when(agentsContainer.size(LightManagerAgent.class)).thenReturn(1);
         return new Scheduler(taskManager, configContainer, agentsContainer, createEventBus());
     }
 
     private StartSimulationEvent prepareSimulationEvent(LocalDateTime startTime) {
-        return new StartSimulationEvent(false, 111, 112, true,
+        return new StartSimulationEvent(false, 111, 112, false, 444,
+                222, false, true,
                 5005, 222, 223, startTime,
                 false, 333, false, 354, false);
     }

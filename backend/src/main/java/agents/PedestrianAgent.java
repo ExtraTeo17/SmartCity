@@ -81,7 +81,7 @@ public class PedestrianAgent extends AbstractAgent {
                                     .toString());
                             msg.setAllUserDefinedParameters(properties);
                             send(msg);
-                            print("Send REQUEST_WHEN to Station");
+                           // print("Send REQUEST_WHEN to Station");
 
                             pedestrian.setState(DrivingState.WAITING_AT_STATION);
                             break;

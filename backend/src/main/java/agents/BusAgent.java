@@ -74,7 +74,7 @@ public class BusAgent extends AbstractAgent {
                             msg.setAllUserDefinedParameters(properties);
                             send(msg);
                             bus.setState(DrivingState.WAITING_AT_LIGHT);
-                            print("Asking LightManager" + light.getLightManagerId() + " for right to passage.");
+                           //print("Asking LightManager" + light.getLightManagerId() + " for right to passage.");
 
                             break;
                         case WAITING_AT_LIGHT:
@@ -115,10 +115,10 @@ public class BusAgent extends AbstractAgent {
                             properties.setProperty(MessageParameter.ARRIVAL_TIME, timeProvider.getCurrentSimulationTime()
                                     .toString());
                             msg.setAllUserDefinedParameters(properties);
-                            print("Send REQUEST_WHEN to station");
+                           // print("Send REQUEST_WHEN to station");
                             send(msg);
 
-                            print("Arrived at station " + station.getAgentId() + ".");
+                          //  print("Arrived at station " + station.getAgentId() + ".");
                             bus.setState(DrivingState.WAITING_AT_STATION);
                             break;
                         case WAITING_AT_STATION:
@@ -141,7 +141,7 @@ public class BusAgent extends AbstractAgent {
                 }
                 else if (bus.isAtDestination()) {
                     bus.setState(DrivingState.AT_DESTINATION);
-                    print("Reached destination.");
+                  //  print("Reached destination.");
 
                     ACLMessage msg = createMessage(ACLMessage.INFORM, SmartCityAgent.name);
                     Properties prop = createProperties(MessageParameter.BUS);
@@ -195,7 +195,7 @@ public class BusAgent extends AbstractAgent {
                                 Properties properties = createProperties(MessageParameter.BUS);
                                 response.setAllUserDefinedParameters(properties);
                                 send(response);
-                                logger.info("BUS: get REQUEST from station");
+                               // logger.info("BUS: get REQUEST from station");
                                 informNextStation();
                                 bus.setState(DrivingState.PASSING_STATION);
                             }
@@ -206,19 +206,19 @@ public class BusAgent extends AbstractAgent {
                             case ACLMessage.REQUEST_WHEN:
                                 int stationId =
                                         Integer.parseInt(rcv.getUserDefinedParameter(MessageParameter.STATION_ID));
-                                print("Passenger " + rcv.getSender().getLocalName() + " entered the bus.",
-                                        LoggerLevel.DEBUG);
+                               // print("Passenger " + rcv.getSender().getLocalName() + " entered the bus.",
+                                  //      LoggerLevel.DEBUG);
                                 bus.addPassengerToStation(stationId, rcv.getSender().getLocalName());
 
                                 ACLMessage response = createMessage(ACLMessage.AGREE, rcv.getSender());
                                 Properties properties = createProperties(MessageParameter.BUS);
                                 response.setAllUserDefinedParameters(properties);
                                 send(response);
-                                print("Passengers: " + bus.getPassengersCount(), LoggerLevel.DEBUG);
+                               // print("Passengers: " + bus.getPassengersCount(), LoggerLevel.DEBUG);
                                 break;
                             case ACLMessage.AGREE:
                                 stationId = Integer.parseInt(rcv.getUserDefinedParameter(MessageParameter.STATION_ID));
-                                print("Passenger " + rcv.getSender().getLocalName() + " left the bus.");
+                               // print("Passenger " + rcv.getSender().getLocalName() + " left the bus.");
                                 if (bus.removePassengerFromStation(stationId, rcv.getSender().getLocalName())) {
                                     print("Passengers: " + bus.getPassengersCount());
                                 }
@@ -257,18 +257,18 @@ public class BusAgent extends AbstractAgent {
                 properties.setProperty(MessageParameter.SCHEDULE_ARRIVAL, timeOnStation.get().toString());
             }
             else {
-                print("Could not retrieve time for " + stationId, LoggerLevel.ERROR);
+              //  print("Could not retrieve time for " + stationId, LoggerLevel.ERROR);
                 ConditionalExecutor.debug(this::logAllStations);
             }
 
             msg.setAllUserDefinedParameters(properties);
-            print("Sending INFORM to Station" + stationId);
+            //print("Sending INFORM to Station" + stationId);
             send(msg);
         }
     }
 
     private void logAllStations() {
-        print("Printing station nodes: ", LoggerLevel.DEBUG);
+     //   print("Printing station nodes: ", LoggerLevel.DEBUG);
         var stations = bus.getStationNodesOnRoute();
         for (int i = 0; i < stations.size(); ++i) {
             var station = stations.get(i);
@@ -278,7 +278,7 @@ public class BusAgent extends AbstractAgent {
             var timeString = timeOnStation.map(LocalDateTime::toString).orElse("");
             print(i + ": [" + osmId + "][" + stationId + "] on '" + timeString + "'", LoggerLevel.DEBUG);
         }
-        print("Printing station nodes finished.", LoggerLevel.DEBUG);
+      //  print("Printing station nodes finished.", LoggerLevel.DEBUG);
     }
 
     public Bus getBus() {
@@ -298,7 +298,7 @@ public class BusAgent extends AbstractAgent {
     public final Optional<Siblings<StationNode>> getTwoSubsequentStations(final Random random) {
         List<StationNode> stationsOnRoute = bus.getStationNodesOnRoute();
         int halfIndex = stationsOnRoute.size() / 2;
-        if(halfIndex < 1){
+        if (halfIndex < 1) {
             return Optional.empty();
         }
 
@@ -313,14 +313,14 @@ public class BusAgent extends AbstractAgent {
         var state = this.getAgentState().getValue();
         if (state != AgentState.cAGENT_STATE_INITIATED) {
             if (state == AgentState.cAGENT_STATE_ACTIVE && bus.isAtDestination()) {
-                print("Stopping!");
+              //  print("Stopping!");
                 return true;
             }
             return false;
         }
 
         if (shouldStart()) {
-            print("Running, state: " + this.getAgentState().getName() + ", isAlive: " + isAlive());
+           // print("Running, state: " + this.getAgentState().getName() + ", isAlive: " + isAlive());
             start();
         }
 

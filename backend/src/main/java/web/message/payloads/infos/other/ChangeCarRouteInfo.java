@@ -1,4 +1,4 @@
-package web.message.payloads.infos.update;
+package web.message.payloads.infos.other;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import web.message.payloads.AbstractPayload;

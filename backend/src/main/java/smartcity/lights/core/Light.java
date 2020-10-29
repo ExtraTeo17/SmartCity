@@ -1,10 +1,6 @@
 package smartcity.lights.core;
 
-import gui.CustomWaypointRenderer;
 import org.jetbrains.annotations.NotNull;
-import org.jxmapviewer.viewer.DefaultWaypoint;
-import org.jxmapviewer.viewer.Waypoint;
-import org.jxmapviewer.viewer.WaypointPainter;
 import routing.core.Position;
 import smartcity.lights.LightColor;
 import smartcity.lights.OptimizationResult;
@@ -15,7 +11,6 @@ import java.util.*;
 
 public class Light extends Position {
     private static final int TRAFFIC_JAM_THRESHOLD = 2;
-	
     private LightColor carLightColor;
     private final long adjacentOsmWayId;
     private final String adjacentCrossingOsmId1;
@@ -44,6 +39,10 @@ public class Light extends Position {
 
     public long getAdjacentWayId() {
         return adjacentOsmWayId;
+    }
+
+    public long uniqueId() {
+        return super.longHash();
     }
 
     @NotNull
@@ -81,15 +80,6 @@ public class Light extends Position {
 
     public boolean isGreen() {
         return carLightColor == LightColor.GREEN;
-    }
-
-    void draw(Collection<Waypoint> lightSet, WaypointPainter<Waypoint> painter) {
-        lightSet.add(new DefaultWaypoint(getLat(), getLng()));
-        switch (carLightColor) {
-            case RED -> painter.setRenderer(new CustomWaypointRenderer("light_red.png"));
-            case YELLOW -> painter.setRenderer(new CustomWaypointRenderer("light_yellow.png"));
-            case GREEN -> painter.setRenderer(new CustomWaypointRenderer("light_green.png"));
-        }
     }
 
     public void switchLight() {
@@ -139,28 +129,29 @@ public class Light extends Position {
         }
     }
 
-	private final boolean trafficJamEmerged() {
-		if (carQueue.size() > TRAFFIC_JAM_THRESHOLD && !trafficJamOngoing) {
-			trafficJamOngoing = true;
-			return true;
-		}
-		return false;
-	}
-
-	private final boolean trafficJamDisappeared() {
-		if (carQueue.size() <= TRAFFIC_JAM_THRESHOLD && trafficJamOngoing) {
-			trafficJamOngoing = false;
-			return true;
-		}
-		return false;
-	}
-
-	public final void checkForTrafficJams(final OptimizationResult result) {
-        if (trafficJamEmerged()) {
-        	result.setShouldNotifyCarAboutStartOfTrafficJamOnThisLight(getLat(), getLng(), carQueue.size(), getOsmLightId());
-        	result.setCarStuckInJam(carQueue.peek());
-        } else if (trafficJamDisappeared()) {
-        	result.setShouldNotifyCarAboutEndOfTrafficJamOnThisLight(getLat(), getLng(), getOsmLightId());
+    private boolean trafficJamEmerged() {
+        if (carQueue.size() > TRAFFIC_JAM_THRESHOLD && !trafficJamOngoing) {
+            trafficJamOngoing = true;
+            return true;
         }
-	}
+        return false;
+    }
+
+    private boolean trafficJamDisappeared() {
+        if (carQueue.size() <= TRAFFIC_JAM_THRESHOLD && trafficJamOngoing) {
+            trafficJamOngoing = false;
+            return true;
+        }
+        return false;
+    }
+
+    final void checkForTrafficJams(final OptimizationResult result) {
+        if (trafficJamEmerged()) {
+            result.setShouldNotifyCarAboutStartOfTrafficJamOnThisLight(this, carQueue.size(), getOsmLightId());
+            result.setCarStuckInJam(carQueue.peek());
+        }
+        else if (trafficJamDisappeared()) {
+            result.setShouldNotifyCarAboutEndOfTrafficJamOnThisLight(getLat(), getLng(), getOsmLightId());
+        }
+    }
 }

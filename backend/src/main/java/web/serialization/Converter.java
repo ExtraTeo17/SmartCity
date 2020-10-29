@@ -14,15 +14,13 @@ import web.message.payloads.models.*;
 import web.message.payloads.requests.PrepareSimulationRequest;
 import web.message.payloads.requests.StartSimulationRequest;
 
-import java.util.Objects;
-
 public class Converter {
     public static Location convert(IGeoPosition geoPosition) {
         return new Location(geoPosition.getLat(), geoPosition.getLng());
     }
 
     public static LightDto convert(Light light) {
-        var id = Objects.hash(light.getAdjacentWayId(), light.getOsmLightId());
+        var id = light.uniqueId();
         var lightGroupId = light.getOsmLightId();
         var location = convert((IGeoPosition) light);
         var color = light.isGreen() ? LightColorDto.GREEN : LightColorDto.RED;
@@ -47,7 +45,7 @@ public class Converter {
 
     public static BusDto convert(Bus bus) {
         var id = bus.getAgentId();
-        var location = convert((IGeoPosition) bus.getPosition());
+        var location = convert(bus.getPosition());
         var routeLocations = bus.getSimpleRoute().stream().map(Converter::convert).toArray(Location[]::new);
         var fillState = convert(bus.getFillState());
 
@@ -71,13 +69,25 @@ public class Converter {
     public static StartSimulationEvent convert(StartSimulationRequest req) {
         var timeLocal = TimeProvider.convertFromUtcToLocal(req.startTime).toLocalDateTime();
 
-        return new StartSimulationEvent(req.generateCars, req.carsLimit,
+        return new StartSimulationEvent(
+                req.generateCars,
+                req.carsLimit,
                 req.testCarId,
-                req.generateTroublePoints, req.timeBeforeTrouble,
-                req.pedestriansLimit, req.testPedestrianId,
+
+                req.generateBikes,
+                req.bikesLimit,
+                req.testBikeId,
+
+                req.generateTrafficJams,
+                req.generateTroublePoints,
+                req.timeBeforeTrouble,
+                req.pedestriansLimit,
+                req.testPedestrianId,
                 timeLocal,
-                req.lightStrategyActive, req.extendLightTime,
-                req.stationStrategyActive, req.extendWaitTime,
+                req.lightStrategyActive,
+                req.extendLightTime,
+                req.stationStrategyActive,
+                req.extendWaitTime,
                 req.changeRouteStrategyActive);
     }
 }

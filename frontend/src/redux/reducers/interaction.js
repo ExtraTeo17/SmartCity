@@ -4,6 +4,25 @@ import {
   SHOULD_START_SIMULATION,
   START_SIMULATION_DATA_UPDATED,
 } from "../core/constants";
+import {
+  D_CHANGE_ROUTE_STRATEGY_ACTIVE,
+  D_STATION_STRATEGY_ACTIVE,
+  D_PEDS_NUM,
+  D_TEST_PED,
+  D_GENERATE_CARS,
+  D_CARS_NUM,
+  D_TEST_CAR,
+  D_GENERATE_BIKES,
+  D_BIKES_NUM,
+  D_TEST_BIKE,
+  D_GENERATE_TP,
+  D_GENERATE_TJ,
+  D_TIME_BEFORE_TROUBLE,
+  D_LIGHT_STRATEGY_ACTIVE,
+  D_EXTEND_LIGHT_TIME,
+  D_EXTEND_WAIT_TIME,
+  D_START_TIME,
+} from "../../constants/defaults";
 import { StartState } from "../models/startState";
 
 // Just for reference - defined in store.js
@@ -12,16 +31,30 @@ const initialState = {
   generatePedestrians: false,
   shouldStart: StartState.Initial,
   startSimulationData: {
-    carsLimit: 0,
-    testCarId: 0,
-    generateCars: true,
-    generateTroublePoints: false,
-    timeBeforeTrouble: 5,
+    pedLimit: D_PEDS_NUM,
+    testPedId: D_TEST_PED,
 
-    pedLimit: 0,
-    testPedId: 0,
+    generateCars: D_GENERATE_CARS,
+    carsLimit: D_CARS_NUM,
+    testCarId: D_TEST_CAR,
 
-    startTime: new Date(),
+    generateBikes: D_GENERATE_BIKES,
+    bikesLimit: D_BIKES_NUM,
+    testBikeId: D_TEST_BIKE,
+
+    generateTroublePoints: D_GENERATE_TP,
+    generateTrafficJams: D_GENERATE_TJ,
+    timeBeforeTrouble: D_TIME_BEFORE_TROUBLE,
+
+    startTime: D_START_TIME,
+
+    lightStrategyActive: D_LIGHT_STRATEGY_ACTIVE,
+    extendLightTime: D_EXTEND_LIGHT_TIME,
+
+    stationStrategyActive: D_STATION_STRATEGY_ACTIVE,
+    extendWaitTime: D_EXTEND_WAIT_TIME,
+
+    changeRouteStrategyActive: D_CHANGE_ROUTE_STRATEGY_ACTIVE,
   },
 };
 

@@ -2,10 +2,6 @@ package smartcity.lights.core;
 
 import com.google.common.eventbus.EventBus;
 import events.SwitchLightsStartEvent;
-import org.jxmapviewer.JXMapViewer;
-import org.jxmapviewer.painter.Painter;
-import org.jxmapviewer.viewer.Waypoint;
-import org.jxmapviewer.viewer.WaypointPainter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import smartcity.lights.OptimizationResult;
@@ -13,12 +9,15 @@ import smartcity.lights.abstractions.ICrossroad;
 import smartcity.stations.ArrivalInfo;
 import utilities.Siblings;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 class SimpleCrossroad implements ICrossroad {
-	private final Logger logger;
+    private final Logger logger;
     private final EventBus eventBus;
     private final int managerId;
 
@@ -44,15 +43,16 @@ class SimpleCrossroad implements ICrossroad {
 
     @Override
     public OptimizationResult requestOptimizations(int extendTimeSeconds) {
-    	final OptimizationResult result = new OptimizationResult(extendTimeSeconds);
+        final OptimizationResult result = new OptimizationResult(extendTimeSeconds);
         for (Light light : wayIdToLightMap.values()) {
-        	light.checkForTrafficJams(result);
+            light.checkForTrafficJams(result);
             if (light.isGreen()) {
                 for (String carName : light.carQueue) {
                     result.addCarGrantedPassthrough(carName);
                     break;
                 }
-            } else {
+            }
+            else {
                 for (String pedestrianName : light.pedestrianQueue) {
                     result.addCarGrantedPassthrough(pedestrianName);
                     break;
@@ -60,25 +60,6 @@ class SimpleCrossroad implements ICrossroad {
             }
         }
         return result;
-    }
-
-    @Override
-    public void draw(List<Painter<JXMapViewer>> painters) {
-        var lights = wayIdToLightMap.values();
-        painters.add(getPainterByColor(lights, true));
-        painters.add(getPainterByColor(lights, false));
-    }
-
-    private Painter<JXMapViewer> getPainterByColor(Collection<Light> lights, boolean isGreen) {
-        WaypointPainter<Waypoint> painter = new WaypointPainter<>();
-        var waypointsSet = new HashSet<Waypoint>();
-        lights.forEach(l -> {
-            if (l.isGreen() == isGreen) {
-                l.draw(waypointsSet, painter);
-            }
-        });
-        painter.setWaypoints(waypointsSet);
-        return painter;
     }
 
     @Override
