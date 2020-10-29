@@ -33,7 +33,7 @@ import static routing.RoutingConstants.STEP_CONSTANT;
 @SuppressWarnings("serial")
 public class VehicleAgent extends AbstractAgent {
     private static final Random random = new Random();
-    private static final int THRESHOLD_UNTIL_INDEX_CHANGE = 20;
+    private static final int THRESHOLD_UNTIL_INDEX_CHANGE = 50;
     protected static final int NO_CONSTRUCTION_SITE_STRATEGY_FACTOR = 20;
 
     private final MovingObject vehicle;
@@ -159,7 +159,7 @@ public class VehicleAgent extends AbstractAgent {
                 logger.info("Got propose to change the route and exclude: " + edgeId);
                 final Integer indexOfRouteNodeWithEdge = vehicle.findIndexOfEdgeOnRoute(edgeId,
                         THRESHOLD_UNTIL_INDEX_CHANGE);
-                if (indexOfRouteNodeWithEdge != null) {
+                if (indexOfRouteNodeWithEdge != null && indexOfRouteNodeWithEdge != vehicle.getUniformRouteSize() - 1) {
                     handleConstructionSiteRouteChange(indexOfRouteNodeWithEdge);
                 }
             }
@@ -281,6 +281,9 @@ public class VehicleAgent extends AbstractAgent {
                 int indexAfterWhichRouteChanges;
                 if (indexOfRouteNodeWithEdge != null || !jamStart) {
                     indexAfterWhichRouteChanges = vehicle.getFarOnIndex(THRESHOLD_UNTIL_INDEX_CHANGE);
+                    if (indexAfterWhichRouteChanges == vehicle.getUniformRouteSize() - 1) {
+                    	return;
+                    }
                     handleLightTrafficJamRouteChange(indexAfterWhichRouteChanges, timeForTheEndWithJam, jamStart);
                 }
             }

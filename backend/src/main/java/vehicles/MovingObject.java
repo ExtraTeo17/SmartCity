@@ -1,6 +1,5 @@
 package vehicles;
 
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import routing.RoutingConstants;
@@ -48,7 +47,9 @@ public abstract class MovingObject {
     public abstract String getVehicleType();
 
 
-    public int getMoveIndex() {return moveIndex;}
+    public int getMoveIndex() {
+    	return moveIndex;
+    }
 
     public int getAgentId() {
         return agentId;
