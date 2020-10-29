@@ -27,6 +27,13 @@ import { NOTIFY_SHOW_MS } from "../constants/global";
 import Dispatcher from "../redux/Dispatcher";
 import { BusFillState } from "../components/Models/BusFillState";
 
+function logMessage(payload) {
+  console.groupCollapsed("HandledMessage");
+  console.log("Message received.");
+  console.log(payload);
+  console.groupEnd();
+}
+
 export default {
   handle(msg) {
     const { payload } = msg;
@@ -132,6 +139,7 @@ export default {
       }
 
       case CREATE_BIKE_INFO:
+        logMessage(payload);
         Dispatcher.createBike(payload);
         break;
 

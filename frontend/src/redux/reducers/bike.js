@@ -10,7 +10,7 @@ const deletedBikeIds = [];
 const bike = (state = initialState, action) => {
   switch (action.type) {
     case BIKE_CREATED: {
-      const { bike } = action.payload;
+      const bike = action.payload;
       return { ...state, bikes: [...state.bikes, bike] };
     }
 
