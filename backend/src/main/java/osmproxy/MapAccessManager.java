@@ -168,6 +168,7 @@ public class MapAccessManager implements IMapAccessManager {
         }
     }
 
+
     @Override
     public List<OSMLight> getOsmLights(List<Long> osmWayIds) {
         var query = OsmQueryManager.getFullTrafficSignalQuery(osmWayIds);

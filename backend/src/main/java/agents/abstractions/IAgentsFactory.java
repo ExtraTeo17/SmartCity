@@ -7,6 +7,7 @@ import osmproxy.elements.OSMNode;
 import osmproxy.elements.OSMStation;
 import routing.nodes.RouteNode;
 import routing.nodes.StationNode;
+import smartcity.recreationalplaces.OSMCafe;
 
 import java.util.List;
 
@@ -16,6 +17,7 @@ public interface IAgentsFactory {
     VehicleAgent create(List<RouteNode> route);
 
     StationAgent create(OSMStation station);
+    CafeAgent create(OSMCafe station);
 
     BusAgent create(List<RouteNode> route, Timetable timetable, String busLine,
                     String brigadeNr);

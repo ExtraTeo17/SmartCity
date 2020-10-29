@@ -16,6 +16,7 @@ import routing.nodes.StationNode;
 import smartcity.ITimeProvider;
 import smartcity.config.ConfigContainer;
 import smartcity.lights.abstractions.ICrossroadFactory;
+import smartcity.recreationalplaces.OSMCafe;
 import smartcity.stations.StationStrategy;
 import vehicles.*;
 
@@ -76,6 +77,14 @@ class AgentsFactory implements IAgentsFactory {
         var stationStrategy = new StationStrategy(id);
         return new StationAgent(id, station, stationStrategy, timeProvider, eventBus);
     }
+
+    @Override
+    public CafeAgent create(OSMCafe cafe) {
+        var id = idGenerator.get(CafeAgent.class);
+        return new CafeAgent(id, cafe, timeProvider, eventBus);
+    }
+
+
 
     @Override
     public BusAgent create(List<RouteNode> route, Timetable timetable, String busLine, String brigadeNr) {

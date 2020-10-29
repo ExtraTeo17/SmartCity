@@ -15,7 +15,7 @@ public class OSMNode extends OSMElement
     protected final double lat;
     protected final double lon;
 
-    OSMNode(long id, double lat, double lon) {
+    public OSMNode(long id, double lat, double lon) {
         super(id);
         this.lat = lat;
         this.lon = lon;
@@ -33,6 +33,7 @@ public class OSMNode extends OSMElement
                 attributes.getNamedItem("lat").getNodeValue(),
                 attributes.getNamedItem("lon").getNodeValue());
     }
+
 
     @Override
     public final double getLat() {

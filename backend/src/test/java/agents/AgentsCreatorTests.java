@@ -24,6 +24,7 @@ import smartcity.lights.abstractions.ICrossroadFactory;
 import smartcity.lights.core.CrossroadFactory;
 import smartcity.lights.core.CrossroadParser;
 import smartcity.lights.core.Light;
+import smartcity.recreationalplaces.CafesManager;
 import testutils.FileLoader;
 
 import java.util.ArrayList;
@@ -124,6 +125,7 @@ class AgentsCreatorTests {
         var lightAccessManager = setupLightAccessManager();
         var configContainer = mock(ConfigContainer.class);
         var busLinesManager = mock(BusLinesManager.class);
+        var cafesManager = mock(CafesManager.class);
         var agentsFactory = setupAgentsFactory();
         var eventBus = new EventBus();
         var mapAccessManager = mock(IMapAccessManager.class);
@@ -132,7 +134,7 @@ class AgentsCreatorTests {
         var cacheWrapper = mock(ICacheWrapper.class);
 
         return new AgentsCreator(agentsContainer, configContainer, busLinesManager, agentsFactory,
-                eventBus, lightAccessManager, mapAccessManager, routeGenerator, cacheWrapper);
+                eventBus, lightAccessManager, mapAccessManager, routeGenerator, cacheWrapper,cafesManager);
     }
 
     private ILightAccessManager setupLightAccessManager() {

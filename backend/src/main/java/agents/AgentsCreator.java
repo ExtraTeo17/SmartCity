@@ -23,11 +23,14 @@ import osmproxy.elements.OSMNode;
 import osmproxy.elements.OSMStation;
 import osmproxy.elements.OSMWay;
 import routing.abstractions.IRouteGenerator;
+import routing.nodes.CafeNode;
 import routing.nodes.RouteNode;
 import routing.nodes.StationNode;
 import smartcity.SimulationState;
 import smartcity.TimeProvider;
 import smartcity.config.ConfigContainer;
+import smartcity.recreationalplaces.ICafesManager;
+import smartcity.recreationalplaces.OSMCafe;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -42,6 +45,7 @@ public class AgentsCreator {
     private final IAgentsContainer agentsContainer;
     private final ConfigContainer configContainer;
     private final IBusLinesManager busLinesManager;
+    private final ICafesManager cafeManager;
     private final IAgentsFactory factory;
     private final EventBus eventBus;
     private final ILightAccessManager lightAccessManager;
@@ -58,7 +62,8 @@ public class AgentsCreator {
                          ILightAccessManager lightAccessManager,
                          IMapAccessManager mapAccessManager,
                          IRouteGenerator routeGenerator,
-                         ICacheWrapper cacheWrapper) {
+                         ICacheWrapper cacheWrapper,
+                         ICafesManager cafeManager) {
         this.agentsContainer = agentsContainer;
         this.configContainer = configContainer;
         this.busLinesManager = busLinesManager;
@@ -68,6 +73,7 @@ public class AgentsCreator {
         this.mapAccessManager = mapAccessManager;
         this.routeGenerator = routeGenerator;
         this.cacheWrapper = cacheWrapper;
+        this.cafeManager = cafeManager;
     }
 
 
@@ -108,6 +114,11 @@ public class AgentsCreator {
                 return false;
             }
         }
+        else if (configContainer.shouldGeneratePedestriansAndCafes())
+        {
+            if(!prepareCafes())
+            return false;
+        }
         return prepareLightManagers();
     }
 
@@ -147,6 +158,34 @@ public class AgentsCreator {
         }
 
         return busData;
+    }
+
+
+    private boolean prepareCafes() {
+        int cafesCount = 0;
+        Collection<OSMCafe> cafePositions = cafeManager.getCafesData();
+        List<CafeNode> cafesNodes = new ArrayList<>();
+        for (var cafePos : cafePositions) {
+           CafeAgent agent = factory.create(cafePos);
+            boolean result = agentsContainer.tryAdd(agent);
+            if (result) {
+                ++cafesCount;
+                agent.start();
+                // Should probably be moved to nodesCreator if any extensions will be needed
+                cafesNodes.add(new CafeNode(agent.getCafe(), agent.getId()));
+            }
+            else {
+                logger.info("Cafe agent could not be added");
+            }
+        }
+
+        if (cafesCount == 0) {
+            logger.error("No cafes were created");
+            return false;
+        }
+
+        logger.info("NUMBER OF CAFE AGENTS: " + cafesCount);
+        return true;
     }
 
     private List<StationNode> prepareStations(Collection<OSMStation> stationPositions) {

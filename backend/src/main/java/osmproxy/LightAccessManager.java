@@ -53,6 +53,8 @@ public class LightAccessManager implements ILightAccessManager {
         return mapAccessManager.parseNodes(nodes.get());
     }
 
+
+
     private List<OSMNode> getLightNodes(final List<OSMNode> lightsAround) {
         var query = getParentWaysOfLightsQuery(lightsAround);
         var documentOpt = mapAccessManager.getNodesDocument(query);

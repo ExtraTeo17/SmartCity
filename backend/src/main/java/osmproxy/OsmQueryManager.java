@@ -33,6 +33,21 @@ public class OsmQueryManager {
                 "  <recurse from=\"minor\" type=\"way-node\"/>\r\n" +
                 "  <print e=\"\" from=\"_\" geometry=\"skeleton\" ids=\"yes\" limit=\"\" mode=\"tags\" n=\"\" order=\"id\" s=\"\" w=\"\"/>\r\n";
     }
+    public static String getCoffeeAroundPointQuery(double middleLat, double middleLon, int radius) {
+        return "<osm-script>\n" +
+                "  <query into=\"_\" type=\"area\">\n" +
+                "    <has-kv k=\"name\" modv=\"\" v=\"Warszawa\"/>\n" +
+                "  </query>\n" +
+                "  <query into=\"_\" type=\"node\">\n" +
+                "    <has-kv k=\"amenity\" modv=\"\" v=\"cafe\"/>\n" +
+                "    <around radius=\""+radius+"\" lat=\""+middleLat+"\" lon=\""+middleLon+"\"/>\n" +
+                "  </query>\n" +
+                "  <print e=\"\" from=\"_\" geometry=\"skeleton\" ids=\"yes\" limit=\"\" mode=\"skeleton\" n=\"\" order=\"id\" s=\"\" w=\"\"/>\n" +
+                "</osm-script>";
+    }
+
+
+
 
     private static String getSingleTrafficSignalQuery(long osmWayId) {
         return "<osm-script>\r\n" +
@@ -74,6 +89,10 @@ public class OsmQueryManager {
                 "  <print e=\"\" from=\"_\" geometry=\"skeleton\" ids=\"yes\" limit=\"\" mode=\"body\" n=\"\" order=\"id\" s=\"\" w=\"\"/>\r\n" +
                 "</osm-script>";
     }
+
+
+
+
 
     static String getLightsAroundQuery(IGeoPosition pos, int radius) {
         return getLightsAroundQuery(pos.getLat(), pos.getLng(), radius);

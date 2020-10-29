@@ -16,7 +16,8 @@ public class AgentsModule extends AbstractModule {
             BusAgent.class,
             LightManagerAgent.class,
             StationAgent.class,
-            PedestrianAgent.class
+            PedestrianAgent.class,
+            CafeAgent.class
     };
 
     @Override
