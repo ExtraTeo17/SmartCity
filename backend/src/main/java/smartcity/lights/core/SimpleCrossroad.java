@@ -4,6 +4,7 @@ import com.google.common.eventbus.EventBus;
 import events.SwitchLightsStartEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import smartcity.config.abstractions.ITroublePointsConfigContainer;
 import smartcity.lights.OptimizationResult;
 import smartcity.lights.abstractions.ICrossroad;
 import smartcity.stations.ArrivalInfo;
@@ -19,16 +20,19 @@ import java.util.stream.Collectors;
 class SimpleCrossroad implements ICrossroad {
     private final Logger logger;
     private final EventBus eventBus;
+    private final ITroublePointsConfigContainer configContainer;
     private final int managerId;
 
     @SuppressWarnings("MismatchedQueryAndUpdateOfCollection")
     private final Map<Long, Light> wayIdToLightMap;
 
     SimpleCrossroad(EventBus eventBus,
+                    ITroublePointsConfigContainer configContainer,
                     int managerId,
                     Siblings<SimpleLightGroup> lightGroups) {
         this.logger = LoggerFactory.getLogger("SimpleCrossroad" + managerId);
         this.eventBus = eventBus;
+        this.configContainer = configContainer;
         this.managerId = managerId;
         this.wayIdToLightMap = new HashMap<>() {{
             putAll(lightGroups.first.prepareMap());
@@ -44,8 +48,13 @@ class SimpleCrossroad implements ICrossroad {
     @Override
     public OptimizationResult requestOptimizations(int extendTimeSeconds) {
         final OptimizationResult result = new OptimizationResult(extendTimeSeconds);
+        boolean shouldCheckForJams = configContainer.shouldChangeRouteOnTrafficJam();
         for (Light light : wayIdToLightMap.values()) {
-            light.checkForTrafficJams(result);
+
+            if (shouldCheckForJams) {
+                light.checkForTrafficJams(result);
+            }
+
             if (light.isGreen()) {
                 for (String carName : light.carQueue) {
                     result.addCarGrantedPassthrough(carName);

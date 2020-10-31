@@ -21,10 +21,10 @@ public class ConfigContainer extends ConfigMutator
     private SimulationState simulationState = SimulationState.INITIAL;
     private boolean shouldGeneratePedestriansAndBuses = false;
     private boolean shouldGenerateConstructionSites = false;
-    private boolean shouldGenerateTrafficJams = false;
+    private boolean changeRouteOnTrafficJam = false;
 
     private boolean isLightStrategyActive = true;
-    private boolean isConstructionSiteStrategyActive = false;
+    private boolean changeRouteOnTroublePoint = false;
     private boolean isStationStrategyActive = true;
 
     private int lightExtendTime = 30;
@@ -98,13 +98,13 @@ public class ConfigContainer extends ConfigMutator
     }
 
     @Override
-    public boolean isChangeRouteStrategyActive() {
-        return isConstructionSiteStrategyActive;
+    public boolean shouldChangeRouteOnTroublePoint() {
+        return changeRouteOnTroublePoint;
     }
 
     @Override
-    public void setChangeRouteStrategyActive(boolean constructionSiteStrategyActive) {
-        isConstructionSiteStrategyActive = constructionSiteStrategyActive;
+    public void setChangeRouteOnTroublePoint(boolean changeRouteOnTroublePoint) {
+        this.changeRouteOnTroublePoint = changeRouteOnTroublePoint;
     }
 
     @Override
@@ -138,13 +138,13 @@ public class ConfigContainer extends ConfigMutator
     }
 
     @Override
-    public boolean shouldGenerateTrafficJams() {
-        return shouldGenerateTrafficJams;
+    public boolean shouldChangeRouteOnTrafficJam() {
+        return changeRouteOnTrafficJam;
     }
 
     @Override
-    public void setShouldGenerateTrafficJams(boolean value) {
-        shouldGenerateTrafficJams = value;
+    public void setChangeRouteOnTrafficJam(boolean changeRouteOnTrafficJam) {
+        this.changeRouteOnTrafficJam = changeRouteOnTrafficJam;
     }
 
 }

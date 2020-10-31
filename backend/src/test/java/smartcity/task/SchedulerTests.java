@@ -110,9 +110,8 @@ class SchedulerTests {
         var changeRouteStrategyActive = false;
 
         var event = new StartSimulationEvent(shouldGenerateCars, carsNum, testCarId,
-                shouldGenerateBikes, bikesNum, testBikeId, shouldGenerateTrafficJams,
-                shouldGenerateTP, timeBeforeTrouble, pedestriansLimit, testPedestrianId, startTime,
-                lightStrategyActive, extendLightTime, stationStrategyActive, extendWaitTime, changeRouteStrategyActive);
+                shouldGenerateBikes, bikesNum, testBikeId, shouldGenerateTP, timeBeforeTrouble, pedestriansLimit, testPedestrianId, startTime, lightStrategyActive, extendLightTime, stationStrategyActive, extendWaitTime, changeRouteStrategyActive, shouldGenerateTrafficJams
+        );
 
         // Act
         scheduler.handle(event);
@@ -126,7 +125,7 @@ class SchedulerTests {
 
         assertEquals(shouldGenerateTP, configContainer.shouldGenerateConstructionSites());
         assertEquals(timeBeforeTrouble, configContainer.getTimeBeforeTrouble());
-        assertEquals(shouldGenerateTrafficJams, configContainer.shouldGenerateTrafficJams());
+        assertEquals(shouldGenerateTrafficJams, configContainer.shouldChangeRouteOnTrafficJam());
 
         assertEquals(pedestriansLimit, ref.pedLimit);
         assertEquals(testPedestrianId, ref.testPedId);
@@ -134,7 +133,7 @@ class SchedulerTests {
         assertEquals(extendLightTime, configContainer.getExtendLightTime());
         assertEquals(stationStrategyActive, configContainer.isStationStrategyActive());
         assertEquals(extendWaitTime, configContainer.getExtendWaitTime());
-        assertEquals(changeRouteStrategyActive, configContainer.isChangeRouteStrategyActive());
+        assertEquals(changeRouteStrategyActive, configContainer.shouldChangeRouteOnTroublePoint());
     }
 
     @Test
@@ -168,9 +167,8 @@ class SchedulerTests {
 
     private StartSimulationEvent prepareSimulationEvent(LocalDateTime startTime) {
         return new StartSimulationEvent(false, 111, 112, false, 444,
-                222, false, true,
-                5005, 222, 223, startTime,
-                false, 333, false, 354, false);
+                222, true, 5005, 222, 223, startTime, false, 333, false, 354, false, false
+        );
     }
 
 }

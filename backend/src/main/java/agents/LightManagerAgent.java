@@ -63,14 +63,12 @@ public class LightManagerAgent extends AbstractAgent {
                 //Expected one agent in the list
                 final List<String> agentsFreeToProceed = result.carsFreeToProceed();
 
-                if (configContainer.shouldGenerateTrafficJams()) {
-                    final String agentStuckInJam = result.getAgentStuckInJam();
-                    if (result.shouldNotifyCarAboutStartOfTrafficJamOnThisLight()) {
-                        handleTrafficJams(result, agentStuckInJam);
-                    }
-                    if (result.shouldNotifyCarAboutStopOfTrafficJamOnThisLight()) {
-                        sendMessageAboutTroubleStopToTroubleManager(result);
-                    }
+                final String agentStuckInJam = result.getAgentStuckInJam();
+                if (result.shouldNotifyCarAboutStartOfTrafficJamOnThisLight()) {
+                    handleTrafficJams(result, agentStuckInJam);
+                }
+                if (result.shouldNotifyCarAboutStopOfTrafficJamOnThisLight()) {
+                    sendMessageAboutTroubleStopToTroubleManager(result);
                 }
 
                 if (agentsFreeToProceed.size() != 0) {

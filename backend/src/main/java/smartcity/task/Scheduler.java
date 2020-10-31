@@ -38,14 +38,13 @@ public class Scheduler {
         configContainer.setLightStrategyActive(e.lightStrategyActive);
 
         activateLightManagerAgents();
-        configContainer.setShouldGenerateTrafficJams(
-                agentsContainer.size(LightManagerAgent.class) > 0 &&
-                        e.shouldGenerateTrafficJams);
+        configContainer.setChangeRouteOnTrafficJam(
+                agentsContainer.size(LightManagerAgent.class) > 0 && e.changeRouteOnTrafficJam);
 
         if (e.shouldGenerateCars) {
             configContainer.setShouldGenerateConstructionSites(e.shouldGenerateTroublePoints);
             configContainer.setTimeBeforeTrouble(e.timeBeforeTrouble);
-            configContainer.setChangeRouteStrategyActive(e.changeRouteStrategyActive);
+            configContainer.setChangeRouteOnTroublePoint(e.changeRouteOnTroublePoint);
             taskManager.scheduleCarCreation(e.carsNum, e.testCarId);
         }
 

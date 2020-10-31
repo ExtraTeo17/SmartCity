@@ -11,7 +11,6 @@ public class StartSimulationEvent {
     public final int bikesNum;
     public final int testBikeId;
 
-    public final boolean shouldGenerateTrafficJams;
     public final boolean shouldGenerateTroublePoints;
     public final int timeBeforeTrouble;
 
@@ -27,7 +26,8 @@ public class StartSimulationEvent {
     public final boolean stationStrategyActive;
     public final int extendWaitTime;
 
-    public final boolean changeRouteStrategyActive;
+    public final boolean changeRouteOnTroublePoint;
+    public final boolean changeRouteOnTrafficJam;
 
     public StartSimulationEvent(boolean shouldGenerateCars,
                                 int carsNum,
@@ -35,7 +35,6 @@ public class StartSimulationEvent {
                                 boolean shouldGenerateBikes,
                                 int bikesNum,
                                 int testBikeId,
-                                boolean generateTrafficJams,
                                 boolean generateTroublePoints,
                                 int timeBeforeTrouble,
                                 int pedestriansLimit,
@@ -45,14 +44,15 @@ public class StartSimulationEvent {
                                 int extendLightTime,
                                 boolean stationStrategyActive,
                                 int extendWaitTime,
-                                boolean changeRouteStrategyActive) {
+                                boolean changeRouteOnTroublePoint,
+                                boolean changeRouteOnTrafficJam) {
         this.carsNum = carsNum;
         this.testCarId = testCarId;
         this.shouldGenerateCars = shouldGenerateCars;
         this.shouldGenerateBikes = shouldGenerateBikes;
         this.bikesNum = bikesNum;
         this.testBikeId = testBikeId;
-        this.shouldGenerateTrafficJams = generateTrafficJams;
+        this.changeRouteOnTrafficJam = changeRouteOnTrafficJam;
         this.shouldGenerateTroublePoints = generateTroublePoints;
         this.timeBeforeTrouble = timeBeforeTrouble;
         this.pedestriansLimit = pedestriansLimit;
@@ -62,6 +62,6 @@ public class StartSimulationEvent {
         this.extendLightTime = extendLightTime;
         this.stationStrategyActive = stationStrategyActive;
         this.extendWaitTime = extendWaitTime;
-        this.changeRouteStrategyActive = changeRouteStrategyActive;
+        this.changeRouteOnTroublePoint = changeRouteOnTroublePoint;
     }
 }

@@ -166,7 +166,7 @@ public class VehicleAgent extends AbstractAgent {
 
             private void handleConstructionSiteRouteChange(final int indexOfRouteNodeWithEdge) {
                 int indexAfterWhichRouteChanges;
-                if (configContainer.isChangeRouteStrategyActive()) {
+                if (configContainer.shouldChangeRouteOnTroublePoint()) {
                     indexAfterWhichRouteChanges = vehicle.getFarOnIndex(THRESHOLD_UNTIL_INDEX_CHANGE);
                 }
                 else {

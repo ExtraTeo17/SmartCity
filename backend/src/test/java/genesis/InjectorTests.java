@@ -24,7 +24,6 @@ import events.web.pedestrian.*;
 import events.web.roadblocks.TrafficJamFinishedEvent;
 import events.web.roadblocks.TrafficJamStartedEvent;
 import events.web.roadblocks.TroublePointCreatedEvent;
-import events.web.roadblocks.TroublePointVanishedEvent;
 import events.web.vehicle.VehicleAgentCreatedEvent;
 import events.web.vehicle.VehicleAgentDeadEvent;
 import events.web.vehicle.VehicleAgentRouteChangedEvent;
@@ -102,9 +101,8 @@ class InjectorTests {
         eventBus.post(new SimulationPreparedEvent(new ArrayList<>(), new ArrayList<>(), new ArrayList<>()));
         eventBus.post("Test"); // Dead event
         eventBus.post(new StartSimulationEvent(false, 0, 0, false,
-                0, 0, false, false,
-                5000, 0, 1, LocalDateTime.now(), false,
-                30, false, 60, false));
+                0, 0, false, 5000, 0, 1, LocalDateTime.now(), false, 30, false, 60, false, false
+        ));
         eventBus.post(new SimulationStartedEvent());
         eventBus.post(new ClearSimulationEvent());
 

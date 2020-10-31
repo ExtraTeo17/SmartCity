@@ -175,11 +175,6 @@ public class TroubleManagerAgent extends Agent {
                     return;
                 }
 
-                if (!configContainer.shouldGenerateTrafficJams()) {
-                    logger.warn("Stopping sayAboutJam");
-                    stop();
-                }
-
                 for (Map.Entry<Integer, String> entry : mapOfLightTrafficJamBlockedEdges.entrySet()) {
                     sendBroadcast(generateMessageAboutTrafficJam(entry.getKey(), entry.getValue(),
                             MessageParameter.TRAFFIC_JAM, MessageParameter.SHOW));

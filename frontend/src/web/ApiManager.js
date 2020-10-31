@@ -57,7 +57,6 @@ export default {
         bikesLimit,
         testBikeId,
 
-        changeRouteOnTrafficJam,
         generateTroublePoints,
         timeBeforeTrouble,
 
@@ -70,6 +69,7 @@ export default {
         extendWaitTime,
 
         changeRouteOnTroublePoint,
+        changeRouteOnTrafficJam,
       },
     };
     WebServer.send(msg);
