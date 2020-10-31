@@ -45,6 +45,7 @@ class SimpleCrossroad implements ICrossroad {
 
     @Override
     public void startLifetime() {
+        eventBus.register(this);
         eventBus.post(new SwitchLightsStartEvent(managerId, wayIdToLightMap.values()));
     }
 

@@ -1,11 +1,10 @@
 package web.message.payloads.responses;
 
-import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import web.message.payloads.AbstractPayload;
 
+@JsonSerialize
 public class StartResponse extends AbstractPayload {
-    @JsonCreator(mode = JsonCreator.Mode.PROPERTIES)
     public StartResponse() {
     }
 }
