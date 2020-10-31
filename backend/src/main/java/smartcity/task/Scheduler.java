@@ -40,11 +40,11 @@ public class Scheduler {
         activateLightManagerAgents();
         configContainer.setChangeRouteOnTrafficJam(
                 agentsContainer.size(LightManagerAgent.class) > 0 && e.changeRouteOnTrafficJam);
+        configContainer.setShouldGenerateConstructionSites(e.shouldGenerateTroublePoints);
+        configContainer.setTimeBeforeTrouble(e.timeBeforeTrouble);
+        configContainer.setChangeRouteOnTroublePoint(e.changeRouteOnTroublePoint);
 
         if (e.shouldGenerateCars) {
-            configContainer.setShouldGenerateConstructionSites(e.shouldGenerateTroublePoints);
-            configContainer.setTimeBeforeTrouble(e.timeBeforeTrouble);
-            configContainer.setChangeRouteOnTroublePoint(e.changeRouteOnTroublePoint);
             taskManager.scheduleCarCreation(e.carsNum, e.testCarId);
         }
 

@@ -21,11 +21,11 @@ public class ConfigContainer extends ConfigMutator
     private SimulationState simulationState = SimulationState.INITIAL;
     private boolean shouldGeneratePedestriansAndBuses = false;
     private boolean shouldGenerateConstructionSites = false;
-    private boolean changeRouteOnTrafficJam = false;
 
     private boolean isLightStrategyActive = true;
     private boolean changeRouteOnTroublePoint = false;
     private boolean isStationStrategyActive = true;
+    private boolean changeRouteOnTrafficJam = false;
 
     private int lightExtendTime = 30;
     private int extendWaitTime = 60;

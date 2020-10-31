@@ -13,6 +13,7 @@ import {
   D_STATION_STRATEGY_ACTIVE,
   D_EXTEND_LIGHT_TIME,
   D_CHANGE_ROUTE_TP_ACTIVE,
+  D_CHANGE_ROUTE_TJ_ACTIVE,
 } from "../../constants/defaults";
 
 const StrategyMenu = props => {
@@ -24,6 +25,7 @@ const StrategyMenu = props => {
   const [extendWaitTime, setExtendWaitTime] = useState(D_EXTEND_WAIT_TIME);
 
   const [changeRouteOnTroublePoint, setchangeRouteOnTroublePoint] = useState(D_CHANGE_ROUTE_TP_ACTIVE);
+  const [changeRouteOnTrafficJam, setchangeRouteOnTrafficJam] = useState(D_CHANGE_ROUTE_TJ_ACTIVE);
 
   const onStart = () => {
     if (shouldStart === StartState.Invoke) {
@@ -34,6 +36,7 @@ const StrategyMenu = props => {
           stationStrategyActive,
           extendWaitTime,
           changeRouteOnTroublePoint,
+          changeRouteOnTrafficJam,
         })
       );
     }
@@ -46,6 +49,10 @@ const StrategyMenu = props => {
 
   function evSetWaitExtend(e) {
     setIfValidInt(e, STATION_EXTEND_MIN, STATION_EXTEND_MAX, setExtendWaitTime);
+  }
+
+  function evSetchangeRouteOnTrafficJam(e) {
+    setchangeRouteOnTrafficJam(e.target.checked);
   }
 
   return (
@@ -122,7 +129,7 @@ const StrategyMenu = props => {
             onChange={e => setchangeRouteOnTroublePoint(e.target.checked)}
           />
           <label htmlFor="changeRouteOnTroublePoint" className="form-check-label">
-            Change route on trouble point strategy
+            Change route on trouble point
           </label>
         </div>
       </div>
@@ -131,14 +138,14 @@ const StrategyMenu = props => {
         <div className="form-check user-select-none">
           <input
             type="checkbox"
-            checked={changeRouteOnTroublePoint}
+            defaultChecked={changeRouteOnTrafficJam}
             disabled={wasStarted}
             className="form-check-input"
-            id="changeRouteOnTroublePoint"
-            onChange={e => setchangeRouteOnTroublePoint(e.target.checked)}
+            id="changeRouteOnTrafficJam"
+            onChange={evSetchangeRouteOnTrafficJam}
           />
-          <label htmlFor="changeRouteOnTroublePoint" className="form-check-label">
-            Change route on traffic jam strategy
+          <label htmlFor="changeRouteOnTrafficJam" className="form-check-label">
+            Change route on traffic jam
           </label>
         </div>
       </div>

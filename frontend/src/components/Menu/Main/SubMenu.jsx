@@ -15,7 +15,6 @@ import {
   D_TEST_BIKE,
   D_GENERATE_TP,
   D_TIME_BEFORE_TROUBLE,
-  D_CHANGE_ROUTE_TJ_ACTIVE,
 } from "../../../constants/defaults";
 
 import {
@@ -47,7 +46,7 @@ const SubMenu = props => {
   const [testBikeId, setTestBikeId] = useState(D_TEST_BIKE);
 
   const [generateTroublePoints, setGenerateTroublePoints] = useState(D_GENERATE_TP);
-  const [changeRouteOnTrafficJam, setchangeRouteOnTrafficJam] = useState(D_CHANGE_ROUTE_TJ_ACTIVE);
+
   const [timeBeforeTrouble, setTimeBeforeTrouble] = useState(D_TIME_BEFORE_TROUBLE);
 
   function onStart() {
@@ -63,7 +62,6 @@ const SubMenu = props => {
           testBikeId,
 
           generateTroublePoints,
-          changeRouteOnTrafficJam,
           timeBeforeTrouble,
           pedLimit,
           testPedId,
@@ -103,10 +101,6 @@ const SubMenu = props => {
 
   function evSetTimeBeforeTrouble(e) {
     setIfValidInt(e, TIME_BEFORE_TP_MIN, TIME_BEFORE_TP_MAX, setTimeBeforeTrouble);
-  }
-
-  function evSetchangeRouteOnTrafficJam(e) {
-    setchangeRouteOnTrafficJam(e.target.checked);
   }
 
   return (
@@ -269,19 +263,6 @@ const SubMenu = props => {
           </div>
         </div>
       )}
-      <div className="form-check user-select-none">
-        <input
-          type="checkbox"
-          defaultChecked={changeRouteOnTrafficJam}
-          disabled={wasStarted}
-          className="form-check-input"
-          id="changeRouteOnTrafficJam"
-          onChange={evSetchangeRouteOnTrafficJam}
-        />
-        <label htmlFor="changeRouteOnTrafficJam" className="form-check-label">
-          Generate traffic jams
-        </label>
-      </div>
     </>
   );
 };
