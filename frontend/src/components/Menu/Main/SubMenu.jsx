@@ -15,7 +15,7 @@ import {
   D_TEST_BIKE,
   D_GENERATE_TP,
   D_TIME_BEFORE_TROUBLE,
-  D_GENERATE_TJ,
+  D_CHANGE_ROUTE_TJ_ACTIVE,
 } from "../../../constants/defaults";
 
 import {
@@ -47,7 +47,7 @@ const SubMenu = props => {
   const [testBikeId, setTestBikeId] = useState(D_TEST_BIKE);
 
   const [generateTroublePoints, setGenerateTroublePoints] = useState(D_GENERATE_TP);
-  const [generateTrafficJams, setGenerateTrafficJams] = useState(D_GENERATE_TJ);
+  const [changeRouteOnTrafficJam, setchangeRouteOnTrafficJam] = useState(D_CHANGE_ROUTE_TJ_ACTIVE);
   const [timeBeforeTrouble, setTimeBeforeTrouble] = useState(D_TIME_BEFORE_TROUBLE);
 
   function onStart() {
@@ -63,7 +63,7 @@ const SubMenu = props => {
           testBikeId,
 
           generateTroublePoints,
-          generateTrafficJams,
+          changeRouteOnTrafficJam,
           timeBeforeTrouble,
           pedLimit,
           testPedId,
@@ -105,8 +105,8 @@ const SubMenu = props => {
     setIfValidInt(e, TIME_BEFORE_TP_MIN, TIME_BEFORE_TP_MAX, setTimeBeforeTrouble);
   }
 
-  function evSetGenerateTrafficJams(e) {
-    setGenerateTrafficJams(e.target.checked);
+  function evSetchangeRouteOnTrafficJam(e) {
+    setchangeRouteOnTrafficJam(e.target.checked);
   }
 
   return (
@@ -272,13 +272,13 @@ const SubMenu = props => {
       <div className="form-check user-select-none">
         <input
           type="checkbox"
-          defaultChecked={generateTrafficJams}
+          defaultChecked={changeRouteOnTrafficJam}
           disabled={wasStarted}
           className="form-check-input"
-          id="generateTrafficJams"
-          onChange={evSetGenerateTrafficJams}
+          id="changeRouteOnTrafficJam"
+          onChange={evSetchangeRouteOnTrafficJam}
         />
-        <label htmlFor="generateTrafficJams" className="form-check-label">
+        <label htmlFor="changeRouteOnTrafficJam" className="form-check-label">
           Generate traffic jams
         </label>
       </div>
@@ -289,7 +289,7 @@ const SubMenu = props => {
 const mapStateToProps = (state /* ownProps */) => {
   const { wasPrepared, wasStarted } = state.message;
   const {
-    startSimulationData: { carsNum, testCarNum, generateCars, generateTrafficJams, generateTroublePoints, timeBeforeTrouble },
+    startSimulationData: { carsNum, testCarNum, generateCars, changeRouteOnTrafficJam, generateTroublePoints, timeBeforeTrouble },
     shouldStart,
     generatePedestrians,
   } = state.interaction;
@@ -301,7 +301,7 @@ const mapStateToProps = (state /* ownProps */) => {
     testCarNum,
     generateCars,
     generatePedestrians,
-    generateTrafficJams,
+    changeRouteOnTrafficJam,
     generateTroublePoints,
     timeBeforeTrouble,
   };

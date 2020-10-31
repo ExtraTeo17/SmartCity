@@ -1,7 +1,7 @@
 import { createStore } from "redux";
 import { composeWithDevTools } from "redux-devtools-extension";
 import {
-  D_CHANGE_ROUTE_STRATEGY_ACTIVE,
+  D_CHANGE_ROUTE_TP_ACTIVE,
   D_STATION_STRATEGY_ACTIVE,
   D_PEDS_NUM,
   D_TEST_PED,
@@ -9,7 +9,7 @@ import {
   D_TEST_CAR,
   D_GENERATE_CARS,
   D_GENERATE_TP,
-  D_GENERATE_TJ,
+  D_CHANGE_ROUTE_TJ_ACTIVE,
   D_TIME_BEFORE_TROUBLE,
   D_LIGHT_STRATEGY_ACTIVE,
   D_EXTEND_LIGHT_TIME,
@@ -36,7 +36,7 @@ const initialState = {
       testCarId: D_TEST_CAR,
       generateCars: D_GENERATE_CARS,
       generateTroublePoints: D_GENERATE_TP,
-      generateTrafficJams: D_GENERATE_TJ,
+      changeRouteOnTrafficJam: D_CHANGE_ROUTE_TJ_ACTIVE,
       timeBeforeTrouble: D_TIME_BEFORE_TROUBLE,
 
       startTime: D_START_TIME,
@@ -47,7 +47,7 @@ const initialState = {
       stationStrategyActive: D_STATION_STRATEGY_ACTIVE,
       extendWaitTime: D_EXTEND_WAIT_TIME,
 
-      changeRouteStrategyActive: D_CHANGE_ROUTE_STRATEGY_ACTIVE,
+      changeRouteOnTroublePoint: D_CHANGE_ROUTE_TP_ACTIVE,
     },
   },
   message: {

@@ -5,7 +5,7 @@ import {
   START_SIMULATION_DATA_UPDATED,
 } from "../core/constants";
 import {
-  D_CHANGE_ROUTE_STRATEGY_ACTIVE,
+  D_CHANGE_ROUTE_TP_ACTIVE,
   D_STATION_STRATEGY_ACTIVE,
   D_PEDS_NUM,
   D_TEST_PED,
@@ -16,7 +16,7 @@ import {
   D_BIKES_NUM,
   D_TEST_BIKE,
   D_GENERATE_TP,
-  D_GENERATE_TJ,
+  D_CHANGE_ROUTE_TJ_ACTIVE,
   D_TIME_BEFORE_TROUBLE,
   D_LIGHT_STRATEGY_ACTIVE,
   D_EXTEND_LIGHT_TIME,
@@ -43,7 +43,6 @@ const initialState = {
     testBikeId: D_TEST_BIKE,
 
     generateTroublePoints: D_GENERATE_TP,
-    generateTrafficJams: D_GENERATE_TJ,
     timeBeforeTrouble: D_TIME_BEFORE_TROUBLE,
 
     startTime: D_START_TIME,
@@ -54,7 +53,8 @@ const initialState = {
     stationStrategyActive: D_STATION_STRATEGY_ACTIVE,
     extendWaitTime: D_EXTEND_WAIT_TIME,
 
-    changeRouteStrategyActive: D_CHANGE_ROUTE_STRATEGY_ACTIVE,
+    changeRouteOnTroublePoint: D_CHANGE_ROUTE_TP_ACTIVE,
+    changeRouteOnTrafficJam: D_CHANGE_ROUTE_TJ_ACTIVE,
   },
 };
 

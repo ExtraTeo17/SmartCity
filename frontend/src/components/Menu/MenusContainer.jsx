@@ -9,7 +9,7 @@ import "../../styles/MenusContainer.css";
 import SetupsMenu from "./SetupsMenu";
 
 const MenusContainer = ({ timeResults, wasPrepared }) => {
-  const [key, setKey] = useState("main");
+  const [key, setKey] = useState("strategy");
 
   useEffect(() => {
     if (wasPrepared) {

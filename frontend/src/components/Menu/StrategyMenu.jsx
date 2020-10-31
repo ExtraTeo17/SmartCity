@@ -12,7 +12,7 @@ import {
   D_LIGHT_STRATEGY_ACTIVE,
   D_STATION_STRATEGY_ACTIVE,
   D_EXTEND_LIGHT_TIME,
-  D_CHANGE_ROUTE_STRATEGY_ACTIVE,
+  D_CHANGE_ROUTE_TP_ACTIVE,
 } from "../../constants/defaults";
 
 const StrategyMenu = props => {
@@ -23,7 +23,7 @@ const StrategyMenu = props => {
   const [stationStrategyActive, setStationStrategyActive] = useState(D_STATION_STRATEGY_ACTIVE);
   const [extendWaitTime, setExtendWaitTime] = useState(D_EXTEND_WAIT_TIME);
 
-  const [changeRouteStrategyActive, setChangeRouteStrategyActive] = useState(D_CHANGE_ROUTE_STRATEGY_ACTIVE);
+  const [changeRouteOnTroublePoint, setchangeRouteOnTroublePoint] = useState(D_CHANGE_ROUTE_TP_ACTIVE);
 
   const onStart = () => {
     if (shouldStart === StartState.Invoke) {
@@ -33,7 +33,7 @@ const StrategyMenu = props => {
           extendLightTime,
           stationStrategyActive,
           extendWaitTime,
-          changeRouteStrategyActive,
+          changeRouteOnTroublePoint,
         })
       );
     }
@@ -61,7 +61,7 @@ const StrategyMenu = props => {
             onChange={e => setLightStrategyActive(e.target.checked)}
           />
           <label htmlFor="lightStrategyActive" className="form-check-label">
-            Light strategy active
+            Light strategy
           </label>
         </div>
         {lightStrategyActive && (
@@ -92,7 +92,7 @@ const StrategyMenu = props => {
             onChange={e => setStationStrategyActive(e.target.checked)}
           />
           <label htmlFor="stationStrategyActive" className="form-check-label">
-            Station strategy active
+            Station strategy
           </label>
         </div>
         {stationStrategyActive && (
@@ -115,14 +115,30 @@ const StrategyMenu = props => {
         <div className="form-check user-select-none">
           <input
             type="checkbox"
-            checked={changeRouteStrategyActive}
+            checked={changeRouteOnTroublePoint}
             disabled={wasStarted}
             className="form-check-input"
-            id="changeRouteStrategyActive"
-            onChange={e => setChangeRouteStrategyActive(e.target.checked)}
+            id="changeRouteOnTroublePoint"
+            onChange={e => setchangeRouteOnTroublePoint(e.target.checked)}
           />
-          <label htmlFor="changeRouteStrategyActive" className="form-check-label">
-            Change route strategy active
+          <label htmlFor="changeRouteOnTroublePoint" className="form-check-label">
+            Change route on trouble point strategy
+          </label>
+        </div>
+      </div>
+
+      <div className="mb-4 form-border">
+        <div className="form-check user-select-none">
+          <input
+            type="checkbox"
+            checked={changeRouteOnTroublePoint}
+            disabled={wasStarted}
+            className="form-check-input"
+            id="changeRouteOnTroublePoint"
+            onChange={e => setchangeRouteOnTroublePoint(e.target.checked)}
+          />
+          <label htmlFor="changeRouteOnTroublePoint" className="form-check-label">
+            Change route on traffic jam strategy
           </label>
         </div>
       </div>
