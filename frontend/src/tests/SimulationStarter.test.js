@@ -3,7 +3,7 @@
 import React from "react";
 import { render, unmountComponentAtNode } from "react-dom";
 import { act } from "react-dom/test-utils";
-import { SimulationStarter } from "../components/Menu/Main/SimulationStarter";
+import { SimulationStarterObj } from "../components/Menu/Main/SimulationStarter";
 import { StartState } from "../redux/models/startState";
 import { START_SIMULATION_REQUEST } from "../web/MessageType";
 import WebServer from "../web/WebServer";
@@ -62,7 +62,7 @@ it("Passes correct data to ApiManager", async () => {
   // Use the asynchronous version of act to apply resolved promises
   act(() => {
     render(
-      <SimulationStarter
+      <SimulationStarterObj
         shouldStart={StartState.Proceed}
         startSimulationData={startSimulationData}
         wasPrepared

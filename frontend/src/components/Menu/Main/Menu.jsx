@@ -9,7 +9,7 @@ import "flatpickr/dist/themes/material_blue.css";
 import { dispatch } from "../../../redux/store";
 import { startSimulationDataUpdated } from "../../../redux/core/actions";
 import PrepareMenu from "./PrepareMenu";
-import SubMenu from "./SubMenu";
+import GenerationSubMenu from "./GenerationSubMenu";
 import SimulationStarter from "./SimulationStarter";
 import "../../../styles/Menu.css";
 import { StartState } from "../../../redux/models/startState";
@@ -35,7 +35,7 @@ const Menu = props => {
       {!wasStarted && <PrepareMenu />}
 
       <form className="form-border">
-        <SubMenu />
+        <GenerationSubMenu />
 
         <div className="mt-3">
           <label htmlFor="simulationTime">Simulation start time</label>
