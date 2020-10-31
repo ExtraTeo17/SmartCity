@@ -21,7 +21,6 @@ const initialState = {
   troublePoints: [],
   wasPrepared: 0,
   wasStarted: false,
-  timeScale: 10,
   timeResults: [],
 };
 
@@ -49,8 +48,7 @@ const message = (state = initialState, action) => {
     }
 
     case SIMULATION_STARTED: {
-      const timeScale = action.payload;
-      return { ...state, wasStarted: true, timeScale };
+      return { ...state, wasStarted: true };
     }
 
     case LIGHTS_SWITCHED: {

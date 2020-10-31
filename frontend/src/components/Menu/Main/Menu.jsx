@@ -14,20 +14,27 @@ import SimulationStarter from "./SimulationStarter";
 import "../../../styles/Menu.css";
 import { StartState } from "../../../redux/models/startState";
 import CustomClock from "./CustomClock";
-import { D_START_TIME } from "../../../constants/defaults";
+import { D_START_TIME, D_TIME_SCALE } from "../../../constants/defaults";
+import { TIME_SCALE_MIN, TIME_SCALE_MAX } from "../../../constants/minMax";
+import { setIfValidInt } from "../../../utils/helpers";
 
 const Menu = props => {
   const { wasStarted, shouldStart } = props;
   const [startTime, setTime] = useState(D_START_TIME);
+  const [timeScale, setTimeScale] = useState(D_TIME_SCALE);
   const onStart = () => {
     if (shouldStart === StartState.Invoke) {
-      dispatch(startSimulationDataUpdated({ startTime }));
+      dispatch(startSimulationDataUpdated({ startTime, timeScale }));
     }
   };
   useEffect(onStart, [shouldStart]);
 
   function evSetTime(newTime) {
     setTime(newTime[0]);
+  }
+
+  function evSetTimeScale(e) {
+    setIfValidInt(e, TIME_SCALE_MIN, TIME_SCALE_MAX, setTimeScale);
   }
 
   return (
@@ -53,6 +60,20 @@ const Menu = props => {
           >
             <input type="text" className="form-control" disabled={wasStarted} placeholder="Select Date.." data-input />
           </Flatpickr>
+        </div>
+        <div className="form-group mt-2">
+          <label htmlFor="timeScale">Time scale</label>
+          <input
+            type="number"
+            defaultValue={timeScale}
+            disabled={wasStarted}
+            min={TIME_SCALE_MIN}
+            max={TIME_SCALE_MAX}
+            className="form-control"
+            id="timeScale"
+            title="Increase scale to speed up time"
+            onChange={evSetTimeScale}
+          />
         </div>
         <SimulationStarter />
       </form>

@@ -22,6 +22,7 @@ import {
   D_EXTEND_LIGHT_TIME,
   D_EXTEND_WAIT_TIME,
   D_START_TIME,
+  D_TIME_SCALE,
 } from "../../constants/defaults";
 import { StartState } from "../models/startState";
 
@@ -46,6 +47,7 @@ const initialState = {
     timeBeforeTrouble: D_TIME_BEFORE_TROUBLE,
 
     startTime: D_START_TIME,
+    timeScale: D_TIME_SCALE,
 
     lightStrategyActive: D_LIGHT_STRATEGY_ACTIVE,
     extendLightTime: D_EXTEND_LIGHT_TIME,

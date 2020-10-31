@@ -25,3 +25,6 @@ export const STATION_EXTEND_MAX = 300;
 
 export const TIME_BEFORE_TP_MIN = 5;
 export const TIME_BEFORE_TP_MAX = 120;
+
+export const TIME_SCALE_MIN = 1;
+export const TIME_SCALE_MAX = 25;

@@ -34,6 +34,7 @@ export default {
     timeBeforeTrouble,
 
     startTime,
+    timeScale,
 
     lightStrategyActive,
     extendLightTime,
@@ -61,6 +62,7 @@ export default {
         timeBeforeTrouble,
 
         startTime,
+        timeScale,
 
         lightStrategyActive,
         extendLightTime,

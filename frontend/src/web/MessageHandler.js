@@ -51,7 +51,7 @@ export default {
       case START_SIMULATION_RESPONSE:
         notify.show("Simulation started!", "success", NOTIFY_SHOW_MS);
 
-        Dispatcher.startSimulation(payload.timeScale);
+        Dispatcher.startSimulation();
         break;
 
       case CREATE_CAR_INFO:
@@ -139,7 +139,6 @@ export default {
       }
 
       case CREATE_BIKE_INFO:
-        logMessage(payload);
         Dispatcher.createBike(payload);
         break;
 

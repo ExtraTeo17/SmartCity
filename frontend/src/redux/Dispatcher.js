@@ -27,7 +27,6 @@ import {
 
 const fps = 15;
 const fpsInterval = 1000 / fps;
-let timeScale = 1;
 let timer = null;
 
 const carUpdateQueue = new Map();
@@ -95,11 +94,10 @@ const Dispatcher = {
     dispatch(simulationPrepared({ lights, stations, buses }));
   },
 
-  startSimulation(newTimeScale) {
+  startSimulation() {
     localWasPrepared = false;
-    timeScale = newTimeScale;
     timer = update(window.performance.now());
-    dispatch(simulationStarted(timeScale));
+    dispatch(simulationStarted());
   },
 
   createCar(car) {
