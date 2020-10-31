@@ -76,7 +76,7 @@ public class BusApiManager implements IBusApiManager {
         ConditionalExecutor.debug(() -> {
             //noinspection OptionalGetWithoutIsPresent
             var result = resultOpt.get();
-            String path = "busWays_" + waysIds.get(0) + "_" +
+            String path = "target/busWays_" + waysIds.get(0) + "_" +
                     waysIds.get(waysIds.size() - 1) + ".xml";
             logger.info("Writing bus-ways to: " + path);
             FileWrapper.write(result, path);
