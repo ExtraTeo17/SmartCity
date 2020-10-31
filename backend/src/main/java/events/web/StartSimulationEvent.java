@@ -19,6 +19,7 @@ public class StartSimulationEvent {
 
     // TODO: Maybe include post time to reduce discrepancy between frontend and backend
     public final LocalDateTime startTime;
+    public final int timeScale;
 
     public final boolean lightStrategyActive;
     public final int extendLightTime;
@@ -40,6 +41,7 @@ public class StartSimulationEvent {
                                 int pedestriansLimit,
                                 int testPedestrianId,
                                 LocalDateTime startTime,
+                                int timeScale,
                                 boolean lightStrategyActive,
                                 int extendLightTime,
                                 boolean stationStrategyActive,
@@ -52,6 +54,7 @@ public class StartSimulationEvent {
         this.shouldGenerateBikes = shouldGenerateBikes;
         this.bikesNum = bikesNum;
         this.testBikeId = testBikeId;
+        this.timeScale = timeScale;
         this.changeRouteOnTrafficJam = changeRouteOnTrafficJam;
         this.shouldGenerateTroublePoints = generateTroublePoints;
         this.timeBeforeTrouble = timeBeforeTrouble;

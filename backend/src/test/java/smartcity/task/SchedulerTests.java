@@ -5,6 +5,7 @@ import agents.abstractions.IAgentsContainer;
 import events.SwitchLightsStartEvent;
 import events.web.StartSimulationEvent;
 import org.junit.jupiter.api.Test;
+import smartcity.ITimeProvider;
 import smartcity.config.ConfigContainer;
 import smartcity.config.ConfigMutator;
 import smartcity.task.abstractions.ITaskManager;
@@ -49,8 +50,9 @@ class SchedulerTests {
     private Scheduler createScheduler(ITaskManager taskManager) {
         var configContainer = mock(ConfigContainer.class);
         var agentsContainer = mock(IAgentsContainer.class);
+        var timeProvider = mock(ITimeProvider.class);
 
-        return new Scheduler(taskManager, configContainer, agentsContainer, createEventBus());
+        return new Scheduler(taskManager, configContainer, agentsContainer, timeProvider, createEventBus());
     }
 
     @Test
@@ -66,6 +68,7 @@ class SchedulerTests {
             int testBikeId = 0;
             int pedLimit = 0;
             int testPedId = 0;
+            int timeScale = 0;
         };
         var taskManager = mock(ITaskManager.class);
         doAnswer(invocationOnMock -> {
@@ -84,7 +87,13 @@ class SchedulerTests {
             return null;
         }).when(taskManager).scheduleBikeCreation(any(int.class), any(int.class));
 
-        var scheduler = createScheduler(configContainer, taskManager);
+        var timeProvider = mock(ITimeProvider.class);
+        doAnswer(invocationOnMock -> {
+            ref.timeScale = invocationOnMock.getArgument(0);
+            return null;
+        }).when(timeProvider).setTimeScale(any(int.class));
+
+        var scheduler = createScheduler(configContainer, taskManager, timeProvider);
 
         var shouldGenerateCars = true;
         var carsNum = 111;
@@ -103,6 +112,8 @@ class SchedulerTests {
 
         var startTime = LocalDateTime.of(LocalDate.of(2020, 10, 14),
                 LocalTime.of(10, 10, 10));
+        var timeScale = 12;
+
         var lightStrategyActive = false;
         var extendLightTime = 333;
         var stationStrategyActive = false;
@@ -110,7 +121,9 @@ class SchedulerTests {
         var changeRouteStrategyActive = false;
 
         var event = new StartSimulationEvent(shouldGenerateCars, carsNum, testCarId,
-                shouldGenerateBikes, bikesNum, testBikeId, shouldGenerateTP, timeBeforeTrouble, pedestriansLimit, testPedestrianId, startTime, lightStrategyActive, extendLightTime, stationStrategyActive, extendWaitTime, changeRouteStrategyActive, shouldGenerateTrafficJams
+                shouldGenerateBikes, bikesNum, testBikeId, shouldGenerateTP, timeBeforeTrouble,
+                pedestriansLimit, testPedestrianId, startTime, timeScale, lightStrategyActive, extendLightTime,
+                stationStrategyActive, extendWaitTime, changeRouteStrategyActive, shouldGenerateTrafficJams
         );
 
         // Act
@@ -134,6 +147,8 @@ class SchedulerTests {
         assertEquals(stationStrategyActive, configContainer.isStationStrategyActive());
         assertEquals(extendWaitTime, configContainer.getExtendWaitTime());
         assertEquals(changeRouteStrategyActive, configContainer.shouldChangeRouteOnTroublePoint());
+
+        assertEquals(timeScale, ref.timeScale);
     }
 
     @Test
@@ -159,15 +174,17 @@ class SchedulerTests {
         assertEquals(startTime, ref.timeSet);
     }
 
-    private Scheduler createScheduler(ConfigContainer configContainer, ITaskManager taskManager) {
+    private Scheduler createScheduler(ConfigContainer configContainer, ITaskManager taskManager, ITimeProvider timeProvider) {
         var agentsContainer = mock(IAgentsContainer.class);
         when(agentsContainer.size(LightManagerAgent.class)).thenReturn(1);
-        return new Scheduler(taskManager, configContainer, agentsContainer, createEventBus());
+        return new Scheduler(taskManager, configContainer, agentsContainer, timeProvider, createEventBus());
     }
 
     private StartSimulationEvent prepareSimulationEvent(LocalDateTime startTime) {
         return new StartSimulationEvent(false, 111, 112, false, 444,
-                222, true, 5005, 222, 223, startTime, false, 333, false, 354, false, false
+                222, true, 5005, 222, 223, startTime, 31,
+                false, 333, false, 354, false,
+                false
         );
     }
 

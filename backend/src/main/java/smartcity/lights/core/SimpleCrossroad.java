@@ -1,6 +1,8 @@
 package smartcity.lights.core;
 
 import com.google.common.eventbus.EventBus;
+import com.google.common.eventbus.Subscribe;
+import events.LightSwitcherStartedEvent;
 import events.SwitchLightsStartEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -25,6 +27,7 @@ class SimpleCrossroad implements ICrossroad {
 
     @SuppressWarnings("MismatchedQueryAndUpdateOfCollection")
     private final Map<Long, Light> wayIdToLightMap;
+    private int defaultExecutionDelay = -1;
 
     SimpleCrossroad(EventBus eventBus,
                     ITroublePointsConfigContainer configContainer,
@@ -45,9 +48,22 @@ class SimpleCrossroad implements ICrossroad {
         eventBus.post(new SwitchLightsStartEvent(managerId, wayIdToLightMap.values()));
     }
 
+    @Subscribe
+    public void handle(LightSwitcherStartedEvent e) {
+        if (e.managerId == this.managerId) {
+            this.defaultExecutionDelay = e.defaultExecutionDelay;
+            eventBus.unregister(this);
+        }
+    }
+
     @Override
     public OptimizationResult requestOptimizations(int extendTimeSeconds) {
-        final OptimizationResult result = new OptimizationResult(extendTimeSeconds);
+        if (defaultExecutionDelay < 0) {
+            logger.warn("Light switcher did not start yet.");
+            return OptimizationResult.empty();
+        }
+
+        final OptimizationResult result = new OptimizationResult(extendTimeSeconds, defaultExecutionDelay);
         boolean shouldCheckForJams = configContainer.shouldChangeRouteOnTrafficJam();
         for (Light light : wayIdToLightMap.values()) {
 

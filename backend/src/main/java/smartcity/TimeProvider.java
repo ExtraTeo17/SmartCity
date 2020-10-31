@@ -9,22 +9,33 @@ import java.time.ZonedDateTime;
 import java.time.temporal.ChronoUnit;
 
 public class TimeProvider implements ITimeProvider {
-    public static final int TIME_SCALE = 10;
     public static final int MS_PER_TICK = 100;
     private static final Logger logger = LoggerFactory.getLogger(TimeProvider.class);
 
+    private int timeScale;
     private LocalDateTime simulationStartTime;
     private long ticks;
 
     TimeProvider() {
         simulationStartTime = LocalDateTime.now();
         ticks = 0;
+        timeScale = 10;
+    }
+
+    @Override
+    public int getTimeScale() {
+        return timeScale;
+    }
+
+    @Override
+    public void setTimeScale(int timeScale) {
+        this.timeScale = timeScale;
     }
 
     @Override
     public LocalDateTime getCurrentSimulationTime() {
         var delta = ticks * MS_PER_TICK;
-        return simulationStartTime.plus(TIME_SCALE * delta, ChronoUnit.MILLIS);
+        return simulationStartTime.plus(timeScale * delta, ChronoUnit.MILLIS);
     }
 
     @Override

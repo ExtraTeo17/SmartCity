@@ -19,8 +19,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import osmproxy.ExtendedGraphHopper;
 import routing.core.Position;
+import smartcity.ITimeProvider;
 import smartcity.SimulationState;
-import smartcity.TimeProvider;
 import smartcity.config.ConfigContainer;
 
 import java.util.Arrays;
@@ -34,23 +34,24 @@ public class TroubleManagerAgent extends Agent {
     private final static Logger logger = LoggerFactory.getLogger(TroubleManagerAgent.class);
 
     private final IAgentsContainer agentsContainer;
+    private final ITimeProvider timeProvider;
     private final ConfigContainer configContainer;
     private final EventBus eventBus;
 
     private final Map<Integer, String> mapOfLightTrafficJamBlockedEdges;
     private final Map<Integer, String> mapOfConstructionSiteBlockedEdges;
-    private final HashMap<Long, Integer> troublePointsMap;
     private int latestTroublePointId;
 
     @Inject
     TroubleManagerAgent(IAgentsContainer agentsContainer,
+                        ITimeProvider timeProvider,
                         ConfigContainer configContainer,
                         EventBus eventBus) {
         this.agentsContainer = agentsContainer;
+        this.timeProvider = timeProvider;
         this.configContainer = configContainer;
         this.eventBus = eventBus;
 
-        this.troublePointsMap = new HashMap<>();
         this.mapOfLightTrafficJamBlockedEdges = new HashMap<>();
         this.mapOfConstructionSiteBlockedEdges = new HashMap<>();
     }
@@ -91,8 +92,7 @@ public class TroubleManagerAgent extends Agent {
         var troublePoint = Position.of(Double.parseDouble(rcv.getUserDefinedParameter(MessageParameter.TROUBLE_LAT)),
                 Double.parseDouble(rcv.getUserDefinedParameter(MessageParameter.TROUBLE_LON)));
 
-        troublePointsMap.put(troublePoint.longHash(), ++latestTroublePointId);
-        eventBus.post(new TroublePointCreatedEvent(latestTroublePointId, troublePoint));
+        eventBus.post(new TroublePointCreatedEvent(++latestTroublePointId, troublePoint));
         logger.info("Got message about trouble - CONSTRUCTION");
         logger.info("troublePoint: " + troublePoint.getLat() + "  " + troublePoint.getLng());
         if (!mapOfConstructionSiteBlockedEdges.containsKey(edgeId)) {
@@ -167,8 +167,7 @@ public class TroubleManagerAgent extends Agent {
         };
         addBehaviour(communication);
 
-
-        Behaviour sayAboutJam = new TickerBehaviour(this, 2_000 / TimeProvider.TIME_SCALE) {
+        Behaviour sayAboutJam = new TickerBehaviour(this, 2_000 / timeProvider.getTimeScale()) {
             @Override
             protected void onTick() {
                 if (configContainer.getSimulationState() != SimulationState.RUNNING) {

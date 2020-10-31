@@ -21,6 +21,7 @@ import vehicles.*;
 
 import java.util.List;
 
+@SuppressWarnings("OverlyCoupledClass")
 class AgentsFactory implements IAgentsFactory {
     private static final Logger logger = LoggerFactory.getLogger(AgentsFactory.class);
 
@@ -54,7 +55,7 @@ class AgentsFactory implements IAgentsFactory {
         var id = idGenerator.get(VehicleAgent.class);
         var uniformRoute = routeTransformer.uniformRoute(route);
         logger.trace("DisplayRoute size: " + route.size() + ", routeSize: " + uniformRoute.size());
-        var car = new Car(id, route, uniformRoute);
+        var car = new Car(id, route, uniformRoute, timeProvider);
         if (testCar) {
             car = new TestCar(car, timeProvider);
         }
@@ -68,13 +69,12 @@ class AgentsFactory implements IAgentsFactory {
         return create(route, false);
     }
 
-
     @Override
     public BikeAgent create(List<RouteNode> route, boolean testBike, String check) {
         var id = idGenerator.get(VehicleAgent.class);
         var uniformRoute = routeTransformer.uniformRoute(route);
         logger.trace("DisplayRoute size: " + route.size() + ", routeSize: " + uniformRoute.size());
-        var bike = new Bike(id, route, uniformRoute);
+        var bike = new Bike(id, route, uniformRoute, timeProvider);
         if (testBike) {
             // TODO: CHANGE TO TEST BIKE
             //  bike = new Bike(bike, timeProvider);
@@ -88,7 +88,6 @@ class AgentsFactory implements IAgentsFactory {
     public BikeAgent create(List<RouteNode> route, String check) {
         return create(route, false, check);
     }
-
 
     @Override
     public StationAgent create(OSMStation station) {
@@ -106,6 +105,7 @@ class AgentsFactory implements IAgentsFactory {
         return new BusAgent(id, bus, timeProvider, eventBus);
     }
 
+    @Deprecated
     @Override
     public LightManagerAgent create(Node crossroadNode) {
         var id = idGenerator.get(LightManagerAgent.class);
@@ -122,7 +122,8 @@ class AgentsFactory implements IAgentsFactory {
 
     // TODO: Simplify to avoid 6 arguments
     @Override
-    public PedestrianAgent create(List<RouteNode> routeToStation, List<RouteNode> routeFromStation, String preferredBusLine,
+    public PedestrianAgent create(List<RouteNode> routeToStation, List<RouteNode> routeFromStation,
+                                  String preferredBusLine,
                                   StationNode startStation, StationNode finishStation,
                                   boolean testPedestrian) {
         var id = idGenerator.get(PedestrianAgent.class);
@@ -131,9 +132,10 @@ class AgentsFactory implements IAgentsFactory {
         var pedestrian = new Pedestrian(id, routeToStation, uniformRouteToStation,
                 routeFromStation, uniformRouteFromStation,
                 preferredBusLine,
-                startStation, finishStation);
+                startStation, finishStation,
+                timeProvider);
         if (testPedestrian) {
-            pedestrian = new TestPedestrian(pedestrian, timeProvider);
+            pedestrian = new TestPedestrian(pedestrian);
         }
 
         return new PedestrianAgent(id, pedestrian, timeProvider, eventBus);

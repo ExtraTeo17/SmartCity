@@ -29,7 +29,8 @@ public class LightManagerAgent extends AbstractAgent {
 
     LightManagerAgent(int id, ICrossroad crossroad,
                       ITimeProvider timeProvider,
-                      EventBus eventBus, ConfigContainer configContainer) {
+                      EventBus eventBus,
+                      ConfigContainer configContainer) {
         super(id, name, timeProvider, eventBus);
         this.crossroad = crossroad;
         this.configContainer = configContainer;
@@ -40,7 +41,7 @@ public class LightManagerAgent extends AbstractAgent {
         print("I'm a traffic manager.");
         crossroad.startLifetime();
 
-        var notifyCarAboutGreen = new TickerBehaviour(this, 10_000 / TimeProvider.TIME_SCALE) {
+        var notifyCarAboutGreen = new TickerBehaviour(this, 10_000 / timeProvider.getTimeScale()) {
             @Override
             protected void onTick() {
                 //for all Light check

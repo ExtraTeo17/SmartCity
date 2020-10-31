@@ -33,6 +33,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.function.Supplier;
 
+@SuppressWarnings("OverlyCoupledClass")
 public class TaskProvider implements ITaskProvider {
     private static final Logger logger = LoggerFactory.getLogger(TaskProvider.class);
 

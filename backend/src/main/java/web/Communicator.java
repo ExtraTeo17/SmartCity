@@ -23,7 +23,6 @@ import events.web.vehicle.VehicleAgentRouteChangedEvent;
 import events.web.vehicle.VehicleAgentUpdatedEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import smartcity.TimeProvider;
 import web.abstractions.IWebService;
 
 @SuppressWarnings("OverlyCoupledClass")
@@ -47,7 +46,7 @@ class Communicator {
 
     @Subscribe
     public void handle(SimulationStartedEvent e) {
-        webService.startSimulation(TimeProvider.TIME_SCALE);
+        webService.startSimulation();
     }
 
     @Subscribe

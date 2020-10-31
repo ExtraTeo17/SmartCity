@@ -10,6 +10,7 @@ import events.ClearSimulationEvent;
 import events.SwitchLightsStartEvent;
 import events.web.SimulationStartedEvent;
 import events.web.StartSimulationEvent;
+import smartcity.ITimeProvider;
 import smartcity.SimulationState;
 import smartcity.config.ConfigContainer;
 import smartcity.task.abstractions.ITaskManager;
@@ -18,16 +19,19 @@ public class Scheduler {
     private final ITaskManager taskManager;
     private final ConfigContainer configContainer;
     private final IAgentsContainer agentsContainer;
+    private final ITimeProvider timeProvider;
     private final EventBus eventBus;
 
     @Inject
     public Scheduler(ITaskManager taskManager,
                      ConfigContainer configContainer,
                      IAgentsContainer agentsContainer,
+                     ITimeProvider timeProvider,
                      EventBus eventBus) {
         this.taskManager = taskManager;
         this.configContainer = configContainer;
         this.agentsContainer = agentsContainer;
+        this.timeProvider = timeProvider;
         this.eventBus = eventBus;
     }
 
@@ -36,6 +40,7 @@ public class Scheduler {
     public void handle(StartSimulationEvent e) {
         configContainer.setExtendLightTime(e.extendLightTime);
         configContainer.setLightStrategyActive(e.lightStrategyActive);
+        timeProvider.setTimeScale(e.timeScale);
 
         activateLightManagerAgents();
         configContainer.setChangeRouteOnTrafficJam(
