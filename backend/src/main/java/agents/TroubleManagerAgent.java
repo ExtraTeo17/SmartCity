@@ -9,7 +9,6 @@ import events.web.DebugEvent;
 import events.web.roadblocks.TrafficJamFinishedEvent;
 import events.web.roadblocks.TrafficJamStartedEvent;
 import events.web.roadblocks.TroublePointCreatedEvent;
-import events.web.roadblocks.TroublePointVanishedEvent;
 import jade.core.Agent;
 import jade.core.behaviours.Behaviour;
 import jade.core.behaviours.CyclicBehaviour;
@@ -117,7 +116,7 @@ public class TroubleManagerAgent extends Agent {
         else {
             mapOfLightTrafficJamBlockedEdges.replace(edgeId, rcv.getUserDefinedParameter(MessageParameter.LENGTH_OF_JAM));
         }
-        sendBroadcast(generateMessageAboutTrouble(rcv, MessageParameter.TRAFFIC_JAMS, MessageParameter.SHOW));
+        sendBroadcast(generateMessageAboutTrouble(rcv, MessageParameter.TRAFFIC_JAM, MessageParameter.SHOW));
     }
 
     private void trafficJamsDisappearedHandle(ACLMessage rcv) {
@@ -131,7 +130,7 @@ public class TroubleManagerAgent extends Agent {
             mapOfLightTrafficJamBlockedEdges.remove(edgeId);
             ExtendedGraphHopper.removeForbiddenEdges(Arrays.asList(edgeId));
         }
-        sendBroadcast(generateMessageAboutTrouble(rcv, MessageParameter.TRAFFIC_JAMS, MessageParameter.STOP));
+        sendBroadcast(generateMessageAboutTrouble(rcv, MessageParameter.TRAFFIC_JAM, MessageParameter.STOP));
     }
 
     @Override
@@ -151,15 +150,12 @@ public class TroubleManagerAgent extends Agent {
                                 if (rcv.getUserDefinedParameter(MessageParameter.TYPEOFTROUBLE).equals(MessageParameter.CONSTRUCTION)) {
                                     constructionAppearedHandle(rcv);
                                 }
-                                else if (rcv.getUserDefinedParameter(MessageParameter.TYPEOFTROUBLE).equals(MessageParameter.TRAFFIC_JAMS)) {
+                                else if (rcv.getUserDefinedParameter(MessageParameter.TYPEOFTROUBLE).equals(MessageParameter.TRAFFIC_JAM)) {
                                     trafficJamsAppearedHandle(rcv);
                                 }
                             }
                             else if (rcv.getUserDefinedParameter(MessageParameter.TROUBLE).equals(MessageParameter.STOP)) {
-                                if (rcv.getUserDefinedParameter(MessageParameter.TYPEOFTROUBLE).equals(MessageParameter.CONSTRUCTION)) {
-                                    constructionHideHandle(rcv);
-                                }
-                                else {
+                                if (rcv.getUserDefinedParameter(MessageParameter.TYPEOFTROUBLE).equals(MessageParameter.TRAFFIC_JAM)) {
                                     trafficJamsDisappearedHandle(rcv);
                                 }
                             }
@@ -168,16 +164,6 @@ public class TroubleManagerAgent extends Agent {
                 }
                 block(100);
             }
-
-            private void constructionHideHandle(ACLMessage rcv) {
-                var troublePoint = Position.of(Double.parseDouble(rcv.getUserDefinedParameter(MessageParameter.TROUBLE_LAT)),
-                        Double.parseDouble(rcv.getUserDefinedParameter(MessageParameter.TROUBLE_LON)));
-                var id = troublePointsMap.remove(troublePoint.longHash());
-
-                eventBus.post(new TroublePointVanishedEvent(id));
-                logger.info("Hiding construction" + id);
-            }
-
         };
         addBehaviour(communication);
 
@@ -196,7 +182,7 @@ public class TroubleManagerAgent extends Agent {
 
                 for (Map.Entry<Integer, String> entry : mapOfLightTrafficJamBlockedEdges.entrySet()) {
                     sendBroadcast(generateMessageAboutTrafficJam(entry.getKey(), entry.getValue(),
-                            MessageParameter.TRAFFIC_JAMS, MessageParameter.SHOW));
+                            MessageParameter.TRAFFIC_JAM, MessageParameter.SHOW));
                 }
             }
         };

@@ -85,7 +85,7 @@ public class LightManagerAgent extends AbstractAgent {
                 //  same graphhopper edge ID when traffic jam starts and stops
                 ACLMessage msg = createMessage(ACLMessage.INFORM, TroubleManagerAgent.name);
                 Properties properties = createProperties(MessageParameter.LIGHT);
-                properties.setProperty(MessageParameter.TYPEOFTROUBLE, MessageParameter.TRAFFIC_JAMS);
+                properties.setProperty(MessageParameter.TYPEOFTROUBLE, MessageParameter.TRAFFIC_JAM);
                 properties.setProperty(MessageParameter.TROUBLE, MessageParameter.STOP);
                 var jammedLight = result.getJammedLightPosition();
                 properties.setProperty(MessageParameter.TROUBLE_LAT, Double.toString(jammedLight.getLat()));
@@ -108,7 +108,7 @@ public class LightManagerAgent extends AbstractAgent {
                 //  to return the same graphhopper edge ID when traffic jam starts and stops
                 ACLMessage msg = createMessage(ACLMessage.PROPOSE, nameOfAgent);
                 Properties properties = createProperties(MessageParameter.LIGHT);
-                properties.setProperty(MessageParameter.TYPEOFTROUBLE, MessageParameter.TRAFFIC_JAMS);
+                properties.setProperty(MessageParameter.TYPEOFTROUBLE, MessageParameter.TRAFFIC_JAM);
                 properties.setProperty(MessageParameter.TROUBLE, MessageParameter.SHOW);
                 properties.setProperty(MessageParameter.LENGTH_OF_JAM, Double.toString(result.getLengthOfJam()));
                 properties.setProperty(MessageParameter.TROUBLE_LAT, Double.toString(result.getJammedLightPosition().getLat()));

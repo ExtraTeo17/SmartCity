@@ -132,7 +132,7 @@ public class VehicleAgent extends AbstractAgent {
                                 logger.info("Handle construction jam");
                                 handleConstructionJam(rcv);
                             }
-                            else if (rcv.getUserDefinedParameter(MessageParameter.TYPEOFTROUBLE).equals(MessageParameter.TRAFFIC_JAMS)) {
+                            else if (rcv.getUserDefinedParameter(MessageParameter.TYPEOFTROUBLE).equals(MessageParameter.TRAFFIC_JAM)) {
                                 if (rcv.getSender().getLocalName().equals(TroubleManagerAgent.name)) {
                                     logger.info("Handle traffic jams from trouble manager");
                                     handleTrafficJamsFromTroubleManager(rcv);
@@ -144,7 +144,7 @@ public class VehicleAgent extends AbstractAgent {
                             }
                         }
                         case ACLMessage.CANCEL -> {
-                            if (rcv.getUserDefinedParameter(MessageParameter.TYPEOFTROUBLE).equals(MessageParameter.TRAFFIC_JAMS)) {
+                            if (rcv.getUserDefinedParameter(MessageParameter.TYPEOFTROUBLE).equals(MessageParameter.TRAFFIC_JAM)) {
                                 logger.info("Handle traffic jam stop from light manager");
                                 handleTrafficJamsFromLightManager(rcv, MessageParameter.STOP);
                             }
@@ -233,7 +233,7 @@ public class VehicleAgent extends AbstractAgent {
                                                            String adjOsmWayId) {
                 ACLMessage msg = createMessage(performative, name);
                 Properties properties = createProperties(MessageParameter.VEHICLE);
-                properties.setProperty(MessageParameter.TYPEOFTROUBLE, MessageParameter.TRAFFIC_JAMS);
+                properties.setProperty(MessageParameter.TYPEOFTROUBLE, MessageParameter.TRAFFIC_JAM);
                 properties.setProperty(MessageParameter.TROUBLE, showOrStop);
                 properties.setProperty(MessageParameter.ADJACENT_OSM_WAY_ID, adjOsmWayId);
                 properties.setProperty(MessageParameter.TROUBLE_LAT, String.valueOf(positionOfTroubleLight.getLat()));
@@ -282,7 +282,7 @@ public class VehicleAgent extends AbstractAgent {
                 if (indexOfRouteNodeWithEdge != null || !jamStart) {
                     indexAfterWhichRouteChanges = vehicle.getFarOnIndex(THRESHOLD_UNTIL_INDEX_CHANGE);
                     if (indexAfterWhichRouteChanges == vehicle.getUniformRouteSize() - 1) {
-                    	return;
+                        return;
                     }
                     handleLightTrafficJamRouteChange(indexAfterWhichRouteChanges, timeForTheEndWithJam, jamStart);
                 }
@@ -298,7 +298,7 @@ public class VehicleAgent extends AbstractAgent {
                         mergeResult.newUniformRoute.size() - 1);
                 logger.info("=======================timeForOfDynamicRoute" + timeForOfDynamicRoute);
                 logger.info("-----------------------timeForTheEndWithJam" + timeForTheEndWithJam);
-                if ( timeForTheEndWithJam > timeForOfDynamicRoute){
+                if (timeForTheEndWithJam > timeForOfDynamicRoute) {
                     logger.info("Trip time through the jam: " + timeForTheEndWithJam + " is longer than alternative route time: "
                             + timeForOfDynamicRoute + ", so route will be changed");
                     // TODO: CHECK IF send refusal is on place // switchToNextLight was after this line

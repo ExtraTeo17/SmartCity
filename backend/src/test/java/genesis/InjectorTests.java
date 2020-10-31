@@ -110,7 +110,6 @@ class InjectorTests {
 
         // other
         eventBus.post(new TroublePointCreatedEvent(1, null));
-        eventBus.post(new TroublePointVanishedEvent(1));
         eventBus.post(new SwitchLightsStartEvent(1, null));
         eventBus.post(new TrafficJamStartedEvent(1));
         eventBus.post(new TrafficJamFinishedEvent(1));
