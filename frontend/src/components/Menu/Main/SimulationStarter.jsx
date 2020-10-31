@@ -9,7 +9,7 @@ import { dispatch } from "../../../redux/store";
 import { shouldStartSimulation } from "../../../redux/core/actions";
 import { StartState } from "../../../redux/models/startState";
 
-const SimulationStarter = props => {
+export const SimulationStarter = props => {
   const { wasPrepared, shouldStart, wasStarted, startSimulationData } = props;
 
   const startSimulationProceed = () => {
