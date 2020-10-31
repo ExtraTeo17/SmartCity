@@ -14,10 +14,10 @@ const App = () => (
       <Notifications />
       <header className="App-header">
         <div className="row w-100 main-container">
-          <div className="col-9" onContextMenu={e => e.preventDefault()}>
+          <div className="col" onContextMenu={e => e.preventDefault()}>
             <CityMap />
           </div>
-          <div className="col-3">
+          <div className="col-3 menu-col">
             <MenusContainer />
           </div>
         </div>

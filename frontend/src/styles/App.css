@@ -21,3 +21,11 @@
 .main-container {
   min-height: 95vh;
 }
+
+@media screen and (max-width: 960px) {
+  .menu-col {
+    flex: 0 0 0;
+    min-width: 220px;
+    /* // font-size: 12px; */
+  }
+}
