@@ -26,3 +26,5 @@ export const D_EXTEND_WAIT_TIME = 60;
 
 export const D_CHANGE_ROUTE_TP_ACTIVE = true;
 export const D_CHANGE_ROUTE_TJ_ACTIVE = false;
+
+export const D_HERE_MAP_STYLE = "hybrid.day";

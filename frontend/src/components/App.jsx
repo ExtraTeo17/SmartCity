@@ -10,8 +10,8 @@ import MenusContainer from "./Menu/MenusContainer";
 
 const App = () => (
   <Provider store={store}>
+    <Notifications />
     <div className="App">
-      <Notifications />
       <header className="App-header">
         <div className="row w-100 main-container">
           <div className="col" onContextMenu={e => e.preventDefault()}>
