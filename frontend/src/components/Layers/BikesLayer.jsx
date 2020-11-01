@@ -1,5 +1,6 @@
 import React from "react";
 import { connect } from "react-redux";
+import { FeatureGroup } from "react-leaflet";
 
 import Bike from "../Markers/Bike";
 import BikeRoute from "../Routes/BikeRoute";
@@ -13,10 +14,10 @@ const BikesLayer = props => {
   ));
 
   return (
-    <>
+    <FeatureGroup>
       {bikeMarkers}
       {bikeRoutes}
-    </>
+    </FeatureGroup>
   );
 };
 

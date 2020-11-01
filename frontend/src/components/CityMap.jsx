@@ -1,5 +1,5 @@
-import React, { useState } from "react";
-import { Circle, LayersControl, Map as LeafletMap, Marker, Popup, TileLayer, FeatureGroup, LayerGroup } from "react-leaflet";
+import React, { useState, useEffect } from "react";
+import { Circle, LayersControl, Map as LeafletMap, Marker, Popup, FeatureGroup } from "react-leaflet";
 import { connect } from "react-redux";
 import { notify } from "react-notify-toast";
 import { dispatch } from "../redux/store";
@@ -13,14 +13,18 @@ import CarsLayer from "./Layers/CarsLayer";
 import BikesLayer from "./Layers/BikesLayer";
 import BusesLayer from "./Layers/BusesLayer";
 import PedestriansLayer from "./Layers/PedestriansLayer";
-import { HERE_MAP_API_KEY, NOTIFY_SHOW_MS } from "../constants/global";
-import { D_HERE_MAP_STYLE, D_ZOOM } from "../constants/defaults";
-import { MAX_NATIVE_ZOOM, MAX_ZOOM } from "../constants/minMax";
+import { NOTIFY_SHOW_MS } from "../constants/global";
+import { D_ZOOM } from "../constants/defaults";
+import { BaseLayers } from "./Layers/BaseLayers";
 
-const { BaseLayer, Overlay } = LayersControl;
+const { Overlay } = LayersControl;
 
 const CityMap = ({ center, wasStarted }) => {
   const [zoom, setZoom] = useState(D_ZOOM);
+
+  useEffect(() => {
+    console.log("Rendered!");
+  });
 
   function setCenter(latlng) {
     const { lat, lng } = latlng;
@@ -42,46 +46,7 @@ const CityMap = ({ center, wasStarted }) => {
   return (
     <LeafletMap center={center} zoom={zoom} preferCanvas onzoomanim={onZoom} oncontextmenu={rightClickOnMap}>
       <LayersControl position="topright">
-        <BaseLayer checked name="Map - Main">
-          <TileLayer
-            attribution='&amp;copy <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
-            url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-            maxZoom={MAX_ZOOM}
-            maxNativeZoom={MAX_NATIVE_ZOOM}
-          />
-        </BaseLayer>
-        <BaseLayer name="Map - Black & White">
-          <TileLayer
-            attribution='&amp;copy <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
-            url="https://tiles.wmflabs.org/bw-mapnik/{z}/{x}/{y}.png"
-            maxZoom={MAX_ZOOM}
-            maxNativeZoom={MAX_NATIVE_ZOOM}
-          />
-        </BaseLayer>
-        <BaseLayer name="Map - Streets">
-          <TileLayer
-            attribution='&amp;copy; <a href="https://www.maptiler.com/copyright/">MapTiler</a> &amp;copy <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
-            url="https://api.maptiler.com/maps/streets/{z}/{x}/{y}.png?key=JTQMBGnY9XYwZnvQilbM"
-            maxZoom={MAX_ZOOM}
-            maxNativeZoom={MAX_NATIVE_ZOOM}
-          />
-        </BaseLayer>
-        <BaseLayer name="Map - Carto">
-          <TileLayer
-            attribution='&amp;copy; <a href="https://carto.com/about-carto/">Carto</a> &amp;copy <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
-            url="https://{s}.basemaps.cartocdn.com/rastertiles/light_all/{z}/{x}/{y}.png"
-            maxZoom={MAX_ZOOM}
-            maxNativeZoom={MAX_NATIVE_ZOOM}
-          />
-        </BaseLayer>
-        <BaseLayer name="Map - Here">
-          <TileLayer
-            attribution='&amp;copy; <a href="http://here.net/services/terms">HERE 2020</a> &amp;copy <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
-            url={`https://2.aerial.maps.ls.hereapi.com/maptile/2.1/maptile/newest/${D_HERE_MAP_STYLE}/{z}/{x}/{y}/256/png8?apiKey=${HERE_MAP_API_KEY}`}
-            maxZoom={MAX_ZOOM}
-            maxNativeZoom={MAX_NATIVE_ZOOM}
-          />
-        </BaseLayer>
+        {BaseLayers}
 
         <Overlay name="Zone" checked>
           <FeatureGroup>
@@ -94,12 +59,24 @@ const CityMap = ({ center, wasStarted }) => {
         <Overlay name="Lights" checked>
           <LightsLayer />
         </Overlay>
-        <CarsLayer />
-        <BikesLayer />
-        <StationsLayer />
-        <BusesLayer />
-        <TroublePointsLayer />
-        <PedestriansLayer />
+        <Overlay name="Cars" checked>
+          <CarsLayer />
+        </Overlay>
+        <Overlay name="Bikes" checked>
+          <BikesLayer />
+        </Overlay>
+        <Overlay name="Pedestrians" checked>
+          <PedestriansLayer />
+        </Overlay>
+        <Overlay name="Buses" checked>
+          <BusesLayer />
+        </Overlay>
+        <Overlay name="Stations" checked>
+          <StationsLayer />
+        </Overlay>
+        <Overlay name="Trouble points" checked>
+          <TroublePointsLayer />
+        </Overlay>
       </LayersControl>
     </LeafletMap>
   );
