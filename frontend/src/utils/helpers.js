@@ -53,3 +53,5 @@ export const setIfValidInt = (e, min, max, setFunc) => {
 export const setIfValidFloat = (e, min, max, setFunc) => {
   setIfValid(e.target, parseFloat, min, max, setFunc);
 };
+
+export const boolToInt = b => (b ? 1 : 0);
