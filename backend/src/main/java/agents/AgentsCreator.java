@@ -37,6 +37,7 @@ import java.util.stream.Collectors;
 
 import static smartcity.config.StaticConfig.USE_DEPRECATED_XML_FOR_LIGHT_MANAGERS;
 
+@SuppressWarnings("OverlyCoupledClass")
 public class AgentsCreator {
     private static final Logger logger = LoggerFactory.getLogger(AgentsCreator.class);
     private final IAgentsContainer agentsContainer;
@@ -253,6 +254,7 @@ public class AgentsCreator {
             if (USE_DEPRECATED_XML_FOR_LIGHT_MANAGERS) {
                 var nodes = mapAccessManager.getLightManagersNodes(configContainer.getZone());
                 for (var node : nodes) {
+                    //noinspection deprecation
                     var manager = factory.create(node);
                     if (agentsContainer.tryAdd(manager)) {
                         ++managersCounter;

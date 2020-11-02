@@ -1,17 +1,18 @@
 package vehicles;
 
 import routing.nodes.RouteNode;
+import smartcity.ITimeProvider;
 import vehicles.enums.VehicleType;
 
 import java.util.List;
 
 public class Car extends MovingObject {
-    public Car(int agentId, List<RouteNode> displayRoute, List<RouteNode> uniformRoute) {
-        super(agentId, 17, uniformRoute, displayRoute);
+    public Car(int agentId, List<RouteNode> displayRoute, List<RouteNode> uniformRoute, ITimeProvider timeProvider) {
+        super(timeProvider, agentId, 17, uniformRoute, displayRoute);
     }
 
     Car(Car car) {
-        super(car.agentId, car.speed, car.uniformRoute, car.simpleRoute);
+        super(car.timeProvider, car.agentId, car.speed, car.uniformRoute, car.simpleRoute);
     }
 
     @Override

@@ -1,0 +1,18 @@
+.tab-animate {
+  animation: blinking 1500ms infinite ease-out;
+}
+
+@keyframes blinking {
+  0% {
+    box-shadow: 0 0 0px 0px rgba(176, 224, 230, 0.8);
+    border-radius: 50%;
+  }
+  75% {
+    box-shadow: 0 0 10px 10px rgba(176, 224, 230, 0);
+    border-radius: 50%;
+  }
+  100% {
+    box-shadow: 0 0 0px 0px rgba(176, 224, 230, 0);
+    border-radius: 50%;
+  }
+}

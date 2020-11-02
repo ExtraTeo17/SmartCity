@@ -19,12 +19,14 @@ import routing.core.Zone;
 import routing.nodes.NodesContainer;
 import smartcity.ITimeProvider;
 import smartcity.config.ConfigContainer;
+import smartcity.config.ConfigMutator;
 import smartcity.config.StaticConfig;
 import smartcity.lights.abstractions.ICrossroadFactory;
 import smartcity.lights.core.CrossroadFactory;
 import smartcity.lights.core.CrossroadParser;
 import smartcity.lights.core.Light;
 import testutils.FileLoader;
+import testutils.ReflectionHelper;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -157,7 +159,9 @@ class AgentsCreatorTests {
     private ICrossroadFactory setupCrossroadFactory() {
         var eventBus = new EventBus();
         var crossroadParser = new CrossroadParser();
+        ReflectionHelper.setStatic("counter", ConfigMutator.class,0);
+        var configContainer = new ConfigContainer();
 
-        return new CrossroadFactory(eventBus, crossroadParser);
+        return new CrossroadFactory(eventBus, crossroadParser, configContainer);
     }
 }

@@ -27,7 +27,7 @@ public class MessageParameter {
     public static final String TYPEOFTROUBLE = "type_of_trouble";
     public static final String CONSTRUCTION = "construction";
     public static final String ACCIDENT = "accident";
-    public static final String TRAFFIC_JAMS = "traffic_jams";
+    public static final String TRAFFIC_JAM = "traffic_jams";
     public static final String SHOW = "show";
     public static final String STOP = "stop";
     public static final String LENGTH_OF_JAM = "length_of_jam";

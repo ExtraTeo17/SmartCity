@@ -8,19 +8,16 @@ import vehicles.enums.VehicleType;
 import java.time.LocalDateTime;
 
 public class TestPedestrian extends Pedestrian implements ITestable {
-    private final ITimeProvider timeProvider;
-
     private LocalDateTime start;
     private LocalDateTime end;
 
     @VisibleForTesting
-    TestPedestrian(ITimeProvider timeProvider) {
-        this.timeProvider = timeProvider;
+    public TestPedestrian(ITimeProvider timeProvider) {
+        super(timeProvider);
     }
 
-    public TestPedestrian(Pedestrian pedestrian, ITimeProvider timeProvider) {
+    public TestPedestrian(Pedestrian pedestrian) {
         super(pedestrian);
-        this.timeProvider = timeProvider;
     }
 
     @Override

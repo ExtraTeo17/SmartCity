@@ -1,17 +1,18 @@
 package vehicles;
 
 import routing.nodes.RouteNode;
+import smartcity.ITimeProvider;
 import vehicles.enums.VehicleType;
 
 import java.util.List;
 
 public class Bike extends MovingObject {
-    public Bike(int agentId, List<RouteNode> displayRoute, List<RouteNode> uniformRoute) {
-        super(agentId, 50, uniformRoute, displayRoute);
+    public Bike(int agentId, List<RouteNode> displayRoute, List<RouteNode> uniformRoute, ITimeProvider timeProvider) {
+        super(timeProvider, agentId, 50, uniformRoute, displayRoute);
     }
 
     Bike(Bike bike) {
-        super(bike.agentId, bike.speed, bike.uniformRoute, bike.simpleRoute);
+        super(bike.timeProvider, bike.agentId, bike.speed, bike.uniformRoute, bike.simpleRoute);
     }
 
     @Override

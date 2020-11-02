@@ -43,8 +43,8 @@ const CustomClock = props => {
 };
 
 const mapStateToProps = (state /* , ownProps */) => {
-  const { wasStarted, timeScale } = state.message;
-  const { startTime } = state.interaction.startSimulationData;
+  const { wasStarted } = state.message;
+  const { startTime, timeScale } = state.interaction.startSimulationData;
   return {
     wasStarted,
     time: startTime,

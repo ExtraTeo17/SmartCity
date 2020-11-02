@@ -16,7 +16,7 @@ public class StartSimulationRequest extends AbstractPayload {
     public final int bikesLimit;
     public final int testBikeId;
 
-    public final boolean generateTrafficJams;
+    public final boolean changeRouteOnTrafficJam;
     public final boolean generateTroublePoints;
     public final int timeBeforeTrouble;
 
@@ -24,6 +24,7 @@ public class StartSimulationRequest extends AbstractPayload {
     public final int testPedestrianId;
 
     public final ZonedDateTime startTime;
+    public final int timeScale;
 
     public final boolean lightStrategyActive;
     public final int extendLightTime;
@@ -31,20 +32,17 @@ public class StartSimulationRequest extends AbstractPayload {
     public final boolean stationStrategyActive;
     public final int extendWaitTime;
 
-    public final boolean changeRouteStrategyActive;
-
+    public final boolean changeRouteOnTroublePoint;
 
     @JsonCreator(mode = JsonCreator.Mode.PROPERTIES)
     public StartSimulationRequest(@JsonProperty("generateCars") boolean generateCars,
                                   @JsonProperty("carsLimit") int carsLimit,
                                   @JsonProperty("testCarId") int testCarId,
 
-
                                   @JsonProperty("generateBikes") boolean generateBikes,
                                   @JsonProperty("bikesLimit") int bikesLimit,
                                   @JsonProperty("testBikeId") int testBikeId,
 
-                                  @JsonProperty("generateTrafficJams") boolean generateTrafficJams,
                                   @JsonProperty("generateTroublePoints") boolean generateTroublePoints,
                                   @JsonProperty("timeBeforeTrouble") int timeBeforeTrouble,
 
@@ -52,6 +50,7 @@ public class StartSimulationRequest extends AbstractPayload {
                                   @JsonProperty("testPedId") int testPedestrianId,
 
                                   @JsonProperty("startTime") ZonedDateTime startTime,
+                                  @JsonProperty("timeScale") int timeScale,
 
                                   @JsonProperty("lightStrategyActive") boolean lightStrategyActive,
                                   @JsonProperty("extendLightTime") int extendLightTime,
@@ -59,7 +58,8 @@ public class StartSimulationRequest extends AbstractPayload {
                                   @JsonProperty("stationStrategyActive") boolean stationStrategyActive,
                                   @JsonProperty("extendWaitTime") int extendWaitTime,
 
-                                  @JsonProperty("changeRouteStrategyActive") boolean changeRouteStrategyActive) {
+                                  @JsonProperty("changeRouteOnTroublePoint") boolean changeRouteOnTroublePoint,
+                                  @JsonProperty("changeRouteOnTrafficJam") boolean changeRouteOnTrafficJam) {
 
         this.carsLimit = carsLimit;
         this.testCarId = testCarId;
@@ -67,7 +67,6 @@ public class StartSimulationRequest extends AbstractPayload {
         this.generateBikes = generateBikes;
         this.bikesLimit = bikesLimit;
         this.testBikeId = testBikeId;
-        this.generateTrafficJams = generateTrafficJams;
         this.generateTroublePoints = generateTroublePoints;
         this.timeBeforeTrouble = timeBeforeTrouble;
         this.pedestriansLimit = pedestriansLimit;
@@ -77,6 +76,8 @@ public class StartSimulationRequest extends AbstractPayload {
         this.extendLightTime = extendLightTime;
         this.stationStrategyActive = stationStrategyActive;
         this.extendWaitTime = extendWaitTime;
-        this.changeRouteStrategyActive = changeRouteStrategyActive;
+        this.changeRouteOnTroublePoint = changeRouteOnTroublePoint;
+        this.changeRouteOnTrafficJam = changeRouteOnTrafficJam;
+        this.timeScale = timeScale;
     }
 }

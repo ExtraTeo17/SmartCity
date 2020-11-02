@@ -45,7 +45,7 @@ public class Bus extends MovingObject {
                Timetable timetable,
                String busLine,
                String brigadeNr) {
-        super(agentId, 40, uniformRoute, simpleRoute);
+        super(timeProvider, agentId, 40, uniformRoute, simpleRoute);
         this.timeProvider = timeProvider;
         this.eventBus = eventBus;
         this.timetable = timetable;

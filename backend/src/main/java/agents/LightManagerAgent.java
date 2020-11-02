@@ -29,7 +29,8 @@ public class LightManagerAgent extends AbstractAgent {
 
     LightManagerAgent(int id, ICrossroad crossroad,
                       ITimeProvider timeProvider,
-                      EventBus eventBus, ConfigContainer configContainer) {
+                      EventBus eventBus,
+                      ConfigContainer configContainer) {
         super(id, name, timeProvider, eventBus);
         this.crossroad = crossroad;
         this.configContainer = configContainer;
@@ -40,7 +41,7 @@ public class LightManagerAgent extends AbstractAgent {
         print("I'm a traffic manager.");
         crossroad.startLifetime();
 
-        var notifyCarAboutGreen = new TickerBehaviour(this, 10_000 / TimeProvider.TIME_SCALE) {
+        var notifyCarAboutGreen = new TickerBehaviour(this, 10_000 / timeProvider.getTimeScale()) {
             @Override
             protected void onTick() {
                 //for all Light check
@@ -63,14 +64,12 @@ public class LightManagerAgent extends AbstractAgent {
                 //Expected one agent in the list
                 final List<String> agentsFreeToProceed = result.carsFreeToProceed();
 
-                if (configContainer.shouldGenerateTrafficJams()) {
-                    final String agentStuckInJam = result.getAgentStuckInJam();
-                    if (result.shouldNotifyCarAboutStartOfTrafficJamOnThisLight()) {
-                        handleTrafficJams(result, agentStuckInJam);
-                    }
-                    if (result.shouldNotifyCarAboutStopOfTrafficJamOnThisLight()) {
-                        sendMessageAboutTroubleStopToTroubleManager(result);
-                    }
+                final String agentStuckInJam = result.getAgentStuckInJam();
+                if (result.shouldNotifyCarAboutStartOfTrafficJamOnThisLight()) {
+                    handleTrafficJams(result, agentStuckInJam);
+                }
+                if (result.shouldNotifyCarAboutStopOfTrafficJamOnThisLight()) {
+                    sendMessageAboutTroubleStopToTroubleManager(result);
                 }
 
                 if (agentsFreeToProceed.size() != 0) {
@@ -85,7 +84,7 @@ public class LightManagerAgent extends AbstractAgent {
                 //  same graphhopper edge ID when traffic jam starts and stops
                 ACLMessage msg = createMessage(ACLMessage.INFORM, TroubleManagerAgent.name);
                 Properties properties = createProperties(MessageParameter.LIGHT);
-                properties.setProperty(MessageParameter.TYPEOFTROUBLE, MessageParameter.TRAFFIC_JAMS);
+                properties.setProperty(MessageParameter.TYPEOFTROUBLE, MessageParameter.TRAFFIC_JAM);
                 properties.setProperty(MessageParameter.TROUBLE, MessageParameter.STOP);
                 var jammedLight = result.getJammedLightPosition();
                 properties.setProperty(MessageParameter.TROUBLE_LAT, Double.toString(jammedLight.getLat()));
@@ -108,7 +107,7 @@ public class LightManagerAgent extends AbstractAgent {
                 //  to return the same graphhopper edge ID when traffic jam starts and stops
                 ACLMessage msg = createMessage(ACLMessage.PROPOSE, nameOfAgent);
                 Properties properties = createProperties(MessageParameter.LIGHT);
-                properties.setProperty(MessageParameter.TYPEOFTROUBLE, MessageParameter.TRAFFIC_JAMS);
+                properties.setProperty(MessageParameter.TYPEOFTROUBLE, MessageParameter.TRAFFIC_JAM);
                 properties.setProperty(MessageParameter.TROUBLE, MessageParameter.SHOW);
                 properties.setProperty(MessageParameter.LENGTH_OF_JAM, Double.toString(result.getLengthOfJam()));
                 properties.setProperty(MessageParameter.TROUBLE_LAT, Double.toString(result.getJammedLightPosition().getLat()));

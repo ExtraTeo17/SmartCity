@@ -2,8 +2,11 @@ package smartcity;
 
 import java.time.LocalDateTime;
 
-// TODO: Date will be probably changed to Instant/long
 public interface ITimeProvider {
+    int getTimeScale();
+
+    void setTimeScale(int timeScale);
+
     LocalDateTime getCurrentSimulationTime();
 
     void setSimulationStartTime(LocalDateTime simulationTime);
@@ -21,6 +24,11 @@ public interface ITimeProvider {
     default Runnable getUpdateTimeTask(LocalDateTime simulationStartTime) {
         setSimulationStartTime(simulationStartTime);
         return getUpdateTimeTask();
+    }
+
+    default Runnable getUpdateTimeTask(int timeScale, LocalDateTime simulationStartTime) {
+        setTimeScale(timeScale);
+        return getUpdateTimeTask(simulationStartTime);
     }
 
     default Runnable getUpdateTimeTask(LocalDateTime simulationStartTime, long initialTicks) {
