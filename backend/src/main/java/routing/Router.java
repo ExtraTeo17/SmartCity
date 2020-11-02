@@ -146,7 +146,7 @@ final class Router implements
     }
 
     /////////////////////////////////////////////////////////////
-    //  HELPERS - Most are abominable :(
+    //  HELPERS - Most are deliverable :(
     /////////////////////////////////////////////////////////////
 
     private boolean updateCacheDataAgentId(List<RouteNode> data, List<StationNode> stationNodes) {
@@ -231,7 +231,7 @@ final class Router implements
         return minIndex + 1;
     }
 
-    private static BusRouteData generateBusRoute(List<OSMWay> route) {
+    private static RouteData generateBusRoute(List<OSMWay> route) {
         var osmWaysIds = new ArrayList<Long>();
         var routeNodes = new ArrayList<RouteNode>();
         for (OSMWay way : route) {
@@ -240,14 +240,14 @@ final class Router implements
                     .map(RouteNode::new).collect(Collectors.toList());
             routeNodes.addAll(nodes);
         }
-        return new BusRouteData(osmWaysIds, routeNodes);
+        return new RouteData(osmWaysIds, routeNodes);
     }
 
-    private static class BusRouteData {
+    private static class RouteData {
         private final ArrayList<Long> waysIds;
         private final ArrayList<RouteNode> route;
 
-        private BusRouteData(ArrayList<Long> waysIds, ArrayList<RouteNode> route) {
+        private RouteData(ArrayList<Long> waysIds, ArrayList<RouteNode> route) {
             this.waysIds = waysIds;
             this.route = route;
         }
