@@ -211,18 +211,17 @@ public class MapAccessManager implements IMapAccessManager {
 
         return osmLights;
     }
-
+    
     @Override
-    public Optional<RouteInfo> getRouteInfo(List<Long> osmWayIds) {
+    public Optional<RouteInfo> getRouteInfo(List<Long> osmWayIds, boolean isCar) {
         var query = OsmQueryManager.getMultipleWayAndItsNodesQuery(osmWayIds);
         var overpassNodes = getNodesDocument(query);
         if (overpassNodes.isEmpty()) {
             return Optional.empty();
         }
-
         RouteInfo info;
         try {
-            info = parseWayAndNodes(overpassNodes.get());
+            info = parseWayAndNodes(overpassNodes.get(), isCar);
         } catch (Exception e) {
             logger.warn("Error trying to get route info", e);
             return Optional.empty();
@@ -230,9 +229,10 @@ public class MapAccessManager implements IMapAccessManager {
 
         return Optional.of(info);
     }
-
-    private static RouteInfo parseWayAndNodes(Document nodesViaOverpass) {
+    
+    private static RouteInfo parseWayAndNodes(Document nodesViaOverpass, boolean isCar) {
         final RouteInfo info = new RouteInfo();
+        final String tagType = isCar ? "highway" : "crossing";
         Node osmRoot = nodesViaOverpass.getFirstChild();
         NodeList osmXMLNodes = osmRoot.getChildNodes();
         for (int i = 1; i < osmXMLNodes.getLength(); i++) {
@@ -246,7 +246,7 @@ public class MapAccessManager implements IMapAccessManager {
                 for (int j = 0; j < nodeChildren.getLength(); ++j) {
                     Node nodeChild = nodeChildren.item(j);
                     if (nodeChild.getNodeName().equals("tag") &&
-                            nodeChild.getAttributes().getNamedItem("k").getNodeValue().equals("crossing") &&
+                            nodeChild.getAttributes().getNamedItem("k").getNodeValue().equals(tagType) &&
                             nodeChild.getAttributes().getNamedItem("v").getNodeValue().equals("traffic_signals")) {
                         var id = Long.parseLong(item.getAttributes().getNamedItem("id").getNodeValue());
                         info.add(id);

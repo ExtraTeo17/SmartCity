@@ -73,7 +73,7 @@ public class TaskProvider implements ITaskProvider {
             try {
                 route = routeInfoCache.get(start, end);
                 if (route == null) {
-                    route = routeGenerator.generateRouteInfoWithJams(start, end, false);
+                    route = routeGenerator.generateRouteInfo(start, end, false);
                     routeInfoCache.put(start, end, route);
                 }
             } catch (Exception e) {

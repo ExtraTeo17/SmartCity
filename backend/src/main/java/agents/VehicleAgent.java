@@ -183,7 +183,7 @@ public class VehicleAgent extends AbstractAgent {
                 final IGeoPosition positionAfterWhichRouteChanges = vehicle
                         .getPositionOnIndex(indexAfterWhichRouteChanges);
                 var oldUniformRoute = vehicle.getUniformRoute();
-                var newSimpleRouteEnd = routeGenerator.generateRouteInfoWithJams(positionAfterWhichRouteChanges,
+                var newSimpleRouteEnd = routeGenerator.generateRouteInfo(positionAfterWhichRouteChanges,
                         oldUniformRoute.get(oldUniformRoute.size() - 1),
                         bewareOfJammedEdge);
                 var newRouteAfterChangeIndex = routeTransformer.uniformRoute(newSimpleRouteEnd);
