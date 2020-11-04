@@ -1,5 +1,5 @@
-import React, { useState } from "react";
-import { Circle, Map as LeafletMap, Marker, Popup, TileLayer } from "react-leaflet";
+import React, { useState, useEffect } from "react";
+import { Circle, LayersControl, Map as LeafletMap, Marker, Popup, FeatureGroup } from "react-leaflet";
 import { connect } from "react-redux";
 import { notify } from "react-notify-toast";
 import { dispatch } from "../redux/store";
@@ -15,10 +15,16 @@ import BusesLayer from "./Layers/BusesLayer";
 import PedestriansLayer from "./Layers/PedestriansLayer";
 import { NOTIFY_SHOW_MS } from "../constants/global";
 import { D_ZOOM } from "../constants/defaults";
-import { MAX_NATIVE_ZOOM, MAX_ZOOM } from "../constants/minMax";
+import { BaseLayers } from "./Layers/BaseLayers";
+
+const { Overlay } = LayersControl;
 
 const CityMap = ({ center, wasStarted }) => {
   const [zoom, setZoom] = useState(D_ZOOM);
+
+  useEffect(() => {
+    console.log("Rendered!");
+  });
 
   function setCenter(latlng) {
     const { lat, lng } = latlng;
@@ -39,25 +45,39 @@ const CityMap = ({ center, wasStarted }) => {
 
   return (
     <LeafletMap center={center} zoom={zoom} preferCanvas onzoomanim={onZoom} oncontextmenu={rightClickOnMap}>
-      <TileLayer
-        attribution='&amp;copy <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
-        url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-        maxZoom={MAX_ZOOM}
-        maxNativeZoom={MAX_NATIVE_ZOOM}
-      />
+      <LayersControl position="topright">
+        {BaseLayers}
 
-      <Circle center={center} radius={center.rad}>
-        <Marker position={center}>
-          <Popup>Zone center</Popup>
-        </Marker>
-      </Circle>
-      <CarsLayer />
-      <BikesLayer />
-      <LightsLayer />
-      <StationsLayer />
-      <BusesLayer />
-      <TroublePointsLayer />
-      <PedestriansLayer />
+        <Overlay name="Zone" checked>
+          <FeatureGroup>
+            <Circle center={center} radius={center.rad} />
+            <Marker position={center}>
+              <Popup>Zone center</Popup>
+            </Marker>
+          </FeatureGroup>
+        </Overlay>
+        <Overlay name="Lights" checked>
+          <LightsLayer />
+        </Overlay>
+        <Overlay name="Cars" checked>
+          <CarsLayer />
+        </Overlay>
+        <Overlay name="Bikes" checked>
+          <BikesLayer />
+        </Overlay>
+        <Overlay name="Pedestrians" checked>
+          <PedestriansLayer />
+        </Overlay>
+        <Overlay name="Buses" checked>
+          <BusesLayer />
+        </Overlay>
+        <Overlay name="Stations" checked>
+          <StationsLayer />
+        </Overlay>
+        <Overlay name="Trouble points" checked>
+          <TroublePointsLayer />
+        </Overlay>
+      </LayersControl>
     </LeafletMap>
   );
 };

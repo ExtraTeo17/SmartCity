@@ -19,6 +19,8 @@ class TimeProviderTests {
         var timeProvider = new TimeProvider();
         int waitTimeMillis = 300;
         int accuracyMillis = 10;
+        var timeScale = 10;
+        timeProvider.setTimeScale(timeScale);
 
         // Act
         timeProvider.setSimulationStartTime(startTime);
@@ -30,8 +32,8 @@ class TimeProviderTests {
 
         // Assert
         var resultTimeDiff = ChronoUnit.MILLIS.between(startTime, resultTime);
-        var min = TimeProvider.TIME_SCALE * (waitTimeMillis - accuracyMillis);
-        var max = TimeProvider.TIME_SCALE * (waitTimeMillis + accuracyMillis);
+        var min = timeScale * (waitTimeMillis - accuracyMillis);
+        var max = timeScale * (waitTimeMillis + accuracyMillis);
         assertTrue(resultTimeDiff >= min &&
                         resultTimeDiff <= max,
                 "Should be: [" + min + ", " + max + "], but is: " + resultTimeDiff + "[ms]");

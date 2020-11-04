@@ -29,11 +29,12 @@ export default {
     bikesLimit,
     testBikeId,
 
-    generateTrafficJams,
+    changeRouteOnTrafficJam,
     generateTroublePoints,
     timeBeforeTrouble,
 
     startTime,
+    timeScale,
 
     lightStrategyActive,
     extendLightTime,
@@ -41,7 +42,7 @@ export default {
     stationStrategyActive,
     extendWaitTime,
 
-    changeRouteStrategyActive,
+    changeRouteOnTroublePoint,
   }) {
     const msg = {
       type: START_SIMULATION_REQUEST,
@@ -57,11 +58,11 @@ export default {
         bikesLimit,
         testBikeId,
 
-        generateTrafficJams,
         generateTroublePoints,
         timeBeforeTrouble,
 
         startTime,
+        timeScale,
 
         lightStrategyActive,
         extendLightTime,
@@ -69,7 +70,8 @@ export default {
         stationStrategyActive,
         extendWaitTime,
 
-        changeRouteStrategyActive,
+        changeRouteOnTroublePoint,
+        changeRouteOnTrafficJam,
       },
     };
     WebServer.send(msg);

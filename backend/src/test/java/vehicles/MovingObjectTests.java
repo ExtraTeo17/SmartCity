@@ -5,6 +5,7 @@ import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import routing.nodes.LightManagerNode;
 import routing.nodes.RouteNode;
+import smartcity.ITimeProvider;
 
 import java.util.Arrays;
 import java.util.List;
@@ -21,7 +22,7 @@ class MovingObjectTests {
     @MethodSource("routesProvider")
     void switchToNextTrafficLight(String testCaseName, int initialMoveIndex, List<RouteNode> route, int expectedLightIndex) {
         // Arrange
-        var movingObject = new Car(1, route, route);
+        var movingObject = new Car(1, route, route, mock(ITimeProvider.class));
         movingObject.moveIndex = initialMoveIndex;
 
         // Act
@@ -74,7 +75,7 @@ class MovingObjectTests {
     @MethodSource("routesProvider")
     void isAtTrafficLights(String testCaseName, int initialMoveIndex, List<RouteNode> route) {
         // Arrange
-        var movingObject = new Car(1, route, route);
+        var movingObject = new Car(1, route, route, mock(ITimeProvider.class));
         movingObject.moveIndex = initialMoveIndex;
 
         // Act
@@ -90,7 +91,7 @@ class MovingObjectTests {
                                     @SuppressWarnings("unused") int initialMoveIndex,
                                     List<RouteNode> route) {
         // Arrange
-        var movingObject = new Car(1, route, route);
+        var movingObject = new Car(1, route, route, mock(ITimeProvider.class));
 
         // Act
         var result = movingObject.switchToNextTrafficLight();

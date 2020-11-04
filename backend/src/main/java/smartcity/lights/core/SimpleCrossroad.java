@@ -1,9 +1,12 @@
 package smartcity.lights.core;
 
 import com.google.common.eventbus.EventBus;
+import com.google.common.eventbus.Subscribe;
+import events.LightSwitcherStartedEvent;
 import events.SwitchLightsStartEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import smartcity.config.abstractions.ITroublePointsConfigContainer;
 import smartcity.lights.OptimizationResult;
 import smartcity.lights.abstractions.ICrossroad;
 import smartcity.stations.ArrivalInfo;
@@ -19,16 +22,20 @@ import java.util.stream.Collectors;
 class SimpleCrossroad implements ICrossroad {
     private final Logger logger;
     private final EventBus eventBus;
+    private final ITroublePointsConfigContainer configContainer;
     private final int managerId;
 
     @SuppressWarnings("MismatchedQueryAndUpdateOfCollection")
     private final Map<Long, Light> wayIdToLightMap;
+    private int defaultExecutionDelay = -1;
 
     SimpleCrossroad(EventBus eventBus,
+                    ITroublePointsConfigContainer configContainer,
                     int managerId,
                     Siblings<SimpleLightGroup> lightGroups) {
         this.logger = LoggerFactory.getLogger("SimpleCrossroad" + managerId);
         this.eventBus = eventBus;
+        this.configContainer = configContainer;
         this.managerId = managerId;
         this.wayIdToLightMap = new HashMap<>() {{
             putAll(lightGroups.first.prepareMap());
@@ -38,14 +45,33 @@ class SimpleCrossroad implements ICrossroad {
 
     @Override
     public void startLifetime() {
+        eventBus.register(this);
         eventBus.post(new SwitchLightsStartEvent(managerId, wayIdToLightMap.values()));
+    }
+
+    @Subscribe
+    public void handle(LightSwitcherStartedEvent e) {
+        if (e.managerId == this.managerId) {
+            this.defaultExecutionDelay = e.defaultExecutionDelay;
+            eventBus.unregister(this);
+        }
     }
 
     @Override
     public OptimizationResult requestOptimizations(int extendTimeSeconds) {
-        final OptimizationResult result = new OptimizationResult(extendTimeSeconds);
+        if (defaultExecutionDelay < 0) {
+            logger.warn("Light switcher did not start yet.");
+            return OptimizationResult.empty();
+        }
+
+        final OptimizationResult result = new OptimizationResult(extendTimeSeconds, defaultExecutionDelay);
+        boolean shouldCheckForJams = configContainer.shouldChangeRouteOnTrafficJam();
         for (Light light : wayIdToLightMap.values()) {
-            light.checkForTrafficJams(result);
+
+            if (shouldCheckForJams) {
+                light.checkForTrafficJams(result);
+            }
+
             if (light.isGreen()) {
                 for (String carName : light.carQueue) {
                     result.addCarGrantedPassthrough(carName);

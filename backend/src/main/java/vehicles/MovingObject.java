@@ -6,6 +6,7 @@ import routing.RoutingConstants;
 import routing.core.IGeoPosition;
 import routing.nodes.LightManagerNode;
 import routing.nodes.RouteNode;
+import smartcity.ITimeProvider;
 import smartcity.TimeProvider;
 import vehicles.enums.DrivingState;
 
@@ -14,6 +15,7 @@ import java.util.List;
 
 // TODO: Change name to IVehicle/AbstractVehicle
 public abstract class MovingObject {
+    final ITimeProvider timeProvider;
     final Logger logger;
     final int agentId;
     final int speed;
@@ -23,7 +25,8 @@ public abstract class MovingObject {
     int closestLightIndex;
     DrivingState state;
 
-    MovingObject(int agentId, int speed, List<RouteNode> uniformRoute, List<RouteNode> simpleRoute) {
+    MovingObject(ITimeProvider timeProvider, int agentId, int speed, List<RouteNode> uniformRoute, List<RouteNode> simpleRoute) {
+        this.timeProvider = timeProvider;
         this.logger = LoggerFactory.getLogger(this.getClass().getSimpleName() + "Object" + agentId);
         this.agentId = agentId;
         this.speed = speed;
@@ -34,7 +37,8 @@ public abstract class MovingObject {
         this.state = DrivingState.STARTING;
     }
 
-    MovingObject(int agentId, int speed, List<RouteNode> uniformRoute) {
+    MovingObject(ITimeProvider timeProvider, int agentId, int speed, List<RouteNode> uniformRoute) {
+        this.timeProvider = timeProvider;
         this.logger = LoggerFactory.getLogger(this.getClass().getSimpleName() + "Object" + agentId);
         this.agentId = agentId;
         this.speed = speed;
@@ -60,7 +64,7 @@ public abstract class MovingObject {
      * @return Scaled speed in KM/H
      */
     public int getSpeed() {
-        return speed * TimeProvider.TIME_SCALE;
+        return speed * timeProvider.getTimeScale();
     }
 
     public void move() {

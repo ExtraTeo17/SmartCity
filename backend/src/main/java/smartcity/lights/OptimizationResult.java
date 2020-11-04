@@ -3,7 +3,6 @@ package smartcity.lights;
 import org.javatuples.Pair;
 import routing.core.IGeoPosition;
 import routing.core.Position;
-import smartcity.TimeProvider;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -11,18 +10,19 @@ import java.util.List;
 public class OptimizationResult {
     private final List<String> carsFreeToProceedNames = new ArrayList<>();
     private final List<Pair<String, List<String>>> busesAndPedestriansFreeToProceedNames = new ArrayList<>();
+    private final int extendTimeSeconds;
+    private final int defaultExecutionDelay;
+
     private boolean shouldNotifyCarAboutStartOfTrafficJamOnThisLight = false;
     private boolean shouldNotifyCarAboutStopOfTrafficJamOnThisLight = false;
     private double lengthOfJam = 0;
     private long osmWayId = 0;
     private IGeoPosition jammedLightPosition = null;
     private String agentStuckInJam = null;
-    private final int extendTimeSeconds;
-    private final int defaultExecutionDelay;
 
-    public OptimizationResult(int extendTimeSeconds) {
+    public OptimizationResult(int extendTimeSeconds, int defaultExecutionDelay) {
         this.extendTimeSeconds = extendTimeSeconds;
-        this.defaultExecutionDelay = extendTimeSeconds * 1000 / TimeProvider.TIME_SCALE;
+        this.defaultExecutionDelay = defaultExecutionDelay;
     }
 
     public long getOsmWayId() {
@@ -30,7 +30,7 @@ public class OptimizationResult {
     }
 
     public static OptimizationResult empty() {
-        return new OptimizationResult(0);
+        return new OptimizationResult(0, 0);
     }
 
     public List<String> carsFreeToProceed() {
@@ -53,14 +53,14 @@ public class OptimizationResult {
         return busesAndPedestriansFreeToProceedNames;
     }
 
-	public void setShouldNotifyCarAboutStartOfTrafficJamOnThisLight(IGeoPosition jammedLightPosition,  int numerOfCarsInTheQueue,
-																	long osmWayId) {
-		shouldNotifyCarAboutStartOfTrafficJamOnThisLight = true;
-		this.osmWayId = osmWayId;
-		//TODO: change 2 na liczbé samochodów które przejzdzaja podczas jednego swiatla. Oraz change how long is green and red
-		lengthOfJam = Math.floor((numerOfCarsInTheQueue * 1000.0 /defaultExecutionDelay)  *
-				((defaultExecutionDelay + defaultExecutionDelay) +
-						(defaultExecutionDelay + defaultExecutionDelay + extendTimeSeconds)) / 2); // TODO: Magic numbers
+    public void setShouldNotifyCarAboutStartOfTrafficJamOnThisLight(IGeoPosition jammedLightPosition, int numerOfCarsInTheQueue,
+                                                                    long osmWayId) {
+        shouldNotifyCarAboutStartOfTrafficJamOnThisLight = true;
+        this.osmWayId = osmWayId;
+        //TODO: change 2 na liczbe samochodów które przejzdzaja podczas jednego swiatla. Oraz change how long is green and red
+        lengthOfJam = Math.floor((numerOfCarsInTheQueue * 1000.0 / defaultExecutionDelay) *
+                ((defaultExecutionDelay + defaultExecutionDelay) +
+                        (defaultExecutionDelay + defaultExecutionDelay + extendTimeSeconds)) / 2); // TODO: Magic numbers
 
 
     }

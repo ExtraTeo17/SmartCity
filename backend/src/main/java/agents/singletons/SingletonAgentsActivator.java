@@ -1,7 +1,10 @@
 package agents.singletons;
 
 import agents.TroubleManagerAgent;
+import com.google.common.eventbus.EventBus;
+import com.google.common.eventbus.Subscribe;
 import com.google.inject.Inject;
+import events.web.SimulationStartedEvent;
 import jade.core.Agent;
 import jade.wrapper.ContainerController;
 import jade.wrapper.StaleProxyException;
@@ -12,17 +15,22 @@ import smartcity.SmartCityAgent;
 public class SingletonAgentsActivator {
     private static final Logger logger = LoggerFactory.getLogger(SingletonAgentsActivator.class);
     private final ContainerController controller;
+    private final TroubleManagerAgent troubleManagerAgent;
+    private final EventBus eventBus;
 
     @Inject
     public SingletonAgentsActivator(ContainerController controller,
+                                    EventBus eventBus,
                                     SmartCityAgent smartCityAgent,
                                     TroubleManagerAgent troubleManagerAgent) {
         this.controller = controller;
+        this.eventBus = eventBus;
+
+        this.troubleManagerAgent = troubleManagerAgent;
         activate(SmartCityAgent.name, smartCityAgent);
-        activate(TroubleManagerAgent.name, troubleManagerAgent);
     }
 
-    public void activate(String name, Agent agent) {
+    private void activate(String name, Agent agent) {
         try {
             var agentController = controller.acceptNewAgent(name, agent);
             agentController.activate();
@@ -33,4 +41,10 @@ public class SingletonAgentsActivator {
         }
     }
 
+    // Need timeScale, so possible only after simulation start
+    @Subscribe
+    public void handle(SimulationStartedEvent e) {
+        activate(TroubleManagerAgent.name, troubleManagerAgent);
+        this.eventBus.unregister(this);
+    }
 }

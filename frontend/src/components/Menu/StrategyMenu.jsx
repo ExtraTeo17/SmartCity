@@ -5,12 +5,15 @@ import { StartState } from "../../redux/models/startState";
 import { dispatch } from "../../redux/store";
 import { startSimulationDataUpdated } from "../../redux/core/actions";
 import "../../styles/Menu.css";
+import { setIfValidInt } from "../../utils/helpers";
+import { LIGHT_EXTEND_MIN, LIGHT_EXTEND_MAX, STATION_EXTEND_MAX, STATION_EXTEND_MIN } from "../../constants/minMax";
 import {
   D_EXTEND_WAIT_TIME,
   D_LIGHT_STRATEGY_ACTIVE,
   D_STATION_STRATEGY_ACTIVE,
   D_EXTEND_LIGHT_TIME,
-  D_CHANGE_ROUTE_STRATEGY_ACTIVE,
+  D_CHANGE_ROUTE_TP_ACTIVE,
+  D_CHANGE_ROUTE_TJ_ACTIVE,
 } from "../../constants/defaults";
 
 const StrategyMenu = props => {
@@ -21,7 +24,8 @@ const StrategyMenu = props => {
   const [stationStrategyActive, setStationStrategyActive] = useState(D_STATION_STRATEGY_ACTIVE);
   const [extendWaitTime, setExtendWaitTime] = useState(D_EXTEND_WAIT_TIME);
 
-  const [changeRouteStrategyActive, setChangeRouteStrategyActive] = useState(D_CHANGE_ROUTE_STRATEGY_ACTIVE);
+  const [changeRouteOnTroublePoint, setchangeRouteOnTroublePoint] = useState(D_CHANGE_ROUTE_TP_ACTIVE);
+  const [changeRouteOnTrafficJam, setchangeRouteOnTrafficJam] = useState(D_CHANGE_ROUTE_TJ_ACTIVE);
 
   const onStart = () => {
     if (shouldStart === StartState.Invoke) {
@@ -31,12 +35,25 @@ const StrategyMenu = props => {
           extendLightTime,
           stationStrategyActive,
           extendWaitTime,
-          changeRouteStrategyActive,
+          changeRouteOnTroublePoint,
+          changeRouteOnTrafficJam,
         })
       );
     }
   };
   useEffect(onStart, [shouldStart]);
+
+  function evSetLightExtend(e) {
+    setIfValidInt(e, LIGHT_EXTEND_MIN, LIGHT_EXTEND_MAX, setExtendLightTime);
+  }
+
+  function evSetWaitExtend(e) {
+    setIfValidInt(e, STATION_EXTEND_MIN, STATION_EXTEND_MAX, setExtendWaitTime);
+  }
+
+  function evSetchangeRouteOnTrafficJam(e) {
+    setchangeRouteOnTrafficJam(e.target.checked);
+  }
 
   return (
     <>
@@ -51,7 +68,7 @@ const StrategyMenu = props => {
             onChange={e => setLightStrategyActive(e.target.checked)}
           />
           <label htmlFor="lightStrategyActive" className="form-check-label">
-            Light strategy active
+            Light strategy
           </label>
         </div>
         {lightStrategyActive && (
@@ -61,10 +78,12 @@ const StrategyMenu = props => {
               type="number"
               disabled={wasStarted}
               defaultValue={extendLightTime}
+              min={LIGHT_EXTEND_MIN}
+              max={LIGHT_EXTEND_MAX}
               className="form-control"
               id="extendLightTime"
               placeholder="Enter green lights extension time"
-              onChange={e => setExtendLightTime(e.target.value)}
+              onChange={evSetLightExtend}
             />
           </div>
         )}
@@ -80,7 +99,7 @@ const StrategyMenu = props => {
             onChange={e => setStationStrategyActive(e.target.checked)}
           />
           <label htmlFor="stationStrategyActive" className="form-check-label">
-            Station strategy active
+            Station strategy
           </label>
         </div>
         {stationStrategyActive && (
@@ -93,7 +112,7 @@ const StrategyMenu = props => {
               className="form-control"
               id="extendWaitTime"
               placeholder="Enter bus extension wait time"
-              onChange={e => setExtendWaitTime(e.target.value)}
+              onChange={evSetWaitExtend}
             />
           </div>
         )}
@@ -103,14 +122,30 @@ const StrategyMenu = props => {
         <div className="form-check user-select-none">
           <input
             type="checkbox"
-            checked={changeRouteStrategyActive}
+            checked={changeRouteOnTroublePoint}
             disabled={wasStarted}
             className="form-check-input"
-            id="changeRouteStrategyActive"
-            onChange={e => setChangeRouteStrategyActive(e.target.checked)}
+            id="changeRouteOnTroublePoint"
+            onChange={e => setchangeRouteOnTroublePoint(e.target.checked)}
           />
-          <label htmlFor="changeRouteStrategyActive" className="form-check-label">
-            Change route strategy active
+          <label htmlFor="changeRouteOnTroublePoint" className="form-check-label">
+            Change route on trouble point
+          </label>
+        </div>
+      </div>
+
+      <div className="mb-4 form-border">
+        <div className="form-check user-select-none">
+          <input
+            type="checkbox"
+            defaultChecked={changeRouteOnTrafficJam}
+            disabled={wasStarted}
+            className="form-check-input"
+            id="changeRouteOnTrafficJam"
+            onChange={evSetchangeRouteOnTrafficJam}
+          />
+          <label htmlFor="changeRouteOnTrafficJam" className="form-check-label">
+            Change route on traffic jam
           </label>
         </div>
       </div>

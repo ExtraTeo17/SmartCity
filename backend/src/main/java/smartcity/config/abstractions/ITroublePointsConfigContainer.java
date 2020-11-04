@@ -2,9 +2,9 @@ package smartcity.config.abstractions;
 
 public interface ITroublePointsConfigContainer {
 
-    boolean isChangeRouteStrategyActive();
+    boolean shouldChangeRouteOnTroublePoint();
 
-    void setChangeRouteStrategyActive(boolean constructionSiteStrategyActive);
+    void setChangeRouteOnTroublePoint(boolean constructionSiteStrategyActive);
 
     boolean shouldGenerateConstructionSites();
 
@@ -20,7 +20,7 @@ public interface ITroublePointsConfigContainer {
      */
     void setTimeBeforeTrouble(int timeBeforeTrouble);
 
-    boolean shouldGenerateTrafficJams();
+    boolean shouldChangeRouteOnTrafficJam();
 
-    void setShouldGenerateTrafficJams(boolean value);
+    void setChangeRouteOnTrafficJam(boolean changeRouteOnTrafficJam);
 }

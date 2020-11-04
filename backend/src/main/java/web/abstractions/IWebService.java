@@ -15,7 +15,7 @@ public interface IWebService extends IStartable {
                            List<? extends OSMNode> stations,
                            List<? extends Bus> buses);
 
-    void startSimulation(int timeScale);
+    void startSimulation();
 
     void createCar(int id, IGeoPosition position, List<? extends IGeoPosition> route, boolean isTestCar);
 

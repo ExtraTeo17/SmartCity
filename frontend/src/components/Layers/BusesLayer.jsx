@@ -1,4 +1,5 @@
 import React from "react";
+import { FeatureGroup } from "react-leaflet";
 import { connect } from "react-redux";
 
 import Bus from "../Markers/Bus";
@@ -11,10 +12,10 @@ const BusesLayer = props => {
   const busRoutes = buses.map(bus => <BusRoute key={`busRoute${bus.id}`} busId={bus.id} route={bus.route} />);
 
   return (
-    <>
+    <FeatureGroup>
       {busMarkers}
       {busRoutes}
-    </>
+    </FeatureGroup>
   );
 };
 

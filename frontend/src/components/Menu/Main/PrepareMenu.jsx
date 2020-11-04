@@ -9,29 +9,21 @@ import { D_DECIMAL_PLACES } from "../../../constants/defaults";
 import { LAT_MIN, LAT_MAX, LNG_MIN, LNG_MAX, RAD_MIN, RAD_MAX } from "../../../constants/minMax";
 
 import "../../../styles/Menu.css";
+import { setIfValidFloat } from "../../../utils/helpers";
 
 const PrepareMenu = props => {
   const { wasPrepared, wasStarted, generatePedestrians } = props;
 
   const setLat = e => {
-    const val = parseFloat(e.target.value);
-    if (!isNaN(val) && val >= LAT_MIN && val <= LAT_MAX) {
-      dispatch(centerUpdated({ lat: val }));
-    }
+    setIfValidFloat(e, LAT_MIN, LAT_MAX, val => dispatch(centerUpdated({ lat: val })));
   };
 
   const setLng = e => {
-    const val = parseFloat(e.target.value);
-    if (!isNaN(val) && val >= LNG_MIN && val <= LNG_MAX) {
-      dispatch(centerUpdated({ lng: val }));
-    }
+    setIfValidFloat(e, LNG_MIN, LNG_MAX, val => dispatch(centerUpdated({ lng: val })));
   };
 
   const setRad = e => {
-    const val = parseFloat(e.target.value);
-    if (!isNaN(val) && val >= RAD_MIN && val <= RAD_MAX) {
-      dispatch(centerUpdated({ rad: val }));
-    }
+    setIfValidFloat(e, RAD_MIN, RAD_MAX, val => dispatch(centerUpdated({ rad: val })));
   };
 
   const setGeneratePedestrians = e => {
@@ -56,7 +48,7 @@ const PrepareMenu = props => {
           <label htmlFor="lat">Latitude </label>
           <input
             type="number"
-            value={lat}
+            defaultValue={lat}
             className="form-control"
             id="lat"
             step="0.0001"
@@ -71,7 +63,7 @@ const PrepareMenu = props => {
           <label htmlFor="lng">Longitude</label>
           <input
             type="number"
-            value={lng}
+            defaultValue={lng}
             className="form-control"
             id="lng"
             step="0.0001"
@@ -87,7 +79,7 @@ const PrepareMenu = props => {
         <div className="input-group">
           <input
             type="number"
-            value={rad}
+            defaultValue={rad}
             className="form-control"
             id="rad"
             step="10"

@@ -5,6 +5,7 @@ import routing.RoutingConstants;
 import routing.nodes.LightManagerNode;
 import routing.nodes.RouteNode;
 import routing.nodes.StationNode;
+import smartcity.ITimeProvider;
 import vehicles.enums.VehicleType;
 
 import java.util.ArrayList;
@@ -27,8 +28,10 @@ public class Pedestrian extends MovingObject {
                       List<RouteNode> uniformRouteFromStation,
                       String preferredBusLine,
                       StationNode startStation,
-                      StationNode finishStation) {
-        super(agentId, 10, createRoute(startStation, uniformRouteToStation, finishStation, uniformRouteFromStation));
+                      StationNode finishStation,
+                      ITimeProvider timeProvider) {
+        super(timeProvider, agentId, 10, createRoute(startStation, uniformRouteToStation,
+                finishStation, uniformRouteFromStation));
         this.displayRouteBeforeBus = routeToStation;
         this.routeBeforeBus = uniformRouteToStation;
         this.routeBeforeBus.add(startStation);
@@ -54,7 +57,7 @@ public class Pedestrian extends MovingObject {
     }
 
     Pedestrian(Pedestrian ped) {
-        super(ped.agentId, ped.speed, ped.uniformRoute);
+        super(ped.timeProvider, ped.agentId, ped.speed, ped.uniformRoute);
         this.displayRouteBeforeBus = ped.displayRouteBeforeBus;
         this.routeBeforeBus = ped.routeBeforeBus;
 
@@ -67,8 +70,8 @@ public class Pedestrian extends MovingObject {
     }
 
     @VisibleForTesting
-    Pedestrian() {
-        super(1, 10, new ArrayList<>());
+    Pedestrian(ITimeProvider timeProvider) {
+        super(timeProvider, 1, 10, new ArrayList<>());
         preferredBusLine = "";
         displayRouteBeforeBus = new ArrayList<>();
         displayRouteAfterBus = new ArrayList<>();
