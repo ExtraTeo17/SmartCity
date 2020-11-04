@@ -36,11 +36,12 @@ public class PedestrianAgent extends AbstractAgent {
         this.pedestrian = pedestrian;
     }
 
-    public boolean isInBus() { return DrivingState.IN_BUS == pedestrian.getState();}
+    public boolean isInBus() { return DrivingState.IN_BUS == pedestrian.getState(); }
 
     @Override
     protected void setup() {
         getNextStation();
+        informLightManager(pedestrian);
 
         pedestrian.setState(DrivingState.MOVING);
         Behaviour move = new TickerBehaviour(this, RoutingConstants.STEP_CONSTANT / pedestrian.getSpeed()) {
