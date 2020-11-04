@@ -29,7 +29,7 @@ import java.util.function.Consumer;
 public class TaskManager implements ITaskManager {
     private static final Logger logger = LoggerFactory.getLogger(TaskManager.class);
     private static final TimeUnit TIME_UNIT = TimeUnit.MILLISECONDS;
-    private static final int CREATE_CAR_INTERVAL = 500;
+    private static final int CREATE_CAR_INTERVAL = 120;
     private static final int CREATE_BIKE_INTERVAL = 500;
     private static final int CREATE_PEDESTRIAN_INTERVAL = 120;
     private static final int BUS_CONTROL_INTERVAL = 2000;

@@ -22,7 +22,7 @@ public class TestCar extends Car implements ITestable {
 
     @VisibleForTesting
     TestCar(ITimeProvider timeProvider) {
-        super(1, new ArrayList<>(), new ArrayList<>());
+        super(1, new ArrayList<>(), new ArrayList<>(), timeProvider);
         this.timeProvider = timeProvider;
     }
 

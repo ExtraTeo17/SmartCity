@@ -3,11 +3,11 @@ package smartcity.task.functional;
 import com.google.common.eventbus.EventBus;
 import com.google.inject.Inject;
 import com.google.inject.assistedinject.Assisted;
+import events.LightSwitcherStartedEvent;
 import events.web.SwitchLightsEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import smartcity.ITimeProvider;
-import smartcity.TimeProvider;
 import smartcity.config.ConfigContainer;
 import smartcity.lights.core.Light;
 import smartcity.task.data.ISwitchLightsContext;
@@ -39,11 +39,11 @@ class LightSwitcher implements Function<ISwitchLightsContext, Integer> {
         this.eventBus = eventBus;
 
         this.extendTimeSeconds = extendTimeSeconds;
-
-        this.defaultExecutionDelay = extendTimeSeconds * 1000 / TimeProvider.TIME_SCALE;
+        this.defaultExecutionDelay = extendTimeSeconds * 1000 / timeProvider.getTimeScale();
         this.lights = lights;
         this.lightOsmId = lights.iterator().next().getOsmLightId();
         this.logger = LoggerFactory.getLogger("LightSwitcher" + managerId);
+        eventBus.post(new LightSwitcherStartedEvent(managerId, defaultExecutionDelay));
     }
 
     @Override

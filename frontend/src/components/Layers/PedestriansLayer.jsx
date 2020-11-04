@@ -1,4 +1,5 @@
 import React from "react";
+import { FeatureGroup } from "react-leaflet";
 import { connect } from "react-redux";
 import pedestrianSelector from "../../redux/selectors/pedestriansSelector";
 
@@ -19,10 +20,10 @@ const PedestriansLayer = props => {
   ));
 
   return (
-    <>
+    <FeatureGroup>
       {pedestrianMarkers}
       {pedestrianRoutes}
-    </>
+    </FeatureGroup>
   );
 };
 

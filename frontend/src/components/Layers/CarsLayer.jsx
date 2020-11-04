@@ -1,4 +1,5 @@
 import React from "react";
+import { FeatureGroup } from "react-leaflet";
 import { connect } from "react-redux";
 
 import Car from "../Markers/Car";
@@ -19,10 +20,10 @@ const CarsLayer = props => {
   ));
 
   return (
-    <>
+    <FeatureGroup>
       {carMarkers}
       {carRoutes}
-    </>
+    </FeatureGroup>
   );
 };
 

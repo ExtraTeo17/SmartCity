@@ -19,12 +19,14 @@ import routing.core.Zone;
 import routing.nodes.NodesContainer;
 import smartcity.ITimeProvider;
 import smartcity.config.ConfigContainer;
+import smartcity.config.ConfigMutator;
 import smartcity.config.StaticConfig;
 import smartcity.lights.abstractions.ICrossroadFactory;
 import smartcity.lights.core.CrossroadFactory;
 import smartcity.lights.core.CrossroadParser;
 import smartcity.lights.core.Light;
 import testutils.FileLoader;
+import testutils.ReflectionHelper;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -38,7 +40,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 @SuppressWarnings("OverlyCoupledClass")
-class AgentsCreatorTests {
+class AgentsPreparatorTests {
     private final IZone defaultZone = Zone.of(52.23682, 21.01681, 600);
 
     @Test
@@ -120,7 +122,7 @@ class AgentsCreatorTests {
                 "This lights should be in same group: (" + adjacentIds[0] + "," + adjacentIds[1] + ")");
     }
 
-    private AgentsCreator setupAgentsCreator(IAgentsContainer agentsContainer) {
+    private AgentsPreparator setupAgentsCreator(IAgentsContainer agentsContainer) {
         var lightAccessManager = setupLightAccessManager();
         var configContainer = mock(ConfigContainer.class);
         var busLinesManager = mock(BusLinesManager.class);
@@ -131,7 +133,7 @@ class AgentsCreatorTests {
         var osmContainer = mock(NodesContainer.class);
         var cacheWrapper = mock(ICacheWrapper.class);
 
-        return new AgentsCreator(agentsContainer, configContainer, busLinesManager, agentsFactory,
+        return new AgentsPreparator(agentsContainer, configContainer, busLinesManager, agentsFactory,
                 eventBus, lightAccessManager, mapAccessManager, routeGenerator, cacheWrapper);
     }
 
@@ -151,13 +153,15 @@ class AgentsCreatorTests {
         var eventBus = new EventBus();
 
         return new AgentsFactory(idGenerator, eventBus, timeProvider, routeTransformer,
-        		crossroadFactory, mock(IRouteGenerator.class), mock(ConfigContainer.class));
+                crossroadFactory, mock(IRouteGenerator.class), mock(ConfigContainer.class));
     }
 
     private ICrossroadFactory setupCrossroadFactory() {
         var eventBus = new EventBus();
         var crossroadParser = new CrossroadParser();
+        ReflectionHelper.setStatic("counter", ConfigMutator.class, 0);
+        var configContainer = new ConfigContainer();
 
-        return new CrossroadFactory(eventBus, crossroadParser);
+        return new CrossroadFactory(eventBus, crossroadParser, configContainer);
     }
 }
