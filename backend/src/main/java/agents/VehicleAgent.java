@@ -166,13 +166,17 @@ public class VehicleAgent extends AbstractAgent {
 
             private void handleConstructionSiteRouteChange(final int indexOfRouteNodeWithEdge) {
                 int indexAfterWhichRouteChanges;
+                logger.info("step 1");
                 if (configContainer.shouldChangeRouteOnTroublePoint()) {
+                    logger.info("step shouldChangeRouteOnTroublePoint");
                     indexAfterWhichRouteChanges = vehicle.getFarOnIndex(THRESHOLD_UNTIL_INDEX_CHANGE);
                 }
                 else {
+                    logger.info("step indexOfRouteNodeWithEdge max");
                     indexAfterWhichRouteChanges = Math.max(indexOfRouteNodeWithEdge -
                             (NO_CONSTRUCTION_SITE_STRATEGY_FACTOR * THRESHOLD_UNTIL_INDEX_CHANGE), 0);
                 }
+                logger.info("step mergeResult");
                 final RouteMergeInfo mergeResult =
                         createMergedWithOldRouteAlternativeRouteFromIndex(indexAfterWhichRouteChanges, true);
                 updateVehicleRouteAfterMerge(indexAfterWhichRouteChanges, mergeResult);
@@ -333,7 +337,8 @@ public class VehicleAgent extends AbstractAgent {
                 @Override
                 public void onTick() {
                     var route = vehicle.getUniformRoute();
-                    var el = random.nextInt(route.size()); // TODO: from current index //choose trouble EdgeId
+
+                    var el = random.nextInt(route.size() - vehicle.getMoveIndex() + 1)+ vehicle.getMoveIndex(); // TODO: from current index //choose trouble EdgeId
                     RouteNode troublePointTmp = route.get(el);
                     troublePoint = new RouteNode(troublePointTmp.getLat(), troublePointTmp.getLng(),
                             troublePointTmp.getInternalEdgeId());
