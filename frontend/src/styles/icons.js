@@ -17,8 +17,8 @@ export const redLightIcon = new L.Icon({
 });
 
 export const carIcon = new L.Icon({
-  iconUrl: "/images/car.png",
-  iconRetinaUrl: "/images/car.png",
+  iconUrl: "/images/car_top.png",
+  iconRetinaUrl: "/images/car_top.png",
   iconAnchor: [16, 16],
   popupAnchor: [8, 8],
   iconSize: [32, 32],

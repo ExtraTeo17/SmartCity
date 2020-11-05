@@ -1,3 +1,5 @@
+import { useEffect, useRef } from "react";
+
 /* eslint-disable no-restricted-globals */
 function getRandomInt(min, max) {
   // eslint-disable-next-line no-bitwise
@@ -55,3 +57,11 @@ export const setIfValidFloat = (e, min, max, setFunc) => {
 };
 
 export const boolToInt = b => (b ? 1 : 0);
+
+export const usePrevious = value => {
+  const ref = useRef();
+  useEffect(() => {
+    ref.current = value;
+  });
+  return ref.current;
+};
