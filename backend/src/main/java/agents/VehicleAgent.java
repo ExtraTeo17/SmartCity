@@ -42,6 +42,7 @@ public class VehicleAgent extends AbstractAgent {
     private final ITroublePointsConfigContainer configContainer;
     private RouteNode troublePoint;
     private final Set<Integer> trafficJamsEdgeId = new HashSet<>();
+    private final Set<Long> constructionsEdgeId = new HashSet<>();
 
     VehicleAgent(int id, MovingObject vehicle,
                  ITimeProvider timeProvider,
@@ -157,6 +158,11 @@ public class VehicleAgent extends AbstractAgent {
             private void handleConstructionJam(ACLMessage rcv) {
                 Long edgeId = Long.parseLong(rcv.getUserDefinedParameter(MessageParameter.EDGE_ID));
                 logger.info("Got propose to change the route and exclude: " + edgeId);
+                if (constructionsEdgeId.contains(edgeId)) {
+                    logger.info("I'm already notified about construction place on edge: " + edgeId);
+                    return;
+                }
+                constructionsEdgeId.add(edgeId);
                 final Integer indexOfRouteNodeWithEdge = vehicle.findIndexOfEdgeOnRoute(edgeId,
                         THRESHOLD_UNTIL_INDEX_CHANGE);
                 if (indexOfRouteNodeWithEdge != null && indexOfRouteNodeWithEdge != vehicle.getUniformRouteSize() - 1) {
@@ -169,7 +175,12 @@ public class VehicleAgent extends AbstractAgent {
                 logger.info("step 1");
                 if (configContainer.shouldChangeRouteOnTroublePoint()) {
                     logger.info("step shouldChangeRouteOnTroublePoint");
-                    indexAfterWhichRouteChanges = vehicle.getFarOnIndex(THRESHOLD_UNTIL_INDEX_CHANGE);
+                    if(indexOfRouteNodeWithEdge - vehicle.getMoveIndex() > THRESHOLD_UNTIL_INDEX_CHANGE){
+                        indexAfterWhichRouteChanges = vehicle.getFarOnIndex(THRESHOLD_UNTIL_INDEX_CHANGE);
+                    }
+                    else{
+                        indexAfterWhichRouteChanges = vehicle.getMoveIndex();
+                    }
                 }
                 else {
                     logger.info("step indexOfRouteNodeWithEdge max");
@@ -196,6 +207,9 @@ public class VehicleAgent extends AbstractAgent {
                 final RouteMergeInfo mergeResult = routeTransformer.mergeByDistance(vehicle.getSimpleRoute(),
                         newSimpleRouteEnd);
                 mergeResult.newUniformRoute = route;
+
+                logger.info("OLD & NEW"+ oldUniformRoute.size() + "  "+ mergeResult.newUniformRoute.size() );
+
                 return mergeResult;
             }
 
@@ -338,7 +352,7 @@ public class VehicleAgent extends AbstractAgent {
                 public void onTick() {
                     var route = vehicle.getUniformRoute();
 
-                    var el = random.nextInt(route.size() - vehicle.getMoveIndex() + 1)+ vehicle.getMoveIndex(); // TODO: from current index //choose trouble EdgeId
+                    var el = random.nextInt(route.size()  - vehicle.getMoveIndex() + 1)+ vehicle.getMoveIndex() ; // TODO: from current index //choose trouble EdgeId
                     RouteNode troublePointTmp = route.get(el);
                     troublePoint = new RouteNode(troublePointTmp.getLat(), troublePointTmp.getLng(),
                             troublePointTmp.getInternalEdgeId());

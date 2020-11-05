@@ -167,20 +167,25 @@ public class TroubleManagerAgent extends Agent {
         };
         addBehaviour(communication);
 
-        Behaviour sayAboutJam = new TickerBehaviour(this, 2_000 / timeProvider.getTimeScale()) {
+        Behaviour sayAboutTroubles = new TickerBehaviour(this, 2_000 / timeProvider.getTimeScale()) {
             @Override
             protected void onTick() {
                 if (configContainer.getSimulationState() != SimulationState.RUNNING) {
                     return;
                 }
-
+                for (Map.Entry<Integer, String> entry : mapOfConstructionSiteBlockedEdges.entrySet()) {
+                   // construction site
+                    sendBroadcast(generateMessageAboutTrafficJam(entry.getKey(), entry.getValue(),
+                            MessageParameter.CONSTRUCTION, MessageParameter.SHOW));
+                }
                 for (Map.Entry<Integer, String> entry : mapOfLightTrafficJamBlockedEdges.entrySet()) {
+                    //traffic jam
                     sendBroadcast(generateMessageAboutTrafficJam(entry.getKey(), entry.getValue(),
                             MessageParameter.TRAFFIC_JAM, MessageParameter.SHOW));
                 }
             }
         };
-        addBehaviour(sayAboutJam);
+        addBehaviour(sayAboutTroubles);
     }
 
     @Subscribe
