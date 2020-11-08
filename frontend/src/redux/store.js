@@ -16,6 +16,9 @@ import {
   D_EXTEND_WAIT_TIME,
   D_START_TIME,
   D_TIME_SCALE,
+  D_GENERATE_BIKES,
+  D_BIKES_NUM,
+  D_TEST_BIKE,
 } from "../constants/defaults";
 import { StartState } from "./models/startState";
 import appReducer from "./reducers/index";
@@ -33,11 +36,15 @@ const initialState = {
       pedLimit: D_PEDS_NUM,
       testPedId: D_TEST_PED,
 
+      generateCars: D_GENERATE_CARS,
       carsLimit: D_CARS_NUM,
       testCarId: D_TEST_CAR,
-      generateCars: D_GENERATE_CARS,
+
+      generateBikes: D_GENERATE_BIKES,
+      bikesLimit: D_BIKES_NUM,
+      testBikeId: D_TEST_BIKE,
+
       generateTroublePoints: D_GENERATE_TP,
-      changeRouteOnTrafficJam: D_CHANGE_ROUTE_TJ_ACTIVE,
       timeBeforeTrouble: D_TIME_BEFORE_TROUBLE,
 
       startTime: D_START_TIME,
@@ -50,6 +57,7 @@ const initialState = {
       extendWaitTime: D_EXTEND_WAIT_TIME,
 
       changeRouteOnTroublePoint: D_CHANGE_ROUTE_TP_ACTIVE,
+      changeRouteOnTrafficJam: D_CHANGE_ROUTE_TJ_ACTIVE,
     },
   },
   message: {
