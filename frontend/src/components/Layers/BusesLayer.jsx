@@ -1,6 +1,7 @@
 import React from "react";
 import { FeatureGroup } from "react-leaflet";
 import { connect } from "react-redux";
+import busesSelector from "../../redux/selectors/busesSelector";
 
 import Bus from "../Markers/Bus";
 import BusRoute from "../Routes/BusRoute";
@@ -20,9 +21,8 @@ const BusesLayer = props => {
 };
 
 const mapStateToProps = (state /* , ownProps */) => {
-  const { buses } = state.bus;
   return {
-    buses,
+    buses: busesSelector(state),
   };
 };
 

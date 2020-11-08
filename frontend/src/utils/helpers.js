@@ -23,8 +23,8 @@ export const generateRandomColor = (minLight = 0, maxLight = 7) => {
   return `#${result.toString(16)}`;
 };
 
-const precision = 100; // lat and long precsion, boost to 1000 if need be
-const latOffset = 1000; // Anithing above 180 would do
+const precision = 1000; // lat and long precsion, boost to 1000 if need be
+const latOffset = 200; // Anithing above 180 would do
 
 export const getLocationHash = loc => {
   return Number(loc.lat * precision * latOffset) + Number(loc.lng * precision);
