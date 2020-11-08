@@ -65,27 +65,19 @@ export const busHighIcon = new L.Icon({
 });
 
 export const pedestrianIcon = new L.Icon({
-  iconUrl: "/images/pedestrian_small.png",
-  iconRetinaUrl: "/images/pedestrian_small.png",
-  iconAnchor: [12, 12],
-  popupAnchor: [6, 6],
-  iconSize: [24, 24],
+  iconUrl: "/images/pedestrian.png",
+  iconRetinaUrl: "/images/pedestrian.png",
+  popupAnchor: [5, 3],
+  iconAnchor: [10, 7],
+  iconSize: [20, 14],
 });
 
 export const testPedestrianIcon = new L.Icon({
-  iconUrl: "/images/pedestrian_small_blue.png",
-  iconRetinaUrl: "/images/pedestrian_small_blue.png",
-  iconAnchor: [12, 12],
-  popupAnchor: [6, 6],
-  iconSize: [24, 24],
-});
-
-export const bigPedestrianIcon = new L.Icon({
-  iconUrl: "/images/pedestrian.png",
-  iconRetinaUrl: "/images/pedestrian.png",
-  iconAnchor: [16, 16],
-  popupAnchor: [8, 8],
-  iconSize: [32, 32],
+  iconUrl: "/images/test_pedestrian.png",
+  iconRetinaUrl: "/images/test_pedestrian.png",
+  popupAnchor: [5, 4],
+  iconAnchor: [10, 9],
+  iconSize: [20, 19],
 });
 
 export const troublePointIcon = new L.Icon({
