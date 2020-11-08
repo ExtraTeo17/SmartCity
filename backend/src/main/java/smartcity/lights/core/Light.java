@@ -130,7 +130,7 @@ public class Light extends Position {
     }
 
     private boolean trafficJamEmerged() {
-        if (carQueue.size() > TRAFFIC_JAM_THRESHOLD && !trafficJamOngoing) {
+        if (carQueue.size() >= TRAFFIC_JAM_THRESHOLD && !trafficJamOngoing) {
             trafficJamOngoing = true;
             return true;
         }

@@ -24,7 +24,7 @@ public class AgentsModule extends AbstractModule {
     public void configure(Binder binder) {
         super.configure(binder);
         binder.bind(IAgentsFactory.class).to(AgentsFactory.class).in(Singleton.class);
-        binder.bind(AgentsCreator.class).asEagerSingleton();
+        binder.bind(AgentsPreparator.class).asEagerSingleton();
         binder.bind(TroubleManagerAgent.class).in(Singleton.class);
         binder.bind(SingletonAgentsActivator.class).asEagerSingleton();
     }
