@@ -1,12 +1,23 @@
-import React from "react";
-import { Marker, Popup } from "react-leaflet";
+import React, { useEffect, useReducer } from "react";
+import { Popup } from "react-leaflet";
+import { BUS_ROTATION_THRESHOLD } from "../../constants/thresholds";
 import { busLowIcon, busMidIcon, busHighIcon } from "../../styles/icons";
 import { BusFillState } from "../Models/BusFillState";
+import { angleFromCoordinates } from "../../utils/helpers";
+import { getRotationReducer } from "./Extensions/reducers";
+import RotatedMarker from "./Extensions/RotatedMarker";
 
 const Bus = props => {
   const {
-    bus: { id, location, fillState },
+    bus: { id, route, location, fillState },
   } = props;
+
+  const defaultAngle = route ? angleFromCoordinates(route[0], route[1]) : 0;
+  const [state, dispatch] = useReducer(getRotationReducer(BUS_ROTATION_THRESHOLD), { loc: location, angle: defaultAngle });
+
+  useEffect(() => {
+    dispatch({ payload: location });
+  }, [location]);
 
   function getIcon() {
     switch (fillState) {
@@ -24,9 +35,9 @@ const Bus = props => {
   }
 
   return (
-    <Marker position={location} icon={getIcon()} zIndexOffset={20}>
+    <RotatedMarker rotationAngle={state.angle} rotationOrigin="center" position={state.loc} icon={getIcon()} zIndexOffset={20}>
       <Popup>I am a bus-{id}!</Popup>
-    </Marker>
+    </RotatedMarker>
   );
 };
 

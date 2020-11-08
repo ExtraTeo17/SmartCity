@@ -43,25 +43,25 @@ export const stationIcon = new L.Icon({
 export const busLowIcon = new L.Icon({
   iconUrl: "/images/bus_low.png",
   iconRetinaUrl: "/images/bus_low.png",
-  iconAnchor: [16, 16],
-  popupAnchor: [8, 8],
-  iconSize: [32, 32],
+  popupAnchor: [4, 10],
+  iconAnchor: [9, 21],
+  iconSize: [18, 42],
 });
 
 export const busMidIcon = new L.Icon({
   iconUrl: "/images/bus_mid.png",
   iconRetinaUrl: "/images/bus_mid.png",
-  iconAnchor: [16, 16],
-  popupAnchor: [8, 8],
-  iconSize: [32, 32],
+  popupAnchor: [4, 10],
+  iconAnchor: [9, 21],
+  iconSize: [18, 42],
 });
 
 export const busHighIcon = new L.Icon({
   iconUrl: "/images/bus_high.png",
   iconRetinaUrl: "/images/bus_high.png",
-  iconAnchor: [16, 16],
-  popupAnchor: [8, 8],
-  iconSize: [32, 32],
+  popupAnchor: [4, 10],
+  iconAnchor: [9, 21],
+  iconSize: [18, 42],
 });
 
 export const pedestrianIcon = new L.Icon({
