@@ -17,19 +17,19 @@ export const redLightIcon = new L.Icon({
 });
 
 export const carIcon = new L.Icon({
-  iconUrl: "/images/car_top.png",
-  iconRetinaUrl: "/images/car_top.png",
-  iconAnchor: [16, 16],
-  popupAnchor: [8, 8],
-  iconSize: [32, 32],
+  iconUrl: "/images/car.png",
+  iconRetinaUrl: "/images/car.png",
+  iconAnchor: [8, 16],
+  popupAnchor: [4, 8],
+  iconSize: [16, 32],
 });
 
 export const testCarIcon = new L.Icon({
   iconUrl: "/images/test_car.png",
   iconRetinaUrl: "/images/test_car.png",
-  iconAnchor: [16, 16],
-  popupAnchor: [8, 8],
-  iconSize: [32, 32],
+  iconAnchor: [8, 16],
+  popupAnchor: [4, 8],
+  iconSize: [16, 32],
 });
 
 export const stationIcon = new L.Icon({

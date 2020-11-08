@@ -77,7 +77,6 @@ const message = (state = initialState, action) => {
     case TROUBLE_POINT_VANISHED: {
       const id = action.payload;
 
-      console.log(`Handling tp-hide: ${id}`);
       return { ...state, troublePoints: state.troublePoints.filter(tp => tp.id !== id) };
     }
 
