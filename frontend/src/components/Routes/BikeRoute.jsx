@@ -6,7 +6,7 @@ import { COLORS_NUMBER, DEFAULT_WEIGHT } from "./constants";
 
 const pathColors = new Map();
 for (let pathsIter = 0; pathsIter < COLORS_NUMBER; ++pathsIter) {
-  pathColors.set(pathsIter, generateRandomColor());
+  pathColors.set(pathsIter, generateRandomColor(5, 0xb));
 }
 
 const BikeRoute = props => {

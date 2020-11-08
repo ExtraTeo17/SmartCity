@@ -3,7 +3,7 @@ import { Popup } from "react-leaflet";
 import { CAR_ROTATION_THRESHOLD } from "../../constants/thresholds";
 import { carIcon, testCarIcon } from "../../styles/icons";
 import { angleFromCoordinates } from "../../utils/helpers";
-import RotatedMarker from "./RotatedMarker";
+import RotatedMarker from "./Extensions/RotatedMarker";
 
 function rotationReducer(state = { loc: 0, angle: 0 }, action) {
   const newLocation = action.payload;
