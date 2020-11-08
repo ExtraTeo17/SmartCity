@@ -23,7 +23,7 @@ const CityMap = ({ center, wasStarted }) => {
   const [zoom, setZoom] = useState(D_ZOOM);
 
   useEffect(() => {
-    console.log("Rendered!");
+    console.info("Rendered whole map!");
   });
 
   function setCenter(latlng) {
