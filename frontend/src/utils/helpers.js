@@ -65,3 +65,33 @@ export const usePrevious = value => {
   });
   return ref.current;
 };
+
+function degToRad(degrees) {
+  return degrees * (Math.PI / 180);
+}
+
+function radToDeg(rad) {
+  return rad * (180 / Math.PI);
+}
+
+// https://stackoverflow.com/a/18738281/6841224
+export const angleFromCoordinates = (loc1, loc2) => {
+  if (!loc1 || !loc2) {
+    return 0;
+  }
+
+  const lat1Rad = degToRad(loc1.lat);
+  const lat2Rad = degToRad(loc2.lat);
+
+  const dLng = degToRad(loc2.lng - loc1.lng);
+
+  const y = Math.sin(dLng) * Math.cos(lat2Rad);
+  const x = Math.cos(lat1Rad) * Math.sin(lat2Rad) - Math.sin(lat1Rad) * Math.cos(lat2Rad) * Math.cos(dLng);
+
+  let heading = Math.atan2(y, x);
+  heading = radToDeg(heading);
+  heading = (heading + 360) % 360;
+  // heading = 360 - heading; // count degrees counter-clockwise - remove to make clockwise
+
+  return heading;
+};

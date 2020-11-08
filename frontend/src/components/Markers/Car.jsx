@@ -1,25 +1,40 @@
-import React, { useEffect, useState } from "react";
-import { Marker, Popup } from "react-leaflet";
+import React, { useEffect, useReducer } from "react";
+import { Popup } from "react-leaflet";
+import { CAR_ROTATION_THRESHOLD } from "../../constants/thresholds";
 import { carIcon, testCarIcon } from "../../styles/icons";
-import { usePrevious } from "../../utils/helpers";
+import { angleFromCoordinates } from "../../utils/helpers";
 import RotatedMarker from "./RotatedMarker";
 
-let i = 0;
+function rotationReducer(state = { loc: 0, angle: 0 }, action) {
+  const newLocation = action.payload;
+  if (state.loc !== newLocation) {
+    const newAngle = angleFromCoordinates(state.loc, newLocation);
+    if (Math.abs(newAngle - state.angle) > CAR_ROTATION_THRESHOLD) {
+      return { loc: newLocation, angle: newAngle };
+    }
+
+    return { ...state, loc: newLocation };
+  }
+
+  return state;
+}
+
 const Car = props => {
   const {
-    car: { id, location, isTestCar },
+    car: { id, route, location, isTestCar },
   } = props;
-  const prevLocation = usePrevious(location);
-  const [loc, setLoc] = useState(location);
+
+  const defaultAngle = route ? angleFromCoordinates(route[0], route[1]) : 0;
+  const [state, dispatch] = useReducer(rotationReducer, { loc: location, angle: defaultAngle });
+
   useEffect(() => {
-    setLoc(location);
-    ++i;
+    dispatch({ payload: location });
   }, [location]);
 
   const icon = isTestCar ? testCarIcon : carIcon;
 
   return (
-    <RotatedMarker rotationAngle={i} position={loc} icon={icon} zIndexOffset={20} style={{ width: 100 }}>
+    <RotatedMarker rotationAngle={state.angle} rotationOrigin="center" position={state.loc} icon={icon} zIndexOffset={20}>
       <Popup>I am a car-{id}!</Popup>
     </RotatedMarker>
   );
