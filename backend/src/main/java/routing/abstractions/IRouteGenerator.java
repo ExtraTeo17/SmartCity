@@ -8,18 +8,26 @@ import routing.nodes.StationNode;
 import java.util.List;
 
 public interface IRouteGenerator {
-    List<RouteNode> generateRouteInfo(IGeoPosition pointA, IGeoPosition pointB, String typeOfVehicle);
+    default List<RouteNode> generateRouteInfo(IGeoPosition pointA, IGeoPosition pointB, String typeOfVehicle) {
+    	return generateRouteInfo(pointA, pointB, typeOfVehicle, false);
+    }
 
-	List<RouteNode> generateRouteInfo(IGeoPosition pointA, IGeoPosition pointB, String typeOfVehicle,
-			boolean bewareOfJammedEdge);
+	default List<RouteNode> generateRouteInfo(IGeoPosition pointA, IGeoPosition pointB, String typeOfVehicle,
+			boolean bewareOfJammedEdge) {
+		return generateRouteInfo(pointA, pointB, null, null, typeOfVehicle, bewareOfJammedEdge);
+	}
 
-	List<RouteNode> generateRouteInfo(IGeoPosition pointA, IGeoPosition pointB, boolean bewareOfJammedEdge);
+	default List<RouteNode> generateRouteInfo(IGeoPosition pointA, IGeoPosition pointB, boolean bewareOfJammedEdge) {
+		return generateRouteInfo(pointA, pointB, null, null, "car", bewareOfJammedEdge);
+	}
 
 	List<RouteNode> generateRouteInfo(IGeoPosition pointA, IGeoPosition pointB, String startingOsmNodeRef,
 			String finishingOsmNodeRef, String typeOfVehicle, boolean bewareOfJammedEdge);
 
-    List<RouteNode> generateRouteForPedestrians(IGeoPosition pointA, IGeoPosition pointB,
-                                                String startingOsmNodeRef, String finishingOsmNodeRef);
+    default List<RouteNode> generateRouteForPedestrians(IGeoPosition pointA, IGeoPosition pointB,
+                                                String startingOsmNodeRef, String finishingOsmNodeRef) {
+    	return generateRouteInfo(pointA, pointB, startingOsmNodeRef, finishingOsmNodeRef, "foot", false);
+    }
 
     List<RouteNode> generateRouteInfoForBuses(List<OSMWay> route, List<StationNode> stationNodes);
 
