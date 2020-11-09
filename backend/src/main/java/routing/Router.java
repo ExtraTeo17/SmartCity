@@ -38,6 +38,11 @@ final class Router implements
         this.nodesContainer = nodesContainer;
         this.cacheWrapper = cacheWrapper;
     }
+    
+    @Override // TODO: check out if new route generation works for BIKES (!!!)
+    public List<RouteNode> generateRouteInfo(IGeoPosition pointA, IGeoPosition pointB, String typeOfVehicle) {
+    	return generateRouteInfo(pointA, pointB, typeOfVehicle, false);
+    }
 
 	@Override // TODO: now with new route generation there is sometimes "failed to get adjacent osmwayid" error, check it out
     public List<RouteNode> generateRouteInfo(IGeoPosition pointA, IGeoPosition pointB,

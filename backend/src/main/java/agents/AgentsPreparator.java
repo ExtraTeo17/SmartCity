@@ -260,8 +260,7 @@ public class AgentsPreparator {
                         ++managersCounter;
                     }
                 }
-            }
-            else {
+            } else {
                 var lights = lightAccessManager.getLightsOfTypeA();
                 for (final OSMNode centerCrossroad : lights) {
                     if (centerCrossroad.determineParentOrientationsTowardsCrossroad()) {
