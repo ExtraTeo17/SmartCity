@@ -57,6 +57,7 @@ public class OptimizationResult {
                                                                     long osmWayId) {
         shouldNotifyCarAboutStartOfTrafficJamOnThisLight = true;
         this.osmWayId = osmWayId;
+        this.jammedLightPosition =jammedLightPosition;
         //TODO: change 2 na liczbe samochodów które przejzdzaja podczas jednego swiatla. Oraz change how long is green and red
         lengthOfJam = Math.floor((numerOfCarsInTheQueue * 1000.0 / defaultExecutionDelay) *
                 ((defaultExecutionDelay + defaultExecutionDelay) +
