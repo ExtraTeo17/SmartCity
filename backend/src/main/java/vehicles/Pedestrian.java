@@ -94,7 +94,8 @@ public class Pedestrian extends MovingObject {
 
     @Override
     public long getAdjacentOsmWayId() {
-        return ((LightManagerNode) uniformRoute.get(moveIndex)).getCrossingOsmId1(); // TODO: remember to consider the crossingosmid2!!!
+        return ((LightManagerNode) uniformRoute.get(moveIndex)).getCrossingOsmId1();
+        // TODO: remember to consider the crossingosmid2!!!
     }
 
     @Override
