@@ -148,7 +148,8 @@ public class BusDataParser implements IBusDataParser {
         }
         
         int lastIndexInZone = wayList.size() - 1;
-        while (!wayList.get(lastIndexInZone).isInZone(zone)) { // TODO: if not accurate enough, consider changing to node.isInZone (node-based)
+        while (!wayList.get(lastIndexInZone).isInZone(zone)) {
+        	// TODO: if not accurate enough, consider changing to node.isInZone (node-based)
         	--lastIndexInZone;
         }
         wayList = wayList.subList(0, lastIndexInZone + 1); // TODO: test
