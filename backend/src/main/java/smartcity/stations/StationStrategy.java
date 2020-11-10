@@ -120,7 +120,7 @@ public class StationStrategy {
                     if(!busesFreeToGo.containsKey(busAgentNameToLine.get(busLine))) {
                         busesFreeToGo.put(busAgentNameToLine.get(busLine),false);
                         toWhichPassengersStrategyWaits.put(busAgentNameToLine.get(busLine), farPassengers);
-                        scheduledArrival.actual = 
+                      //  scheduledArrival.actual =
                     }
                        // logger.info("-----------------WAITING FOR: " + farPassengers.size() + " PASSENGERS------------------");
                         logger.info("------------------NUMBER OF PASSENGERS TO WHICH WE WAIT "+ toWhichPassengersStrategyWaits.get(busAgentNameToLine.get(busLine)).size());
