@@ -167,7 +167,7 @@ public class TroubleManagerAgent extends Agent {
         };
         addBehaviour(communication);
 
-        Behaviour sayAboutTroubles = new TickerBehaviour(this, 2_000 / timeProvider.getTimeScale()) {
+        Behaviour sayAboutTroubles = new TickerBehaviour(this, 2000) {
             @Override
             protected void onTick() {
                 if (configContainer.getSimulationState() != SimulationState.RUNNING) {
