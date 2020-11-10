@@ -1,23 +1,24 @@
 import React from "react";
-import CityMap from "./CityMap";
-import "../styles/App.css";
-import Menu from "./Menu";
+import { Provider } from "react-redux";
 import Notifications from "react-notify-toast";
 
-import { Provider } from "react-redux";
+import CityMap from "./CityMap";
+import "../styles/App.css";
+
 import store from "../redux/store";
+import MenusContainer from "./Menu/MenusContainer";
 
 const App = () => (
   <Provider store={store}>
+    <Notifications />
     <div className="App">
-      <Notifications />
       <header className="App-header">
         <div className="row w-100 main-container">
-          <div className="col-9">
+          <div className="col" onContextMenu={e => e.preventDefault()}>
             <CityMap />
           </div>
-          <div className="col-3">
-            <Menu />
+          <div className="col-3 menu-col">
+            <MenusContainer />
           </div>
         </div>
       </header>

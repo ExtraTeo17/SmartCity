@@ -12,11 +12,15 @@ import org.junit.runner.RunWith;
 import org.mockito.Mockito;
 import org.mockito.junit.MockitoJUnitRunner;
 import osmproxy.elements.OSMStation;
+import routing.abstractions.IRouteGenerator;
+import routing.abstractions.IRouteTransformer;
+import smartcity.config.ConfigContainer;
 import smartcity.lights.abstractions.ICrossroad;
 import smartcity.stations.StationStrategy;
 import vehicles.Bus;
 import vehicles.MovingObject;
 import vehicles.Pedestrian;
+import vehicles.enums.VehicleType;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -26,6 +30,7 @@ import static mocks.TestInstanceCreator.createEventBus;
 import static mocks.TestInstanceCreator.createTimeProvider;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 @RunWith(MockitoJUnitRunner.class)
 class HashAgentsContainerTest {
@@ -60,6 +65,7 @@ class HashAgentsContainerTest {
             agents.add(getBusAgent());
             agents.add(getStationAgent());
             agents.add(getVehicleAgent());
+            agents.add(getBikeAgent());
             agents.add(getLightManagerAgent());
         }
         int agentTypes = agents.size() / agentsPerTypeCount;
@@ -79,13 +85,25 @@ class HashAgentsContainerTest {
     }
 
     PedestrianAgent getPedestrianAgent() {
-        return new PedestrianAgent(idGenerator.get(PedestrianAgent.class), mock(Pedestrian.class),
+        var ped = mock(Pedestrian.class);
+        when(ped.getVehicleType()).thenReturn(VehicleType.PEDESTRIAN.toString());
+        return new PedestrianAgent(idGenerator.get(PedestrianAgent.class), ped,
+                createTimeProvider(), createEventBus());
+    }
+
+    BikeAgent getBikeAgent() {
+        var mov = mock(MovingObject.class);
+        when(mov.getVehicleType()).thenReturn(VehicleType.BIKE.toString());
+        return new BikeAgent(idGenerator.get(BikeAgent.class), mov,
                 createTimeProvider(), createEventBus());
     }
 
     VehicleAgent getVehicleAgent() {
-        return new VehicleAgent(idGenerator.get(VehicleAgent.class), mock(MovingObject.class),
-                createTimeProvider(), createEventBus());
+        var mov = mock(MovingObject.class);
+        when(mov.getVehicleType()).thenReturn(VehicleType.REGULAR_CAR.toString());
+        return new VehicleAgent(idGenerator.get(VehicleAgent.class), mov,
+                createTimeProvider(), mock(IRouteGenerator.class), mock(IRouteTransformer.class),
+                createEventBus(), mock(ConfigContainer.class));
     }
 
     StationAgent getStationAgent() {
@@ -95,7 +113,7 @@ class HashAgentsContainerTest {
 
     LightManagerAgent getLightManagerAgent() {
         return new LightManagerAgent(idGenerator.get(LightManagerAgent.class), mock(ICrossroad.class),
-                createTimeProvider(), createEventBus());
+                createTimeProvider(), createEventBus(), mock(ConfigContainer.class));
     }
 
     BusAgent getBusAgent() {

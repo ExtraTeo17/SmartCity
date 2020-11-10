@@ -1,15 +1,33 @@
 import React from "react";
-import { greenLightIcon } from "../../styles/icons";
 import { Marker, Popup } from "react-leaflet";
+import { greenLightIcon, redLightIcon } from "../../styles/icons";
+import { LightColor } from "../Models/LightColor";
+import "../../styles/Light.css";
 
 const Light = props => {
-  const { location } = props;
+  const { light } = props;
+  const initMarker = ref => {
+    if (ref && light.jammed) {
+      const elem = ref.leafletElement;
+      const htmlElem = elem.getElement();
+      htmlElem.classList.add("jammed");
+    } else if (ref) {
+      const elem = ref.leafletElement;
+      const htmlElem = elem.getElement();
+      htmlElem.classList.remove("jammed");
+    }
+  };
 
   return (
-    <Marker position={location} opacity={0.95} icon={greenLightIcon} zIndexOffset={10}>
-      <Popup>I am a light!</Popup>
+    <Marker
+      ref={initMarker}
+      position={light.location}
+      icon={light.color === LightColor.GREEN ? greenLightIcon : redLightIcon}
+      zIndexOffset={10}
+    >
+      <Popup>I am a light-{light.id}!</Popup>
     </Marker>
   );
 };
 
-export default Light;
+export default React.memo(Light);

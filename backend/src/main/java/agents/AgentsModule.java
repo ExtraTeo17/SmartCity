@@ -2,6 +2,7 @@ package agents;
 
 import agents.abstractions.IAgentsContainer;
 import agents.abstractions.IAgentsFactory;
+import agents.singletons.SingletonAgentsActivator;
 import com.google.inject.Binder;
 import com.google.inject.Inject;
 import com.google.inject.Provides;
@@ -15,14 +16,17 @@ public class AgentsModule extends AbstractModule {
             BusAgent.class,
             LightManagerAgent.class,
             StationAgent.class,
-            PedestrianAgent.class
+            PedestrianAgent.class,
+            BikeAgent.class
     };
 
     @Override
     public void configure(Binder binder) {
         super.configure(binder);
         binder.bind(IAgentsFactory.class).to(AgentsFactory.class).in(Singleton.class);
-        binder.bind(AgentsCreator.class).asEagerSingleton();
+        binder.bind(AgentsPreparator.class).asEagerSingleton();
+        binder.bind(TroubleManagerAgent.class).in(Singleton.class);
+        binder.bind(SingletonAgentsActivator.class).asEagerSingleton();
     }
 
     @Provides

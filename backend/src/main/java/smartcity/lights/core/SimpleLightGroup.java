@@ -1,8 +1,6 @@
 package smartcity.lights.core;
 
-import agents.utilities.LightColor;
-import org.jxmapviewer.viewer.Waypoint;
-import org.jxmapviewer.viewer.WaypointPainter;
+import smartcity.lights.LightColor;
 
 import java.util.*;
 
@@ -16,15 +14,6 @@ class SimpleLightGroup {
         }
     }
 
-    void drawLights(WaypointPainter<Waypoint> painter) {
-        HashSet<Waypoint> set = new HashSet<>();
-        for (Light light : lights) {
-            light.draw(set, painter);
-        }
-
-        painter.setWaypoints(set);
-    }
-
     void switchLights() {
         for (Light light : lights) {
             light.switchLight();
@@ -35,6 +24,8 @@ class SimpleLightGroup {
         Map<Long, Light> lightMap = new HashMap<>();
         for (Light light : lights) {
             lightMap.put(light.getAdjacentWayId(), light);
+            // TODO: consider adding distinct structure for crossing IDs (and crossingOsmId2!!!)
+            lightMap.put(Long.parseLong(light.getAdjacentCrossingOsmId1()), light);
         }
         return lightMap;
     }

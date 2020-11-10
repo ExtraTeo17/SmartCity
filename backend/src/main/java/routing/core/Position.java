@@ -1,12 +1,21 @@
 package routing.core;
 
 import org.jxmapviewer.viewer.GeoPosition;
+import utilities.ForSerialization;
 
+import java.io.Serializable;
 import java.util.Objects;
 
-public class Position implements IGeoPosition {
+public class Position implements IGeoPosition, Serializable {
+    public static final int precisionDigits = 8;
     private final double lat;
     private final double lng;
+
+    @ForSerialization
+    protected Position() {
+        lat = 0;
+        lng = 0;
+    }
 
     protected Position(double lat, double lng) {
         this.lat = lat;
@@ -36,7 +45,7 @@ public class Position implements IGeoPosition {
         if (o == null || getClass() != o.getClass()) {
             return false;
         }
-        
+
         Position position = (Position) o;
         return Double.compare(position.lat, lat) == 0 &&
                 Double.compare(position.lng, lng) == 0;
@@ -45,6 +54,10 @@ public class Position implements IGeoPosition {
     @Override
     public int hashCode() {
         return Objects.hash(lat, lng);
+    }
+
+    public long longHash() {
+        return longHash(this.lat, this.lng);
     }
 
     @Override
@@ -62,5 +75,12 @@ public class Position implements IGeoPosition {
 
     public static Position of(String lat, String lng) {
         return new Position(Double.parseDouble(lat), Double.parseDouble(lng));
+    }
+
+    public static long longHash(double lat, double lng) {
+        var precisionShift = Math.pow(20, precisionDigits);
+
+        // Cantor pairing function :)
+        return (long) (precisionShift * ((lat + lng) / 2 * (lat + lng + 1) + lng));
     }
 }

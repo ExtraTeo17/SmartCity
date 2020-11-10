@@ -1,22 +1,34 @@
 package routing.abstractions;
 
-import com.google.common.annotations.Beta;
 import osmproxy.elements.OSMWay;
-import routing.RouteNode;
-import routing.StationNode;
 import routing.core.IGeoPosition;
+import routing.nodes.RouteNode;
+import routing.nodes.StationNode;
 
 import java.util.List;
 
 public interface IRouteGenerator {
-    List<RouteNode> generateRouteInfo(IGeoPosition pointA, IGeoPosition pointB);
+    default List<RouteNode> generateRouteInfo(IGeoPosition pointA, IGeoPosition pointB, String typeOfVehicle) {
+    	return generateRouteInfo(pointA, pointB, typeOfVehicle, false);
+    }
 
-    // TODO: Merge with function for cars if testing proves they are identical
-    List<RouteNode> generateRouteForPedestrians(IGeoPosition pointA, IGeoPosition pointB);
+	default List<RouteNode> generateRouteInfo(IGeoPosition pointA, IGeoPosition pointB, String typeOfVehicle,
+			boolean bewareOfJammedEdge) {
+		return generateRouteInfo(pointA, pointB, null, null, typeOfVehicle, bewareOfJammedEdge);
+	}
 
-    @Beta
-    List<RouteNode> generateRouteForPedestrians(IGeoPosition pointA, IGeoPosition pointB,
-                                                String startingOsmNodeRef, String finishingOsmNodeRef);
+	default List<RouteNode> generateRouteInfo(IGeoPosition pointA, IGeoPosition pointB, boolean bewareOfJammedEdge) {
+		return generateRouteInfo(pointA, pointB, null, null, "car", bewareOfJammedEdge);
+	}
+
+	List<RouteNode> generateRouteInfo(IGeoPosition pointA, IGeoPosition pointB, String startingOsmNodeRef,
+			String finishingOsmNodeRef, String typeOfVehicle, boolean bewareOfJammedEdge);
+
+    default List<RouteNode> generateRouteForPedestrians(IGeoPosition pointA, IGeoPosition pointB,
+                                                String startingOsmNodeRef, String finishingOsmNodeRef) {
+    	return generateRouteInfo(pointA, pointB, startingOsmNodeRef, finishingOsmNodeRef, "foot", false);
+    }
 
     List<RouteNode> generateRouteInfoForBuses(List<OSMWay> route, List<StationNode> stationNodes);
+
 }

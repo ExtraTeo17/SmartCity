@@ -3,6 +3,7 @@ package agents;
 import agents.abstractions.AbstractAgent;
 import agents.abstractions.IAgentsContainer;
 import com.google.inject.Inject;
+import jade.wrapper.AgentController;
 import jade.wrapper.ContainerController;
 import jade.wrapper.StaleProxyException;
 import org.jetbrains.annotations.NotNull;
@@ -27,11 +28,16 @@ class HashAgentsContainer implements IAgentsContainer {
     }
 
     @Override
-    public boolean tryAdd(@NotNull AbstractAgent agent) {
+    public boolean tryAdd(@NotNull AbstractAgent agent, boolean shouldTryAccept) {
         var type = agent.getClass();
         var collection = getOrThrow(type);
 
-        if (tryAccept(agent)) {
+        if (shouldTryAccept) {
+            if (tryAccept(agent)) {
+                return collection.putIfAbsent(agent.getId(), agent) == null;
+            }
+        }
+        else {
             return collection.putIfAbsent(agent.getId(), agent) == null;
         }
 
@@ -40,10 +46,11 @@ class HashAgentsContainer implements IAgentsContainer {
 
     @Override
     public boolean tryAccept(@NotNull AbstractAgent agent) {
+        AgentController agentController;
         try {
-            controller.acceptNewAgent(agent.getPredictedName(), agent);
+            agentController = controller.acceptNewAgent(agent.getPredictedName(), agent);
         } catch (StaleProxyException e) {
-            logger.warn("Error adding agent", e);
+            logger.warn("Error adding agent: " + agent.getLocalName(), e);
             return false;
         }
 
@@ -93,7 +100,7 @@ class HashAgentsContainer implements IAgentsContainer {
     public <TAgent extends AbstractAgent> Optional<TAgent> remove(Class<TAgent> type, int agentId) {
         var agent = getOrThrow(type).remove(agentId);
         if (agent != null) {
-            agent.doDelete();
+            tryKillAgent(agent);
             return Optional.of(type.cast(agent));
         }
 
@@ -123,15 +130,21 @@ class HashAgentsContainer implements IAgentsContainer {
         }
     }
 
-    private void tryDeleteAll(Collection<AbstractAgent> collection) {
-        for (var agent : collection) {
-            try {
-                agent.doDelete();
-            } catch (Exception e) {
-                logger.warn("Failed to delete agent from container.", e);
-            }
+    private void tryDeleteAll(Collection<AbstractAgent> agents) {
+        for (var agent : agents) {
+            tryKillAgent(agent);
         }
-        collection.clear();
+        agents.clear();
+    }
+
+    private void tryKillAgent(AbstractAgent agent) {
+        try {
+            if (agent.isAlive()) {
+                agent.doDelete();
+            }
+        } catch (Exception e) {
+            logger.warn("Failed to stop agent execution:" + agent.getLocalName(), e);
+        }
     }
 
     private Map<Integer, AbstractAgent> getOrThrow(Class<?> type) {

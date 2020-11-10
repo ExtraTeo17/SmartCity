@@ -7,27 +7,33 @@ import jade.core.behaviours.CyclicBehaviour;
 import jade.core.behaviours.TickerBehaviour;
 import jade.lang.acl.ACLMessage;
 import jade.util.leap.Properties;
-import org.jxmapviewer.JXMapViewer;
-import org.jxmapviewer.painter.Painter;
 import smartcity.ITimeProvider;
 import smartcity.TimeProvider;
+import smartcity.config.ConfigContainer;
 import smartcity.lights.OptimizationResult;
 import smartcity.lights.abstractions.ICrossroad;
 import smartcity.lights.core.Light;
 import smartcity.stations.ArrivalInfo;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+
+import static agents.message.MessageManager.*;
 
 public class LightManagerAgent extends AbstractAgent {
     public static final String name = LightManagerAgent.class.getSimpleName().replace("Agent", "");
-
     private final ICrossroad crossroad;
+    private final Map<String, String> trafficJammedEdgeSet = new HashMap<>();
+    private final ConfigContainer configContainer;
 
     LightManagerAgent(int id, ICrossroad crossroad,
                       ITimeProvider timeProvider,
-                      EventBus eventBus) {
+                      EventBus eventBus,
+                      ConfigContainer configContainer) {
         super(id, name, timeProvider, eventBus);
         this.crossroad = crossroad;
+        this.configContainer = configContainer;
     }
 
     @Override
@@ -35,7 +41,7 @@ public class LightManagerAgent extends AbstractAgent {
         print("I'm a traffic manager.");
         crossroad.startLifetime();
 
-        var switchLights = new TickerBehaviour(this, 100 / TimeProvider.TIME_SCALE) {
+        var notifyCarAboutGreen = new TickerBehaviour(this, 10_000 / timeProvider.getTimeScale()) {
             @Override
             protected void onTick() {
                 //for all Light check
@@ -46,15 +52,70 @@ public class LightManagerAgent extends AbstractAgent {
                 // if queue is empty
                 // apply strategy
                 //for elements in queue (if there are elements in queue, make green)
-                OptimizationResult result = crossroad.requestOptimizations();
-                handleOptimizationResult(result);
+                OptimizationResult result = crossroad.requestOptimizations(configContainer.getExtendLightTime());
+                try {
+                    handleOptimizationResult(result);
+                } catch (Exception e) {
+                    logger.warn("Error handling optimization result", e);
+                }
             }
 
             private void handleOptimizationResult(OptimizationResult result) {
-                List<String> agents = result.carsFreeToProceed();
-                for (String agentName : agents) {
-                    answerCanProceed(agentName);
+                //Expected one agent in the list
+                final List<String> agentsFreeToProceed = result.carsFreeToProceed();
+
+                final String agentStuckInJam = result.getAgentStuckInJam();
+                if (result.shouldNotifyCarAboutStartOfTrafficJamOnThisLight()) {
+                    handleTrafficJams(result, agentStuckInJam);
                 }
+                if (result.shouldNotifyCarAboutStopOfTrafficJamOnThisLight()) {
+                    sendMessageAboutTroubleStopToTroubleManager(result);
+                }
+
+                if (agentsFreeToProceed.size() != 0) {
+                    for (String agentName : agentsFreeToProceed) {
+                        answerCanProceed(agentName);
+                    }
+                }
+            }
+
+            private synchronized void sendMessageAboutTroubleStopToTroubleManager(OptimizationResult result) {
+                // Remember that this solution is based on different agents expected to return the
+                //  same graphhopper edge ID when traffic jam starts and stops
+                ACLMessage msg = createMessage(ACLMessage.INFORM, TroubleManagerAgent.name);
+                Properties properties = createProperties(MessageParameter.LIGHT);
+                properties.setProperty(MessageParameter.TYPEOFTROUBLE, MessageParameter.TRAFFIC_JAM);
+                properties.setProperty(MessageParameter.TROUBLE, MessageParameter.STOP);
+                var jammedLight = result.getJammedLightPosition();
+                properties.setProperty(MessageParameter.TROUBLE_LAT, Double.toString(jammedLight.getLat()));
+                properties.setProperty(MessageParameter.TROUBLE_LON, Double.toString(jammedLight.getLng()));
+                properties.setProperty(MessageParameter.EDGE_ID, trafficJammedEdgeSet.get(String.valueOf(result.getOsmWayId())));
+                trafficJammedEdgeSet.remove(Long.toString(result.getOsmWayId()));
+                msg.setAllUserDefinedParameters(properties);
+                logger.info("Send message to " + TroubleManagerAgent.name + " for request of EdgeID when stopping traffic jam");
+                send(msg);
+            }
+
+            private void handleTrafficJams(OptimizationResult result, String nameOfAgent) {
+                // TODO shouldNotifyCarAboutTrafficJamOnThisLight have an old state to stop the jam
+                // TODO: use result.getJammedLight(...)
+                sendMessageAboutTroubleToVehicle(result, nameOfAgent);
+            }
+
+            private void sendMessageAboutTroubleToVehicle(OptimizationResult result, String nameOfAgent) {
+                // Remember that this solution is based on different agents expected
+                //  to return the same graphhopper edge ID when traffic jam starts and stops
+                ACLMessage msg = createMessage(ACLMessage.PROPOSE, nameOfAgent);
+                Properties properties = createProperties(MessageParameter.LIGHT);
+                properties.setProperty(MessageParameter.TYPEOFTROUBLE, MessageParameter.TRAFFIC_JAM);
+                properties.setProperty(MessageParameter.TROUBLE, MessageParameter.SHOW);
+                properties.setProperty(MessageParameter.LENGTH_OF_JAM, Double.toString(result.getLengthOfJam()));
+                properties.setProperty(MessageParameter.TROUBLE_LAT, Double.toString(result.getJammedLightPosition().getLat()));
+                properties.setProperty(MessageParameter.TROUBLE_LON, Double.toString(result.getJammedLightPosition().getLng()));
+                properties.setProperty(MessageParameter.ADJACENT_OSM_WAY_ID, Long.toString(result.getOsmWayId()));
+                msg.setAllUserDefinedParameters(properties);
+                logger.info("Send message to " + nameOfAgent + " for request of EdgeID when starting traffic jam");
+                send(msg);
             }
 
             private void answerCanProceed(String carName) {
@@ -64,10 +125,10 @@ public class LightManagerAgent extends AbstractAgent {
                 msg.setAllUserDefinedParameters(properties);
                 send(msg);
             }
-
         };
 
         var communicate = new CyclicBehaviour() {
+
             @Override
             public void action() {
                 ACLMessage rcv = receive();
@@ -97,14 +158,11 @@ public class LightManagerAgent extends AbstractAgent {
                 switch (rcv.getPerformative()) {
                     case ACLMessage.INFORM -> {
                         var time = getDateParameter(rcv, MessageParameter.ARRIVAL_TIME);
-                        print(agentName + " is approaching at " + time);
 
                         var arrivalInfo = ArrivalInfo.of(agentName, time);
                         crossroad.addCarToFarAwayQueue(getIntParameter(rcv, MessageParameter.ADJACENT_OSM_WAY_ID), arrivalInfo);
                     }
                     case ACLMessage.REQUEST_WHEN -> {
-                        print(agentName + " is waiting on way " + getIntParameter(rcv,
-                                MessageParameter.ADJACENT_OSM_WAY_ID) + ".");
                         crossroad.removeCarFromFarAwayQueue(getIntParameter(rcv,
                                 MessageParameter.ADJACENT_OSM_WAY_ID), agentName);
                         ACLMessage agree = createMessage(ACLMessage.AGREE, agentName);
@@ -114,8 +172,13 @@ public class LightManagerAgent extends AbstractAgent {
                         crossroad.addCarToQueue(getIntParameter(rcv, MessageParameter.ADJACENT_OSM_WAY_ID), agentName);
                     }
                     case ACLMessage.AGREE -> {
-                        print(agentName + " passed the light.");
                         crossroad.removeCarFromQueue(getIntParameter(rcv, MessageParameter.ADJACENT_OSM_WAY_ID));
+                    }
+                    case ACLMessage.REFUSE -> {
+                        crossroad.removeCarFromFarAwayQueue(getIntParameter(rcv, MessageParameter.ADJACENT_OSM_WAY_ID), agentName);
+                    }
+                    case ACLMessage.CONFIRM -> {
+                        trafficJammedEdgeSet.put(rcv.getUserDefinedParameter(MessageParameter.ADJACENT_OSM_WAY_ID), rcv.getUserDefinedParameter(MessageParameter.EDGE_ID));
                     }
                     default -> logger.info("Wait");
                 }
@@ -127,25 +190,23 @@ public class LightManagerAgent extends AbstractAgent {
                 switch (rcv.getPerformative()) {
                     case ACLMessage.INFORM -> {
                         var time = getDateParameter(rcv, MessageParameter.ARRIVAL_TIME);
-                        print(agentName + " is approaching in " + time);
                         var arrivalInfo = ArrivalInfo.of(agentName, time);
                         crossroad.addPedestrianToFarAwayQueue(getIntParameter(rcv, MessageParameter.ADJACENT_OSM_WAY_ID),
                                 arrivalInfo);
+                        logger.info("Got inform from pedestrian" + rcv.getSender().getLocalName());
                     }
                     case ACLMessage.REQUEST_WHEN -> {
-                        print(agentName + " is waiting on way " + getIntParameter(rcv,
-                                MessageParameter.ADJACENT_OSM_WAY_ID) + ".");
                         crossroad.removePedestrianFromFarAwayQueue(getIntParameter(rcv, MessageParameter.ADJACENT_OSM_WAY_ID),
                                 agentName);
                         ACLMessage agree = createMessage(ACLMessage.AGREE, rcv.getSender());
                         Properties properties = createProperties(MessageParameter.LIGHT);
                         agree.setAllUserDefinedParameters(properties);
                         send(agree);
-                        crossroad.addPedestrianToQueue(getIntParameter(rcv, MessageParameter.ADJACENT_OSM_WAY_ID), agentName
-                        );
+                        crossroad.addPedestrianToQueue(getIntParameter(rcv, MessageParameter.ADJACENT_OSM_WAY_ID), agentName);
+                        logger.info("Got request_when from pedestrian" + rcv.getSender().getLocalName());
                     }
                     case ACLMessage.AGREE -> {
-                        print(agentName + " passed the light.");
+                        logger.info("Got agree from pedestrian" + rcv.getSender().getLocalName());
                         crossroad.removePedestrianFromQueue(getIntParameter(rcv, MessageParameter.ADJACENT_OSM_WAY_ID));
                     }
                     default -> print("Wait");
@@ -153,15 +214,11 @@ public class LightManagerAgent extends AbstractAgent {
             }
         };
 
-        addBehaviour(switchLights);
+        addBehaviour(notifyCarAboutGreen);
         addBehaviour(communicate);
     }
 
     public List<Light> getLights() {
         return crossroad.getLights();
-    }
-
-    public void draw(List<Painter<JXMapViewer>> waypointPainter) {
-        crossroad.draw(waypointPainter);
     }
 }

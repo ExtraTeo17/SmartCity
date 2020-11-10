@@ -2,6 +2,7 @@ package vehicles;
 
 import org.junit.jupiter.api.Test;
 import smartcity.ITimeProvider;
+import vehicles.enums.DrivingState;
 
 import java.time.LocalDateTime;
 

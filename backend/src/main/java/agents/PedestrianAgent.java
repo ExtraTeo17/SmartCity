@@ -3,18 +3,25 @@ package agents;
 import agents.abstractions.AbstractAgent;
 import agents.utilities.MessageParameter;
 import com.google.common.eventbus.EventBus;
+import events.web.pedestrian.PedestrianAgentEnteredBusEvent;
+import events.web.pedestrian.PedestrianAgentLeftBusEvent;
+import events.web.pedestrian.PedestrianAgentUpdatedEvent;
 import jade.core.behaviours.Behaviour;
 import jade.core.behaviours.CyclicBehaviour;
 import jade.core.behaviours.TickerBehaviour;
 import jade.lang.acl.ACLMessage;
 import jade.util.leap.Properties;
-import routing.LightManagerNode;
 import routing.RoutingConstants;
-import routing.StationNode;
+import routing.core.IGeoPosition;
+import routing.nodes.LightManagerNode;
+import routing.nodes.StationNode;
 import smartcity.ITimeProvider;
 import smartcity.SmartCityAgent;
-import vehicles.DrivingState;
 import vehicles.Pedestrian;
+import vehicles.enums.DrivingState;
+
+import static agents.message.MessageManager.createMessage;
+import static agents.message.MessageManager.createProperties;
 
 public class PedestrianAgent extends AbstractAgent {
     public static final String name = PedestrianAgent.class.getSimpleName().replace("Agent", "");
@@ -25,15 +32,16 @@ public class PedestrianAgent extends AbstractAgent {
                     Pedestrian pedestrian,
                     ITimeProvider timeProvider,
                     EventBus eventBus) {
-        super(agentId, name, timeProvider, eventBus);
+        super(agentId, pedestrian.getVehicleType(), timeProvider, eventBus);
         this.pedestrian = pedestrian;
     }
 
-    public boolean isInBus() { return DrivingState.IN_BUS == pedestrian.getState();}
+    public boolean isInBus() { return DrivingState.IN_BUS == pedestrian.getState(); }
 
     @Override
     protected void setup() {
         getNextStation();
+        informLightManager(pedestrian);
 
         pedestrian.setState(DrivingState.MOVING);
         Behaviour move = new TickerBehaviour(this, RoutingConstants.STEP_CONSTANT / pedestrian.getSpeed()) {
@@ -42,8 +50,8 @@ public class PedestrianAgent extends AbstractAgent {
                 if (pedestrian.isAtTrafficLights()) {
                     switch (pedestrian.getState()) {
                         case MOVING:
-                            LightManagerNode light = pedestrian.getCurrentTrafficLightNode();
-                            ACLMessage msg = createMessage(ACLMessage.REQUEST_WHEN, LightManagerAgent.name,
+                            var light = pedestrian.getCurrentTrafficLightNode();
+                            ACLMessage msg = createMessageById(ACLMessage.REQUEST_WHEN, LightManagerAgent.name,
                                     light.getLightManagerId());
                             Properties properties = createProperties(MessageParameter.PEDESTRIAN);
                             properties.setProperty(MessageParameter.ADJACENT_OSM_WAY_ID, Long.toString(pedestrian.getAdjacentOsmWayId()));
@@ -58,7 +66,7 @@ public class PedestrianAgent extends AbstractAgent {
                             break;
                         case PASSING_LIGHT:
                             print("Passing the light.");
-                            pedestrian.move();
+                            move();
                             pedestrian.setState(DrivingState.MOVING);
                             break;
                     }
@@ -67,14 +75,14 @@ public class PedestrianAgent extends AbstractAgent {
                     switch (pedestrian.getState()) {
                         case MOVING:
                             StationNode station = pedestrian.getStartingStation();
-                            ACLMessage msg = createMessage(ACLMessage.REQUEST_WHEN, StationAgent.name, station.getAgentId());
+                            ACLMessage msg = createMessageById(ACLMessage.REQUEST_WHEN, StationAgent.name, station.getAgentId());
                             Properties properties = createProperties(MessageParameter.PEDESTRIAN);
                             properties.setProperty(MessageParameter.DESIRED_BUS_LINE, pedestrian.getPreferredBusLine());
                             properties.setProperty(MessageParameter.ARRIVAL_TIME, timeProvider.getCurrentSimulationTime()
                                     .toString());
                             msg.setAllUserDefinedParameters(properties);
                             send(msg);
-                            print("Send REQUEST_WHEN to Station");
+                           // print("Send REQUEST_WHEN to Station");
 
                             pedestrian.setState(DrivingState.WAITING_AT_STATION);
                             break;
@@ -87,7 +95,7 @@ public class PedestrianAgent extends AbstractAgent {
 
                             break;
                         case PASSING_STATION:
-                            pedestrian.move();
+                            move();
                             pedestrian.setState(DrivingState.MOVING);
                             break;
                     }
@@ -104,7 +112,7 @@ public class PedestrianAgent extends AbstractAgent {
                     doDelete();
                 }
                 else {
-                    pedestrian.move();
+                    move();
                 }
             }
         };
@@ -155,10 +163,9 @@ public class PedestrianAgent extends AbstractAgent {
                             properties.setProperty(MessageParameter.STATION_ID, String.valueOf(pedestrian.getTargetStation()
                                     .getAgentId()));
                             msg.setAllUserDefinedParameters(properties);
-                            pedestrian.setState(DrivingState.IN_BUS);
+                            enterBus();
                             send(msg);
 
-                            // TODO: What's happening here? Why does he use teleportation?
                             while (!pedestrian.isAtStation() && !pedestrian.isAtDestination()) {
                                 pedestrian.move();
                             }
@@ -175,8 +182,7 @@ public class PedestrianAgent extends AbstractAgent {
                             send(response);
 
                             if (!pedestrian.isAtDestination()) {
-                                pedestrian.move();
-                                pedestrian.setState(DrivingState.PASSING_STATION);
+                                quitBus();
                             }
                             informLightManager(pedestrian);
                         }
@@ -189,12 +195,12 @@ public class PedestrianAgent extends AbstractAgent {
         addBehaviour(communication);
     }
 
-    void getNextStation() {
+    private void getNextStation() {
         // finds next station and announces his arrival
         StationNode nextStation = pedestrian.findNextStation();
         pedestrian.setState(DrivingState.MOVING);
         if (nextStation != null) {
-            ACLMessage msg = createMessage(ACLMessage.INFORM, StationAgent.name, nextStation.getAgentId());
+            ACLMessage msg = createMessageById(ACLMessage.INFORM, StationAgent.name, nextStation.getAgentId());
             Properties properties = createProperties(MessageParameter.PEDESTRIAN);
             var currentTime = timeProvider.getCurrentSimulationTime();
             var predictedTime = currentTime.plusNanos(pedestrian.getMillisecondsToNextStation() * 1_000_000);
@@ -205,6 +211,26 @@ public class PedestrianAgent extends AbstractAgent {
             send(msg);
             print("Sent INFORM to Station");
         }
+    }
+
+    private void move() {
+        pedestrian.move();
+        eventBus.post(new PedestrianAgentUpdatedEvent(this.getId(), pedestrian.getPosition()));
+    }
+
+    private void enterBus() {
+        pedestrian.setState(DrivingState.IN_BUS);
+        eventBus.post(new PedestrianAgentEnteredBusEvent(this.getId()));
+    }
+
+    private void quitBus() {
+        pedestrian.move();
+        pedestrian.setState(DrivingState.PASSING_STATION);
+        eventBus.post(new PedestrianAgentLeftBusEvent(this.getId(), pedestrian.getPosition()));
+    }
+
+    public IGeoPosition getPosition() {
+        return pedestrian.getPosition();
     }
 
     public Pedestrian getPedestrian() {
