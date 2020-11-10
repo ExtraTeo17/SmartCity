@@ -55,24 +55,11 @@ public class HighwayAccessor {
 
     public static Pair<List<Long>, List<RouteNode>> getOsmWayIdsAndPointList(double fromLat, double fromLon,
                                                                              double toLat, double toLon,
-                                                                             boolean bewareOfJammedRoutes) {
-
-        GHResponse response = new GHResponse();
-        GHRequest request = new GHRequest(fromLat, fromLon, toLat, toLon).setVehicle("car");
-        String weighting = bewareOfJammedRoutes ? AvoidEdgesRemovableWeighting.NAME : "fastest";
-        request = request.setWeighting(weighting);
-
-        return calculatePaths(request, response);
-    }
-
-    public static Pair<List<Long>, List<RouteNode>> getOsmWayIdsAndPointList(double fromLat, double fromLon,
-                                                                             double toLat, double toLon,
-                                                                             String typeOfVehicle) {
+                                                                             String typeOfVehicle, boolean bewareOfJammedRoutes) {
         GHResponse response = new GHResponse();
         GHRequest request = new GHRequest(fromLat, fromLon, toLat, toLon).setVehicle(typeOfVehicle);
-        request = request.setWeighting("fastest");
-
-
+        String weighting = bewareOfJammedRoutes ? AvoidEdgesRemovableWeighting.NAME : "fastest";
+        request = request.setWeighting(weighting);
         return calculatePaths(request, response);
     }
 

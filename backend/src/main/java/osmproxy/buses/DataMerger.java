@@ -9,12 +9,12 @@ import java.util.*;
 public class DataMerger implements IDataMerger {
     @Override
     public LinkedHashSet<BusInfo> getBusInfosWithStops(Collection<BusInfoData> busInfoDataSet,
-                                                       Map<Long, OSMStation> busStops) {
+                                                       Map<Long, OSMStation> busStopMap) {
         var busInfos = new LinkedHashSet<BusInfo>();
         for (var busInfoData : busInfoDataSet) {
             List<OSMStation> validBusStops = new ArrayList<>(busInfoData.busStopIds.size());
             for (var id : busInfoData.busStopIds) {
-                var station = busStops.get(id);
+                var station = busStopMap.get(id);
                 if (station != null) {
                     // WARN: Station is not copied here - should not be modified in any way
                     validBusStops.add(station);
