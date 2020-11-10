@@ -7,6 +7,7 @@ import events.web.vehicle.VehicleAgentRouteChangedEvent;
 import events.web.vehicle.VehicleAgentUpdatedEvent;
 import jade.core.behaviours.Behaviour;
 import jade.core.behaviours.CyclicBehaviour;
+import jade.core.behaviours.ThreadedBehaviourFactory;
 import jade.core.behaviours.TickerBehaviour;
 import jade.lang.acl.ACLMessage;
 import jade.util.leap.Properties;
@@ -23,6 +24,7 @@ import smartcity.SmartCityAgent;
 import smartcity.config.abstractions.ITroublePointsConfigContainer;
 import vehicles.MovingObject;
 import vehicles.enums.DrivingState;
+import jade.core.behaviours.OneShotBehaviour;
 
 import java.util.*;
 
@@ -188,9 +190,19 @@ public class VehicleAgent extends AbstractAgent {
                             (NO_CONSTRUCTION_SITE_STRATEGY_FACTOR * THRESHOLD_UNTIL_INDEX_CHANGE), 0);
                 }
                 logger.info("step mergeResult");
-                final RouteMergeInfo mergeResult =
-                        createMergedWithOldRouteAlternativeRouteFromIndex(indexAfterWhichRouteChanges, true);
-                updateVehicleRouteAfterMerge(indexAfterWhichRouteChanges, mergeResult);
+                
+                ThreadedBehaviourFactory factory = new ThreadedBehaviourFactory();
+				Behaviour mergeUpdateBehaviour = new OneShotBehaviour() {
+
+					@Override
+					public void action() {
+						final RouteMergeInfo mergeResult = createMergedWithOldRouteAlternativeRouteFromIndex(
+								indexAfterWhichRouteChanges, true);
+						updateVehicleRouteAfterMerge(indexAfterWhichRouteChanges, mergeResult);
+					}
+
+				};
+				addBehaviour(factory.wrap(mergeUpdateBehaviour));
             }
 
             private RouteMergeInfo createMergedWithOldRouteAlternativeRouteFromIndex(final int indexAfterWhichRouteChanges,

@@ -19,6 +19,12 @@ final class RouteTransformer implements
     @SuppressWarnings("FeatureEnvy")
     @Override
     public List<RouteNode> uniformRoute(List<RouteNode> route) {
+    	return route; // TODO: CLEAN UP
+    }
+
+
+	@Override
+	public List<RouteNode> uniformRouteNew(List<RouteNode> route, List<Integer> edgeList) {
         List<RouteNode> newRoute = new ArrayList<>();
         for (int i = 0; i < route.size() - 1; ++i) {
             RouteNode nodeA = route.get(i);
@@ -41,16 +47,24 @@ final class RouteTransformer implements
             for (int p = RoutingConstants.STEP_SIZE_METERS; p < distance; p += RoutingConstants.STEP_SIZE_METERS) {
                 lon = lon + RoutingConstants.STEP_SIZE_METERS * dx;
                 lat = lat + RoutingConstants.STEP_SIZE_METERS * dy;
-                newRoute.add(new RouteNode(lat, lon, nodeA.getInternalEdgeId()));
+                newRoute.add(new RouteNode(lat, lon));
             }
         }
 
         if (route.size() > 0) {
             newRoute.add(route.get(route.size() - 1));
         }
+        
+        double denominator = newRoute.size();
+        for (double nominator = 0; nominator < denominator; ++nominator) {
+        	double percent = nominator / denominator;
+        	long index = Math.round((percent * ((double)(edgeList.size()))));
+        	if ((int)index == edgeList.size()) --index;
+        	newRoute.get((int)nominator).setInternalEdgeId(edgeList.get((int)index));
+        }
 
         return newRoute;
-    }
+	}
 
 
     @Override

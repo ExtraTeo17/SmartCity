@@ -12,6 +12,7 @@ import osmproxy.elements.OSMWay.RouteOrientation;
 import osmproxy.elements.OSMWaypoint;
 import routing.abstractions.INodesContainer;
 import routing.abstractions.IRouteGenerator;
+import routing.abstractions.IRouteTransformer;
 import routing.core.IGeoPosition;
 import routing.nodes.LightManagerNode;
 import routing.nodes.RouteNode;
@@ -29,19 +30,17 @@ final class Router implements
     private final IMapAccessManager mapAccessManager;
     private final INodesContainer nodesContainer;
     private final ICacheWrapper cacheWrapper;
+    private final IRouteTransformer routeTransformer;
 
     @Inject
     public Router(IMapAccessManager mapAccessManager,
                   INodesContainer nodesContainer,
-                  ICacheWrapper cacheWrapper) {
+                  ICacheWrapper cacheWrapper,
+                  IRouteTransformer routeTransformer) {
         this.mapAccessManager = mapAccessManager;
         this.nodesContainer = nodesContainer;
         this.cacheWrapper = cacheWrapper;
-    }
-    
-    @Override // TODO: check out if new route generation works for BIKES (!!!)
-    public List<RouteNode> generateRouteInfo(IGeoPosition pointA, IGeoPosition pointB, String typeOfVehicle) {
-    	return generateRouteInfo(pointA, pointB, typeOfVehicle, false);
+        this.routeTransformer = routeTransformer;
     }
 
 	@Override // TODO: now with new route generation there is sometimes "failed to get adjacent osmwayid" error, check it out
@@ -49,8 +48,8 @@ final class Router implements
             		String startingOsmNodeRef, String finishingOsmNodeRef, String typeOfVehicle,
             		boolean bewareOfJammedEdge) {
 		boolean isCar = typeOfVehicle.equals("car");
-        var osmWayIdsAndPointList = findRoute(pointA, pointB, typeOfVehicle, bewareOfJammedEdge);
-        var osmWayIds = osmWayIdsAndPointList.getValue0();
+        var osmWayIdsAndEdgeList = findRoute(pointA, pointB, typeOfVehicle, bewareOfJammedEdge);
+        var osmWayIds = osmWayIdsAndEdgeList.getValue0();
         var routeInfoOpt = mapAccessManager.getRouteInfo(osmWayIds, isCar); // TODO: refactor inside to throw exception if not car or pedestrian
         if (routeInfoOpt.isEmpty()) {
             logger.warn("Generating route failed because of empty routeInfo");
@@ -59,7 +58,8 @@ final class Router implements
 
         var routeInfo = routeInfoOpt.get();
         routeInfo.determineRouteOrientationsAndFilterRelevantNodes(startingOsmNodeRef, finishingOsmNodeRef);
-        return createRouteNodeList(routeInfo, isCar);
+        var route = createRouteNodeList(routeInfo, isCar);
+        return routeTransformer.uniformRouteNew(route, osmWayIdsAndEdgeList.getValue1());
     }
 
     private List<RouteNode> createRouteNodeList(RouteInfo routeInfo, boolean isCar) {
@@ -144,9 +144,9 @@ final class Router implements
         return true;
     }
 
-    private static Pair<List<Long>, List<RouteNode>> findRoute(IGeoPosition pointA,
+    private static Pair<List<Long>, List<Integer>> findRoute(IGeoPosition pointA,
     		IGeoPosition pointB, String typeOfVehicle, boolean bewareOfJammedEdge) {
-        return osmproxy.HighwayAccessor.getOsmWayIdsAndPointList(pointA.getLat(), pointA.getLng(), pointB.getLat(),
+        return osmproxy.HighwayAccessor.getOsmWayIdsAndEdgeList(pointA.getLat(), pointA.getLng(), pointB.getLat(),
                 pointB.getLng(), typeOfVehicle, bewareOfJammedEdge);
     }
 

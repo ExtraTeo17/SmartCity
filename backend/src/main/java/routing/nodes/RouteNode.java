@@ -19,6 +19,9 @@ public class RouteNode extends Position {
     public RouteNode(IGeoPosition pos) {
         super(pos);
     }
+    
+    
+    public void setInternalEdgeId(int edgeId) { this.internalEdgeId = edgeId; }
 
     public int getInternalEdgeId() { return internalEdgeId;}
 
