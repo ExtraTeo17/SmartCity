@@ -7,8 +7,9 @@ import vehicles.enums.VehicleType;
 import java.util.List;
 
 public class Car extends MovingObject {
+
     public Car(int agentId, List<RouteNode> displayRoute, List<RouteNode> uniformRoute, ITimeProvider timeProvider) {
-        super(timeProvider, agentId, 17, uniformRoute, displayRoute);
+        super(timeProvider, agentId, 75, uniformRoute, displayRoute);
     }
 
     Car(Car car) {

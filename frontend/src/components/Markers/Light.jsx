@@ -3,6 +3,7 @@ import { Marker, Popup } from "react-leaflet";
 import { greenLightIcon, redLightIcon } from "../../styles/icons";
 import { LightColor } from "../Models/LightColor";
 import "../../styles/Light.css";
+import { STATIC_Z_INDEX } from "../../constants/markers";
 
 const Light = props => {
   const { light } = props;
@@ -23,7 +24,7 @@ const Light = props => {
       ref={initMarker}
       position={light.location}
       icon={light.color === LightColor.GREEN ? greenLightIcon : redLightIcon}
-      zIndexOffset={10}
+      zIndexOffset={STATIC_Z_INDEX}
     >
       <Popup>I am a light-{light.id}!</Popup>
     </Marker>

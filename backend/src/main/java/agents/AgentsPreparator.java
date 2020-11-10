@@ -151,11 +151,11 @@ public class AgentsPreparator {
         return busData;
     }
 
-    private List<StationNode> prepareStations(Collection<OSMStation> stationPositions) {
+    private List<StationNode> prepareStations(Collection<OSMStation> stations) {
         int stationsCount = 0;
         List<StationNode> stationNodes = new ArrayList<>();
-        for (var stationPos : stationPositions) {
-            StationAgent agent = factory.create(stationPos);
+        for (var station : stations) {
+            StationAgent agent = factory.create(station);
             boolean result = agentsContainer.tryAdd(agent);
             if (result) {
                 ++stationsCount;
@@ -260,8 +260,7 @@ public class AgentsPreparator {
                         ++managersCounter;
                     }
                 }
-            }
-            else {
+            } else {
                 var lights = lightAccessManager.getLightsOfTypeA();
                 for (final OSMNode centerCrossroad : lights) {
                     if (centerCrossroad.determineParentOrientationsTowardsCrossroad()) {

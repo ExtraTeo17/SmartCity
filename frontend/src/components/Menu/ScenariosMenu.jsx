@@ -23,7 +23,7 @@ const prepareBusZone = () => {
   prepareSimulation({ lat: 52.203342, lng: 20.861213, rad: 300, generatePedestrians: true });
 };
 
-const SetupsMenu = ({ wasStarted }) => {
+const ScenariosMenu = ({ wasStarted }) => {
   return (
     <div className="form-border">
       <button className="btn btn-primary btn-block" type="button" disabled={wasStarted} onClick={prepareCarZone}>
@@ -32,6 +32,7 @@ const SetupsMenu = ({ wasStarted }) => {
       <button className="btn btn-primary btn-block mt-5" type="button" disabled={wasStarted} onClick={prepareBusZone}>
         Prepare bus zone
       </button>
+
       {IS_DEBUG && (
         <button className="btn btn-primary btn-block mt-5" type="button" onClick={ApiManager.debug}>
           Debug
@@ -48,4 +49,4 @@ const mapStateToProps = (state /* , ownProps */) => {
   };
 };
 
-export default connect(mapStateToProps)(React.memo(SetupsMenu));
+export default connect(mapStateToProps)(React.memo(ScenariosMenu));

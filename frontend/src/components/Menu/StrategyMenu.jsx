@@ -17,7 +17,7 @@ import {
 } from "../../constants/defaults";
 
 const StrategyMenu = props => {
-  const { wasStarted, shouldStart } = props;
+  const { wasStarted, shouldStart, generatePedestrians } = props;
   const [lightStrategyActive, setLightStrategyActive] = useState(D_LIGHT_STRATEGY_ACTIVE);
   const [extendLightTime, setExtendLightTime] = useState(D_EXTEND_LIGHT_TIME);
 
@@ -88,35 +88,37 @@ const StrategyMenu = props => {
           </div>
         )}
       </div>
-      <div className="mb-4 form-border">
-        <div className="form-check user-select-none">
-          <input
-            type="checkbox"
-            checked={stationStrategyActive}
-            disabled={wasStarted}
-            className="form-check-input"
-            id="stationStrategyActive"
-            onChange={e => setStationStrategyActive(e.target.checked)}
-          />
-          <label htmlFor="stationStrategyActive" className="form-check-label">
-            Station strategy
-          </label>
-        </div>
-        {stationStrategyActive && (
-          <div className="form-group mt-2">
-            <label htmlFor="extendWaitTime">Bus extension wait time</label>
+      {generatePedestrians && (
+        <div className="mb-4 form-border">
+          <div className="form-check user-select-none">
             <input
-              type="number"
-              defaultValue={extendWaitTime}
+              type="checkbox"
+              checked={stationStrategyActive}
               disabled={wasStarted}
-              className="form-control"
-              id="extendWaitTime"
-              placeholder="Enter bus extension wait time"
-              onChange={evSetWaitExtend}
+              className="form-check-input"
+              id="stationStrategyActive"
+              onChange={e => setStationStrategyActive(e.target.checked)}
             />
+            <label htmlFor="stationStrategyActive" className="form-check-label">
+              Station strategy
+            </label>
           </div>
-        )}
-      </div>
+          {stationStrategyActive && (
+            <div className="form-group mt-2">
+              <label htmlFor="extendWaitTime">Bus extension wait time</label>
+              <input
+                type="number"
+                defaultValue={extendWaitTime}
+                disabled={wasStarted}
+                className="form-control"
+                id="extendWaitTime"
+                placeholder="Enter bus extension wait time"
+                onChange={evSetWaitExtend}
+              />
+            </div>
+          )}
+        </div>
+      )}
 
       <div className="mb-4 form-border">
         <div className="form-check user-select-none">
@@ -155,10 +157,11 @@ const StrategyMenu = props => {
 
 const mapStateToProps = (state /* , ownProps */) => {
   const { wasStarted } = state.message;
-  const { shouldStart } = state.interaction;
+  const { shouldStart, generatePedestrians } = state.interaction;
   return {
     wasStarted,
     shouldStart,
+    generatePedestrians,
   };
 };
 

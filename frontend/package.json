@@ -4,6 +4,7 @@
   "private": true,
   "dependencies": {
     "leaflet": "1.6.0",
+    "leaflet-rotatedmarker": "^0.2.0",
     "moment": "2.29.1",
     "react": "^16.13.1",
     "react-bootstrap": "^1.4.0",

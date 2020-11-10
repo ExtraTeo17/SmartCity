@@ -6,7 +6,7 @@ import Menu from "./Main/Menu";
 import StrategyMenu from "./StrategyMenu";
 import ResultsMenu from "./ResultsMenu";
 import "../../styles/MenusContainer.css";
-import SetupsMenu from "./SetupsMenu";
+import ScenariosMenu from "./ScenariosMenu";
 import LimitsMenu from "./LimitsMenu";
 
 const MenusContainer = ({
@@ -61,8 +61,8 @@ const MenusContainer = ({
         <StrategyMenu />
       </Tab>
       {!wasStarted && (
-        <Tab eventKey="contact" title="Setups">
-          <SetupsMenu />
+        <Tab eventKey="scenarios" title="Scenarios">
+          <ScenariosMenu />
         </Tab>
       )}
       {wasStarted && (

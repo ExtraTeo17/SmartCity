@@ -25,7 +25,7 @@ import {
   bikeKilled,
 } from "./core/actions";
 
-const fps = 15;
+const fps = 20;
 const fpsInterval = 1000 / fps;
 let timer = null;
 

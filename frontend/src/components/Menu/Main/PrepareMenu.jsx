@@ -48,7 +48,7 @@ const PrepareMenu = props => {
           <label htmlFor="lat">Latitude </label>
           <input
             type="number"
-            defaultValue={lat}
+            value={lat}
             className="form-control"
             id="lat"
             step="0.0001"
@@ -63,7 +63,7 @@ const PrepareMenu = props => {
           <label htmlFor="lng">Longitude</label>
           <input
             type="number"
-            defaultValue={lng}
+            value={lng}
             className="form-control"
             id="lng"
             step="0.0001"
@@ -79,7 +79,7 @@ const PrepareMenu = props => {
         <div className="input-group">
           <input
             type="number"
-            defaultValue={rad}
+            value={rad}
             className="form-control"
             id="rad"
             step="10"
