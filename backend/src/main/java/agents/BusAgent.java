@@ -109,6 +109,7 @@ public class BusAgent extends AbstractAgent {
                             Properties properties = createProperties(MessageParameter.BUS);
 
                             var timeOnStation = bus.getTimeOnStation(station.getOsmId());
+                            logger.info("CASE MOVING");
                             timeOnStation.ifPresent(time -> properties.setProperty(MessageParameter.SCHEDULE_ARRIVAL, time
                                     .toString()));
                             properties.setProperty(MessageParameter.ARRIVAL_TIME, timeProvider.getCurrentSimulationTime()
@@ -138,7 +139,7 @@ public class BusAgent extends AbstractAgent {
                 }
                 else if (bus.isAtDestination()) {
                     bus.setState(DrivingState.AT_DESTINATION);
-
+                    logger.info("isAtDestination");
                     ACLMessage msg = createMessage(ACLMessage.INFORM, SmartCityAgent.name);
                     Properties prop = createProperties(MessageParameter.BUS);
                     prop.setProperty(MessageParameter.AT_DESTINATION, String.valueOf(Boolean.TRUE));
@@ -189,11 +190,17 @@ public class BusAgent extends AbstractAgent {
                                 ACLMessage response = createMessage(ACLMessage.AGREE, rcv.getSender());
 
                                 Properties properties = createProperties(MessageParameter.BUS);
+
                                 response.setAllUserDefinedParameters(properties);
                                 send(response);
                                 informNextStation();
                                 bus.setState(DrivingState.PASSING_STATION);
                             }
+                        }
+                        else if (rcv.getPerformative() == ACLMessage.AGREE)
+                        {
+                            logger.info("GOT AGREE from station");
+                            bus.setState(DrivingState.WAITING_AT_STATION);
                         }
                         break;
                     case MessageParameter.PEDESTRIAN:
@@ -231,6 +238,7 @@ public class BusAgent extends AbstractAgent {
 
     private void informNextStation() {
         // finds next station and announces his arrival
+        System.out.println("informNextStation");
         var stationOpt = bus.findNextStation();
         if (stationOpt.isPresent()) {
             var station = stationOpt.get();
