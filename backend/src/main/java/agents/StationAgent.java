@@ -78,7 +78,8 @@ public class StationAgent extends AbstractAgent {
                     var msg = createMessage(ACLMessage.AGREE, rcv.getSender());
                     // TODO: This is send to busAgent without type - won't be handled
                     //  I am not sure if needed
-                    // msg.setAllUserDefinedParameters(createProperties(MessageParameter.STATION));
+                    logger.info("SEND AGREE in answer to REQUEST WHEN");
+                    msg.setAllUserDefinedParameters(createProperties(MessageParameter.STATION));
                     send(msg);
                 }
                 else if (messageKind == ACLMessage.AGREE) {
@@ -106,13 +107,16 @@ public class StationAgent extends AbstractAgent {
                     stationStrategy.addPedestrianToQueue(agentName, desiredBusLine,
                             getDateParameter(rcv, MessageParameter.ARRIVAL_TIME));
 
-                    var msg = createMessage(ACLMessage.REQUEST, rcv.getSender());
+                    stationStrategy.removeFromToWhomWaitMap(agentName,desiredBusLine);
+
+
+                    //var msg = createMessage(ACLMessage.REQUEST, rcv.getSender());
                     // TODO: This is send to pedestrian without type - won't be handled
                     //  But also needs busAgent name parameter or Pedestrian will die
                     //  I am not sure if needed
-                    // var properties = createProperties(MessageParameter.STATION);
-                    // msg.setAllUserDefinedParameters(createProperties(MessageParameter.STATION));
-                    send(msg);
+                   // var properties = createProperties(MessageParameter.STATION);
+                   // msg.setAllUserDefinedParameters(createProperties(MessageParameter.STATION));
+                    //send(msg);
                 }
                 else if (messageKind == ACLMessage.AGREE) {
                     print("-----GET AGREE from PEDESTRIAN------", LoggerLevel.DEBUG);
@@ -154,6 +158,7 @@ public class StationAgent extends AbstractAgent {
             }
 
             private void answerBusCanProceed(String busAgentName) {
+                logger.info("SEND REQUEST");
                 ACLMessage msg = createMessage(ACLMessage.REQUEST, busAgentName);
                 Properties properties = createProperties(MessageParameter.STATION);
                 msg.setAllUserDefinedParameters(properties);
