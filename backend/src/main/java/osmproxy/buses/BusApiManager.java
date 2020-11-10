@@ -59,6 +59,10 @@ public class BusApiManager implements IBusApiManager {
             return Optional.empty();
         }
 
+        if (jsonString.length() == 0) {
+            return Optional.empty();
+        }
+
         ConditionalExecutor.debug(() -> {
             String path = "target/line_" + busLine + "_stop_" + busStopId + "_" + busStopNr + ".json";
             logger.info("Writing bus-brigade-date to: " + path);

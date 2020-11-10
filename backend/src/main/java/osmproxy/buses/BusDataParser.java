@@ -8,6 +8,7 @@ import org.w3c.dom.Document;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
+import osmproxy.BrigadeInfoGenerator;
 import osmproxy.buses.abstractions.IApiSerializer;
 import osmproxy.buses.abstractions.IBusApiManager;
 import osmproxy.buses.abstractions.IBusDataParser;
@@ -37,7 +38,8 @@ public class BusDataParser implements IBusDataParser {
 
     @Inject
     BusDataParser(IDataMerger busDataMerger,
-                  IApiSerializer apiSerializer, IBusApiManager busApiManager,
+                  IApiSerializer apiSerializer,
+                  IBusApiManager busApiManager,
                   IZone zone) {
         this.busDataMerger = busDataMerger;
         this.apiSerializer = apiSerializer;
@@ -65,7 +67,8 @@ public class BusDataParser implements IBusDataParser {
                     throw new RuntimeException("Too much errors when parsing busInfo");
                 }
                 busInfoDataSet.add(busInfoData.get());
-            } else if (nodeName.equals("node")) {
+            }
+            else if (nodeName.equals("node")) {
                 var station = parseNode(osmNode, busStopsMap::containsKey);
                 station.ifPresent(st -> busStopsMap.put(st.getId(), st));
             }
@@ -138,34 +141,35 @@ public class BusDataParser implements IBusDataParser {
         route.add(secondWay);
         String adjacentNodeRef = firstWay.orientateWith(secondWay);
         boolean failedToMatchPreviously = false;
-        
+
         List<OSMWay> wayList = new ArrayList<>();
         while (nodesIter.hasNext()) {
-        	Node wayNode = nodesIter.next();
-        	if (wayNode.getNodeName().equals("way")) {
-        		wayList.add(new OSMWay(wayNode));
-        	}
+            Node wayNode = nodesIter.next();
+            if (wayNode.getNodeName().equals("way")) {
+                wayList.add(new OSMWay(wayNode));
+            }
         }
-        
+
         int lastIndexInZone = wayList.size() - 1;
         while (!wayList.get(lastIndexInZone).isInZone(zone)) {
-        	// TODO: if not accurate enough, consider changing to node.isInZone (node-based)
-        	--lastIndexInZone;
+            // TODO: if not accurate enough, consider changing to node.isInZone (node-based)
+            --lastIndexInZone;
         }
         wayList = wayList.subList(0, lastIndexInZone + 1); // TODO: test
-        
+
         for (final OSMWay way : wayList) {
-	        var referenceOpt = way.reverseTowardsNode(adjacentNodeRef);
-	        if (referenceOpt.isEmpty()) {
-	            logger.debug("Failed to match way: " + way + " with " + adjacentNodeRef);
-	            failedToMatchPreviously = true;
-	            continue;
-	        } else if (failedToMatchPreviously) {
-	            logger.info("Reconnected to way: " + way + " after failed match with " + adjacentNodeRef);
-	        }
-	
-	        adjacentNodeRef = referenceOpt.get();
-	        route.add(way);
+            var referenceOpt = way.reverseTowardsNode(adjacentNodeRef);
+            if (referenceOpt.isEmpty()) {
+                logger.debug("Failed to match way: " + way + " with " + adjacentNodeRef);
+                failedToMatchPreviously = true;
+                continue;
+            }
+            else if (failedToMatchPreviously) {
+                logger.info("Reconnected to way: " + way + " after failed match with " + adjacentNodeRef);
+            }
+
+            adjacentNodeRef = referenceOpt.get();
+            route.add(way);
         }
 
         return route;
@@ -229,17 +233,26 @@ public class BusDataParser implements IBusDataParser {
                 .map(attr -> attr.getNamedItem("v").getNodeValue());
     }
 
-    private Collection<BrigadeInfo> generateBrigadeInfos(String busLine, Collection<OSMStation> osmStations) {
+    private Collection<BrigadeInfo> generateBrigadeInfos(String busLine, List<OSMStation> osmStations) {
         Map<String, BrigadeInfo> brigadeInfoMap = new LinkedHashMap<>();
+        boolean errorOccured = false;
         for (OSMStation station : osmStations) {
             var jsonStringOpt = busApiManager.getBusTimetablesViaWarszawskieAPI(station.getBusStopId(),
                     station.getBusStopNr(), busLine);
             if (jsonStringOpt.isEmpty()) {
-                continue;
+                logger.warn("Empty result from WarszawskieAPI.");
+                errorOccured = true;
+                break;
             }
 
             var jsonString = jsonStringOpt.get();
             var timetableRecords = apiSerializer.serializeTimetables(jsonString);
+            if (timetableRecords.isEmpty()) {
+                logger.warn("No timetables received from WarszawskieAPI.");
+                errorOccured = true;
+                break;
+            }
+
             var brigadeIdToRecords = timetableRecords.stream()
                     .collect(Collectors.groupingBy(record -> record.brigadeId));
             var stationId = station.getId();
@@ -256,6 +269,12 @@ public class BusDataParser implements IBusDataParser {
 
                 ConditionalExecutor.trace(() -> logBrigadeData(brigadeTimeRecords, station, busLine));
             }
+        }
+
+        if (errorOccured) {
+            logger.info("Switching to brigadeInfo generator.");
+            var gen = new BrigadeInfoGenerator();
+            return gen.generate(osmStations);
         }
 
         return brigadeInfoMap.values();

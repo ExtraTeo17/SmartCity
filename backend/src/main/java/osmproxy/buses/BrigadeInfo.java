@@ -25,6 +25,15 @@ public class BrigadeInfo implements Iterable<Timetable>, Serializable {
                 .collect(Collectors.toList());
     }
 
+    BrigadeInfo(String brigadeId,
+                long initialStopId,
+                List<Timetable> initialStopTimetables) {
+        this.brigadeId = brigadeId;
+        this.timetables = initialStopTimestamps.stream()
+                .map(record -> new Timetable(initialStopId, record.timeOnStop))
+                .collect(Collectors.toList());
+    }
+
     public void addTimetableRecords(long stationId, List<TimetableRecord> timetableRecords) {
         if (timetables.size() != timetableRecords.size()) {
             logger.error("Initial timetables size different than current:\n" +
