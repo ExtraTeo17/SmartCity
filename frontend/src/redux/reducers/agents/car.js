@@ -1,4 +1,4 @@
-import { CAR_KILLED, CAR_CREATED, CAR_UPDATED, CAR_ROUTE_CHANGED } from "../core/constants";
+import { CAR_KILLED, CAR_CREATED, CAR_UPDATED, CAR_ROUTE_CHANGED } from "../../core/constants";
 
 // Just for reference - defined in store.js
 const initialState = {

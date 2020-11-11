@@ -26,7 +26,10 @@ import {
   BIKE_KILLED,
   BIKE_UPDATED,
   BIKE_CREATED,
+  CONFIG_REPLACED,
 } from "./constants";
+
+export const configReplaced = createAction(CONFIG_REPLACED);
 
 /**
  * @param {{ lat: number; lng:number; rad:number }} center

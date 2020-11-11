@@ -74,7 +74,7 @@ public class TroubleManagerAgent extends Agent {
     }
 
     private ACLMessage generateMessageAboutTrafficJam(int edgeId, String lengthOfJam, String typeOfTrouble, String showOrStop) {
-        logger.info("Got message about trouble on edge: " + edgeId); // broadcasting to everybody
+        logger.debug("Got message about trouble on edge: " + edgeId); // broadcasting to everybody
         ACLMessage response = new ACLMessage(ACLMessage.PROPOSE);
         Properties properties = createProperties(MessageParameter.TROUBLE_MANAGER);
         properties.setProperty(MessageParameter.EDGE_ID, Long.toString(edgeId));

@@ -85,7 +85,7 @@ const CityMap = ({ center, wasStarted }) => {
 const mapStateToProps = (state /* , ownProps */) => {
   const { interaction, message } = state;
   return {
-    center: interaction.center,
+    center: interaction.prepareSimulationData.center,
     wasStarted: message.wasStarted,
   };
 };

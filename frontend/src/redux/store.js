@@ -22,19 +22,18 @@ import {
   D_RAD,
   D_LNG,
   D_LAT,
+  D_GENERATE_PEDS,
 } from "../constants/defaults";
 import { StartState } from "./models/startState";
 import appReducer from "./reducers/index";
 
 const initialState = {
   interaction: {
-    center: {
-      lat: D_LAT,
-      lng: D_LNG,
-      rad: D_RAD,
-    },
-    generatePedestrians: false,
     shouldStart: StartState.Initial,
+    prepareSimulationData: {
+      center: { lat: D_LAT, lng: D_LNG, rad: D_RAD },
+      generatePedestrians: D_GENERATE_PEDS,
+    },
     startSimulationData: {
       pedLimit: D_PEDS_NUM,
       testPedId: D_TEST_PED,

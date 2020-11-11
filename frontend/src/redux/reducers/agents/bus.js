@@ -1,5 +1,5 @@
-import { BusFillState } from "../../components/Models/BusFillState";
-import { SIMULATION_PREPARED, BUS_UPDATED, BUS_FILL_STATE_UPDATED, BUS_KILLED } from "../core/constants";
+import { BusFillState } from "../../../components/Models/BusFillState";
+import { SIMULATION_PREPARED, BUS_UPDATED, BUS_FILL_STATE_UPDATED, BUS_KILLED } from "../../core/constants";
 
 // Just for reference - defined in store.js
 const initialState = {

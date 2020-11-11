@@ -12,7 +12,7 @@ import "../../../styles/Menu.css";
 import { setIfValidFloat } from "../../../utils/helpers";
 
 const PrepareMenu = props => {
-  const { wasPrepared, wasStarted, generatePedestrians } = props;
+  const { wasPrepared, wasStarted, prepareSimulationData } = props;
 
   const setLat = e => {
     setIfValidFloat(e, LAT_MIN, LAT_MAX, val => dispatch(centerUpdated({ lat: val })));
@@ -31,15 +31,16 @@ const PrepareMenu = props => {
     dispatch(generatePedestriansUpdated(val));
   };
 
+  const prepareSimulation = () => {
+    ApiManager.prepareSimulation(prepareSimulationData);
+  };
+
   let {
     center: { lat, lng, rad },
-  } = props;
+    generatePedestrians,
+  } = prepareSimulationData;
   lat = lat.toFixed(D_DECIMAL_PLACES);
   lng = lng.toFixed(D_DECIMAL_PLACES);
-
-  const prepareSimulation = () => {
-    ApiManager.prepareSimulation({ lat, lng, rad, generatePedestrians });
-  };
 
   return (
     <form className="mb-4 form-border">
@@ -124,12 +125,11 @@ const PrepareMenu = props => {
 
 const mapStateToProps = (state /* , ownProps */) => {
   const { wasPrepared, wasStarted } = state.message;
-  const { center, generatePedestrians } = state.interaction;
+  const { prepareSimulationData } = state.interaction;
   return {
-    center,
+    prepareSimulationData,
     wasPrepared,
     wasStarted,
-    generatePedestrians,
   };
 };
 

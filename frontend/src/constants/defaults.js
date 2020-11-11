@@ -19,6 +19,7 @@ export const D_GENERATE_BIKES = false;
 export const D_BIKES_NUM = 8;
 export const D_TEST_BIKE = 4;
 
+export const D_GENERATE_PEDS = false;
 export const D_PEDS_NUM = 20;
 export const D_TEST_PED = 5;
 
