@@ -27,6 +27,7 @@ class SimpleCrossroad implements ICrossroad {
 
     @SuppressWarnings("MismatchedQueryAndUpdateOfCollection")
     private final Map<Long, Light> wayIdToLightMap;
+    private final List<Light> lightList;
     private int defaultExecutionDelay = -1;
 
     SimpleCrossroad(EventBus eventBus,
@@ -41,12 +42,15 @@ class SimpleCrossroad implements ICrossroad {
             putAll(lightGroups.first.prepareMap());
             putAll(lightGroups.second.prepareMap());
         }};
+        lightList = new ArrayList<>();
+        lightList.addAll(lightGroups.first.prepareList());
+        lightList.addAll(lightGroups.second.prepareList());
     }
 
     @Override
     public void startLifetime() {
         eventBus.register(this);
-        eventBus.post(new SwitchLightsStartEvent(managerId, wayIdToLightMap.values()));
+        eventBus.post(new SwitchLightsStartEvent(managerId, lightList));
     }
 
     @Subscribe
@@ -66,7 +70,7 @@ class SimpleCrossroad implements ICrossroad {
 
         final OptimizationResult result = new OptimizationResult(extendTimeSeconds, defaultExecutionDelay);
         boolean shouldCheckForJams = configContainer.shouldChangeRouteOnTrafficJam();
-        for (Light light : wayIdToLightMap.values()) {
+        for (Light light : lightList) {
 
             if (shouldCheckForJams) {
                 light.checkForTrafficJams(result);
@@ -90,7 +94,7 @@ class SimpleCrossroad implements ICrossroad {
 
     @Override
     public List<Light> getLights() {
-        return new ArrayList<>(wayIdToLightMap.values());
+        return new ArrayList<>(lightList);
     }
 
     private boolean tryConsume(long adjacentWayId, Consumer<Light> consumer) {

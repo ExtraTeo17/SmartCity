@@ -84,12 +84,12 @@ public class VehicleAgent extends AbstractAgent {
                             properties.setProperty(MessageParameter.ADJACENT_OSM_WAY_ID, Long.toString(vehicle.getAdjacentOsmWayId()));
                             msg.setAllUserDefinedParameters(properties);
                             send(msg);
-                            print("Asking LightManager" + light.getLightManagerId() + " for right to passage.");
+                            print("Ask LightManager" + light.getLightManagerId() + " for right to passage.");
                             break;
                         case WAITING_AT_LIGHT:
                             break;
                         case PASSING_LIGHT:
-                            print("Passing");
+                            print("Pass the traffic light");
                             move();
                             vehicle.setState(DrivingState.MOVING);
                             break;
@@ -97,7 +97,7 @@ public class VehicleAgent extends AbstractAgent {
                 }
                 else if (vehicle.isAtDestination()) {
                     vehicle.setState(DrivingState.AT_DESTINATION);
-                    print("Reached destination.");
+                    print("Reach destination");
 
                     ACLMessage msg = createMessage(ACLMessage.INFORM, SmartCityAgent.name);
                     var prop = createProperties(MessageParameter.VEHICLE);
@@ -161,7 +161,7 @@ public class VehicleAgent extends AbstractAgent {
                 Long edgeId = Long.parseLong(rcv.getUserDefinedParameter(MessageParameter.EDGE_ID));
                 logger.info("Got propose to change the route and exclude: " + edgeId);
                 if (constructionsEdgeId.contains(edgeId)) {
-                    logger.info("I'm already notified about construction place on edge: " + edgeId);
+                    logger.info("Already notified about construction place on edge: " + edgeId);
                     return;
                 }
                 constructionsEdgeId.add(edgeId);
@@ -174,22 +174,16 @@ public class VehicleAgent extends AbstractAgent {
 
             private void handleConstructionSiteRouteChange(final int indexOfRouteNodeWithEdge) {
                 int indexAfterWhichRouteChanges;
-                logger.info("step 1");
                 if (configContainer.shouldChangeRouteOnTroublePoint()) {
-                    logger.info("step shouldChangeRouteOnTroublePoint");
-                    if(indexOfRouteNodeWithEdge - vehicle.getMoveIndex() > THRESHOLD_UNTIL_INDEX_CHANGE){
+                    if (indexOfRouteNodeWithEdge - vehicle.getMoveIndex() > THRESHOLD_UNTIL_INDEX_CHANGE){
                         indexAfterWhichRouteChanges = vehicle.getFarOnIndex(THRESHOLD_UNTIL_INDEX_CHANGE);
-                    }
-                    else{
+                    } else {
                         indexAfterWhichRouteChanges = vehicle.getMoveIndex();
                     }
-                }
-                else {
-                    logger.info("step indexOfRouteNodeWithEdge max");
+                } else {
                     indexAfterWhichRouteChanges = Math.max(indexOfRouteNodeWithEdge -
                             (NO_CONSTRUCTION_SITE_STRATEGY_FACTOR * THRESHOLD_UNTIL_INDEX_CHANGE), 0);
                 }
-                logger.info("step mergeResult");
                 
                 ThreadedBehaviourFactory factory = new ThreadedBehaviourFactory();
 				Behaviour mergeUpdateBehaviour = new OneShotBehaviour() {
@@ -220,7 +214,7 @@ public class VehicleAgent extends AbstractAgent {
                         newSimpleRouteEnd);
                 mergeResult.newUniformRoute = route;
 
-                logger.info("OLD & NEW"+ oldUniformRoute.size() + "  "+ mergeResult.newUniformRoute.size() );
+                //logger.info("OLD & NEW"+ oldUniformRoute.size() + "  "+ mergeResult.newUniformRoute.size() );
 
                 return mergeResult;
             }
@@ -280,7 +274,7 @@ public class VehicleAgent extends AbstractAgent {
 
             private void handleTrafficJamsFromTroubleManager(ACLMessage rcv) {
                 if (vehicle.isAtTrafficLights()) {
-                    logger.info("I'm already on the light. I can't change route");
+                    logger.info("Already on the light. Can't change route");
                     return;
                 }
                 int edgeId = Integer.parseInt(rcv.getUserDefinedParameter(MessageParameter.EDGE_ID));
@@ -288,14 +282,14 @@ public class VehicleAgent extends AbstractAgent {
                 boolean jamStart;
                 if (showOrStop.equals(MessageParameter.SHOW)) {
                     if (trafficJamsEdgeId.contains(edgeId)) {
-                        logger.info("I'm already notified about traffic jam on edge: " + edgeId);
+                        logger.info("Already notified about traffic jam on edge: " + edgeId);
                         return;
                     }
                     trafficJamsEdgeId.add(edgeId);
                     jamStart = true;
                 }
                 else {
-                    logger.info("Traffic jam has ended on edge: " + edgeId);
+                    logger.info("Traffic jam end on edge: " + edgeId);
                     trafficJamsEdgeId.remove(edgeId);
                     jamStart = false;
                 }
@@ -320,14 +314,14 @@ public class VehicleAgent extends AbstractAgent {
 
             private void handleLightTrafficJamRouteChange(final int indexAfterWhichRouteChanges,
                                                           final double timeForTheEndWithJam, boolean bewareOfJammedEdge) {
-                logger.info("The traffic light with the jam is on my route, handle it");
+                logger.info("Jammed traffic light on route, handle it");
                 double timeForOfDynamicRoute = 0;
                 final RouteMergeInfo mergeResult = createMergedWithOldRouteAlternativeRouteFromIndex(indexAfterWhichRouteChanges,
                         bewareOfJammedEdge);
                 timeForOfDynamicRoute = vehicle.getMillisecondsFromAToB(vehicle.getMoveIndex(),
                         mergeResult.newUniformRoute.size() - 1);
-                logger.info("=======================timeForOfDynamicRoute" + timeForOfDynamicRoute);
-                logger.info("-----------------------timeForTheEndWithJam" + timeForTheEndWithJam);
+                //logger.info("=======================timeForOfDynamicRoute" + timeForOfDynamicRoute);
+                //logger.info("-----------------------timeForTheEndWithJam" + timeForTheEndWithJam);
                 if (timeForTheEndWithJam > timeForOfDynamicRoute) {
                     logger.info("Trip time through the jam: " + timeForTheEndWithJam + " is longer than alternative route time: "
                             + timeForOfDynamicRoute + ", so route will be changed");
@@ -348,7 +342,7 @@ public class VehicleAgent extends AbstractAgent {
                     Properties properties = createProperties(MessageParameter.VEHICLE);
                     properties.setProperty(MessageParameter.ADJACENT_OSM_WAY_ID, Long.toString(currentManager.getAdjacentWayId()));
                     send(msg);
-                    print("Send REFUSE to LightManager" + currentManager.getLightManagerId());
+                    print("Send refuse to LightManager" + currentManager.getLightManagerId());
                 }
             }
         };
@@ -382,7 +376,7 @@ public class VehicleAgent extends AbstractAgent {
 
                     properties.setProperty(MessageParameter.EDGE_ID, Long.toString(troublePoint.getInternalEdgeId()));
                     msg.setAllUserDefinedParameters(properties);
-                    print(" send message about trouble on " + Long.toString(troublePoint.getInternalEdgeId()));
+                    print("Send message about trouble on edge" + Long.toString(troublePoint.getInternalEdgeId()));
                     send(msg);
                 }
 
@@ -407,7 +401,7 @@ public class VehicleAgent extends AbstractAgent {
                     properties.setProperty(MessageParameter.TROUBLE_LON, Double.toString(troublePoint.getLng()));
                     properties.setProperty(MessageParameter.EDGE_ID, Long.toString(troublePoint.getInternalEdgeId()));
                     msg.setAllUserDefinedParameters(properties);
-                    print("Send message about trouble stop on " + Long.toString(troublePoint.getInternalEdgeId()));
+                    print("Send message about trouble stop on edge " + Long.toString(troublePoint.getInternalEdgeId()));
                     send(msg);
                 }
             };
