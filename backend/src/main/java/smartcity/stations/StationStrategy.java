@@ -2,10 +2,12 @@ package smartcity.stations;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import smartcity.ITimeProvider;
 import smartcity.config.abstractions.IStationConfigContainer;
 import smartcity.lights.OptimizationResult;
 
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -17,13 +19,16 @@ public class StationStrategy {
     private final Logger logger;
     private final int waitPeriodSeconds;
     private final IStationConfigContainer configContainer;
-    private final Map<String,List<String>> toWhichPassengersStrategyWaits = new HashMap<>();
-    private final Map<String,Boolean> busesFreeToGo = new HashMap<>();
+    private final Map<String, List<String>> toWhichPassengersStrategyWaits = new HashMap<>();
+    private final Map<String, Boolean> busesFreeToGo = new HashMap<>();
+    private final ITimeProvider timeProvider;
 
-    public StationStrategy(int managerId, IStationConfigContainer configContainer) {
+
+    public StationStrategy(int managerId, IStationConfigContainer configContainer, ITimeProvider timeProvider) {
         this.logger = LoggerFactory.getLogger(this.getClass().getSimpleName() + managerId);
         this.waitPeriodSeconds = configContainer.getExtendWaitTime();
         this.configContainer = configContainer;
+        this.timeProvider = timeProvider;
     }
 
     // AgentName - Schedule Arrival Time / Arrival Time
@@ -96,63 +101,63 @@ public class StationStrategy {
             var busLine = entry.getKey();
             var scheduledArrival = entry.getValue();
 
-            var scheduledTime = scheduledArrival.scheduled;
+            var scheduledDateTime = scheduledArrival.scheduled;
+            var scheduledTime = LocalTime.of(scheduledDateTime.getHour(), scheduledDateTime.getMinute(), 0, 0);
             var scheduledTimePlusWait = scheduledTime.plusSeconds(waitPeriodSeconds);
-            logger.info("Scheduled time + seconds "+ String.valueOf(scheduledTimePlusWait));
+
             var scheduledTimeMinusWait = scheduledTime.minusSeconds(waitPeriodSeconds);
-            var actualTime = scheduledArrival.actual;
-            logger.info("Actual time: "+String.valueOf(actualTime));
+
+
+            var currentTime = timeProvider.getCurrentSimulationTime();
+
+            var actualTime = LocalTime.of(currentTime.getHour(),
+                    currentTime.getMinute(), 1, 0);   //scheduledArrival.actual;
+            logger.info("Scheduled time + seconds " + String.valueOf(scheduledTimePlusWait));
+
+            logger.info("Actual time: " + String.valueOf(actualTime));
             if (actualTime.isAfter(scheduledTimePlusWait)) {
                 logger.info("------------------BUS WAS LATE-----------------------");
                 List<String> passengersThatCanLeave = getPassengersWhoAreReadyToGo(busLine);
                 result.addBusAndPedestrianGrantedPassthrough(busLine, passengersThatCanLeave);
-            }
-            else if (actualTime.isAfter(scheduledTimeMinusWait) &&
+            } else if (actualTime.isAfter(scheduledTimeMinusWait) &&
                     actualTime.isBefore(scheduledTimePlusWait)) {
                 logger.info("------------------BUS WAS ON TIME-----------------------");
 
 
-                //passengersThatCanLeave.put(busLine,getPassengersWhoAreReadyToGo(busLine));
                 if (configContainer.isStationStrategyActive()) {
-                        var farPassengers = getPassengersWhoAreFar(busLine, scheduledTime.plusSeconds(waitPeriodSeconds));
-                     //  passengersThatCanLeave.addAll(farPassengers);
-
-                    if(!busesFreeToGo.containsKey(busAgentNameToLine.get(busLine))) {
-                        busesFreeToGo.put(busAgentNameToLine.get(busLine),false);
+                    var farPassengers = getPassengersWhoAreFar(busLine, scheduledDateTime.plusSeconds(waitPeriodSeconds));
+                    if (!busesFreeToGo.containsKey(busAgentNameToLine.get(busLine))) {
+                        busesFreeToGo.put(busAgentNameToLine.get(busLine), false);
                         toWhichPassengersStrategyWaits.put(busAgentNameToLine.get(busLine), farPassengers);
-                      //  scheduledArrival.actual =
-                    }
-                       // logger.info("-----------------WAITING FOR: " + farPassengers.size() + " PASSENGERS------------------");
-                        logger.info("------------------NUMBER OF PASSENGERS TO WHICH WE WAIT "+ toWhichPassengersStrategyWaits.get(busAgentNameToLine.get(busLine)).size());
-                        List<String> passengersThatCanLeave = getPassengersWhoAreReadyToGo(busLine);
-                        if(busesFreeToGo.containsKey(busAgentNameToLine.get(busLine)))
-                        {
-                            if (busesFreeToGo.get(busAgentNameToLine.get(busLine))) {
+                        logger.info("INIALISATION OF WAITING");
+                        logger.info("far passangers" + farPassengers.size());
 
-                                result.addBusAndPedestrianGrantedPassthrough(busLine, passengersThatCanLeave);
-                                toWhichPassengersStrategyWaits.remove(busAgentNameToLine.get(busLine));
-                                busesFreeToGo.remove(busAgentNameToLine.get(busLine));
-                            }
-                        }
-                        else if (!busesFreeToGo.containsKey(busAgentNameToLine.get(busLine))
-                                && toWhichPassengersStrategyWaits.get(busAgentNameToLine.get(busLine)).size()==0)
-                        {
-                            logger.info("ZOSTALO 0 toWhichPassengersStrategyWaits");
+                    }
+
+                    logger.info("------------------NUMBER OF PASSENGERS TO WHICH WE WAIT " + toWhichPassengersStrategyWaits.get(busAgentNameToLine.get(busLine)).size());
+                    List<String> passengersThatCanLeave = getPassengersWhoAreReadyToGo(busLine);
+                    if (busesFreeToGo.containsKey(busAgentNameToLine.get(busLine))) {
+                        if (busesFreeToGo.get(busAgentNameToLine.get(busLine))) {
+
                             result.addBusAndPedestrianGrantedPassthrough(busLine, passengersThatCanLeave);
                             toWhichPassengersStrategyWaits.remove(busAgentNameToLine.get(busLine));
+                            busesFreeToGo.remove(busAgentNameToLine.get(busLine));
                         }
+                    } else if (!busesFreeToGo.containsKey(busAgentNameToLine.get(busLine))
+                            && toWhichPassengersStrategyWaits.get(busAgentNameToLine.get(busLine)).size() == 0) {
+                        logger.info("ZOSTALO 0 toWhichPassengersStrategyWaits");
+                        result.addBusAndPedestrianGrantedPassthrough(busLine, passengersThatCanLeave);
+                        toWhichPassengersStrategyWaits.remove(busAgentNameToLine.get(busLine));
+                    }
 
                 }
-               // result.addBusAndPedestrianGrantedPassthrough(busLine, passengersThatCanLeave);
-            }
-            else if (actualTime.isBefore(scheduledTimeMinusWait)) {
-                // TODO: Maybe bus should send message to bus or sth? Or check if simulation_time.now() == scheduled.
-                //  I added it because bus was waiting indefinitely on station
-                List<String> passengersThatCanLeave = getPassengersWhoAreReadyToGo(busLine);
-                result.addBusAndPedestrianGrantedPassthrough(busLine, passengersThatCanLeave);
+
+            } else if (actualTime.isBefore(scheduledTimeMinusWait)) {
+
+                // List<String> passengersThatCanLeave = getPassengersWhoAreReadyToGo(busLine);
+                // result.addBusAndPedestrianGrantedPassthrough(busLine, passengersThatCanLeave);
                 logger.debug("BUS TOO EARLY: scheduled: " + scheduledTimeMinusWait + ", actual: " + actualTime);
-            }
-            else {
+            } else {
                 logger.warn("Undetermined situation for line " + busLine + ", scheduledTime" + scheduledTime +
                         ", actualTime" + actualTime);
             }
@@ -179,19 +184,18 @@ public class StationStrategy {
         }
 
         return arrivalInfos.stream()
-                .filter(info -> info.arrivalTime.isBefore(deadline))
+                .filter(info -> info.arrivalTime.toLocalTime().isBefore(deadline.toLocalTime()))
                 .map(info -> info.agentName)
                 .collect(Collectors.toList());
     }
 
     public void removeFromToWhomWaitMap(String agentName, String desiredBusLine) {
-        if(toWhichPassengersStrategyWaits.containsKey(desiredBusLine))
-        {
+        if (toWhichPassengersStrategyWaits.containsKey(desiredBusLine)) {
             logger.info("DELETE FROM TO WHOM WE WAIT -  QUQUE");
             toWhichPassengersStrategyWaits.get(desiredBusLine).remove(agentName);
             //oWhichPassengersStrategyWaits.put(desiredBusLine, );
-            if(toWhichPassengersStrategyWaits.get(desiredBusLine).size()==0)
-                busesFreeToGo.put(desiredBusLine,true);
+            if (toWhichPassengersStrategyWaits.get(desiredBusLine).size() == 0)
+                busesFreeToGo.put(desiredBusLine, true);
 
         }
 
