@@ -26,6 +26,7 @@ const createSocket = () => {
     MessageHandler.handle(msg);
   };
 
+  // eslint-disable-next-line
   function logMessage(e) {
     console.groupCollapsed("OnMessage");
     console.log(`Message received:${e.data}`);

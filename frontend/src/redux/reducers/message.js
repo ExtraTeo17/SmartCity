@@ -2,6 +2,7 @@ import { notify } from "react-notify-toast";
 import { NOTIFY_SHOW_MS } from "../../constants/global";
 import { LightColor } from "../../components/Models/LightColor";
 import { getResultObj } from "../dataUtils/helpers";
+import { getRandomInt } from "../../utils/helpers";
 import {
   SIMULATION_PREPARED,
   LIGHTS_SWITCHED,
@@ -69,7 +70,8 @@ const message = (state = initialState, action) => {
     }
 
     case TROUBLE_POINT_CREATED: {
-      const troublePoint = action.payload;
+      const isAccident = getRandomInt(0, 1) % 2 === 0;
+      const troublePoint = { ...action.payload, isAccident };
 
       return { ...state, troublePoints: [...state.troublePoints, troublePoint] };
     }

@@ -27,6 +27,7 @@ import { NOTIFY_SHOW_MS } from "../constants/global";
 import Dispatcher from "../redux/Dispatcher";
 import { BusFillState } from "../components/Models/BusFillState";
 
+// eslint-disable-next-line
 function logMessage(payload) {
   console.groupCollapsed("HandledMessage");
   console.log("Message received.");

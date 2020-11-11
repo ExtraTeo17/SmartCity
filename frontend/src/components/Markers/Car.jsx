@@ -19,15 +19,10 @@ const Car = props => {
   }, [location]);
 
   const icon = isTestCar ? testCarIcon : carIcon;
+  const zOffset = isTestCar ? MOVING_Z_INDEX + 1 : MOVING_Z_INDEX;
 
   return (
-    <RotatedMarker
-      rotationAngle={state.angle}
-      rotationOrigin="center"
-      position={state.loc}
-      icon={icon}
-      zIndexOffset={MOVING_Z_INDEX}
-    >
+    <RotatedMarker rotationAngle={state.angle} rotationOrigin="center" position={state.loc} icon={icon} zIndexOffset={zOffset}>
       <Popup>I am a car-{id}!</Popup>
     </RotatedMarker>
   );

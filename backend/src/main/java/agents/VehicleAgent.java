@@ -132,7 +132,7 @@ public class VehicleAgent extends AbstractAgent {
                         case ACLMessage.AGREE -> vehicle.setState(DrivingState.WAITING_AT_LIGHT);
                         case ACLMessage.PROPOSE -> {
                             if (rcv.getUserDefinedParameter(MessageParameter.TYPEOFTROUBLE).equals(MessageParameter.CONSTRUCTION)) {
-                                logger.info("Handle construction jam");
+                                logger.debug("Handle construction jam");
                                 handleConstructionJam(rcv);
                             }
                             else if (rcv.getUserDefinedParameter(MessageParameter.TYPEOFTROUBLE).equals(MessageParameter.TRAFFIC_JAM)) {
@@ -159,9 +159,9 @@ public class VehicleAgent extends AbstractAgent {
 
             private void handleConstructionJam(ACLMessage rcv) {
                 Long edgeId = Long.parseLong(rcv.getUserDefinedParameter(MessageParameter.EDGE_ID));
-                logger.info("Got propose to change the route and exclude: " + edgeId);
+                logger.debug("Got propose to change the route and exclude: " + edgeId);
                 if (constructionsEdgeId.contains(edgeId)) {
-                    logger.info("I'm already notified about construction place on edge: " + edgeId);
+                    logger.debug("I'm already notified about construction place on edge: " + edgeId);
                     return;
                 }
                 constructionsEdgeId.add(edgeId);

@@ -19,15 +19,10 @@ const Bike = props => {
   }, [location]);
 
   const icon = isTestBike ? testBikeIcon : bikeIcon;
+  const zOffset = isTestBike ? MOVING_Z_INDEX + 1 : MOVING_Z_INDEX;
 
   return (
-    <RotatedMarker
-      rotationAngle={state.angle}
-      rotationOrigin="center"
-      position={state.loc}
-      icon={icon}
-      zIndexOffset={MOVING_Z_INDEX}
-    >
+    <RotatedMarker rotationAngle={state.angle} rotationOrigin="center" position={state.loc} icon={icon} zIndexOffset={zOffset}>
       <Popup>I am a bike-{id}!</Popup>
     </RotatedMarker>
   );

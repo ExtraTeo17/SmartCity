@@ -19,6 +19,9 @@ import {
   D_GENERATE_BIKES,
   D_BIKES_NUM,
   D_TEST_BIKE,
+  D_RAD,
+  D_LNG,
+  D_LAT,
 } from "../constants/defaults";
 import { StartState } from "./models/startState";
 import appReducer from "./reducers/index";
@@ -26,9 +29,9 @@ import appReducer from "./reducers/index";
 const initialState = {
   interaction: {
     center: {
-      lat: 52.23698,
-      lng: 21.01766,
-      rad: 130,
+      lat: D_LAT,
+      lng: D_LNG,
+      rad: D_RAD,
     },
     generatePedestrians: false,
     shouldStart: StartState.Initial,

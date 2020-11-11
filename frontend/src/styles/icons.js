@@ -88,6 +88,14 @@ export const troublePointIcon = new L.Icon({
   iconSize: [32, 32],
 });
 
+export const accidentIcon = new L.Icon({
+  iconUrl: "/images/accident.png",
+  iconRetinaUrl: "/images/accident.png",
+  popupAnchor: [8, 8],
+  iconAnchor: [16, 16],
+  iconSize: [32, 32],
+});
+
 export const goldMarkerIcon = new L.Icon({
   iconUrl: "/images/marker-icon-gold.png",
   iconRetinaUrl: "/images/marker-icon-gold.png",

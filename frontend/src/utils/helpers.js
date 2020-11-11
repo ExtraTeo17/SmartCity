@@ -1,10 +1,9 @@
 import { useEffect, useRef } from "react";
 
-/* eslint-disable no-restricted-globals */
-function getRandomInt(min, max) {
+export const getRandomInt = (min, max) => {
   // eslint-disable-next-line no-bitwise
   return (Math.random() * (max - min + 1) + min) | 0;
-}
+};
 
 // https://stackoverflow.com/a/5365036/6841224
 
@@ -23,8 +22,8 @@ export const generateRandomColor = (minLight = 0, maxLight = 7) => {
   return `#${result.toString(16)}`;
 };
 
-const precision = 1000; // lat and long precsion, boost to 1000 if need be
-const latOffset = 200; // Anithing above 180 would do
+const precision = 1000; // lat and long precision, boost to 1000 if need be
+const latOffset = 200; // Anything above 180 would do
 
 export const getLocationHash = loc => {
   return Number(loc.lat * precision * latOffset) + Number(loc.lng * precision);
@@ -40,6 +39,7 @@ export const setValid = htmlELem => {
 
 function setIfValid(elem, parseFunc, min, max, setFunc) {
   const val = parseFunc(elem.value);
+  // eslint-disable-next-line no-restricted-globals
   if (!isNaN(val) && val >= min && val <= max) {
     setValid(elem);
     setFunc(val);
