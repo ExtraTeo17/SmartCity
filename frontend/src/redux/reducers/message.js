@@ -84,7 +84,6 @@ const message = (state = initialState, action) => {
 
     case TRAFFIC_JAM_STARTED: {
       const id = action.payload;
-      console.info(`Jam with ${id} started`);
 
       const newLights = state.lights.map(l => {
         if (l.id === id) {
@@ -98,7 +97,6 @@ const message = (state = initialState, action) => {
 
     case TRAFFIC_JAM_ENDED: {
       const id = action.payload;
-      console.info(`Jam with ${id} finished`);
 
       const newLights = state.lights.map(l => {
         if (l.id === id) {

@@ -29,7 +29,7 @@ const createSocket = () => {
   // eslint-disable-next-line
   function logMessage(e) {
     console.groupCollapsed("OnMessage");
-    console.log(`Message received:${e.data}`);
+    console.info(`Message received:${e.data}`);
     console.groupEnd();
   }
 
@@ -71,7 +71,7 @@ export default {
       payload: JSON.stringify(msgObj.payload),
     };
 
-    console.log(msg.payload);
+    console.info(msg.payload);
     socketContainer.socket.send(JSON.stringify(msg));
 
     console.groupEnd();
