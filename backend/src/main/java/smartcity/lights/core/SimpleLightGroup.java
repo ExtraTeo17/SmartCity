@@ -29,4 +29,12 @@ class SimpleLightGroup {
         }
         return lightMap;
     }
+
+	public Collection<? extends Light> prepareList() {
+		final List<Light> lightList = new ArrayList<>();
+		for (Light light : lights) {
+			lightList.add(light);
+		}
+		return lightList;
+	}
 }
