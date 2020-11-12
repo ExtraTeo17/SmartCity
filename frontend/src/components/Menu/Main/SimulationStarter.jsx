@@ -7,19 +7,19 @@ import ApiManager from "../../../web/ApiManager";
 import "../../../styles/Menu.css";
 import { dispatch } from "../../../redux/store";
 import { shouldStartSimulation } from "../../../redux/core/actions";
-import { StartState } from "../../../redux/models/startState";
+import { StartState } from "../../../redux/models/states";
 
 export const SimulationStarterObj = props => {
-  const { wasPrepared, shouldStart, wasStarted, startSimulationData } = props;
+  const { wasPrepared, startState, wasStarted, startSimulationData } = props;
 
   const startSimulationProceed = () => {
-    if (shouldStart === StartState.Invoke) {
+    if (startState === StartState.Invoke) {
       dispatch(shouldStartSimulation());
-    } else if (shouldStart === StartState.Proceed) {
+    } else if (startState === StartState.Proceed) {
       ApiManager.startSimulation(startSimulationData);
     }
   };
-  useEffect(startSimulationProceed, [shouldStart]);
+  useEffect(startSimulationProceed, [startState]);
 
   const startSimulationInvoke = () => {
     dispatch(shouldStartSimulation());
@@ -44,11 +44,11 @@ export const SimulationStarterObj = props => {
 
 const mapStateToProps = (state /* ownProps */) => {
   const { wasPrepared, wasStarted } = state.message;
-  const { startSimulationData, shouldStart } = state.interaction;
+  const { startSimulationData, startState } = state.interaction;
   return {
     wasPrepared,
     wasStarted,
-    shouldStart,
+    startState,
     startSimulationData,
   };
 };
@@ -58,7 +58,7 @@ export default connect(mapStateToProps)(
     return (
       prevprops.wasPrepared === newProps.wasPrepared &&
       prevprops.wasStarted === newProps.wasStarted &&
-      prevprops.shouldStart === newProps.shouldStart
+      prevprops.startState === newProps.startState
     );
   })
 );

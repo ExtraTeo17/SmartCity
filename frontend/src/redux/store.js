@@ -24,12 +24,13 @@ import {
   D_LAT,
   D_GENERATE_PEDS,
 } from "../constants/defaults";
-import { StartState } from "./models/startState";
+import { StartState, ConfigState } from "./models/states";
 import appReducer from "./reducers/index";
 
 const initialState = {
   interaction: {
-    shouldStart: StartState.Initial,
+    startState: StartState.Initial,
+    configState: ConfigState.Initial,
     prepareSimulationData: {
       center: { lat: D_LAT, lng: D_LNG, rad: D_RAD },
       generatePedestrians: D_GENERATE_PEDS,

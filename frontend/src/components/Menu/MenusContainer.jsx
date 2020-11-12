@@ -20,6 +20,7 @@ const MenusContainer = ({
 }) => {
   const [key, setKey] = useState("main");
   const [limitsClassName, setLimitsClassName] = useState("");
+  const [strategyClassName, setStrategyClassName] = useState("");
 
   useEffect(() => {
     if (wasPrepared) {
@@ -27,24 +28,26 @@ const MenusContainer = ({
     }
   }, [wasPrepared]);
 
-  function createEffect(arg) {
+  function createEffect(arg = false, setFuncArray = []) {
     return () => {
       if (arg) {
-        setLimitsClassName("tab-animate");
+        setFuncArray.forEach(setFunc => setFunc("tab-animate"));
       } else {
-        setLimitsClassName("");
+        setFuncArray.forEach(setFunc => setFunc(""));
       }
     };
   }
 
-  useEffect(createEffect(generatePedestrians), [generatePedestrians]);
-  useEffect(createEffect(generateCars), [generateCars]);
-  useEffect(createEffect(generateBikes), [generateBikes]);
-  useEffect(createEffect(generateTroublePoints), [generateTroublePoints]);
+  useEffect(createEffect(generatePedestrians, [setLimitsClassName, setStrategyClassName]), [generatePedestrians]);
+  useEffect(createEffect(generateCars, [setLimitsClassName, setStrategyClassName]), [generateCars]);
+  useEffect(createEffect(generateBikes, [setLimitsClassName]), [generateBikes]);
+  useEffect(createEffect(generateTroublePoints, [setLimitsClassName, setStrategyClassName]), [generateTroublePoints]);
 
   const onSelect = key => {
     if (key === "limits") {
       setLimitsClassName("");
+    } else if (key === "strategy") {
+      setStrategyClassName("");
     }
     setKey(key);
   };
@@ -57,7 +60,7 @@ const MenusContainer = ({
       <Tab eventKey="limits" title="Limits" tabClassName={limitsClassName}>
         <LimitsMenu />
       </Tab>
-      <Tab eventKey="strategy" title="Strategy">
+      <Tab eventKey="strategy" title="Strategy" tabClassName={strategyClassName}>
         <StrategyMenu />
       </Tab>
       {!wasStarted && (
@@ -78,7 +81,7 @@ const mapStateToProps = (state /* , ownProps */) => {
   const { timeResults, wasPrepared, wasStarted } = state.message;
   const {
     startSimulationData: { generateCars, generateBikes, generateTroublePoints },
-    generatePedestrians,
+    prepareSimulationData: { generatePedestrians },
   } = state.interaction;
 
   return {

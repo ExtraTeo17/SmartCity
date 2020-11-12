@@ -34,12 +34,48 @@ const ScenariosMenu = props => {
     prepareSimulation(state.prepareSimulationData);
   };
 
-  const setupRandomZoneForCars = () => {
+  const prepareRandomZoneForCars = () => {
     const state = config;
     state.prepareSimulationData.center = { lat: 52.24492, lng: 21.08439, rad: 300 };
     state.prepareSimulationData.generatePedestrians = false;
     state.startSimulationData.generateCars = true;
     state.startSimulationData.carsLimit = 10;
+    state.startSimulationData.timeScale = 9;
+    dispatch(configReplaced(state));
+    prepareSimulation(state.prepareSimulationData);
+  };
+
+  const prepareAllInOneZone = () => {
+    const state = config;
+    state.prepareSimulationData.center = { lat: 52.19221, lng: 20.89436, rad: 300 };
+    state.prepareSimulationData.generatePedestrians = true;
+    state.startSimulationData = {
+      pedLimit: 12,
+      testPedId: 2,
+
+      generateCars: true,
+      carsLimit: 5,
+      testCarId: 3,
+
+      generateBikes: true,
+      bikesLimit: 6,
+      testBikeId: 4,
+
+      generateTroublePoints: true,
+      timeBeforeTrouble: 6,
+
+      startTime: new Date(),
+      timeScale: 7,
+
+      lightStrategyActive: true,
+      extendLightTime: 33,
+
+      stationStrategyActive: true,
+      extendWaitTime: 61,
+
+      changeRouteOnTroublePoint: true,
+      changeRouteOnTrafficJam: true,
+    };
     dispatch(configReplaced(state));
     prepareSimulation(state.prepareSimulationData);
   };
@@ -49,12 +85,17 @@ const ScenariosMenu = props => {
       <button className="btn btn-primary btn-block" type="button" disabled={wasStarted} onClick={prepareCarZone}>
         Prepare car zone
       </button>
+
       <button className="btn btn-primary btn-block mt-5" type="button" disabled={wasStarted} onClick={prepareBusZone}>
         Prepare bus zone
       </button>
 
-      <button className="btn btn-light btn-block mt-5" type="button" disabled={wasStarted} onClick={setupRandomZoneForCars}>
-        Setup random zone for cars
+      <button className="btn btn-light btn-block mt-5" type="button" disabled={wasStarted} onClick={prepareRandomZoneForCars}>
+        Prepare random zone for cars
+      </button>
+
+      <button className="btn btn-light btn-block mt-5" type="button" disabled={wasStarted} onClick={prepareAllInOneZone}>
+        Prepare zone for all
       </button>
 
       {IS_DEBUG && (

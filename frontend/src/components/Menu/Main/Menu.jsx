@@ -12,22 +12,30 @@ import PrepareMenu from "./PrepareMenu";
 import GenerationSubMenu from "./GenerationSubMenu";
 import SimulationStarter from "./SimulationStarter";
 import "../../../styles/Menu.css";
-import { StartState } from "../../../redux/models/startState";
+import { ConfigState, StartState } from "../../../redux/models/states";
 import CustomClock from "./CustomClock";
 import { D_START_TIME, D_TIME_SCALE } from "../../../constants/defaults";
 import { TIME_SCALE_MIN, TIME_SCALE_MAX } from "../../../constants/minMax";
 import { setIfValidInt } from "../../../utils/helpers";
 
 const Menu = props => {
-  const { wasStarted, shouldStart } = props;
+  const { configState, startState, wasStarted, timeScaleConfig, timeStartConfig } = props;
   const [startTime, setTime] = useState(D_START_TIME);
   const [timeScale, setTimeScale] = useState(D_TIME_SCALE);
   const onStart = () => {
-    if (shouldStart === StartState.Invoke) {
+    if (startState === StartState.Invoke) {
       dispatch(startSimulationDataUpdated({ startTime, timeScale }));
     }
   };
-  useEffect(onStart, [shouldStart]);
+  useEffect(onStart, [startState]);
+
+  function onReplace() {
+    if (configState !== ConfigState.Initial) {
+      setTimeScale(timeScaleConfig);
+      setTime(timeStartConfig);
+    }
+  }
+  useEffect(onReplace, [configState]);
 
   function evSetTime(newTime) {
     setTime(newTime[0]);
@@ -54,18 +62,18 @@ const Menu = props => {
               time_24hr: true,
               allowInput: true,
               wrap: true,
-              defaultDate: startTime,
+              defaultDate: timeStartConfig,
             }}
             onChange={evSetTime}
           >
             <input type="text" className="form-control" disabled={wasStarted} placeholder="Select Date.." data-input />
           </Flatpickr>
         </div>
-        <div className="form-group mt-2">
+        <div className="form-group mt-2" key={`t-s-${configState}`}>
           <label htmlFor="timeScale">Time scale</label>
           <input
             type="number"
-            defaultValue={timeScale}
+            defaultValue={timeScaleConfig}
             disabled={wasStarted}
             min={TIME_SCALE_MIN}
             max={TIME_SCALE_MAX}
@@ -85,10 +93,17 @@ const Menu = props => {
 
 const mapStateToProps = (state /* , ownProps */) => {
   const { wasStarted } = state.message;
-  const { shouldStart } = state.interaction;
+  const {
+    startState,
+    configState,
+    startSimulationData: { timeScale, startTime },
+  } = state.interaction;
   return {
     wasStarted,
-    shouldStart,
+    startState,
+    configState,
+    timeScaleConfig: timeScale,
+    timeStartConfig: startTime,
   };
 };
 

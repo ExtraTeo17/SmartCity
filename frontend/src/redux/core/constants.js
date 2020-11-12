@@ -1,4 +1,5 @@
 export const CENTER_UPDATED = "Center/UPDATED";
+export const CENTER_MENU_UPDATED = "Center/MENU_UPDATED";
 export const START_SIMULATION_DATA_UPDATED = "StartData/UPDATED";
 export const SHOULD_START_SIMULATION = "Start/SHOULD";
 export const GENERATE_PEDESTRIANS_UPDATED = "GenPed/UPDATED";

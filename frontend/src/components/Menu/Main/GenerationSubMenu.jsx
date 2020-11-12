@@ -25,7 +25,7 @@ const GenerationSubMenu = props => {
   }
 
   return (
-    <>
+    <div>
       <div className="form-check user-select-none">
         <input
           type="checkbox"
@@ -57,7 +57,7 @@ const GenerationSubMenu = props => {
       <div className="form-check user-select-none">
         <input
           type="checkbox"
-          defaultChecked={generateTroublePoints}
+          checked={generateTroublePoints}
           disabled={!generateCars || wasStarted}
           className="form-check-input"
           id="generateTroublePoints"
@@ -67,7 +67,7 @@ const GenerationSubMenu = props => {
           Generate trouble points
         </label>
       </div>
-    </>
+    </div>
   );
 };
 

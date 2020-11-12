@@ -4,8 +4,9 @@ import React from "react";
 import { render, unmountComponentAtNode } from "react-dom";
 import { act } from "react-dom/test-utils";
 import { SimulationStarterObj } from "../components/Menu/Main/SimulationStarter";
-import { StartState } from "../redux/models/startState";
+import { StartState } from "../redux/models/states";
 import { START_SIMULATION_REQUEST } from "../web/MessageType";
+// eslint-disable-next-line no-unused-vars
 import WebServer from "../web/WebServer";
 
 let message;
@@ -63,7 +64,7 @@ it("Passes correct data to ApiManager", async () => {
   act(() => {
     render(
       <SimulationStarterObj
-        shouldStart={StartState.Proceed}
+        startState={StartState.Proceed}
         startSimulationData={startSimulationData}
         wasPrepared
         wasStarted={false}

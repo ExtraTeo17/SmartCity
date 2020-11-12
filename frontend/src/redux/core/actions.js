@@ -4,6 +4,7 @@ import {
   CAR_UPDATED,
   CAR_CREATED,
   CENTER_UPDATED,
+  CENTER_MENU_UPDATED,
   SIMULATION_PREPARED,
   SIMULATION_STARTED,
   LIGHTS_SWITCHED,
@@ -35,6 +36,8 @@ export const configReplaced = createAction(CONFIG_REPLACED);
  * @param {{ lat: number; lng:number; rad:number }} center
  */
 export const centerUpdated = createAction(CENTER_UPDATED);
+
+export const centerMenuUpdated = createAction(CENTER_MENU_UPDATED);
 
 export const startSimulationDataUpdated = createAction(START_SIMULATION_DATA_UPDATED);
 

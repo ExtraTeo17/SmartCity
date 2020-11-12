@@ -4,6 +4,7 @@ import {
   SHOULD_START_SIMULATION,
   START_SIMULATION_DATA_UPDATED,
   CONFIG_REPLACED,
+  CENTER_MENU_UPDATED,
 } from "../core/constants";
 import {
   D_CHANGE_ROUTE_TP_ACTIVE,
@@ -29,11 +30,12 @@ import {
   D_RAD,
   D_GENERATE_PEDS,
 } from "../../constants/defaults";
-import { StartState } from "../models/startState";
+import { StartState, ConfigState, getNextConfigState, getNextStartState } from "../models/states";
 
 // Just for reference - defined in store.js
 export const initialInteractionState = {
-  shouldStart: StartState.Initial,
+  startState: StartState.Initial,
+  configState: ConfigState.Initial,
   prepareSimulationData: {
     center: { lat: D_LAT, lng: D_LNG, rad: D_RAD },
     generatePedestrians: D_GENERATE_PEDS,
@@ -67,24 +69,20 @@ export const initialInteractionState = {
   },
 };
 
-function getNextState(oldState) {
-  switch (oldState) {
-    case StartState.Initial:
-      return StartState.Invoke;
-    case StartState.Invoke:
-      return StartState.Proceed;
-
-    default:
-      return StartState.Initial;
-  }
-}
-
-/**
- * @param {{ type: any; payload: { center: { lat: number; lng: number; rad: number}; }; }} action
- */
 const interaction = (state = initialInteractionState, action) => {
   switch (action.type) {
     case CENTER_UPDATED: {
+      const center = action.payload;
+      const oldData = state.prepareSimulationData;
+      return {
+        ...state,
+        configState: getNextConfigState(state.configState),
+        prepareSimulationData: { ...oldData, center: { ...oldData.center, ...center } },
+      };
+    }
+
+    // To avoid re-rendering of prepare-menu components
+    case CENTER_MENU_UPDATED: {
       const center = action.payload;
       const oldData = state.prepareSimulationData;
       return {
@@ -104,8 +102,8 @@ const interaction = (state = initialInteractionState, action) => {
     }
 
     case SHOULD_START_SIMULATION: {
-      const newState = getNextState(state.shouldStart);
-      return { ...state, shouldStart: newState };
+      const newState = getNextStartState(state.startState);
+      return { ...state, startState: newState };
     }
 
     case CONFIG_REPLACED: {
@@ -114,7 +112,7 @@ const interaction = (state = initialInteractionState, action) => {
       console.info(newConfig);
       console.groupEnd();
 
-      return { ...newConfig };
+      return { ...newConfig, configState: getNextConfigState(state.configState) };
     }
 
     default:
