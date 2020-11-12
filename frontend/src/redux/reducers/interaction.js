@@ -30,12 +30,11 @@ import {
   D_RAD,
   D_GENERATE_PEDS,
 } from "../../constants/defaults";
-import { StartState, ConfigState, getNextConfigState, getNextStartState } from "../models/states";
+import { ConfigState, getNextConfigState } from "../models/states";
 import { storageKey } from "../../constants/global";
 
 // Just for reference - defined in store.js
 export const initialInteractionState = {
-  startState: StartState.Initial,
   configState: ConfigState.Initial,
   prepareSimulationData: {
     center: { lat: D_LAT, lng: D_LNG, rad: D_RAD },
@@ -103,13 +102,10 @@ const interaction = (state = initialInteractionState, action) => {
     }
 
     case SHOULD_START_SIMULATION: {
-      const newState = getNextStartState(state.startState);
-      if (newState === StartState.Proceed) {
-        console.info("Saving data to localStorage");
-        localStorage.setItem(storageKey, JSON.stringify(state.startSimulationData));
-      }
+      console.info("Saving data to localStorage");
+      localStorage.setItem(storageKey, JSON.stringify(state.startSimulationData));
 
-      return { ...state, startState: newState };
+      return state;
     }
 
     case CONFIG_REPLACED: {

@@ -1,6 +1,6 @@
 /* eslint-disable no-restricted-globals */
 import { connect } from "react-redux";
-import React, { useEffect, useState } from "react";
+import React from "react";
 import { dispatch } from "../../redux/store";
 import { startSimulationDataUpdated } from "../../redux/core/actions";
 
@@ -17,75 +17,30 @@ import {
   TEST_ID_MAX,
 } from "../../constants/minMax";
 
-import { ConfigState, StartState } from "../../redux/models/states";
 import "../../styles/Menu.css";
 import { setIfValidInt } from "../../utils/helpers";
-import {
-  D_PEDS_NUM,
-  D_TEST_PED,
-  D_CARS_NUM,
-  D_TEST_CAR,
-  D_BIKES_NUM,
-  D_TEST_BIKE,
-  D_TIME_BEFORE_TROUBLE,
-} from "../../constants/defaults";
 
 const LimitsMenu = props => {
   const {
     configState,
-    startState,
     wasStarted,
     generatePedestrians,
     generateCars,
     generateBikes,
     generateTroublePoints,
-    startSimulationData,
+    startSimulationData: {
+      pedLimit,
+      testPedId,
+
+      carsLimit,
+      testCarId,
+
+      bikesLimit,
+      testBikeId,
+
+      timeBeforeTrouble,
+    },
   } = props;
-  const [pedLimit, setPedLimit] = useState(startSimulationData.pedLimit);
-  const [testPedId, setTestPedId] = useState(D_TEST_PED);
-
-  const [carsLimit, setCarsLimit] = useState(D_CARS_NUM);
-  const [testCarId, setTestCarId] = useState(D_TEST_CAR);
-
-  const [bikesLimit, setBikesLimit] = useState(D_BIKES_NUM);
-  const [testBikeId, setTestBikeId] = useState(D_TEST_BIKE);
-
-  const [timeBeforeTrouble, setTimeBeforeTrouble] = useState(D_TIME_BEFORE_TROUBLE);
-
-  function onStart() {
-    if (startState === StartState.Invoke) {
-      dispatch(
-        startSimulationDataUpdated({
-          carsLimit,
-          testCarId,
-
-          bikesLimit,
-          testBikeId,
-
-          timeBeforeTrouble,
-          pedLimit,
-          testPedId,
-        })
-      );
-    }
-  }
-  useEffect(onStart, [startState]);
-
-  function onReplace() {
-    if (configState !== ConfigState.Initial) {
-      setPedLimit(startSimulationData.pedLimit);
-      setTestPedId(startSimulationData.testPedId);
-
-      setCarsLimit(startSimulationData.carsLimit);
-      setTestCarId(startSimulationData.testCarId);
-
-      setBikesLimit(startSimulationData.bikesLimit);
-      setTestBikeId(startSimulationData.testBikeId);
-
-      setTimeBeforeTrouble(startSimulationData.timeBeforeTrouble);
-    }
-  }
-  useEffect(onReplace, [configState]);
 
   function evSetPedsLimit(e) {
     setIfValidInt(e, PED_MIN, PED_MAX, val => dispatch(startSimulationDataUpdated({ pedLimit: val })));
@@ -96,23 +51,25 @@ const LimitsMenu = props => {
   }
 
   function evSetCarsLimit(e) {
-    setIfValidInt(e, CAR_MIN, CAR_MAX, setCarsLimit);
+    setIfValidInt(e, CAR_MIN, CAR_MAX, val => dispatch(startSimulationDataUpdated({ carsLimit: val })));
   }
 
   function evSetTestCarId(e) {
-    setIfValidInt(e, TEST_ID_MIN, TEST_ID_MAX, setTestCarId);
+    setIfValidInt(e, TEST_ID_MIN, TEST_ID_MAX, val => dispatch(startSimulationDataUpdated({ testCarId: val })));
   }
 
   function evSetBikesLimit(e) {
-    setIfValidInt(e, BIKE_MIN, BIKE_MAX, setBikesLimit);
+    setIfValidInt(e, BIKE_MIN, BIKE_MAX, val => dispatch(startSimulationDataUpdated({ bikesLimit: val })));
   }
 
   function evSetTestBikeId(e) {
-    setIfValidInt(e, TEST_ID_MIN, TEST_ID_MAX, setTestBikeId);
+    setIfValidInt(e, TEST_ID_MIN, TEST_ID_MAX, val => dispatch(startSimulationDataUpdated({ testBikeId: val })));
   }
 
   function evSetTimeBeforeTrouble(e) {
-    setIfValidInt(e, TIME_BEFORE_TP_MIN, TIME_BEFORE_TP_MAX, setTimeBeforeTrouble);
+    setIfValidInt(e, TIME_BEFORE_TP_MIN, TIME_BEFORE_TP_MAX, val =>
+      dispatch(startSimulationDataUpdated({ timeBeforeTrouble: val }))
+    );
   }
 
   return (
@@ -129,7 +86,7 @@ const LimitsMenu = props => {
                 disabled={wasStarted}
                 min={PED_MIN}
                 max={PED_MAX}
-                defaultValue={startSimulationData.pedLimit}
+                defaultValue={pedLimit}
                 placeholder="Enter limit for pedestrians"
                 onChange={evSetPedsLimit}
               />
@@ -143,7 +100,7 @@ const LimitsMenu = props => {
                 disabled={wasStarted}
                 min={TEST_ID_MIN}
                 max={TEST_ID_MAX}
-                defaultValue={startSimulationData.testPedId}
+                defaultValue={testPedId}
                 placeholder="Enter test pedestrians number"
                 onChange={evSetTestPedId}
               />
@@ -164,7 +121,7 @@ const LimitsMenu = props => {
                 disabled={wasStarted}
                 min={CAR_MIN}
                 max={CAR_MAX}
-                defaultValue={startSimulationData.carsLimit}
+                defaultValue={carsLimit}
                 placeholder="Enter limit for cars"
                 onChange={evSetCarsLimit}
               />
@@ -178,7 +135,7 @@ const LimitsMenu = props => {
                 disabled={wasStarted}
                 min={TEST_ID_MIN}
                 max={TEST_ID_MAX}
-                defaultValue={startSimulationData.testCarId}
+                defaultValue={testCarId}
                 placeholder="Enter test car number"
                 onChange={evSetTestCarId}
               />
@@ -200,7 +157,7 @@ const LimitsMenu = props => {
                 min={BIKE_MIN}
                 max={BIKE_MAX}
                 placeholder="Enter limit for bikes"
-                defaultValue={startSimulationData.bikesLimit}
+                defaultValue={bikesLimit}
                 onChange={evSetBikesLimit}
               />
             </div>
@@ -213,7 +170,7 @@ const LimitsMenu = props => {
                 disabled={wasStarted}
                 min={TEST_ID_MIN}
                 max={TEST_ID_MAX}
-                defaultValue={startSimulationData.testBikeId}
+                defaultValue={testBikeId}
                 placeholder="Enter test bike number"
                 onChange={evSetTestBikeId}
               />
@@ -234,7 +191,7 @@ const LimitsMenu = props => {
                 disabled={wasStarted}
                 min={TIME_BEFORE_TP_MIN}
                 max={TIME_BEFORE_TP_MAX}
-                defaultValue={startSimulationData.timeBeforeTrouble}
+                defaultValue={timeBeforeTrouble}
                 placeholder="Enter time before road trouble occurs"
                 onChange={evSetTimeBeforeTrouble}
               />
@@ -253,14 +210,12 @@ const mapStateToProps = (state /* ownProps */) => {
   const { wasStarted } = state.message;
   const {
     startSimulationData,
-    startState,
     configState,
     prepareSimulationData: { generatePedestrians },
   } = state.interaction;
 
   return {
     configState,
-    startState,
     wasStarted,
     startSimulationData,
     generatePedestrians,

@@ -1,23 +1,3 @@
-export const StartState = {
-  Initial: 200,
-  Invoke: 300,
-  Proceed: 400,
-};
-
-export const getNextStartState = oldState => {
-  switch (oldState) {
-    case StartState.Initial:
-    case StartState.Replace:
-      return StartState.Invoke;
-
-    case StartState.Invoke:
-      return StartState.Proceed;
-
-    default:
-      return StartState.Initial;
-  }
-};
-
 export const ConfigState = {
   Initial: 1000,
   Replace_Start: 2000,

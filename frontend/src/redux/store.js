@@ -25,12 +25,11 @@ import {
   D_GENERATE_PEDS,
 } from "../constants/defaults";
 import { storageKey } from "../constants/global";
-import { StartState, ConfigState } from "./models/states";
+import { ConfigState } from "./models/states";
 import appReducer from "./reducers/index";
 
 const initialState = {
   interaction: {
-    startState: StartState.Initial,
     configState: ConfigState.Initial,
     prepareSimulationData: {
       center: { lat: D_LAT, lng: D_LNG, rad: D_RAD },

@@ -1,28 +1,19 @@
 import { connect } from "react-redux";
-import React, { useEffect } from "react";
-
-import "flatpickr/dist/themes/material_blue.css";
+import React from "react";
 
 import ApiManager from "../../../web/ApiManager";
+
+import "flatpickr/dist/themes/material_blue.css";
 import "../../../styles/Menu.css";
 import { dispatch } from "../../../redux/store";
 import { shouldStartSimulation } from "../../../redux/core/actions";
-import { StartState } from "../../../redux/models/states";
 
 export const SimulationStarterObj = props => {
-  const { wasPrepared, startState, wasStarted, startSimulationData } = props;
-
-  const startSimulationProceed = () => {
-    if (startState === StartState.Invoke) {
-      dispatch(shouldStartSimulation());
-    } else if (startState === StartState.Proceed) {
-      ApiManager.startSimulation(startSimulationData);
-    }
-  };
-  useEffect(startSimulationProceed, [startState]);
+  const { wasPrepared, wasStarted, startSimulationData } = props;
 
   const startSimulationInvoke = () => {
     dispatch(shouldStartSimulation());
+    ApiManager.startSimulation(startSimulationData);
   };
 
   return (
@@ -44,21 +35,12 @@ export const SimulationStarterObj = props => {
 
 const mapStateToProps = (state /* ownProps */) => {
   const { wasPrepared, wasStarted } = state.message;
-  const { startSimulationData, startState } = state.interaction;
+  const { startSimulationData } = state.interaction;
   return {
     wasPrepared,
     wasStarted,
-    startState,
     startSimulationData,
   };
 };
 
-export default connect(mapStateToProps)(
-  React.memo(SimulationStarterObj, (prevprops, newProps) => {
-    return (
-      prevprops.wasPrepared === newProps.wasPrepared &&
-      prevprops.wasStarted === newProps.wasStarted &&
-      prevprops.startState === newProps.startState
-    );
-  })
-);
+export default connect(mapStateToProps)(React.memo(SimulationStarterObj));
