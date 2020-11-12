@@ -24,6 +24,7 @@ import {
   D_LAT,
   D_GENERATE_PEDS,
 } from "../constants/defaults";
+import { storageKey } from "../constants/global";
 import { StartState, ConfigState } from "./models/states";
 import appReducer from "./reducers/index";
 
@@ -84,6 +85,15 @@ const initialState = {
     bikes: [],
   },
 };
+
+export const { localStorage } = window;
+
+const startSimulationData = JSON.parse(localStorage.getItem(storageKey));
+if (startSimulationData) {
+  startSimulationData.startTime = new Date();
+  initialState.interaction.startSimulationData = startSimulationData;
+  console.info("Set initial data from localStorage");
+}
 
 const store = createStore(appReducer, initialState, composeWithDevTools());
 export const { dispatch } = store;

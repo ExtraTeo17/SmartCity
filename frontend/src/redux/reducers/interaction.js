@@ -31,6 +31,7 @@ import {
   D_GENERATE_PEDS,
 } from "../../constants/defaults";
 import { StartState, ConfigState, getNextConfigState, getNextStartState } from "../models/states";
+import { storageKey } from "../../constants/global";
 
 // Just for reference - defined in store.js
 export const initialInteractionState = {
@@ -103,6 +104,11 @@ const interaction = (state = initialInteractionState, action) => {
 
     case SHOULD_START_SIMULATION: {
       const newState = getNextStartState(state.startState);
+      if (newState === StartState.Proceed) {
+        console.info("Saving data to localStorage");
+        localStorage.setItem(storageKey, JSON.stringify(state.startSimulationData));
+      }
+
       return { ...state, startState: newState };
     }
 
