@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { connect } from "react-redux";
 import Tabs from "react-bootstrap/Tabs";
 import Tab from "react-bootstrap/Tab";
@@ -8,6 +8,8 @@ import ResultsMenu from "./ResultsMenu";
 import "../../styles/MenusContainer.css";
 import ScenariosMenu from "./ScenariosMenu";
 import LimitsMenu from "./LimitsMenu";
+
+const animationEffectsCount = 4;
 
 const MenusContainer = ({
   timeResults,
@@ -28,8 +30,15 @@ const MenusContainer = ({
     }
   }, [wasPrepared]);
 
+  const firstUpdate = useRef(0);
+
   function createEffect(arg = false, setFuncArray = []) {
     return () => {
+      if (firstUpdate.current < animationEffectsCount) {
+        firstUpdate.current += 1;
+        return;
+      }
+
       if (arg) {
         setFuncArray.forEach(setFunc => setFunc("tab-animate"));
       } else {

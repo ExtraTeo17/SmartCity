@@ -24,7 +24,7 @@ import {
   D_LAT,
   D_GENERATE_PEDS,
 } from "../constants/defaults";
-import { storageKey } from "../constants/global";
+import { loadLocalData } from "./dataUtils/helpers";
 import { ConfigState } from "./models/states";
 import appReducer from "./reducers/index";
 
@@ -85,12 +85,10 @@ const initialState = {
   },
 };
 
-export const { localStorage } = window;
-
-const startSimulationData = JSON.parse(localStorage.getItem(storageKey));
-if (startSimulationData) {
-  startSimulationData.startTime = new Date();
-  initialState.interaction.startSimulationData = startSimulationData;
+const data = loadLocalData();
+if (data) {
+  initialState.interaction.startSimulationData = data.startSimulationData;
+  initialState.interaction.prepareSimulationData = data.prepareSimulationData;
   console.info("Set initial data from localStorage");
 }
 

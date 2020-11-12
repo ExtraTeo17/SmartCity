@@ -22,13 +22,15 @@ export default createSelector([getBuses], buses => {
       return;
     }
 
-    const routeStart = b.route[0];
-    const routeEnd = b.route[b.route.length - 1];
-    const routeHash = 100000 * getLocationHash(routeStart) + getLocationHash(routeEnd);
-    if (routesSet.has(routeHash) === false) {
-      routesSet.add(routeHash);
-      busSet.add(b.id);
-      result.push(b);
+    if (b.route) {
+      const routeStart = b.route[0];
+      const routeEnd = b.route[b.route.length - 1];
+      const routeHash = 100000 * getLocationHash(routeStart) + getLocationHash(routeEnd);
+      if (routesSet.has(routeHash) === false) {
+        routesSet.add(routeHash);
+        busSet.add(b.id);
+        result.push(b);
+      }
     }
   });
 
