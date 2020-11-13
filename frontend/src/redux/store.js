@@ -25,7 +25,7 @@ const initialState = {
     center: {
       lat: 52.23698,
       lng: 21.01766,
-      rad: 130,
+      rad: 260,
     },
     generatePedestrians: false,
     shouldStart: StartState.Initial,

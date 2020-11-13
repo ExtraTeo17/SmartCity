@@ -229,4 +229,17 @@ public abstract class MovingObject {
     public boolean currentTrafficLightNodeWithinAlternativeRouteThreshold(int thresholdUntilIndexChange) {
         return moveIndex + thresholdUntilIndexChange >= closestLightIndex;
     }
+
+	public int getNextNonVirtualIndex() {
+		return getNextNonVirtualIndexFromIndex(moveIndex);
+	}
+
+	public int getNextNonVirtualIndex(int thresholdUntilIndexChange) {
+		return getNextNonVirtualIndexFromIndex(moveIndex + thresholdUntilIndexChange);
+	}
+	
+	private int getNextNonVirtualIndexFromIndex(int index) {
+		while (uniformRoute.get(index++).isVirtual());
+		return index - 1;
+	}
 }

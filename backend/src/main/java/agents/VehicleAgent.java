@@ -45,6 +45,8 @@ public class VehicleAgent extends AbstractAgent {
     private RouteNode troublePoint;
     private final Set<Integer> trafficJamsEdgeId = new HashSet<>();
     private final Set<Long> constructionsEdgeId = new HashSet<>();
+    
+    private OptionalInt borderlineIndex = OptionalInt.empty();
 
     VehicleAgent(int id, MovingObject vehicle,
                  ITimeProvider timeProvider,
@@ -176,15 +178,16 @@ public class VehicleAgent extends AbstractAgent {
                 int indexAfterWhichRouteChanges;
                 if (configContainer.shouldChangeRouteOnTroublePoint()) {
                     if (indexOfRouteNodeWithEdge - vehicle.getMoveIndex() > THRESHOLD_UNTIL_INDEX_CHANGE){
-                        indexAfterWhichRouteChanges = vehicle.getFarOnIndex(THRESHOLD_UNTIL_INDEX_CHANGE);
+                        indexAfterWhichRouteChanges = vehicle.getNextNonVirtualIndex(THRESHOLD_UNTIL_INDEX_CHANGE);
                     } else {
-                        indexAfterWhichRouteChanges = vehicle.getMoveIndex();
+                        indexAfterWhichRouteChanges = vehicle.getNextNonVirtualIndex();
                     }
                 } else {
                     indexAfterWhichRouteChanges = Math.max(indexOfRouteNodeWithEdge -
                             (NO_CONSTRUCTION_SITE_STRATEGY_FACTOR * THRESHOLD_UNTIL_INDEX_CHANGE), 0);
                 }
                 
+                borderlineIndex = OptionalInt.of(indexAfterWhichRouteChanges);
                 ThreadedBehaviourFactory factory = new ThreadedBehaviourFactory();
 				Behaviour mergeUpdateBehaviour = new OneShotBehaviour() {
 
@@ -193,6 +196,7 @@ public class VehicleAgent extends AbstractAgent {
 						final RouteMergeInfo mergeResult = createMergedWithOldRouteAlternativeRouteFromIndex(
 								indexAfterWhichRouteChanges, true);
 						updateVehicleRouteAfterMerge(indexAfterWhichRouteChanges, mergeResult);
+						borderlineIndex = OptionalInt.empty();
 					}
 
 				};
@@ -422,10 +426,12 @@ public class VehicleAgent extends AbstractAgent {
         return vehicle;
     }
 
-    public void move() {
-        vehicle.move();
-        eventBus.post(new VehicleAgentUpdatedEvent(this.getId(), vehicle.getPosition()));
-    }
+	public void move() {
+		if (borderlineIndex.isEmpty() || vehicle.getMoveIndex() < borderlineIndex.getAsInt()) {
+			vehicle.move();
+			eventBus.post(new VehicleAgentUpdatedEvent(this.getId(), vehicle.getPosition()));
+		}
+	}
 
     public IGeoPosition getPosition() {
         return vehicle.getPosition();

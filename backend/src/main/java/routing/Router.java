@@ -57,13 +57,21 @@ final class Router implements
         }
 
         var routeInfo = routeInfoOpt.get();
+        
+        if (startingOsmNodeRef == null) {
+        	startingOsmNodeRef = routeInfo.getFirst().findClosestNodeRefTo(pointA);
+        }
+        if (finishingOsmNodeRef == null) {
+        	finishingOsmNodeRef = routeInfo.getLast().findClosestNodeRefTo(pointB);
+        }
+        
         routeInfo.determineRouteOrientationsAndFilterRelevantNodes(startingOsmNodeRef, finishingOsmNodeRef);
         var route = createRouteNodeList(routeInfo, isCar);
         return routeTransformer.uniformRouteNew(route, osmWayIdsAndEdgeList.getValue1());
     }
 
-    private List<RouteNode> createRouteNodeList(RouteInfo routeInfo, boolean isCar) {
-        List<RouteNode> routeNodes = new ArrayList<>();
+	private List<RouteNode> createRouteNodeList(RouteInfo routeInfo, boolean isCar) {
+		List<RouteNode> routeNodes = new ArrayList<>();
         for (var way : routeInfo) {
             int waypointCount = way.getWaypointCount();
         	int lastLightManagerId = -1;
@@ -88,7 +96,7 @@ final class Router implements
         return routeNodes;
     }
 
-    private RouteNode getNode(OSMWay way, OSMWaypoint waypoint, RouteInfo routeInfo, boolean isCar) {
+	private RouteNode getNode(OSMWay way, OSMWaypoint waypoint, RouteInfo routeInfo, boolean isCar) {
     	long wayId = way.getId();
         long nodeRefId = Long.parseLong(waypoint.getOsmNodeRef());
         if (routeInfo.remove(nodeRefId)) {
@@ -98,7 +106,7 @@ final class Router implements
         		return nodesContainer.getLightManagerNode(nodeRefId);
         	}
         }
-        return new RouteNode(waypoint.getLat(), waypoint.getLng());
+        return new RouteNode(waypoint.getLat(), waypoint.getLng(), false);
     }
 
     @Override
