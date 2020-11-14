@@ -8,8 +8,10 @@ import org.junit.jupiter.api.Test;
 import smartcity.ITimeProvider;
 import smartcity.config.ConfigContainer;
 import smartcity.config.ConfigMutator;
+import smartcity.lights.LightColor;
 import smartcity.task.abstractions.ITaskManager;
 import testutils.ReflectionHelper;
+import utilities.Siblings;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -17,8 +19,7 @@ import java.time.LocalTime;
 import java.util.Arrays;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-import static mocks.TestInstanceCreator.createEventBus;
-import static mocks.TestInstanceCreator.createLight;
+import static mocks.TestInstanceCreator.*;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
@@ -37,8 +38,9 @@ class SchedulerTests {
             return null;
         }).when(taskManager).scheduleSwitchLightTask(any(int.class), any());
         var scheduler = createScheduler(taskManager);
-        var lights = Arrays.asList(createLight(), createLight(), createLight());
-        var event = new SwitchLightsStartEvent(1, lights);
+        var lightsA = createLightGroup(LightColor.RED);
+        var lightsB =  createLightGroup(LightColor.GREEN);
+        var event = new SwitchLightsStartEvent(1, Siblings.of(lightsA, lightsB));
 
         // Act
         scheduler.handle(event);

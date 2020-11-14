@@ -24,9 +24,11 @@ import routing.nodes.StationNode;
 import smartcity.ITimeProvider;
 import smartcity.config.ConfigContainer;
 import smartcity.lights.core.Light;
+import smartcity.lights.core.SimpleLightGroup;
 import smartcity.task.abstractions.ITaskProvider;
 import smartcity.task.data.ISwitchLightsContext;
 import smartcity.task.functional.IFunctionalTaskFactory;
+import utilities.Siblings;
 
 import java.time.LocalDateTime;
 import java.util.Collection;
@@ -176,7 +178,7 @@ public class TaskProvider implements ITaskProvider {
     }
 
     @Override
-    public Supplier<Integer> getSwitchLightsTask(int managerId, Collection<Light> lights) {
+    public Supplier<Integer> getSwitchLightsTask(int managerId, Siblings<SimpleLightGroup> lights) {
         var switchLights = functionalTaskFactory
                 .createLightSwitcher(managerId, configContainer.getExtendWaitTime(), lights);
         // Can be moved somewhere else if needed and passed as parameter

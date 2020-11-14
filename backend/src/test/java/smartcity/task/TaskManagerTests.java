@@ -7,15 +7,16 @@ import routing.abstractions.IRoutingHelper;
 import routing.core.IZone;
 import routing.core.Position;
 import routing.core.Zone;
+import smartcity.lights.LightColor;
 import smartcity.task.abstractions.ITaskProvider;
 import smartcity.task.runnable.abstractions.IRunnableFactory;
 import smartcity.task.runnable.abstractions.IVariableExecutionRunnable;
+import utilities.Siblings;
 
-import java.util.Arrays;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Supplier;
 
-import static mocks.TestInstanceCreator.createLight;
+import static mocks.TestInstanceCreator.createLightGroup;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
@@ -27,7 +28,9 @@ class TaskManagerTests {
     @Test
     void scheduleSwitchLightTask_shouldStartEndlessTask() {
         // Arrange
-        var lights = Arrays.asList(createLight(), createLight(), createLight());
+        var lightsA = createLightGroup(LightColor.RED);
+        var lightsB = createLightGroup(LightColor.GREEN);
+        var lights = Siblings.of(lightsA, lightsB);
         var taskProvider = mock(ITaskProvider.class);
         Supplier<Integer> switchLightTask = () -> 100;
         when(taskProvider.getSwitchLightsTask(1, lights)).thenReturn(switchLightTask);

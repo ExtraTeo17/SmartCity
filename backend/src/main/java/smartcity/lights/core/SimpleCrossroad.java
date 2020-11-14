@@ -27,7 +27,10 @@ class SimpleCrossroad implements ICrossroad {
 
     @SuppressWarnings("MismatchedQueryAndUpdateOfCollection")
     private final Map<Long, Light> wayIdToLightMap;
-    private final List<Light> lightList;
+    private final Map<Long, Light> crossroadIdToLightMap;
+    private final Siblings<SimpleLightGroup> lightGroups;
+    private final List<Light> allLights;
+
     private int defaultExecutionDelay = -1;
 
     SimpleCrossroad(EventBus eventBus,
@@ -38,19 +41,35 @@ class SimpleCrossroad implements ICrossroad {
         this.eventBus = eventBus;
         this.configContainer = configContainer;
         this.managerId = managerId;
-        this.wayIdToLightMap = new HashMap<>() {{
-            putAll(lightGroups.first.prepareMap());
-            putAll(lightGroups.second.prepareMap());
-        }};
-        lightList = new ArrayList<>();
-        lightList.addAll(lightGroups.first.prepareList());
-        lightList.addAll(lightGroups.second.prepareList());
+
+        this.lightGroups = lightGroups;
+        this.allLights = new ArrayList<>();
+        this.crossroadIdToLightMap = new HashMap<>();
+        this.wayIdToLightMap = new HashMap<>();
+        fillLightCollections(lightGroups);
+    }
+
+    private void fillLightCollections(Siblings<SimpleLightGroup> lightGroups) {
+        for (var light : lightGroups.first) {
+            fillLight(light);
+        }
+        for (var light : lightGroups.second) {
+            fillLight(light);
+        }
+    }
+
+    private void fillLight(Light light) {
+        allLights.add(light);
+
+        var crossroadId = Long.parseLong(light.getAdjacentCrossingOsmId1());
+        crossroadIdToLightMap.put(crossroadId, light);
+        wayIdToLightMap.put(light.getAdjacentWayId(), light);
     }
 
     @Override
     public void startLifetime() {
         eventBus.register(this);
-        eventBus.post(new SwitchLightsStartEvent(managerId, lightList));
+        eventBus.post(new SwitchLightsStartEvent(managerId, lightGroups));
     }
 
     @Subscribe
@@ -70,7 +89,8 @@ class SimpleCrossroad implements ICrossroad {
 
         final OptimizationResult result = new OptimizationResult(extendTimeSeconds, defaultExecutionDelay);
         boolean shouldCheckForJams = configContainer.shouldChangeRouteOnTrafficJam();
-        for (Light light : lightList) {
+
+        for (Light light : allLights) {
 
             if (shouldCheckForJams) {
                 light.checkForTrafficJams(result);
@@ -94,13 +114,33 @@ class SimpleCrossroad implements ICrossroad {
 
     @Override
     public List<Light> getLights() {
-        return new ArrayList<>(lightList);
+        return new ArrayList<>(allLights);
     }
 
-    private boolean tryConsume(long adjacentWayId, Consumer<Light> consumer) {
+    @Override
+    public boolean addCarToQueue(long adjacentWayId, String agentName) {
+        return tryConsumeByWay(adjacentWayId, l -> l.addCarToQueue(agentName));
+    }
+
+    @Override
+    public boolean removeCarFromQueue(long adjacentWayId) {
+        return tryConsumeByWay(adjacentWayId, Light::removeCarFromQueue);
+    }
+
+    @Override
+    public boolean addCarToFarAwayQueue(long adjacentWayId, ArrivalInfo arrivalInfo) {
+        return tryConsumeByWay(adjacentWayId, l -> l.addCarToFarAwayQueue(arrivalInfo));
+    }
+
+    @Override
+    public boolean removeCarFromFarAwayQueue(long adjacentWayId, String agentName) {
+        return tryConsumeByWay(adjacentWayId, light -> light.removeCarFromFarAwayQueue(agentName));
+    }
+
+    private boolean tryConsumeByWay(long adjacentWayId, Consumer<Light> consumer) {
         var light = wayIdToLightMap.get(adjacentWayId);
         if (light == null) {
-            logAddError(adjacentWayId);
+            logAddErrorByWay(adjacentWayId);
             return false;
         }
 
@@ -108,49 +148,46 @@ class SimpleCrossroad implements ICrossroad {
         return true;
     }
 
-    private void logAddError(long adjacentWayId) {
+    private void logAddErrorByWay(long adjacentWayId) {
         logger.warn("Failed to get adjacentWayId: " + adjacentWayId + "\n" + wayIdToLightMap.entrySet().stream()
                 .map(entry -> entry.getKey() + ", " + entry.getValue().getOsmLightId())
                 .collect(Collectors.joining("\n")));
     }
 
     @Override
-    public boolean addCarToQueue(long adjacentWayId, String agentName) {
-        return tryConsume(adjacentWayId, l -> l.addCarToQueue(agentName));
+    public boolean addPedestrianToQueue(long adjacentCrossroadId, String agentName) {
+        return tryConsumeByCrossroad(adjacentCrossroadId, light -> light.addPedestrianToQueue(agentName));
     }
 
     @Override
-    public boolean removeCarFromQueue(long adjacentWayId) {
-        return tryConsume(adjacentWayId, Light::removeCarFromQueue);
+    public boolean addPedestrianToFarAwayQueue(long adjacentCrossroadId, ArrivalInfo arrivalInfo) {
+        return tryConsumeByCrossroad(adjacentCrossroadId, light -> light.addPedestrianToFarAwayQueue(arrivalInfo));
     }
 
     @Override
-    public boolean addCarToFarAwayQueue(long adjacentWayId, ArrivalInfo arrivalInfo) {
-        return tryConsume(adjacentWayId, l -> l.addCarToFarAwayQueue(arrivalInfo));
+    public boolean removePedestrianFromQueue(long adjacentCrossroadId) {
+        return tryConsumeByCrossroad(adjacentCrossroadId, Light::removePedestrianFromQueue);
     }
 
     @Override
-    public boolean removeCarFromFarAwayQueue(long adjacentWayId, String agentName) {
-        return tryConsume(adjacentWayId, light -> light.removeCarFromFarAwayQueue(agentName));
+    public boolean removePedestrianFromFarAwayQueue(long adjacentCrossroadId, String agentName) {
+        return tryConsumeByCrossroad(adjacentCrossroadId, l -> l.removePedestrianFromFarAwayQueue(agentName));
     }
 
-    @Override
-    public boolean addPedestrianToQueue(long adjacentWayId, String agentName) {
-        return tryConsume(adjacentWayId, light -> light.addPedestrianToQueue(agentName));
+    private boolean tryConsumeByCrossroad(long adjacentCrossroadId, Consumer<Light> consumer) {
+        var light = crossroadIdToLightMap.get(adjacentCrossroadId);
+        if (light == null) {
+            logAddErrorByCrossroad(adjacentCrossroadId);
+            return false;
+        }
+
+        consumer.accept(light);
+        return true;
     }
 
-    @Override
-    public boolean addPedestrianToFarAwayQueue(long adjacentWayId, ArrivalInfo arrivalInfo) {
-        return tryConsume(adjacentWayId, light -> light.addPedestrianToFarAwayQueue(arrivalInfo));
-    }
-
-    @Override
-    public boolean removePedestrianFromQueue(long adjacentWayId) {
-        return tryConsume(adjacentWayId, Light::removePedestrianFromQueue);
-    }
-
-    @Override
-    public boolean removePedestrianFromFarAwayQueue(long adjacentWayId, String agentName) {
-        return tryConsume(adjacentWayId, l -> l.removePedestrianFromFarAwayQueue(agentName));
+    private void logAddErrorByCrossroad(long adjacentCrossroadId) {
+        logger.warn("Failed to get adjacentCrossroadId: " + adjacentCrossroadId + "\n" + crossroadIdToLightMap.entrySet().stream()
+                .map(entry -> entry.getKey() + ", " + entry.getValue().getOsmLightId())
+                .collect(Collectors.joining("\n")));
     }
 }

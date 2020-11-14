@@ -1,20 +1,27 @@
 package smartcity.lights.core;
 
+import com.google.common.annotations.VisibleForTesting;
+import org.jetbrains.annotations.NotNull;
 import smartcity.lights.LightColor;
 
 import java.util.*;
 
-class SimpleLightGroup {
+public class SimpleLightGroup implements Iterable<Light> {
     private final Set<Light> lights;
 
-    SimpleLightGroup(List<LightInfo> infoList, LightColor color) {
-        lights = new HashSet<>();
+    SimpleLightGroup(LightColor initColor, List<LightInfo> infoList) {
+        this.lights = new HashSet<>();
         for (LightInfo info : infoList) {
-            lights.add(new Light(info, color));
+            lights.add(new Light(info, initColor));
         }
     }
 
-    void switchLights() {
+    @VisibleForTesting
+    public SimpleLightGroup(Collection<Light> lights) {
+        this.lights = new HashSet<>(lights);
+    }
+
+    public void switchLights() {
         for (Light light : lights) {
             light.switchLight();
         }
@@ -30,11 +37,13 @@ class SimpleLightGroup {
         return lightMap;
     }
 
-	public Collection<? extends Light> prepareList() {
-		final List<Light> lightList = new ArrayList<>();
-		for (Light light : lights) {
-			lightList.add(light);
-		}
-		return lightList;
-	}
+    public Collection<? extends Light> getLights() {
+        return lights;
+    }
+
+    @NotNull
+    @Override
+    public Iterator<Light> iterator() {
+        return lights.iterator();
+    }
 }

@@ -11,6 +11,8 @@ import java.util.*;
 
 public class Light extends Position {
     private static final int TRAFFIC_JAM_THRESHOLD = 2;
+
+
     private LightColor carLightColor;
     private final long adjacentOsmWayId;
     private final String adjacentCrossingOsmId1;
@@ -18,8 +20,8 @@ public class Light extends Position {
     private final long osmLightId;
     private boolean trafficJamOngoing;
 
-    private final Map<String, LocalDateTime> farAwayCarMap = new HashMap<>();
-    private final Map<String, LocalDateTime> farAwayPedestrianMap = new HashMap<>();
+    final Map<String, LocalDateTime> farAwayCarMap = new HashMap<>();
+    final Map<String, LocalDateTime> farAwayPedestrianMap = new HashMap<>();
     final Queue<String> carQueue = new LinkedList<>();
     final Queue<String> pedestrianQueue = new LinkedList<>();
 
@@ -54,23 +56,7 @@ public class Light extends Position {
         return adjacentCrossingOsmId2;
     }
 
-    public int getGreenGroupSize() {
-        if (isGreen()) {
-            return carQueue.size();
-        }
-
-        return pedestrianQueue.size();
-    }
-
-    public int getRedGroupSize() {
-        if (isGreen()) {
-            return pedestrianQueue.size();
-        }
-
-        return carQueue.size();
-    }
-
-    public Collection<LocalDateTime> getFarAwayTimeCollection() {
+    Collection<LocalDateTime> getFarAwayTimeCollection() {
         if (isGreen()) {
             return farAwayCarMap.values();
         }

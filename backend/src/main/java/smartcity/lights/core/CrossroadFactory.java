@@ -48,8 +48,8 @@ public class CrossroadFactory implements ICrossroadFactory {
     }
 
     private Siblings<SimpleLightGroup> getLightGroups(List<LightInfo> groupA, List<LightInfo> groupB) {
-        var lightGroupA = new SimpleLightGroup(groupA, LightColor.RED);
-        var lightGroupB = new SimpleLightGroup(groupB, LightColor.GREEN);
+        var lightGroupA = new SimpleLightGroup(LightColor.RED, groupA);
+        var lightGroupB = new SimpleLightGroup(LightColor.GREEN, groupB);
 
         return Siblings.of(lightGroupA, lightGroupB);
     }

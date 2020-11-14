@@ -13,9 +13,11 @@ import routing.core.IZone;
 import routing.core.Zone;
 import smartcity.TimeProvider;
 import smartcity.lights.core.Light;
+import smartcity.lights.core.SimpleLightGroup;
 import smartcity.task.abstractions.ITaskManager;
 import smartcity.task.abstractions.ITaskProvider;
 import smartcity.task.runnable.abstractions.IRunnableFactory;
+import utilities.Siblings;
 
 import java.time.LocalDateTime;
 import java.util.Collection;
@@ -114,7 +116,7 @@ public class TaskManager implements ITaskManager {
     }
 
     @Override
-    public void scheduleSwitchLightTask(int managerId, Collection<Light> lights) {
+    public void scheduleSwitchLightTask(int managerId, Siblings<SimpleLightGroup> lights) {
         var switchLightsTaskWithDelay = taskProvider.getSwitchLightsTask(managerId, lights);
         var runnable = runnableFactory.createDelay(switchLightsTaskWithDelay, false);
         runnable.runEndless(0, TIME_UNIT);
