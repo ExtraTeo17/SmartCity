@@ -46,7 +46,7 @@ public class VehicleAgent extends AbstractAgent {
     private final Set<Integer> trafficJamsEdgeId = new HashSet<>();
     private final Set<Long> constructionsEdgeId = new HashSet<>();
     
-    private OptionalInt borderlineIndex = OptionalInt.empty();
+    private Integer borderlineIndex = null;
 
     VehicleAgent(int id, MovingObject vehicle,
                  ITimeProvider timeProvider,
@@ -187,7 +187,7 @@ public class VehicleAgent extends AbstractAgent {
                             (NO_CONSTRUCTION_SITE_STRATEGY_FACTOR * THRESHOLD_UNTIL_INDEX_CHANGE), 0);
                 }
                 
-                borderlineIndex = OptionalInt.of(indexAfterWhichRouteChanges);
+                borderlineIndex = indexAfterWhichRouteChanges;
                 ThreadedBehaviourFactory factory = new ThreadedBehaviourFactory();
 				Behaviour mergeUpdateBehaviour = new OneShotBehaviour() {
 
@@ -196,7 +196,7 @@ public class VehicleAgent extends AbstractAgent {
 						final RouteMergeInfo mergeResult = createMergedWithOldRouteAlternativeRouteFromIndex(
 								indexAfterWhichRouteChanges, true);
 						updateVehicleRouteAfterMerge(indexAfterWhichRouteChanges, mergeResult);
-						borderlineIndex = OptionalInt.empty();
+						borderlineIndex = null;
 					}
 
 				};
@@ -319,7 +319,7 @@ public class VehicleAgent extends AbstractAgent {
             private void handleLightTrafficJamRouteChange(final int indexAfterWhichRouteChanges,
                                                           final double timeForTheEndWithJam, boolean bewareOfJammedEdge) {
                 logger.info("Jammed traffic light on route, handle it");
-                double timeForOfDynamicRoute = 0;
+                double timeForOfDynamicRoute;
                 final RouteMergeInfo mergeResult = createMergedWithOldRouteAlternativeRouteFromIndex(indexAfterWhichRouteChanges,
                         bewareOfJammedEdge);
                 timeForOfDynamicRoute = vehicle.getMillisecondsFromAToB(vehicle.getMoveIndex(),
@@ -392,7 +392,7 @@ public class VehicleAgent extends AbstractAgent {
                 @Override
                 public void onTick() {
                     sendMessageAboutTroubleStop(MessageParameter.CONSTRUCTION);
-                    ExtendedGraphHopper.removeForbiddenEdges(Arrays.asList(troublePoint.getInternalEdgeId()));
+                    ExtendedGraphHopper.removeForbiddenEdges(Collections.singletonList(troublePoint.getInternalEdgeId()));
                     stop();
                 }
 
@@ -427,7 +427,7 @@ public class VehicleAgent extends AbstractAgent {
     }
 
 	public void move() {
-		if (borderlineIndex.isEmpty() || vehicle.getMoveIndex() < borderlineIndex.getAsInt()) {
+		if (borderlineIndex == null || vehicle.getMoveIndex() < borderlineIndex) {
 			vehicle.move();
 			eventBus.post(new VehicleAgentUpdatedEvent(this.getId(), vehicle.getPosition()));
 		}
