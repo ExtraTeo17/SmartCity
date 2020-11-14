@@ -41,7 +41,7 @@ import java.util.List;
  */
 public class ExtendedGraphHopper extends GraphHopper {
 
-    private static final double HEAVY_EDGE_PENALTY_FACTOR = 999999999;
+    private static final double HEAVY_EDGE_PENALTY_FACTOR = 99999999;
 
     // mapping of internal edge ID to OSM way ID
     private DataAccess edgeMapping;

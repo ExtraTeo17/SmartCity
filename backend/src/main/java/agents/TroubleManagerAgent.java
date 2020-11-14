@@ -170,11 +170,13 @@ public class TroubleManagerAgent extends Agent {
         Behaviour sayAboutTroubles = new TickerBehaviour(this, 2000) {
             @Override
             protected void onTick() {
+
                 if (configContainer.getSimulationState() != SimulationState.RUNNING) {
                     return;
                 }
                 for (Map.Entry<Integer, String> entry : mapOfConstructionSiteBlockedEdges.entrySet()) {
                     // construction site
+                    logger.info("Edge id blocked: " + entry.getKey() + " length of jam: " + entry.getValue());
                     sendBroadcast(generateMessageAboutTrafficJam(entry.getKey(), entry.getValue(),
                             MessageParameter.CONSTRUCTION, MessageParameter.SHOW));
                 }
