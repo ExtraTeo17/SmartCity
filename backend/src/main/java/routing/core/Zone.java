@@ -39,8 +39,8 @@ public class Zone implements IZone {
     @SuppressWarnings("FeatureEnvy")
     // source: https://stackoverflow.com/a/27943/6841224
     @Override
-    public boolean contains(IGeoPosition pos) {
-        return RoutingHelper.getDistance(center, pos) <= radius;
+    public boolean contains(IGeoPosition pos, int radiusTolerance) {
+        return RoutingHelper.getDistance(center, pos) <= radius + radiusTolerance;
     }
 
     @Override

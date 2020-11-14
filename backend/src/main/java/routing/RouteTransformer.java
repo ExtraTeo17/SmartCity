@@ -19,12 +19,12 @@ public final class RouteTransformer implements // TODO: We'll make it private ot
     @SuppressWarnings("FeatureEnvy")
     @Override
     public List<RouteNode> uniformRoute(List<RouteNode> route) {
-    	return route; // TODO: CLEAN UP
+        return route; // TODO: CLEAN UP
     }
-    
+
     @Override
     public List<RouteNode> uniformRouteNext(List<RouteNode> route) {
-    	List<RouteNode> newRoute = new ArrayList<>();
+        List<RouteNode> newRoute = new ArrayList<>();
         for (int i = 0; i < route.size() - 1; ++i) {
             RouteNode nodeA = route.get(i);
             RouteNode nodeB = route.get(i + 1);
@@ -53,28 +53,34 @@ public final class RouteTransformer implements // TODO: We'll make it private ot
         if (route.size() > 0) {
             newRoute.add(route.get(route.size() - 1));
         }
-        
+
         return newRoute;
     }
 
-	@Override
-	public List<RouteNode> uniformRouteNew(List<RouteNode> route, List<Integer> edgeList) {
+    @Override
+    public List<RouteNode> uniformRouteNew(List<RouteNode> route, List<Integer> edgeList) {
         List<RouteNode> newRoute = uniformRouteNext(route);
-        
+
         double denominator = newRoute.size();
         for (double nominator = 0; nominator < denominator; ++nominator) {
-        	double percent = nominator / denominator;
-        	long index = Math.round((percent * ((double)(edgeList.size()))));
-        	if ((int)index == edgeList.size()) --index;
-        	newRoute.get((int)nominator).setInternalEdgeId(edgeList.get((int)index));
+            double percent = nominator / denominator;
+            int index = (int) Math.round((percent * ((double) (edgeList.size()))));
+            if (index == edgeList.size()) {
+                --index;
+            }
+            newRoute.get((int) nominator).setInternalEdgeId(edgeList.get(index));
         }
 
         return newRoute;
-	}
+    }
 
 
     @Override
     public RouteMergeInfo mergeByDistance(List<RouteNode> oldRoute, List<RouteNode> newRoute) {
+        if (newRoute.isEmpty()) {
+            throw new IllegalArgumentException("New route cannot be empty");
+        }
+
         var beg = newRoute.get(0);
         int mergeIndex = oldRoute.size();
         for (int i = oldRoute.size() - 1; i > 0; --i) {

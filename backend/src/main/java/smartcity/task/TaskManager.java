@@ -9,14 +9,13 @@ import com.google.inject.Inject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import routing.abstractions.IRoutingHelper;
-import routing.core.IGeoPosition;
 import routing.core.IZone;
+import routing.core.Zone;
 import smartcity.TimeProvider;
 import smartcity.lights.core.Light;
 import smartcity.task.abstractions.ITaskManager;
 import smartcity.task.abstractions.ITaskProvider;
 import smartcity.task.runnable.abstractions.IRunnableFactory;
-import utilities.Siblings;
 
 import java.time.LocalDateTime;
 import java.util.Collection;
@@ -33,6 +32,8 @@ public class TaskManager implements ITaskManager {
     private static final int CREATE_BIKE_INTERVAL = 500;
     private static final int CREATE_PEDESTRIAN_INTERVAL = 120;
     private static final int BUS_CONTROL_INTERVAL = 2000;
+
+    private static final int ZONE_ADJUSTMENT = 20;
 
     private final IRunnableFactory runnableFactory;
     private final IAgentsContainer agentsContainer;
@@ -59,27 +60,20 @@ public class TaskManager implements ITaskManager {
 
     @Override
     public void scheduleCarCreation(int carsLimit, int testCarId) {
+        var adjustedZone = getAdjustedZone();
         Consumer<Integer> createCars = (runCount) -> {
-            var randomPositions = getRandomPositions();
-
+            var randomPositions = routingHelper.getRandomPositions(adjustedZone);
             taskProvider.getCreateCarTask(randomPositions.first, randomPositions.second, runCount == testCarId).run();
         };
 
         runIf(() -> agentsContainer.size(CarAgent.class) < carsLimit, createCars, CREATE_CAR_INTERVAL, true);
     }
 
-    private Siblings<IGeoPosition> getRandomPositions() {
-        var zoneCenter = zone.getCenter();
-        var geoPosInZoneCircle = routingHelper.generateRandomOffset(zone.getRadius());
-        var posA = zoneCenter.sum(geoPosInZoneCircle);
-        var posB = zoneCenter.diff(geoPosInZoneCircle);
-        return Siblings.of(posA, posB);
-    }
-
     @Override
     public void scheduleBikeCreation(int bikeLimit, int testBikeId) {
+        var adjustedZone = getAdjustedZone();
         Consumer<Integer> createBikes = (runCount) -> {
-            var positions = getRandomPositions();
+            var positions = routingHelper.getRandomPositions(adjustedZone);
             taskProvider.getCreateBikeTask(positions.first, positions.second, runCount == testBikeId).run();
         };
 
@@ -142,6 +136,11 @@ public class TaskManager implements ITaskManager {
                 logger.warn("Error cancelling executor: ", e);
             }
         }
+    }
+
+    private IZone getAdjustedZone() {
+        var adjustedRadius = this.zone.getRadius() - ZONE_ADJUSTMENT;
+        return Zone.of(this.zone.getCenter(), adjustedRadius);
     }
 
     private void runNTimes(Consumer<Integer> runCountConsumer, int runCount, int interval) {

@@ -18,5 +18,9 @@ public interface IZone {
         set(mutation, other.getCenter(), other.getRadius());
     }
 
-    boolean contains(IGeoPosition pos);
+    default boolean contains(IGeoPosition pos) {
+        return contains(pos, 0);
+    }
+
+    boolean contains(IGeoPosition pos, int radiusTolerance);
 }

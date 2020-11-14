@@ -4,6 +4,7 @@ import com.google.inject.Inject;
 import org.javatuples.Pair;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import osmproxy.HighwayAccessor;
 import osmproxy.abstractions.ICacheWrapper;
 import osmproxy.abstractions.IMapAccessManager;
 import osmproxy.elements.OSMLight;
@@ -20,7 +21,7 @@ import routing.nodes.StationNode;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.function.UnaryOperator;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 final class Router implements
@@ -43,70 +44,86 @@ final class Router implements
         this.routeTransformer = routeTransformer;
     }
 
-	@Override // TODO: now with new route generation there is sometimes "failed to get adjacent osmwayid" error, check it out
+    // TODO: now with new route generation there is sometimes "failed to get adjacent osmwayId" error, check it out
+    @Override
     public List<RouteNode> generateRouteInfo(IGeoPosition pointA, IGeoPosition pointB,
-            		String startingOsmNodeRef, String finishingOsmNodeRef, String typeOfVehicle,
-            		boolean bewareOfJammedEdge) {
-		boolean isCar = typeOfVehicle.equals("car");
+                                             String startingOsmNodeRef, String finishingOsmNodeRef,
+                                             String typeOfVehicle,
+                                             boolean bewareOfJammedEdge) {
+        boolean isCar = typeOfVehicle.equals("car");
         var osmWayIdsAndEdgeList = findRoute(pointA, pointB, typeOfVehicle, bewareOfJammedEdge);
         var osmWayIds = osmWayIdsAndEdgeList.getValue0();
-        var routeInfoOpt = mapAccessManager.getRouteInfo(osmWayIds, isCar); // TODO: refactor inside to throw exception if not car or pedestrian
+
+        // TODO: refactor inside to throw exception if not car or pedestrian
+        var routeInfoOpt = mapAccessManager.getRouteInfo(osmWayIds, isCar);
         if (routeInfoOpt.isEmpty()) {
             logger.warn("Generating route failed because of empty routeInfo");
             return new ArrayList<>();
         }
 
         var routeInfo = routeInfoOpt.get();
-        
+
         if (startingOsmNodeRef == null) {
-        	startingOsmNodeRef = routeInfo.getFirst().findClosestNodeRefTo(pointA);
+            startingOsmNodeRef = routeInfo.getFirst().findClosestNodeRefTo(pointA);
         }
         if (finishingOsmNodeRef == null) {
-        	finishingOsmNodeRef = routeInfo.getLast().findClosestNodeRefTo(pointB);
+            finishingOsmNodeRef = routeInfo.getLast().findClosestNodeRefTo(pointB);
         }
-        
+
         routeInfo.determineRouteOrientationsAndFilterRelevantNodes(startingOsmNodeRef, finishingOsmNodeRef);
         var route = createRouteNodeList(routeInfo, isCar);
         return routeTransformer.uniformRouteNew(route, osmWayIdsAndEdgeList.getValue1());
     }
 
-	private List<RouteNode> createRouteNodeList(RouteInfo routeInfo, boolean isCar) {
-		List<RouteNode> routeNodes = new ArrayList<>();
+    private List<RouteNode> createRouteNodeList(RouteInfo routeInfo, boolean isCar) {
+        List<RouteNode> routeNodes = new ArrayList<>();
         for (var way : routeInfo) {
             int waypointCount = way.getWaypointCount();
-        	int lastLightManagerId = -1;
-        	boolean straight = way.getRouteOrientation() == RouteOrientation.FRONT;
-        	int startingIndex = straight ? 0 : waypointCount - 1;
-        	int lastIndex = straight ? waypointCount : -1;
-        	int increment = straight ? 1 : -1;
+            int lastLightManagerId = -1;
+
+            boolean straight = way.getRouteOrientation() == RouteOrientation.FRONT;
+            int startingIndex = straight ? 0 : waypointCount - 1;
+            int lastIndex = straight ? waypointCount : -1;
+            int increment = straight ? 1 : -1;
+            boolean zoneNotStarted = true;
             for (int j = startingIndex; j != lastIndex; j += increment) {
-                var node = getNode(way, way.getWaypoint(j), routeInfo, isCar);
-                if (node instanceof LightManagerNode) {
-                	int lightManagerId = ((LightManagerNode)node).getLightManagerId();
-                	if (!(lightManagerId == lastLightManagerId)) {
-                		routeNodes.add(node);
-                		lastLightManagerId = lightManagerId;
-                	}
-                } else if (node != null) {
-                	routeNodes.add(node);
+                var nodeOpt = getNode(way, way.getWaypoint(j), routeInfo, isCar);
+                if (nodeOpt.isEmpty()) {
+                    continue;
                 }
+
+                var node = nodeOpt.get();
+                if (node instanceof LightManagerNode) {
+                    int lightManagerId = ((LightManagerNode) node).getLightManagerId();
+                    if (!(lightManagerId == lastLightManagerId)) {
+                        routeNodes.add(node);
+                        lastLightManagerId = lightManagerId;
+                    }
+                }
+                else {
+                    routeNodes.add(node);
+                }
+
             }
         }
 
         return routeNodes;
     }
 
-	private RouteNode getNode(OSMWay way, OSMWaypoint waypoint, RouteInfo routeInfo, boolean isCar) {
-    	long wayId = way.getId();
+    private Optional<RouteNode> getNode(OSMWay way, OSMWaypoint waypoint, RouteInfo routeInfo, boolean isCar) {
+        long wayId = way.getId();
         long nodeRefId = Long.parseLong(waypoint.getOsmNodeRef());
+
+        RouteNode result;
         if (routeInfo.remove(nodeRefId)) {
-        	if (isCar) {
-        		return nodesContainer.getLightManagerNode(wayId, nodeRefId);
-        	} else {
-        		return nodesContainer.getLightManagerNode(nodeRefId);
-        	}
+            result = isCar ? nodesContainer.getLightManagerNode(wayId, nodeRefId) :
+                    nodesContainer.getLightManagerNode(nodeRefId);
         }
-        return new RouteNode(waypoint.getLat(), waypoint.getLng(), false);
+        else {
+            result = new RouteNode(waypoint.getLat(), waypoint.getLng(), false);
+        }
+
+        return Optional.ofNullable(result);
     }
 
     @Override
@@ -131,7 +148,7 @@ final class Router implements
     }
 
     /////////////////////////////////////////////////////////////
-    //  HELPERS - Most are deliverable :(
+    //  HELPERS - Most are awful :(
     /////////////////////////////////////////////////////////////
 
     private boolean updateCacheDataAgentId(List<RouteNode> data, List<StationNode> stationNodes) {
@@ -153,9 +170,9 @@ final class Router implements
     }
 
     private static Pair<List<Long>, List<Integer>> findRoute(IGeoPosition pointA,
-    		IGeoPosition pointB, String typeOfVehicle, boolean bewareOfJammedEdge) {
-        return osmproxy.HighwayAccessor.getOsmWayIdsAndEdgeList(pointA.getLat(), pointA.getLng(), pointB.getLat(),
-                pointB.getLng(), typeOfVehicle, bewareOfJammedEdge);
+                                                             IGeoPosition pointB,
+                                                             String typeOfVehicle, boolean bewareOfJammedEdge) {
+        return HighwayAccessor.getOsmWayIdsAndEdgeList(pointA, pointB, typeOfVehicle, bewareOfJammedEdge);
     }
 
     private List<RouteNode> getManagersNodesForLights(List<OSMLight> lights) {

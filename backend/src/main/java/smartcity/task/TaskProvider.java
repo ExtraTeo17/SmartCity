@@ -36,6 +36,7 @@ import java.util.function.Supplier;
 @SuppressWarnings("OverlyCoupledClass")
 public class TaskProvider implements ITaskProvider {
     private static final Logger logger = LoggerFactory.getLogger(TaskProvider.class);
+    private final int pedestrianRouteOffset = 200;
 
     private final ConfigContainer configContainer;
     private final IRouteGenerator routeGenerator;
@@ -120,10 +121,11 @@ public class TaskProvider implements ITaskProvider {
                                             String busLine, boolean testPedestrian) {
         return () -> {
             try {
-                // TODO: Generating this offset doesn't work?
-                var geoPosInFirstStationCircle = routingHelper.generateRandomOffset(200);
-                IGeoPosition pedestrianStartPoint = startStation.sum(geoPosInFirstStationCircle);
-                IGeoPosition pedestrianFinishPoint = endStation.diff(geoPosInFirstStationCircle);
+                var randomOffsetStart = routingHelper.generateRandomOffset(pedestrianRouteOffset, startStation.getLat());
+                var pedestrianStartPoint = startStation.sum(randomOffsetStart);
+
+                var randomOffsetEnd = routingHelper.generateRandomOffset(pedestrianRouteOffset, endStation.getLat());
+                var pedestrianFinishPoint = endStation.diff(randomOffsetEnd);
 
                 // TODO: No null here
                 List<RouteNode> routeToStation = routeGenerator.generateRouteForPedestrians(
@@ -137,7 +139,6 @@ public class TaskProvider implements ITaskProvider {
                         String.valueOf(endStation.getOsmId()),
                         null);
 
-                // TODO: Separate fields for testPedestrian and pedestriansLimit
                 PedestrianAgent agent = agentsFactory.create(routeToStation, routeFromStation,
                         busLine, startStation, endStation, testPedestrian);
                 if (agentsContainer.tryAdd(agent)) {

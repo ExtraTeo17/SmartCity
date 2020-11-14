@@ -1,6 +1,7 @@
 package routing.core;
 
 import org.jetbrains.annotations.NotNull;
+import routing.RoutingHelper;
 import utilities.NumericHelper;
 
 public interface IGeoPosition extends Comparable<IGeoPosition> {
@@ -26,7 +27,7 @@ public interface IGeoPosition extends Comparable<IGeoPosition> {
     }
 
     default double distance(IGeoPosition other) {
-        return Math.sqrt(this.diff(other).squaredSum());
+        return RoutingHelper.getDistance(this, other);
     }
 
     default IGeoPosition sum(IGeoPosition other) {
@@ -114,7 +115,7 @@ public interface IGeoPosition extends Comparable<IGeoPosition> {
         return cmp != 0 ? cmp : Double.compare(getLng(), o.getLng());
     }
 
-    default String pointText() {
+    default String toText() {
         return "(" + getLat() + ", " + getLng() + ')';
     }
 }
