@@ -51,8 +51,8 @@ class AgentsFactory implements IAgentsFactory {
     }
 
     @Override
-    public VehicleAgent create(List<RouteNode> route, boolean testCar) {
-        var id = idGenerator.get(VehicleAgent.class);
+    public CarAgent create(List<RouteNode> route, boolean testCar) {
+        var id = idGenerator.get(CarAgent.class);
         var uniformRoute = routeTransformer.uniformRoute(route);
         logger.trace("DisplayRoute size: " + route.size() + ", routeSize: " + uniformRoute.size());
         var car = new Car(id, route, uniformRoute, timeProvider);
@@ -60,18 +60,18 @@ class AgentsFactory implements IAgentsFactory {
             car = new TestCar(car, timeProvider);
         }
 
-        return new VehicleAgent(id, car, timeProvider,
+        return new CarAgent(id, car, timeProvider,
                 routeGenerator, routeTransformer, eventBus, configContainer);
     }
 
     @Override
-    public VehicleAgent create(List<RouteNode> route) {
+    public CarAgent create(List<RouteNode> route) {
         return create(route, false);
     }
 
     @Override
     public BikeAgent create(List<RouteNode> route, boolean testBike, String check) {
-        var id = idGenerator.get(VehicleAgent.class);
+        var id = idGenerator.get(CarAgent.class);
         var uniformRoute = routeTransformer.uniformRoute(route);
         logger.trace("DisplayRoute size: " + route.size() + ", routeSize: " + uniformRoute.size());
         var bike = new Bike(id, route, uniformRoute, timeProvider);
@@ -92,7 +92,7 @@ class AgentsFactory implements IAgentsFactory {
     @Override
     public StationAgent create(OSMStation station) {
         var id = idGenerator.get(StationAgent.class);
-        var stationStrategy = new StationStrategy(id, configContainer,timeProvider);
+        var stationStrategy = new StationStrategy(id, configContainer, timeProvider);
         return new StationAgent(id, station, stationStrategy, timeProvider, eventBus);
     }
 

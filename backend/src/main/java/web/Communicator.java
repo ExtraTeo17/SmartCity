@@ -12,15 +12,15 @@ import events.web.bus.BusAgentDeadEvent;
 import events.web.bus.BusAgentFillStateUpdatedEvent;
 import events.web.bus.BusAgentStartedEvent;
 import events.web.bus.BusAgentUpdatedEvent;
+import events.web.car.CarAgentCreatedEvent;
+import events.web.car.CarAgentDeadEvent;
+import events.web.car.CarAgentRouteChangedEvent;
+import events.web.car.CarAgentUpdatedEvent;
 import events.web.pedestrian.*;
 import events.web.roadblocks.TrafficJamFinishedEvent;
 import events.web.roadblocks.TrafficJamStartedEvent;
 import events.web.roadblocks.TroublePointCreatedEvent;
 import events.web.roadblocks.TroublePointVanishedEvent;
-import events.web.vehicle.VehicleAgentCreatedEvent;
-import events.web.vehicle.VehicleAgentDeadEvent;
-import events.web.vehicle.VehicleAgentRouteChangedEvent;
-import events.web.vehicle.VehicleAgentUpdatedEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import web.abstractions.IWebService;
@@ -50,13 +50,13 @@ class Communicator {
     }
 
     @Subscribe
-    public void handle(VehicleAgentCreatedEvent e) {
+    public void handle(CarAgentCreatedEvent e) {
         onHandle(e);
         webService.createCar(e.agentId, e.agentPosition, e.route, e.isTestCar);
     }
 
     @Subscribe
-    public void handle(VehicleAgentUpdatedEvent e) {
+    public void handle(CarAgentUpdatedEvent e) {
         webService.updateCar(e.id, e.position);
     }
 
@@ -66,13 +66,13 @@ class Communicator {
     }
 
     @Subscribe
-    public void handle(VehicleAgentDeadEvent e) {
+    public void handle(CarAgentDeadEvent e) {
         onHandle(e);
         webService.killCar(e.id, e.travelDistance, e.travelTime);
     }
 
     @Subscribe
-    public void handle(VehicleAgentRouteChangedEvent e) {
+    public void handle(CarAgentRouteChangedEvent e) {
         webService.changeCarRoute(e.agentId, e.routeStart, e.changePosition, e.routeEnd);
     }
 

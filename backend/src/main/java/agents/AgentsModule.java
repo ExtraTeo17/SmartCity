@@ -12,7 +12,7 @@ import jade.wrapper.ContainerController;
 
 public class AgentsModule extends AbstractModule {
     public static final Class<?>[] agentTypes = {
-            VehicleAgent.class,
+            CarAgent.class,
             BusAgent.class,
             LightManagerAgent.class,
             StationAgent.class,

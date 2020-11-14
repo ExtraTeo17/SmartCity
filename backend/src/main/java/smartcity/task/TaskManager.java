@@ -2,8 +2,8 @@ package smartcity.task;
 
 import agents.BikeAgent;
 import agents.BusAgent;
+import agents.CarAgent;
 import agents.PedestrianAgent;
-import agents.VehicleAgent;
 import agents.abstractions.IAgentsContainer;
 import com.google.inject.Inject;
 import org.slf4j.Logger;
@@ -65,7 +65,7 @@ public class TaskManager implements ITaskManager {
             taskProvider.getCreateCarTask(randomPositions.first, randomPositions.second, runCount == testCarId).run();
         };
 
-        runIf(() -> agentsContainer.size(VehicleAgent.class) < carsLimit, createCars, CREATE_CAR_INTERVAL, true);
+        runIf(() -> agentsContainer.size(CarAgent.class) < carsLimit, createCars, CREATE_CAR_INTERVAL, true);
     }
 
     private Siblings<IGeoPosition> getRandomPositions() {

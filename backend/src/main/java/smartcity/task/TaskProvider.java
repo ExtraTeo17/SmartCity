@@ -2,8 +2,8 @@ package smartcity.task;
 
 import agents.BikeAgent;
 import agents.BusAgent;
+import agents.CarAgent;
 import agents.PedestrianAgent;
-import agents.VehicleAgent;
 import agents.abstractions.IAgentsContainer;
 import agents.abstractions.IAgentsFactory;
 import com.google.common.collect.HashBasedTable;
@@ -12,8 +12,8 @@ import com.google.common.eventbus.EventBus;
 import com.google.inject.Inject;
 import events.web.bike.BikeAgentCreatedEvent;
 import events.web.bus.BusAgentStartedEvent;
+import events.web.car.CarAgentCreatedEvent;
 import events.web.pedestrian.PedestrianAgentCreatedEvent;
-import events.web.vehicle.VehicleAgentCreatedEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import routing.abstractions.IRouteGenerator;
@@ -82,10 +82,10 @@ public class TaskProvider implements ITaskProvider {
                 return;
             }
 
-            VehicleAgent agent = agentsFactory.create(route, testCar);
+            CarAgent agent = agentsFactory.create(route, testCar);
             if (agentsContainer.tryAdd(agent)) {
                 agent.start();
-                eventBus.post(new VehicleAgentCreatedEvent(agent.getId(), agent.getPosition(), route, testCar));
+                eventBus.post(new CarAgentCreatedEvent(agent.getId(), agent.getPosition(), route, testCar));
             }
         };
     }

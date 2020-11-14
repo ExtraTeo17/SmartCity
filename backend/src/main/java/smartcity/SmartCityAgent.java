@@ -2,16 +2,16 @@ package smartcity;
 
 import agents.BikeAgent;
 import agents.BusAgent;
+import agents.CarAgent;
 import agents.PedestrianAgent;
-import agents.VehicleAgent;
 import agents.abstractions.IAgentsContainer;
 import agents.utilities.MessageParameter;
 import com.google.common.eventbus.EventBus;
 import com.google.inject.Inject;
 import events.web.bike.BikeAgentDeadEvent;
 import events.web.bus.BusAgentDeadEvent;
+import events.web.car.CarAgentDeadEvent;
 import events.web.pedestrian.PedestrianAgentDeadEvent;
-import events.web.vehicle.VehicleAgentDeadEvent;
 import jade.core.Agent;
 import jade.core.behaviours.CyclicBehaviour;
 import jade.lang.acl.ACLMessage;
@@ -103,15 +103,15 @@ public class SmartCityAgent extends Agent {
 
     private void onReceiveVehicle(ACLMessage rcv) {
         var name = rcv.getSender().getLocalName();
-        var agentOpt = agentsContainer.get(VehicleAgent.class, (v) -> v.getLocalName().equals(name));
+        var agentOpt = agentsContainer.get(CarAgent.class, (v) -> v.getLocalName().equals(name));
         if (agentOpt.isPresent()) {
             var agent = agentOpt.get();
-            var vehicle = agent.getVehicle();
+            var vehicle = agent.getCar();
 
             Long resultTime = getTimeIfTestable(vehicle);
             int distance = vehicle.getUniformRouteSize() * RoutingConstants.STEP_SIZE_METERS;
             if (agentsContainer.remove(agent)) {
-                eventBus.post(new VehicleAgentDeadEvent(agent.getId(), distance, resultTime));
+                eventBus.post(new CarAgentDeadEvent(agent.getId(), distance, resultTime));
             }
         }
     }
