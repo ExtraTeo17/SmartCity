@@ -102,7 +102,9 @@ public class BusApiManager implements IBusApiManager {
      * @return Query string for downloading timetable for specified line from WarszawskieAPI
      */
     private static String getBusTimetablesWarszawskieQuery(String busStopId, String busStopNr, String busLine) {
-        return "https://api.um.warszawa.pl/api/action/dbtimetable_get/?id=e923fa0e-d96c-43f9-ae6e-60518c9f3238&busstopId=" +
-                busStopId + "&busstopNr=" + busStopNr + "&line=" + busLine + "&apikey=400dacf8-9cc4-4d6c-82cc-88d9311401a5";
+        String request = "https://api.um.warszawa.pl/api/action/dbtimetable_get/?id=e923fa0e-d96c-43f9-ae6e-60518c9f3238&busstopId=" +
+                busStopId + "&busstopNr=" + busStopNr + "&line=" + busLine + "&apikey=3320a2ff-9dc5-4492-83f1-255eaf6778d4";
+        System.out.println(request);
+        return request;
     }
 }

@@ -92,7 +92,7 @@ public class LightManagerAgent extends AbstractAgent {
                 properties.setProperty(MessageParameter.EDGE_ID, trafficJammedEdgeSet.get(String.valueOf(result.getOsmWayId())));
                 trafficJammedEdgeSet.remove(Long.toString(result.getOsmWayId()));
                 msg.setAllUserDefinedParameters(properties);
-                logger.info("Send message to " + TroubleManagerAgent.name + " for request of EdgeID when stopping traffic jam");
+                logger.debug("Send message to " + TroubleManagerAgent.name + " for request of EdgeID when stopping traffic jam");
                 send(msg);
             }
 
@@ -114,12 +114,12 @@ public class LightManagerAgent extends AbstractAgent {
                 properties.setProperty(MessageParameter.TROUBLE_LON, Double.toString(result.getJammedLightPosition().getLng()));
                 properties.setProperty(MessageParameter.ADJACENT_OSM_WAY_ID, Long.toString(result.getOsmWayId()));
                 msg.setAllUserDefinedParameters(properties);
-                logger.info("Send message to " + nameOfAgent + " for request of EdgeID when starting traffic jam");
+                logger.debug("Send message to " + nameOfAgent + " for request of EdgeID when starting traffic jam");
                 send(msg);
             }
 
             private void answerCanProceed(String carName) {
-                print(carName + " can proceed.");
+                logger.debug("Send request to proceed to " + carName);
                 ACLMessage msg = createMessage(ACLMessage.REQUEST, carName);
                 Properties properties = createProperties(MessageParameter.LIGHT);
                 msg.setAllUserDefinedParameters(properties);
@@ -158,8 +158,8 @@ public class LightManagerAgent extends AbstractAgent {
                 switch (rcv.getPerformative()) {
                     case ACLMessage.INFORM -> {
                         var time = getDateParameter(rcv, MessageParameter.ARRIVAL_TIME);
-
                         var arrivalInfo = ArrivalInfo.of(agentName, time);
+                        logger.debug("Add " + agentName + " to far away queue");
                         crossroad.addCarToFarAwayQueue(getIntParameter(rcv, MessageParameter.ADJACENT_OSM_WAY_ID), arrivalInfo);
                     }
                     case ACLMessage.REQUEST_WHEN -> {
@@ -169,18 +169,22 @@ public class LightManagerAgent extends AbstractAgent {
                         Properties properties = createProperties(MessageParameter.LIGHT);
                         agree.setAllUserDefinedParameters(properties);
                         send(agree);
+                        logger.debug("Add " + agentName + " to close queue");
                         crossroad.addCarToQueue(getIntParameter(rcv, MessageParameter.ADJACENT_OSM_WAY_ID), agentName);
                     }
                     case ACLMessage.AGREE -> {
+                    	logger.debug("Remove " + agentName + " from close queue");
                         crossroad.removeCarFromQueue(getIntParameter(rcv, MessageParameter.ADJACENT_OSM_WAY_ID));
                     }
                     case ACLMessage.REFUSE -> {
+                    	logger.debug("Remove " + agentName + " from far away queue");
                         crossroad.removeCarFromFarAwayQueue(getIntParameter(rcv, MessageParameter.ADJACENT_OSM_WAY_ID), agentName);
                     }
                     case ACLMessage.CONFIRM -> {
+                    	logger.debug("Add edge " + rcv.getUserDefinedParameter(MessageParameter.EDGE_ID) + " from " + agentName + " to jammed edge set");
                         trafficJammedEdgeSet.put(rcv.getUserDefinedParameter(MessageParameter.ADJACENT_OSM_WAY_ID), rcv.getUserDefinedParameter(MessageParameter.EDGE_ID));
                     }
-                    default -> logger.info("Wait");
+                    default -> logger.debug("Wait");
                 }
             }
 
@@ -193,7 +197,7 @@ public class LightManagerAgent extends AbstractAgent {
                         var arrivalInfo = ArrivalInfo.of(agentName, time);
                         crossroad.addPedestrianToFarAwayQueue(getIntParameter(rcv, MessageParameter.ADJACENT_OSM_WAY_ID),
                                 arrivalInfo);
-                        logger.info("Got inform from pedestrian" + rcv.getSender().getLocalName());
+                        logger.debug("Got inform from pedestrian" + rcv.getSender().getLocalName());
                     }
                     case ACLMessage.REQUEST_WHEN -> {
                         crossroad.removePedestrianFromFarAwayQueue(getIntParameter(rcv, MessageParameter.ADJACENT_OSM_WAY_ID),
@@ -203,10 +207,10 @@ public class LightManagerAgent extends AbstractAgent {
                         agree.setAllUserDefinedParameters(properties);
                         send(agree);
                         crossroad.addPedestrianToQueue(getIntParameter(rcv, MessageParameter.ADJACENT_OSM_WAY_ID), agentName);
-                        logger.info("Got request_when from pedestrian" + rcv.getSender().getLocalName());
+                        logger.debug("Got request_when from pedestrian" + rcv.getSender().getLocalName());
                     }
                     case ACLMessage.AGREE -> {
-                        logger.info("Got agree from pedestrian" + rcv.getSender().getLocalName());
+                        logger.debug("Got agree from pedestrian" + rcv.getSender().getLocalName());
                         crossroad.removePedestrianFromQueue(getIntParameter(rcv, MessageParameter.ADJACENT_OSM_WAY_ID));
                     }
                     default -> print("Wait");

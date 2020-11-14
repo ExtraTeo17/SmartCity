@@ -82,7 +82,7 @@ public abstract class AbstractAgent extends Agent {
         if (nextManager != null) {
             ACLMessage msg = prepareMessageForManager(nextManager, movingObject);
             send(msg);
-            print("Sent INFORM to LightManager" + nextManager.getLightManagerId() + ".");
+            logger.debug("Sent INFORM to LightManager" + nextManager.getLightManagerId() + ".");
         }
     }
 

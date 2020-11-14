@@ -27,6 +27,9 @@ import com.graphhopper.util.PointList;
 import org.javatuples.Pair;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import routing.RouteTransformer;
+import routing.abstractions.IRouteTransformer;
 import routing.nodes.RouteNode;
 
 import java.util.ArrayList;
@@ -53,7 +56,7 @@ public class HighwayAccessor {
 
     // TODO: tested manually, but add unit tests / integration tests
 
-    public static Pair<List<Long>, List<RouteNode>> getOsmWayIdsAndPointList(double fromLat, double fromLon,
+    public static Pair<List<Long>, List<Integer>> getOsmWayIdsAndEdgeList(double fromLat, double fromLon,
                                                                              double toLat, double toLon,
                                                                              String typeOfVehicle, boolean bewareOfJammedRoutes) {
         GHResponse response = new GHResponse();
@@ -63,9 +66,9 @@ public class HighwayAccessor {
         return calculatePaths(request, response);
     }
 
-    private static Pair<List<Long>, List<RouteNode>> calculatePaths(GHRequest req, GHResponse resp) {
+    private static Pair<List<Long>, List<Integer>> calculatePaths(GHRequest req, GHResponse resp) {
         List<Long> osmWayIds = new ArrayList<>();
-        List<RouteNode> pointList = new ArrayList<>();
+        List<Integer> edgeList = new ArrayList<>();
         List<Path> paths = graphHopper.calcPaths(req, resp);
         Path path0 = paths.get(0);
 
@@ -84,17 +87,28 @@ public class HighwayAccessor {
                 osmWayIds.add(osmWayIdToAdd);
                 previousWayId = osmWayIdToAdd;
             }
-            pointList.addAll(getRouteNodeList(edgeId, edge.fetchWayGeometry(2)));
+            edgeList.addAll(getEdgeList(edgeId, edge.fetchWayGeometry(3)));
         }
 
-        return new Pair<>(osmWayIds, pointList);
+        return new Pair<>(osmWayIds, edgeList);
     }
 
-    private static List<RouteNode> getRouteNodeList(int edgeId, PointList pointList) {
-        List<RouteNode> nodeList = new ArrayList<>();
-        for (int i = 0; i < pointList.size(); ++i) {
-            nodeList.add(new RouteNode(pointList.toGHPoint(i).lat, pointList.toGHPoint(i).lon, edgeId));
+    private static List<Integer> getEdgeList(int edgeId, PointList pointList) {
+        List<Integer> edgeList = new ArrayList<>();
+        List<RouteNode> temporaryList = pointListToNodeList(pointList);
+        IRouteTransformer transformer = new RouteTransformer();
+        temporaryList = transformer.uniformRouteNext(temporaryList);
+        for (int i = 0; i < temporaryList.size(); ++i) {
+            edgeList.add(edgeId);
         }
-        return nodeList;
+        return edgeList;
     }
+
+	private static List<RouteNode> pointListToNodeList(PointList pointList) {
+		List<RouteNode> list = new ArrayList<>();
+		for (int i = 0; i < pointList.size(); ++i) {
+			list.add(new RouteNode(pointList.toGHPoint(i).getLat(), pointList.toGHPoint(i).getLon()));
+		}
+		return list;
+	}
 }
