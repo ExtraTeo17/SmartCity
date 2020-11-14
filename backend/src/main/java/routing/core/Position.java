@@ -1,6 +1,5 @@
 package routing.core;
 
-import org.jxmapviewer.viewer.GeoPosition;
 import utilities.ForSerialization;
 
 import java.io.Serializable;
@@ -62,11 +61,11 @@ public class Position implements IGeoPosition, Serializable {
 
     @Override
     public String toString() {
-        return "[" + lat + ", " + lng + "]";
+        return toText();
     }
 
-    public static Position of(GeoPosition pos) {
-        return new Position(pos.getLatitude(), pos.getLongitude());
+    public static Position of(IGeoPosition pos) {
+        return new Position(pos.getLat(), pos.getLng());
     }
 
     public static Position of(double lat, double lng) {

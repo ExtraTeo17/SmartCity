@@ -20,14 +20,14 @@ import events.web.bus.BusAgentDeadEvent;
 import events.web.bus.BusAgentFillStateUpdatedEvent;
 import events.web.bus.BusAgentStartedEvent;
 import events.web.bus.BusAgentUpdatedEvent;
+import events.web.car.CarAgentCreatedEvent;
+import events.web.car.CarAgentDeadEvent;
+import events.web.car.CarAgentRouteChangedEvent;
+import events.web.car.CarAgentUpdatedEvent;
 import events.web.pedestrian.*;
 import events.web.roadblocks.TrafficJamFinishedEvent;
 import events.web.roadblocks.TrafficJamStartedEvent;
 import events.web.roadblocks.TroublePointCreatedEvent;
-import events.web.vehicle.VehicleAgentCreatedEvent;
-import events.web.vehicle.VehicleAgentDeadEvent;
-import events.web.vehicle.VehicleAgentRouteChangedEvent;
-import events.web.vehicle.VehicleAgentUpdatedEvent;
 import jade.wrapper.ContainerController;
 import jade.wrapper.StaleProxyException;
 import org.junit.jupiter.api.Test;
@@ -115,10 +115,10 @@ class InjectorTests {
         eventBus.post(new TrafficJamFinishedEvent(1));
 
         // vehicle
-        eventBus.post(new VehicleAgentCreatedEvent(1, null, null, false));
-        eventBus.post(new VehicleAgentUpdatedEvent(1, null));
-        eventBus.post(new VehicleAgentRouteChangedEvent(1, new ArrayList<>(), null, new ArrayList<>()));
-        eventBus.post(new VehicleAgentDeadEvent(1, 0, null));
+        eventBus.post(new CarAgentCreatedEvent(1, null, null, false));
+        eventBus.post(new CarAgentUpdatedEvent(1, null));
+        eventBus.post(new CarAgentRouteChangedEvent(1, new ArrayList<>(), null, new ArrayList<>()));
+        eventBus.post(new CarAgentDeadEvent(1, 0, null));
 
         // bike
         eventBus.post(new BikeAgentCreatedEvent(1, null, null, false));

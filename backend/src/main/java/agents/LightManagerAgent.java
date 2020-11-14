@@ -8,7 +8,6 @@ import jade.core.behaviours.TickerBehaviour;
 import jade.lang.acl.ACLMessage;
 import jade.util.leap.Properties;
 import smartcity.ITimeProvider;
-import smartcity.TimeProvider;
 import smartcity.config.ConfigContainer;
 import smartcity.lights.OptimizationResult;
 import smartcity.lights.abstractions.ICrossroad;
@@ -149,6 +148,7 @@ public class LightManagerAgent extends AbstractAgent {
                 switch (type) {
                     case MessageParameter.VEHICLE -> handleMessageFromVehicle(rcv);
                     case MessageParameter.PEDESTRIAN -> handleMessageFromPedestrian(rcv);
+                    case MessageParameter.BIKE -> handleMessageFromVehicle(rcv);
                 }
             }
 

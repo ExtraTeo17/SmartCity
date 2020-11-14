@@ -10,6 +10,9 @@ export const CAR_MAX = 50;
 export const BIKE_MIN = 1;
 export const BIKE_MAX = 100;
 
+export const TEST_ID_MIN = 1;
+export const TEST_ID_MAX = 1000;
+
 export const LAT_MIN = -90;
 export const LAT_MAX = 90;
 export const LNG_MIN = -180;

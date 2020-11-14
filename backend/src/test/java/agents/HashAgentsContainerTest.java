@@ -64,7 +64,7 @@ class HashAgentsContainerTest {
             agents.add(getPedestrianAgent());
             agents.add(getBusAgent());
             agents.add(getStationAgent());
-            agents.add(getVehicleAgent());
+            agents.add(getCarAgent());
             agents.add(getBikeAgent());
             agents.add(getLightManagerAgent());
         }
@@ -98,10 +98,10 @@ class HashAgentsContainerTest {
                 createTimeProvider(), createEventBus());
     }
 
-    VehicleAgent getVehicleAgent() {
+    CarAgent getCarAgent() {
         var mov = mock(MovingObject.class);
         when(mov.getVehicleType()).thenReturn(VehicleType.REGULAR_CAR.toString());
-        return new VehicleAgent(idGenerator.get(VehicleAgent.class), mov,
+        return new CarAgent(idGenerator.get(CarAgent.class), mov,
                 createTimeProvider(), mock(IRouteGenerator.class), mock(IRouteTransformer.class),
                 createEventBus(), mock(ConfigContainer.class));
     }

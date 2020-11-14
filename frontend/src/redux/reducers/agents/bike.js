@@ -1,4 +1,4 @@
-import { BIKE_KILLED, BIKE_CREATED, BIKE_UPDATED } from "../core/constants";
+import { BIKE_KILLED, BIKE_CREATED, BIKE_UPDATED } from "../../core/constants";
 
 // Just for reference - defined in store.js
 const initialState = {

@@ -2,6 +2,7 @@ import { notify } from "react-notify-toast";
 import { NOTIFY_SHOW_MS } from "../../constants/global";
 import { LightColor } from "../../components/Models/LightColor";
 import { getResultObj } from "../dataUtils/helpers";
+import { getRandomInt } from "../../utils/helpers";
 import {
   SIMULATION_PREPARED,
   LIGHTS_SWITCHED,
@@ -69,7 +70,8 @@ const message = (state = initialState, action) => {
     }
 
     case TROUBLE_POINT_CREATED: {
-      const troublePoint = action.payload;
+      const isAccident = getRandomInt(0, 1) % 2 === 0;
+      const troublePoint = { ...action.payload, isAccident };
 
       return { ...state, troublePoints: [...state.troublePoints, troublePoint] };
     }
@@ -77,13 +79,11 @@ const message = (state = initialState, action) => {
     case TROUBLE_POINT_VANISHED: {
       const id = action.payload;
 
-      console.log(`Handling tp-hide: ${id}`);
       return { ...state, troublePoints: state.troublePoints.filter(tp => tp.id !== id) };
     }
 
     case TRAFFIC_JAM_STARTED: {
       const id = action.payload;
-      console.info(`Jam with ${id} started`);
 
       const newLights = state.lights.map(l => {
         if (l.id === id) {
@@ -97,7 +97,6 @@ const message = (state = initialState, action) => {
 
     case TRAFFIC_JAM_ENDED: {
       const id = action.payload;
-      console.info(`Jam with ${id} finished`);
 
       const newLights = state.lights.map(l => {
         if (l.id === id) {

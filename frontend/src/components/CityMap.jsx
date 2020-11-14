@@ -23,7 +23,7 @@ const CityMap = ({ center, wasStarted }) => {
   const [zoom, setZoom] = useState(D_ZOOM);
 
   useEffect(() => {
-    console.log("Rendered!");
+    console.info("Rendered whole map!");
   });
 
   function setCenter(latlng) {
@@ -85,7 +85,7 @@ const CityMap = ({ center, wasStarted }) => {
 const mapStateToProps = (state /* , ownProps */) => {
   const { interaction, message } = state;
   return {
-    center: interaction.center,
+    center: interaction.prepareSimulationData.center,
     wasStarted: message.wasStarted,
   };
 };

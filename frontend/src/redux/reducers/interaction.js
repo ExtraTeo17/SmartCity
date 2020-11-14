@@ -3,6 +3,8 @@ import {
   GENERATE_PEDESTRIANS_UPDATED,
   SHOULD_START_SIMULATION,
   START_SIMULATION_DATA_UPDATED,
+  CONFIG_REPLACED,
+  CENTER_MENU_UPDATED,
 } from "../core/constants";
 import {
   D_CHANGE_ROUTE_TP_ACTIVE,
@@ -23,14 +25,21 @@ import {
   D_EXTEND_WAIT_TIME,
   D_START_TIME,
   D_TIME_SCALE,
+  D_LAT,
+  D_LNG,
+  D_RAD,
+  D_GENERATE_PEDS,
 } from "../../constants/defaults";
-import { StartState } from "../models/startState";
+import { ConfigState, getNextConfigState } from "../models/states";
+import { saveLocalData } from "../dataUtils/helpers";
 
 // Just for reference - defined in store.js
-const initialState = {
-  center: { lat: 0, lng: 0, rad: 0 },
-  generatePedestrians: false,
-  shouldStart: StartState.Initial,
+export const initialInteractionState = {
+  configState: ConfigState.Initial,
+  prepareSimulationData: {
+    center: { lat: D_LAT, lng: D_LNG, rad: D_RAD },
+    generatePedestrians: D_GENERATE_PEDS,
+  },
   startSimulationData: {
     pedLimit: D_PEDS_NUM,
     testPedId: D_TEST_PED,
@@ -60,31 +69,31 @@ const initialState = {
   },
 };
 
-function getNextState(oldState) {
-  switch (oldState) {
-    case StartState.Initial:
-      return StartState.Invoke;
-    case StartState.Invoke:
-      return StartState.Proceed;
-
-    default:
-      return StartState.Initial;
-  }
-}
-
-/**
- * @param {{ type: any; payload: { center: { lat: number; lng: number; rad: number}; }; }} action
- */
-const interaction = (state = initialState, action) => {
+const interaction = (state = initialInteractionState, action) => {
   switch (action.type) {
     case CENTER_UPDATED: {
       const center = action.payload;
-      return { ...state, center: { ...state.center, ...center } };
+      const oldData = state.prepareSimulationData;
+      return {
+        ...state,
+        configState: getNextConfigState(state.configState),
+        prepareSimulationData: { ...oldData, center: { ...oldData.center, ...center } },
+      };
+    }
+
+    // To avoid re-rendering of prepare-menu components
+    case CENTER_MENU_UPDATED: {
+      const center = action.payload;
+      const oldData = state.prepareSimulationData;
+      return {
+        ...state,
+        prepareSimulationData: { ...oldData, center: { ...oldData.center, ...center } },
+      };
     }
 
     case GENERATE_PEDESTRIANS_UPDATED: {
       const generatePedestrians = action.payload;
-      return { ...state, generatePedestrians };
+      return { ...state, prepareSimulationData: { ...state.prepareSimulationData, generatePedestrians } };
     }
 
     case START_SIMULATION_DATA_UPDATED: {
@@ -93,8 +102,18 @@ const interaction = (state = initialState, action) => {
     }
 
     case SHOULD_START_SIMULATION: {
-      const newState = getNextState(state.shouldStart);
-      return { ...state, shouldStart: newState };
+      saveLocalData({ prepareSimulationData: state.prepareSimulationData, startSimulationData: state.startSimulationData });
+
+      return state;
+    }
+
+    case CONFIG_REPLACED: {
+      const newConfig = action.payload;
+      console.group("Config");
+      console.info(newConfig);
+      console.groupEnd();
+
+      return { ...newConfig, configState: getNextConfigState(state.configState) };
     }
 
     default:

@@ -14,22 +14,23 @@ export default createSelector([getBuses], buses => {
       return;
     }
 
-    const hash = getLocationHash(b.location);
-    if (positionsSet.has(hash) === false) {
-      positionsSet.add(hash);
+    const locHash = getLocationHash(b.location);
+    if (positionsSet.has(locHash) === false) {
+      positionsSet.add(locHash);
       busSet.add(b.id);
       result.push(b);
       return;
     }
 
-    const routeStart = b.route[0];
-    const routeEnd = b.route[b.route.length - 1];
-    // TODO: Compute hash here
-    const boundaries = [routeStart, routeEnd];
-    if (routesSet.has(boundaries) === false) {
-      routesSet.add(boundaries);
-      busSet.add(b.id);
-      result.push(b);
+    if (b.route) {
+      const routeStart = b.route[0];
+      const routeEnd = b.route[b.route.length - 1];
+      const routeHash = 100000 * getLocationHash(routeStart) + getLocationHash(routeEnd);
+      if (routesSet.has(routeHash) === false) {
+        routesSet.add(routeHash);
+        busSet.add(b.id);
+        result.push(b);
+      }
     }
   });
 

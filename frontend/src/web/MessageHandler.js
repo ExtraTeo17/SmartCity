@@ -27,10 +27,11 @@ import { NOTIFY_SHOW_MS } from "../constants/global";
 import Dispatcher from "../redux/Dispatcher";
 import { BusFillState } from "../components/Models/BusFillState";
 
+// eslint-disable-next-line
 function logMessage(payload) {
   console.groupCollapsed("HandledMessage");
-  console.log("Message received.");
-  console.log(payload);
+  console.info("Message received.");
+  console.info(payload);
   console.groupEnd();
 }
 
@@ -41,7 +42,7 @@ export default {
       case PREPARE_SIMULATION_RESPONSE: {
         notify.show("Simulation prepared!", "success", NOTIFY_SHOW_MS);
         console.groupCollapsed("Prepared");
-        console.log(msg.payload);
+        console.info(msg.payload);
         console.groupEnd();
         const { lights, stations, buses } = payload;
         Dispatcher.prepareSimulation(lights, stations, buses);

@@ -1,16 +1,30 @@
-import React from "react";
-import { Marker, Popup } from "react-leaflet";
+import React, { useEffect, useReducer } from "react";
+import { Popup } from "react-leaflet";
+import { BIKE_ROTATION_THRESHOLD, MOVING_Z_INDEX } from "../../constants/markers";
 import { bikeIcon, testBikeIcon } from "../../styles/icons";
+import { angleFromCoordinates } from "../../utils/helpers";
+import { getRotationReducer } from "./Extensions/reducers";
+import RotatedMarker from "./Extensions/RotatedMarker";
 
 const Bike = props => {
   const {
-    bike: { id, location, isTestBike },
+    bike: { id, route, location, isTestBike },
   } = props;
 
+  const defaultAngle = route ? angleFromCoordinates(route[0], route[1]) : 0;
+  const [state, dispatch] = useReducer(getRotationReducer(BIKE_ROTATION_THRESHOLD), { loc: location, angle: defaultAngle });
+
+  useEffect(() => {
+    dispatch({ payload: location });
+  }, [location]);
+
+  const icon = isTestBike ? testBikeIcon : bikeIcon;
+  const zOffset = isTestBike ? MOVING_Z_INDEX + 1 : MOVING_Z_INDEX;
+
   return (
-    <Marker position={location} icon={isTestBike ? testBikeIcon : bikeIcon} zIndexOffset={20}>
+    <RotatedMarker rotationAngle={state.angle} rotationOrigin="center" position={state.loc} icon={icon} zIndexOffset={zOffset}>
       <Popup>I am a bike-{id}!</Popup>
-    </Marker>
+    </RotatedMarker>
   );
 };
 

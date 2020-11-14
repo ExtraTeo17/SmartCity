@@ -16,28 +16,38 @@ import {
   D_EXTEND_WAIT_TIME,
   D_START_TIME,
   D_TIME_SCALE,
+  D_GENERATE_BIKES,
+  D_BIKES_NUM,
+  D_TEST_BIKE,
+  D_RAD,
+  D_LNG,
+  D_LAT,
+  D_GENERATE_PEDS,
 } from "../constants/defaults";
-import { StartState } from "./models/startState";
+import { loadLocalData } from "./dataUtils/helpers";
+import { ConfigState } from "./models/states";
 import appReducer from "./reducers/index";
 
 const initialState = {
   interaction: {
-    center: {
-      lat: 52.23698,
-      lng: 21.01766,
-      rad: 260,
+    configState: ConfigState.Initial,
+    prepareSimulationData: {
+      center: { lat: D_LAT, lng: D_LNG, rad: D_RAD },
+      generatePedestrians: D_GENERATE_PEDS,
     },
-    generatePedestrians: false,
-    shouldStart: StartState.Initial,
     startSimulationData: {
       pedLimit: D_PEDS_NUM,
       testPedId: D_TEST_PED,
 
+      generateCars: D_GENERATE_CARS,
       carsLimit: D_CARS_NUM,
       testCarId: D_TEST_CAR,
-      generateCars: D_GENERATE_CARS,
+
+      generateBikes: D_GENERATE_BIKES,
+      bikesLimit: D_BIKES_NUM,
+      testBikeId: D_TEST_BIKE,
+
       generateTroublePoints: D_GENERATE_TP,
-      changeRouteOnTrafficJam: D_CHANGE_ROUTE_TJ_ACTIVE,
       timeBeforeTrouble: D_TIME_BEFORE_TROUBLE,
 
       startTime: D_START_TIME,
@@ -50,6 +60,7 @@ const initialState = {
       extendWaitTime: D_EXTEND_WAIT_TIME,
 
       changeRouteOnTroublePoint: D_CHANGE_ROUTE_TP_ACTIVE,
+      changeRouteOnTrafficJam: D_CHANGE_ROUTE_TJ_ACTIVE,
     },
   },
   message: {
@@ -73,6 +84,13 @@ const initialState = {
     bikes: [],
   },
 };
+
+const data = loadLocalData();
+if (data) {
+  initialState.interaction.startSimulationData = data.startSimulationData;
+  initialState.interaction.prepareSimulationData = data.prepareSimulationData;
+  console.info("Set initial data from localStorage");
+}
 
 const store = createStore(appReducer, initialState, composeWithDevTools());
 export const { dispatch } = store;

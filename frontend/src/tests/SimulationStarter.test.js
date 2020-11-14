@@ -4,8 +4,8 @@ import React from "react";
 import { render, unmountComponentAtNode } from "react-dom";
 import { act } from "react-dom/test-utils";
 import { SimulationStarterObj } from "../components/Menu/Main/SimulationStarter";
-import { StartState } from "../redux/models/startState";
 import { START_SIMULATION_REQUEST } from "../web/MessageType";
+// eslint-disable-next-line no-unused-vars
 import WebServer from "../web/WebServer";
 
 let message;
@@ -61,15 +61,12 @@ const startSimulationData = {
 it("Passes correct data to ApiManager", async () => {
   // Use the asynchronous version of act to apply resolved promises
   act(() => {
-    render(
-      <SimulationStarterObj
-        shouldStart={StartState.Proceed}
-        startSimulationData={startSimulationData}
-        wasPrepared
-        wasStarted={false}
-      />,
-      container
-    );
+    render(<SimulationStarterObj startSimulationData={startSimulationData} wasPrepared wasStarted={false} />, container);
+  });
+
+  const button = container.querySelector("button");
+  act(() => {
+    button.dispatchEvent(new MouseEvent("click", { bubbles: true }));
   });
 
   expect(message).toBeTruthy();

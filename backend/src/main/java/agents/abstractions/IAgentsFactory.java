@@ -11,9 +11,9 @@ import routing.nodes.StationNode;
 import java.util.List;
 
 public interface IAgentsFactory {
-    VehicleAgent create(List<RouteNode> route, boolean testCar);
+    CarAgent create(List<RouteNode> route, boolean testCar);
 
-    VehicleAgent create(List<RouteNode> route);
+    CarAgent create(List<RouteNode> route);
 
     BikeAgent create(List<RouteNode> route, boolean testCar, String check);
 

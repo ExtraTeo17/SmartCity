@@ -4,7 +4,7 @@ import {
   PEDESTRIAN_KILLED,
   PEDESTRIAN_PUSHED,
   PEDESTRIAN_PULLED,
-} from "../core/constants";
+} from "../../core/constants";
 
 // Just for reference - defined in store.js
 const initialState = {

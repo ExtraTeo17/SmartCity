@@ -57,8 +57,8 @@ public class TroubleManagerAgent extends Agent {
     }
 
     private void sendBroadcast(ACLMessage response) {
-        agentsContainer.forEach(VehicleAgent.class, vehicleAgent -> {
-            response.addReceiver(vehicleAgent.getAID());
+        agentsContainer.forEach(CarAgent.class, CarAgent -> {
+            response.addReceiver(CarAgent.getAID());
         });
         send(response);
         logger.debug("Sent broadcast");
@@ -74,7 +74,8 @@ public class TroubleManagerAgent extends Agent {
     }
 
     private ACLMessage generateMessageAboutTrafficJam(int edgeId, String lengthOfJam, String typeOfTrouble, String showOrStop) {
-        //logger.info("Got message about trouble on edge: " + edgeId); // broadcasting to everybody
+        logger.debug("Got message about trouble on edge: " + edgeId); // broadcasting to everybody
+
         ACLMessage response = new ACLMessage(ACLMessage.PROPOSE);
         Properties properties = createProperties(MessageParameter.TROUBLE_MANAGER);
         properties.setProperty(MessageParameter.EDGE_ID, Long.toString(edgeId));
@@ -173,7 +174,7 @@ public class TroubleManagerAgent extends Agent {
                     return;
                 }
                 for (Map.Entry<Integer, String> entry : mapOfConstructionSiteBlockedEdges.entrySet()) {
-                   // construction site
+                    // construction site
                     sendBroadcast(generateMessageAboutTrafficJam(entry.getKey(), entry.getValue(),
                             MessageParameter.CONSTRUCTION, MessageParameter.SHOW));
                 }

@@ -19,17 +19,17 @@ export const redLightIcon = new L.Icon({
 export const carIcon = new L.Icon({
   iconUrl: "/images/car.png",
   iconRetinaUrl: "/images/car.png",
-  iconAnchor: [16, 16],
-  popupAnchor: [8, 8],
-  iconSize: [32, 32],
+  popupAnchor: [3, 7],
+  iconAnchor: [7, 15],
+  iconSize: [15, 30],
 });
 
 export const testCarIcon = new L.Icon({
   iconUrl: "/images/test_car.png",
   iconRetinaUrl: "/images/test_car.png",
-  iconAnchor: [16, 16],
-  popupAnchor: [8, 8],
-  iconSize: [32, 32],
+  popupAnchor: [3, 7],
+  iconAnchor: [7, 15],
+  iconSize: [15, 30],
 });
 
 export const stationIcon = new L.Icon({
@@ -43,49 +43,41 @@ export const stationIcon = new L.Icon({
 export const busLowIcon = new L.Icon({
   iconUrl: "/images/bus_low.png",
   iconRetinaUrl: "/images/bus_low.png",
-  iconAnchor: [16, 16],
-  popupAnchor: [8, 8],
-  iconSize: [32, 32],
+  popupAnchor: [4, 10],
+  iconAnchor: [9, 21],
+  iconSize: [18, 42],
 });
 
 export const busMidIcon = new L.Icon({
   iconUrl: "/images/bus_mid.png",
   iconRetinaUrl: "/images/bus_mid.png",
-  iconAnchor: [16, 16],
-  popupAnchor: [8, 8],
-  iconSize: [32, 32],
+  popupAnchor: [4, 10],
+  iconAnchor: [9, 21],
+  iconSize: [18, 42],
 });
 
 export const busHighIcon = new L.Icon({
   iconUrl: "/images/bus_high.png",
   iconRetinaUrl: "/images/bus_high.png",
-  iconAnchor: [16, 16],
-  popupAnchor: [8, 8],
-  iconSize: [32, 32],
+  popupAnchor: [4, 10],
+  iconAnchor: [9, 21],
+  iconSize: [18, 42],
 });
 
 export const pedestrianIcon = new L.Icon({
-  iconUrl: "/images/pedestrian_small.png",
-  iconRetinaUrl: "/images/pedestrian_small.png",
-  iconAnchor: [12, 12],
-  popupAnchor: [6, 6],
-  iconSize: [24, 24],
+  iconUrl: "/images/pedestrian.png",
+  iconRetinaUrl: "/images/pedestrian.png",
+  popupAnchor: [4, 2],
+  iconAnchor: [8, 5],
+  iconSize: [16, 11],
 });
 
 export const testPedestrianIcon = new L.Icon({
-  iconUrl: "/images/pedestrian_small_blue.png",
-  iconRetinaUrl: "/images/pedestrian_small_blue.png",
-  iconAnchor: [12, 12],
-  popupAnchor: [6, 6],
-  iconSize: [24, 24],
-});
-
-export const bigPedestrianIcon = new L.Icon({
-  iconUrl: "/images/pedestrian.png",
-  iconRetinaUrl: "/images/pedestrian.png",
-  iconAnchor: [16, 16],
-  popupAnchor: [8, 8],
-  iconSize: [32, 32],
+  iconUrl: "/images/test_pedestrian.png",
+  iconRetinaUrl: "/images/test_pedestrian.png",
+  popupAnchor: [4, 3],
+  iconAnchor: [8, 7],
+  iconSize: [16, 15],
 });
 
 export const troublePointIcon = new L.Icon({
@@ -93,6 +85,14 @@ export const troublePointIcon = new L.Icon({
   iconRetinaUrl: "/images/trouble_point.png",
   iconAnchor: [16, 16],
   popupAnchor: [8, 8],
+  iconSize: [32, 32],
+});
+
+export const accidentIcon = new L.Icon({
+  iconUrl: "/images/accident.png",
+  iconRetinaUrl: "/images/accident.png",
+  popupAnchor: [8, 8],
+  iconAnchor: [16, 16],
   iconSize: [32, 32],
 });
 
@@ -107,16 +107,15 @@ export const goldMarkerIcon = new L.Icon({
 export const bikeIcon = new L.Icon({
   iconUrl: "/images/bike.png",
   iconRetinaUrl: "/images/bike.png",
-  iconAnchor: [12, 12],
-  popupAnchor: [6, 6],
-  iconSize: [24, 24],
+  popupAnchor: [7, 10],
+  iconAnchor: [14, 20],
+  iconSize: [28, 40],
 });
 
-// TODO: Different icon/style
 export const testBikeIcon = new L.Icon({
-  iconUrl: "/images/bike.png",
-  iconRetinaUrl: "/images/bike.png",
-  iconAnchor: [12, 12],
-  popupAnchor: [6, 6],
-  iconSize: [24, 24],
+  iconUrl: "/images/test_bike.png",
+  iconRetinaUrl: "/images/test_bike.png",
+  popupAnchor: [7, 10],
+  iconAnchor: [14, 20],
+  iconSize: [28, 40],
 });

@@ -1,6 +1,10 @@
 export const D_ZOOM = 15;
 export const D_DECIMAL_PLACES = 5;
 
+export const D_LAT = 52.23698;
+export const D_LNG = 21.01766;
+export const D_RAD = 600;
+
 export const D_START_TIME = new Date();
 export const D_TIME_SCALE = 10;
 
@@ -11,10 +15,11 @@ export const D_TEST_CAR = 2;
 export const D_GENERATE_TP = true;
 export const D_TIME_BEFORE_TROUBLE = 5;
 
-export const D_GENERATE_BIKES = true;
+export const D_GENERATE_BIKES = false;
 export const D_BIKES_NUM = 8;
 export const D_TEST_BIKE = 4;
 
+export const D_GENERATE_PEDS = false;
 export const D_PEDS_NUM = 20;
 export const D_TEST_PED = 5;
 

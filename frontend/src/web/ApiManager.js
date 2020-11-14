@@ -4,7 +4,9 @@ import WebServer from "./WebServer";
 /** PUBLIC INTERFACE ---------------------------------------------------------- */
 
 export default {
-  prepareSimulation({ lat, lng, rad, generatePedestrians } = { lat: 0, lng: 0, rad: 0, generatePedestrians: false }) {
+  prepareSimulation(
+    { center: { lat, lng, rad }, generatePedestrians } = { center: { lat: 0, lng: 0, rad: 0 }, generatePedestrians: false }
+  ) {
     const msg = {
       type: PREPARE_SIMULATION_REQUEST,
       payload: {
