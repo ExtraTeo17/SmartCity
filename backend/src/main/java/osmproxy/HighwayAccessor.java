@@ -27,6 +27,9 @@ import com.graphhopper.util.PointList;
 import org.javatuples.Pair;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import routing.RouteTransformer;
+import routing.abstractions.IRouteTransformer;
 import routing.nodes.RouteNode;
 
 import java.util.ArrayList;
@@ -92,9 +95,20 @@ public class HighwayAccessor {
 
     private static List<Integer> getEdgeList(int edgeId, PointList pointList) {
         List<Integer> edgeList = new ArrayList<>();
-        for (int i = 0; i < pointList.size(); ++i) {
+        List<RouteNode> temporaryList = pointListToNodeList(pointList);
+        IRouteTransformer transformer = new RouteTransformer();
+        temporaryList = transformer.uniformRouteNext(temporaryList);
+        for (int i = 0; i < temporaryList.size(); ++i) {
             edgeList.add(edgeId);
         }
         return edgeList;
     }
+
+	private static List<RouteNode> pointListToNodeList(PointList pointList) {
+		List<RouteNode> list = new ArrayList<>();
+		for (int i = 0; i < pointList.size(); ++i) {
+			list.add(new RouteNode(pointList.toGHPoint(i).getLat(), pointList.toGHPoint(i).getLon()));
+		}
+		return list;
+	}
 }

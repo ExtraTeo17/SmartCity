@@ -61,7 +61,7 @@ public class TroubleManagerAgent extends Agent {
             response.addReceiver(vehicleAgent.getAID());
         });
         send(response);
-        logger.info("Sent broadcast");
+        logger.debug("Sent broadcast");
     }
 
     private ACLMessage generateMessageAboutTrouble(ACLMessage rcv, String typeOfTrouble, String showOrStop) {
@@ -75,6 +75,7 @@ public class TroubleManagerAgent extends Agent {
 
     private ACLMessage generateMessageAboutTrafficJam(int edgeId, String lengthOfJam, String typeOfTrouble, String showOrStop) {
         logger.debug("Got message about trouble on edge: " + edgeId); // broadcasting to everybody
+      
         ACLMessage response = new ACLMessage(ACLMessage.PROPOSE);
         Properties properties = createProperties(MessageParameter.TROUBLE_MANAGER);
         properties.setProperty(MessageParameter.EDGE_ID, Long.toString(edgeId));
@@ -93,8 +94,7 @@ public class TroubleManagerAgent extends Agent {
                 Double.parseDouble(rcv.getUserDefinedParameter(MessageParameter.TROUBLE_LON)));
 
         eventBus.post(new TroublePointCreatedEvent(++latestTroublePointId, troublePoint));
-        logger.info("Got message about trouble - CONSTRUCTION");
-        logger.info("troublePoint: " + troublePoint.getLat() + "  " + troublePoint.getLng());
+        logger.debug("Got message about new troublePoint: " + troublePoint.getLat() + "  " + troublePoint.getLng());
         if (!mapOfConstructionSiteBlockedEdges.containsKey(edgeId)) {
             mapOfConstructionSiteBlockedEdges.put(edgeId, rcv.getUserDefinedParameter(MessageParameter.LENGTH_OF_JAM));
             ExtendedGraphHopper.addForbiddenEdges(Arrays.asList(edgeId));
@@ -108,7 +108,7 @@ public class TroubleManagerAgent extends Agent {
         eventBus.post(new TrafficJamStartedEvent(Position.longHash(lat, lng)));
 
         int edgeId = Integer.parseInt(rcv.getUserDefinedParameter(MessageParameter.EDGE_ID));
-        logger.info("Got message about light traffic jam start on: " + edgeId);
+        logger.debug("Got message about light traffic jam start on: " + edgeId);
         if (!mapOfLightTrafficJamBlockedEdges.containsKey(edgeId)) {
             mapOfLightTrafficJamBlockedEdges.put(edgeId, rcv.getUserDefinedParameter(MessageParameter.LENGTH_OF_JAM));
             ExtendedGraphHopper.addForbiddenEdges(Arrays.asList(edgeId));
@@ -125,7 +125,7 @@ public class TroubleManagerAgent extends Agent {
         eventBus.post(new TrafficJamFinishedEvent(Position.longHash(lat, lng)));
 
         int edgeId = Integer.parseInt(rcv.getUserDefinedParameter(MessageParameter.EDGE_ID));
-        logger.info("Got message about light traffic jam stop on: " + edgeId);
+        logger.debug("Got message about light traffic jam stop on: " + edgeId);
         if (mapOfLightTrafficJamBlockedEdges.containsKey(edgeId)) {
             mapOfLightTrafficJamBlockedEdges.remove(edgeId);
             ExtendedGraphHopper.removeForbiddenEdges(Arrays.asList(edgeId));

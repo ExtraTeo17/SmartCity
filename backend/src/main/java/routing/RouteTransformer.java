@@ -11,7 +11,7 @@ import java.util.List;
 
 import static utilities.NumericHelper.PRECISION;
 
-final class RouteTransformer implements
+public final class RouteTransformer implements // TODO: We'll make it private other time, sorry
         IRouteTransformer {
     private static final Logger logger = LoggerFactory.getLogger(RouteTransformer.class);
 
@@ -21,11 +21,10 @@ final class RouteTransformer implements
     public List<RouteNode> uniformRoute(List<RouteNode> route) {
     	return route; // TODO: CLEAN UP
     }
-
-
-	@Override
-	public List<RouteNode> uniformRouteNew(List<RouteNode> route, List<Integer> edgeList) {
-        List<RouteNode> newRoute = new ArrayList<>();
+    
+    @Override
+    public List<RouteNode> uniformRouteNext(List<RouteNode> route) {
+    	List<RouteNode> newRoute = new ArrayList<>();
         for (int i = 0; i < route.size() - 1; ++i) {
             RouteNode nodeA = route.get(i);
             RouteNode nodeB = route.get(i + 1);
@@ -54,6 +53,13 @@ final class RouteTransformer implements
         if (route.size() > 0) {
             newRoute.add(route.get(route.size() - 1));
         }
+        
+        return newRoute;
+    }
+
+	@Override
+	public List<RouteNode> uniformRouteNew(List<RouteNode> route, List<Integer> edgeList) {
+        List<RouteNode> newRoute = uniformRouteNext(route);
         
         double denominator = newRoute.size();
         for (double nominator = 0; nominator < denominator; ++nominator) {

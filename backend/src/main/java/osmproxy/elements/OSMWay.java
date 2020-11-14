@@ -8,6 +8,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
+
+import routing.core.IGeoPosition;
 import routing.core.IZone;
 import routing.core.Position;
 import utilities.ForSerialization;
@@ -350,4 +352,17 @@ public class OSMWay extends OSMElement implements Serializable {
         BACK,
         FRONT
     }
+
+	public String findClosestNodeRefTo(IGeoPosition pointA) {
+		String closestNodeRef = null;
+		double minDist = Double.MAX_VALUE;
+		for (final OSMWaypoint point : waypoints) {
+			double currDist = point.distance(pointA);
+			if (currDist < minDist) {
+				minDist = currDist;
+				closestNodeRef = point.getOsmNodeRef();
+			}
+		}
+		return closestNodeRef;
+	}
 }
