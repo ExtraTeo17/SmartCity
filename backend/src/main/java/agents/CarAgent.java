@@ -8,7 +8,6 @@ import events.web.car.CarAgentUpdatedEvent;
 import jade.core.behaviours.*;
 import jade.lang.acl.ACLMessage;
 import jade.util.leap.Properties;
-import osmproxy.ExtendedGraphHopper;
 import routing.abstractions.IRouteGenerator;
 import routing.abstractions.IRouteTransformer;
 import routing.core.IGeoPosition;
@@ -22,7 +21,10 @@ import smartcity.config.abstractions.ITroublePointsConfigContainer;
 import vehicles.MovingObject;
 import vehicles.enums.DrivingState;
 
-import java.util.*;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Random;
+import java.util.Set;
 
 import static agents.message.MessageManager.createMessage;
 import static agents.message.MessageManager.createProperties;
@@ -170,8 +172,8 @@ public class CarAgent extends AbstractAgent {
                 if (indexOfRouteNodeWithEdge != null && indexOfRouteNodeWithEdge != car.getUniformRouteSize() - 1) {
                     handleConstructionSiteRouteChange(indexOfRouteNodeWithEdge);
                 }
-                else{
-                    logger.info("kokokokokokokokokokokokokokokokokokokokokokokokokokokoko");
+                else {
+                    logger.info("Index of edge route is invalid: " + indexOfRouteNodeWithEdge);
                 }
             }
 
@@ -327,8 +329,6 @@ public class CarAgent extends AbstractAgent {
                         bewareOfJammedEdge);
                 timeForOfDynamicRoute = car.getMillisecondsFromAToB(car.getMoveIndex(),
                         mergeResult.newUniformRoute.size() - 1);
-                //logger.info("=======================timeForOfDynamicRoute" + timeForOfDynamicRoute);
-                //logger.info("-----------------------timeForTheEndWithJam" + timeForTheEndWithJam);
                 if (timeForTheEndWithJam > timeForOfDynamicRoute) {
                     logger.info("Trip time through the jam: " + timeForTheEndWithJam + " is longer than alternative route time: "
                             + timeForOfDynamicRoute + ", so route will be changed");
@@ -365,7 +365,7 @@ public class CarAgent extends AbstractAgent {
                 public void onTick() {
                     var route = car.getUniformRoute();
 
-                    var el = random.nextInt(route.size() - car.getMoveIndex() - THRESHOLD_UNTIL_INDEX_CHANGE - 5 + 1) + car.getMoveIndex()+ THRESHOLD_UNTIL_INDEX_CHANGE + 5; // TODO: from current index //choose trouble EdgeId
+                    var el = random.nextInt(route.size() - car.getMoveIndex() - THRESHOLD_UNTIL_INDEX_CHANGE - 5 + 1) + car.getMoveIndex() + THRESHOLD_UNTIL_INDEX_CHANGE + 5; // TODO: from current index //choose trouble EdgeId
                     RouteNode troublePointTmp = route.get(el);
                     troublePoint = new RouteNode(troublePointTmp.getLat(), troublePointTmp.getLng(),
                             troublePointTmp.getInternalEdgeId());
@@ -393,7 +393,6 @@ public class CarAgent extends AbstractAgent {
 
         }
     }
-
 
     private void displayRouteDebug(List<RouteNode> route) {
         for (RouteNode node : route) {
