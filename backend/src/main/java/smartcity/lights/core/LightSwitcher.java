@@ -94,6 +94,7 @@ public class LightSwitcher implements Function<ISwitchLightsContext, Integer> {
     private boolean shouldExtend(boolean hadPreviouslyExtended) {
         if (configContainer.isLightStrategyActive()) {
 
+            // TODO: Get group sizes and ensure that red is 0 when going to next condition
             if (shouldExtendGreenLightBecauseOfObjectsOnLight(hadPreviouslyExtended)) {
                 logger.debug("-------------------------------------shouldExtendGreenLightBecauseOfCarsOnLight--------------");
                 return true;
@@ -159,6 +160,7 @@ public class LightSwitcher implements Function<ISwitchLightsContext, Integer> {
         }
 
         for (Light light : redLights) {
+            // TODO: getFarawayCarsAndPedestriansWithinInterval
             for (var time : light.farAwayPedestrianMap.values()) {
                 if (time.isAfter(currentTime) && time.isBefore(currentTimePlusExtend)) {
                     ++greenGroupObjects;

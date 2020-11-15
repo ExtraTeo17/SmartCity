@@ -117,6 +117,27 @@ class LightSwitcherTests {
     }
 
     @Test
+    void apply_onStrategyActive_onNotCorrectObjectsInQueue_onObjectsInFarawayQueue_shouldNotExtend() {
+        // Arrange
+        var lights = createLights();
+        var greenLights = lights.first.getLights();
+        greenLights.forEach(l -> l.farAwayCarMap.put("someCar", currentTime.plusSeconds(extendTimeSeconds / 2)));
+        var redLights = lights.second.getLights();
+        redLights.forEach(l -> l.carQueue.add("someCar1"));
+
+        var switcher = createLightSwitcher(lights);
+        var context = createContext();
+
+        // Act
+        switcher.apply(context);
+
+        // Assert
+        assertTrue(context.haveNotExtendedYet());
+        assertTrue(greenLights.stream().noneMatch(Light::isGreen));
+    }
+
+
+    @Test
     void apply_onStrategyActive_onCorrectObjects_inFarAwayQueue_shouldExtend_manyTimes() {
         // Arrange
         var lights = createLights();
@@ -136,7 +157,7 @@ class LightSwitcherTests {
         switcher.apply(context);
         // green here, extended
         assertTrue(greenLights.stream().allMatch(Light::isGreen));
-        
+
         switcher.apply(context);
         // green here, extended
         assertFalse(context.haveNotExtendedYet());
