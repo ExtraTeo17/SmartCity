@@ -8,7 +8,7 @@ import events.web.SwitchLightsEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import smartcity.ITimeProvider;
-import smartcity.config.ConfigContainer;
+import smartcity.config.abstractions.ILightConfigContainer;
 import smartcity.task.data.ISwitchLightsContext;
 import utilities.Siblings;
 
@@ -19,7 +19,7 @@ public class LightSwitcher implements Function<ISwitchLightsContext, Integer> {
     private final Logger logger;
 
     private final ITimeProvider timeProvider;
-    private final ConfigContainer configContainer;
+    private final ILightConfigContainer configContainer;
     private final EventBus eventBus;
 
     private final int extendTimeSeconds;
@@ -31,7 +31,7 @@ public class LightSwitcher implements Function<ISwitchLightsContext, Integer> {
 
     @Inject
     LightSwitcher(ITimeProvider timeProvider,
-                  ConfigContainer configContainer,
+                  ILightConfigContainer configContainer,
                   EventBus eventBus,
                   @Assisted("managerId") int managerId,
                   @Assisted("extendTime") int extendTimeSeconds,
@@ -53,7 +53,7 @@ public class LightSwitcher implements Function<ISwitchLightsContext, Integer> {
         var secondIter = lights.second.iterator();
 
         Light anyLight;
-        boolean isFirstGroupGreen = true;
+        boolean isFirstGroupGreen;
         if (firstIter.hasNext()) {
             anyLight = firstIter.next();
             isFirstGroupGreen = anyLight.isGreen();
@@ -80,22 +80,21 @@ public class LightSwitcher implements Function<ISwitchLightsContext, Integer> {
 
     @Override
     public Integer apply(ISwitchLightsContext context) {
-        // TODO: check if works
         if (configContainer.isLightStrategyActive()) {
-            if (!context.haveAlreadyExtendedGreen()) {
+            if (context.haveNotExtendedYet()) {
                 if (shouldExtendGreenLightBecauseOfObjectsOnLight()) {
                     logger.debug("-------------------------------------shouldExtendGreenLightBecauseOfCarsOnLight--------------");
-                    context.setExtendedGreen(true);
+                    context.setNotExtendedGreen(false);
                     return defaultExecutionDelay;
                 }
                 else if (shouldExtendBecauseOfFarAwayQueue()) {
                     logger.debug("-------------------------------------shouldExtendBecauseOfFarAwayQueue--------------");
-                    context.setExtendedGreen(true);
+                    context.setNotExtendedGreen(false);
                     return defaultExecutionDelay;
                 }
             }
             else {
-                context.setExtendedGreen(false);
+                context.setNotExtendedGreen(true);
             }
         }
 
@@ -125,7 +124,6 @@ public class LightSwitcher implements Function<ISwitchLightsContext, Integer> {
             logger.debug("LM:CROSSROAD HAS PROLONGED GREEN LIGHT FOR " + greenGroupObjects + " CARS AS OPPOSED TO " + redGroupObjects);
         }
 
-        // TODO: should check if two base green intervals have passed (also temporary, because it also sucks)
         return result;
     }
 
