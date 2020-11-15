@@ -8,6 +8,8 @@ import smartcity.config.abstractions.ITroublePointsConfigContainer;
 import smartcity.lights.LightColor;
 import smartcity.lights.abstractions.ICrossroad;
 import smartcity.lights.abstractions.ICrossroadFactory;
+import smartcity.lights.abstractions.ICrossroadParser;
+import smartcity.lights.core.data.LightInfo;
 import utilities.Siblings;
 
 import java.util.List;

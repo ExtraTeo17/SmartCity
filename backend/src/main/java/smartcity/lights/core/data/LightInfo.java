@@ -1,14 +1,14 @@
-package smartcity.lights.core;
+package smartcity.lights.core.data;
 
 
 import routing.core.IGeoPosition;
 
 public class LightInfo {
-    final long osmLightId;
-    final long adjacentOsmWayId;
-    final IGeoPosition position;
-    final String adjacentCrossingOsmId1;
-    final String adjacentCrossingOsmId2;
+    public final long osmLightId;
+    public final long adjacentOsmWayId;
+    public final IGeoPosition position;
+    public final String adjacentCrossingOsmId1;
+    public final String adjacentCrossingOsmId2;
 
     public LightInfo(long osmLightId,
                      long adjacentOsmWayId,

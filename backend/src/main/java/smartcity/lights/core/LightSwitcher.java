@@ -80,32 +80,35 @@ public class LightSwitcher implements Function<ISwitchLightsContext, Integer> {
 
     @Override
     public Integer apply(ISwitchLightsContext context) {
-        if (configContainer.isLightStrategyActive()) {
-            if (context.haveNotExtendedYet()) {
-                if (shouldExtendGreenLightBecauseOfObjectsOnLight()) {
-                    logger.debug("-------------------------------------shouldExtendGreenLightBecauseOfCarsOnLight--------------");
-                    context.setNotExtendedGreen(false);
-                    return defaultExecutionDelay;
-                }
-                else if (shouldExtendBecauseOfFarAwayQueue()) {
-                    logger.debug("-------------------------------------shouldExtendBecauseOfFarAwayQueue--------------");
-                    context.setNotExtendedGreen(false);
-                    return defaultExecutionDelay;
-                }
-            }
-            else {
-                context.setNotExtendedGreen(true);
-            }
+        if (shouldExtend(!context.haveNotExtendedYet())) {
+            context.setNotExtendedGreen(false);
+            return defaultExecutionDelay;
         }
 
+        context.setNotExtendedGreen(true);
         switchLights();
-        logger.debug("Switched light at: " + timeProvider.getCurrentSimulationTime());
-        eventBus.post(new SwitchLightsEvent(lightOsmId));
 
         return defaultExecutionDelay;
     }
 
-    private boolean shouldExtendGreenLightBecauseOfObjectsOnLight() {
+    private boolean shouldExtend(boolean hadPreviouslyExtended) {
+        if (configContainer.isLightStrategyActive()) {
+
+            if (shouldExtendGreenLightBecauseOfObjectsOnLight(hadPreviouslyExtended)) {
+                logger.debug("-------------------------------------shouldExtendGreenLightBecauseOfCarsOnLight--------------");
+                return true;
+            }
+            else if (shouldExtendBecauseOfFarAwayQueue(hadPreviouslyExtended)) {
+                logger.debug("-------------------------------------shouldExtendBecauseOfFarAwayQueue--------------");
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+
+    private boolean shouldExtendGreenLightBecauseOfObjectsOnLight(boolean hadPreviouslyExtended) {
         int greenGroupObjects = 0;
         int redGroupObjects = 0;
 
@@ -119,7 +122,15 @@ public class LightSwitcher implements Function<ISwitchLightsContext, Integer> {
             redGroupObjects += CAR_TO_PEDESTRIAN_LIGHT_RATE * light.carQueue.size();
         }
 
-        boolean result = greenGroupObjects > redGroupObjects;
+        boolean result;
+        if (hadPreviouslyExtended) {
+            result = greenGroupObjects > 0 && redGroupObjects == 0;
+        }
+        else {
+            result = greenGroupObjects > redGroupObjects;
+        }
+
+
         if (result) {
             logger.debug("LM:CROSSROAD HAS PROLONGED GREEN LIGHT FOR " + greenGroupObjects + " CARS AS OPPOSED TO " + redGroupObjects);
         }
@@ -127,7 +138,8 @@ public class LightSwitcher implements Function<ISwitchLightsContext, Integer> {
         return result;
     }
 
-    private boolean shouldExtendBecauseOfFarAwayQueue() {
+
+    private boolean shouldExtendBecauseOfFarAwayQueue(boolean hadPreviouslyExtended) {
         var currentTime = timeProvider.getCurrentSimulationTime();
         var currentTimePlusExtend = currentTime.plusSeconds(extendTimeSeconds);
 
@@ -135,12 +147,12 @@ public class LightSwitcher implements Function<ISwitchLightsContext, Integer> {
         int redGroupObjects = 0;
         for (Light light : greenLights) {
             for (var time : light.farAwayCarMap.values()) {
-                if (currentTimePlusExtend.isAfter(time) && time.isBefore(currentTime)) {
+                if (time.isAfter(currentTime) && time.isBefore(currentTimePlusExtend)) {
                     greenGroupObjects += CAR_TO_PEDESTRIAN_LIGHT_RATE;
                 }
             }
             for (var time : light.farAwayPedestrianMap.values()) {
-                if (currentTimePlusExtend.isAfter(time) && time.isBefore(currentTime)) {
+                if (time.isAfter(currentTime) && time.isBefore(currentTimePlusExtend)) {
                     ++redGroupObjects;
                 }
             }
@@ -148,18 +160,26 @@ public class LightSwitcher implements Function<ISwitchLightsContext, Integer> {
 
         for (Light light : redLights) {
             for (var time : light.farAwayPedestrianMap.values()) {
-                if (currentTimePlusExtend.isAfter(time) && time.isBefore(currentTime)) {
+                if (time.isAfter(currentTime) && time.isBefore(currentTimePlusExtend)) {
                     ++greenGroupObjects;
                 }
             }
             for (var time : light.farAwayCarMap.values()) {
-                if (currentTimePlusExtend.isAfter(time) && time.isBefore(currentTime)) {
+                if (time.isAfter(currentTime) && time.isBefore(currentTimePlusExtend)) {
                     redGroupObjects += CAR_TO_PEDESTRIAN_LIGHT_RATE;
                 }
             }
         }
 
-        return greenGroupObjects > redGroupObjects;
+        boolean result;
+        if (hadPreviouslyExtended) {
+            result = greenGroupObjects > 0 && redGroupObjects == 0;
+        }
+        else {
+            result = greenGroupObjects > redGroupObjects;
+        }
+
+        return result;
     }
 
     private void switchLights() {
@@ -170,5 +190,8 @@ public class LightSwitcher implements Function<ISwitchLightsContext, Integer> {
         var tmp = greenLights;
         greenLights = redLights;
         redLights = tmp;
+
+        logger.debug("Switched light at: " + timeProvider.getCurrentSimulationTime());
+        eventBus.post(new SwitchLightsEvent(lightOsmId));
     }
 }

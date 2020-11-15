@@ -4,6 +4,7 @@ import org.jetbrains.annotations.NotNull;
 import routing.core.Position;
 import smartcity.lights.LightColor;
 import smartcity.lights.OptimizationResult;
+import smartcity.lights.core.data.LightInfo;
 import smartcity.stations.ArrivalInfo;
 
 import java.time.LocalDateTime;
@@ -11,7 +12,6 @@ import java.util.*;
 
 public class Light extends Position {
     private static final int TRAFFIC_JAM_THRESHOLD = 2;
-
 
     private LightColor carLightColor;
     private final long adjacentOsmWayId;

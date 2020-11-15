@@ -11,6 +11,8 @@ import osmproxy.elements.OSMWaypoint;
 import routing.RoutingConstants;
 import routing.core.IGeoPosition;
 import routing.core.Position;
+import smartcity.lights.abstractions.ICrossroadParser;
+import smartcity.lights.core.data.LightInfo;
 import utilities.IterableNodeList;
 import utilities.Siblings;
 
