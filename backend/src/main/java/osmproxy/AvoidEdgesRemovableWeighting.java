@@ -2,6 +2,7 @@ package osmproxy;
 
 import com.graphhopper.routing.weighting.AvoidEdgesWeighting;
 import com.graphhopper.routing.weighting.Weighting;
+import com.graphhopper.util.EdgeIteratorState;
 import gnu.trove.set.TIntSet;
 
 import java.util.Collection;
@@ -40,5 +41,14 @@ public class AvoidEdgesRemovableWeighting extends AvoidEdgesWeighting {
     @Override
     public String getName() {
         return NAME;
+    }
+
+    @Override
+    public double calcWeight(EdgeIteratorState edgeState, boolean reverse, int prevOrNextEdgeId) {
+        double weight = superWeighting.calcWeight(edgeState, reverse, prevOrNextEdgeId);
+        if (visitedEdges.contains(edgeState.getEdge()))
+            return Double.MAX_VALUE;
+
+        return weight;
     }
 }

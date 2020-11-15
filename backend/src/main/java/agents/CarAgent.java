@@ -157,16 +157,21 @@ public class CarAgent extends AbstractAgent {
 
             private void handleConstructionJam(ACLMessage rcv) {
                 Long edgeId = Long.parseLong(rcv.getUserDefinedParameter(MessageParameter.EDGE_ID));
-                logger.debug("Got propose to change the route and exclude: " + edgeId);
+                logger.info("Got propose to change the route and exclude: " + edgeId);
                 if (constructionsEdgeId.contains(edgeId)) {
-                    logger.debug("Already notified about construction place on edge: " + edgeId);
+                    logger.info("Already notified about construction place on edge: " + edgeId);
                     return;
                 }
                 constructionsEdgeId.add(edgeId);
                 final Integer indexOfRouteNodeWithEdge = car.findIndexOfEdgeOnRoute(edgeId,
                         THRESHOLD_UNTIL_INDEX_CHANGE);
+
+
                 if (indexOfRouteNodeWithEdge != null && indexOfRouteNodeWithEdge != car.getUniformRouteSize() - 1) {
                     handleConstructionSiteRouteChange(indexOfRouteNodeWithEdge);
+                }
+                else{
+                    logger.info("kokokokokokokokokokokokokokokokokokokokokokokokokokokoko");
                 }
             }
 
@@ -360,7 +365,7 @@ public class CarAgent extends AbstractAgent {
                 public void onTick() {
                     var route = car.getUniformRoute();
 
-                    var el = random.nextInt(route.size() - car.getMoveIndex() + 1) + car.getMoveIndex(); // TODO: from current index //choose trouble EdgeId
+                    var el = random.nextInt(route.size() - car.getMoveIndex() - THRESHOLD_UNTIL_INDEX_CHANGE - 5 + 1) + car.getMoveIndex()+ THRESHOLD_UNTIL_INDEX_CHANGE + 5; // TODO: from current index //choose trouble EdgeId
                     RouteNode troublePointTmp = route.get(el);
                     troublePoint = new RouteNode(troublePointTmp.getLat(), troublePointTmp.getLng(),
                             troublePointTmp.getInternalEdgeId());
@@ -384,31 +389,8 @@ public class CarAgent extends AbstractAgent {
 
             };
 
-
-            Behaviour troubleStopper = new TickerBehaviour(this, 3 * timeBeforeTroubleMs) {
-
-                @Override
-                public void onTick() {
-                    sendMessageAboutTroubleStop(MessageParameter.CONSTRUCTION);
-                    ExtendedGraphHopper.removeForbiddenEdges(Collections.singletonList(troublePoint.getInternalEdgeId()));
-                    stop();
-                }
-
-                private void sendMessageAboutTroubleStop(String type) {
-                    ACLMessage msg = createMessage(ACLMessage.INFORM, TroubleManagerAgent.name);
-                    Properties properties = createProperties(MessageParameter.VEHICLE);
-                    properties.setProperty(MessageParameter.TROUBLE, MessageParameter.STOP);
-                    properties.setProperty(MessageParameter.TYPEOFTROUBLE, type);
-                    properties.setProperty(MessageParameter.TROUBLE_LAT, Double.toString(troublePoint.getLat()));
-                    properties.setProperty(MessageParameter.TROUBLE_LON, Double.toString(troublePoint.getLng()));
-                    properties.setProperty(MessageParameter.EDGE_ID, Long.toString(troublePoint.getInternalEdgeId()));
-                    msg.setAllUserDefinedParameters(properties);
-                    print("Send message about trouble stop on edge " + Long.toString(troublePoint.getInternalEdgeId()));
-                    send(msg);
-                }
-            };
             addBehaviour(troubleGenerator);
-            addBehaviour(troubleStopper);
+
         }
     }
 
