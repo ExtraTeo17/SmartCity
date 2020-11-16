@@ -47,6 +47,14 @@ public class RoutingHelper implements IRoutingHelper {
         return Position.of(lat, lng);
     }
 
+    public static RoutingHelper of(int seed) {
+        return new RoutingHelper(new Random(seed));
+    }
+
+    public static RoutingHelper of(Random random) {
+        return new RoutingHelper(random);
+    }
+
     public static double getDistance(IGeoPosition posA, IGeoPosition posB) {
         var delta = posA.diff(posB).toRadians();
         var dLat = delta.getLat() / 2;

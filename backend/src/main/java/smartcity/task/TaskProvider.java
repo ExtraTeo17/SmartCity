@@ -40,7 +40,6 @@ public class TaskProvider implements ITaskProvider {
 
     private final ConfigContainer configContainer;
     private final IRouteGenerator routeGenerator;
-    private final IRoutingHelper routingHelper;
     private final IAgentsFactory agentsFactory;
     private final IAgentsContainer agentsContainer;
     private final IFunctionalTaskFactory functionalTaskFactory;
@@ -50,8 +49,8 @@ public class TaskProvider implements ITaskProvider {
     private final Table<IGeoPosition, IGeoPosition, List<RouteNode>> routeInfoCache;
 
     @Inject
-    public TaskProvider(ConfigContainer configContainer, IRouteGenerator routeGenerator,
-                        IRoutingHelper routingHelper,
+    public TaskProvider(ConfigContainer configContainer,
+                        IRouteGenerator routeGenerator,
                         IAgentsFactory agentsFactory,
                         IAgentsContainer agentsContainer,
                         IFunctionalTaskFactory functionalTaskFactory,
@@ -59,7 +58,6 @@ public class TaskProvider implements ITaskProvider {
                         EventBus eventBus) {
         this.configContainer = configContainer;
         this.routeGenerator = routeGenerator;
-        this.routingHelper = routingHelper;
         this.agentsFactory = agentsFactory;
         this.agentsContainer = agentsContainer;
         this.functionalTaskFactory = functionalTaskFactory;
@@ -99,6 +97,7 @@ public class TaskProvider implements ITaskProvider {
                 route = routeInfoCache.get(start, end);
                 if (route == null) {
                     route = routeGenerator.generateRouteInfo(start, end, "bike");
+                    // TODO: If car start & end will be equal to bike, then car can receive bike route.
                     routeInfoCache.put(start, end, route);
                 }
             } catch (Exception e) {
@@ -117,7 +116,8 @@ public class TaskProvider implements ITaskProvider {
 
 
     @Override
-    public Runnable getCreatePedestrianTask(StationNode startStation, StationNode endStation,
+    public Runnable getCreatePedestrianTask(IRoutingHelper routingHelper,
+                                            StationNode startStation, StationNode endStation,
                                             String busLine, boolean testPedestrian) {
         return () -> {
             try {

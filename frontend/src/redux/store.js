@@ -23,6 +23,7 @@ import {
   D_LNG,
   D_LAT,
   D_GENERATE_PEDS,
+  D_USE_FIXED_ROUTES,
 } from "../constants/defaults";
 import { loadLocalData } from "./dataUtils/helpers";
 import { ConfigState } from "./models/states";
@@ -50,6 +51,7 @@ const initialState = {
       generateTroublePoints: D_GENERATE_TP,
       timeBeforeTrouble: D_TIME_BEFORE_TROUBLE,
 
+      useFixedRoutes: D_USE_FIXED_ROUTES,
       startTime: D_START_TIME,
       timeScale: D_TIME_SCALE,
 
@@ -85,10 +87,11 @@ const initialState = {
   },
 };
 
+const interactionState = initialState.interaction;
 const data = loadLocalData();
 if (data) {
-  initialState.interaction.startSimulationData = data.startSimulationData;
-  initialState.interaction.prepareSimulationData = data.prepareSimulationData;
+  interactionState.prepareSimulationData = { ...interactionState.prepareSimulationData, ...data.prepareSimulationData };
+  interactionState.startSimulationData = { ...interactionState.startSimulationData, ...data.startSimulationData };
   console.info("Set initial data from localStorage");
 }
 

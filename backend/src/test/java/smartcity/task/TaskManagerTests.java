@@ -7,6 +7,7 @@ import routing.abstractions.IRoutingHelper;
 import routing.core.IZone;
 import routing.core.Position;
 import routing.core.Zone;
+import smartcity.config.abstractions.IGenerationConfigContainer;
 import smartcity.lights.LightColor;
 import smartcity.task.abstractions.ITaskProvider;
 import smartcity.task.runnable.abstractions.IRunnableFactory;
@@ -66,7 +67,8 @@ class TaskManagerTests {
         IAgentsContainer agentsContainer = mock(IAgentsContainer.class);
         IRoutingHelper routingHelper = mock(IRoutingHelper.class);
         IZone zone = Zone.of(Position.of(1, 1), 1);
+        IGenerationConfigContainer configContainer = mock(IGenerationConfigContainer.class);
 
-        return new TaskManager(runnableFactory, agentsContainer, routingHelper, taskProvider, zone);
+        return new TaskManager(runnableFactory, agentsContainer, routingHelper, taskProvider, configContainer, zone);
     }
 }

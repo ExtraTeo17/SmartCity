@@ -23,6 +23,7 @@ public class StartSimulationRequest extends AbstractPayload {
     public final int pedestriansLimit;
     public final int testPedestrianId;
 
+    public final boolean useFixedRoutes;
     public final ZonedDateTime startTime;
     public final int timeScale;
 
@@ -49,6 +50,7 @@ public class StartSimulationRequest extends AbstractPayload {
                                   @JsonProperty("pedLimit") int pedestriansLimit,
                                   @JsonProperty("testPedId") int testPedestrianId,
 
+                                  @JsonProperty("useFixedRoutes") boolean useFixedRoutes,
                                   @JsonProperty("startTime") ZonedDateTime startTime,
                                   @JsonProperty("timeScale") int timeScale,
 
@@ -79,5 +81,6 @@ public class StartSimulationRequest extends AbstractPayload {
         this.changeRouteOnTroublePoint = changeRouteOnTroublePoint;
         this.changeRouteOnTrafficJam = changeRouteOnTrafficJam;
         this.timeScale = timeScale;
+        this.useFixedRoutes = useFixedRoutes;
     }
 }

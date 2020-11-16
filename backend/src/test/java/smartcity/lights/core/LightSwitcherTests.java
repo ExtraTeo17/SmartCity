@@ -116,11 +116,11 @@ class LightSwitcherTests {
                 arguments("One car, close", prepareLights(
                         1, 0, 0, 0,
                         0, 0, 0, 0
-                ), true, extendTimeSeconds / 2),
+                ), true, extendTimeSeconds),
                 arguments("Car vs ped, close", prepareLights(
                         1, 1, 0, 0,
                         0, 0, 0, 0
-                ), true, extendTimeSeconds / 2),
+                ), true, extendTimeSeconds),
                 arguments("Red greater, close", prepareLights(
                         1, 1, 0, 0,
                         1, 0, 0, 0
@@ -152,7 +152,7 @@ class LightSwitcherTests {
                 arguments("Green greater, close", prepareLights(
                         2, 2, 0, 0,
                         1, 1, 0, 0
-                ), true, extendTimeSeconds / 2),
+                ), true, extendTimeSeconds),
                 arguments("Green greater, far", prepareLights(
                         0, 0, 3, 3,
                         0, 0, 1, 0
@@ -160,7 +160,7 @@ class LightSwitcherTests {
                 arguments("Green greater close and equal far", prepareLights(
                         0, 1, 2, 3,
                         1, 5, 1, 1
-                ), true, extendTimeSeconds / 2)
+                ), true, extendTimeSeconds)
         );
     }
 

@@ -2,6 +2,7 @@ package events.web;
 
 import java.time.LocalDateTime;
 
+@SuppressWarnings("ClassWithTooManyFields")
 public class StartSimulationEvent {
     public final boolean shouldGenerateCars;
     public final int carsNum;
@@ -17,7 +18,7 @@ public class StartSimulationEvent {
     public final int pedestriansLimit;
     public final int testPedestrianId;
 
-    // TODO: Maybe include post time to reduce discrepancy between frontend and backend
+    public final boolean useFixedRoutes;
     public final LocalDateTime startTime;
     public final int timeScale;
 
@@ -40,6 +41,7 @@ public class StartSimulationEvent {
                                 int timeBeforeTrouble,
                                 int pedestriansLimit,
                                 int testPedestrianId,
+                                boolean useFixedRoutes,
                                 LocalDateTime startTime,
                                 int timeScale,
                                 boolean lightStrategyActive,
@@ -54,6 +56,7 @@ public class StartSimulationEvent {
         this.shouldGenerateBikes = shouldGenerateBikes;
         this.bikesNum = bikesNum;
         this.testBikeId = testBikeId;
+        this.useFixedRoutes = useFixedRoutes;
         this.timeScale = timeScale;
         this.changeRouteOnTrafficJam = changeRouteOnTrafficJam;
         this.shouldGenerateTroublePoints = generateTroublePoints;

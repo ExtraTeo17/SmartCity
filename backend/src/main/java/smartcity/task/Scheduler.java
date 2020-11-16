@@ -48,12 +48,12 @@ public class Scheduler {
         configContainer.setShouldGenerateConstructionSites(e.shouldGenerateTroublePoints);
         configContainer.setTimeBeforeTrouble(e.timeBeforeTrouble);
         configContainer.setChangeRouteOnTroublePoint(e.changeRouteOnTroublePoint);
+        configContainer.setUseFixedRoutes(e.useFixedRoutes);
 
         if (e.shouldGenerateCars) {
             taskManager.scheduleCarCreation(e.carsNum, e.testCarId);
         }
 
-        // TODO: Add bikes limit and testBikeID
         if (e.shouldGenerateBikes) {
             taskManager.scheduleBikeCreation(e.bikesNum, e.testBikeId);
         }

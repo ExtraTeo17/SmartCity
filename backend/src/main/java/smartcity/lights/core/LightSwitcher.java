@@ -10,6 +10,7 @@ import org.slf4j.LoggerFactory;
 import smartcity.ITimeProvider;
 import smartcity.config.abstractions.ILightConfigContainer;
 import smartcity.task.data.ISwitchLightsContext;
+import utilities.ConditionalExecutor;
 import utilities.Siblings;
 
 import java.util.function.Function;
@@ -105,11 +106,11 @@ public class LightSwitcher implements Function<ISwitchLightsContext, Integer> {
             }
 
             if (shouldExtendQueue) {
-                logger.debug("-------------------------------------shouldExtendGreenLightBecauseOfCarsOnLight--------------");
-                return defaultExecutionDelay / 2;
+                logger.info("-------------------------------------shouldExtendGreenLightBecauseOfCarsOnLight--------------");
+                return defaultExecutionDelay;
             }
             else if (groups[1] == 0 && shouldExtendBecauseOfFarAwayQueue(hadPreviouslyExtended)) {
-                logger.debug("-------------------------------------shouldExtendBecauseOfFarAwayQueue--------------");
+                logger.info("-------------------------------------shouldExtendBecauseOfFarAwayQueue--------------");
                 return defaultExecutionDelay;
             }
         }
@@ -193,7 +194,7 @@ public class LightSwitcher implements Function<ISwitchLightsContext, Integer> {
         greenLights = redLights;
         redLights = tmp;
 
-        logger.debug("Switched light at: " + timeProvider.getCurrentSimulationTime());
+        ConditionalExecutor.debug(() -> logger.debug("Switched light at: " + timeProvider.getCurrentSimulationTime()));
         eventBus.post(new SwitchLightsEvent(lightOsmId));
     }
 }
