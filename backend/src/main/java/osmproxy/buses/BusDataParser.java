@@ -65,7 +65,8 @@ public class BusDataParser implements IBusDataParser {
                     throw new RuntimeException("Too much errors when parsing busInfo");
                 }
                 busInfoDataSet.add(busInfoData.get());
-            } else if (nodeName.equals("node")) {
+            }
+            else if (nodeName.equals("node")) {
                 var station = parseNode(osmNode, busStopsMap::containsKey);
                 station.ifPresent(st -> busStopsMap.put(st.getId(), st));
             }
@@ -138,34 +139,38 @@ public class BusDataParser implements IBusDataParser {
         route.add(secondWay);
         String adjacentNodeRef = firstWay.orientateWith(secondWay);
         boolean failedToMatchPreviously = false;
-        
+
         List<OSMWay> wayList = new ArrayList<>();
+        int lastIndexInZone = -1;
         while (nodesIter.hasNext()) {
-        	Node wayNode = nodesIter.next();
-        	if (wayNode.getNodeName().equals("way")) {
-        		wayList.add(new OSMWay(wayNode));
-        	}
+            Node wayNode = nodesIter.next();
+            if (wayNode.getNodeName().equals("way")) {
+                var way = new OSMWay(wayNode);
+                // TODO: if not accurate enough, consider changing to node.isInZone (node-based)
+                if (way.isInZone(zone)) {
+                    lastIndexInZone = wayList.size();
+                }
+                wayList.add(way);
+            }
         }
         
-        int lastIndexInZone = wayList.size() - 1;
-        while (!wayList.get(lastIndexInZone).isInZone(zone)) {
-        	// TODO: if not accurate enough, consider changing to node.isInZone (node-based)
-        	--lastIndexInZone;
+        if (lastIndexInZone > 0) {
+            wayList = wayList.subList(0, lastIndexInZone + 1);
         }
-        wayList = wayList.subList(0, lastIndexInZone + 1); // TODO: test
-        
+
         for (final OSMWay way : wayList) {
-	        var referenceOpt = way.reverseTowardsNode(adjacentNodeRef);
-	        if (referenceOpt.isEmpty()) {
-	            logger.debug("Failed to match way: " + way + " with " + adjacentNodeRef);
-	            failedToMatchPreviously = true;
-	            continue;
-	        } else if (failedToMatchPreviously) {
-	            logger.info("Reconnected to way: " + way + " after failed match with " + adjacentNodeRef);
-	        }
-	
-	        adjacentNodeRef = referenceOpt.get();
-	        route.add(way);
+            var referenceOpt = way.reverseTowardsNode(adjacentNodeRef);
+            if (referenceOpt.isEmpty()) {
+                logger.debug("Failed to match way: " + way + " with " + adjacentNodeRef);
+                failedToMatchPreviously = true;
+                continue;
+            }
+            else if (failedToMatchPreviously) {
+                logger.info("Reconnected to way: " + way + " after failed match with " + adjacentNodeRef);
+            }
+
+            adjacentNodeRef = referenceOpt.get();
+            route.add(way);
         }
 
         return route;
