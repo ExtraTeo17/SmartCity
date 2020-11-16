@@ -85,7 +85,6 @@ final class Router implements
             int startingIndex = straight ? 0 : waypointCount - 1;
             int lastIndex = straight ? waypointCount : -1;
             int increment = straight ? 1 : -1;
-            boolean zoneNotStarted = true;
             for (int j = startingIndex; j != lastIndex; j += increment) {
                 var nodeOpt = getNode(way, way.getWaypoint(j), routeInfo, isCar);
                 if (nodeOpt.isEmpty()) {

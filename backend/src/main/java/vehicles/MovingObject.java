@@ -7,7 +7,6 @@ import routing.core.IGeoPosition;
 import routing.nodes.LightManagerNode;
 import routing.nodes.RouteNode;
 import smartcity.ITimeProvider;
-import smartcity.TimeProvider;
 import vehicles.enums.DrivingState;
 
 import java.util.ArrayList;
@@ -52,7 +51,7 @@ public abstract class MovingObject {
 
 
     public int getMoveIndex() {
-    	return moveIndex;
+        return moveIndex;
     }
 
     public int getAgentId() {
@@ -230,16 +229,18 @@ public abstract class MovingObject {
         return moveIndex + thresholdUntilIndexChange >= closestLightIndex;
     }
 
-	public int getNextNonVirtualIndex() {
-		return getNextNonVirtualIndexFromIndex(moveIndex);
-	}
+    public int getNextNonVirtualIndex() {
+        return getNextNonVirtualIndexFromIndex(moveIndex);
+    }
 
-	public int getNextNonVirtualIndex(int thresholdUntilIndexChange) {
-		return getNextNonVirtualIndexFromIndex(moveIndex + thresholdUntilIndexChange);
-	}
-	
-	private int getNextNonVirtualIndexFromIndex(int index) {
-		while (uniformRoute.get(index++).isVirtual());
-		return index - 1;
-	}
+    public int getNextNonVirtualIndex(int thresholdUntilIndexChange) {
+        return getNextNonVirtualIndexFromIndex(moveIndex + thresholdUntilIndexChange);
+    }
+
+    private int getNextNonVirtualIndexFromIndex(int index) {
+        while (index < uniformRoute.size() && uniformRoute.get(index).isVirtual()) {
+            ++index;
+        }
+        return index - 1;
+    }
 }
