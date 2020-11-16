@@ -365,7 +365,11 @@ public class CarAgent extends AbstractAgent {
                 public void onTick() {
                     var route = car.getUniformRoute();
 
-                    var el = random.nextInt(route.size() - car.getMoveIndex() - THRESHOLD_UNTIL_INDEX_CHANGE - 5 + 1) + car.getMoveIndex() + THRESHOLD_UNTIL_INDEX_CHANGE + 5; // TODO: from current index //choose trouble EdgeId
+                    // TODO: from current index
+                    //   choose trouble EdgeId
+                    // TODO: magic numbers !!!
+                    var el = random.nextInt(route.size() - car.getMoveIndex() - THRESHOLD_UNTIL_INDEX_CHANGE - 5 + 1)
+                            + car.getMoveIndex() + THRESHOLD_UNTIL_INDEX_CHANGE + 5;
                     RouteNode troublePointTmp = route.get(el);
                     troublePoint = new RouteNode(troublePointTmp.getLat(), troublePointTmp.getLng(),
                             troublePointTmp.getInternalEdgeId());

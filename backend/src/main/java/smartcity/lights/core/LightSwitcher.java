@@ -80,9 +80,10 @@ public class LightSwitcher implements Function<ISwitchLightsContext, Integer> {
 
     @Override
     public Integer apply(ISwitchLightsContext context) {
-        if (shouldExtend(!context.haveNotExtendedYet())) {
+        var extendTime = getExtendTime(!context.haveNotExtendedYet());
+        if (extendTime > 0) {
             context.setNotExtendedGreen(false);
-            return defaultExecutionDelay;
+            return extendTime;
         }
 
         context.setNotExtendedGreen(true);
@@ -91,25 +92,32 @@ public class LightSwitcher implements Function<ISwitchLightsContext, Integer> {
         return defaultExecutionDelay;
     }
 
-    private boolean shouldExtend(boolean hadPreviouslyExtended) {
+    private int getExtendTime(boolean hadPreviouslyExtended) {
         if (configContainer.isLightStrategyActive()) {
 
-            // TODO: Get group sizes and ensure that red is 0 when going to next condition
-            if (shouldExtendGreenLightBecauseOfObjectsOnLight(hadPreviouslyExtended)) {
-                logger.debug("-------------------------------------shouldExtendGreenLightBecauseOfCarsOnLight--------------");
-                return true;
+            var groups = getLightGroupsOnLight();
+            boolean shouldExtendQueue;
+            if (hadPreviouslyExtended) {
+                shouldExtendQueue = groups[0] > 0 && groups[1] == 0;
             }
-            else if (shouldExtendBecauseOfFarAwayQueue(hadPreviouslyExtended)) {
+            else {
+                shouldExtendQueue = groups[0] > groups[1];
+            }
+
+            if (shouldExtendQueue) {
+                logger.debug("-------------------------------------shouldExtendGreenLightBecauseOfCarsOnLight--------------");
+                return defaultExecutionDelay / 2;
+            }
+            else if (groups[1] == 0 && shouldExtendBecauseOfFarAwayQueue(hadPreviouslyExtended)) {
                 logger.debug("-------------------------------------shouldExtendBecauseOfFarAwayQueue--------------");
-                return true;
+                return defaultExecutionDelay;
             }
         }
 
-        return false;
+        return 0;
     }
 
-
-    private boolean shouldExtendGreenLightBecauseOfObjectsOnLight(boolean hadPreviouslyExtended) {
+    private int[] getLightGroupsOnLight() {
         int greenGroupObjects = 0;
         int redGroupObjects = 0;
 
@@ -123,27 +131,27 @@ public class LightSwitcher implements Function<ISwitchLightsContext, Integer> {
             redGroupObjects += CAR_TO_PEDESTRIAN_LIGHT_RATE * light.carQueue.size();
         }
 
+        return new int[]{greenGroupObjects, redGroupObjects};
+    }
+
+
+    private boolean shouldExtendBecauseOfFarAwayQueue(boolean hadPreviouslyExtended) {
+        var groups = getLightGroupsInFarawayQueue();
+
         boolean result;
         if (hadPreviouslyExtended) {
-            result = greenGroupObjects > 0 && redGroupObjects == 0;
+            result = groups[0] > 0 && groups[1] == 0;
         }
         else {
-            result = greenGroupObjects > redGroupObjects;
-        }
-
-
-        if (result) {
-            logger.debug("LM:CROSSROAD HAS PROLONGED GREEN LIGHT FOR " + greenGroupObjects + " CARS AS OPPOSED TO " + redGroupObjects);
+            result = groups[0] > groups[1];
         }
 
         return result;
     }
 
-
-    private boolean shouldExtendBecauseOfFarAwayQueue(boolean hadPreviouslyExtended) {
+    private int[] getLightGroupsInFarawayQueue() {
         var currentTime = timeProvider.getCurrentSimulationTime();
         var currentTimePlusExtend = currentTime.plusSeconds(extendTimeSeconds);
-
         int greenGroupObjects = 0;
         int redGroupObjects = 0;
         for (Light light : greenLights) {
@@ -173,15 +181,7 @@ public class LightSwitcher implements Function<ISwitchLightsContext, Integer> {
             }
         }
 
-        boolean result;
-        if (hadPreviouslyExtended) {
-            result = greenGroupObjects > 0 && redGroupObjects == 0;
-        }
-        else {
-            result = greenGroupObjects > redGroupObjects;
-        }
-
-        return result;
+        return new int[]{greenGroupObjects, redGroupObjects};
     }
 
     private void switchLights() {

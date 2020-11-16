@@ -2,6 +2,9 @@ package smartcity.lights.core;
 
 import com.google.common.eventbus.EventBus;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 import smartcity.config.abstractions.ILightConfigContainer;
 import smartcity.task.data.ISwitchLightsContext;
 import utilities.Siblings;
@@ -9,23 +12,25 @@ import utilities.Siblings;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.util.Collection;
+import java.util.stream.Stream;
 
 import static mocks.TestInstanceCreator.createLights;
 import static mocks.TestInstanceCreator.createTimeProvider;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.params.provider.Arguments.arguments;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 class LightSwitcherTests {
-    private final int extendTimeSeconds;
-    private final LocalDateTime currentTime;
+    private static final int extendTimeSeconds;
+    private static final LocalDateTime currentTime;
 
-    LightSwitcherTests() {
-        this.extendTimeSeconds = 10;
+    static {
+        extendTimeSeconds = 10;
         var date = LocalDate.ofYearDay(2021, 36);
         var time = LocalTime.of(10, 10, 0);
-        this.currentTime = LocalDateTime.of(date, time);
+        currentTime = LocalDateTime.of(date, time);
     }
 
     @Test
@@ -62,68 +67,145 @@ class LightSwitcherTests {
         assertTrue(greenLights.stream().noneMatch(Light::isGreen));
     }
 
-    @Test
-    void apply_onStrategyActiveAndObjectsInQueue_shouldExtend() {
+    @ParameterizedTest
+    @MethodSource("testProvider")
+    void apply_onStrategyActive_differentCorrectCases_correctResult(String testCaseName,
+                                                                    Siblings<SimpleLightGroup> lights,
+                                                                    boolean shouldExtend,
+                                                                    int expectedExtendSeconds) {
         // Arrange
-        var lights = createLights();
-        var greenLights = lights.first.getLights();
-        greenLights.forEach(l -> l.carQueue.add("someCar"));
-
-        var switcher = createLightSwitcher(lights);
+        var switcher = createLightSwitcher(true, lights);
         var context = createContext();
 
         // Act
-        switcher.apply(context);
+        var extendTime = switcher.apply(context);
 
         // Assert
-        assertFalse(context.haveNotExtendedYet());
-        assertTrue(greenLights.stream().allMatch(Light::isGreen));
+        assertEquals(shouldExtend, !context.haveNotExtendedYet(), "Invalid extend");
+        assertEquals(expectedExtendSeconds * 1000, extendTime, "Invalid extend time");
+        var greenLights = lights.first.getLights();
+        assertTrue(areLightsCorrect(greenLights, shouldExtend), "Lights should be correct");
     }
 
-    @Test
-    void apply_onStrategyActive_onCorrectObjects_inFarAwayQueue_shouldExtend() {
-        // Arrange
-        var lights = createLights();
-        var greenLights = lights.first.getLights();
-        greenLights.forEach(l -> l.farAwayCarMap.put("someCar", currentTime.plusSeconds(extendTimeSeconds / 2)));
+    private boolean areLightsCorrect(Collection<? extends Light> lights, boolean isGreen) {
+        if (lights.isEmpty()) {
+            throw new IllegalArgumentException("Empty light collection");
+        }
 
-        var switcher = createLightSwitcher(lights);
-        var context = createContext();
+        var areValid = true;
+        Boolean prevGreen = null;
+        for (var l : lights) {
+            if (prevGreen != null && prevGreen != l.isGreen()) {
+                throw new IllegalStateException("Not all lights in group are in the same colour");
+            }
 
-        // Act
-        switcher.apply(context);
+            areValid = areValid && (l.isGreen() == isGreen);
 
-        // Assert
-        assertFalse(context.haveNotExtendedYet());
-        assertTrue(greenLights.stream().allMatch(Light::isGreen));
+            prevGreen = l.isGreen();
+        }
+
+        return areValid;
     }
 
-    @Test
-    void apply_onStrategyActive_onNotCorrectObjects_inFarAwayQueue_shouldExtend() {
-        // Arrange
-        var lights = createLights();
-        var greenLights = lights.first.getLights();
-        greenLights.forEach(l -> l.farAwayCarMap.put("someCar", currentTime.plusSeconds(extendTimeSeconds + 1)));
 
-        var switcher = createLightSwitcher(lights);
-        var context = createContext();
+    private static Stream<Arguments> testProvider() {
 
-        // Act
-        switcher.apply(context);
-
-        // Assert
-        assertTrue(context.haveNotExtendedYet());
-        assertTrue(greenLights.stream().noneMatch(Light::isGreen));
+        // green: (car, ped-red,   farCar, farPed-red)
+        // red:   (car, ped-green, farCar, farPed-green)
+        return Stream.of(
+                arguments("One car, close", prepareLights(
+                        1, 0, 0, 0,
+                        0, 0, 0, 0
+                ), true, extendTimeSeconds / 2),
+                arguments("Car vs ped, close", prepareLights(
+                        1, 1, 0, 0,
+                        0, 0, 0, 0
+                ), true, extendTimeSeconds / 2),
+                arguments("Red greater, close", prepareLights(
+                        1, 1, 0, 0,
+                        1, 0, 0, 0
+                ), false, extendTimeSeconds),
+                arguments("Red equal, close", prepareLights(
+                        1, 1, 0, 0,
+                        1, 1, 0, 0
+                ), false, extendTimeSeconds),
+                arguments("Red in close + green in far", prepareLights(
+                        0, 1, 1, 1,
+                        0, 0, 0, 0
+                ), false, extendTimeSeconds),
+                arguments("One green, far", prepareLights(
+                        0, 0, 1, 0,
+                        0, 0, 0, 0
+                ), true, extendTimeSeconds),
+                arguments("Car vs ped, far", prepareLights(
+                        0, 0, 1, 1,
+                        0, 0, 0, 0
+                ), true, extendTimeSeconds),
+                arguments("Red greater, far", prepareLights(
+                        0, 0, 1, 1,
+                        0, 0, 1, 0
+                ), false, extendTimeSeconds),
+                arguments("Red equal, far", prepareLights(
+                        0, 0, 1, 1,
+                        0, 0, 1, 1
+                ), false, extendTimeSeconds),
+                arguments("Green greater, close", prepareLights(
+                        2, 2, 0, 0,
+                        1, 1, 0, 0
+                ), true, extendTimeSeconds / 2),
+                arguments("Green greater, far", prepareLights(
+                        0, 0, 3, 3,
+                        0, 0, 1, 0
+                ), true, extendTimeSeconds),
+                arguments("Green greater close and equal far", prepareLights(
+                        0, 1, 2, 3,
+                        1, 5, 1, 1
+                ), true, extendTimeSeconds / 2)
+        );
     }
 
-    @Test
-    void apply_onStrategyActive_onNotCorrectObjectsInQueue_onObjectsInFarawayQueue_shouldNotExtend() {
-        // Arrange
+    private static Siblings<SimpleLightGroup> prepareLights(int... objects) {
         var lights = createLights();
         var greenLights = lights.first.getLights();
-        greenLights.forEach(l -> l.farAwayCarMap.put("someCar", currentTime.plusSeconds(extendTimeSeconds / 2)));
+        prepareLights(greenLights, objects[0], objects[1], objects[2], objects[3]);
+
         var redLights = lights.second.getLights();
-        redLights.forEach(l -> l.carQueue.add("someCar1"));
+        prepareLights(redLights, objects[4], objects[5], objects[6], objects[7]);
+
+        return lights;
+    }
+
+    private static void prepareLights(Collection<? extends Light> lights,
+                                      int carsInQueue,
+                                      int pedestriansInQueue,
+                                      int carsInFarQueue,
+                                      int pedestriansInFarQueue) {
+        lights.forEach(l -> {
+            for (int i = 0; i < carsInQueue; ++i) {
+                l.carQueue.add("car" + i);
+            }
+
+            for (int i = 0; i < pedestriansInQueue; ++i) {
+                l.pedestrianQueue.add("ped" + i);
+            }
+
+            for (int i = 0; i < carsInFarQueue; ++i) {
+                l.farAwayCarMap.put("farCar" + i, currentTime.plusSeconds(extendTimeSeconds / 2));
+            }
+
+            for (int i = 0; i < pedestriansInFarQueue; ++i) {
+                l.farAwayPedestrianMap.put("farPed" + i, currentTime.plusSeconds(extendTimeSeconds / 2));
+            }
+        });
+    }
+
+    @Test
+    void apply_onStrategyActive_onNotCorrectObjects_inFarAwayQueue_shouldNotExtend() {
+        // Arrange
+        var lights = createLights();
+        var greenLights = lights.first.getLights();
+        greenLights.forEach(l -> l.farAwayCarMap.put("someCar1", currentTime.plusSeconds(extendTimeSeconds + 1)));
+        greenLights.forEach(l -> l.farAwayCarMap.put("someCar2", currentTime.minusSeconds(1)));
 
         var switcher = createLightSwitcher(lights);
         var context = createContext();
@@ -135,7 +217,6 @@ class LightSwitcherTests {
         assertTrue(context.haveNotExtendedYet());
         assertTrue(greenLights.stream().noneMatch(Light::isGreen));
     }
-
 
     @Test
     void apply_onStrategyActive_onCorrectObjects_inFarAwayQueue_shouldExtend_manyTimes() {
