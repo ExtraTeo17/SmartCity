@@ -29,7 +29,13 @@ public class InfiniteVariableExecutionRunnable implements IVariableExecutionRunn
         var future = executor.schedule(new Callable<Void>() {
             @Override
             public Void call() {
+                if (Thread.interrupted()) {
+                    return null;
+                }
                 int nextDelay = delayRunnable.get();
+                if (Thread.interrupted()) {
+                    return null;
+                }
                 self = executor.schedule(this, nextDelay, timeUnit);
                 return null;
             }

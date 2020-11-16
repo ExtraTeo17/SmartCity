@@ -1,6 +1,6 @@
 package routing.core;
 
-import routing.RoutingHelper;
+import routing.RoutingConstants;
 import smartcity.config.ConfigMutator;
 
 import java.util.Objects;
@@ -40,7 +40,18 @@ public class Zone implements IZone {
     // source: https://stackoverflow.com/a/27943/6841224
     @Override
     public boolean contains(IGeoPosition pos) {
-        return RoutingHelper.getDistance(center, pos) <= radius;
+        var delta = center.diff(pos).toRadians();
+        var dLat = delta.getLat() / 2;
+        var dLng = delta.getLng() / 2;
+
+        var latPos = pos.getLat();
+        var latCenter = center.getLat();
+        var haversine = Math.sin(dLat) * Math.sin(dLat) +
+                Math.cos(Math.toRadians(latPos)) * Math.cos(Math.toRadians(latCenter)) * Math.sin(dLng) * Math.sin(dLng);
+        var dist = 2 * Math.atan2(Math.sqrt(haversine), Math.sqrt(1 - haversine));
+        var distMeters = RoutingConstants.EARTH_RADIUS_METERS * dist;
+
+        return distMeters <= radius;
     }
 
     @Override

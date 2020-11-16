@@ -1,5 +1,7 @@
 package osmproxy.elements;
 
+import utilities.NumericHelper;
+
 public class OSMLight extends OSMNode {
     private long adherentWayId;
 

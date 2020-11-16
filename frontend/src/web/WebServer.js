@@ -1,52 +1,42 @@
-import { notify } from "react-notify-toast";
-import { SERVER_ADDRESS, RECONNECT_INTERVAL_SEC, NOTIFY_SHOW_MS } from "../constants/global";
+import { SERVER_ADDRESS, RECONNECT_INTERVAL_SEC, NOTIFY_SHOW_SEC } from "../utils/constants";
 import MessageHandler from "./MessageHandler";
+import { notify } from "react-notify-toast";
 
-const socketContainer = {
+var socketContainer = {
   socket: {},
-  reconnecting: false,
 };
 
 const createSocket = () => {
   const socket = new WebSocket(SERVER_ADDRESS);
   socket.onopen = () => {
     console.info("Connected !!!");
-    socketContainer.reconnecting = false;
-    notify.hide();
-    notify.show("Sucessfully connected", "success", NOTIFY_SHOW_MS);
+
+    notify.show("Sucessfully connected", "success", NOTIFY_SHOW_SEC * 1000);
   };
 
   /**
    * @param {{ data: object; }} e
    */
   socket.onmessage = e => {
-    // logMessage(e);
-    const msgDto = JSON.parse(e.data);
-    const msg = { type: msgDto.type, payload: JSON.parse(msgDto.payload) };
+    // console.groupCollapsed("OnMessage");
+
+    // console.log("Message received:" + e.data);
+    let msgDto = JSON.parse(e.data);
+    let msg = { type: msgDto.type, payload: JSON.parse(msgDto.payload) };
     MessageHandler.handle(msg);
+
+    // console.groupEnd();
   };
 
-  function logMessage(e) {
-    console.groupCollapsed("OnMessage");
-    console.log(`Message received:${e.data}`);
-    console.groupEnd();
-  }
-
-  socket.onerror = () => {
-    if (!socketContainer.reconnecting) {
-      console.error("Socket encountered error: ", "Closing socket");
-    }
+  socket.onerror = err => {
+    console.error("Socket encountered error: ", err, "Closing socket");
     socket.close();
   };
 
   socket.onclose = e => {
-    if (!socketContainer.reconnecting) {
-      console.warn(`Socket is closed. Reconnect will be attempted in ${RECONNECT_INTERVAL_SEC} seconds`, e.reason);
-      notify.show("Error encountered, trying to reconnect...", "error", -1);
-    }
-
+    console.warn(`Socket is closed. Reconnect will be attempted in ${RECONNECT_INTERVAL_SEC} seconds`, e.reason);
+    notify.show("Error encountered, trying to reconnect...", "error", RECONNECT_INTERVAL_SEC * 1000);
     setTimeout(() => {
-      socketContainer.reconnecting = true;
       socketContainer.socket = createSocket();
     }, RECONNECT_INTERVAL_SEC * 1000);
   };
@@ -65,7 +55,7 @@ export default {
   send(msgObj) {
     console.group("Send");
 
-    const msg = {
+    var msg = {
       type: msgObj.type,
       payload: JSON.stringify(msgObj.payload),
     };

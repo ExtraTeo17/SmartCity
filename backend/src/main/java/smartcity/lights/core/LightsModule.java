@@ -3,6 +3,7 @@ package smartcity.lights.core;
 import com.google.inject.Binder;
 import com.google.inject.Singleton;
 import genesis.AbstractModule;
+import smartcity.lights.abstractions.ICrossroad;
 import smartcity.lights.abstractions.ICrossroadFactory;
 
 public class LightsModule extends AbstractModule {

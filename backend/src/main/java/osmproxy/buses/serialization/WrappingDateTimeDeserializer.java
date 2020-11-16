@@ -1,6 +1,7 @@
 package osmproxy.buses.serialization;
 
 import com.fasterxml.jackson.core.JsonParser;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.JsonDeserializer;
 
@@ -16,7 +17,7 @@ public class WrappingDateTimeDeserializer extends JsonDeserializer<LocalDateTime
      */
     @Override
     public LocalDateTime deserialize(JsonParser jsonParser, DeserializationContext deserializationContext)
-            throws IOException {
+            throws IOException, JsonProcessingException {
         String time = jsonParser.getText();
         String[] timeParts = time.split(":");
         if (timeParts.length != 3) {

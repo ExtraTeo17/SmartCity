@@ -5,12 +5,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import osmproxy.buses.models.TimetableRecord;
 
-import java.io.Serializable;
 import java.util.Iterator;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class BrigadeInfo implements Iterable<Timetable>, Serializable {
+public class BrigadeInfo implements Iterable<Timetable> {
     private final static Logger logger = LoggerFactory.getLogger(BrigadeInfo.class);
 
     public final String brigadeId;
@@ -32,7 +31,7 @@ public class BrigadeInfo implements Iterable<Timetable>, Serializable {
                     " current: " + timetableRecords.size());
         }
 
-        for (int i = 0; i < timetables.size() && i < timetableRecords.size(); ++i) {
+        for (int i = 0; i < timetables.size(); ++i) {
             var timetable = timetables.get(i);
             var record = timetableRecords.get(i);
             timetable.addTimeRecord(stationId, record.timeOnStop);

@@ -2,7 +2,6 @@ package web.serialization;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.ObjectWriter;
 import com.google.inject.Inject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -15,18 +14,18 @@ import java.util.Optional;
 
 class MessageObjectMapper implements IMessageObjectMapper {
     private static final Logger logger = LoggerFactory.getLogger(MessageObjectMapper.class);
-    private final ObjectWriter objectWriter;
+    private final ObjectMapper objectMapper;
 
     @Inject
-    MessageObjectMapper(ObjectWriter objectWriter) {
-        this.objectWriter = objectWriter;
+    MessageObjectMapper(ObjectMapper objectMapper) {
+        this.objectMapper = objectMapper;
     }
 
     @Override
     public Optional<String> serialize(MessageType type, AbstractPayload payload) {
         String serializedPayload;
         try {
-            serializedPayload = objectWriter.writeValueAsString(payload);
+            serializedPayload = objectMapper.writeValueAsString(payload);
         } catch (JsonProcessingException e) {
             logger.warn("Error serializing payload", e);
             return Optional.empty();
@@ -35,7 +34,7 @@ class MessageObjectMapper implements IMessageObjectMapper {
         MessageDto message = new MessageDto(type, serializedPayload);
         String serializedMessage;
         try {
-            serializedMessage = objectWriter.writeValueAsString(message);
+            serializedMessage = objectMapper.writeValueAsString(message);
         } catch (JsonProcessingException e) {
             logger.warn("Error serializing message", e);
             return Optional.empty();

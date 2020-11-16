@@ -33,7 +33,7 @@ public class IdGenerator implements IRegistrable {
     }
 
     public int get(Class<?> type) {
-        return idMap.get(type).incrementAndGet();
+        return idMap.get(type).getAndIncrement();
     }
 
     public void reset(Class<?> type) {

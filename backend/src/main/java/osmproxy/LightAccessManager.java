@@ -13,13 +13,14 @@ import osmproxy.elements.OSMNode;
 import osmproxy.elements.OSMWay;
 import routing.core.IZone;
 import utilities.ConditionalExecutor;
-import utilities.FileWrapper;
+import utilities.FileWriterWrapper;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
 
+// TODO: Interface
 @Beta
 public class LightAccessManager implements ILightAccessManager {
     private static final Logger logger = LoggerFactory.getLogger(LightAccessManager.class);
@@ -67,7 +68,7 @@ public class LightAccessManager implements ILightAccessManager {
                     lightsAround.get(lightsAround.size() - 1).getId() +
                     ".xml";
             logger.info("Writing lightNodes document to file: " + path);
-            FileWrapper.write(document, path);
+            FileWriterWrapper.write(document, path);
         }, lightsAround.size() > 0);
 
         return parseLightNodesDocument(document);

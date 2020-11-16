@@ -18,7 +18,7 @@ public class Siblings<T> {
         return second != null;
     }
 
-    public static <TSpec> Siblings<TSpec> of(TSpec first, TSpec second) {
+    public static <TSpec> Siblings<TSpec> of(TSpec first,  TSpec second) {
         return new Siblings<>(first, second);
     }
 }

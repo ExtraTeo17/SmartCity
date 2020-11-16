@@ -1,7 +1,6 @@
 package agents.abstractions;
 
 import agents.LightManagerAgent;
-import agents.message.MessageManager;
 import agents.utilities.LoggerLevel;
 import agents.utilities.MessageParameter;
 import com.google.common.eventbus.EventBus;
@@ -12,15 +11,13 @@ import jade.util.leap.Properties;
 import jade.wrapper.ControllerException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import routing.nodes.LightManagerNode;
+import routing.LightManagerNode;
 import smartcity.ITimeProvider;
 import utilities.ConditionalExecutor;
 import vehicles.MovingObject;
 
 import java.time.LocalDateTime;
-import java.time.temporal.ChronoUnit;
-
-import static agents.message.MessageManager.createProperties;
+import java.util.List;
 
 public abstract class AbstractAgent extends Agent {
     private final int id;
@@ -78,21 +75,20 @@ public abstract class AbstractAgent extends Agent {
     // TODO: Pass only LightManager here, remove movingObject and pass additional parameters
     protected void informLightManager(MovingObject movingObject) {
         // finds next traffic light and announces his arrival
-        LightManagerNode nextManager = movingObject.switchToNextTrafficLight();
+        LightManagerNode nextManager = movingObject.getNextTrafficLight();
         if (nextManager != null) {
             ACLMessage msg = prepareMessageForManager(nextManager, movingObject);
             send(msg);
-            print("Sent INFORM to LightManager" + nextManager.getLightManagerId() + ".");
+            print("Sending INFORM to LightManager" + nextManager.getLightManagerId() + ".");
         }
     }
 
     private ACLMessage prepareMessageForManager(LightManagerNode managerNode, MovingObject movingObject) {
-        ACLMessage msg = createMessageById(ACLMessage.INFORM, LightManagerAgent.name, managerNode.getLightManagerId());
+        ACLMessage msg = createMessage(ACLMessage.INFORM, LightManagerAgent.name, managerNode.getLightManagerId());
         var agentType = MessageParameter.getTypeByMovingObject(movingObject);
         Properties properties = createProperties(agentType);
-        var simulationTime = timeProvider.getCurrentSimulationTime();
-        var msToNextLight = movingObject.getMillisecondsToNextLight();
-        var predictedTime = simulationTime.plus(msToNextLight, ChronoUnit.MILLIS);
+        var predictedTime = timeProvider.getCurrentSimulationTime().plusNanos(
+                movingObject.getMillisecondsToNextLight() * 1_000_000);
         properties.setProperty(MessageParameter.ARRIVAL_TIME, "" + predictedTime);
         properties.setProperty(MessageParameter.ADJACENT_OSM_WAY_ID, "" + managerNode.getAdjacentWayId());
         msg.setAllUserDefinedParameters(properties);
@@ -100,9 +96,39 @@ public abstract class AbstractAgent extends Agent {
         return msg;
     }
 
-    protected ACLMessage createMessageById(int type, String receiverName, int receiverId) {
+    // TODO: Special class - MessageCreator for all msg-related code, protected, dependency, injected
+    protected ACLMessage createMessage(int type, List<String> receivers) {
+        ACLMessage msg = new ACLMessage(type);
+        for (var name : receivers) {
+            msg.addReceiver(new AID(name, AID.ISLOCALNAME));
+        }
+        return msg;
+    }
+
+    protected ACLMessage createMessage(int type, String receiverName) {
+        var receiver = new AID(receiverName, AID.ISLOCALNAME);
+        return createMessage(type, receiver);
+    }
+
+    protected ACLMessage createMessage(int type, String receiverName, int receiverId) {
         var receiver = new AID(getPredictedName(receiverName, receiverId), AID.ISLOCALNAME);
-        return MessageManager.createMessage(type, receiver);
+        return createMessage(type, receiver);
+    }
+
+    protected ACLMessage createMessage(int type, AID receiver) {
+        ACLMessage msg = new ACLMessage(type);
+        msg.addReceiver(receiver);
+        return msg;
+    }
+
+    protected Properties createProperties(String senderType) {
+        var result = new Properties();
+        result.setProperty(MessageParameter.TYPE, senderType);
+        return result;
+    }
+
+    protected String getSender(ACLMessage rcv) {
+        return rcv.getSender().getLocalName();
     }
 
     protected LocalDateTime getDateParameter(ACLMessage rcv, String param) {
@@ -115,14 +141,14 @@ public abstract class AbstractAgent extends Agent {
         return LocalDateTime.parse(paramValue);
     }
 
-    protected long getIntParameter(ACLMessage rcv, String param) {
+    protected int getIntParameter(ACLMessage rcv, String param) {
         var paramValue = rcv.getUserDefinedParameter(param);
         if (paramValue == null) {
             print("Did not receive " + param + " from " + rcv.getSender(), LoggerLevel.ERROR);
             return 0;
         }
 
-        return Long.parseLong(rcv.getUserDefinedParameter(param));
+        return Integer.parseInt(rcv.getUserDefinedParameter(param));
     }
 
     protected void logTypeError(ACLMessage rcv) {

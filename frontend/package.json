@@ -4,36 +4,20 @@
   "private": true,
   "dependencies": {
     "leaflet": "1.6.0",
-    "moment": "2.29.1",
     "react": "^16.13.1",
-    "react-bootstrap": "^1.4.0",
     "react-dom": "^16.13.1",
-    "react-flatpickr": "^3.10.6",
     "react-leaflet": "2.7.0",
-    "react-leaflet-markercluster": "^2.0.0",
-    "react-live-clock": "^5.0.10",
     "react-notify-toast": "0.5.1",
     "react-redux": "^7.2.1",
-    "react-scripts": "^3.4.4",
-    "redux": "^4.0.5",
-    "redux-actions": "^2.6.5",
-    "reselect": "^4.0.0"
+    "react-scripts": "3.4.1",
+    "redux": "^4.0.5"
   },
   "devDependencies": {
     "eslint": "^6.8.0",
-    "eslint-config-airbnb": "^18.0.1",
-    "eslint-config-prettier": "^6.14.0",
-    "eslint-loader": "^3.0.2",
     "eslint-plugin-autofix": "^1.0.2",
-    "eslint-plugin-import": "^2.18.2",
     "eslint-plugin-jest": "^22.17.0",
-    "eslint-plugin-jsx-a11y": "^6.2.3",
-    "eslint-plugin-prettier": "^3.1.1",
     "eslint-plugin-react": "^7.20.3",
-    "jest": "24.9.0",
-    "@types/jest": "24.9.0",
     "prettier": "^1.19.1",
-    "prettier-eslint": "^11.0.0",
     "redux-devtools-extension": "2.13.8"
   },
   "scripts": {

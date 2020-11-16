@@ -5,20 +5,14 @@ import routing.core.Zone;
 
 public class PrepareSimulationEvent {
     public final IZone zone;
-    public final boolean shouldGeneratePedestriansAndBuses;
 
-    public PrepareSimulationEvent(double latitude, double longitude, double radius,
-                                  boolean shouldGeneratePedestriansAndBuses) {
+    public PrepareSimulationEvent(double latitude, double longitude, double radius) {
         this.zone = Zone.of(latitude, longitude, (int) radius);
-        this.shouldGeneratePedestriansAndBuses = shouldGeneratePedestriansAndBuses;
     }
 
-    public PrepareSimulationEvent(IZone zone,
-                                  boolean shouldGeneratePedestriansAndBuses) {
+    public PrepareSimulationEvent(IZone zone) {
         this.zone = zone;
-        this.shouldGeneratePedestriansAndBuses = shouldGeneratePedestriansAndBuses;
     }
-
 
     @Override
     public String toString() {

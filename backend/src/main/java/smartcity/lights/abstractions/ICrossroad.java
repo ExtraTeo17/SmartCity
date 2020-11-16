@@ -1,5 +1,8 @@
 package smartcity.lights.abstractions;
 
+import org.jxmapviewer.JXMapViewer;
+import org.jxmapviewer.painter.Painter;
+import routing.core.IGeoPosition;
 import smartcity.lights.OptimizationResult;
 import smartcity.lights.core.Light;
 import smartcity.stations.ArrivalInfo;
@@ -27,7 +30,9 @@ public interface ICrossroad {
 
     boolean removePedestrianFromFarAwayQueue(long adjacentWayId, String agentName);
 
-    OptimizationResult requestOptimizations(int extendTimeSeconds);
+    OptimizationResult requestOptimizations();
+
+    void draw(List<Painter<JXMapViewer>> painter);
 
     void startLifetime();
 }

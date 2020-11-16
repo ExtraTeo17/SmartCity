@@ -1,7 +1,7 @@
 package routing;
 
 public class RoutingConstants {
-    public static final int STEP_SIZE_METERS = 2;
+    public static final int STEP_SIZE_METERS = 1;
     public static final int M_MILLISECONDS_TO_KM_HOUR = 3600;
     public static final int STEP_CONSTANT = STEP_SIZE_METERS * M_MILLISECONDS_TO_KM_HOUR;
 

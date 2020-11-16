@@ -2,22 +2,23 @@ package vehicles;
 
 import com.google.common.annotations.VisibleForTesting;
 import smartcity.ITimeProvider;
-import vehicles.enums.DrivingState;
-import vehicles.enums.VehicleType;
 
 import java.time.LocalDateTime;
 
-public class TestPedestrian extends Pedestrian implements ITestable {
+public class TestPedestrian extends Pedestrian {
+    private final ITimeProvider timeProvider;
+
     private LocalDateTime start;
     private LocalDateTime end;
 
     @VisibleForTesting
-    public TestPedestrian(ITimeProvider timeProvider) {
-        super(timeProvider);
+    TestPedestrian(ITimeProvider timeProvider) {
+        this.timeProvider = timeProvider;
     }
 
-    public TestPedestrian(Pedestrian pedestrian) {
+    public TestPedestrian(Pedestrian pedestrian, ITimeProvider timeProvider) {
         super(pedestrian);
+        this.timeProvider = timeProvider;
     }
 
     @Override
@@ -28,6 +29,7 @@ public class TestPedestrian extends Pedestrian implements ITestable {
         }
         if (newState == DrivingState.AT_DESTINATION) {
             end = timeProvider.getCurrentSimulationTime();
+            ;
         }
 
         super.setState(newState);
@@ -38,12 +40,10 @@ public class TestPedestrian extends Pedestrian implements ITestable {
         return VehicleType.TEST_PEDESTRIAN.toString();
     }
 
-    @Override
     public LocalDateTime getStart() {
         return start;
     }
 
-    @Override
     public LocalDateTime getEnd() {
         return end;
     }

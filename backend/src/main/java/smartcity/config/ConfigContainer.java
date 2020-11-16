@@ -1,43 +1,45 @@
 package smartcity.config;
 
+import com.google.common.eventbus.EventBus;
 import com.google.inject.Inject;
+import events.web.SimulationPreparedEvent;
 import routing.core.IGeoPosition;
 import routing.core.IZone;
 import routing.core.Position;
 import routing.core.Zone;
 import smartcity.SimulationState;
-import smartcity.config.abstractions.ILightConfigContainer;
-import smartcity.config.abstractions.IStationConfigContainer;
-import smartcity.config.abstractions.ITroublePointsConfigContainer;
-import smartcity.config.abstractions.IZoneMutator;
 
 
-@SuppressWarnings("ClassWithTooManyFields")
 public class ConfigContainer extends ConfigMutator
-        implements IZoneMutator,
-        ILightConfigContainer,
-        ITroublePointsConfigContainer,
-        IStationConfigContainer {
+        implements IZoneMutator, ILightConfigContainer {
+    private final EventBus eventBus;
     private SimulationState simulationState = SimulationState.INITIAL;
     private boolean shouldGeneratePedestriansAndBuses = false;
-    private boolean shouldGenerateConstructionSites = false;
-
+    private boolean shouldGenerateCars = true;
+    private boolean lightManagersLock = false;
     private boolean isLightStrategyActive = true;
-    private boolean changeRouteOnTroublePoint = false;
-    private boolean isStationStrategyActive = true;
-    private boolean changeRouteOnTrafficJam = false;
-
-    private int lightExtendTime = 30;
-    private int extendWaitTime = 60;
-    private int timeBeforeTrouble = 5000;
-
     private final IZone zone;
+    private final ObjectsConfig carsConfig;
 
     @Inject
-    public ConfigContainer() {
+    public ConfigContainer(EventBus eventBus) {
+        this.eventBus = eventBus;
+
         IGeoPosition warsawPos = Position.of(52.23682, 21.01681);
         int defaultRadius = 600;
         this.zone = Zone.of(warsawPos, defaultRadius);
+
+        int defaultTestCarId = 2;
+        int defaultCarsNum = 4;
+        this.carsConfig = CarsConfig.of(defaultCarsNum, defaultTestCarId);
+    }
+
+    public boolean shouldGenerateCars() {
+        return shouldGenerateCars;
+    }
+
+    public void setGenerateCars(boolean value) {
+        this.shouldGenerateCars = value;
     }
 
     public boolean shouldGeneratePedestriansAndBuses() {
@@ -46,6 +48,21 @@ public class ConfigContainer extends ConfigMutator
 
     public void setGeneratePedestriansAndBuses(boolean value) {
         this.shouldGeneratePedestriansAndBuses = value;
+    }
+
+    @Override
+    public synchronized boolean tryLockLightManagers() {
+        if (lightManagersLock) {
+            return false;
+        }
+
+        lightManagersLock = true;
+        return true;
+    }
+
+    @Override
+    public synchronized void unlockLightManagers() {
+        lightManagersLock = false;
     }
 
     public IZone getZone() {
@@ -67,6 +84,22 @@ public class ConfigContainer extends ConfigMutator
         }
     }
 
+    public int getTestCarId() {
+        return carsConfig.getTestObjectNumber();
+    }
+
+    public void setTestCarId(int id) {
+        carsConfig.setTestObjectNumber(mutation, id);
+    }
+
+    public int getCarsNumber() {
+        return carsConfig.getNumber();
+    }
+
+    public void setCarsNumber(int num) {
+        carsConfig.setNumber(mutation, num);
+    }
+
     @Override
     public boolean isLightStrategyActive() {
         return isLightStrategyActive;
@@ -76,75 +109,4 @@ public class ConfigContainer extends ConfigMutator
     public void setLightStrategyActive(boolean lightStrategyActive) {
         isLightStrategyActive = lightStrategyActive;
     }
-
-    @Override
-    public int getExtendWaitTime() {
-        return extendWaitTime;
-    }
-
-    @Override
-    public void setExtendWaitTime(int extendWaitTime) {
-        this.extendWaitTime = extendWaitTime;
-    }
-
-    @Override
-    public int getExtendLightTime() {
-        return lightExtendTime;
-    }
-
-    @Override
-    public void setExtendLightTime(int lightExtendTime) {
-        this.lightExtendTime = lightExtendTime;
-    }
-
-    @Override
-    public boolean shouldChangeRouteOnTroublePoint() {
-        return changeRouteOnTroublePoint;
-    }
-
-    @Override
-    public void setChangeRouteOnTroublePoint(boolean changeRouteOnTroublePoint) {
-        this.changeRouteOnTroublePoint = changeRouteOnTroublePoint;
-    }
-
-    @Override
-    public boolean shouldGenerateConstructionSites() {
-        return shouldGenerateConstructionSites;
-    }
-
-    @Override
-    public void setShouldGenerateConstructionSites(boolean constructionSiteGenerationActive) {
-        shouldGenerateConstructionSites = constructionSiteGenerationActive;
-    }
-
-    @Override
-    public boolean isStationStrategyActive() {
-        return isStationStrategyActive;
-    }
-
-    @Override
-    public void setStationStrategyActive(boolean stationStrategyActive) {
-        isStationStrategyActive = stationStrategyActive;
-    }
-
-    @Override
-    public int getTimeBeforeTrouble() {
-        return timeBeforeTrouble;
-    }
-
-    @Override
-    public void setTimeBeforeTrouble(int timeBeforeTrouble) {
-        this.timeBeforeTrouble = timeBeforeTrouble;
-    }
-
-    @Override
-    public boolean shouldChangeRouteOnTrafficJam() {
-        return changeRouteOnTrafficJam;
-    }
-
-    @Override
-    public void setChangeRouteOnTrafficJam(boolean changeRouteOnTrafficJam) {
-        this.changeRouteOnTrafficJam = changeRouteOnTrafficJam;
-    }
-
 }

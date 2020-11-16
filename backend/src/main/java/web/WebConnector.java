@@ -31,7 +31,7 @@ class WebConnector implements IWebConnector {
         if (messageOpt.isPresent()) {
             String serializedMessage = messageOpt.get();
             for (var bus : socketServer.getMessageBuses()) {
-                bus.send(serializedMessage);
+                bus.accept(serializedMessage);
             }
         }
         else {

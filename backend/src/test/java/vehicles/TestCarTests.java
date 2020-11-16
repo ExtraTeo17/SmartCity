@@ -2,7 +2,6 @@ package vehicles;
 
 import org.junit.jupiter.api.Test;
 import smartcity.ITimeProvider;
-import vehicles.enums.DrivingState;
 
 import java.time.LocalDateTime;
 
@@ -27,6 +26,7 @@ class TestCarTests {
         var start = car.getStart();
         assertEquals(time, start);
     }
+
 
     @Test
     void setState_onFinalState_shouldSetStartAndEnd() {

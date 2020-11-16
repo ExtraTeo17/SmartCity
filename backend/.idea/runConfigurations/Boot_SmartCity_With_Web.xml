@@ -2,7 +2,7 @@
   <configuration default="false" name="Boot-SmartCity-With-Web" type="Application" factoryName="Application">
     <option name="MAIN_CLASS_NAME" value="SmartCity" />
     <module name="smartCity" />
-    <option name="PROGRAM_PARAMETERS" value="-gui -port 4000" />
+    <option name="PROGRAM_PARAMETERS" value="" />
     <method v="2">
       <option name="Make" enabled="true" />
     </method>

@@ -1,17 +1,9 @@
 package osmproxy.elements;
 
-import utilities.ForSerialization;
-
-import java.io.Serializable;
 import java.util.Objects;
 
-public class OSMElement implements Serializable {
+public class OSMElement {
     protected final long id;
-
-    @ForSerialization
-    OSMElement() {
-        id = 0;
-    }
 
     OSMElement(final String id) {
         this.id = Long.parseLong(id);

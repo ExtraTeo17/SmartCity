@@ -1,6 +1,7 @@
 package routing.core;
 
 import org.jetbrains.annotations.NotNull;
+import org.jxmapviewer.viewer.GeoPosition;
 import utilities.NumericHelper;
 
 public interface IGeoPosition extends Comparable<IGeoPosition> {
@@ -63,23 +64,6 @@ public interface IGeoPosition extends Comparable<IGeoPosition> {
         };
     }
 
-    default IGeoPosition multiply(double multipler) {
-        return new IGeoPosition() {
-            private final double lat = IGeoPosition.this.getLat() * multipler;
-            private final double lng = IGeoPosition.this.getLng() * multipler;
-
-            @Override
-            public double getLat() {
-                return lat;
-            }
-
-            @Override
-            public double getLng() {
-                return lng;
-            }
-        };
-    }
-
     default double squaredSum() {
         return getLat() * getLat() + getLng() * getLng();
     }
@@ -114,7 +98,12 @@ public interface IGeoPosition extends Comparable<IGeoPosition> {
         return cmp != 0 ? cmp : Double.compare(getLng(), o.getLng());
     }
 
-    default String pointText() {
+    default String pointText(){
         return "(" + getLat() + ", " + getLng() + ')';
+    }
+
+    @Deprecated
+    default GeoPosition toMapGeoPosition() {
+        return new GeoPosition(getLat(), getLng());
     }
 }

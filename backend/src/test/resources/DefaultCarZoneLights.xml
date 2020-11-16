@@ -1,629 +1,627 @@
-<?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<osm generator="Overpass API 0.7.56.7 b85c4387" version="0.6">
-    <note>The data included in this document is from www.openstreetmap.org. The data is made available under ODbL.
-    </note>
-    <meta osm_base="2020-10-03T16:37:02Z"/>
+<?xml version="1.0" encoding="UTF-8" standalone="no"?><osm generator="Overpass API 0.7.56.7 b85c4387" version="0.6">
+<note>The data included in this document is from www.openstreetmap.org. The data is made available under ODbL.</note>
+<meta osm_base="2020-10-03T16:37:02Z"/>
 
-    <node id="32528268" lat="52.2370227" lon="21.0179317">
-        <tag k="highway" v="traffic_signals"/>
-        <tag k="traffic_signals:sound" v="yes"/>
-        <tag k="traffic_signals:vibration" v="yes"/>
-    </node>
-    <way id="48279420">
-        <bounds maxlat="52.2370227" maxlon="21.0179982" minlat="52.2368305" minlon="21.0179317"/>
-        <nd lat="52.2370227" lon="21.0179317" ref="32528268"/>
-        <nd lat="52.2369820" lon="21.0179447" ref="7161320947"/>
-        <nd lat="52.2368305" lon="21.0179982" ref="533674870"/>
-        <tag k="bicycle" v="yes"/>
-        <tag k="cycleway:both" v="no"/>
-        <tag k="foot" v="yes"/>
-        <tag k="highway" v="tertiary"/>
-        <tag k="lit" v="yes"/>
-        <tag k="maxspeed" v="50"/>
-        <tag k="motor_vehicle" v="no"/>
-        <tag k="name" v="Nowy Świat"/>
-        <tag k="name:de" v="Neue Welt"/>
-        <tag k="name:en" v="New World"/>
-        <tag k="name:pl" v="Nowy Świat"/>
-        <tag k="psv" v="yes"/>
-        <tag k="sidewalk" v="both"/>
-        <tag k="sidewalk:both:bicycle" v="yes"/>
-        <tag k="surface" v="asphalt"/>
-        <tag k="wikidata" v="Q1109610"/>
-        <tag k="wikipedia" v="pl:Ulica Nowy Świat w Warszawie"/>
-    </way>
-    <way id="237193611">
-        <bounds maxlat="52.2372427" maxlon="21.0194791" minlat="52.2370227" minlon="21.0179317"/>
-        <nd lat="52.2370227" lon="21.0179317" ref="32528268"/>
-        <nd lat="52.2370581" lon="21.0181250" ref="533674882"/>
-        <nd lat="52.2371188" lon="21.0185690" ref="5242369779"/>
-        <nd lat="52.2371401" lon="21.0187255" ref="2451400254"/>
-        <nd lat="52.2371617" lon="21.0188840" ref="5217719911"/>
-        <nd lat="52.2371673" lon="21.0189256" ref="5226086086"/>
-        <nd lat="52.2372034" lon="21.0191903" ref="1701518371"/>
-        <nd lat="52.2372243" lon="21.0193440" ref="1701468658"/>
-        <nd lat="52.2372427" lon="21.0194791" ref="32528269"/>
-        <tag k="cycleway" v="lane"/>
-        <tag k="highway" v="tertiary"/>
-        <tag k="horse" v="no"/>
-        <tag k="lanes" v="1"/>
-        <tag k="lit" v="yes"/>
-        <tag k="maxspeed" v="50"/>
-        <tag k="name" v="Świętokrzyska"/>
-        <tag k="old_ref" v="719"/>
-        <tag k="sidewalk" v="separate"/>
-        <tag k="source" v="ortofoto2008"/>
-        <tag k="source:maxspeed" v="PL:urban"/>
-        <tag k="surface" v="asphalt"/>
-        <tag k="wikidata" v="Q8082347"/>
-        <tag k="wikipedia" v="pl:Ulica Świętokrzyska w Warszawie"/>
-    </way>
-    <way id="346893830">
-        <bounds maxlat="52.2370227" maxlon="21.0179317" minlat="52.2365240" minlon="21.0153006"/>
-        <nd lat="52.2365240" lon="21.0153006" ref="3378411272"/>
-        <nd lat="52.2365599" lon="21.0154847" ref="4501473593"/>
-        <nd lat="52.2365728" lon="21.0155514" ref="5729316209"/>
-        <nd lat="52.2365910" lon="21.0156445" ref="4162180369"/>
-        <nd lat="52.2366554" lon="21.0159756" ref="334558139"/>
-        <nd lat="52.2367084" lon="21.0162476" ref="314590535"/>
-        <nd lat="52.2367405" lon="21.0164125" ref="32528267"/>
-        <nd lat="52.2367778" lon="21.0166039" ref="314590534"/>
-        <nd lat="52.2368135" lon="21.0167968" ref="334558632"/>
-        <nd lat="52.2368866" lon="21.0171918" ref="1111952968"/>
-        <nd lat="52.2369335" lon="21.0174455" ref="5230960354"/>
-        <nd lat="52.2369810" lon="21.0177026" ref="4890506869"/>
-        <nd lat="52.2370227" lon="21.0179317" ref="32528268"/>
-        <tag k="cycleway" v="lane"/>
-        <tag k="highway" v="tertiary"/>
-        <tag k="horse" v="no"/>
-        <tag k="lanes" v="4"/>
-        <tag k="lit" v="yes"/>
-        <tag k="maxspeed" v="50"/>
-        <tag k="name" v="Świętokrzyska"/>
-        <tag k="old_ref" v="719"/>
-        <tag k="oneway" v="no"/>
-        <tag k="source:maxspeed" v="PL:urban"/>
-        <tag k="surface" v="asphalt"/>
-        <tag k="wikidata" v="Q8082347"/>
-        <tag k="wikipedia" v="pl:Ulica Świętokrzyska w Warszawie"/>
-    </way>
-    <way id="709895408">
-        <bounds maxlat="52.2372025" maxlon="21.0179317" minlat="52.2370227" minlon="21.0178683"/>
-        <nd lat="52.2372025" lon="21.0178683" ref="533674874"/>
-        <nd lat="52.2370826" lon="21.0179121" ref="7161320968"/>
-        <nd lat="52.2370227" lon="21.0179317" ref="32528268"/>
-        <tag k="bicycle" v="yes"/>
-        <tag k="foot" v="yes"/>
-        <tag k="highway" v="tertiary"/>
-        <tag k="lit" v="yes"/>
-        <tag k="maxspeed" v="30"/>
-        <tag k="motor_vehicle" v="no"/>
-        <tag k="name" v="Nowy Świat"/>
-        <tag k="name:de" v="Neue Welt"/>
-        <tag k="name:en" v="New World"/>
-        <tag k="name:pl" v="Nowy Świat"/>
-        <tag k="psv" v="designated"/>
-        <tag k="surface" v="asphalt"/>
-        <tag k="wikidata" v="Q1109610"/>
-        <tag k="wikipedia" v="pl:Ulica Nowy Świat w Warszawie"/>
-    </way>
-    <node id="32572247" lat="52.2403876" lon="21.0137099">
-        <tag k="highway" v="traffic_signals"/>
-    </node>
-    <way id="230770434">
-        <bounds maxlat="52.2404208" maxlon="21.0140052" minlat="52.2402123" minlon="21.0131484"/>
-        <nd lat="52.2402123" lon="21.0131484" ref="2392223759"/>
-        <nd lat="52.2402823" lon="21.0133396" ref="317616323"/>
-        <nd lat="52.2403260" lon="21.0134713" ref="3344086875"/>
-        <nd lat="52.2403876" lon="21.0137099" ref="32572247"/>
-        <nd lat="52.2404026" lon="21.0137718" ref="1443527768"/>
-        <nd lat="52.2404138" lon="21.0138595" ref="7891327106"/>
-        <nd lat="52.2404160" lon="21.0139403" ref="7891327108"/>
-        <nd lat="52.2404208" lon="21.0140052" ref="32572248"/>
-        <tag k="highway" v="tertiary"/>
-        <tag k="lanes" v="3"/>
-        <tag k="name" v="Królewska"/>
-        <tag k="oneway" v="yes"/>
-        <tag k="surface" v="asphalt"/>
-        <tag k="turn:lanes" v="left|left|through;right"/>
-    </way>
-    <node id="32572254" lat="52.2400258" lon="21.0123900">
-        <tag k="highway" v="traffic_signals"/>
-    </node>
-    <way id="16238024">
-        <bounds maxlat="52.2400258" maxlon="21.0123900" minlat="52.2398620" minlon="21.0122346"/>
-        <nd lat="52.2400258" lon="21.0123900" ref="32572254"/>
-        <nd lat="52.2399843" lon="21.0123221" ref="638465720"/>
-        <nd lat="52.2399480" lon="21.0122798" ref="2639505677"/>
-        <nd lat="52.2399056" lon="21.0122476" ref="638465605"/>
-        <nd lat="52.2398620" lon="21.0122346" ref="165115647"/>
-        <tag k="highway" v="tertiary"/>
-        <tag k="name" v="Mazowiecka"/>
-        <tag k="oneway" v="yes"/>
-        <tag k="source" v="ortofoto2008"/>
-        <tag k="surface" v="asphalt"/>
-    </way>
-    <way id="184744199">
-        <bounds maxlat="52.2400258" maxlon="21.0123900" minlat="52.2398759" minlon="21.0119565"/>
-        <nd lat="52.2400258" lon="21.0123900" ref="32572254"/>
-        <nd lat="52.2398759" lon="21.0119565" ref="638465599"/>
-        <tag k="highway" v="tertiary"/>
-        <tag k="name" v="Królewska"/>
-        <tag k="oneway" v="yes"/>
-        <tag k="surface" v="asphalt"/>
-        <tag k="wikidata" v="Q9365538"/>
-        <tag k="wikipedia" v="pl:Ulica Królewska w Warszawie"/>
-    </way>
-    <way id="236023342">
-        <bounds maxlat="52.2404306" maxlon="21.0134380" minlat="52.2400258" minlon="21.0123900"/>
-        <nd lat="52.2404306" lon="21.0134380" ref="317616325"/>
-        <nd lat="52.2403442" lon="21.0131998" ref="32572253"/>
-        <nd lat="52.2400258" lon="21.0123900" ref="32572254"/>
-        <tag k="highway" v="tertiary"/>
-        <tag k="name" v="Królewska"/>
-        <tag k="oneway" v="yes"/>
-        <tag k="surface" v="asphalt"/>
-        <tag k="wikidata" v="Q9365538"/>
-        <tag k="wikipedia" v="pl:Ulica Królewska w Warszawie"/>
-    </way>
-    <node id="32892162" lat="52.2361236" lon="21.0132515">
-        <tag k="highway" v="traffic_signals"/>
-    </node>
-    <way id="4966690">
-        <bounds maxlat="52.2361236" maxlon="21.0140944" minlat="52.2340550" minlon="21.0132515"/>
-        <nd lat="52.2340550" lon="21.0140944" ref="1908123185"/>
-        <nd lat="52.2341763" lon="21.0140218" ref="308197346"/>
-        <nd lat="52.2343213" lon="21.0139687" ref="317587210"/>
-        <nd lat="52.2344197" lon="21.0139618" ref="32892176"/>
-        <nd lat="52.2345494" lon="21.0139676" ref="1908121134"/>
-        <nd lat="52.2346083" lon="21.0139740" ref="266185943"/>
-        <nd lat="52.2346560" lon="21.0139738" ref="4501493772"/>
-        <nd lat="52.2347233" lon="21.0139648" ref="224852315"/>
-        <nd lat="52.2348524" lon="21.0139168" ref="32892171"/>
-        <nd lat="52.2352789" lon="21.0136817" ref="6079444005"/>
-        <nd lat="52.2355417" lon="21.0135368" ref="3035066854"/>
-        <nd lat="52.2357715" lon="21.0134102" ref="4501493784"/>
-        <nd lat="52.2358478" lon="21.0133772" ref="4501472085"/>
-        <nd lat="52.2360148" lon="21.0132927" ref="638465316"/>
-        <nd lat="52.2361236" lon="21.0132515" ref="32892162"/>
-        <tag k="highway" v="tertiary"/>
-        <tag k="lanes" v="3"/>
-        <tag k="name" v="Plac Powstańców Warszawy"/>
-        <tag k="oneway" v="yes"/>
-        <tag k="surface" v="asphalt"/>
-        <tag k="wikidata" v="Q7970920"/>
-        <tag k="wikipedia" v="pl:Plac Powstańców Warszawy w Warszawie"/>
-    </way>
-    <way id="117656382">
-        <bounds maxlat="52.2386625" maxlon="21.0132639" minlat="52.2361236" minlon="21.0127415"/>
-        <nd lat="52.2361236" lon="21.0132515" ref="32892162"/>
-        <nd lat="52.2362549" lon="21.0132639" ref="638465320"/>
-        <nd lat="52.2362929" lon="21.0132588" ref="3692612165"/>
-        <nd lat="52.2369193" lon="21.0131750" ref="2064575958"/>
-        <nd lat="52.2371820" lon="21.0131310" ref="312892950"/>
-        <nd lat="52.2376528" lon="21.0130298" ref="165121950"/>
-        <nd lat="52.2383178" lon="21.0128492" ref="248200307"/>
-        <nd lat="52.2383618" lon="21.0128395" ref="638465543"/>
-        <nd lat="52.2386625" lon="21.0127415" ref="165115665"/>
-        <tag k="highway" v="tertiary"/>
-        <tag k="lanes" v="2"/>
-        <tag k="name" v="Mazowiecka"/>
-        <tag k="oneway" v="yes"/>
-        <tag k="source" v="ortofoto2008"/>
-        <tag k="surface" v="asphalt"/>
-    </way>
-    <way id="218386444">
-        <bounds maxlat="52.2361236" maxlon="21.0132515" minlat="52.2360094" minlon="21.0126594"/>
-        <nd lat="52.2360094" lon="21.0126594" ref="32892177"/>
-        <nd lat="52.2360742" lon="21.0129954" ref="5729314439"/>
-        <nd lat="52.2361236" lon="21.0132515" ref="32892162"/>
-        <tag k="cycleway:right" v="lane"/>
-        <tag k="highway" v="tertiary"/>
-        <tag k="lanes" v="1"/>
-        <tag k="lit" v="yes"/>
-        <tag k="maxspeed" v="50"/>
-        <tag k="name" v="Świętokrzyska"/>
-        <tag k="old_ref" v="719"/>
-        <tag k="oneway" v="no"/>
-        <tag k="oneway:bicycle" v="yes"/>
-        <tag k="source:maxspeed" v="PL:urban"/>
-        <tag k="surface" v="asphalt"/>
-        <tag k="wikidata" v="Q8082347"/>
-        <tag k="wikipedia" v="pl:Ulica Świętokrzyska w Warszawie"/>
-    </way>
-    <way id="218386450">
-        <bounds maxlat="52.2364640" maxlon="21.0150021" minlat="52.2361236" minlon="21.0132515"/>
-        <nd lat="52.2361236" lon="21.0132515" ref="32892162"/>
-        <nd lat="52.2361700" lon="21.0134770" ref="4501472088"/>
-        <nd lat="52.2361839" lon="21.0135509" ref="5729314444"/>
-        <nd lat="52.2362956" lon="21.0141160" ref="4158683987"/>
-        <nd lat="52.2363637" lon="21.0144741" ref="4158681380"/>
-        <nd lat="52.2364371" lon="21.0148602" ref="4158681381"/>
-        <nd lat="52.2364640" lon="21.0150021" ref="1754815728"/>
-        <tag k="bicycle" v="yes"/>
-        <tag k="cycleway:right" v="lane"/>
-        <tag k="highway" v="tertiary"/>
-        <tag k="horse" v="no"/>
-        <tag k="lanes" v="4"/>
-        <tag k="lit" v="yes"/>
-        <tag k="maxspeed" v="50"/>
-        <tag k="name" v="Świętokrzyska"/>
-        <tag k="old_ref" v="719"/>
-        <tag k="oneway" v="no"/>
-        <tag k="oneway:bicycle" v="yes"/>
-        <tag k="source:maxspeed" v="PL:urban"/>
-        <tag k="surface" v="asphalt"/>
-        <tag k="wikidata" v="Q8082347"/>
-        <tag k="wikipedia" v="pl:Ulica Świętokrzyska w Warszawie"/>
-    </way>
-    <node id="224829889" lat="52.2411232" lon="21.0220752">
-        <tag k="highway" v="traffic_signals"/>
-        <tag k="traffic_signals:sound" v="yes"/>
-    </node>
-    <way id="19919306">
-        <bounds maxlat="52.2418839" maxlon="21.0246791" minlat="52.2411232" minlon="21.0220752"/>
-        <nd lat="52.2411232" lon="21.0220752" ref="224829889"/>
-        <nd lat="52.2411618" lon="21.0221984" ref="345519303"/>
-        <nd lat="52.2411976" lon="21.0223183" ref="778326304"/>
-        <nd lat="52.2418285" lon="21.0244992" ref="778326336"/>
-        <nd lat="52.2418839" lon="21.0246791" ref="209094020"/>
-        <tag k="highway" v="residential"/>
-        <tag k="lit" v="yes"/>
-        <tag k="name" v="Lipowa"/>
-        <tag k="surface" v="asphalt"/>
-    </way>
-    <way id="236238463">
-        <bounds maxlat="52.2411232" maxlon="21.0232580" minlat="52.2398350" minlon="21.0220752"/>
-        <nd lat="52.2411232" lon="21.0220752" ref="224829889"/>
-        <nd lat="52.2408512" lon="21.0223062" ref="778327666"/>
-        <nd lat="52.2404915" lon="21.0225995" ref="224829887"/>
-        <nd lat="52.2402025" lon="21.0228389" ref="5063033838"/>
-        <nd lat="52.2401134" lon="21.0229324" ref="345519298"/>
-        <nd lat="52.2399215" lon="21.0230976" ref="345519299"/>
-        <nd lat="52.2398350" lon="21.0232580" ref="224760594"/>
-        <tag k="highway" v="tertiary"/>
-        <tag k="lanes" v="2"/>
-        <tag k="lit" v="yes"/>
-        <tag k="maxspeed" v="50"/>
-        <tag k="name" v="Browarna"/>
-        <tag k="source:maxspeed" v="PL:zone50"/>
-        <tag k="surface" v="asphalt"/>
-    </way>
-    <way id="316067494">
-        <bounds maxlat="52.2416038" maxlon="21.0220752" minlat="52.2411232" minlon="21.0216926"/>
-        <nd lat="52.2416038" lon="21.0216926" ref="5063043124"/>
-        <nd lat="52.2411967" lon="21.0220140" ref="345519302"/>
-        <nd lat="52.2411232" lon="21.0220752" ref="224829889"/>
-        <tag k="highway" v="tertiary"/>
-        <tag k="lanes" v="3"/>
-        <tag k="lanes:backward" v="1"/>
-        <tag k="lanes:forward" v="2"/>
-        <tag k="lit" v="yes"/>
-        <tag k="maxspeed" v="50"/>
-        <tag k="name" v="Browarna"/>
-        <tag k="source:maxspeed" v="PL:zone50"/>
-        <tag k="surface" v="asphalt"/>
-        <tag k="turn:lanes:forward" v="left|through"/>
-    </way>
-    <node id="317616291" lat="52.2405265" lon="21.0141769">
-        <tag k="highway" v="traffic_signals"/>
-    </node>
-    <way id="4968936">
-        <bounds maxlat="52.2405459" maxlon="21.0146606" minlat="52.2405089" minlon="21.0139667"/>
-        <nd lat="52.2405459" lon="21.0146606" ref="32917758"/>
-        <nd lat="52.2405286" lon="21.0142329" ref="7086357712"/>
-        <nd lat="52.2405265" lon="21.0141769" ref="317616291"/>
-        <nd lat="52.2405248" lon="21.0141328" ref="7891327109"/>
-        <nd lat="52.2405089" lon="21.0139667" ref="32572252"/>
-        <tag k="highway" v="tertiary"/>
-        <tag k="lanes" v="1"/>
-        <tag k="name" v="Królewska"/>
-        <tag k="oneway" v="yes"/>
-        <tag k="surface" v="asphalt"/>
-        <tag k="wikidata" v="Q9365538"/>
-        <tag k="wikipedia" v="pl:Ulica Królewska w Warszawie"/>
-    </way>
-    <node id="1321790320" lat="52.2356606" lon="21.0108390">
-        <tag k="highway" v="traffic_signals"/>
-    </node>
-    <way id="117656398">
-        <bounds maxlat="52.2360094" maxlon="21.0126594" minlat="52.2356606" minlon="21.0108390"/>
-        <nd lat="52.2356606" lon="21.0108390" ref="1321790320"/>
-        <nd lat="52.2357005" lon="21.0110463" ref="4238022147"/>
-        <nd lat="52.2358166" lon="21.0116496" ref="2276192052"/>
-        <nd lat="52.2360094" lon="21.0126594" ref="32892177"/>
-        <tag k="cycleway:right" v="lane"/>
-        <tag k="highway" v="tertiary"/>
-        <tag k="lanes" v="2"/>
-        <tag k="lit" v="yes"/>
-        <tag k="maxspeed" v="50"/>
-        <tag k="name" v="Świętokrzyska"/>
-        <tag k="old_ref" v="719"/>
-        <tag k="oneway:bicycle" v="yes"/>
-        <tag k="source:maxspeed" v="PL:urban"/>
-        <tag k="surface" v="asphalt"/>
-        <tag k="wikidata" v="Q8082347"/>
-        <tag k="wikipedia" v="pl:Ulica Świętokrzyska w Warszawie"/>
-    </way>
-    <way id="185067270">
-        <bounds maxlat="52.2356606" maxlon="21.0110080" minlat="52.2354178" minlon="21.0108390"/>
-        <nd lat="52.2356606" lon="21.0108390" ref="1321790320"/>
-        <nd lat="52.2356338" lon="21.0108566" ref="7161321000"/>
-        <nd lat="52.2356034" lon="21.0108765" ref="3115151676"/>
-        <nd lat="52.2355319" lon="21.0109233" ref="638465030"/>
-        <nd lat="52.2354178" lon="21.0110080" ref="3035065890"/>
-        <tag k="highway" v="tertiary"/>
-        <tag k="lanes" v="1"/>
-        <tag k="lit" v="yes"/>
-        <tag k="name" v="Jasna"/>
-        <tag k="oneway" v="yes"/>
-        <tag k="source:maxspeed" v="PL:urban"/>
-        <tag k="surface" v="asphalt"/>
-    </way>
-    <way id="426582806">
-        <bounds maxlat="52.2356606" maxlon="21.0108390" minlat="52.2354410" minlon="21.0097092"/>
-        <nd lat="52.2354410" lon="21.0097092" ref="3378411271"/>
-        <nd lat="52.2356076" lon="21.0105664" ref="638465000"/>
-        <nd lat="52.2356206" lon="21.0106332" ref="4501472083"/>
-        <nd lat="52.2356606" lon="21.0108390" ref="1321790320"/>
-        <tag k="cycleway:right" v="lane"/>
-        <tag k="highway" v="tertiary"/>
-        <tag k="lanes" v="4"/>
-        <tag k="maxspeed" v="50"/>
-        <tag k="name" v="Świętokrzyska"/>
-        <tag k="old_ref" v="719"/>
-        <tag k="oneway:bicycle" v="yes"/>
-        <tag k="source:maxspeed" v="sign"/>
-        <tag k="surface" v="asphalt"/>
-        <tag k="wikidata" v="Q8082347"/>
-        <tag k="wikipedia" v="pl:Ulica Świętokrzyska w Warszawie"/>
-    </way>
-    <way id="442355018">
-        <bounds maxlat="52.2367555" maxlon="21.0108390" minlat="52.2356606" minlon="21.0101155"/>
-        <nd lat="52.2367555" lon="21.0101155" ref="248200305"/>
-        <nd lat="52.2366581" lon="21.0101756" ref="638465129"/>
-        <nd lat="52.2363201" lon="21.0104071" ref="4000816417"/>
-        <nd lat="52.2358146" lon="21.0107470" ref="3692612162"/>
-        <nd lat="52.2357702" lon="21.0107779" ref="638465032"/>
-        <nd lat="52.2356606" lon="21.0108390" ref="1321790320"/>
-        <tag k="highway" v="tertiary"/>
-        <tag k="lanes" v="1"/>
-        <tag k="lit" v="yes"/>
-        <tag k="maxspeed:type" v="PL:urban"/>
-        <tag k="name" v="Jasna"/>
-        <tag k="oneway" v="yes"/>
-        <tag k="surface" v="asphalt"/>
-    </way>
-    <node id="1443527790" lat="52.2406352" lon="21.0137235">
-        <tag k="highway" v="traffic_signals"/>
-    </node>
-    <way id="131117058">
-        <bounds maxlat="52.2407737" maxlon="21.0137528" minlat="52.2404306" minlon="21.0134380"/>
-        <nd lat="52.2407737" lon="21.0137528" ref="1443527818"/>
-        <nd lat="52.2407100" lon="21.0137520" ref="7891327112"/>
-        <nd lat="52.2406352" lon="21.0137235" ref="1443527790"/>
-        <nd lat="52.2405931" lon="21.0136933" ref="1443527782"/>
-        <nd lat="52.2405554" lon="21.0136629" ref="1443527771"/>
-        <nd lat="52.2405230" lon="21.0136195" ref="2639505680"/>
-        <nd lat="52.2404863" lon="21.0135531" ref="2639505679"/>
-        <nd lat="52.2404306" lon="21.0134380" ref="317616325"/>
-        <tag k="highway" v="tertiary_link"/>
-        <tag k="lanes" v="1"/>
-        <tag k="oneway" v="yes"/>
-        <tag k="surface" v="asphalt"/>
-    </way>
-    <node id="3378411269" lat="52.2352447" lon="21.0086618">
-        <tag k="highway" v="traffic_signals"/>
-    </node>
-    <way id="4968932">
-        <bounds maxlat="52.2354037" maxlon="21.0086618" minlat="52.2352447" minlon="21.0085647"/>
-        <nd lat="52.2352447" lon="21.0086618" ref="3378411269"/>
-        <nd lat="52.2354037" lon="21.0085647" ref="1736081787"/>
-        <tag k="highway" v="secondary"/>
-        <tag k="lit" v="yes"/>
-        <tag k="maxspeed" v="50"/>
-        <tag k="maxspeed:conditional" v="60 @ (23:00-05:00)"/>
-        <tag k="name" v="Marszałkowska"/>
-        <tag k="name:de" v="Marschallstraße"/>
-        <tag k="name:pl" v="Marszałkowska"/>
-        <tag k="oneway" v="yes"/>
-        <tag k="source:maxspeed" v="PL:urban"/>
-        <tag k="surface" v="asphalt"/>
-        <tag k="wikidata" v="Q1888750"/>
-        <tag k="wikipedia" v="pl:Ulica Marszałkowska w Warszawie"/>
-    </way>
-    <way id="161634980">
-        <bounds maxlat="52.2352447" maxlon="21.0092697" minlat="52.2342048" minlon="21.0086618"/>
-        <nd lat="52.2342048" lon="21.0092697" ref="32572233"/>
-        <nd lat="52.2349195" lon="21.0088583" ref="3820284610"/>
-        <nd lat="52.2350433" lon="21.0087836" ref="1736081785"/>
-        <nd lat="52.2350863" lon="21.0087575" ref="3115151668"/>
-        <nd lat="52.2352447" lon="21.0086618" ref="3378411269"/>
-        <tag k="highway" v="secondary"/>
-        <tag k="lanes" v="3"/>
-        <tag k="maxspeed" v="50"/>
-        <tag k="maxspeed:conditional" v="60 @ (23:00-05:00)"/>
-        <tag k="name" v="Marszałkowska"/>
-        <tag k="name:de" v="Marschallstraße"/>
-        <tag k="name:pl" v="Marszałkowska"/>
-        <tag k="oneway" v="yes"/>
-        <tag k="surface" v="asphalt"/>
-        <tag k="wikidata" v="Q1888750"/>
-        <tag k="wikipedia" v="pl:Ulica Marszałkowska w Warszawie"/>
-    </way>
-    <way id="331647914">
-        <bounds maxlat="52.2353533" maxlon="21.0092560" minlat="52.2352447" minlon="21.0086618"/>
-        <nd lat="52.2352447" lon="21.0086618" ref="3378411269"/>
-        <nd lat="52.2352779" lon="21.0088355" ref="3890763504"/>
-        <nd lat="52.2352923" lon="21.0089070" ref="4665940556"/>
-        <nd lat="52.2353533" lon="21.0092560" ref="3378411270"/>
-        <tag k="highway" v="tertiary"/>
-        <tag k="lanes" v="4"/>
-        <tag k="lit" v="yes"/>
-        <tag k="maxspeed" v="50"/>
-        <tag k="name" v="Świętokrzyska"/>
-        <tag k="old_ref" v="719"/>
-        <tag k="source:maxspeed" v="PL:urban"/>
-        <tag k="surface" v="asphalt"/>
-        <tag k="wikidata" v="Q8082347"/>
-        <tag k="wikipedia" v="pl:Ulica Świętokrzyska w Warszawie"/>
-    </way>
-    <way id="335238477">
-        <bounds maxlat="52.2352447" maxlon="21.0086618" minlat="52.2351859" minlon="21.0083651"/>
-        <nd lat="52.2351859" lon="21.0083651" ref="3378411268"/>
-        <nd lat="52.2352112" lon="21.0084929" ref="254515314"/>
-        <nd lat="52.2352195" lon="21.0085349" ref="1454672649"/>
-        <nd lat="52.2352447" lon="21.0086618" ref="3378411269"/>
-        <tag k="highway" v="tertiary"/>
-        <tag k="lanes" v="4"/>
-        <tag k="lit" v="yes"/>
-        <tag k="name" v="Świętokrzyska"/>
-        <tag k="old_ref" v="719"/>
-        <tag k="source:maxspeed" v="PL:urban"/>
-        <tag k="surface" v="asphalt"/>
-        <tag k="wikidata" v="Q8082347"/>
-        <tag k="wikipedia" v="pl:Ulica Świętokrzyska w Warszawie"/>
-    </way>
-    <node id="3694922569" lat="52.2319806" lon="21.0203133">
-        <tag k="highway" v="traffic_signals"/>
-    </node>
-    <way id="4966674">
-        <bounds maxlat="52.2322202" maxlon="21.0204364" minlat="52.2318293" minlon="21.0201679"/>
-        <nd lat="52.2322202" lon="21.0201679" ref="32892156"/>
-        <nd lat="52.2320922" lon="21.0202198" ref="5076871225"/>
-        <nd lat="52.2319989" lon="21.0202997" ref="5076871292"/>
-        <nd lat="52.2319806" lon="21.0203133" ref="3694922569"/>
-        <nd lat="52.2319306" lon="21.0203549" ref="332010965"/>
-        <nd lat="52.2318293" lon="21.0204364" ref="300412660"/>
-        <tag k="access" v="delivery"/>
-        <tag k="bicycle" v="yes"/>
-        <tag k="foot" v="yes"/>
-        <tag k="highway" v="tertiary"/>
-        <tag k="lanes" v="2"/>
-        <tag k="maxspeed" v="30"/>
-        <tag k="motor_vehicle" v="no"/>
-        <tag k="name" v="Nowy Świat"/>
-        <tag k="name:de" v="Neue Welt"/>
-        <tag k="name:en" v="New World"/>
-        <tag k="name:pl" v="Nowy Świat"/>
-        <tag k="oneway" v="yes"/>
-        <tag k="psv" v="yes"/>
-        <tag k="surface" v="asphalt"/>
-        <tag k="wikidata" v="Q1109610"/>
-        <tag k="wikipedia" v="pl:Ulica Nowy Świat w Warszawie"/>
-    </way>
-    <way id="365482276">
-        <bounds maxlat="52.2320125" maxlon="21.0207332" minlat="52.2316371" minlon="21.0201669"/>
-        <nd lat="52.2319202" lon="21.0204688" ref="2864390504"/>
-        <nd lat="52.2319127" lon="21.0204466" ref="2864390502"/>
-        <nd lat="52.2319155" lon="21.0204369" ref="2864390503"/>
-        <nd lat="52.2319214" lon="21.0204323" ref="2864390505"/>
-        <nd lat="52.2319517" lon="21.0204045" ref="3411823281"/>
-        <nd lat="52.2319820" lon="21.0203766" ref="3411823283"/>
-        <nd lat="52.2320125" lon="21.0203489" ref="3694922571"/>
-        <nd lat="52.2319989" lon="21.0202997" ref="5076871292"/>
-        <nd lat="52.2319806" lon="21.0203133" ref="3694922569"/>
-        <nd lat="52.2319627" lon="21.0202616" ref="3694922568"/>
-        <nd lat="52.2319471" lon="21.0202738" ref="5076870366"/>
-        <nd lat="52.2319331" lon="21.0202816" ref="5076871263"/>
-        <nd lat="52.2319170" lon="21.0202875" ref="5076870365"/>
-        <nd lat="52.2319029" lon="21.0202900" ref="3412106144"/>
-        <nd lat="52.2318898" lon="21.0202903" ref="5076870364"/>
-        <nd lat="52.2318790" lon="21.0202890" ref="3412106143"/>
-        <nd lat="52.2318673" lon="21.0202860" ref="5076870363"/>
-        <nd lat="52.2318574" lon="21.0202822" ref="3412106142"/>
-        <nd lat="52.2318393" lon="21.0202718" ref="3412106141"/>
-        <nd lat="52.2318265" lon="21.0202616" ref="5076870362"/>
-        <nd lat="52.2318165" lon="21.0202516" ref="3412106140"/>
-        <nd lat="52.2317945" lon="21.0202147" ref="3412106139"/>
-        <nd lat="52.2317731" lon="21.0201669" ref="3694922564"/>
-        <nd lat="52.2317383" lon="21.0202013" ref="3694922561"/>
-        <nd lat="52.2316975" lon="21.0202417" ref="3411991932"/>
-        <nd lat="52.2317175" lon="21.0202900" ref="3694922560"/>
-        <nd lat="52.2317375" lon="21.0203384" ref="3411991935"/>
-        <nd lat="52.2317550" lon="21.0203848" ref="3411991937"/>
-        <nd lat="52.2317571" lon="21.0203951" ref="3411991938"/>
-        <nd lat="52.2317537" lon="21.0204030" ref="3411991936"/>
-        <nd lat="52.2317057" lon="21.0204336" ref="3411991934"/>
-        <nd lat="52.2316825" lon="21.0204534" ref="3411991930"/>
-        <nd lat="52.2316644" lon="21.0204717" ref="3411991928"/>
-        <nd lat="52.2316544" lon="21.0204841" ref="3411991927"/>
-        <nd lat="52.2316497" lon="21.0204907" ref="3411991925"/>
-        <nd lat="52.2316422" lon="21.0204954" ref="3411991923"/>
-        <nd lat="52.2316371" lon="21.0204919" ref="3411991921"/>
-        <nd lat="52.2316423" lon="21.0205942" ref="300412670"/>
-        <nd lat="52.2316494" lon="21.0207332" ref="3411823220"/>
-        <nd lat="52.2316572" lon="21.0207038" ref="3411823221"/>
-        <nd lat="52.2316652" lon="21.0206799" ref="3411823224"/>
-        <nd lat="52.2316757" lon="21.0206578" ref="3411823225"/>
-        <nd lat="52.2316934" lon="21.0206368" ref="3411823226"/>
-        <nd lat="52.2317369" lon="21.0206017" ref="3411823229"/>
-        <nd lat="52.2317436" lon="21.0205990" ref="3411823231"/>
-        <nd lat="52.2318607" lon="21.0205138" ref="3694922566"/>
-        <nd lat="52.2319202" lon="21.0204688" ref="2864390504"/>
-        <tag k="area:highway" v="secondary"/>
-        <tag k="junction" v="yes"/>
-    </way>
-    <node id="7891327113" lat="52.2406341" lon="21.0137915">
-        <tag k="highway" v="traffic_signals"/>
-    </node>
-    <way id="236023343">
-        <bounds maxlat="52.2407737" maxlon="21.0138453" minlat="52.2404972" minlon="21.0137528"/>
-        <nd lat="52.2407737" lon="21.0137528" ref="1443527818"/>
-        <nd lat="52.2406341" lon="21.0137915" ref="7891327113"/>
-        <nd lat="52.2405838" lon="21.0138103" ref="1443527786"/>
-        <nd lat="52.2404972" lon="21.0138453" ref="32917756"/>
-        <tag k="highway" v="tertiary"/>
-        <tag k="lanes" v="1"/>
-        <tag k="name" v="Plac marszałka Józefa Piłsudskiego"/>
-        <tag k="oneway" v="yes"/>
-        <tag k="surface" v="asphalt"/>
-        <tag k="wikidata" v="Q929269"/>
-        <tag k="wikipedia" v="pl:Plac marsz. Józefa Piłsudskiego w Warszawie"/>
-    </way>
-    <node id="7891376007" lat="52.2397224" lon="21.0122994">
-        <tag k="direction" v="backward"/>
-        <tag k="highway" v="traffic_signals"/>
-    </node>
-    <way id="184744207">
-        <bounds maxlat="52.2398620" maxlon="21.0126793" minlat="52.2387490" minlon="21.0122346"/>
-        <nd lat="52.2398620" lon="21.0122346" ref="165115647"/>
-        <nd lat="52.2397700" lon="21.0122773" ref="638465608"/>
-        <nd lat="52.2397224" lon="21.0122994" ref="7891376007"/>
-        <nd lat="52.2395489" lon="21.0123800" ref="7891376008"/>
-        <nd lat="52.2392152" lon="21.0125079" ref="317616247"/>
-        <nd lat="52.2391681" lon="21.0125264" ref="334559760"/>
-        <nd lat="52.2391259" lon="21.0125412" ref="312892958"/>
-        <nd lat="52.2387490" lon="21.0126793" ref="638465588"/>
-        <tag k="highway" v="tertiary"/>
-        <tag k="name" v="Mazowiecka"/>
-        <tag k="surface" v="asphalt"/>
-    </way>
-    <node id="7891376009" lat="52.2397790" lon="21.0119499">
-        <tag k="highway" v="traffic_signals"/>
-    </node>
-    <way id="306610860">
-        <bounds maxlat="52.2398620" maxlon="21.0122346" minlat="52.2382172" minlon="21.0068224"/>
-        <nd lat="52.2382172" lon="21.0068224" ref="32572240"/>
-        <nd lat="52.2382353" lon="21.0068901" ref="7894847471"/>
-        <nd lat="52.2382707" lon="21.0070078" ref="3890763491"/>
-        <nd lat="52.2382867" lon="21.0070613" ref="32572241"/>
-        <nd lat="52.2383833" lon="21.0073784" ref="1701518417"/>
-        <nd lat="52.2386134" lon="21.0081434" ref="32572243"/>
-        <nd lat="52.2390982" lon="21.0097645" ref="7894847478"/>
-        <nd lat="52.2391421" lon="21.0098924" ref="248200294"/>
-        <nd lat="52.2392494" lon="21.0102052" ref="7894847477"/>
-        <nd lat="52.2393598" lon="21.0105740" ref="3035066890"/>
-        <nd lat="52.2394430" lon="21.0108467" ref="255152621"/>
-        <nd lat="52.2394717" lon="21.0109409" ref="638465282"/>
-        <nd lat="52.2397082" lon="21.0117169" ref="32572245"/>
-        <nd lat="52.2397790" lon="21.0119499" ref="7891376009"/>
-        <nd lat="52.2397995" lon="21.0120173" ref="638465601"/>
-        <nd lat="52.2398620" lon="21.0122346" ref="165115647"/>
-        <tag k="highway" v="tertiary"/>
-        <tag k="name" v="Królewska"/>
-        <tag k="oneway" v="yes"/>
-        <tag k="surface" v="asphalt"/>
-    </way>
+  <node id="32528268" lat="52.2370227" lon="21.0179317">
+    <tag k="highway" v="traffic_signals"/>
+    <tag k="traffic_signals:sound" v="yes"/>
+    <tag k="traffic_signals:vibration" v="yes"/>
+  </node>
+  <way id="48279420">
+    <bounds maxlat="52.2370227" maxlon="21.0179982" minlat="52.2368305" minlon="21.0179317"/>
+    <nd lat="52.2370227" lon="21.0179317" ref="32528268"/>
+    <nd lat="52.2369820" lon="21.0179447" ref="7161320947"/>
+    <nd lat="52.2368305" lon="21.0179982" ref="533674870"/>
+    <tag k="bicycle" v="yes"/>
+    <tag k="cycleway:both" v="no"/>
+    <tag k="foot" v="yes"/>
+    <tag k="highway" v="tertiary"/>
+    <tag k="lit" v="yes"/>
+    <tag k="maxspeed" v="50"/>
+    <tag k="motor_vehicle" v="no"/>
+    <tag k="name" v="Nowy Świat"/>
+    <tag k="name:de" v="Neue Welt"/>
+    <tag k="name:en" v="New World"/>
+    <tag k="name:pl" v="Nowy Świat"/>
+    <tag k="psv" v="yes"/>
+    <tag k="sidewalk" v="both"/>
+    <tag k="sidewalk:both:bicycle" v="yes"/>
+    <tag k="surface" v="asphalt"/>
+    <tag k="wikidata" v="Q1109610"/>
+    <tag k="wikipedia" v="pl:Ulica Nowy Świat w Warszawie"/>
+  </way>
+  <way id="237193611">
+    <bounds maxlat="52.2372427" maxlon="21.0194791" minlat="52.2370227" minlon="21.0179317"/>
+    <nd lat="52.2370227" lon="21.0179317" ref="32528268"/>
+    <nd lat="52.2370581" lon="21.0181250" ref="533674882"/>
+    <nd lat="52.2371188" lon="21.0185690" ref="5242369779"/>
+    <nd lat="52.2371401" lon="21.0187255" ref="2451400254"/>
+    <nd lat="52.2371617" lon="21.0188840" ref="5217719911"/>
+    <nd lat="52.2371673" lon="21.0189256" ref="5226086086"/>
+    <nd lat="52.2372034" lon="21.0191903" ref="1701518371"/>
+    <nd lat="52.2372243" lon="21.0193440" ref="1701468658"/>
+    <nd lat="52.2372427" lon="21.0194791" ref="32528269"/>
+    <tag k="cycleway" v="lane"/>
+    <tag k="highway" v="tertiary"/>
+    <tag k="horse" v="no"/>
+    <tag k="lanes" v="1"/>
+    <tag k="lit" v="yes"/>
+    <tag k="maxspeed" v="50"/>
+    <tag k="name" v="Świętokrzyska"/>
+    <tag k="old_ref" v="719"/>
+    <tag k="sidewalk" v="separate"/>
+    <tag k="source" v="ortofoto2008"/>
+    <tag k="source:maxspeed" v="PL:urban"/>
+    <tag k="surface" v="asphalt"/>
+    <tag k="wikidata" v="Q8082347"/>
+    <tag k="wikipedia" v="pl:Ulica Świętokrzyska w Warszawie"/>
+  </way>
+  <way id="346893830">
+    <bounds maxlat="52.2370227" maxlon="21.0179317" minlat="52.2365240" minlon="21.0153006"/>
+    <nd lat="52.2365240" lon="21.0153006" ref="3378411272"/>
+    <nd lat="52.2365599" lon="21.0154847" ref="4501473593"/>
+    <nd lat="52.2365728" lon="21.0155514" ref="5729316209"/>
+    <nd lat="52.2365910" lon="21.0156445" ref="4162180369"/>
+    <nd lat="52.2366554" lon="21.0159756" ref="334558139"/>
+    <nd lat="52.2367084" lon="21.0162476" ref="314590535"/>
+    <nd lat="52.2367405" lon="21.0164125" ref="32528267"/>
+    <nd lat="52.2367778" lon="21.0166039" ref="314590534"/>
+    <nd lat="52.2368135" lon="21.0167968" ref="334558632"/>
+    <nd lat="52.2368866" lon="21.0171918" ref="1111952968"/>
+    <nd lat="52.2369335" lon="21.0174455" ref="5230960354"/>
+    <nd lat="52.2369810" lon="21.0177026" ref="4890506869"/>
+    <nd lat="52.2370227" lon="21.0179317" ref="32528268"/>
+    <tag k="cycleway" v="lane"/>
+    <tag k="highway" v="tertiary"/>
+    <tag k="horse" v="no"/>
+    <tag k="lanes" v="4"/>
+    <tag k="lit" v="yes"/>
+    <tag k="maxspeed" v="50"/>
+    <tag k="name" v="Świętokrzyska"/>
+    <tag k="old_ref" v="719"/>
+    <tag k="oneway" v="no"/>
+    <tag k="source:maxspeed" v="PL:urban"/>
+    <tag k="surface" v="asphalt"/>
+    <tag k="wikidata" v="Q8082347"/>
+    <tag k="wikipedia" v="pl:Ulica Świętokrzyska w Warszawie"/>
+  </way>
+  <way id="709895408">
+    <bounds maxlat="52.2372025" maxlon="21.0179317" minlat="52.2370227" minlon="21.0178683"/>
+    <nd lat="52.2372025" lon="21.0178683" ref="533674874"/>
+    <nd lat="52.2370826" lon="21.0179121" ref="7161320968"/>
+    <nd lat="52.2370227" lon="21.0179317" ref="32528268"/>
+    <tag k="bicycle" v="yes"/>
+    <tag k="foot" v="yes"/>
+    <tag k="highway" v="tertiary"/>
+    <tag k="lit" v="yes"/>
+    <tag k="maxspeed" v="30"/>
+    <tag k="motor_vehicle" v="no"/>
+    <tag k="name" v="Nowy Świat"/>
+    <tag k="name:de" v="Neue Welt"/>
+    <tag k="name:en" v="New World"/>
+    <tag k="name:pl" v="Nowy Świat"/>
+    <tag k="psv" v="designated"/>
+    <tag k="surface" v="asphalt"/>
+    <tag k="wikidata" v="Q1109610"/>
+    <tag k="wikipedia" v="pl:Ulica Nowy Świat w Warszawie"/>
+  </way>
+  <node id="32572247" lat="52.2403876" lon="21.0137099">
+    <tag k="highway" v="traffic_signals"/>
+  </node>
+  <way id="230770434">
+    <bounds maxlat="52.2404208" maxlon="21.0140052" minlat="52.2402123" minlon="21.0131484"/>
+    <nd lat="52.2402123" lon="21.0131484" ref="2392223759"/>
+    <nd lat="52.2402823" lon="21.0133396" ref="317616323"/>
+    <nd lat="52.2403260" lon="21.0134713" ref="3344086875"/>
+    <nd lat="52.2403876" lon="21.0137099" ref="32572247"/>
+    <nd lat="52.2404026" lon="21.0137718" ref="1443527768"/>
+    <nd lat="52.2404138" lon="21.0138595" ref="7891327106"/>
+    <nd lat="52.2404160" lon="21.0139403" ref="7891327108"/>
+    <nd lat="52.2404208" lon="21.0140052" ref="32572248"/>
+    <tag k="highway" v="tertiary"/>
+    <tag k="lanes" v="3"/>
+    <tag k="name" v="Królewska"/>
+    <tag k="oneway" v="yes"/>
+    <tag k="surface" v="asphalt"/>
+    <tag k="turn:lanes" v="left|left|through;right"/>
+  </way>
+  <node id="32572254" lat="52.2400258" lon="21.0123900">
+    <tag k="highway" v="traffic_signals"/>
+  </node>
+  <way id="16238024">
+    <bounds maxlat="52.2400258" maxlon="21.0123900" minlat="52.2398620" minlon="21.0122346"/>
+    <nd lat="52.2400258" lon="21.0123900" ref="32572254"/>
+    <nd lat="52.2399843" lon="21.0123221" ref="638465720"/>
+    <nd lat="52.2399480" lon="21.0122798" ref="2639505677"/>
+    <nd lat="52.2399056" lon="21.0122476" ref="638465605"/>
+    <nd lat="52.2398620" lon="21.0122346" ref="165115647"/>
+    <tag k="highway" v="tertiary"/>
+    <tag k="name" v="Mazowiecka"/>
+    <tag k="oneway" v="yes"/>
+    <tag k="source" v="ortofoto2008"/>
+    <tag k="surface" v="asphalt"/>
+  </way>
+  <way id="184744199">
+    <bounds maxlat="52.2400258" maxlon="21.0123900" minlat="52.2398759" minlon="21.0119565"/>
+    <nd lat="52.2400258" lon="21.0123900" ref="32572254"/>
+    <nd lat="52.2398759" lon="21.0119565" ref="638465599"/>
+    <tag k="highway" v="tertiary"/>
+    <tag k="name" v="Królewska"/>
+    <tag k="oneway" v="yes"/>
+    <tag k="surface" v="asphalt"/>
+    <tag k="wikidata" v="Q9365538"/>
+    <tag k="wikipedia" v="pl:Ulica Królewska w Warszawie"/>
+  </way>
+  <way id="236023342">
+    <bounds maxlat="52.2404306" maxlon="21.0134380" minlat="52.2400258" minlon="21.0123900"/>
+    <nd lat="52.2404306" lon="21.0134380" ref="317616325"/>
+    <nd lat="52.2403442" lon="21.0131998" ref="32572253"/>
+    <nd lat="52.2400258" lon="21.0123900" ref="32572254"/>
+    <tag k="highway" v="tertiary"/>
+    <tag k="name" v="Królewska"/>
+    <tag k="oneway" v="yes"/>
+    <tag k="surface" v="asphalt"/>
+    <tag k="wikidata" v="Q9365538"/>
+    <tag k="wikipedia" v="pl:Ulica Królewska w Warszawie"/>
+  </way>
+  <node id="32892162" lat="52.2361236" lon="21.0132515">
+    <tag k="highway" v="traffic_signals"/>
+  </node>
+  <way id="4966690">
+    <bounds maxlat="52.2361236" maxlon="21.0140944" minlat="52.2340550" minlon="21.0132515"/>
+    <nd lat="52.2340550" lon="21.0140944" ref="1908123185"/>
+    <nd lat="52.2341763" lon="21.0140218" ref="308197346"/>
+    <nd lat="52.2343213" lon="21.0139687" ref="317587210"/>
+    <nd lat="52.2344197" lon="21.0139618" ref="32892176"/>
+    <nd lat="52.2345494" lon="21.0139676" ref="1908121134"/>
+    <nd lat="52.2346083" lon="21.0139740" ref="266185943"/>
+    <nd lat="52.2346560" lon="21.0139738" ref="4501493772"/>
+    <nd lat="52.2347233" lon="21.0139648" ref="224852315"/>
+    <nd lat="52.2348524" lon="21.0139168" ref="32892171"/>
+    <nd lat="52.2352789" lon="21.0136817" ref="6079444005"/>
+    <nd lat="52.2355417" lon="21.0135368" ref="3035066854"/>
+    <nd lat="52.2357715" lon="21.0134102" ref="4501493784"/>
+    <nd lat="52.2358478" lon="21.0133772" ref="4501472085"/>
+    <nd lat="52.2360148" lon="21.0132927" ref="638465316"/>
+    <nd lat="52.2361236" lon="21.0132515" ref="32892162"/>
+    <tag k="highway" v="tertiary"/>
+    <tag k="lanes" v="3"/>
+    <tag k="name" v="Plac Powstańców Warszawy"/>
+    <tag k="oneway" v="yes"/>
+    <tag k="surface" v="asphalt"/>
+    <tag k="wikidata" v="Q7970920"/>
+    <tag k="wikipedia" v="pl:Plac Powstańców Warszawy w Warszawie"/>
+  </way>
+  <way id="117656382">
+    <bounds maxlat="52.2386625" maxlon="21.0132639" minlat="52.2361236" minlon="21.0127415"/>
+    <nd lat="52.2361236" lon="21.0132515" ref="32892162"/>
+    <nd lat="52.2362549" lon="21.0132639" ref="638465320"/>
+    <nd lat="52.2362929" lon="21.0132588" ref="3692612165"/>
+    <nd lat="52.2369193" lon="21.0131750" ref="2064575958"/>
+    <nd lat="52.2371820" lon="21.0131310" ref="312892950"/>
+    <nd lat="52.2376528" lon="21.0130298" ref="165121950"/>
+    <nd lat="52.2383178" lon="21.0128492" ref="248200307"/>
+    <nd lat="52.2383618" lon="21.0128395" ref="638465543"/>
+    <nd lat="52.2386625" lon="21.0127415" ref="165115665"/>
+    <tag k="highway" v="tertiary"/>
+    <tag k="lanes" v="2"/>
+    <tag k="name" v="Mazowiecka"/>
+    <tag k="oneway" v="yes"/>
+    <tag k="source" v="ortofoto2008"/>
+    <tag k="surface" v="asphalt"/>
+  </way>
+  <way id="218386444">
+    <bounds maxlat="52.2361236" maxlon="21.0132515" minlat="52.2360094" minlon="21.0126594"/>
+    <nd lat="52.2360094" lon="21.0126594" ref="32892177"/>
+    <nd lat="52.2360742" lon="21.0129954" ref="5729314439"/>
+    <nd lat="52.2361236" lon="21.0132515" ref="32892162"/>
+    <tag k="cycleway:right" v="lane"/>
+    <tag k="highway" v="tertiary"/>
+    <tag k="lanes" v="1"/>
+    <tag k="lit" v="yes"/>
+    <tag k="maxspeed" v="50"/>
+    <tag k="name" v="Świętokrzyska"/>
+    <tag k="old_ref" v="719"/>
+    <tag k="oneway" v="no"/>
+    <tag k="oneway:bicycle" v="yes"/>
+    <tag k="source:maxspeed" v="PL:urban"/>
+    <tag k="surface" v="asphalt"/>
+    <tag k="wikidata" v="Q8082347"/>
+    <tag k="wikipedia" v="pl:Ulica Świętokrzyska w Warszawie"/>
+  </way>
+  <way id="218386450">
+    <bounds maxlat="52.2364640" maxlon="21.0150021" minlat="52.2361236" minlon="21.0132515"/>
+    <nd lat="52.2361236" lon="21.0132515" ref="32892162"/>
+    <nd lat="52.2361700" lon="21.0134770" ref="4501472088"/>
+    <nd lat="52.2361839" lon="21.0135509" ref="5729314444"/>
+    <nd lat="52.2362956" lon="21.0141160" ref="4158683987"/>
+    <nd lat="52.2363637" lon="21.0144741" ref="4158681380"/>
+    <nd lat="52.2364371" lon="21.0148602" ref="4158681381"/>
+    <nd lat="52.2364640" lon="21.0150021" ref="1754815728"/>
+    <tag k="bicycle" v="yes"/>
+    <tag k="cycleway:right" v="lane"/>
+    <tag k="highway" v="tertiary"/>
+    <tag k="horse" v="no"/>
+    <tag k="lanes" v="4"/>
+    <tag k="lit" v="yes"/>
+    <tag k="maxspeed" v="50"/>
+    <tag k="name" v="Świętokrzyska"/>
+    <tag k="old_ref" v="719"/>
+    <tag k="oneway" v="no"/>
+    <tag k="oneway:bicycle" v="yes"/>
+    <tag k="source:maxspeed" v="PL:urban"/>
+    <tag k="surface" v="asphalt"/>
+    <tag k="wikidata" v="Q8082347"/>
+    <tag k="wikipedia" v="pl:Ulica Świętokrzyska w Warszawie"/>
+  </way>
+  <node id="224829889" lat="52.2411232" lon="21.0220752">
+    <tag k="highway" v="traffic_signals"/>
+    <tag k="traffic_signals:sound" v="yes"/>
+  </node>
+  <way id="19919306">
+    <bounds maxlat="52.2418839" maxlon="21.0246791" minlat="52.2411232" minlon="21.0220752"/>
+    <nd lat="52.2411232" lon="21.0220752" ref="224829889"/>
+    <nd lat="52.2411618" lon="21.0221984" ref="345519303"/>
+    <nd lat="52.2411976" lon="21.0223183" ref="778326304"/>
+    <nd lat="52.2418285" lon="21.0244992" ref="778326336"/>
+    <nd lat="52.2418839" lon="21.0246791" ref="209094020"/>
+    <tag k="highway" v="residential"/>
+    <tag k="lit" v="yes"/>
+    <tag k="name" v="Lipowa"/>
+    <tag k="surface" v="asphalt"/>
+  </way>
+  <way id="236238463">
+    <bounds maxlat="52.2411232" maxlon="21.0232580" minlat="52.2398350" minlon="21.0220752"/>
+    <nd lat="52.2411232" lon="21.0220752" ref="224829889"/>
+    <nd lat="52.2408512" lon="21.0223062" ref="778327666"/>
+    <nd lat="52.2404915" lon="21.0225995" ref="224829887"/>
+    <nd lat="52.2402025" lon="21.0228389" ref="5063033838"/>
+    <nd lat="52.2401134" lon="21.0229324" ref="345519298"/>
+    <nd lat="52.2399215" lon="21.0230976" ref="345519299"/>
+    <nd lat="52.2398350" lon="21.0232580" ref="224760594"/>
+    <tag k="highway" v="tertiary"/>
+    <tag k="lanes" v="2"/>
+    <tag k="lit" v="yes"/>
+    <tag k="maxspeed" v="50"/>
+    <tag k="name" v="Browarna"/>
+    <tag k="source:maxspeed" v="PL:zone50"/>
+    <tag k="surface" v="asphalt"/>
+  </way>
+  <way id="316067494">
+    <bounds maxlat="52.2416038" maxlon="21.0220752" minlat="52.2411232" minlon="21.0216926"/>
+    <nd lat="52.2416038" lon="21.0216926" ref="5063043124"/>
+    <nd lat="52.2411967" lon="21.0220140" ref="345519302"/>
+    <nd lat="52.2411232" lon="21.0220752" ref="224829889"/>
+    <tag k="highway" v="tertiary"/>
+    <tag k="lanes" v="3"/>
+    <tag k="lanes:backward" v="1"/>
+    <tag k="lanes:forward" v="2"/>
+    <tag k="lit" v="yes"/>
+    <tag k="maxspeed" v="50"/>
+    <tag k="name" v="Browarna"/>
+    <tag k="source:maxspeed" v="PL:zone50"/>
+    <tag k="surface" v="asphalt"/>
+    <tag k="turn:lanes:forward" v="left|through"/>
+  </way>
+  <node id="317616291" lat="52.2405265" lon="21.0141769">
+    <tag k="highway" v="traffic_signals"/>
+  </node>
+  <way id="4968936">
+    <bounds maxlat="52.2405459" maxlon="21.0146606" minlat="52.2405089" minlon="21.0139667"/>
+    <nd lat="52.2405459" lon="21.0146606" ref="32917758"/>
+    <nd lat="52.2405286" lon="21.0142329" ref="7086357712"/>
+    <nd lat="52.2405265" lon="21.0141769" ref="317616291"/>
+    <nd lat="52.2405248" lon="21.0141328" ref="7891327109"/>
+    <nd lat="52.2405089" lon="21.0139667" ref="32572252"/>
+    <tag k="highway" v="tertiary"/>
+    <tag k="lanes" v="1"/>
+    <tag k="name" v="Królewska"/>
+    <tag k="oneway" v="yes"/>
+    <tag k="surface" v="asphalt"/>
+    <tag k="wikidata" v="Q9365538"/>
+    <tag k="wikipedia" v="pl:Ulica Królewska w Warszawie"/>
+  </way>
+  <node id="1321790320" lat="52.2356606" lon="21.0108390">
+    <tag k="highway" v="traffic_signals"/>
+  </node>
+  <way id="117656398">
+    <bounds maxlat="52.2360094" maxlon="21.0126594" minlat="52.2356606" minlon="21.0108390"/>
+    <nd lat="52.2356606" lon="21.0108390" ref="1321790320"/>
+    <nd lat="52.2357005" lon="21.0110463" ref="4238022147"/>
+    <nd lat="52.2358166" lon="21.0116496" ref="2276192052"/>
+    <nd lat="52.2360094" lon="21.0126594" ref="32892177"/>
+    <tag k="cycleway:right" v="lane"/>
+    <tag k="highway" v="tertiary"/>
+    <tag k="lanes" v="2"/>
+    <tag k="lit" v="yes"/>
+    <tag k="maxspeed" v="50"/>
+    <tag k="name" v="Świętokrzyska"/>
+    <tag k="old_ref" v="719"/>
+    <tag k="oneway:bicycle" v="yes"/>
+    <tag k="source:maxspeed" v="PL:urban"/>
+    <tag k="surface" v="asphalt"/>
+    <tag k="wikidata" v="Q8082347"/>
+    <tag k="wikipedia" v="pl:Ulica Świętokrzyska w Warszawie"/>
+  </way>
+  <way id="185067270">
+    <bounds maxlat="52.2356606" maxlon="21.0110080" minlat="52.2354178" minlon="21.0108390"/>
+    <nd lat="52.2356606" lon="21.0108390" ref="1321790320"/>
+    <nd lat="52.2356338" lon="21.0108566" ref="7161321000"/>
+    <nd lat="52.2356034" lon="21.0108765" ref="3115151676"/>
+    <nd lat="52.2355319" lon="21.0109233" ref="638465030"/>
+    <nd lat="52.2354178" lon="21.0110080" ref="3035065890"/>
+    <tag k="highway" v="tertiary"/>
+    <tag k="lanes" v="1"/>
+    <tag k="lit" v="yes"/>
+    <tag k="name" v="Jasna"/>
+    <tag k="oneway" v="yes"/>
+    <tag k="source:maxspeed" v="PL:urban"/>
+    <tag k="surface" v="asphalt"/>
+  </way>
+  <way id="426582806">
+    <bounds maxlat="52.2356606" maxlon="21.0108390" minlat="52.2354410" minlon="21.0097092"/>
+    <nd lat="52.2354410" lon="21.0097092" ref="3378411271"/>
+    <nd lat="52.2356076" lon="21.0105664" ref="638465000"/>
+    <nd lat="52.2356206" lon="21.0106332" ref="4501472083"/>
+    <nd lat="52.2356606" lon="21.0108390" ref="1321790320"/>
+    <tag k="cycleway:right" v="lane"/>
+    <tag k="highway" v="tertiary"/>
+    <tag k="lanes" v="4"/>
+    <tag k="maxspeed" v="50"/>
+    <tag k="name" v="Świętokrzyska"/>
+    <tag k="old_ref" v="719"/>
+    <tag k="oneway:bicycle" v="yes"/>
+    <tag k="source:maxspeed" v="sign"/>
+    <tag k="surface" v="asphalt"/>
+    <tag k="wikidata" v="Q8082347"/>
+    <tag k="wikipedia" v="pl:Ulica Świętokrzyska w Warszawie"/>
+  </way>
+  <way id="442355018">
+    <bounds maxlat="52.2367555" maxlon="21.0108390" minlat="52.2356606" minlon="21.0101155"/>
+    <nd lat="52.2367555" lon="21.0101155" ref="248200305"/>
+    <nd lat="52.2366581" lon="21.0101756" ref="638465129"/>
+    <nd lat="52.2363201" lon="21.0104071" ref="4000816417"/>
+    <nd lat="52.2358146" lon="21.0107470" ref="3692612162"/>
+    <nd lat="52.2357702" lon="21.0107779" ref="638465032"/>
+    <nd lat="52.2356606" lon="21.0108390" ref="1321790320"/>
+    <tag k="highway" v="tertiary"/>
+    <tag k="lanes" v="1"/>
+    <tag k="lit" v="yes"/>
+    <tag k="maxspeed:type" v="PL:urban"/>
+    <tag k="name" v="Jasna"/>
+    <tag k="oneway" v="yes"/>
+    <tag k="surface" v="asphalt"/>
+  </way>
+  <node id="1443527790" lat="52.2406352" lon="21.0137235">
+    <tag k="highway" v="traffic_signals"/>
+  </node>
+  <way id="131117058">
+    <bounds maxlat="52.2407737" maxlon="21.0137528" minlat="52.2404306" minlon="21.0134380"/>
+    <nd lat="52.2407737" lon="21.0137528" ref="1443527818"/>
+    <nd lat="52.2407100" lon="21.0137520" ref="7891327112"/>
+    <nd lat="52.2406352" lon="21.0137235" ref="1443527790"/>
+    <nd lat="52.2405931" lon="21.0136933" ref="1443527782"/>
+    <nd lat="52.2405554" lon="21.0136629" ref="1443527771"/>
+    <nd lat="52.2405230" lon="21.0136195" ref="2639505680"/>
+    <nd lat="52.2404863" lon="21.0135531" ref="2639505679"/>
+    <nd lat="52.2404306" lon="21.0134380" ref="317616325"/>
+    <tag k="highway" v="tertiary_link"/>
+    <tag k="lanes" v="1"/>
+    <tag k="oneway" v="yes"/>
+    <tag k="surface" v="asphalt"/>
+  </way>
+  <node id="3378411269" lat="52.2352447" lon="21.0086618">
+    <tag k="highway" v="traffic_signals"/>
+  </node>
+  <way id="4968932">
+    <bounds maxlat="52.2354037" maxlon="21.0086618" minlat="52.2352447" minlon="21.0085647"/>
+    <nd lat="52.2352447" lon="21.0086618" ref="3378411269"/>
+    <nd lat="52.2354037" lon="21.0085647" ref="1736081787"/>
+    <tag k="highway" v="secondary"/>
+    <tag k="lit" v="yes"/>
+    <tag k="maxspeed" v="50"/>
+    <tag k="maxspeed:conditional" v="60 @ (23:00-05:00)"/>
+    <tag k="name" v="Marszałkowska"/>
+    <tag k="name:de" v="Marschallstraße"/>
+    <tag k="name:pl" v="Marszałkowska"/>
+    <tag k="oneway" v="yes"/>
+    <tag k="source:maxspeed" v="PL:urban"/>
+    <tag k="surface" v="asphalt"/>
+    <tag k="wikidata" v="Q1888750"/>
+    <tag k="wikipedia" v="pl:Ulica Marszałkowska w Warszawie"/>
+  </way>
+  <way id="161634980">
+    <bounds maxlat="52.2352447" maxlon="21.0092697" minlat="52.2342048" minlon="21.0086618"/>
+    <nd lat="52.2342048" lon="21.0092697" ref="32572233"/>
+    <nd lat="52.2349195" lon="21.0088583" ref="3820284610"/>
+    <nd lat="52.2350433" lon="21.0087836" ref="1736081785"/>
+    <nd lat="52.2350863" lon="21.0087575" ref="3115151668"/>
+    <nd lat="52.2352447" lon="21.0086618" ref="3378411269"/>
+    <tag k="highway" v="secondary"/>
+    <tag k="lanes" v="3"/>
+    <tag k="maxspeed" v="50"/>
+    <tag k="maxspeed:conditional" v="60 @ (23:00-05:00)"/>
+    <tag k="name" v="Marszałkowska"/>
+    <tag k="name:de" v="Marschallstraße"/>
+    <tag k="name:pl" v="Marszałkowska"/>
+    <tag k="oneway" v="yes"/>
+    <tag k="surface" v="asphalt"/>
+    <tag k="wikidata" v="Q1888750"/>
+    <tag k="wikipedia" v="pl:Ulica Marszałkowska w Warszawie"/>
+  </way>
+  <way id="331647914">
+    <bounds maxlat="52.2353533" maxlon="21.0092560" minlat="52.2352447" minlon="21.0086618"/>
+    <nd lat="52.2352447" lon="21.0086618" ref="3378411269"/>
+    <nd lat="52.2352779" lon="21.0088355" ref="3890763504"/>
+    <nd lat="52.2352923" lon="21.0089070" ref="4665940556"/>
+    <nd lat="52.2353533" lon="21.0092560" ref="3378411270"/>
+    <tag k="highway" v="tertiary"/>
+    <tag k="lanes" v="4"/>
+    <tag k="lit" v="yes"/>
+    <tag k="maxspeed" v="50"/>
+    <tag k="name" v="Świętokrzyska"/>
+    <tag k="old_ref" v="719"/>
+    <tag k="source:maxspeed" v="PL:urban"/>
+    <tag k="surface" v="asphalt"/>
+    <tag k="wikidata" v="Q8082347"/>
+    <tag k="wikipedia" v="pl:Ulica Świętokrzyska w Warszawie"/>
+  </way>
+  <way id="335238477">
+    <bounds maxlat="52.2352447" maxlon="21.0086618" minlat="52.2351859" minlon="21.0083651"/>
+    <nd lat="52.2351859" lon="21.0083651" ref="3378411268"/>
+    <nd lat="52.2352112" lon="21.0084929" ref="254515314"/>
+    <nd lat="52.2352195" lon="21.0085349" ref="1454672649"/>
+    <nd lat="52.2352447" lon="21.0086618" ref="3378411269"/>
+    <tag k="highway" v="tertiary"/>
+    <tag k="lanes" v="4"/>
+    <tag k="lit" v="yes"/>
+    <tag k="name" v="Świętokrzyska"/>
+    <tag k="old_ref" v="719"/>
+    <tag k="source:maxspeed" v="PL:urban"/>
+    <tag k="surface" v="asphalt"/>
+    <tag k="wikidata" v="Q8082347"/>
+    <tag k="wikipedia" v="pl:Ulica Świętokrzyska w Warszawie"/>
+  </way>
+  <node id="3694922569" lat="52.2319806" lon="21.0203133">
+    <tag k="highway" v="traffic_signals"/>
+  </node>
+  <way id="4966674">
+    <bounds maxlat="52.2322202" maxlon="21.0204364" minlat="52.2318293" minlon="21.0201679"/>
+    <nd lat="52.2322202" lon="21.0201679" ref="32892156"/>
+    <nd lat="52.2320922" lon="21.0202198" ref="5076871225"/>
+    <nd lat="52.2319989" lon="21.0202997" ref="5076871292"/>
+    <nd lat="52.2319806" lon="21.0203133" ref="3694922569"/>
+    <nd lat="52.2319306" lon="21.0203549" ref="332010965"/>
+    <nd lat="52.2318293" lon="21.0204364" ref="300412660"/>
+    <tag k="access" v="delivery"/>
+    <tag k="bicycle" v="yes"/>
+    <tag k="foot" v="yes"/>
+    <tag k="highway" v="tertiary"/>
+    <tag k="lanes" v="2"/>
+    <tag k="maxspeed" v="30"/>
+    <tag k="motor_vehicle" v="no"/>
+    <tag k="name" v="Nowy Świat"/>
+    <tag k="name:de" v="Neue Welt"/>
+    <tag k="name:en" v="New World"/>
+    <tag k="name:pl" v="Nowy Świat"/>
+    <tag k="oneway" v="yes"/>
+    <tag k="psv" v="yes"/>
+    <tag k="surface" v="asphalt"/>
+    <tag k="wikidata" v="Q1109610"/>
+    <tag k="wikipedia" v="pl:Ulica Nowy Świat w Warszawie"/>
+  </way>
+  <way id="365482276">
+    <bounds maxlat="52.2320125" maxlon="21.0207332" minlat="52.2316371" minlon="21.0201669"/>
+    <nd lat="52.2319202" lon="21.0204688" ref="2864390504"/>
+    <nd lat="52.2319127" lon="21.0204466" ref="2864390502"/>
+    <nd lat="52.2319155" lon="21.0204369" ref="2864390503"/>
+    <nd lat="52.2319214" lon="21.0204323" ref="2864390505"/>
+    <nd lat="52.2319517" lon="21.0204045" ref="3411823281"/>
+    <nd lat="52.2319820" lon="21.0203766" ref="3411823283"/>
+    <nd lat="52.2320125" lon="21.0203489" ref="3694922571"/>
+    <nd lat="52.2319989" lon="21.0202997" ref="5076871292"/>
+    <nd lat="52.2319806" lon="21.0203133" ref="3694922569"/>
+    <nd lat="52.2319627" lon="21.0202616" ref="3694922568"/>
+    <nd lat="52.2319471" lon="21.0202738" ref="5076870366"/>
+    <nd lat="52.2319331" lon="21.0202816" ref="5076871263"/>
+    <nd lat="52.2319170" lon="21.0202875" ref="5076870365"/>
+    <nd lat="52.2319029" lon="21.0202900" ref="3412106144"/>
+    <nd lat="52.2318898" lon="21.0202903" ref="5076870364"/>
+    <nd lat="52.2318790" lon="21.0202890" ref="3412106143"/>
+    <nd lat="52.2318673" lon="21.0202860" ref="5076870363"/>
+    <nd lat="52.2318574" lon="21.0202822" ref="3412106142"/>
+    <nd lat="52.2318393" lon="21.0202718" ref="3412106141"/>
+    <nd lat="52.2318265" lon="21.0202616" ref="5076870362"/>
+    <nd lat="52.2318165" lon="21.0202516" ref="3412106140"/>
+    <nd lat="52.2317945" lon="21.0202147" ref="3412106139"/>
+    <nd lat="52.2317731" lon="21.0201669" ref="3694922564"/>
+    <nd lat="52.2317383" lon="21.0202013" ref="3694922561"/>
+    <nd lat="52.2316975" lon="21.0202417" ref="3411991932"/>
+    <nd lat="52.2317175" lon="21.0202900" ref="3694922560"/>
+    <nd lat="52.2317375" lon="21.0203384" ref="3411991935"/>
+    <nd lat="52.2317550" lon="21.0203848" ref="3411991937"/>
+    <nd lat="52.2317571" lon="21.0203951" ref="3411991938"/>
+    <nd lat="52.2317537" lon="21.0204030" ref="3411991936"/>
+    <nd lat="52.2317057" lon="21.0204336" ref="3411991934"/>
+    <nd lat="52.2316825" lon="21.0204534" ref="3411991930"/>
+    <nd lat="52.2316644" lon="21.0204717" ref="3411991928"/>
+    <nd lat="52.2316544" lon="21.0204841" ref="3411991927"/>
+    <nd lat="52.2316497" lon="21.0204907" ref="3411991925"/>
+    <nd lat="52.2316422" lon="21.0204954" ref="3411991923"/>
+    <nd lat="52.2316371" lon="21.0204919" ref="3411991921"/>
+    <nd lat="52.2316423" lon="21.0205942" ref="300412670"/>
+    <nd lat="52.2316494" lon="21.0207332" ref="3411823220"/>
+    <nd lat="52.2316572" lon="21.0207038" ref="3411823221"/>
+    <nd lat="52.2316652" lon="21.0206799" ref="3411823224"/>
+    <nd lat="52.2316757" lon="21.0206578" ref="3411823225"/>
+    <nd lat="52.2316934" lon="21.0206368" ref="3411823226"/>
+    <nd lat="52.2317369" lon="21.0206017" ref="3411823229"/>
+    <nd lat="52.2317436" lon="21.0205990" ref="3411823231"/>
+    <nd lat="52.2318607" lon="21.0205138" ref="3694922566"/>
+    <nd lat="52.2319202" lon="21.0204688" ref="2864390504"/>
+    <tag k="area:highway" v="secondary"/>
+    <tag k="junction" v="yes"/>
+  </way>
+  <node id="7891327113" lat="52.2406341" lon="21.0137915">
+    <tag k="highway" v="traffic_signals"/>
+  </node>
+  <way id="236023343">
+    <bounds maxlat="52.2407737" maxlon="21.0138453" minlat="52.2404972" minlon="21.0137528"/>
+    <nd lat="52.2407737" lon="21.0137528" ref="1443527818"/>
+    <nd lat="52.2406341" lon="21.0137915" ref="7891327113"/>
+    <nd lat="52.2405838" lon="21.0138103" ref="1443527786"/>
+    <nd lat="52.2404972" lon="21.0138453" ref="32917756"/>
+    <tag k="highway" v="tertiary"/>
+    <tag k="lanes" v="1"/>
+    <tag k="name" v="Plac marszałka Józefa Piłsudskiego"/>
+    <tag k="oneway" v="yes"/>
+    <tag k="surface" v="asphalt"/>
+    <tag k="wikidata" v="Q929269"/>
+    <tag k="wikipedia" v="pl:Plac marsz. Józefa Piłsudskiego w Warszawie"/>
+  </way>
+  <node id="7891376007" lat="52.2397224" lon="21.0122994">
+    <tag k="direction" v="backward"/>
+    <tag k="highway" v="traffic_signals"/>
+  </node>
+  <way id="184744207">
+    <bounds maxlat="52.2398620" maxlon="21.0126793" minlat="52.2387490" minlon="21.0122346"/>
+    <nd lat="52.2398620" lon="21.0122346" ref="165115647"/>
+    <nd lat="52.2397700" lon="21.0122773" ref="638465608"/>
+    <nd lat="52.2397224" lon="21.0122994" ref="7891376007"/>
+    <nd lat="52.2395489" lon="21.0123800" ref="7891376008"/>
+    <nd lat="52.2392152" lon="21.0125079" ref="317616247"/>
+    <nd lat="52.2391681" lon="21.0125264" ref="334559760"/>
+    <nd lat="52.2391259" lon="21.0125412" ref="312892958"/>
+    <nd lat="52.2387490" lon="21.0126793" ref="638465588"/>
+    <tag k="highway" v="tertiary"/>
+    <tag k="name" v="Mazowiecka"/>
+    <tag k="surface" v="asphalt"/>
+  </way>
+  <node id="7891376009" lat="52.2397790" lon="21.0119499">
+    <tag k="highway" v="traffic_signals"/>
+  </node>
+  <way id="306610860">
+    <bounds maxlat="52.2398620" maxlon="21.0122346" minlat="52.2382172" minlon="21.0068224"/>
+    <nd lat="52.2382172" lon="21.0068224" ref="32572240"/>
+    <nd lat="52.2382353" lon="21.0068901" ref="7894847471"/>
+    <nd lat="52.2382707" lon="21.0070078" ref="3890763491"/>
+    <nd lat="52.2382867" lon="21.0070613" ref="32572241"/>
+    <nd lat="52.2383833" lon="21.0073784" ref="1701518417"/>
+    <nd lat="52.2386134" lon="21.0081434" ref="32572243"/>
+    <nd lat="52.2390982" lon="21.0097645" ref="7894847478"/>
+    <nd lat="52.2391421" lon="21.0098924" ref="248200294"/>
+    <nd lat="52.2392494" lon="21.0102052" ref="7894847477"/>
+    <nd lat="52.2393598" lon="21.0105740" ref="3035066890"/>
+    <nd lat="52.2394430" lon="21.0108467" ref="255152621"/>
+    <nd lat="52.2394717" lon="21.0109409" ref="638465282"/>
+    <nd lat="52.2397082" lon="21.0117169" ref="32572245"/>
+    <nd lat="52.2397790" lon="21.0119499" ref="7891376009"/>
+    <nd lat="52.2397995" lon="21.0120173" ref="638465601"/>
+    <nd lat="52.2398620" lon="21.0122346" ref="165115647"/>
+    <tag k="highway" v="tertiary"/>
+    <tag k="name" v="Królewska"/>
+    <tag k="oneway" v="yes"/>
+    <tag k="surface" v="asphalt"/>
+  </way>
 
 </osm>

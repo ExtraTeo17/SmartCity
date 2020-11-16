@@ -1,8 +1,6 @@
 package osmproxy.elements;
 
-import java.io.Serializable;
-
-public class OSMStation extends OSMNode implements Serializable {
+public class OSMStation extends OSMNode {
     private final String stopId;
     private final String stopNumber;
 

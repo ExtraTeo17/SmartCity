@@ -57,15 +57,16 @@ public class BusDataParser implements IBusDataParser {
         for (var osmNode : osmXMLNodes) {
             var nodeName = osmNode.getNodeName();
             if (nodeName.equals("relation")) {
-                var busInfoData = parseRelation(osmNode);
-                if (busInfoData.isEmpty()) {
+                var busInfo = parseRelation(osmNode);
+                if (busInfo.isEmpty()) {
                     if (++errors < 5) {
                         continue;
                     }
                     throw new RuntimeException("Too much errors when parsing busInfo");
                 }
-                busInfoDataSet.add(busInfoData.get());
-            } else if (nodeName.equals("node")) {
+                busInfoDataSet.add(busInfo.get());
+            }
+            else if (nodeName.equals("node")) {
                 var station = parseNode(osmNode, busStopsMap::containsKey);
                 station.ifPresent(st -> busStopsMap.put(st.getId(), st));
             }
@@ -112,7 +113,7 @@ public class BusDataParser implements IBusDataParser {
             return Optional.empty();
         }
         logger.debug("Started parsing ways: " + waysIds.get(0) + "_" + waysIds.get(waysIds.size() - 1));
-        List<OSMWay> ways = parseOsmWays(waysDoc.get()); // TODO: reuse in car
+        List<OSMWay> ways = parseOsmWays(waysDoc.get());
 
         return Optional.of(new BusInfoData(new BusInfo(busLine, ways), stationIds));
     }
@@ -138,34 +139,26 @@ public class BusDataParser implements IBusDataParser {
         route.add(secondWay);
         String adjacentNodeRef = firstWay.orientateWith(secondWay);
         boolean failedToMatchPreviously = false;
-        
-        List<OSMWay> wayList = new ArrayList<>();
         while (nodesIter.hasNext()) {
-        	Node wayNode = nodesIter.next();
-        	if (wayNode.getNodeName().equals("way")) {
-        		wayList.add(new OSMWay(wayNode));
-        	}
-        }
-        
-        int lastIndexInZone = wayList.size() - 1;
-        while (!wayList.get(lastIndexInZone).isInZone(zone)) {
-        	// TODO: if not accurate enough, consider changing to node.isInZone (node-based)
-        	--lastIndexInZone;
-        }
-        wayList = wayList.subList(0, lastIndexInZone + 1); // TODO: test
-        
-        for (final OSMWay way : wayList) {
-	        var referenceOpt = way.reverseTowardsNode(adjacentNodeRef);
-	        if (referenceOpt.isEmpty()) {
-	            logger.debug("Failed to match way: " + way + " with " + adjacentNodeRef);
-	            failedToMatchPreviously = true;
-	            continue;
-	        } else if (failedToMatchPreviously) {
-	            logger.info("Reconnected to way: " + way + " after failed match with " + adjacentNodeRef);
-	        }
-	
-	        adjacentNodeRef = referenceOpt.get();
-	        route.add(way);
+            Node item = nodesIter.next();
+            if (item.getNodeName().equals("way")) {
+                var way = new OSMWay(item);
+                // TODO: CORRECT POTENTIAL BUGS CAUSING ROUTE TO BE CUT INTO PIECES BECAUSE OF RZĄŻEWSKI CASE
+                if (way.startsInZone(zone)) {
+                    var referenceOpt = way.reverseTowardsNode(adjacentNodeRef);
+                    if (referenceOpt.isEmpty()) {
+                        logger.debug("Failed to match way: " + way + " with " + adjacentNodeRef);
+                        failedToMatchPreviously = true;
+                        continue;
+                    }
+                    else if (failedToMatchPreviously) {
+                        logger.info("Reconnected to way: " + way + " after failed match with " + adjacentNodeRef);
+                    }
+
+                    adjacentNodeRef = referenceOpt.get();
+                    route.add(way);
+                }
+            }
         }
 
         return route;
@@ -213,7 +206,7 @@ public class BusDataParser implements IBusDataParser {
             }
         }
 
-        logger.trace("Station: " + osmId + " won't be included. IsPresent: " + isPresentVal);
+        logger.debug("Station: " + osmId + " won't be included. IsPresent: " + isPresentVal);
 
         return Optional.empty();
     }

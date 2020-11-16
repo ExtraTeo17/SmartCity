@@ -10,26 +10,18 @@ import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import routing.core.IZone;
 import routing.core.Position;
-import utilities.ForSerialization;
 import utilities.IterableNodeList;
 import utilities.Siblings;
 
-import java.io.Serializable;
 import java.util.*;
 
-public class OSMWay extends OSMElement implements Serializable {
+public class OSMWay extends OSMElement {
     private static final Logger logger = LoggerFactory.getLogger(OSMWay.class);
     private final List<String> childNodeIds;
     private final boolean isOneWay;
     private List<OSMWaypoint> waypoints;
     private LightOrientation lightOrientation = null;
     private RouteOrientation routeOrientation = RouteOrientation.FRONT;
-
-    @ForSerialization
-    public OSMWay() {
-        childNodeIds = new ArrayList<>();
-        isOneWay = false;
-    }
 
     public OSMWay(Node item) {
         super(item.getAttributes().getNamedItem("id").getNodeValue());

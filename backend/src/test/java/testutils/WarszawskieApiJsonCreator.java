@@ -11,7 +11,7 @@ public class WarszawskieApiJsonCreator extends JsonCreator {
         String[] valuesObjects = new String[orderedKeyValues.length / pairLength];
         for (int arraysIter = 0; arraysIter < valuesObjects.length; ++arraysIter) {
             var currArray = new String[fieldsCount];
-            int propStart = arraysIter * pairLength;
+            int propStart = arraysIter * pairLength ;
             int propEnd = propStart + pairLength;
             int currArrayIter = 0;
             for (int propIter = propStart; propIter < propEnd; propIter += 2) {

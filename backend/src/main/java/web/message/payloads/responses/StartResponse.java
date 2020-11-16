@@ -1,10 +1,16 @@
 package web.message.payloads.responses;
 
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import web.message.payloads.AbstractPayload;
+import web.message.payloads.models.Location;
 
-@JsonSerialize
 public class StartResponse extends AbstractPayload {
-    public StartResponse() {
+    @JsonProperty("timeScale")
+    private final int timeScale;
+
+    @JsonCreator(mode = JsonCreator.Mode.PROPERTIES)
+    public StartResponse(@JsonProperty("timeScale") int timeScale) {
+        this.timeScale = timeScale;
     }
 }

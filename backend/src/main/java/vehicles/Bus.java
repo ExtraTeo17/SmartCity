@@ -1,18 +1,13 @@
 package vehicles;
 
-import com.google.common.annotations.VisibleForTesting;
-import com.google.common.eventbus.EventBus;
-import events.web.bus.BusAgentFillStateUpdatedEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import osmproxy.buses.Timetable;
+import routing.LightManagerNode;
+import routing.RouteNode;
 import routing.RoutingConstants;
-import routing.nodes.LightManagerNode;
-import routing.nodes.RouteNode;
-import routing.nodes.StationNode;
+import routing.StationNode;
 import smartcity.ITimeProvider;
-import vehicles.enums.BusFillState;
-import vehicles.enums.VehicleType;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -29,33 +24,31 @@ public class Bus extends MovingObject {
     private final HashMap<Integer, List<String>> stationsForPassengers;
     private final List<StationNode> stationNodesOnRoute;
     private final String busLine;
+    private final List<RouteNode> displayRoute;
     private final ITimeProvider timeProvider;
-    private final EventBus eventBus;
 
-    private BusFillState fillState;
+    private DrivingState state = DrivingState.STARTING;
+    private int closestLightIndex = -1;
     private int closestStationIndex = -1;
     private int passengersCount = 0;
 
     // TODO: Factory for vehicles - inject
-    public Bus(EventBus eventBus,
-               ITimeProvider timeProvider,
-               int agentId,
-               List<RouteNode> simpleRoute,
+    public Bus(ITimeProvider timeProvider,
+               List<RouteNode> route,
                List<RouteNode> uniformRoute,
                Timetable timetable,
                String busLine,
                String brigadeNr) {
-        super(timeProvider, agentId, 40, uniformRoute, simpleRoute);
+        super(40, uniformRoute);
         this.timeProvider = timeProvider;
-        this.eventBus = eventBus;
+        this.displayRoute = route;
         this.timetable = timetable;
         this.busLine = busLine;
-        this.fillState = BusFillState.LOW;
         this.logger = LoggerFactory.getLogger(Bus.class.getName() + " (l_" + busLine + ") (br_" + brigadeNr + ")");
 
         this.stationsForPassengers = new HashMap<>();
         this.stationNodesOnRoute = new ArrayList<>();
-        for (RouteNode node : simpleRoute) {
+        for (RouteNode node : route) {
             if (node instanceof StationNode) {
                 StationNode station = (StationNode) node;
                 stationsForPassengers.put(station.getAgentId(), new ArrayList<>());
@@ -72,44 +65,11 @@ public class Bus extends MovingObject {
         return passengersCount;
     }
 
-    @VisibleForTesting
-    void increasePassengersCount() {
-        ++passengersCount;
-        if (passengersCount > CAPACITY_HIGH) {
-            setFillState(BusFillState.HIGH);
-        }
-        else if (passengersCount > CAPACITY_MID) {
-            setFillState(BusFillState.MID);
-        }
-    }
-
-    @VisibleForTesting
-    void decreasePassengersCount() {
-        --passengersCount;
-        if (passengersCount <= CAPACITY_MID) {
-            setFillState(BusFillState.LOW);
-        }
-        else if (passengersCount <= CAPACITY_HIGH) {
-            setFillState(BusFillState.MID);
-        }
-    }
-
-    private void setFillState(BusFillState newState) {
-        if (this.fillState != newState) {
-            this.fillState = newState;
-            eventBus.post(new BusAgentFillStateUpdatedEvent(agentId, newState));
-        }
-    }
-
-    public BusFillState getFillState() {
-        return fillState;
-    }
-
     public void addPassengerToStation(int id, String name) {
         var passengers = stationsForPassengers.get(id);
         if (passengers != null) {
             passengers.add(name);
-            increasePassengersCount();
+            ++passengersCount;
         }
         else {
             logger.warn("Unrecognized station id: " + id);
@@ -118,7 +78,7 @@ public class Bus extends MovingObject {
 
     public boolean removePassengerFromStation(int id, String name) {
         if (getPassengers(id).remove(name)) {
-            decreasePassengersCount();
+            --passengersCount;
             return true;
         }
 
@@ -144,7 +104,7 @@ public class Bus extends MovingObject {
 
     @Override
     public long getAdjacentOsmWayId() {
-        return ((LightManagerNode) uniformRoute.get(moveIndex)).getAdjacentWayId();
+        return ((LightManagerNode) route.get(moveIndex)).getAdjacentWayId();
     }
 
     @Override
@@ -152,11 +112,23 @@ public class Bus extends MovingObject {
         return VehicleType.BUS.toString();
     }
 
+    @Override
+    public LightManagerNode getNextTrafficLight() {
+        for (int i = moveIndex + 1; i < route.size(); i++) {
+            if (route.get(i) instanceof LightManagerNode) {
+                closestLightIndex = i;
+                return getCurrentTrafficLightNode();
+            }
+        }
+        closestLightIndex = -1;
+        return getCurrentTrafficLightNode();
+    }
+
     public Optional<StationNode> findNextStation() {
-        for (int i = moveIndex + 1; i < uniformRoute.size(); ++i) {
-            if (uniformRoute.get(i) instanceof StationNode) {
+        for (int i = moveIndex + 1; i < route.size(); ++i) {
+            if (route.get(i) instanceof StationNode) {
                 closestStationIndex = i;
-                return Optional.of((StationNode) uniformRoute.get(i));
+                return Optional.of((StationNode) route.get(i));
             }
         }
         closestStationIndex = -1;
@@ -177,34 +149,71 @@ public class Bus extends MovingObject {
     }
 
     public RouteNode findNextStop() {
-        for (int i = moveIndex + 1; i < uniformRoute.size(); i++) {
-            if (uniformRoute.get(i) instanceof StationNode) {
-                return uniformRoute.get(i);
+        for (int i = moveIndex + 1; i < route.size(); i++) {
+            if (route.get(i) instanceof StationNode) {
+                return route.get(i);
             }
-            else if (uniformRoute.get(i) instanceof LightManagerNode) {
-                return uniformRoute.get(i);
+            else if (route.get(i) instanceof LightManagerNode) {
+                return route.get(i);
             }
         }
         return null;
     }
 
-    public boolean isAtStation() {
-        if (moveIndex == uniformRoute.size()) {
+    @Override
+    public LightManagerNode getCurrentTrafficLightNode() {
+        if (closestLightIndex == -1) {
+            return null;
+        }
+        return (LightManagerNode) (route.get(closestLightIndex));
+    }
+
+    @Override
+    public boolean isAtTrafficLights() {
+        if (moveIndex == route.size()) {
             return false;
         }
-        return uniformRoute.get(moveIndex) instanceof StationNode;
+        return route.get(moveIndex) instanceof LightManagerNode;
+    }
+
+    public boolean isAtStation() {
+        if (moveIndex == route.size()) {
+            return false;
+        }
+        return route.get(moveIndex) instanceof StationNode;
     }
 
     public Optional<StationNode> getCurrentStationNode() {
         if (closestStationIndex == -1) {
             return Optional.empty();
         }
-        return Optional.of((StationNode) (uniformRoute.get(closestStationIndex)));
+        return Optional.of((StationNode) (route.get(closestStationIndex)));
+    }
+
+    @Override
+    public boolean isAtDestination() {
+        return moveIndex == route.size();
     }
 
     @Override
     public void move() {
-        ++moveIndex;
+        if (isAtDestination()) {
+            // TODO: why?
+            moveIndex = 0;
+        }
+        else {
+            moveIndex++;
+        }
+    }
+
+    @Override
+    public List<RouteNode> getDisplayRoute() {
+        return displayRoute;
+    }
+
+    @Override
+    public int getMillisecondsToNextLight() {
+        return ((closestLightIndex - moveIndex) * RoutingConstants.STEP_CONSTANT) / getSpeed();
     }
 
     // TODO: Are they though?
@@ -213,6 +222,16 @@ public class Bus extends MovingObject {
     //  This calculation is highly dependent on processor speed :(
     public int getMillisecondsToNextStation() {
         return ((closestStationIndex - moveIndex) * RoutingConstants.STEP_CONSTANT) / getSpeed();
+    }
+
+    @Override
+    public DrivingState getState() {
+        return state;
+    }
+
+    @Override
+    public void setState(DrivingState state) {
+        this.state = state;
     }
 
     public boolean shouldStart() {

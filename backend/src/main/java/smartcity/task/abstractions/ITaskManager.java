@@ -2,22 +2,15 @@ package smartcity.task.abstractions;
 
 import smartcity.lights.core.Light;
 
-import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.function.BooleanSupplier;
 
 public interface ITaskManager {
-    void scheduleCarCreation(int carsLimit, int testCarId);
+    void scheduleCarCreation(int numberOfCars, int testCarId);
 
-    void scheduleBikeCreation(int bikesLimit, int testBikeId);
-
-    void schedulePedestrianCreation(int pedestriansLimit, int testPedestrianId);
+    void schedulePedestrianCreation(int numberOfPedestrians, int testPedestrianId);
 
     void scheduleBusControl(BooleanSupplier testSimulationState);
 
-    void scheduleSwitchLightTask(int managerId, Collection<Light> lights);
-
-    void scheduleSimulationControl(BooleanSupplier testSimulationState, LocalDateTime simulationStartTime);
-
-    void cancelAll();
+    void scheduleSwitchLightTask(Collection<Light> lights);
 }
