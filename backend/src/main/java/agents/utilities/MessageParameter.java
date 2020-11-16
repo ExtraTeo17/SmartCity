@@ -18,7 +18,7 @@ public class MessageParameter {
     public static final String BUS_AGENT_NAME = "bus_id";
     public static final String STATION_ID = "station_id";
     public static final String SCHEDULE_ARRIVAL = "schedule_arrival";
-    public static final String DESIRED_BUS_LINE = "desired_bus";
+    //public static final String DESIRED_BUS_LINE = "desired_bus";
     public static final String BUS_LINE = "bus_line";
     public static final String TROUBLE_LON = "trouble_lon";
     public static final String TROUBLE_LAT = "trouble_lat";
@@ -31,6 +31,8 @@ public class MessageParameter {
     public static final String SHOW = "show";
     public static final String STOP = "stop";
     public static final String LENGTH_OF_JAM = "length_of_jam";
+
+    public static final String DESIRED_OSM_STATION_ID = "desired_osm_station_id";
 
 
     public static String getTypeByMovingObject(MovingObject movingObject) {

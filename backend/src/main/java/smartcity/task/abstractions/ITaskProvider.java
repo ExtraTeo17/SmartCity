@@ -15,7 +15,7 @@ public interface ITaskProvider {
 
 
     Runnable getCreatePedestrianTask(StationNode startStation, StationNode endStation,
-                                     String busLine, boolean testPedestrian);
+                                     boolean testPedestrian);
 
     Runnable getScheduleBusControlTask();
 

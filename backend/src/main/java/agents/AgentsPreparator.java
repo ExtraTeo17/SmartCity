@@ -182,8 +182,10 @@ public class AgentsPreparator {
         var closestTime = LocalDateTime.now().plusDays(1);
         var currTime = LocalDateTime.now();
         for (var busInfo : busData.busInfos) {
-            var route = getBusRoute(busInfo.route, busInfo.stops, allStations);
             var busLine = busInfo.busLine;
+            var route = getBusRoute(busInfo.route, busInfo.stops, allStations,busLine);
+
+
             for (var brigade : busInfo) {
                 var brigadeNr = brigade.brigadeId;
                 for (Timetable timetable : brigade) {
@@ -212,24 +214,40 @@ public class AgentsPreparator {
     }
 
     private List<RouteNode> getBusRoute(List<OSMWay> osmRoute, List<OSMStation> osmStops,
-                                        List<StationNode> allStations) {
+                                        List<StationNode> allStations,String busLine) {
         List<StationNode> mergedStationNodes = new ArrayList<>(osmStops.size());
+        List<OSMStation> mergedOsmStops = new ArrayList<>(osmStops.size());
+
         for (var osmStop : osmStops) {
             var stopId = osmStop.getId();
             var station = allStations.stream().filter(node -> node.getOsmId() == stopId).findAny();
             if (station.isPresent()) {
                 mergedStationNodes.add(station.get());
+                mergedOsmStops.add(osmStop);
             }
             else {
                 logger.error("Stop present on way is not initiated as StationAgent: " + osmStop);
             }
         }
-
+        addInfoAboutAllBusStopsOnTheRouteAndBusLine(mergedOsmStops,busLine,mergedStationNodes);
         var timeNow = System.nanoTime();
         var route = routeGenerator.generateRouteInfoForBuses(osmRoute, mergedStationNodes);
         logger.info("Generating routeInfo finished. Took: " + (TimeProvider.getTimeInMs(timeNow)) + "ms");
 
         return route;
+    }
+
+    private void addInfoAboutAllBusStopsOnTheRouteAndBusLine( List<OSMStation> osmStops,
+                                                             String busLine,
+                                                             List<StationNode> mergedStationNodes) {
+
+       // var stationIds = mergedStationNodes.stream().map(node -> node.getOsmId()).collect(Collectors.toList());
+        for (OSMStation el : osmStops)
+        {
+            el.addToBusLineStopMap(busLine, mergedStationNodes);
+        }
+
+
     }
 
 

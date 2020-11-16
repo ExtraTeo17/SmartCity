@@ -77,7 +77,7 @@ public class PedestrianAgent extends AbstractAgent {
                             StationNode station = pedestrian.getStartingStation();
                             ACLMessage msg = createMessageById(ACLMessage.REQUEST_WHEN, StationAgent.name, station.getAgentId());
                             Properties properties = createProperties(MessageParameter.PEDESTRIAN);
-                            properties.setProperty(MessageParameter.DESIRED_BUS_LINE, pedestrian.getPreferredBusLine());
+                            properties.setProperty(MessageParameter.DESIRED_OSM_STATION_ID, pedestrian.getTargetStation().getOsmId()+"");
                             properties.setProperty(MessageParameter.ARRIVAL_TIME, timeProvider.getCurrentSimulationTime()
                                     .toString());
                             msg.setAllUserDefinedParameters(properties);
@@ -153,7 +153,7 @@ public class PedestrianAgent extends AbstractAgent {
                         if (rcv.getPerformative() == ACLMessage.REQUEST) {
                             ACLMessage response = createMessage(ACLMessage.AGREE, rcv.getSender());
                             var properties = createProperties(MessageParameter.PEDESTRIAN);
-                            properties.setProperty(MessageParameter.DESIRED_BUS_LINE, pedestrian.getPreferredBusLine());
+                            properties.setProperty(MessageParameter.DESIRED_OSM_STATION_ID, pedestrian.getTargetStation().getOsmId()+"");
                             response.setAllUserDefinedParameters(properties);
                             send(response);
 
@@ -205,7 +205,7 @@ public class PedestrianAgent extends AbstractAgent {
             var currentTime = timeProvider.getCurrentSimulationTime();
             var predictedTime = currentTime.plusNanos(pedestrian.getMillisecondsToNextStation() * 1_000_000);
             properties.setProperty(MessageParameter.ARRIVAL_TIME, predictedTime.toString());
-            properties.setProperty(MessageParameter.DESIRED_BUS_LINE, pedestrian.getPreferredBusLine());
+            properties.setProperty(MessageParameter.DESIRED_OSM_STATION_ID, pedestrian.getTargetStation().getOsmId()+"");
             msg.setAllUserDefinedParameters(properties);
 
             send(msg);

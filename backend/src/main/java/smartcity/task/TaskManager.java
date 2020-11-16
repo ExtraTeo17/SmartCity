@@ -97,7 +97,7 @@ public class TaskManager implements ITaskManager {
             }
 
             var stations = stationsOpt.get();
-            taskProvider.getCreatePedestrianTask(stations.first, stations.second, busAgent.getLine(),
+            taskProvider.getCreatePedestrianTask(stations.first, stations.second,
                     runCount == testPedestrianId).run();
         };
         runIf(() -> agentsContainer.size(PedestrianAgent.class) < pedestriansLimit, createPedestrians,

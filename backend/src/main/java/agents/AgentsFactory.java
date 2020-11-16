@@ -123,7 +123,6 @@ class AgentsFactory implements IAgentsFactory {
     // TODO: Simplify to avoid 6 arguments
     @Override
     public PedestrianAgent create(List<RouteNode> routeToStation, List<RouteNode> routeFromStation,
-                                  String preferredBusLine,
                                   StationNode startStation, StationNode finishStation,
                                   boolean testPedestrian) {
         var id = idGenerator.get(PedestrianAgent.class);
@@ -131,7 +130,6 @@ class AgentsFactory implements IAgentsFactory {
         var uniformRouteFromStation = routeTransformer.uniformRoute(routeFromStation);
         var pedestrian = new Pedestrian(id, routeToStation, uniformRouteToStation,
                 routeFromStation, uniformRouteFromStation,
-                preferredBusLine,
                 startStation, finishStation,
                 timeProvider);
         if (testPedestrian) {
@@ -142,8 +140,8 @@ class AgentsFactory implements IAgentsFactory {
     }
 
     @Override
-    public PedestrianAgent create(List<RouteNode> routeToStation, List<RouteNode> routeFromStation, String preferredBusLine,
+    public PedestrianAgent create(List<RouteNode> routeToStation, List<RouteNode> routeFromStation,
                                   StationNode startStation, StationNode finishStation) {
-        return create(routeToStation, routeFromStation, preferredBusLine, startStation, finishStation, false);
+        return create(routeToStation, routeFromStation,  startStation, finishStation, false);
     }
 }

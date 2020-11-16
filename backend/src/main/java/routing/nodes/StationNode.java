@@ -50,4 +50,5 @@ public class StationNode extends RouteNode {
     public int hashCode() {
         return Objects.hash(super.hashCode(), osmId);
     }
+
 }

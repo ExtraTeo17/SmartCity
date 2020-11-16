@@ -30,9 +30,9 @@ public interface IAgentsFactory {
     LightManagerAgent create(OSMNode centerCrossroad);
 
     PedestrianAgent create(List<RouteNode> routeToStation, List<RouteNode> routeFromStation,
-                           String preferredBusLine, StationNode startStation, StationNode finishStation,
+                          StationNode startStation, StationNode finishStation,
                            boolean testPedestrian);
 
     PedestrianAgent create(List<RouteNode> routeToStation, List<RouteNode> routeFromStation,
-                           String preferredBusLine, StationNode startStation, StationNode finishStation);
+                           StationNode startStation, StationNode finishStation);
 }

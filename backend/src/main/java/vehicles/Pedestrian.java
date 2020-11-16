@@ -12,7 +12,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Pedestrian extends MovingObject {
-    private final String preferredBusLine;
+   // private final String preferredBusLine;
     private final List<RouteNode> displayRouteBeforeBus;
     private final List<RouteNode> displayRouteAfterBus;
     private final List<RouteNode> routeBeforeBus;
@@ -26,7 +26,6 @@ public class Pedestrian extends MovingObject {
                       List<RouteNode> uniformRouteToStation,
                       List<RouteNode> routeFromStation,
                       List<RouteNode> uniformRouteFromStation,
-                      String preferredBusLine,
                       StationNode startStation,
                       StationNode finishStation,
                       ITimeProvider timeProvider) {
@@ -38,8 +37,6 @@ public class Pedestrian extends MovingObject {
 
         this.displayRouteAfterBus = routeFromStation;
         this.stationIndex = routeBeforeBus.size() - 1;
-        this.preferredBusLine = preferredBusLine;
-
         this.stationStart = startStation;
         this.stationFinish = finishStation;
     }
@@ -63,7 +60,7 @@ public class Pedestrian extends MovingObject {
 
         this.displayRouteAfterBus = ped.displayRouteAfterBus;
         this.stationIndex = ped.stationIndex;
-        this.preferredBusLine = ped.preferredBusLine;
+     //   this.preferredBusLine = ped.preferredBusLine;
 
         this.stationStart = ped.stationStart;
         this.stationFinish = ped.stationFinish;
@@ -72,7 +69,7 @@ public class Pedestrian extends MovingObject {
     @VisibleForTesting
     Pedestrian(ITimeProvider timeProvider) {
         super(timeProvider, 1, 10, new ArrayList<>());
-        preferredBusLine = "";
+    //    preferredBusLine = "";
         displayRouteBeforeBus = new ArrayList<>();
         displayRouteAfterBus = new ArrayList<>();
         routeBeforeBus = new ArrayList<>();
@@ -88,9 +85,9 @@ public class Pedestrian extends MovingObject {
         return (StationNode) uniformRoute.get(stationIndex + 1);
     }
 
-    public String getPreferredBusLine() {
-        return preferredBusLine;
-    }
+    //public String getPreferredBusLine() {
+     //   return preferredBusLine;
+    //}
 
     @Override
     public long getAdjacentOsmWayId() {

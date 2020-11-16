@@ -96,13 +96,15 @@ public class StationAgent extends AbstractAgent {
                 var messageKind = rcv.getPerformative();
                 var agentName = rcv.getSender().getLocalName();
                 if (messageKind == ACLMessage.INFORM) {
-                    stationStrategy.addPedestrianToFarAwayQueue(agentName,
-                            rcv.getUserDefinedParameter(MessageParameter.DESIRED_BUS_LINE),
+
+                    String desiredBusLine =  getBusLineFromStationId(rcv.getUserDefinedParameter(MessageParameter.DESIRED_OSM_STATION_ID));
+                    station.addToAgentMap(agentName,desiredBusLine);
+                    stationStrategy.addPedestrianToFarAwayQueue(agentName,desiredBusLine,
                             getDateParameter(rcv, MessageParameter.ARRIVAL_TIME));
                 }
                 else if (messageKind == ACLMessage.REQUEST_WHEN) {
                     print("GOT MESSAGE FROM PEDESTRIAN REQUEST_WHEN", LoggerLevel.DEBUG);
-                    var desiredBusLine = rcv.getUserDefinedParameter(MessageParameter.DESIRED_BUS_LINE);
+                    var desiredBusLine = station.getFromAgentMap(agentName);
                     stationStrategy.removePedestrianFromFarAwayQueue(agentName, desiredBusLine);
                     stationStrategy.addPedestrianToQueue(agentName, desiredBusLine,
                             getDateParameter(rcv, MessageParameter.ARRIVAL_TIME));
@@ -121,7 +123,8 @@ public class StationAgent extends AbstractAgent {
                 else if (messageKind == ACLMessage.AGREE) {
                     print("-----GET AGREE from PEDESTRIAN------", LoggerLevel.DEBUG);
 
-                    var desiredBusLine = rcv.getUserDefinedParameter(MessageParameter.DESIRED_BUS_LINE);
+                    var desiredBusLine =  station.getFromAgentMap(agentName);
+                    station.removeFromAgentMap(agentName);
                     if (!stationStrategy.removePedestrianFromQueue(agentName, desiredBusLine)) {
                         stationStrategy.removePedestrianFromFarAwayQueue(agentName, desiredBusLine);
                     }
@@ -168,6 +171,10 @@ public class StationAgent extends AbstractAgent {
 
         addBehaviour(communication);
         addBehaviour(checkState);
+    }
+
+    private String getBusLineFromStationId(String stationOsmId) {
+       return station.findBusLineFromStation(stationOsmId);
     }
 
     public OSMStation getStation() {

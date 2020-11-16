@@ -118,7 +118,7 @@ public class TaskProvider implements ITaskProvider {
 
     @Override
     public Runnable getCreatePedestrianTask(StationNode startStation, StationNode endStation,
-                                            String busLine, boolean testPedestrian) {
+                                            boolean testPedestrian) {
         return () -> {
             try {
                 var randomOffsetStart = routingHelper.generateRandomOffset(pedestrianRouteOffset, startStation.getLat());
@@ -140,7 +140,7 @@ public class TaskProvider implements ITaskProvider {
                         null);
 
                 PedestrianAgent agent = agentsFactory.create(routeToStation, routeFromStation,
-                        busLine, startStation, endStation, testPedestrian);
+                         startStation, endStation, testPedestrian);
                 if (agentsContainer.tryAdd(agent)) {
                     agent.start();
                     eventBus.post(new PedestrianAgentCreatedEvent(agent.getId(), agent.getPosition(),

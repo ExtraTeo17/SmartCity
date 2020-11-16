@@ -60,11 +60,13 @@ public class StationStrategy {
     }
 
     public void addPedestrianToFarAwayQueue(String agentName, String desiredBusLine, LocalDateTime arrivalTime) {
+
         var farAwayPedestriansForLine = busLineToFarAwayPedestrians
                 .computeIfAbsent(desiredBusLine, key -> new ArrayList<>());
         var arrivalInfo = new ArrivalInfo(agentName, arrivalTime);
         farAwayPedestriansForLine.add(arrivalInfo);
     }
+
 
     public boolean removePedestrianFromFarAwayQueue(String agentName, String busLine) {
         var arrivalInfos = busLineToFarAwayPedestrians.get(busLine);
