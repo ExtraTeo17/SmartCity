@@ -12,7 +12,6 @@ import routing.abstractions.IRoutingHelper;
 import routing.core.IZone;
 import routing.core.Zone;
 import smartcity.TimeProvider;
-import smartcity.lights.core.Light;
 import smartcity.lights.core.SimpleLightGroup;
 import smartcity.task.abstractions.ITaskManager;
 import smartcity.task.abstractions.ITaskProvider;
@@ -20,7 +19,6 @@ import smartcity.task.runnable.abstractions.IRunnableFactory;
 import utilities.Siblings;
 
 import java.time.LocalDateTime;
-import java.util.Collection;
 import java.util.Optional;
 import java.util.Random;
 import java.util.concurrent.TimeUnit;
@@ -43,8 +41,6 @@ public class TaskManager implements ITaskManager {
     private final ITaskProvider taskProvider;
     private final IZone zone;
 
-    private final Random random;
-
     @Inject
     TaskManager(IRunnableFactory runnableFactory,
                 IAgentsContainer agentsContainer,
@@ -56,8 +52,6 @@ public class TaskManager implements ITaskManager {
         this.routingHelper = routingHelper;
         this.taskProvider = taskProvider;
         this.zone = zone;
-
-        this.random = new Random();
     }
 
     @Override
@@ -85,8 +79,9 @@ public class TaskManager implements ITaskManager {
 
     @Override
     public void schedulePedestrianCreation(int pedestriansLimit, int testPedestrianId) {
+        var random = new Random();
         Consumer<Integer> createPedestrians = (runCount) -> {
-            var busAgentOpt = getRandomBusAgent();
+            var busAgentOpt = getRandomBusAgent(random);
             if (busAgentOpt.isEmpty()) {
                 logger.error("No buses exist");
                 return;
@@ -106,7 +101,7 @@ public class TaskManager implements ITaskManager {
                 CREATE_PEDESTRIAN_INTERVAL, true);
     }
 
-    private Optional<BusAgent> getRandomBusAgent() {
+    private Optional<BusAgent> getRandomBusAgent(Random random) {
         return agentsContainer.getRandom(BusAgent.class, random);
     }
 
