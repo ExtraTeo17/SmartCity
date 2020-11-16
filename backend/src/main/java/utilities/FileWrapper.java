@@ -10,6 +10,8 @@ import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 import java.io.*;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
 
 public class FileWrapper {
     public static final String DEFAULT_OUTPUT_PATH_XML = "target/output.xml";
@@ -83,10 +85,14 @@ public class FileWrapper {
                 data = (T) objectStream.readObject();
             }
         } catch (Exception e) {
-            logger.warn("Could not get file from cache: " + path + ", msg: " + e.getMessage());
+            logger.warn("Could not get file from cache: " + path + ", msg:\n" + e.getMessage());
             if (file != null && file.exists()) {
-                if (file.delete()) {
-                    logger.info("Deleted: " + file.getPath());
+                try {
+                    var pathObj = Path.of(path);
+                    Files.delete(pathObj);
+                    logger.info("Deleted: " + path);
+                } catch (Exception eDelete) {
+                    logger.warn("Failed to delete file" + path, eDelete);
                 }
             }
         }
