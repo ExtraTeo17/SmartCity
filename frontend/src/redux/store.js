@@ -24,6 +24,7 @@ import {
   D_LAT,
   D_GENERATE_PEDS,
   D_USE_FIXED_ROUTES,
+  D_USE_FIXED_TP,
 } from "../constants/defaults";
 import { loadLocalData } from "./dataUtils/helpers";
 import { ConfigState } from "./models/states";
@@ -52,6 +53,7 @@ const initialState = {
       timeBeforeTrouble: D_TIME_BEFORE_TROUBLE,
 
       useFixedRoutes: D_USE_FIXED_ROUTES,
+      useFixedTroublePoints: D_USE_FIXED_TP,
       startTime: D_START_TIME,
       timeScale: D_TIME_SCALE,
 

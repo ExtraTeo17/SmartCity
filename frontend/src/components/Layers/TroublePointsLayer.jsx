@@ -5,16 +5,19 @@ import { connect } from "react-redux";
 import TroublePoint from "../Markers/TroublePoint";
 
 const TroublePointsLayer = props => {
-  const { troublePoints = [] } = props;
-  const troublePointMarkers = troublePoints.map(tp => <TroublePoint key={`tp${tp.id}`} troublePoint={tp} />);
+  const { troublePoints = [], useFixedTroublePoints = false } = props;
+  const troublePointMarkers = troublePoints.map(tp => (
+    <TroublePoint key={`tp${tp.id}`} useFixed={useFixedTroublePoints} troublePoint={tp} />
+  ));
 
   return <FeatureGroup>{troublePointMarkers}</FeatureGroup>;
 };
 
 const mapStateToProps = (state /* , ownProps */) => {
-  const { message } = state;
+  const { message, interaction } = state;
   return {
     troublePoints: message.troublePoints,
+    useFixedTroublePoints: interaction.startSimulationData.useFixedTroublePoints,
   };
 };
 

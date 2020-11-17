@@ -6,6 +6,7 @@ export const D_LNG = 21.01766;
 export const D_RAD = 600;
 
 export const D_USE_FIXED_ROUTES = true;
+export const D_USE_FIXED_TP = true;
 export const D_START_TIME = new Date();
 export const D_TIME_SCALE = 10;
 
