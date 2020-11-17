@@ -153,12 +153,11 @@ public class BusDataParser implements IBusDataParser {
                 wayList.add(way);
             }
         }
-        
-        if (lastIndexInZone > 0) {
-            wayList = wayList.subList(0, lastIndexInZone + 1);
-        }
 
-        for (final OSMWay way : wayList) {
+        wayList = wayList.subList(0, lastIndexInZone + 1);
+
+        for (int i = 0; i <= lastIndexInZone; ++i) {
+            var way = wayList.get(i);
             var referenceOpt = way.reverseTowardsNode(adjacentNodeRef);
             if (referenceOpt.isEmpty()) {
                 logger.debug("Failed to match way: " + way + " with " + adjacentNodeRef);
