@@ -181,16 +181,16 @@ public class TaskProvider implements ITaskProvider {
                 .createLightSwitcher(managerId, configContainer.getExtendLightTime(), lights);
         // Can be moved somewhere else if needed and passed as parameter
         var switchLightsContext = new ISwitchLightsContext() {
-            private boolean haveNotExtendedYet = true;
+            private boolean haveAlreadyExtended = false;
 
             @Override
-            public boolean haveNotExtendedYet() {
-                return haveNotExtendedYet;
+            public boolean haveAlreadyExtended() {
+                return haveAlreadyExtended;
             }
 
             @Override
-            public void setNotExtendedGreen(boolean value) {
-                haveNotExtendedYet = value;
+            public void setAlreadyExtendedGreen(boolean value) {
+                haveAlreadyExtended = value;
             }
         };
 

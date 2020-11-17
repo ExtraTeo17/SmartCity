@@ -6,6 +6,7 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import smartcity.config.abstractions.ILightConfigContainer;
+import smartcity.stations.ArrivalInfo;
 import smartcity.task.data.ISwitchLightsContext;
 import utilities.Siblings;
 
@@ -44,7 +45,7 @@ class LightSwitcherTests {
         switcher.apply(context);
 
         // Assert
-        assertTrue(context.haveNotExtendedYet());
+        assertFalse(context.haveAlreadyExtended());
         var greenLights = lights.first.getLights();
         assertTrue(greenLights.stream().noneMatch(Light::isGreen));
     }
@@ -63,7 +64,7 @@ class LightSwitcherTests {
         switcher.apply(context);
 
         // Assert
-        assertTrue(context.haveNotExtendedYet());
+        assertFalse(context.haveAlreadyExtended());
         assertTrue(greenLights.stream().noneMatch(Light::isGreen));
     }
 
@@ -81,7 +82,7 @@ class LightSwitcherTests {
         var extendTime = switcher.apply(context);
 
         // Assert
-        assertEquals(shouldExtend, !context.haveNotExtendedYet(), "Invalid extend");
+        assertEquals(shouldExtend, context.haveAlreadyExtended(), "Invalid extend");
         assertEquals(expectedExtendSeconds * 1000, extendTime, "Invalid extend time");
         var greenLights = lights.first.getLights();
         assertTrue(areLightsCorrect(greenLights, shouldExtend), "Lights should be correct");
@@ -190,11 +191,12 @@ class LightSwitcherTests {
             }
 
             for (int i = 0; i < carsInFarQueue; ++i) {
-                l.farAwayCarMap.put("farCar" + i, currentTime.plusSeconds(extendTimeSeconds / 2));
+                l.addCarToFarAwayQueue(ArrivalInfo.of("farCar" + i, currentTime.plusSeconds(extendTimeSeconds / 2)));
             }
 
             for (int i = 0; i < pedestriansInFarQueue; ++i) {
-                l.farAwayPedestrianMap.put("farPed" + i, currentTime.plusSeconds(extendTimeSeconds / 2));
+                l.addPedestrianToFarAwayQueue(ArrivalInfo.of("farPed" + i,
+                        currentTime.plusSeconds(extendTimeSeconds / 2)));
             }
         });
     }
@@ -204,8 +206,9 @@ class LightSwitcherTests {
         // Arrange
         var lights = createLights();
         var greenLights = lights.first.getLights();
-        greenLights.forEach(l -> l.farAwayCarMap.put("someCar1", currentTime.plusSeconds(extendTimeSeconds + 1)));
-        greenLights.forEach(l -> l.farAwayCarMap.put("someCar2", currentTime.minusSeconds(1)));
+        greenLights.forEach(l -> l.addCarToFarAwayQueue(ArrivalInfo.of("someCar1",
+                currentTime.plusSeconds(extendTimeSeconds + 1))));
+        greenLights.forEach(l -> l.addCarToFarAwayQueue(ArrivalInfo.of("someCar2", currentTime.minusSeconds(1))));
 
         var switcher = createLightSwitcher(lights);
         var context = createContext();
@@ -214,7 +217,7 @@ class LightSwitcherTests {
         switcher.apply(context);
 
         // Assert
-        assertTrue(context.haveNotExtendedYet());
+        assertFalse(context.haveAlreadyExtended());
         assertTrue(greenLights.stream().noneMatch(Light::isGreen));
     }
 
@@ -223,7 +226,8 @@ class LightSwitcherTests {
         // Arrange
         var lights = createLights();
         var greenLights = lights.first.getLights();
-        greenLights.forEach(l -> l.farAwayCarMap.put("someCar", currentTime.plusSeconds(extendTimeSeconds / 2)));
+        greenLights.forEach(l -> l.addCarToFarAwayQueue(ArrivalInfo.of("someCar",
+                currentTime.plusSeconds(extendTimeSeconds / 2))));
 
         var switcher = createLightSwitcher(lights);
         var context = createContext();
@@ -241,7 +245,7 @@ class LightSwitcherTests {
 
         switcher.apply(context);
         // green here, extended
-        assertFalse(context.haveNotExtendedYet());
+        assertTrue(context.haveAlreadyExtended());
         assertTrue(greenLights.stream().allMatch(Light::isGreen));
     }
 
@@ -250,10 +254,11 @@ class LightSwitcherTests {
         // Arrange
         var lights = createLights();
         var greenLights = lights.first.getLights();
-        greenLights.forEach(l -> l.farAwayCarMap.put("someCar", currentTime.plusSeconds(extendTimeSeconds / 2)));
+        greenLights.forEach(l -> l.addCarToFarAwayQueue(ArrivalInfo.of("someCar",
+                currentTime.plusSeconds(extendTimeSeconds / 2))));
         var redLights = lights.second.getLights();
-        redLights.stream().limit(1).forEach(l -> l.farAwayCarMap.put("someCar1",
-                currentTime.plusSeconds(extendTimeSeconds / 2)));
+        redLights.stream().limit(1).forEach(l -> l.addCarToFarAwayQueue(ArrivalInfo.of("someCar1",
+                currentTime.plusSeconds(extendTimeSeconds / 2))));
 
         var switcher = createLightSwitcher(lights);
         var context = createContext();
@@ -267,7 +272,7 @@ class LightSwitcherTests {
 
         switcher.apply(context);
         // red here. not extended again
-        assertTrue(context.haveNotExtendedYet());
+        assertFalse(context.haveAlreadyExtended());
         assertTrue(greenLights.stream().noneMatch(Light::isGreen));
     }
 
@@ -296,20 +301,20 @@ class LightSwitcherTests {
     }
 
     private static ISwitchLightsContext createContext() {
-        return createContext(true);
+        return createContext(false);
     }
 
-    private static ISwitchLightsContext createContext(boolean wasNotExtended) {
+    private static ISwitchLightsContext createContext(boolean haveAlreadyExtended) {
         return new ISwitchLightsContext() {
-            private boolean value = wasNotExtended;
+            private boolean value = haveAlreadyExtended;
 
             @Override
-            public boolean haveNotExtendedYet() {
+            public boolean haveAlreadyExtended() {
                 return value;
             }
 
             @Override
-            public void setNotExtendedGreen(boolean value) {
+            public void setAlreadyExtendedGreen(boolean value) {
                 this.value = value;
             }
         };

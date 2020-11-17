@@ -8,7 +8,10 @@ import smartcity.lights.core.data.LightInfo;
 import smartcity.stations.ArrivalInfo;
 
 import java.time.LocalDateTime;
-import java.util.*;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.Map;
+import java.util.Queue;
 
 public class Light extends Position {
     private static final int TRAFFIC_JAM_THRESHOLD = 2;
@@ -20,8 +23,8 @@ public class Light extends Position {
     private final long osmLightId;
     private boolean trafficJamOngoing;
 
-    final Map<String, LocalDateTime> farAwayCarMap = new HashMap<>();
-    final Map<String, LocalDateTime> farAwayPedestrianMap = new HashMap<>();
+    private final Map<String, LocalDateTime> farAwayCarMap = new HashMap<>();
+    private final Map<String, LocalDateTime> farAwayPedestrianMap = new HashMap<>();
     final Queue<String> carQueue = new LinkedList<>();
     final Queue<String> pedestrianQueue = new LinkedList<>();
 
@@ -54,14 +57,6 @@ public class Light extends Position {
 
     public String getAdjacentCrossingOsmId2() {
         return adjacentCrossingOsmId2;
-    }
-
-    Collection<LocalDateTime> getFarAwayTimeCollection() {
-        if (isGreen()) {
-            return farAwayCarMap.values();
-        }
-
-        return farAwayPedestrianMap.values();
     }
 
     public boolean isGreen() {
@@ -139,5 +134,21 @@ public class Light extends Position {
         else if (trafficJamDisappeared()) {
             result.setShouldNotifyCarAboutEndOfTrafficJamOnThisLight(getLat(), getLng(), getOsmLightId());
         }
+    }
+
+    int[] getFarawayCarsAndPedestriansWithinInterval(LocalDateTime from, LocalDateTime to) {
+        int[] groups = new int[2];
+        for (var time : farAwayCarMap.values()) {
+            if (time.isAfter(from) && time.isBefore(to)) {
+                ++groups[0];
+            }
+        }
+        for (var time : farAwayPedestrianMap.values()) {
+            if (time.isAfter(from) && time.isBefore(to)) {
+                ++groups[1];
+            }
+        }
+
+        return groups;
     }
 }

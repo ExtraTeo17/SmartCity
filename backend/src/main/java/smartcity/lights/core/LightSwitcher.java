@@ -81,13 +81,13 @@ public class LightSwitcher implements Function<ISwitchLightsContext, Integer> {
 
     @Override
     public Integer apply(ISwitchLightsContext context) {
-        var extendTime = getExtendTime(!context.haveNotExtendedYet());
+        var extendTime = getExtendTime(context.haveAlreadyExtended());
         if (extendTime > 0) {
-            context.setNotExtendedGreen(false);
+            context.setAlreadyExtendedGreen(true);
             return extendTime;
         }
 
-        context.setNotExtendedGreen(true);
+        context.setAlreadyExtendedGreen(false);
         switchLights();
 
         return defaultExecutionDelay;
@@ -95,21 +95,18 @@ public class LightSwitcher implements Function<ISwitchLightsContext, Integer> {
 
     private int getExtendTime(boolean hadPreviouslyExtended) {
         if (configContainer.isLightStrategyActive()) {
-
-            var groups = getLightGroupsOnLight();
-            boolean shouldExtendQueue;
-            if (hadPreviouslyExtended) {
-                shouldExtendQueue = groups[0] > 0 && groups[1] == 0;
-            }
-            else {
-                shouldExtendQueue = groups[0] > groups[1];
-            }
-
-            if (shouldExtendQueue) {
+            var closeGroups = getLightGroupsOnLight();
+            if (shouldExtendByGroups(hadPreviouslyExtended, closeGroups)) {
                 logger.info("-------------------------------------shouldExtendGreenLightBecauseOfCarsOnLight--------------");
                 return defaultExecutionDelay;
             }
-            else if (groups[1] == 0 && shouldExtendBecauseOfFarAwayQueue(hadPreviouslyExtended)) {
+
+            if (closeGroups[1] > 0) {
+                return 0;
+            }
+
+            var farGroups = getLightGroupsInFarawayQueue();
+            if (shouldExtendByGroups(hadPreviouslyExtended, farGroups)) {
                 logger.info("-------------------------------------shouldExtendBecauseOfFarAwayQueue--------------");
                 return defaultExecutionDelay;
             }
@@ -135,54 +132,33 @@ public class LightSwitcher implements Function<ISwitchLightsContext, Integer> {
         return new int[]{greenGroupObjects, redGroupObjects};
     }
 
-
-    private boolean shouldExtendBecauseOfFarAwayQueue(boolean hadPreviouslyExtended) {
-        var groups = getLightGroupsInFarawayQueue();
-
-        boolean result;
+    private boolean shouldExtendByGroups(boolean hadPreviouslyExtended, int[] groups) {
         if (hadPreviouslyExtended) {
-            result = groups[0] > 0 && groups[1] == 0;
-        }
-        else {
-            result = groups[0] > groups[1];
+            return groups[0] > 0 && groups[1] == 0;
         }
 
-        return result;
+        return groups[0] > groups[1];
     }
 
     private int[] getLightGroupsInFarawayQueue() {
         var currentTime = timeProvider.getCurrentSimulationTime();
         var currentTimePlusExtend = currentTime.plusSeconds(extendTimeSeconds);
+
         int greenGroupObjects = 0;
         int redGroupObjects = 0;
         for (Light light : greenLights) {
-            for (var time : light.farAwayCarMap.values()) {
-                if (time.isAfter(currentTime) && time.isBefore(currentTimePlusExtend)) {
-                    greenGroupObjects += CAR_TO_PEDESTRIAN_LIGHT_RATE;
-                }
-            }
-            for (var time : light.farAwayPedestrianMap.values()) {
-                if (time.isAfter(currentTime) && time.isBefore(currentTimePlusExtend)) {
-                    ++redGroupObjects;
-                }
-            }
+            var lightGroups = light.getFarawayCarsAndPedestriansWithinInterval(currentTime, currentTimePlusExtend);
+            greenGroupObjects += CAR_TO_PEDESTRIAN_LIGHT_RATE * lightGroups[0];
+            redGroupObjects += lightGroups[1];
         }
 
         for (Light light : redLights) {
-            // TODO: getFarawayCarsAndPedestriansWithinInterval
-            for (var time : light.farAwayPedestrianMap.values()) {
-                if (time.isAfter(currentTime) && time.isBefore(currentTimePlusExtend)) {
-                    ++greenGroupObjects;
-                }
-            }
-            for (var time : light.farAwayCarMap.values()) {
-                if (time.isAfter(currentTime) && time.isBefore(currentTimePlusExtend)) {
-                    redGroupObjects += CAR_TO_PEDESTRIAN_LIGHT_RATE;
-                }
-            }
+            var lightGroups = light.getFarawayCarsAndPedestriansWithinInterval(currentTime, currentTimePlusExtend);
+            greenGroupObjects += lightGroups[1];
+            redGroupObjects += CAR_TO_PEDESTRIAN_LIGHT_RATE * lightGroups[0];
         }
 
-        return new int[]{greenGroupObjects, redGroupObjects};
+        return new int[] { greenGroupObjects, redGroupObjects };
     }
 
     private void switchLights() {
