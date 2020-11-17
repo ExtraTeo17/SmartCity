@@ -25,7 +25,7 @@ export const D_PEDS_NUM = 20;
 export const D_TEST_PED = 5;
 
 export const D_LIGHT_STRATEGY_ACTIVE = true;
-export const D_EXTEND_LIGHT_TIME = 25;
+export const D_EXTEND_LIGHT_TIME = 20;
 
 export const D_STATION_STRATEGY_ACTIVE = true;
 export const D_EXTEND_WAIT_TIME = 60;

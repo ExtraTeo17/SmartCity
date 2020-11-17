@@ -17,7 +17,7 @@ export const LAT_MIN = -90;
 export const LAT_MAX = 90;
 export const LNG_MIN = -180;
 export const LNG_MAX = 180;
-export const RAD_MIN = 1;
+export const RAD_MIN = 10;
 export const RAD_MAX = 5000;
 
 export const LIGHT_EXTEND_MIN = 1;

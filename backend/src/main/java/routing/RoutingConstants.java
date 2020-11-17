@@ -4,7 +4,7 @@ public class RoutingConstants {
     public static final int STEP_SIZE_METERS = 2;
     public static final int M_MILLISECONDS_TO_KM_HOUR = 3600;
     public static final int STEP_CONSTANT = STEP_SIZE_METERS * M_MILLISECONDS_TO_KM_HOUR;
-    // Experimental value
+    // Experimental value: (delay per node)
     public static final double CALCULATION_DELTA_PER_INDEX = 0.02888831;
 
     public static final double EARTH_RADIUS_METERS = 6_378_137;
