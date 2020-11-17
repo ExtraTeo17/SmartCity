@@ -141,7 +141,7 @@ public class BusDataParser implements IBusDataParser {
         boolean failedToMatchPreviously = false;
 
         List<OSMWay> wayList = new ArrayList<>();
-        int lastIndexInZone = 0;
+        int lastIndexInZone = -1;
         while (nodesIter.hasNext()) {
             Node wayNode = nodesIter.next();
             if (wayNode.getNodeName().equals("way")) {
@@ -153,10 +153,9 @@ public class BusDataParser implements IBusDataParser {
                 wayList.add(way);
             }
         }
-        
-        wayList = wayList.subList(0, lastIndexInZone + 1);
 
-        for (final OSMWay way : wayList) {
+        for (int i = 0; i <= lastIndexInZone; ++i) {
+            var way = wayList.get(i);
             var referenceOpt = way.reverseTowardsNode(adjacentNodeRef);
             if (referenceOpt.isEmpty()) {
                 logger.debug("Failed to match way: " + way + " with " + adjacentNodeRef);
