@@ -154,8 +154,6 @@ public class BusDataParser implements IBusDataParser {
             }
         }
 
-        wayList = wayList.subList(0, lastIndexInZone + 1);
-
         for (int i = 0; i <= lastIndexInZone; ++i) {
             var way = wayList.get(i);
             var referenceOpt = way.reverseTowardsNode(adjacentNodeRef);
