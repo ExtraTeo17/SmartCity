@@ -26,6 +26,10 @@ public interface IGeoPosition extends Comparable<IGeoPosition> {
         };
     }
 
+
+    /**
+     * @return Distance in meters between two lat-lng points
+     */
     default double distance(IGeoPosition other) {
         return RoutingHelper.getDistance(this, other);
     }
