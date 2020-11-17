@@ -289,6 +289,10 @@ public class BusAgent extends AbstractAgent {
                     if(!isTroubleManager)
                     {
                         properties.setProperty(MessageParameter.OSM_ID_OF_NEXT_CLOSEST_STATION,((StationNode)bus.findNextStop()).getOsmId()+"");
+                        properties.setProperty(MessageParameter.AGENT_ID_OF_NEXT_CLOSEST_STATION,((StationNode)bus.findNextStop()).getAgentId()+"");
+                        //maybe not needed
+                        properties.setProperty(MessageParameter.LAT_OF_NEXT_CLOSEST_STATION,((StationNode)bus.findNextStop()).getAgentId()+"");
+                        properties.setProperty(MessageParameter.LON_OF_NEXT_CLOSEST_STATION,((StationNode)bus.findNextStop()).getAgentId()+"");
                     }
                     msg.setAllUserDefinedParameters(properties);
                     return msg;

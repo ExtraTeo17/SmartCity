@@ -35,6 +35,9 @@ public class MessageParameter {
 
     public static final String DESIRED_OSM_STATION_ID = "desired_osm_station_id";
     public static final String OSM_ID_OF_NEXT_CLOSEST_STATION = "osm_id_of_next_closest_station" ;
+    public static final String AGENT_ID_OF_NEXT_CLOSEST_STATION = "agent_id_of_next_closest_station";
+    public static final String LAT_OF_NEXT_CLOSEST_STATION = "lat_of_next_closest_station" ;
+    public static final String LON_OF_NEXT_CLOSEST_STATION = "lon_of_next_closest_station" ;
 
 
     public static String getTypeByMovingObject(MovingObject movingObject) {

@@ -190,9 +190,31 @@ public class PedestrianAgent extends AbstractAgent {
                         {
                             logger.info("Get info about trouble from bus");
 
+                            decideWhereToGo(rcv);
                         }
                         break;
                 }
+            }
+
+            private void decideWhereToGo(ACLMessage rcv) {
+               StationNode newStationNode  =  getStationNodeFromMessage(rcv);
+               computeTimeIfGoToStation(newStationNode);
+               computeTimeIfByBicycle();
+            }
+
+            private void computeTimeIfByBicycle() {
+
+            }
+
+            private void computeTimeIfGoToStation(StationNode newStationNode) {
+
+            }
+
+            private StationNode getStationNodeFromMessage(ACLMessage rcv) {
+                return new StationNode(rcv.getUserDefinedParameter(MessageParameter.LAT_OF_NEXT_CLOSEST_STATION),
+                                rcv.getUserDefinedParameter(MessageParameter.LON_OF_NEXT_CLOSEST_STATION),
+                                rcv.getUserDefinedParameter(MessageParameter.OSM_ID_OF_NEXT_CLOSEST_STATION),
+                                rcv.getUserDefinedParameter(MessageParameter.AGENT_ID_OF_NEXT_CLOSEST_STATION));
             }
         };
 
