@@ -17,6 +17,7 @@ import routing.nodes.RouteNode;
 import routing.nodes.StationNode;
 import smartcity.ITimeProvider;
 import smartcity.SmartCityAgent;
+import smartcity.config.abstractions.ITroublePointsConfigContainer;
 import utilities.ConditionalExecutor;
 import utilities.Siblings;
 import vehicles.Bus;
@@ -29,19 +30,24 @@ import java.util.Random;
 
 import static agents.message.MessageManager.createMessage;
 import static agents.message.MessageManager.createProperties;
+import static java.lang.Thread.sleep;
 
 @SuppressWarnings("serial")
 public class BusAgent extends AbstractAgent {
     public static final String name = BusAgent.class.getSimpleName().replace("Agent", "");
     private final ITimeProvider timeProvider;
     private final Bus bus;
-
+    private final ITroublePointsConfigContainer configContainer;
+    private static final int THRESHOLD_UNTIL_INDEX_CHANGE = 50;
+    private RouteNode troublePoint;
     BusAgent(int busId, Bus bus,
              ITimeProvider timeProvider,
-             EventBus eventBus) {
+             EventBus eventBus,
+             ITroublePointsConfigContainer configContainer) {
         super(busId, name, timeProvider, eventBus);
         this.timeProvider = timeProvider;
         this.bus = bus;
+        this.configContainer = configContainer;
     }
 
     @Override
@@ -234,6 +240,74 @@ public class BusAgent extends AbstractAgent {
 
         addBehaviour(move);
         addBehaviour(communication);
+
+
+        if (configContainer.shouldGenerateCrashForBuses()) {
+            var timeBeforeTroubleMs = this.configContainer.getTimeBeforeTrouble() * 1000;
+            Behaviour troubleGenerator = new TickerBehaviour(this, timeBeforeTroubleMs) {
+
+                @Override
+                public void onTick() {
+
+                    var route = bus.getUniformRoute();
+                    Random random = new Random(523);
+                    var el = random.nextInt(route.size() - bus.getMoveIndex() - THRESHOLD_UNTIL_INDEX_CHANGE - 5 + 1) + bus.getMoveIndex()+ THRESHOLD_UNTIL_INDEX_CHANGE + 5; // TODO: from current index //choose trouble EdgeId
+                    RouteNode troublePointTmp = route.get(el);
+                    troublePoint = new RouteNode(troublePointTmp.getLat(), troublePointTmp.getLng(),
+                            troublePointTmp.getInternalEdgeId());
+                    sendMessageAboutCrashTroubleToTroubleManager(); //send message to boss Agent/ maybe not so important in case of buses
+                    sendMessageAboutCrashTroubleToPedestrians();
+                    logger.info("Generated trouble--------------------------------------------------");
+                    try {
+                        sleep(10000000);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                    stop();
+                    //TODO: agent dies
+                }
+
+                private void sendMessageAboutCrashTroubleToPedestrians() {
+                    for(String pedestrian : bus.getAllPassangers())
+                    {
+
+                        ACLMessage msg = createMessageAboutCrash(pedestrian,false);
+                        logger.info("Send message about crash to pedestrian ");
+                        send(msg);
+
+                    }
+                }
+
+                private ACLMessage createMessageAboutCrash(String agentName, boolean isTroubleManager) {
+
+                    ACLMessage msg = createMessage(ACLMessage.INFORM, agentName);
+                    Properties properties = createProperties(MessageParameter.BUS);
+                    properties.setProperty(MessageParameter.TYPEOFTROUBLE, MessageParameter.CRASH);
+                    properties.setProperty(MessageParameter.TROUBLE, MessageParameter.SHOW);
+                    properties.setProperty(MessageParameter.TROUBLE_LAT, Double.toString(troublePoint.getLat()));
+                    properties.setProperty(MessageParameter.TROUBLE_LON, Double.toString(troublePoint.getLng()));
+                    if(!isTroubleManager)
+                    {
+                        properties.setProperty(MessageParameter.OSM_ID_OF_NEXT_CLOSEST_STATION,((StationNode)bus.findNextStop()).getOsmId()+"");
+                    }
+                    msg.setAllUserDefinedParameters(properties);
+                    return msg;
+                }
+
+                private void sendMessageAboutCrashTroubleToTroubleManager() {
+
+                    ACLMessage msg = createMessageAboutCrash(TroubleManagerAgent.name,true);
+                    logger.info("Send message about crash to Trouble Manager ");
+                    send(msg);
+                }
+
+            };
+
+            addBehaviour(troubleGenerator);
+
+        }
+
+
     }
 
     private void informNextStation() {

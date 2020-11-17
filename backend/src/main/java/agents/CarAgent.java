@@ -174,9 +174,7 @@ public class CarAgent extends AbstractAgent {
                 if (indexOfRouteNodeWithEdge != null && indexOfRouteNodeWithEdge != car.getUniformRouteSize() - 1) {
                     handleConstructionSiteRouteChange(indexOfRouteNodeWithEdge);
                 }
-                else{
-                    logger.info("kokokokokokokokokokokokokokokokokokokokokokokokokokokoko");
-                }
+
             }
 
             private void handleConstructionSiteRouteChange(final int indexOfRouteNodeWithEdge) {
@@ -331,8 +329,7 @@ public class CarAgent extends AbstractAgent {
                         bewareOfJammedEdge);
                 timeForOfDynamicRoute = car.getMillisecondsFromAToB(car.getMoveIndex(),
                         mergeResult.newUniformRoute.size() - 1);
-                //logger.info("=======================timeForOfDynamicRoute" + timeForOfDynamicRoute);
-                //logger.info("-----------------------timeForTheEndWithJam" + timeForTheEndWithJam);
+
                 if (timeForTheEndWithJam > timeForOfDynamicRoute) {
                     logger.info("Trip time through the jam: " + timeForTheEndWithJam + " is longer than alternative route time: "
                             + timeForOfDynamicRoute + ", so route will be changed");

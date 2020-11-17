@@ -186,6 +186,11 @@ public class PedestrianAgent extends AbstractAgent {
                             }
                             informLightManager(pedestrian);
                         }
+                        else if (rcv.getPerformative() == ACLMessage.INFORM )
+                        {
+                            logger.info("Get info about trouble from bus");
+
+                        }
                         break;
                 }
             }

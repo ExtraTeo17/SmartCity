@@ -15,10 +15,7 @@ import vehicles.enums.BusFillState;
 import vehicles.enums.VehicleType;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 public class Bus extends MovingObject {
     public static final int CAPACITY_MID = 10;
@@ -70,6 +67,16 @@ public class Bus extends MovingObject {
 
     public int getPassengersCount() {
         return passengersCount;
+    }
+    public List<String> getAllPassangers(){
+        List<String> allPassengers = new ArrayList<>();
+        Iterator it = stationsForPassengers.entrySet().iterator();
+        while (it.hasNext()) {
+            var pair = (Map.Entry)it.next();
+            allPassengers.addAll((List<String>)pair.getValue());
+            it.remove(); // avoids a ConcurrentModificationException
+        }
+        return allPassengers;
     }
 
     @VisibleForTesting

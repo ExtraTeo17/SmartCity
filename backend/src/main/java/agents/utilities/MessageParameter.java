@@ -25,6 +25,7 @@ public class MessageParameter {
     public static final String EDGE_ID = "edge_id";
     public static final String TROUBLE = "trouble";
     public static final String TYPEOFTROUBLE = "type_of_trouble";
+    public static final String CRASH = "crash";
     public static final String CONSTRUCTION = "construction";
     public static final String ACCIDENT = "accident";
     public static final String TRAFFIC_JAM = "traffic_jams";
@@ -33,6 +34,7 @@ public class MessageParameter {
     public static final String LENGTH_OF_JAM = "length_of_jam";
 
     public static final String DESIRED_OSM_STATION_ID = "desired_osm_station_id";
+    public static final String OSM_ID_OF_NEXT_CLOSEST_STATION = "osm_id_of_next_closest_station" ;
 
 
     public static String getTypeByMovingObject(MovingObject movingObject) {

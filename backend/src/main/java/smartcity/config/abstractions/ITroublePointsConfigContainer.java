@@ -7,6 +7,7 @@ public interface ITroublePointsConfigContainer {
     void setChangeRouteOnTroublePoint(boolean constructionSiteStrategyActive);
 
     boolean shouldGenerateConstructionSites();
+    boolean shouldGenerateCrashForBuses();
 
     void setShouldGenerateConstructionSites(boolean constructionSiteGenerationActive);
 

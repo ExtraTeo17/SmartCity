@@ -114,16 +114,16 @@ public class StationStrategy {
 
             var actualTime = LocalTime.of(currentTime.getHour(),
                     currentTime.getMinute(), 1, 0);   //scheduledArrival.actual;
-            logger.info("Scheduled time + seconds " + String.valueOf(scheduledTimePlusWait));
+            logger.debug("Scheduled time + seconds " + String.valueOf(scheduledTimePlusWait));
 
-            logger.info("Actual time: " + String.valueOf(actualTime));
+            logger.debug("Actual time: " + String.valueOf(actualTime));
             if (actualTime.isAfter(scheduledTimePlusWait)) {
-                logger.info("------------------BUS WAS LATE-----------------------");
+                logger.debug("------------------BUS WAS LATE-----------------------");
                 List<String> passengersThatCanLeave = getPassengersWhoAreReadyToGo(busLine);
                 result.addBusAndPedestrianGrantedPassthrough(busLine, passengersThatCanLeave);
             } else if (actualTime.isAfter(scheduledTimeMinusWait) &&
                     actualTime.isBefore(scheduledTimePlusWait)) {
-                logger.info("------------------BUS WAS ON TIME-----------------------");
+                logger.debug("------------------BUS WAS ON TIME-----------------------");
 
 
                 if (configContainer.isStationStrategyActive()) {
@@ -131,12 +131,12 @@ public class StationStrategy {
                     if (!busesFreeToGo.containsKey(busAgentNameToLine.get(busLine))) {
                         busesFreeToGo.put(busAgentNameToLine.get(busLine), false);
                         toWhichPassengersStrategyWaits.put(busAgentNameToLine.get(busLine), farPassengers);
-                        logger.info("INIALISATION OF WAITING");
-                        logger.info("far passangers" + farPassengers.size());
+                        logger.debug("INIALISATION OF WAITING");
+                        logger.debug("far passangers" + farPassengers.size());
 
                     }
 
-                    logger.info("------------------NUMBER OF PASSENGERS TO WHICH WE WAIT " + toWhichPassengersStrategyWaits.get(busAgentNameToLine.get(busLine)).size());
+                    logger.debug("------------------NUMBER OF PASSENGERS TO WHICH WE WAIT " + toWhichPassengersStrategyWaits.get(busAgentNameToLine.get(busLine)).size());
                     List<String> passengersThatCanLeave = getPassengersWhoAreReadyToGo(busLine);
                     if (busesFreeToGo.containsKey(busAgentNameToLine.get(busLine))) {
                         if (busesFreeToGo.get(busAgentNameToLine.get(busLine))) {

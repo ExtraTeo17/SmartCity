@@ -102,7 +102,7 @@ class AgentsFactory implements IAgentsFactory {
         var uniformRoute = routeTransformer.uniformRoute(route);
         logger.trace("DisplayRoute size: " + route.size() + ", routeSize: " + uniformRoute.size());
         var bus = new Bus(eventBus, timeProvider, id, route, uniformRoute, timetable, busLine, brigadeNr);
-        return new BusAgent(id, bus, timeProvider, eventBus);
+        return new BusAgent(id, bus, timeProvider, eventBus,configContainer);
     }
 
     @Deprecated

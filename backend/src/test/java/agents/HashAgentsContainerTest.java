@@ -118,7 +118,7 @@ class HashAgentsContainerTest {
 
     BusAgent getBusAgent() {
         return new BusAgent(idGenerator.get(BusAgent.class), mock(Bus.class),
-                createTimeProvider(), createEventBus());
+                createTimeProvider(), createEventBus(),mock(ConfigContainer.class));
     }
 
 
