@@ -1,6 +1,6 @@
 import React, { useEffect, useReducer } from "react";
 import { Popup } from "react-leaflet";
-import { CAR_ROTATION_THRESHOLD, MOVING_Z_INDEX } from "../../constants/markers";
+import { CAR_MOVING_Z_INDEX, CAR_ROTATION_THRESHOLD } from "../../constants/markers";
 import { carIcon, testCarIcon } from "../../styles/icons";
 import { angleFromCoordinates } from "../../utils/helpers";
 import { getRotationReducer } from "./Extensions/reducers";
@@ -19,7 +19,7 @@ const Car = props => {
   }, [location]);
 
   const icon = isTestCar ? testCarIcon : carIcon;
-  const zOffset = isTestCar ? MOVING_Z_INDEX + 1 : MOVING_Z_INDEX;
+  const zOffset = isTestCar ? CAR_MOVING_Z_INDEX + 1 : CAR_MOVING_Z_INDEX;
 
   return (
     <RotatedMarker rotationAngle={state.angle} rotationOrigin="center" position={state.loc} icon={icon} zIndexOffset={zOffset}>
