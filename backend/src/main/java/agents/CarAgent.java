@@ -88,12 +88,12 @@ public class CarAgent extends AbstractAgent {
                             properties.setProperty(MessageParameter.ADJACENT_OSM_WAY_ID, Long.toString(car.getAdjacentOsmWayId()));
                             msg.setAllUserDefinedParameters(properties);
                             send(msg);
-                            logger.debug("Ask LightManager" + light.getLightManagerId() + " for right to passage.");
+                            logger.debug("Ask LightManager" + light.getLightManagerId() + " for right to passage");
                             break;
                         case WAITING_AT_LIGHT:
                             break;
                         case PASSING_LIGHT:
-                            logger.debug("Pass the traffic light");
+                            logger.info("Passed the traffic light at " + timeProvider.getCurrentSimulationTime());
                             move();
                             car.setState(DrivingState.MOVING);
                             break;
