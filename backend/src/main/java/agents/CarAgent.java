@@ -33,7 +33,7 @@ import static routing.RoutingConstants.STEP_CONSTANT;
 @SuppressWarnings("serial")
 public class CarAgent extends AbstractAgent {
     private static final int THRESHOLD_UNTIL_INDEX_CHANGE = 50;
-    private static final int NO_CONSTRUCTION_SITE_STRATEGY_FACTOR = 20;
+    private static final int NO_CONSTRUCTION_SITE_STRATEGY_FACTOR = 30; // Lower values provide risk of car ignoring the trouble point and passing through it
 
     private static final int CONSTRUCTION_SITE_GENERATION_SEED = 9973;
     private static final long ID_GENERATION_SEED = 10002959;
@@ -199,8 +199,7 @@ public class CarAgent extends AbstractAgent {
                     }
                 }
                 else {
-                    indexAfterWhichRouteChanges = Math.max(indexOfRouteNodeWithEdge -
-                            (NO_CONSTRUCTION_SITE_STRATEGY_FACTOR * THRESHOLD_UNTIL_INDEX_CHANGE), 0);
+                    indexAfterWhichRouteChanges = car.getPrevNonVirtualIndexFromIndex(indexOfRouteNodeWithEdge - NO_CONSTRUCTION_SITE_STRATEGY_FACTOR);
                 }
 
                 borderlineIndex = indexAfterWhichRouteChanges;

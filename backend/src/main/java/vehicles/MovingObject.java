@@ -236,14 +236,21 @@ public abstract class MovingObject {
         return getNextNonVirtualIndexFromIndex(moveIndex);
     }
 
-    public int getNextNonVirtualIndex(int thresholdUntilIndexChange) {
-        return getNextNonVirtualIndexFromIndex(moveIndex + thresholdUntilIndexChange);
+    public int getNextNonVirtualIndex(int threshold) {
+        return getNextNonVirtualIndexFromIndex(moveIndex + threshold);
     }
 
-    private int getNextNonVirtualIndexFromIndex(int index) {
-        while (index < uniformRoute.size() && uniformRoute.get(index).isVirtual()) {
+    public int getNextNonVirtualIndexFromIndex(int index) {
+        while (index < uniformRoute.size() - 1 && uniformRoute.get(index).isVirtual()) {
             ++index;
         }
-        return index - 1;
+        return index;
+    }
+
+    public int getPrevNonVirtualIndexFromIndex(int index) {
+        while (index > 0 && uniformRoute.get(index).isVirtual()) {
+            --index;
+        }
+        return index;
     }
 }
