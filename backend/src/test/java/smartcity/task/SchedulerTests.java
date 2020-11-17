@@ -111,8 +111,9 @@ class SchedulerTests {
 
         int pedestriansLimit = 155;
         int testPedestrianId = 555;
-        boolean useFixedRoutes = false;
 
+        boolean useFixedRoutes = true;
+        boolean useFixedConstructionSites = true;
         var startTime = LocalDateTime.of(LocalDate.of(2020, 10, 14),
                 LocalTime.of(10, 10, 10));
         var timeScale = 12;
@@ -125,7 +126,8 @@ class SchedulerTests {
 
         var event = new StartSimulationEvent(shouldGenerateCars, carsNum, testCarId,
                 shouldGenerateBikes, bikesNum, testBikeId, shouldGenerateTP, timeBeforeTrouble,
-                pedestriansLimit, testPedestrianId, useFixedRoutes, startTime, timeScale, lightStrategyActive, extendLightTime,
+                pedestriansLimit, testPedestrianId, useFixedRoutes, useFixedConstructionSites,
+                startTime, timeScale, lightStrategyActive, extendLightTime,
                 stationStrategyActive, extendWaitTime, changeRouteStrategyActive, shouldGenerateTrafficJams
         );
 
@@ -151,6 +153,8 @@ class SchedulerTests {
         assertEquals(extendWaitTime, configContainer.getExtendWaitTime());
         assertEquals(changeRouteStrategyActive, configContainer.shouldChangeRouteOnTroublePoint());
 
+        assertEquals(useFixedRoutes, configContainer.shouldUseFixedRoutes());
+        assertEquals(useFixedConstructionSites, configContainer.shouldUseFixedConstructionSites());
         assertEquals(timeScale, ref.timeScale);
     }
 
@@ -186,7 +190,7 @@ class SchedulerTests {
     private StartSimulationEvent prepareSimulationEvent(LocalDateTime startTime) {
         return new StartSimulationEvent(false, 111, 112, false, 444,
                 222, true, 5005, 222, 223, false,
-                startTime, 31, false, 333, false,
+                true, startTime, 31, false, 333, false,
                 354, false,
                 false
         );

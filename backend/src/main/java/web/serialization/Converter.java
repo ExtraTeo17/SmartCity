@@ -78,12 +78,25 @@ public class Converter {
                 req.bikesLimit,
                 req.testBikeId,
 
-                req.generateTroublePoints, req.timeBeforeTrouble, req.pedestriansLimit,
+                req.generateTroublePoints,
+                req.timeBeforeTrouble,
+                req.pedestriansLimit,
                 req.testPedestrianId,
-                req.useFixedRoutes, timeLocal, req.timeScale,
+
+                req.useFixedRoutes,
+                req.useFixedTroublePoints,
+
+                timeLocal,
+                req.timeScale,
+
                 req.lightStrategyActive,
-                req.extendLightTime, req.stationStrategyActive, req.extendWaitTime,
-                req.changeRouteOnTroublePoint, req.changeRouteOnTrafficJam
+                req.extendLightTime,
+
+                req.stationStrategyActive,
+                req.extendWaitTime,
+
+                req.changeRouteOnTroublePoint,
+                req.changeRouteOnTrafficJam
         );
     }
 }
