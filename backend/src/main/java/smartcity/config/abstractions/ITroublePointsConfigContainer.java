@@ -23,4 +23,8 @@ public interface ITroublePointsConfigContainer {
     boolean shouldChangeRouteOnTrafficJam();
 
     void setChangeRouteOnTrafficJam(boolean changeRouteOnTrafficJam);
+
+    boolean shouldUseFixedConstructionSites();
+
+    void setUseFixedConstructionSites(boolean value);
 }

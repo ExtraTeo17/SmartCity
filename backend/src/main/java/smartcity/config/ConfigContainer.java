@@ -26,6 +26,7 @@ public class ConfigContainer extends ConfigMutator
     private boolean isStationStrategyActive = true;
     private boolean changeRouteOnTrafficJam = false;
     private boolean shouldUseFixedRoutes = false;
+    private boolean shouldUseFixedConstructionSites = true;
 
     private int lightExtendTime = 30;
     private int extendWaitTime = 60;
@@ -156,4 +157,15 @@ public class ConfigContainer extends ConfigMutator
     public void setUseFixedRoutes(boolean value) {
         shouldUseFixedRoutes = value;
     }
+
+    @Override
+    public boolean shouldUseFixedConstructionSites() {
+        return shouldUseFixedConstructionSites;
+    }
+
+    @Override
+    public void setUseFixedConstructionSites(boolean value) {
+        shouldUseFixedConstructionSites = value;
+    }
+
 }

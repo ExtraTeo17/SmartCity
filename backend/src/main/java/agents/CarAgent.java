@@ -32,14 +32,15 @@ import static routing.RoutingConstants.STEP_CONSTANT;
 
 @SuppressWarnings("serial")
 public class CarAgent extends AbstractAgent {
-    private static final Random random = new Random();
     private static final int THRESHOLD_UNTIL_INDEX_CHANGE = 50;
-    protected static final int NO_CONSTRUCTION_SITE_STRATEGY_FACTOR = 20;
+    private static final int NO_CONSTRUCTION_SITE_STRATEGY_FACTOR = 20;
+    private static final int CONSTRUCTION_SITE_GENERATION_SEED = 30;
 
     private final MovingObject car;
     private final IRouteGenerator routeGenerator;
     private final IRouteTransformer routeTransformer;
     private final ITroublePointsConfigContainer configContainer;
+    private final Random random;
     private final Set<Integer> trafficJamsEdgeId = new HashSet<>();
     private final Set<Long> constructionsEdgeId = new HashSet<>();
 
@@ -57,6 +58,9 @@ public class CarAgent extends AbstractAgent {
         this.routeGenerator = routeGenerator;
         this.routeTransformer = routeTransformer;
         this.configContainer = configContainer;
+
+        this.random = configContainer.shouldUseFixedConstructionSites() ? new Random(id + CONSTRUCTION_SITE_GENERATION_SEED) :
+                new Random();
     }
 
     @Override
@@ -369,16 +373,39 @@ public class CarAgent extends AbstractAgent {
                 public void onTick() {
                     var route = car.getUniformRoute();
 
+                    var index = getRandomIndex(car.getMoveIndex(), route.size());
+                    // TODO: If moveIndex + THRESHOLD_UNTIL_INDEX_CHANGE >= route.size() this can happen
+                    if (index < route.size()) {
+                        RouteNode troublePointTmp = route.get(index);
+                        troublePoint = new RouteNode(troublePointTmp.getLat(), troublePointTmp.getLng(),
+                                troublePointTmp.getInternalEdgeId());
+                        sendMessageAboutConstructionTrouble(); //send message to boss Agent
+                    }
+                    else {
+                        logger.warn("Trouble point won't be generated because of too short path");
+                    }
+
+                    stop();
+                }
+
+                private int getRandomIndex(int moveIndex, int routeSize) {
                     // TODO: from current index
                     //   choose trouble EdgeId
                     // TODO: magic numbers !!!
-                    var el = random.nextInt(route.size() - car.getMoveIndex() - THRESHOLD_UNTIL_INDEX_CHANGE - 5 + 1)
-                            + car.getMoveIndex() + THRESHOLD_UNTIL_INDEX_CHANGE + 5;
-                    RouteNode troublePointTmp = route.get(el);
-                    troublePoint = new RouteNode(troublePointTmp.getLat(), troublePointTmp.getLng(),
-                            troublePointTmp.getInternalEdgeId());
-                    sendMessageAboutConstructionTrouble(); //send message to boss Agent
-                    stop();
+
+                    // Warn: Value inside nextInt must be constant for fixed generation to work
+                    //  (assumption is that routeSize is fixed)
+                    var fixedMax = routeSize - THRESHOLD_UNTIL_INDEX_CHANGE - 5;
+                    var randomInt = Math.abs(random.nextInt(fixedMax));
+
+                    logger.info(" Random: " + randomInt);
+                    var min = moveIndex + THRESHOLD_UNTIL_INDEX_CHANGE + 5;
+                    var index = min + (randomInt) % (fixedMax - moveIndex);
+                    logger.info("Index: " + index);
+                    logger.info("Route size: " + routeSize);
+
+
+                    return index;
                 }
 
                 private void sendMessageAboutConstructionTrouble() {
