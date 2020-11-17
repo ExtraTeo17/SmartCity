@@ -154,6 +154,6 @@ public class ConfigContainer extends ConfigMutator
 
     @Override
     public void setUseFixedRoutes(boolean value) {
-        shouldUseFixedRoutes = true;
+        shouldUseFixedRoutes = value;
     }
 }
