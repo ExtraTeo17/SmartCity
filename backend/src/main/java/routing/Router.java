@@ -141,9 +141,10 @@ final class Router implements
         managersNodes.addAll(stationNodes);
 
         data = getRouteWithAdditionalNodes(busRouteData.route, managersNodes);
-        cacheWrapper.cacheData(route, stationNodes, data);
+        ArrayList<RouteNode> data2 = (ArrayList<RouteNode>) routeTransformer.uniformRouteNext(data);
+        cacheWrapper.cacheData(route, stationNodes, data2);
 
-        return data;
+        return data2;
     }
 
     /////////////////////////////////////////////////////////////
