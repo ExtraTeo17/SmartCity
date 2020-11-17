@@ -23,13 +23,13 @@ import routing.nodes.RouteNode;
 import routing.nodes.StationNode;
 import smartcity.ITimeProvider;
 import smartcity.config.ConfigContainer;
-import smartcity.lights.core.Light;
+import smartcity.lights.core.SimpleLightGroup;
 import smartcity.task.abstractions.ITaskProvider;
 import smartcity.task.data.ISwitchLightsContext;
 import smartcity.task.functional.IFunctionalTaskFactory;
+import utilities.Siblings;
 
 import java.time.LocalDateTime;
-import java.util.Collection;
 import java.util.List;
 import java.util.function.Supplier;
 
@@ -40,7 +40,6 @@ public class TaskProvider implements ITaskProvider {
 
     private final ConfigContainer configContainer;
     private final IRouteGenerator routeGenerator;
-    private final IRoutingHelper routingHelper;
     private final IAgentsFactory agentsFactory;
     private final IAgentsContainer agentsContainer;
     private final IFunctionalTaskFactory functionalTaskFactory;
@@ -50,8 +49,8 @@ public class TaskProvider implements ITaskProvider {
     private final Table<IGeoPosition, IGeoPosition, List<RouteNode>> routeInfoCache;
 
     @Inject
-    public TaskProvider(ConfigContainer configContainer, IRouteGenerator routeGenerator,
-                        IRoutingHelper routingHelper,
+    public TaskProvider(ConfigContainer configContainer,
+                        IRouteGenerator routeGenerator,
                         IAgentsFactory agentsFactory,
                         IAgentsContainer agentsContainer,
                         IFunctionalTaskFactory functionalTaskFactory,
@@ -59,7 +58,6 @@ public class TaskProvider implements ITaskProvider {
                         EventBus eventBus) {
         this.configContainer = configContainer;
         this.routeGenerator = routeGenerator;
-        this.routingHelper = routingHelper;
         this.agentsFactory = agentsFactory;
         this.agentsContainer = agentsContainer;
         this.functionalTaskFactory = functionalTaskFactory;
@@ -99,6 +97,7 @@ public class TaskProvider implements ITaskProvider {
                 route = routeInfoCache.get(start, end);
                 if (route == null) {
                     route = routeGenerator.generateRouteInfo(start, end, "bike");
+                    // TODO: If car start & end will be equal to bike, then car can receive bike route.
                     routeInfoCache.put(start, end, route);
                 }
             } catch (Exception e) {
@@ -117,7 +116,8 @@ public class TaskProvider implements ITaskProvider {
 
 
     @Override
-    public Runnable getCreatePedestrianTask(StationNode startStation, StationNode endStation,
+    public Runnable getCreatePedestrianTask(IRoutingHelper routingHelper,
+                                            StationNode startStation, StationNode endStation,
                                             String busLine, boolean testPedestrian) {
         return () -> {
             try {
@@ -176,21 +176,21 @@ public class TaskProvider implements ITaskProvider {
     }
 
     @Override
-    public Supplier<Integer> getSwitchLightsTask(int managerId, Collection<Light> lights) {
+    public Supplier<Integer> getSwitchLightsTask(int managerId, Siblings<SimpleLightGroup> lights) {
         var switchLights = functionalTaskFactory
-                .createLightSwitcher(managerId, configContainer.getExtendWaitTime(), lights);
+                .createLightSwitcher(managerId, configContainer.getExtendLightTime(), lights);
         // Can be moved somewhere else if needed and passed as parameter
         var switchLightsContext = new ISwitchLightsContext() {
-            private boolean alreadyExtendedGreen = false;
+            private boolean haveAlreadyExtended = false;
 
             @Override
-            public boolean haveAlreadyExtendedGreen() {
-                return alreadyExtendedGreen;
+            public boolean haveAlreadyExtended() {
+                return haveAlreadyExtended;
             }
 
             @Override
-            public void setExtendedGreen(boolean value) {
-                alreadyExtendedGreen = value;
+            public void setAlreadyExtendedGreen(boolean value) {
+                haveAlreadyExtended = value;
             }
         };
 

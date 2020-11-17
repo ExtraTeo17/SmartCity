@@ -8,9 +8,10 @@ import org.w3c.dom.NodeList;
 import osmproxy.elements.OSMNode;
 import osmproxy.elements.OSMWay;
 import osmproxy.elements.OSMWaypoint;
-import routing.RoutingConstants;
 import routing.core.IGeoPosition;
 import routing.core.Position;
+import smartcity.lights.abstractions.ICrossroadParser;
+import smartcity.lights.core.data.LightInfo;
 import utilities.IterableNodeList;
 import utilities.Siblings;
 
@@ -20,7 +21,7 @@ import java.util.List;
 public class CrossroadParser implements ICrossroadParser {
     private static final Logger logger = LoggerFactory.getLogger(CrossroadParser.class);
     private static final double COSINE_OF_135_DEGREES = -0.7071;
-    private static final double DISTANCE_THRESHOLD = 10 * RoutingConstants.DEGREES_PER_METER;
+    private static final double DISTANCE_THRESHOLD = 10;
 
     @Override
     public Siblings<List<LightInfo>> getLightGroups(OSMNode crossroadCenter) {

@@ -5,6 +5,7 @@ export const D_LAT = 52.23698;
 export const D_LNG = 21.01766;
 export const D_RAD = 600;
 
+export const D_USE_FIXED_ROUTES = true;
 export const D_START_TIME = new Date();
 export const D_TIME_SCALE = 10;
 
@@ -24,7 +25,7 @@ export const D_PEDS_NUM = 20;
 export const D_TEST_PED = 5;
 
 export const D_LIGHT_STRATEGY_ACTIVE = true;
-export const D_EXTEND_LIGHT_TIME = 30;
+export const D_EXTEND_LIGHT_TIME = 20;
 
 export const D_STATION_STRATEGY_ACTIVE = true;
 export const D_EXTEND_WAIT_TIME = 60;

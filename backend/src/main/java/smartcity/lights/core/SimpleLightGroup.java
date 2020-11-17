@@ -1,17 +1,38 @@
 package smartcity.lights.core;
 
+import com.google.common.annotations.VisibleForTesting;
+import org.jetbrains.annotations.NotNull;
 import smartcity.lights.LightColor;
+import smartcity.lights.core.data.LightInfo;
 
 import java.util.*;
 
-class SimpleLightGroup {
+public class SimpleLightGroup implements Iterable<Light> {
     private final Set<Light> lights;
+    private final LightColor initialColor;
 
-    SimpleLightGroup(List<LightInfo> infoList, LightColor color) {
-        lights = new HashSet<>();
+    SimpleLightGroup(LightColor initColor, List<LightInfo> infoList) {
+        this.lights = new HashSet<>();
         for (LightInfo info : infoList) {
-            lights.add(new Light(info, color));
+            lights.add(new Light(info, initColor));
         }
+        initialColor = initColor;
+    }
+
+    @VisibleForTesting
+    public SimpleLightGroup(Collection<Light> lights) {
+        this.lights = new HashSet<>(lights);
+
+        var light = lights.stream().findAny();
+        LightColor color = LightColor.RED;
+        if (light.isPresent()) {
+            color = light.get().isGreen() ? LightColor.GREEN : LightColor.RED;
+        }
+        this.initialColor = color;
+    }
+
+    public LightColor getInitialColor() {
+        return initialColor;
     }
 
     void switchLights() {
@@ -20,21 +41,13 @@ class SimpleLightGroup {
         }
     }
 
-    Map<? extends Long, ? extends Light> prepareMap() {
-        Map<Long, Light> lightMap = new HashMap<>();
-        for (Light light : lights) {
-            lightMap.put(light.getAdjacentWayId(), light);
-            // TODO: consider adding distinct structure for crossing IDs (and crossingOsmId2!!!)
-            lightMap.put(Long.parseLong(light.getAdjacentCrossingOsmId1()), light);
-        }
-        return lightMap;
+    public Collection<? extends Light> getLights() {
+        return lights;
     }
 
-	public Collection<? extends Light> prepareList() {
-		final List<Light> lightList = new ArrayList<>();
-		for (Light light : lights) {
-			lightList.add(light);
-		}
-		return lightList;
-	}
+    @NotNull
+    @Override
+    public Iterator<Light> iterator() {
+        return lights.iterator();
+    }
 }

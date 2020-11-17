@@ -79,7 +79,9 @@ public class Converter {
                 req.testBikeId,
 
                 req.generateTroublePoints, req.timeBeforeTrouble, req.pedestriansLimit,
-                req.testPedestrianId, timeLocal, req.timeScale, req.lightStrategyActive,
+                req.testPedestrianId,
+                req.useFixedRoutes, timeLocal, req.timeScale,
+                req.lightStrategyActive,
                 req.extendLightTime, req.stationStrategyActive, req.extendWaitTime,
                 req.changeRouteOnTroublePoint, req.changeRouteOnTrafficJam
         );

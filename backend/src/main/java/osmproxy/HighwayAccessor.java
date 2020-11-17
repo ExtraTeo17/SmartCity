@@ -57,7 +57,8 @@ public class HighwayAccessor {
     // TODO: tested manually, but add unit tests / integration tests
     public static Pair<List<Long>, List<Integer>> getOsmWayIdsAndEdgeList(IGeoPosition from,
                                                                           IGeoPosition to,
-                                                                          String typeOfVehicle, boolean bewareOfJammedRoutes) {
+                                                                          String typeOfVehicle,
+                                                                          boolean bewareOfJammedRoutes) {
         GHResponse response = new GHResponse();
         GHRequest request = new GHRequest(from.getLat(), from.getLng(), to.getLat(), to.getLng()).setVehicle(typeOfVehicle);
         String weighting = bewareOfJammedRoutes ? AvoidEdgesRemovableWeighting.NAME : "fastest";
