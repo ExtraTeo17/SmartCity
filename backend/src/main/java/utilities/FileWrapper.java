@@ -75,28 +75,57 @@ public class FileWrapper {
     @SuppressWarnings(value = "unchecked")
     public static <T extends Serializable> T getFromCache(String fileName) {
         String path = DEFAULT_OUTPUT_PATH_CACHE + "/" + fileName + ".ser";
-        T data = null;
-        File file = null;
+        Object data = tryReadFile(path);
+        if (data == null) {
+            return null;
+        }
+
         try {
-            file = new File(path);
-            if (file.exists()) {
-                var fileStream = new FileInputStream(file);
-                var objectStream = new ObjectInputStream(fileStream);
-                data = (T) objectStream.readObject();
-            }
+            return (T) data;
         } catch (Exception e) {
             logger.warn("Could not get file from cache: " + path + ", msg:\n" + e.getMessage());
-            if (file != null && file.exists()) {
-                try {
-                    var pathObj = Path.of(path);
-                    Files.delete(pathObj);
-                    logger.info("Deleted: " + path);
-                } catch (Exception eDelete) {
-                    logger.warn("Failed to delete file" + path, eDelete);
-                }
+            tryDeleteFile(path);
+        }
+
+        return null;
+    }
+
+    private static Object tryReadFile(String path) {
+        Object data = null;
+        FileInputStream fileStream = null;
+        ObjectInputStream objectStream = null;
+        try {
+            var file = new File(path);
+            if (file.exists()) {
+                fileStream = new FileInputStream(file);
+                objectStream = new ObjectInputStream(fileStream);
+                data = objectStream.readObject();
             }
+        } catch (Exception e) {
+            logger.warn("Could read file: " + path, e);
+        }
+
+        try {
+            if (objectStream != null) {
+                objectStream.close();
+            }
+            if (fileStream != null) {
+                fileStream.close();
+            }
+        } catch (Exception e) {
+            logger.info("Failed to close file streams");
         }
 
         return data;
+    }
+
+    private static void tryDeleteFile(String path) {
+        try {
+            var pathObj = Path.of(path);
+            Files.delete(pathObj);
+            logger.info("Deleted: " + path);
+        } catch (Exception eDelete) {
+            logger.warn("Failed to delete file" + path, eDelete);
+        }
     }
 }
