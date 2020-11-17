@@ -34,8 +34,9 @@ import static routing.RoutingConstants.STEP_CONSTANT;
 public class CarAgent extends AbstractAgent {
     private static final int THRESHOLD_UNTIL_INDEX_CHANGE = 50;
     private static final int NO_CONSTRUCTION_SITE_STRATEGY_FACTOR = 20;
+
     private static final int CONSTRUCTION_SITE_GENERATION_SEED = 9973;
-    private static final int ID_GENERATION_SEED = 7753;
+    private static final long ID_GENERATION_SEED = 10002959;
 
     private final MovingObject car;
     private final IRouteGenerator routeGenerator;
@@ -61,7 +62,7 @@ public class CarAgent extends AbstractAgent {
         this.configContainer = configContainer;
 
         this.random = configContainer.shouldUseFixedConstructionSites() ?
-                new Random(ID_GENERATION_SEED * id + CONSTRUCTION_SITE_GENERATION_SEED) :
+                new Random(ID_GENERATION_SEED * id % CONSTRUCTION_SITE_GENERATION_SEED) :
                 new Random();
     }
 
