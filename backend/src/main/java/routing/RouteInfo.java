@@ -15,13 +15,17 @@ public class RouteInfo implements Iterable<OSMWay> {
     public final void addWay(final OSMWay way) {
         ways.add(way);
     }
-    
-    public final OSMWay getFirst() {
-    	return ways.get(0);
+
+    public final boolean hasNoWays() {
+        return ways.isEmpty();
     }
-    
+
+    public final OSMWay getFirst() {
+        return ways.get(0);
+    }
+
     public final OSMWay getLast() {
-    	return ways.get(ways.size() - 1);
+        return ways.get(ways.size() - 1);
     }
 
     boolean remove(long lightOsmId) {
