@@ -34,7 +34,7 @@ import static routing.RoutingConstants.STEP_CONSTANT;
 public class CarAgent extends AbstractAgent {
     private static final int THRESHOLD_UNTIL_INDEX_CHANGE = 50;
     private static final int NO_CONSTRUCTION_SITE_STRATEGY_FACTOR = 20;
-    private static final int CONSTRUCTION_SITE_GENERATION_SEED = 30;
+    private static final int CONSTRUCTION_SITE_GENERATION_SEED = 9973;
 
     private final MovingObject car;
     private final IRouteGenerator routeGenerator;
@@ -396,14 +396,13 @@ public class CarAgent extends AbstractAgent {
                     // Warn: Value inside nextInt must be constant for fixed generation to work
                     //  (assumption is that routeSize is fixed)
                     var fixedMax = routeSize - THRESHOLD_UNTIL_INDEX_CHANGE - 5;
-                    var randomInt = Math.abs(random.nextInt(fixedMax));
+                    var randomInt = random.nextInt(fixedMax);
 
                     logger.info(" Random: " + randomInt);
                     var min = moveIndex + THRESHOLD_UNTIL_INDEX_CHANGE + 5;
-                    var index = min + (randomInt) % (fixedMax - moveIndex);
+                    var index = min + (randomInt % (fixedMax - moveIndex));
                     logger.info("Index: " + index);
                     logger.info("Route size: " + routeSize);
-
 
                     return index;
                 }
