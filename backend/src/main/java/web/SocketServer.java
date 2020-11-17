@@ -14,7 +14,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 class SocketServer extends WebSocketServer {
-    public static final int CONNECTION_LOST_TIMEOUT = 300;
+    public static final int CONNECTION_LOST_TIMEOUT = 600;
     private static final Logger logger = LoggerFactory.getLogger(SocketServer.class);
     private final MessageHandler messageHandler;
     private final LinkedList<WebSocket> sockets;
