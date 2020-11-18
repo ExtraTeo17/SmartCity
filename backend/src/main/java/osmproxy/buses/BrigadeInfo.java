@@ -14,7 +14,7 @@ public class BrigadeInfo implements Iterable<Timetable>, Serializable {
     private final static Logger logger = LoggerFactory.getLogger(BrigadeInfo.class);
 
     public final String brigadeId;
-    private final List<Timetable> timetables;
+    public final List<Timetable> timetables;
 
     BrigadeInfo(String brigadeId,
                 long initialStopId,
