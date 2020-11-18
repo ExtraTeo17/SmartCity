@@ -2,12 +2,15 @@ package agents.abstractions;
 
 import agents.*;
 import org.w3c.dom.Node;
+
+import osmproxy.buses.BusInfo;
 import osmproxy.buses.Timetable;
 import osmproxy.elements.OSMNode;
 import osmproxy.elements.OSMStation;
 import routing.nodes.RouteNode;
 import routing.nodes.StationNode;
 
+import java.util.HashSet;
 import java.util.List;
 
 public interface IAgentsFactory {
@@ -20,6 +23,8 @@ public interface IAgentsFactory {
     BikeAgent create(List<RouteNode> route, String check);
 
     StationAgent create(OSMStation station);
+
+	BusManagerAgent create(HashSet<BusInfo> busInfos);
 
     BusAgent create(List<RouteNode> route, Timetable timetable, String busLine,
                     String brigadeNr);

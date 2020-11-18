@@ -16,6 +16,7 @@ import org.slf4j.LoggerFactory;
 import osmproxy.abstractions.ICacheWrapper;
 import osmproxy.abstractions.ILightAccessManager;
 import osmproxy.abstractions.IMapAccessManager;
+import osmproxy.buses.BusInfo;
 import osmproxy.buses.Timetable;
 import osmproxy.buses.abstractions.IBusLinesManager;
 import osmproxy.buses.data.BusPreparationData;
@@ -32,6 +33,7 @@ import smartcity.config.ConfigContainer;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -181,11 +183,10 @@ public class AgentsPreparator {
         int busCount = 0;
         var closestTime = LocalDateTime.now().plusDays(1);
         var currTime = LocalDateTime.now();
+        prepareBusManagerAgent(busData.busInfos);
         for (var busInfo : busData.busInfos) {
             var busLine = busInfo.busLine;
             var route = getBusRoute(busInfo.route, busInfo.stops, allStations,busLine);
-
-
             for (var brigade : busInfo) {
                 var brigadeNr = brigade.brigadeId;
                 for (Timetable timetable : brigade) {
@@ -213,7 +214,16 @@ public class AgentsPreparator {
         return true;
     }
 
-    private List<RouteNode> getBusRoute(List<OSMWay> osmRoute, List<OSMStation> osmStops,
+    private void prepareBusManagerAgent(HashSet<BusInfo> busInfos) {
+		BusManagerAgent agent = factory.create(busInfos);
+		boolean result = agentsContainer.tryAdd(agent, true);
+		if (!result) {
+			logger.error("BusManagerAgent was not be created");
+		}
+	}
+
+
+	private List<RouteNode> getBusRoute(List<OSMWay> osmRoute, List<OSMStation> osmStops,
                                         List<StationNode> allStations,String busLine) {
         List<StationNode> mergedStationNodes = new ArrayList<>(osmStops.size());
         List<OSMStation> mergedOsmStops = new ArrayList<>(osmStops.size());

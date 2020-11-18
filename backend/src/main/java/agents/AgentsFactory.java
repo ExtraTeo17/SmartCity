@@ -6,6 +6,8 @@ import com.google.inject.Inject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Node;
+
+import osmproxy.buses.BusInfo;
 import osmproxy.buses.Timetable;
 import osmproxy.elements.OSMNode;
 import osmproxy.elements.OSMStation;
@@ -19,6 +21,7 @@ import smartcity.lights.abstractions.ICrossroadFactory;
 import smartcity.stations.StationStrategy;
 import vehicles.*;
 
+import java.util.HashSet;
 import java.util.List;
 
 @SuppressWarnings("OverlyCoupledClass")
@@ -144,4 +147,9 @@ class AgentsFactory implements IAgentsFactory {
                                   StationNode startStation, StationNode finishStation) {
         return create(routeToStation, routeFromStation,  startStation, finishStation, false);
     }
+
+	@Override
+	public BusManagerAgent create(HashSet<BusInfo> busInfos) {
+		return new BusManagerAgent(timeProvider, eventBus, busInfos);
+	}
 }
