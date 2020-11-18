@@ -128,8 +128,16 @@ public class Pedestrian extends MovingObject {
     }
 
     public int getMillisecondsToNextStation() {
-        return ((routeBeforeBus.size() - 1 - moveIndex) * RoutingConstants.STEP_CONSTANT) / getSpeed();
+        return getMillisecondsOnRoute(routeBeforeBus, moveIndex);
+    }
+    
 
+    public int getMillisecondsOnRoute(List<RouteNode> route) {
+    	return getMillisecondsOnRoute(route, 0);
+    }
+    
+    public int getMillisecondsOnRoute(List<RouteNode> route, int index) {
+    	return ((route.size() - 1 - moveIndex) * RoutingConstants.STEP_CONSTANT) / getSpeed();
     }
 
     public StationNode findNextStation() {

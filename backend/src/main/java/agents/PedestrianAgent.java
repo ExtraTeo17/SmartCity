@@ -11,9 +11,13 @@ import jade.core.behaviours.CyclicBehaviour;
 import jade.core.behaviours.TickerBehaviour;
 import jade.lang.acl.ACLMessage;
 import jade.util.leap.Properties;
+import osmproxy.HighwayAccessor;
 import routing.RoutingConstants;
+import routing.abstractions.IRouteGenerator;
 import routing.core.IGeoPosition;
+import routing.core.Position;
 import routing.nodes.LightManagerNode;
+import routing.nodes.RouteNode;
 import routing.nodes.StationNode;
 import smartcity.ITimeProvider;
 import smartcity.SmartCityAgent;
@@ -23,17 +27,23 @@ import vehicles.enums.DrivingState;
 import static agents.message.MessageManager.createMessage;
 import static agents.message.MessageManager.createProperties;
 
+import java.time.LocalTime;
+import java.util.List;
+
 public class PedestrianAgent extends AbstractAgent {
     public static final String name = PedestrianAgent.class.getSimpleName().replace("Agent", "");
 
     private final Pedestrian pedestrian;
+    private final IRouteGenerator router;
 
     PedestrianAgent(int agentId,
                     Pedestrian pedestrian,
                     ITimeProvider timeProvider,
-                    EventBus eventBus) {
+                    EventBus eventBus,
+                    IRouteGenerator router) {
         super(agentId, pedestrian.getVehicleType(), timeProvider, eventBus);
         this.pedestrian = pedestrian;
+        this.router = router;
     }
 
     public boolean isInBus() { return DrivingState.IN_BUS == pedestrian.getState(); }
@@ -185,18 +195,35 @@ public class PedestrianAgent extends AbstractAgent {
                                 quitBus();
                             }
                             informLightManager(pedestrian);
-                        }
-                        else if (rcv.getPerformative() == ACLMessage.INFORM )
-                        {
+                        } else if (rcv.getPerformative() == ACLMessage.INFORM) {
                             logger.info("Get info about trouble from bus");
-
-                            decideWhereToGo(rcv);
+                            IGeoPosition currentPosition = Position.of(rcv.getUserDefinedParameter(MessageParameter.TROUBLE_LAT),
+                            		rcv.getUserDefinedParameter(MessageParameter.TROUBLE_LON));
+                            IGeoPosition nextClosestStationPosition = Position.of(rcv.getUserDefinedParameter(MessageParameter.LAT_OF_NEXT_CLOSEST_STATION),
+                            		rcv.getUserDefinedParameter(MessageParameter.LON_OF_NEXT_CLOSEST_STATION));
+                            LocalTime arrivalTime = computeArrivalTime(currentPosition, nextClosestStationPosition,
+                            		rcv.getUserDefinedParameter(MessageParameter.DESIRED_OSM_STATION_ID));
+                            ACLMessage messageToBusManager = createMessage(ACLMessage.INFORM, BusManagerAgent.NAME);
+                            messageToBusManager.addUserDefinedParameter(MessageParameter.ARRIVAL_TIME, arrivalTime.toString());
+                            messageToBusManager.addUserDefinedParameter(MessageParameter.STATION_FROM_ID,
+                            		rcv.getUserDefinedParameter(MessageParameter.DESIRED_OSM_STATION_ID));
+                            messageToBusManager.addUserDefinedParameter(MessageParameter.STATION_TO_ID,
+                            		pedestrian.getTargetStation().getOsmId() + "");
+                            send(messageToBusManager);
+                            //decideWhereToGo(rcv);
                         }
                         break;
                 }
             }
 
-            private void decideWhereToGo(ACLMessage rcv) {
+            private LocalTime computeArrivalTime(IGeoPosition pointA, IGeoPosition pointB, String desiredOsmStationId) {
+				LocalTime now = timeProvider.getCurrentSimulationTime().toLocalTime();
+				List<RouteNode> arrivingRoute = router.generateRouteForPedestrians(pointA, pointB, null, desiredOsmStationId);
+				LocalTime arrivingTime = now.plusNanos(pedestrian.getMillisecondsOnRoute(arrivingRoute) * 1_000_000);
+				return arrivingTime;
+			}
+
+			private void decideWhereToGo(ACLMessage rcv) {
                StationNode newStationNode  =  getStationNodeFromMessage(rcv);
                computeTimeIfGoToStation(newStationNode);
                computeTimeIfByBicycle();

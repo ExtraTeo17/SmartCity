@@ -139,7 +139,7 @@ class AgentsFactory implements IAgentsFactory {
             pedestrian = new TestPedestrian(pedestrian);
         }
 
-        return new PedestrianAgent(id, pedestrian, timeProvider, eventBus);
+        return new PedestrianAgent(id, pedestrian, timeProvider, eventBus, routeGenerator);
     }
 
     @Override

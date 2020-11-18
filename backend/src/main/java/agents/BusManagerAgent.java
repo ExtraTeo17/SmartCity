@@ -26,12 +26,14 @@ import smartcity.ITimeProvider;
 
 public class BusManagerAgent extends AbstractAgent {
 
-	private static final String NAME = "BusManager";
+	private static final String NAME_PREFIX = "BusManager";
+	private static final int ID = 1;
+	public static final String NAME = NAME_PREFIX + ID;
 	
 	private HashSet<BusInfo> busInfos;
 
 	public BusManagerAgent(ITimeProvider timeProvider, EventBus eventBus, HashSet<BusInfo> busInfos) {
-		super(1, NAME, timeProvider, eventBus);
+		super(ID, NAME_PREFIX, timeProvider, eventBus);
 		this.busInfos = busInfos;
 	}
 
