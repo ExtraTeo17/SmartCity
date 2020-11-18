@@ -421,6 +421,7 @@ public class CarAgent extends AbstractAgent {
                 }
 
                 private int getRandomIndexInBounds(int min, int max) {
+                    max = Math.max(max, 0);
                     var randomInt = random.nextInt(max + 1);
                     var index = min + (randomInt);
                     logger.debug("Index: " + index);
@@ -451,7 +452,7 @@ public class CarAgent extends AbstractAgent {
 
     private void displayRouteDebug(List<RouteNode> route) {
         for (RouteNode node : route) {
-          logger.info(node.getDebugString(node instanceof LightManagerNode) + "\n");
+            logger.info(node.getDebugString(node instanceof LightManagerNode) + "\n");
         }
     }
 
