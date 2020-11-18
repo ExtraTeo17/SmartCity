@@ -35,6 +35,8 @@ public class PedestrianAgent extends AbstractAgent {
 
     private final Pedestrian pedestrian;
     private final IRouteGenerator router;
+    private List<RouteNode> arrivingRouteToClosestStation = null;
+    private List<RouteNode> bikeRoute = null;
 
     PedestrianAgent(int agentId,
                     Pedestrian pedestrian,
@@ -120,15 +122,17 @@ public class PedestrianAgent extends AbstractAgent {
                     msg.setAllUserDefinedParameters(prop);
                     send(msg);
                     doDelete();
-                }
-                else {
-                    move();
+                } else if (!pedestrian.isTroubled()) {
+                	move();
                 }
             }
         };
 
         Behaviour communication = new CyclicBehaviour() {
-            @Override
+        	
+            private long bikeTime;
+
+			@Override
             public void action() {
                 ACLMessage rcv = receive();
                 if (rcv == null) {
@@ -196,6 +200,7 @@ public class PedestrianAgent extends AbstractAgent {
                             }
                             informLightManager(pedestrian);
                         } else if (rcv.getPerformative() == ACLMessage.INFORM) {
+                        	pedestrian.setTroubled(true);
                             logger.info("Get info about trouble from bus");
                             IGeoPosition currentPosition = Position.of(rcv.getUserDefinedParameter(MessageParameter.TROUBLE_LAT),
                             		rcv.getUserDefinedParameter(MessageParameter.TROUBLE_LON));
@@ -210,16 +215,48 @@ public class PedestrianAgent extends AbstractAgent {
                             messageToBusManager.addUserDefinedParameter(MessageParameter.STATION_TO_ID,
                             		pedestrian.getTargetStation().getOsmId() + "");
                             send(messageToBusManager);
+                            computeBikeTime(currentPosition, pedestrian.getUniformRoute()
+                            		.get(pedestrian.getUniformRouteSize() - 1));
                             //decideWhereToGo(rcv);
                         }
                         break;
+                    case MessageParameter.BUS_MANAGER:
+                    	if (rcv.getPerformative() == ACLMessage.INFORM) {
+                    		long timeBetweenArrivalAtStationAndDesiredStation = Long.parseLong(rcv.getUserDefinedParameter(
+                    				MessageParameter.TIME_BETWEEN_PEDESTRIAN_AT_STATION_ARRIVAL_AND_REACHING_DESIRED_STOP));
+                    		String newBusLine = rcv.getUserDefinedParameter(MessageParameter.BUS_LINE);
+                    		long busTime = (pedestrian.getMillisecondsOnRoute(arrivingRouteToClosestStation) * 1_000_000) +
+                    				timeBetweenArrivalAtStationAndDesiredStation +
+                    				(pedestrian.getMillisecondsOnRoute(pedestrian.getUniformRoute()) * 1_000_000);
+                    		if (bikeTime > busTime) {
+                    			restartAgentWithNewBusLine();
+                    		} else {
+                    			performMetamorphosisToBike();
+                    		}
+                    	}
                 }
             }
 
-            private LocalTime computeArrivalTime(IGeoPosition pointA, IGeoPosition pointB, String desiredOsmStationId) {
+            private void performMetamorphosisToBike() {
+				// TODO Auto-generated method stub
+				
+			}
+
+			private void restartAgentWithNewBusLine() {
+				// TODO Auto-generated method stub
+				
+			}
+
+			private void computeBikeTime(IGeoPosition pointA, IGeoPosition pointB) {
+				bikeRoute = router.generateRouteInfo(pointA, pointB, "bike");
+				int firstIndex = 0, bikeSpeed = 20;
+			    bikeTime = pedestrian.getMillisecondsOnRoute(bikeRoute, firstIndex, bikeSpeed);
+			}
+
+			private LocalTime computeArrivalTime(IGeoPosition pointA, IGeoPosition pointB, String desiredOsmStationId) {
 				LocalTime now = timeProvider.getCurrentSimulationTime().toLocalTime();
-				List<RouteNode> arrivingRoute = router.generateRouteForPedestrians(pointA, pointB, null, desiredOsmStationId);
-				LocalTime arrivingTime = now.plusNanos(pedestrian.getMillisecondsOnRoute(arrivingRoute) * 1_000_000);
+				arrivingRouteToClosestStation = router.generateRouteForPedestrians(pointA, pointB, null, desiredOsmStationId);
+				LocalTime arrivingTime = now.plusNanos(pedestrian.getMillisecondsOnRoute(arrivingRouteToClosestStation) * 1_000_000);
 				return arrivingTime;
 			}
 

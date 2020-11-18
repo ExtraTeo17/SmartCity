@@ -19,6 +19,7 @@ public class MessageParameter {
     public static final String STATION_ID = "station_id";
     public static final String STATION_FROM_ID = "station_from_id";
     public static final String STATION_TO_ID = "station_to_id";
+    public static final String BUS_MANAGER = "bus_manager";
     
     public static final String SCHEDULE_ARRIVAL = "schedule_arrival";
     //public static final String DESIRED_BUS_LINE = "desired_bus";

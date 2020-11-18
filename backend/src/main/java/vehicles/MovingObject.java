@@ -223,6 +223,18 @@ public abstract class MovingObject {
         return ((finishIndex - startIndex) * RoutingConstants.STEP_CONSTANT) / getSpeed();
     }
 
+    public int getMillisecondsOnRoute(List<RouteNode> route) {
+    	return getMillisecondsOnRoute(route, 0);
+    }
+    
+    public int getMillisecondsOnRoute(List<RouteNode> route, int index) {
+    	return getMillisecondsOnRoute(route, index, getSpeed());
+    }
+    
+    public int getMillisecondsOnRoute(List<RouteNode> route, int index, int speed) {
+    	return ((route.size() - 1 - moveIndex) * RoutingConstants.STEP_CONSTANT) / speed;
+    }
+
     public List<RouteNode> getSimpleRoute() { return simpleRoute; }
 
     public boolean currentTrafficLightNodeWithinAlternativeRouteThreshold(int thresholdUntilIndexChange) {

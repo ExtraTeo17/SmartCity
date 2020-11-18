@@ -5,6 +5,7 @@ import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Properties;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -23,6 +24,8 @@ import osmproxy.buses.BusInfo;
 import osmproxy.buses.Timetable;
 import osmproxy.elements.OSMStation;
 import smartcity.ITimeProvider;
+
+import static agents.message.MessageManager.createProperties;
 
 public class BusManagerAgent extends AbstractAgent {
 
@@ -101,6 +104,7 @@ public class BusManagerAgent extends AbstractAgent {
 				response.addUserDefinedParameter(MessageParameter.TIME_BETWEEN_PEDESTRIAN_AT_STATION_ARRIVAL_AND_REACHING_DESIRED_STOP,
 						minimumTimeOverall + "");
 				response.addUserDefinedParameter(MessageParameter.BUS_LINE, preferredBusLine);
+				response.addUserDefinedParameter(MessageParameter.TYPE, MessageParameter.BUS_MANAGER);
 				return response;
 			}
 			

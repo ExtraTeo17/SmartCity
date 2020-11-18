@@ -18,6 +18,7 @@ public class Pedestrian extends MovingObject {
     private final List<RouteNode> routeBeforeBus;
     private final StationNode stationStart;
     private final StationNode stationFinish;
+    private boolean troubled = false;
 
     private transient int stationIndex = 0;
 
@@ -130,17 +131,17 @@ public class Pedestrian extends MovingObject {
     public int getMillisecondsToNextStation() {
         return getMillisecondsOnRoute(routeBeforeBus, moveIndex);
     }
-    
-
-    public int getMillisecondsOnRoute(List<RouteNode> route) {
-    	return getMillisecondsOnRoute(route, 0);
-    }
-    
-    public int getMillisecondsOnRoute(List<RouteNode> route, int index) {
-    	return ((route.size() - 1 - moveIndex) * RoutingConstants.STEP_CONSTANT) / getSpeed();
-    }
 
     public StationNode findNextStation() {
         return stationStart;
     }
+    
+    public void setTroubled(boolean troubled) {
+    	this.troubled = troubled;
+    }
+
+	public boolean isTroubled() {
+		// TODO Auto-generated method stub
+		return false;
+	}
 }
