@@ -19,6 +19,7 @@ import smartcity.ITimeProvider;
 import smartcity.config.ConfigContainer;
 import smartcity.lights.abstractions.ICrossroadFactory;
 import smartcity.stations.StationStrategy;
+import smartcity.task.abstractions.ITaskProvider;
 import vehicles.*;
 
 import java.util.HashSet;
@@ -35,6 +36,7 @@ class AgentsFactory implements IAgentsFactory {
     private final ICrossroadFactory crossroadFactory;
     private final EventBus eventBus;
     private final ConfigContainer configContainer;
+    private final ITaskProvider taskProvider;
 
     @Inject
     public AgentsFactory(IdGenerator idGenerator,
@@ -43,7 +45,8 @@ class AgentsFactory implements IAgentsFactory {
                          IRouteTransformer routeTransformer,
                          ICrossroadFactory crossroadFactory,
                          IRouteGenerator routeGenerator,
-                         ConfigContainer configContainer) {
+                         ConfigContainer configContainer,
+                         ITaskProvider taskProvider) {
         this.idGenerator = idGenerator;
         this.timeProvider = timeProvider;
         this.routeTransformer = routeTransformer;
@@ -51,6 +54,7 @@ class AgentsFactory implements IAgentsFactory {
         this.eventBus = eventBus;
         this.routeGenerator = routeGenerator;
         this.configContainer = configContainer;
+        this.taskProvider = taskProvider;
     }
 
     @Override
@@ -134,7 +138,7 @@ class AgentsFactory implements IAgentsFactory {
         var pedestrian = new Pedestrian(id, routeToStation, uniformRouteToStation,
                 routeFromStation, uniformRouteFromStation,
                 startStation, finishStation,
-                timeProvider);
+                timeProvider,taskProvider);
         if (testPedestrian) {
             pedestrian = new TestPedestrian(pedestrian);
         }

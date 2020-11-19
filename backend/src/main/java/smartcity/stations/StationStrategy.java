@@ -88,7 +88,8 @@ public class StationStrategy {
     public boolean removePedestrianFromQueue(String agentName, String busLine) {
         var arrivalInfos = busLineToPedestriansOnStation.get(busLine);
         if (arrivalInfos == null) {
-            logger.warn("Tried to remove pedestrian" + agentName + " from non-existing queue for " + busLine);
+            //TODO: CHANGE TO WARN!!!!!!
+            logger.debug("Tried to remove pedestrian" + agentName + " from non-existing queue for " + busLine);
             return false;
         }
 

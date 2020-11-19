@@ -58,7 +58,6 @@ public abstract class MovingObject {
         return agentId;
     }
 
-
     /**
      * @return Scaled speed in KM/H
      */

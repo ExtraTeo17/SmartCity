@@ -244,20 +244,22 @@ public class BusAgent extends AbstractAgent {
 
         if (configContainer.shouldGenerateCrashForBuses()) {
             var timeBeforeTroubleMs = this.configContainer.getTimeBeforeTrouble() * 1000;
-            Behaviour troubleGenerator = new TickerBehaviour(this, timeBeforeTroubleMs) {
+            Behaviour troubleGenerator = new TickerBehaviour(this, 7_000) {
 
                 @Override
                 public void onTick() {
-
+                    logger.info("Generated trouble--------------------------------------------------");
                     var route = bus.getUniformRoute();
-                    Random random = new Random(523);
-                    var el = random.nextInt(route.size() - bus.getMoveIndex() - THRESHOLD_UNTIL_INDEX_CHANGE - 5 + 1) + bus.getMoveIndex()+ THRESHOLD_UNTIL_INDEX_CHANGE + 5; // TODO: from current index //choose trouble EdgeId
-                    RouteNode troublePointTmp = route.get(el);
-                    troublePoint = new RouteNode(troublePointTmp.getLat(), troublePointTmp.getLng(),
-                            troublePointTmp.getInternalEdgeId());
+                  //Random random = new Random(523);
+                  //  var el = random.nextInt(route.size() - bus.getMoveIndex() - THRESHOLD_UNTIL_INDEX_CHANGE - 5 + 1) + bus.getMoveIndex()+ THRESHOLD_UNTIL_INDEX_CHANGE + 5; // TODO: from current index //choose trouble EdgeId
+                  //  RouteNode troublePointTmp = route.get(el);
+                    int index = bus.getMoveIndex();
+                    var trouble = bus.getUniformRoute().get(index);
+                    troublePoint = new RouteNode(trouble.getLat(),trouble.getLng(),
+                            trouble.getInternalEdgeId());
                     sendMessageAboutCrashTroubleToTroubleManager(); //send message to boss Agent/ maybe not so important in case of buses
                     sendMessageAboutCrashTroubleToPedestrians();
-                    logger.info("Generated trouble--------------------------------------------------");
+
                     try {
                         sleep(10000000);
                     } catch (InterruptedException e) {
@@ -288,11 +290,11 @@ public class BusAgent extends AbstractAgent {
                     properties.setProperty(MessageParameter.TROUBLE_LON, Double.toString(troublePoint.getLng()));
                     if(!isTroubleManager)
                     {
-                        properties.setProperty(MessageParameter.OSM_ID_OF_NEXT_CLOSEST_STATION,((StationNode)bus.findNextStop()).getOsmId()+"");
+                        properties.setProperty(MessageParameter.DESIRED_OSM_STATION_ID,((StationNode)bus.findNextStop()).getOsmId()+"");
                         properties.setProperty(MessageParameter.AGENT_ID_OF_NEXT_CLOSEST_STATION,((StationNode)bus.findNextStop()).getAgentId()+"");
                         //maybe not needed
-                        properties.setProperty(MessageParameter.LAT_OF_NEXT_CLOSEST_STATION,((StationNode)bus.findNextStop()).getAgentId()+"");
-                        properties.setProperty(MessageParameter.LON_OF_NEXT_CLOSEST_STATION,((StationNode)bus.findNextStop()).getAgentId()+"");
+                        properties.setProperty(MessageParameter.LAT_OF_NEXT_CLOSEST_STATION,((StationNode)bus.findNextStop()).getLat()+"");
+                        properties.setProperty(MessageParameter.LON_OF_NEXT_CLOSEST_STATION,((StationNode)bus.findNextStop()).getLng()+"");
                     }
                     msg.setAllUserDefinedParameters(properties);
                     return msg;

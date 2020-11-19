@@ -6,17 +6,19 @@ import routing.nodes.LightManagerNode;
 import routing.nodes.RouteNode;
 import routing.nodes.StationNode;
 import smartcity.ITimeProvider;
+import smartcity.task.abstractions.ITaskProvider;
 import vehicles.enums.VehicleType;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class Pedestrian extends MovingObject {
-   // private final String preferredBusLine;
-    private final List<RouteNode> displayRouteBeforeBus;
-    private final List<RouteNode> displayRouteAfterBus;
-    private final List<RouteNode> routeBeforeBus;
-    private final StationNode stationStart;
+    private  ITaskProvider taskProvider = null;
+    // private final String preferredBusLine;
+    private  List<RouteNode> displayRouteBeforeBus;
+    private  List<RouteNode> displayRouteAfterBus;
+    private  List<RouteNode> routeBeforeBus;
+    private  StationNode stationStart;
     private final StationNode stationFinish;
     private boolean troubled = false;
 
@@ -29,7 +31,8 @@ public class Pedestrian extends MovingObject {
                       List<RouteNode> uniformRouteFromStation,
                       StationNode startStation,
                       StationNode finishStation,
-                      ITimeProvider timeProvider) {
+                      ITimeProvider timeProvider,
+                      ITaskProvider taskProvider) {
         super(timeProvider, agentId, 10, createRoute(startStation, uniformRouteToStation,
                 finishStation, uniformRouteFromStation));
         this.displayRouteBeforeBus = routeToStation;
@@ -40,6 +43,7 @@ public class Pedestrian extends MovingObject {
         this.stationIndex = routeBeforeBus.size() - 1;
         this.stationStart = startStation;
         this.stationFinish = finishStation;
+        this.taskProvider = taskProvider;
     }
 
     private static List<RouteNode> createRoute(StationNode startStation,
@@ -65,6 +69,7 @@ public class Pedestrian extends MovingObject {
 
         this.stationStart = ped.stationStart;
         this.stationFinish = ped.stationFinish;
+        this.taskProvider = ped.taskProvider;
     }
 
     @VisibleForTesting
@@ -76,6 +81,7 @@ public class Pedestrian extends MovingObject {
         routeBeforeBus = new ArrayList<>();
         stationStart = new StationNode(5, 5, 1L, 1);
         stationFinish = new StationNode(5, 10, 2L, 2);
+
     }
 
     public StationNode getStartingStation() {
@@ -85,7 +91,9 @@ public class Pedestrian extends MovingObject {
     public StationNode getTargetStation() {
         return (StationNode) uniformRoute.get(stationIndex + 1);
     }
-
+    public ITimeProvider getTimeProvider(){return timeProvider;}
+    public StationNode getStationFinish(){return stationFinish;}
+    public ITaskProvider getTaskProvider(){return taskProvider;}
     //public String getPreferredBusLine() {
      //   return preferredBusLine;
     //}
@@ -128,6 +136,8 @@ public class Pedestrian extends MovingObject {
         return displayRouteAfterBus;
     }
 
+
+
     public int getMillisecondsToNextStation() {
         return getMillisecondsOnRoute(routeBeforeBus, moveIndex);
     }
@@ -144,4 +154,21 @@ public class Pedestrian extends MovingObject {
 		// TODO Auto-generated method stub
 		return false;
 	}
+
+	public void setDisplayRouteBeforeBus(List<RouteNode> displayRouteToStation){
+        this.displayRouteBeforeBus = displayRouteToStation;
+    }
+    public void setRouteBeforeBus(List<RouteNode> routeBeforeBus)
+    {
+        this.routeBeforeBus = routeBeforeBus;
+    }
+    public void setStationStart(StationNode newStationStart)
+    {
+        this.stationStart = newStationStart ;
+    }
+    public void setStationIndex(int index)
+    {
+        this.stationIndex = index ;
+    }
+
 }

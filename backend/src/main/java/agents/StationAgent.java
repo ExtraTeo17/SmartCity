@@ -161,7 +161,7 @@ public class StationAgent extends AbstractAgent {
             }
 
             private void answerBusCanProceed(String busAgentName) {
-                logger.info("SEND REQUEST");
+                logger.debug("SEND REQUEST");
                 ACLMessage msg = createMessage(ACLMessage.REQUEST, busAgentName);
                 Properties properties = createProperties(MessageParameter.STATION);
                 msg.setAllUserDefinedParameters(properties);

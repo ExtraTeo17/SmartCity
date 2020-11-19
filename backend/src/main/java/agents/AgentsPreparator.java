@@ -220,6 +220,7 @@ public class AgentsPreparator {
 		if (!result) {
 			logger.error("BusManagerAgent was not be created");
 		}
+		agent.start();
 	}
 
 

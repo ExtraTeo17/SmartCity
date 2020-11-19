@@ -30,7 +30,7 @@ public class ConfigContainer extends ConfigMutator
 
     private int lightExtendTime = 30;
     private int extendWaitTime = 60;
-    private int timeBeforeTrouble = 5000;
+    private int timeBeforeTrouble = 100000;
 
     private final IZone zone;
 

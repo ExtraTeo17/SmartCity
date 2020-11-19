@@ -9,6 +9,7 @@ import java.util.Properties;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import com.google.inject.Inject;
 import org.javatuples.Pair;
 
 import com.google.common.eventbus.EventBus;
@@ -26,6 +27,7 @@ import osmproxy.elements.OSMStation;
 import smartcity.ITimeProvider;
 
 import static agents.message.MessageManager.createProperties;
+import static java.time.temporal.ChronoUnit.MILLIS;
 
 public class BusManagerAgent extends AbstractAgent {
 
@@ -42,8 +44,6 @@ public class BusManagerAgent extends AbstractAgent {
 
 	@Override
 	protected void setup() {
-		super.setup();
-		
 		Behaviour communication = new CyclicBehaviour() {
 
 			@Override
@@ -51,24 +51,34 @@ public class BusManagerAgent extends AbstractAgent {
 				ACLMessage rcv = receive();
 				if (rcv != null) {
 					switch (rcv.getPerformative()) {
-					case ACLMessage.INFORM:
-						handleRouteQuery(rcv);
-						break;
+						case ACLMessage.INFORM -> {
+							logger.info("GET info from pedestrian about");
+							handleRouteQuery(rcv);
+							break;
+
+						}
 					}
 				}
+				block(100);
 			}
-			
+
+
+
+
 			private void handleRouteQuery(ACLMessage rcv) {
 				long stationOsmIdFrom = Long.parseLong(rcv.getUserDefinedParameter(MessageParameter.STATION_FROM_ID));
 				long stationOsmIdTo = Long.parseLong(rcv.getUserDefinedParameter(MessageParameter.STATION_TO_ID));
 				LocalTime arrivalTime = LocalTime.parse(rcv.getUserDefinedParameter(MessageParameter.ARRIVAL_TIME));
-				send(getBestMatch(rcv.createReply(), stationOsmIdFrom, stationOsmIdTo, arrivalTime));
+				ACLMessage msg =  getBestMatch(rcv.createReply(), stationOsmIdFrom, stationOsmIdTo, arrivalTime);
+				send(msg);
+				logger.info("Send message to pedestrian ");
 			}
 
 			private ACLMessage getBestMatch(ACLMessage response, long stationOsmIdFrom, long stationOsmIdTo, LocalTime timeOnStation) {
 				long minimumTimeOverall = Long.MAX_VALUE;
 				String preferredBusLine = null;
 				for (BusInfo info : busInfos) {
+					logger.info("1");
 					OSMStation stationFrom = null, stationTo = null;
 					for (OSMStation station : info.stops) {
 						if (station.getId() == stationOsmIdFrom) {
@@ -86,7 +96,9 @@ public class BusManagerAgent extends AbstractAgent {
 							for (Timetable table : brigInfo.timetables) {
 								LocalTime timeOnStationFrom = table.getTimeOnStation(stationOsmIdFrom).get().toLocalTime();
 								LocalTime timeOnStationTo = table.getTimeOnStation(stationOsmIdTo).get().toLocalTime();
+
 								long timeInSeconds = differenceInSeconds(timeOnStationFrom, timeOnStation);
+								logger.info(String.valueOf(timeInSeconds));
 								if (minimumTimeDistanceBetweenStationFromAndBusArrival > timeInSeconds) { // TODO: take stationTo into consideration
 									minimumTimeDistanceBetweenStationFromAndBusArrival = timeInSeconds;
 									minimumTimeOnStationFrom = timeOnStationFrom;
@@ -105,22 +117,17 @@ public class BusManagerAgent extends AbstractAgent {
 						minimumTimeOverall + "");
 				response.addUserDefinedParameter(MessageParameter.BUS_LINE, preferredBusLine);
 				response.addUserDefinedParameter(MessageParameter.TYPE, MessageParameter.BUS_MANAGER);
+				logger.info("Prepared message for pedestrian");
 				return response;
 			}
-			
+
 			private long differenceInSeconds(LocalTime time1, LocalTime time2) {
-				return (time1.toNanoOfDay() -
-						time2.toNanoOfDay()) / 1000000000L;
+				return time1.isBefore(time2)? Long.MAX_VALUE : Math.abs(MILLIS.between(time1, time2)/1000);
 			}
-			
 		};
-		
-		addBehaviour(communication);
+		 addBehaviour(communication);
+
 	}
 
-	@Override
-	protected void takeDown() {
-		// TODO Auto-generated method stub
-		super.takeDown();
-	}
+
 }
