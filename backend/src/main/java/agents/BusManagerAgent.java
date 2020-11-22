@@ -78,7 +78,6 @@ public class BusManagerAgent extends AbstractAgent {
 				long minimumTimeOverall = Long.MAX_VALUE;
 				String preferredBusLine = null;
 				for (BusInfo info : busInfos) {
-					logger.info("1");
 					OSMStation stationFrom = null, stationTo = null;
 					for (OSMStation station : info.stops) {
 						if (station.getId() == stationOsmIdFrom) {
@@ -98,7 +97,6 @@ public class BusManagerAgent extends AbstractAgent {
 								LocalTime timeOnStationTo = table.getTimeOnStation(stationOsmIdTo).get().toLocalTime();
 
 								long timeInSeconds = differenceInSeconds(timeOnStationFrom, timeOnStation);
-								logger.info(String.valueOf(timeInSeconds));
 								if (minimumTimeDistanceBetweenStationFromAndBusArrival > timeInSeconds) { // TODO: take stationTo into consideration
 									minimumTimeDistanceBetweenStationFromAndBusArrival = timeInSeconds;
 									minimumTimeOnStationFrom = timeOnStationFrom;
@@ -122,7 +120,7 @@ public class BusManagerAgent extends AbstractAgent {
 			}
 
 			private long differenceInSeconds(LocalTime time1, LocalTime time2) {
-				return time1.isBefore(time2)? Long.MAX_VALUE : Math.abs(MILLIS.between(time1, time2)/1000);
+				return time1.isBefore(time2) ? Long.MAX_VALUE : Math.abs(MILLIS.between(time1, time2) / 1000);
 			}
 		};
 		 addBehaviour(communication);

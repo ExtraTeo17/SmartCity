@@ -17,6 +17,7 @@ import routing.nodes.RouteNode;
 import routing.nodes.StationNode;
 import smartcity.ITimeProvider;
 import smartcity.SmartCityAgent;
+import smartcity.config.StaticConfig;
 import smartcity.config.abstractions.ITroublePointsConfigContainer;
 import utilities.ConditionalExecutor;
 import utilities.Siblings;
@@ -58,6 +59,8 @@ public class BusAgent extends AbstractAgent {
             print("No stations on route!", LoggerLevel.ERROR);
             return;
         }
+        
+        print("HELLO I AM A BUS: " + bus.getSuperExtraString());
 
         var firstStation = firstStationOpt.get();
         print("Started at station " + firstStation.getAgentId() + ".");
@@ -246,9 +249,14 @@ public class BusAgent extends AbstractAgent {
             var timeBeforeTroubleMs = this.configContainer.getTimeBeforeTrouble() * 1000;
             Behaviour troubleGenerator = new TickerBehaviour(this, 7_000) {
 
-                @Override
+				@Override
                 public void onTick() {
-                    logger.info("Generated trouble--------------------------------------------------");
+                	if (StaticConfig.busCrashGeneratedOnce) {
+                		logger.info("Already generated once");
+                		return;
+                	}
+                	StaticConfig.busCrashGeneratedOnce = true;
+                    logger.info("Generated trouble");
                     var route = bus.getUniformRoute();
                   //Random random = new Random(523);
                   //  var el = random.nextInt(route.size() - bus.getMoveIndex() - THRESHOLD_UNTIL_INDEX_CHANGE - 5 + 1) + bus.getMoveIndex()+ THRESHOLD_UNTIL_INDEX_CHANGE + 5; // TODO: from current index //choose trouble EdgeId
@@ -270,13 +278,10 @@ public class BusAgent extends AbstractAgent {
                 }
 
                 private void sendMessageAboutCrashTroubleToPedestrians() {
-                    for(String pedestrian : bus.getAllPassangers())
-                    {
-
+                    for (String pedestrian : bus.getAllPassangers()) {
                         ACLMessage msg = createMessageAboutCrash(pedestrian,false);
-                        logger.info("Send message about crash to pedestrian ");
+                        logger.info("Send message about crash to pedestrian: " + pedestrian);
                         send(msg);
-
                     }
                 }
 
@@ -318,7 +323,6 @@ public class BusAgent extends AbstractAgent {
 
     private void informNextStation() {
         // finds next station and announces his arrival
-        System.out.println("informNextStation");
         var stationOpt = bus.findNextStation();
         if (stationOpt.isPresent()) {
             var station = stationOpt.get();
@@ -374,13 +378,13 @@ public class BusAgent extends AbstractAgent {
     // TODO: Fix situation where bus route contains only one station and pedestrians tries to choose two
     public final Optional<Siblings<StationNode>> getTwoSubsequentStations(final Random random) {
         List<StationNode> stationsOnRoute = bus.getStationNodesOnRoute();
-        int halfIndex = stationsOnRoute.size() / 2;
-        if (halfIndex < 1) {
-            return Optional.empty();
+        if (stationsOnRoute.size() <= 1) {
+        	return Optional.empty();
         }
+        int halfIndex = (int)Math.ceil((double)stationsOnRoute.size() / 2.0);
 
-        return Optional.of(Siblings.of(stationsOnRoute.get(random.nextInt(halfIndex)),
-                stationsOnRoute.get(halfIndex + random.nextInt(halfIndex))));
+        return Optional.of(Siblings.of(stationsOnRoute.get(0),//random.nextInt(halfIndex)),
+                stationsOnRoute.get(2)));//halfIndex + random.nextInt(halfIndex)))); TODO: bring back
     }
 
     /**

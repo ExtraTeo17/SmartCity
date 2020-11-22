@@ -11,7 +11,7 @@ import java.util.Map;
 public class OSMStation extends OSMNode implements Serializable {
     private final String stopId;
     private final String stopNumber;
-    private Map<String, List<StationNode>> busLineToAllStationsOnHisRoute = new HashMap<>();
+    private Map<String, StationInfo> busLineToAllStationsOnHisRoute = new HashMap<>();
     private Map<String, String> pedestrianAgentIDPreferredBusLine = new HashMap<>();
 
     public OSMStation(long osmId, double lat, double lng, final String stationRef) {
@@ -28,16 +28,11 @@ public class OSMStation extends OSMNode implements Serializable {
         return stopNumber;
     }
     public void addToBusLineStopMap( String busLine,
-                                     List<StationNode> mergedStationNodes)
-    {
-        if(busLineToAllStationsOnHisRoute.containsKey(busLine))
-        {
-
+                                     List<StationNode> mergedStationNodes) {
+        if (busLineToAllStationsOnHisRoute.containsKey(busLine)) {
             busLineToAllStationsOnHisRoute.get(busLine).addAll(mergedStationNodes);
-        }
-        else
-        {
-            busLineToAllStationsOnHisRoute.put(busLine,List.copyOf(mergedStationNodes));
+        } else {
+            busLineToAllStationsOnHisRoute.put(busLine, new StationInfo(List.copyOf(mergedStationNodes)));
         }
     }
 

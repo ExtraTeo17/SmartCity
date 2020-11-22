@@ -28,6 +28,7 @@ public class Bus extends MovingObject {
     private final String busLine;
     private final ITimeProvider timeProvider;
     private final EventBus eventBus;
+    private final String brigadeNr;
 
     private BusFillState fillState;
     private int closestStationIndex = -1;
@@ -42,7 +43,8 @@ public class Bus extends MovingObject {
                Timetable timetable,
                String busLine,
                String brigadeNr) {
-        super(timeProvider, agentId, 40, uniformRoute, simpleRoute);
+        super(timeProvider, agentId, 50, uniformRoute, simpleRoute);
+        this.brigadeNr = brigadeNr;
         this.timeProvider = timeProvider;
         this.eventBus = eventBus;
         this.timetable = timetable;
@@ -230,4 +232,8 @@ public class Bus extends MovingObject {
 
         return hours == dateNow.getHour() && minutes == dateNow.getMinute();
     }
+
+	public String getSuperExtraString() {
+		return "BRIDAGE: " + brigadeNr + ", BUS LINE: " + busLine;
+	}
 }

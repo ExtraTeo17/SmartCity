@@ -11,6 +11,8 @@ import events.ClearSimulationEvent;
 import events.LightManagersReadyEvent;
 import events.web.PrepareSimulationEvent;
 import events.web.SimulationPreparedEvent;
+
+import org.javatuples.Pair;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import osmproxy.abstractions.ICacheWrapper;
@@ -35,6 +37,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import static smartcity.config.StaticConfig.USE_DEPRECATED_XML_FOR_LIGHT_MANAGERS;
@@ -184,12 +187,19 @@ public class AgentsPreparator {
         var closestTime = LocalDateTime.now().plusDays(1);
         var currTime = LocalDateTime.now();
         prepareBusManagerAgent(busData.busInfos);
+        Set<Pair<Pair<String, String>, String>> addedLinesBrigades = new HashSet<>();
         for (var busInfo : busData.busInfos) {
             var busLine = busInfo.busLine;
             var route = getBusRoute(busInfo.route, busInfo.stops, allStations,busLine);
             for (var brigade : busInfo) {
                 var brigadeNr = brigade.brigadeId;
                 for (Timetable timetable : brigade) {
+                	Pair<String, String> lineBrigade = Pair.with(busLine, brigadeNr);
+                	Pair<Pair<String, String>, String> lbTable = Pair.with(lineBrigade, timetable.getBoardingTime().toString());
+                	if (addedLinesBrigades.contains(lbTable)) {
+                		continue;
+                	}
+            		addedLinesBrigades.add(lbTable);
                     BusAgent agent = factory.create(route, timetable, busLine, brigadeNr);
                     boolean result = agentsContainer.tryAdd(agent, true);
                     if (result) {

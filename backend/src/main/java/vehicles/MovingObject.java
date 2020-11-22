@@ -231,7 +231,7 @@ public abstract class MovingObject {
     }
     
     public int getMillisecondsOnRoute(List<RouteNode> route, int index, int speed) {
-    	return ((route.size() - 1 - moveIndex) * RoutingConstants.STEP_CONSTANT) / speed;
+    	return ((route.size() - 1 - index) * RoutingConstants.STEP_CONSTANT) / speed;
     }
 
     public List<RouteNode> getSimpleRoute() { return simpleRoute; }

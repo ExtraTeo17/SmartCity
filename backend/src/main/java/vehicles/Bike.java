@@ -8,7 +8,7 @@ import java.util.List;
 
 public class Bike extends MovingObject {
     public Bike(int agentId, List<RouteNode> displayRoute, List<RouteNode> uniformRoute, ITimeProvider timeProvider) {
-        super(timeProvider, agentId, 20, uniformRoute, displayRoute);
+        super(timeProvider, agentId, 15, uniformRoute, displayRoute);
     }
 
     Bike(Bike bike) {
