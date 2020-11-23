@@ -46,6 +46,10 @@ public class OptimizationResult {
     }
 
     public void addBusAndPedestrianGrantedPassthrough(String busAgentName, List<String> pedestrians) {
+    	/*System.out.println("Grant passthrough for bus " + busAgentName + " and for " + pedestrians.size() + " pedestrians:");
+    	for (var ped : pedestrians) {
+    		System.out.println(ped);
+    	}*/
         busesAndPedestriansFreeToProceedNames.add(new Pair<String, List<String>>(busAgentName, pedestrians));
     }
 

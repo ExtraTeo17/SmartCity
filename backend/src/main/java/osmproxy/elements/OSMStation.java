@@ -36,7 +36,10 @@ public class OSMStation extends OSMNode implements Serializable {
         }
     }
 
-    public String findBusLineFromStation(String stationOsmId)
+    public String findBusLineFromStation(String stationOsmId) // BIG TODO: THREE THINGS
+    // 1/3: FIX THIS FUNCTION TO TAKE BEST LINE INTO CONSIDERATION, NOT FIRST
+    // 2/3: FIX PEDESTRIAN CHOOSING STOPS TO CHOOSE BETWEEN PREV AND NEXT, NOT ONLY NEXT
+    // 3/3: REFACTOR STATIC BUS CRASH GENERATION PREFERABLY TO TEST BUS
     {
         for (String busLine : busLineToAllStationsOnHisRoute.keySet())
         {

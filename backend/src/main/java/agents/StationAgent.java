@@ -96,14 +96,14 @@ public class StationAgent extends AbstractAgent {
                 var messageKind = rcv.getPerformative();
                 var agentName = rcv.getSender().getLocalName();
                 if (messageKind == ACLMessage.INFORM) {
-
-                    String desiredBusLine =  getBusLineFromStationId(rcv.getUserDefinedParameter(MessageParameter.DESIRED_OSM_STATION_ID));
+                	print("Got INFORM from " + agentName);
+                    String desiredBusLine = getBusLineFromStationId(rcv.getUserDefinedParameter(MessageParameter.DESIRED_OSM_STATION_ID));
                     station.addToAgentMap(agentName,desiredBusLine);
                     stationStrategy.addPedestrianToFarAwayQueue(agentName,desiredBusLine,
                             getDateParameter(rcv, MessageParameter.ARRIVAL_TIME));
                 }
                 else if (messageKind == ACLMessage.REQUEST_WHEN) {
-                    print("GOT MESSAGE FROM PEDESTRIAN REQUEST_WHEN", LoggerLevel.DEBUG);
+                    print("Got REQUEST_WHEN from " + agentName);
                     var desiredBusLine = station.getFromAgentMap(agentName);
                     stationStrategy.removePedestrianFromFarAwayQueue(agentName, desiredBusLine);
                     stationStrategy.addPedestrianToQueue(agentName, desiredBusLine,
@@ -152,6 +152,7 @@ public class StationAgent extends AbstractAgent {
 
             private void answerPedestriansCanProceed(String busAgentName, List<String> pedestriansAgentsNames) {
                 for (String name : pedestriansAgentsNames) {
+                	print("Send REQUEST to " + name);
                     ACLMessage msg = createMessage(ACLMessage.REQUEST, name);
                     var properties = createProperties(MessageParameter.STATION);
                     properties.setProperty(MessageParameter.BUS_AGENT_NAME, busAgentName);
@@ -161,7 +162,7 @@ public class StationAgent extends AbstractAgent {
             }
 
             private void answerBusCanProceed(String busAgentName) {
-                logger.debug("SEND REQUEST");
+                print("Send REQUEST to " + busAgentName);
                 ACLMessage msg = createMessage(ACLMessage.REQUEST, busAgentName);
                 Properties properties = createProperties(MessageParameter.STATION);
                 msg.setAllUserDefinedParameters(properties);

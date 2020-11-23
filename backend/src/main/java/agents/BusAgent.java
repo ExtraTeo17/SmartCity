@@ -60,7 +60,7 @@ public class BusAgent extends AbstractAgent {
             return;
         }
         
-        print("HELLO I AM A BUS: " + bus.getSuperExtraString());
+        //print("HELLO I AM A BUS: " + bus.getSuperExtraString());
 
         var firstStation = firstStationOpt.get();
         print("Started at station " + firstStation.getAgentId() + ".");
@@ -105,6 +105,8 @@ public class BusAgent extends AbstractAgent {
                             }
                             var station = stationOpt.get();
                             List<String> passengerNames = bus.getPassengers(station.getAgentId());
+                            
+                            //System.out.println("PASSENGER NAMES SIZE: " + passengerNames.size());
 
                             if (passengerNames.size() > 0) {
                                 ACLMessage leave = createMessage(ACLMessage.REQUEST, passengerNames);
@@ -118,7 +120,7 @@ public class BusAgent extends AbstractAgent {
                             Properties properties = createProperties(MessageParameter.BUS);
 
                             var timeOnStation = bus.getTimeOnStation(station.getOsmId());
-                            logger.info("CASE MOVING");
+                            //logger.info("CASE MOVING");
                             timeOnStation.ifPresent(time -> properties.setProperty(MessageParameter.SCHEDULE_ARRIVAL, time
                                     .toString()));
                             properties.setProperty(MessageParameter.ARRIVAL_TIME, timeProvider.getCurrentSimulationTime()

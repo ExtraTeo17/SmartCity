@@ -96,7 +96,7 @@ public class PedestrianAgent extends AbstractAgent {
                                     .toString());
                             msg.setAllUserDefinedParameters(properties);
                             send(msg);
-                           // print("Send REQUEST_WHEN to Station");
+                            print("Send REQUEST_WHEN to Station" + station.getAgentId());
 
                             pedestrian.setState(DrivingState.WAITING_AT_STATION);
                             break;
@@ -246,13 +246,15 @@ public class PedestrianAgent extends AbstractAgent {
 						long busTimeMilliseconds = (pedestrian.getMillisecondsOnRoute(arrivingRouteToClosestStation))
 								+ (timeBetweenArrivalAtStationAndDesiredStation * 1000)
 								+ (pedestrian.getMillisecondsOnRoute(pedestrian.getUniformRoute()));
-						logger.info("BikeTimeMilliseconds:" + bikeTimeMilliseconds + "vs BusTimeMilliseconds: "
+						logger.info("Bike time in milliseconds: " + bikeTimeMilliseconds + " vs bus time in milliseconds: "
 								+ busTimeMilliseconds);
-						if (true) {//bikeTimeMilliseconds > busTimeMilliseconds) {
+						if (bikeTimeMilliseconds > busTimeMilliseconds) {
+							logger.info("Choose bus because bike time in milliseconds: " + bikeTimeMilliseconds
+									+ " vs bus time in milliseconds: " + busTimeMilliseconds);
 							restartAgentWithNewBusLine(arrivingRouteToClosestStation);
 						} else {
-							logger.info("Chosen bike because bikeTimeMilliseconds:" + bikeTimeMilliseconds
-									+ "vs busTimeMilliseconds: " + busTimeMilliseconds);
+							logger.info("Choose bike because bike time in milliseconds: " + bikeTimeMilliseconds
+									+ " vs bus time in milliseconds: " + busTimeMilliseconds);
 							performMetamorphosisToBike();
                     		}
                     	}
@@ -280,6 +282,8 @@ public class PedestrianAgent extends AbstractAgent {
                 pedestrian.setTroubled(false);
 
                 pedestrian.setState(DrivingState.MOVING);
+
+                quitBus();
 
 			}
 
@@ -321,7 +325,7 @@ public class PedestrianAgent extends AbstractAgent {
             var currentTime = timeProvider.getCurrentSimulationTime();
             var predictedTime = currentTime.plusNanos(pedestrian.getMillisecondsToNextStation() * 1_000_000);
             properties.setProperty(MessageParameter.ARRIVAL_TIME, predictedTime.toString());
-            properties.setProperty(MessageParameter.DESIRED_OSM_STATION_ID, pedestrian.getTargetStation().getOsmId()+"");
+            properties.setProperty(MessageParameter.DESIRED_OSM_STATION_ID, pedestrian.getTargetStation().getOsmId() + "");
             msg.setAllUserDefinedParameters(properties);
 
             send(msg);
@@ -335,11 +339,13 @@ public class PedestrianAgent extends AbstractAgent {
     }
 
     private void enterBus() {
+    	print("Enter bus");
         pedestrian.setState(DrivingState.IN_BUS);
         eventBus.post(new PedestrianAgentEnteredBusEvent(this.getId()));
     }
 
     private void quitBus() {
+    	print("Quit bus");
         pedestrian.move();
         pedestrian.setState(DrivingState.PASSING_STATION);
         eventBus.post(new PedestrianAgentLeftBusEvent(this.getId(), pedestrian.getPosition()));

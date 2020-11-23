@@ -79,10 +79,22 @@ public class StationStrategy {
     }
 
     public void addPedestrianToQueue(String agentName, String desiredBusLine, LocalDateTime arrivalTime) {
+    	//System.out.println("--------------------------------------------");
+    	//System.out.println("Adding " + agentName + " with bus line " + desiredBusLine + " to queue");
         var pedestriansOnStation = busLineToPedestriansOnStation
                 .computeIfAbsent(desiredBusLine, key -> new ArrayList<>());
+        //System.out.println("Pedestrians on station before: " + pedestriansOnStation.size());
         var arrivalInfo = new ArrivalInfo(agentName, arrivalTime);
         pedestriansOnStation.add(arrivalInfo);
+        //System.out.println("Pedestrians on station after: " + pedestriansOnStation.size());
+        
+    	//logger.info("Get passengers who are ready to leave " + busAgentName + ", bus line: " + busLine);
+        var arrivalInfos = busLineToPedestriansOnStation.get(desiredBusLine);
+        /*if (arrivalInfos == null)
+        	System.out.println("Check-up: Retrieved arrival infos are null");
+        else
+        	System.out.println("Check-up: Retrieved arrival infos size: " + arrivalInfos.size());
+        System.out.println("---------------------------------------------");*/
     }
 
     public boolean removePedestrianFromQueue(String agentName, String busLine) {
@@ -99,7 +111,8 @@ public class StationStrategy {
     public OptimizationResult requestBusesAndPeopleFreeToGo() {
         // TODO: Inject config container
         //  #Przemek: What to inject here? waitTimeExtend is already in configContainer
-        var result = new OptimizationResult(0, 0);
+    	// xd
+        var result = OptimizationResult.empty();
         for (var entry : busAgentOnStationToArrivalTime.entrySet()) {
             var busLine = entry.getKey();
             var scheduledArrival = entry.getValue();
@@ -171,11 +184,17 @@ public class StationStrategy {
 
     private List<String> getPassengersWhoAreReadyToGo(String busAgentName) {
         String busLine = busAgentNameToLine.get(busAgentName);
+    	//logger.info("Get passengers who are ready to leave " + busAgentName + ", bus line: " + busLine);
         var arrivalInfos = busLineToPedestriansOnStation.get(busLine);
         if (arrivalInfos == null) {
+        	//logger.info("Arrival infos were null");
             return new ArrayList<>();
         }
-
+        
+        //StringBuilder builder = new StringBuilder();
+        //arrivalInfos.forEach(info -> builder.append(info.agentName + ", "));
+        //logger.info("Arrival infos size: " + arrivalInfos.size() + ", agent names inside: " + builder.toString());
+        
         return arrivalInfos.stream().map(info -> info.agentName).collect(Collectors.toList());
     }
 
