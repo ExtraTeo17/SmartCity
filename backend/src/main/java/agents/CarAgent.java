@@ -463,7 +463,7 @@ public class CarAgent extends AbstractAgent {
     public void move() {
         if (borderlineIndex == null || car.getMoveIndex() < borderlineIndex) {
             car.move();
-            eventBus.post(new CarAgentUpdatedEvent(this.getId(), car.getPosition()));
+            // eventBus.post(new CarAgentUpdatedEvent(this.getId(), car.getPosition()));
         }
     }
 

@@ -12,6 +12,7 @@ public enum MessageType {
     START_SIMULATION_RESPONSE(4),
 
     DEBUG_REQUEST(5),
+    BATCHED_UPDATE_INFO(6),
 
     CREATE_CAR_INFO(10),
     UPDATE_CAR_INFO(11),
