@@ -6,7 +6,7 @@ class GenerationConstants {
     static final TimeUnit TIME_UNIT = TimeUnit.MILLISECONDS;
 
     static final int CREATE_CAR_INTERVAL = 120;
-    static final int FIXED_CAR_SEED = 97;
+    static final int FIXED_CAR_SEED = 175;
 
     static final int CREATE_BIKE_INTERVAL = 500;
     static final int FIXED_BIKE_SEED = 11;
