@@ -9,7 +9,7 @@ import java.time.ZonedDateTime;
 import java.time.temporal.ChronoUnit;
 
 public class TimeProvider implements ITimeProvider {
-    public static final int MS_PER_TICK = 42; // Cinematic 24 fps
+    public static final int MS_PER_TICK = 50; // Cinematic 20 fps
     private static final Logger logger = LoggerFactory.getLogger(TimeProvider.class);
 
     private int timeScale;
