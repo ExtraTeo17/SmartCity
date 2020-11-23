@@ -10,9 +10,11 @@ import com.google.common.collect.HashBasedTable;
 import com.google.common.collect.Table;
 import com.google.common.eventbus.EventBus;
 import com.google.inject.Inject;
+import events.web.BatchedUpdateEvent;
 import events.web.bike.BikeAgentCreatedEvent;
 import events.web.bus.BusAgentStartedEvent;
 import events.web.car.CarAgentCreatedEvent;
+import events.web.models.UpdateObject;
 import events.web.pedestrian.PedestrianAgentCreatedEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -30,6 +32,7 @@ import smartcity.task.functional.IFunctionalTaskFactory;
 import utilities.Siblings;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Supplier;
 
@@ -199,6 +202,14 @@ public class TaskProvider implements ITaskProvider {
     @Override
     public Runnable getSimulationControlTask(LocalDateTime simulationStartTime) {
         // TODO: Batch update of cars positions: eventBus.post();
-        return timeProvider.getUpdateTimeTask(simulationStartTime);
+        var updateTimeTask = timeProvider.getUpdateTimeTask(simulationStartTime);
+        return () -> {
+            var carUpdates = new ArrayList<UpdateObject>(agentsContainer.size(CarAgent.class));
+            agentsContainer.forEach(CarAgent.class, c -> {
+                carUpdates.add(new UpdateObject(c.getId(), c.getPosition()));
+            });
+            eventBus.post(new BatchedUpdateEvent(carUpdates));
+            updateTimeTask.run();
+        };
     }
 }

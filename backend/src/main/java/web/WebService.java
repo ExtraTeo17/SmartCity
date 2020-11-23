@@ -1,6 +1,7 @@
 package web;
 
 import com.google.inject.Inject;
+import events.web.models.UpdateObject;
 import osmproxy.elements.OSMNode;
 import routing.core.IGeoPosition;
 import smartcity.lights.core.Light;
@@ -13,10 +14,7 @@ import web.message.payloads.infos.kill.*;
 import web.message.payloads.infos.other.ChangeCarRouteInfo;
 import web.message.payloads.infos.other.SwitchLightsInfo;
 import web.message.payloads.infos.update.*;
-import web.message.payloads.models.BusDto;
-import web.message.payloads.models.LightDto;
-import web.message.payloads.models.Location;
-import web.message.payloads.models.StationDto;
+import web.message.payloads.models.*;
 import web.message.payloads.responses.PrepareResponse;
 import web.message.payloads.responses.StartResponse;
 import web.serialization.Converter;
@@ -221,5 +219,13 @@ class WebService implements IWebService {
         var payload = new KillBikeInfo(id, travelDistance, travelTime);
 
         webConnector.broadcastMessage(MessageType.KILL_BIKE_INFO, payload);
+    }
+
+    @Override
+    public void batchedUpdate(List<UpdateObject> carUpdates) {
+        var carUpdateDtos = carUpdates.stream().map(Converter::convert).toArray(UpdateDto[]::new);
+        var payload = new BatchedUpdateInfo(carUpdateDtos);
+
+        webConnector.broadcastMessage(MessageType.BATCHED_UPDATE_INFO, payload);
     }
 }

@@ -1,4 +1,4 @@
-import { CAR_KILLED, CAR_CREATED, CAR_UPDATED, CAR_ROUTE_CHANGED } from "../../core/constants";
+import { CAR_KILLED, CAR_CREATED, CAR_UPDATED, CAR_ROUTE_CHANGED, BATCHED_UPDATE } from "../../core/constants";
 
 // Just for reference - defined in store.js
 const initialState = {
@@ -47,6 +47,20 @@ const car = (state = initialState, action) => {
       const newCars = state.cars.map(c => {
         if (c.id === id) {
           return { ...c, route: [...routeStart, ...routeEnd], routeChangePoint: location };
+        }
+        return c;
+      });
+
+      return { ...state, cars: newCars };
+    }
+
+    case BATCHED_UPDATE: {
+      const carUpdates = payload;
+
+      const newCars = state.cars.map(c => {
+        const update = carUpdates.find(car => car.id === c.id);
+        if (update) {
+          return { ...c, location: update.location };
         }
         return c;
       });

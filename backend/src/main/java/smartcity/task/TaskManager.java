@@ -145,7 +145,7 @@ public class TaskManager implements ITaskManager {
     @Override
     public void scheduleSimulationControl(BooleanSupplier testSimulationState, LocalDateTime simulationStartTime) {
         var simulationControlTask = taskProvider.getSimulationControlTask(simulationStartTime);
-        runWhile(testSimulationState, simulationControlTask, TimeProvider.MS_PER_TICK);
+        runWhile(testSimulationState, simulationControlTask, SIMULATION_CONTROL_INTERVAL);
     }
 
     @Override
