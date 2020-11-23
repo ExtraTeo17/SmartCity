@@ -1,5 +1,5 @@
 import { BusFillState } from "../../../components/Models/BusFillState";
-import { SIMULATION_PREPARED, BUS_UPDATED, BUS_FILL_STATE_UPDATED, BUS_KILLED } from "../../core/constants";
+import { SIMULATION_PREPARED, BUS_UPDATED, BUS_FILL_STATE_UPDATED, BUS_KILLED, BATCHED_UPDATE } from "../../core/constants";
 
 // Just for reference - defined in store.js
 const initialState = {
@@ -30,6 +30,20 @@ const bus = (state = initialState, action) => {
       if (unrecognized === true && !deletedBusIds.includes(bus.id)) {
         newBuses.push({ ...bus, fillState: BusFillState.LOW });
       }
+
+      return { ...state, buses: newBuses };
+    }
+
+    case BATCHED_UPDATE: {
+      const { busUpdates } = payload;
+
+      const newBuses = state.buses.map(b => {
+        const update = busUpdates.find(bus => bus.id === b.id);
+        if (update) {
+          return { ...b, location: update.location };
+        }
+        return b;
+      });
 
       return { ...state, buses: newBuses };
     }

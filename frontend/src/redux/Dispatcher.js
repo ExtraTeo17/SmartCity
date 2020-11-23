@@ -199,9 +199,10 @@ const Dispatcher = {
     dispatch(bikeKilled(data));
   },
 
-  updateBatched(carUpdates) {
-    // TODO: For all objects: batch(() => {}
-    dispatch(batchedUpdate(carUpdates));
+  updateBatched(carUpdates, bikeUpdates, busUpdates, pedUpdates) {
+    batch(() => {
+      dispatch(batchedUpdate({ carUpdates, bikeUpdates, busUpdates, pedUpdates }));
+    });
   },
 };
 

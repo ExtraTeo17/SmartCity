@@ -153,7 +153,7 @@ export default {
         break;
 
       case BATCHED_UPDATE_INFO:
-        Dispatcher.updateBatched(payload.carUpdates);
+        Dispatcher.updateBatched(payload.carUpdates, payload.bikeUpdates, payload.busUpdates, payload.pedUpdates);
         break;
 
       default:

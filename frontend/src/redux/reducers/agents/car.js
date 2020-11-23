@@ -34,6 +34,20 @@ const car = (state = initialState, action) => {
       return { ...state, cars: newCars };
     }
 
+    case BATCHED_UPDATE: {
+      const { carUpdates } = payload;
+
+      const newCars = state.cars.map(c => {
+        const update = carUpdates.find(car => car.id === c.id);
+        if (update) {
+          return { ...c, location: update.location };
+        }
+        return c;
+      });
+
+      return { ...state, cars: newCars };
+    }
+
     case CAR_KILLED: {
       const { id } = action.payload;
       const newCars = state.cars.filter(c => c.id !== id);
@@ -47,20 +61,6 @@ const car = (state = initialState, action) => {
       const newCars = state.cars.map(c => {
         if (c.id === id) {
           return { ...c, route: [...routeStart, ...routeEnd], routeChangePoint: location };
-        }
-        return c;
-      });
-
-      return { ...state, cars: newCars };
-    }
-
-    case BATCHED_UPDATE: {
-      const carUpdates = payload;
-
-      const newCars = state.cars.map(c => {
-        const update = carUpdates.find(car => car.id === c.id);
-        if (update) {
-          return { ...c, location: update.location };
         }
         return c;
       });
