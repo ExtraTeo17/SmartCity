@@ -13,6 +13,8 @@ const StrategyMenu = props => {
     wasStarted,
     startSimulationData: {
       useFixedRoutes,
+      useFixedTroublePoints,
+
       lightStrategyActive,
       extendLightTime,
 
@@ -56,6 +58,10 @@ const StrategyMenu = props => {
     dispatch(startSimulationDataUpdated({ useFixedRoutes: e.target.checked }));
   }
 
+  function evSetUseFixedTroublePoints(e) {
+    dispatch(startSimulationDataUpdated({ useFixedTroublePoints: e.target.checked }));
+  }
+
   return (
     <>
       <div className="mb-4 form-border">
@@ -70,6 +76,19 @@ const StrategyMenu = props => {
           />
           <label htmlFor="useFixedRoutes" className="form-check-label">
             Use fixed routes
+          </label>
+        </div>
+        <div className="form-check user-select-none">
+          <input
+            type="checkbox"
+            className="form-check-input"
+            id="useFixedTroublePoints"
+            checked={useFixedTroublePoints}
+            disabled={wasStarted || !useFixedRoutes}
+            onChange={evSetUseFixedTroublePoints}
+          />
+          <label htmlFor="useFixedTroublePoints" className="form-check-label">
+            Use fixed trouble points
           </label>
         </div>
       </div>

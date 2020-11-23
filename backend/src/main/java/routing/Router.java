@@ -62,6 +62,11 @@ final class Router implements
         }
 
         var routeInfo = routeInfoOpt.get();
+        // TODO: This sometimes happen when generating new route for car (construction site)
+        if (routeInfo.hasNoWays()) {
+            logger.warn("No ways on route");
+            return new ArrayList<>();
+        }
 
         if (startingOsmNodeRef == null) {
             startingOsmNodeRef = routeInfo.getFirst().findClosestNodeRefTo(pointA);

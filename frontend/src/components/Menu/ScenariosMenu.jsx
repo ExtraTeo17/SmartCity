@@ -64,6 +64,8 @@ const ScenariosMenu = props => {
       generateTroublePoints: true,
       timeBeforeTrouble: 6,
 
+      useFixedRoutes: true,
+      useFixedTroublePoints: true,
       startTime: new Date(),
       timeScale: 7,
 

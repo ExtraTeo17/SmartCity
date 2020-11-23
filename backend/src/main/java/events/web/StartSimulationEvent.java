@@ -19,6 +19,7 @@ public class StartSimulationEvent {
     public final int testPedestrianId;
 
     public final boolean useFixedRoutes;
+    public final boolean useFixedConstructionSites;
     public final LocalDateTime startTime;
     public final int timeScale;
 
@@ -42,6 +43,7 @@ public class StartSimulationEvent {
                                 int pedestriansLimit,
                                 int testPedestrianId,
                                 boolean useFixedRoutes,
+                                boolean useFixedConstructionSites,
                                 LocalDateTime startTime,
                                 int timeScale,
                                 boolean lightStrategyActive,
@@ -57,6 +59,7 @@ public class StartSimulationEvent {
         this.bikesNum = bikesNum;
         this.testBikeId = testBikeId;
         this.useFixedRoutes = useFixedRoutes;
+        this.useFixedConstructionSites = useFixedConstructionSites;
         this.timeScale = timeScale;
         this.changeRouteOnTrafficJam = changeRouteOnTrafficJam;
         this.shouldGenerateTroublePoints = generateTroublePoints;

@@ -32,9 +32,12 @@ import static routing.RoutingConstants.STEP_CONSTANT;
 
 @SuppressWarnings("serial")
 public class CarAgent extends AbstractAgent {
-    private static final Random random = new Random();
     private static final int THRESHOLD_UNTIL_INDEX_CHANGE = 50;
-    protected static final int NO_CONSTRUCTION_SITE_STRATEGY_FACTOR = 20;
+    // Lower values provide risk of car ignoring the trouble point and passing through it
+    private static final int NO_CONSTRUCTION_SITE_STRATEGY_FACTOR = 30;
+
+    private static final long CONSTRUCTION_SITE_GENERATION_SEED = 10002959;
+    private static final long ID_GENERATION_SEED = 9973;
 
     private final MovingObject car;
     private final IRouteGenerator routeGenerator;
@@ -42,6 +45,8 @@ public class CarAgent extends AbstractAgent {
     private final ITroublePointsConfigContainer configContainer;
     private final Set<Integer> trafficJamsEdgeId = new HashSet<>();
     private final Set<Long> constructionsEdgeId = new HashSet<>();
+    private final Random random;
+    private final int initialRouteSize;
 
     private RouteNode troublePoint;
     private Integer borderlineIndex = null;
@@ -57,6 +62,15 @@ public class CarAgent extends AbstractAgent {
         this.routeGenerator = routeGenerator;
         this.routeTransformer = routeTransformer;
         this.configContainer = configContainer;
+
+        this.initialRouteSize = this.car.getUniformRouteSize();
+        if (configContainer.shouldUseFixedConstructionSites()) {
+            long seed = ID_GENERATION_SEED * id + CONSTRUCTION_SITE_GENERATION_SEED;
+            this.random = new Random(seed);
+        }
+        else {
+            this.random = new Random();
+        }
     }
 
     @Override
@@ -70,7 +84,8 @@ public class CarAgent extends AbstractAgent {
             return;
         }
 
-        Behaviour move = new TickerBehaviour(this, STEP_CONSTANT / speed) {
+        var movePeriodMs = STEP_CONSTANT / speed;
+        Behaviour move = new TickerBehaviour(this, movePeriodMs) {
             @Override
             public void onTick() {
                 if (car.isAtTrafficLights()) {
@@ -192,8 +207,7 @@ public class CarAgent extends AbstractAgent {
                     }
                 }
                 else {
-                    indexAfterWhichRouteChanges = Math.max(indexOfRouteNodeWithEdge -
-                            (NO_CONSTRUCTION_SITE_STRATEGY_FACTOR * THRESHOLD_UNTIL_INDEX_CHANGE), 0);
+                    indexAfterWhichRouteChanges = car.getPrevNonVirtualIndexFromIndex(indexOfRouteNodeWithEdge - NO_CONSTRUCTION_SITE_STRATEGY_FACTOR);
                 }
 
                 borderlineIndex = indexAfterWhichRouteChanges;
@@ -363,22 +377,56 @@ public class CarAgent extends AbstractAgent {
 
         if (configContainer.shouldGenerateConstructionSites()) {
             var timeBeforeTroubleMs = this.configContainer.getTimeBeforeTrouble() * 1000;
+
             Behaviour troubleGenerator = new TickerBehaviour(this, timeBeforeTroubleMs) {
+                private final int maxMoveIndexOnTP = timeBeforeTroubleMs / movePeriodMs;
 
                 @Override
                 public void onTick() {
                     var route = car.getUniformRoute();
+                    int index = configContainer.shouldUseFixedConstructionSites() ?
+                            getFixedRandomIndex() :
+                            getTrulyRandomIndex(car.getMoveIndex(), route.size());
 
-                    // TODO: from current index
-                    //   choose trouble EdgeId
-                    // TODO: magic numbers !!!
-                    var el = random.nextInt(route.size() - car.getMoveIndex() - THRESHOLD_UNTIL_INDEX_CHANGE - 5 + 1)
-                            + car.getMoveIndex() + THRESHOLD_UNTIL_INDEX_CHANGE + 5;
-                    RouteNode troublePointTmp = route.get(el);
-                    troublePoint = new RouteNode(troublePointTmp.getLat(), troublePointTmp.getLng(),
-                            troublePointTmp.getInternalEdgeId());
-                    sendMessageAboutConstructionTrouble(); //send message to boss Agent
+                    // TODO: If moveIndex + THRESHOLD_UNTIL_INDEX_CHANGE >= route.size() this can happen
+                    if (index < route.size()) {
+                        RouteNode troublePointTmp = route.get(index);
+                        troublePoint = new RouteNode(troublePointTmp.getLat(), troublePointTmp.getLng(),
+                                troublePointTmp.getInternalEdgeId());
+                        sendMessageAboutConstructionTrouble(); //send message to boss Agent
+                    }
+                    else {
+                        logger.warn("Trouble point won't be generated because of too short path");
+                    }
+
                     stop();
+                }
+
+                // TODO: from current index
+                //   choose trouble EdgeId
+                // TODO: magic numbers !!!
+                private final int magicNumber = 5;
+
+                private int getFixedRandomIndex() {
+                    // Warn: Value inside nextInt must be constant for fixed generation to work
+                    var min = maxMoveIndexOnTP + THRESHOLD_UNTIL_INDEX_CHANGE + magicNumber;
+                    var max = initialRouteSize - min;
+                    return getRandomIndexInBounds(min, max);
+                }
+
+                private int getTrulyRandomIndex(int moveIndex, int routeSize) {
+                    var min = moveIndex + THRESHOLD_UNTIL_INDEX_CHANGE + magicNumber;
+                    var max = routeSize - min;
+                    return getRandomIndexInBounds(min, max);
+                }
+
+                private int getRandomIndexInBounds(int min, int max) {
+                    max = Math.max(max, 0);
+                    var randomInt = random.nextInt(max + 1);
+                    var index = min + (randomInt);
+                    logger.debug("Index: " + index);
+
+                    return index;
                 }
 
                 private void sendMessageAboutConstructionTrouble() {
@@ -404,8 +452,7 @@ public class CarAgent extends AbstractAgent {
 
     private void displayRouteDebug(List<RouteNode> route) {
         for (RouteNode node : route) {
-            System.out.print(node.getDebugString(node instanceof LightManagerNode));
-            System.out.println();
+            logger.info(node.getDebugString(node instanceof LightManagerNode) + "\n");
         }
     }
 

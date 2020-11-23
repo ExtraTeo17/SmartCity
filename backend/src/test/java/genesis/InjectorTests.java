@@ -102,7 +102,8 @@ class InjectorTests {
         eventBus.post("Test"); // Dead event
         eventBus.post(new StartSimulationEvent(false, 0, 0, false,
                 0, 0, false, 5000, 0, 1,
-                false, LocalDateTime.now(), 11, false, 30, false,
+                false, true, LocalDateTime.now(), 11, false,
+                30, false,
                 60, false, false
         ));
         eventBus.post(new SimulationStartedEvent());

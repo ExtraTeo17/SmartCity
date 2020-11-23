@@ -114,7 +114,6 @@ public class TaskProvider implements ITaskProvider {
         };
     }
 
-
     @Override
     public Runnable getCreatePedestrianTask(IRoutingHelper routingHelper,
                                             StationNode startStation, StationNode endStation,
