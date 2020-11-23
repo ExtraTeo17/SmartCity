@@ -19,6 +19,7 @@ import vehicles.enums.DrivingState;
 import static agents.message.MessageManager.createMessage;
 import static agents.message.MessageManager.createProperties;
 import static routing.RoutingConstants.STEP_CONSTANT;
+import static smartcity.config.StaticConfig.USE_BATCHED_UPDATES;
 
 public class BikeAgent extends AbstractAgent {
     private final MovingObject vehicle;
@@ -122,7 +123,9 @@ public class BikeAgent extends AbstractAgent {
 
     public void move() {
         vehicle.move();
-        eventBus.post(new BikeAgentUpdatedEvent(this.getId(), vehicle.getPosition()));
+        if (!USE_BATCHED_UPDATES) {
+            eventBus.post(new BikeAgentUpdatedEvent(this.getId(), vehicle.getPosition()));
+        }
     }
 
     public IGeoPosition getPosition() {

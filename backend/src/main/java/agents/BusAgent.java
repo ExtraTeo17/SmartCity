@@ -12,6 +12,7 @@ import jade.lang.acl.ACLMessage;
 import jade.util.leap.Properties;
 import jade.wrapper.AgentState;
 import routing.RoutingConstants;
+import routing.core.IGeoPosition;
 import routing.nodes.LightManagerNode;
 import routing.nodes.RouteNode;
 import routing.nodes.StationNode;
@@ -29,6 +30,7 @@ import java.util.Random;
 
 import static agents.message.MessageManager.createMessage;
 import static agents.message.MessageManager.createProperties;
+import static smartcity.config.StaticConfig.USE_BATCHED_UPDATES;
 
 @SuppressWarnings("serial")
 public class BusAgent extends AbstractAgent {
@@ -236,6 +238,17 @@ public class BusAgent extends AbstractAgent {
         addBehaviour(communication);
     }
 
+    public void move() {
+        bus.move();
+        if(!USE_BATCHED_UPDATES) {
+            eventBus.post(new BusAgentUpdatedEvent(this.getId(), bus.getPosition()));
+        }
+    }
+
+    public IGeoPosition getPosition() {
+        return bus.getPosition();
+    }
+
     private void informNextStation() {
         // finds next station and announces his arrival
         System.out.println("informNextStation");
@@ -286,11 +299,6 @@ public class BusAgent extends AbstractAgent {
         return bus.getLine();
     }
 
-    public void move() {
-        bus.move();
-        eventBus.post(new BusAgentUpdatedEvent(this.getId(), bus.getPosition()));
-    }
-
     // TODO: Fix situation where bus route contains only one station and pedestrians tries to choose two
     public final Optional<Siblings<StationNode>> getTwoSubsequentStations(final Random random) {
         List<StationNode> stationsOnRoute = bus.getStationNodesOnRoute();
@@ -302,7 +310,7 @@ public class BusAgent extends AbstractAgent {
         return Optional.of(Siblings.of(stationsOnRoute.get(random.nextInt(halfIndex)),
                 stationsOnRoute.get(halfIndex + random.nextInt(halfIndex))));
     }
-
+    
     /**
      * @return If busAgent finished execution
      */

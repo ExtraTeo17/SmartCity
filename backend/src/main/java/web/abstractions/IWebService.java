@@ -65,5 +65,8 @@ public interface IWebService extends IStartable {
 
     void killBike(int id, int travelDistance, Long travelTime);
 
-    void batchedUpdate(List<UpdateObject> carUpdates);
+    void batchedUpdate(List<UpdateObject> carUpdates,
+                       List<UpdateObject> bikeUpdates,
+                       List<UpdateObject> busUpdates,
+                       List<UpdateObject> pedUpdates);
 }

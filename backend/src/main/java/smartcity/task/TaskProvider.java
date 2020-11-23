@@ -36,6 +36,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Supplier;
 
+import static smartcity.config.StaticConfig.USE_BATCHED_UPDATES;
+
 @SuppressWarnings("OverlyCoupledClass")
 public class TaskProvider implements ITaskProvider {
     private static final Logger logger = LoggerFactory.getLogger(TaskProvider.class);
@@ -201,14 +203,33 @@ public class TaskProvider implements ITaskProvider {
 
     @Override
     public Runnable getSimulationControlTask(LocalDateTime simulationStartTime) {
-        // TODO: Batch update of cars positions: eventBus.post();
         var updateTimeTask = timeProvider.getUpdateTimeTask(simulationStartTime);
         return () -> {
-            var carUpdates = new ArrayList<UpdateObject>(agentsContainer.size(CarAgent.class));
-            agentsContainer.forEach(CarAgent.class, c -> {
-                carUpdates.add(new UpdateObject(c.getId(), c.getPosition()));
-            });
-            eventBus.post(new BatchedUpdateEvent(carUpdates));
+            if (USE_BATCHED_UPDATES) {
+                var carUpdates = new ArrayList<UpdateObject>(agentsContainer.size(CarAgent.class));
+                agentsContainer.forEach(CarAgent.class, c -> {
+                    carUpdates.add(new UpdateObject(c.getId(), c.getPosition()));
+                });
+
+                var bikeUpdates = new ArrayList<UpdateObject>(agentsContainer.size(BikeAgent.class));
+                agentsContainer.forEach(BikeAgent.class, b -> {
+                    bikeUpdates.add(new UpdateObject(b.getId(), b.getPosition()));
+                });
+
+                var busUpdates = new ArrayList<UpdateObject>(agentsContainer.size(BusAgent.class));
+                agentsContainer.forEach(BusAgent.class, b -> {
+                    if (b.isAlive()) {
+                        busUpdates.add(new UpdateObject(b.getId(), b.getPosition()));
+                    }
+                });
+
+                var pedUpdates = new ArrayList<UpdateObject>(agentsContainer.size(PedestrianAgent.class));
+                agentsContainer.forEach(PedestrianAgent.class, p -> {
+                    pedUpdates.add(new UpdateObject(p.getId(), p.getPosition()));
+                });
+
+                eventBus.post(new BatchedUpdateEvent(carUpdates, bikeUpdates, busUpdates, pedUpdates));
+            }
             updateTimeTask.run();
         };
     }

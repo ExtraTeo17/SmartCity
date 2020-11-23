@@ -29,6 +29,7 @@ import java.util.Set;
 import static agents.message.MessageManager.createMessage;
 import static agents.message.MessageManager.createProperties;
 import static routing.RoutingConstants.STEP_CONSTANT;
+import static smartcity.config.StaticConfig.USE_BATCHED_UPDATES;
 
 @SuppressWarnings("serial")
 public class CarAgent extends AbstractAgent {
@@ -463,7 +464,9 @@ public class CarAgent extends AbstractAgent {
     public void move() {
         if (borderlineIndex == null || car.getMoveIndex() < borderlineIndex) {
             car.move();
-            // eventBus.post(new CarAgentUpdatedEvent(this.getId(), car.getPosition()));
+            if (!USE_BATCHED_UPDATES) {
+                eventBus.post(new CarAgentUpdatedEvent(this.getId(), car.getPosition()));
+            }
         }
     }
 

@@ -222,9 +222,15 @@ class WebService implements IWebService {
     }
 
     @Override
-    public void batchedUpdate(List<UpdateObject> carUpdates) {
+    public void batchedUpdate(List<UpdateObject> carUpdates,
+                              List<UpdateObject> bikeUpdates,
+                              List<UpdateObject> busUpdates,
+                              List<UpdateObject> pedUpdates) {
         var carUpdateDtos = carUpdates.stream().map(Converter::convert).toArray(UpdateDto[]::new);
-        var payload = new BatchedUpdateInfo(carUpdateDtos);
+        var bikeUpdateDtos = bikeUpdates.stream().map(Converter::convert).toArray(UpdateDto[]::new);
+        var busUpdateDtos = busUpdates.stream().map(Converter::convert).toArray(UpdateDto[]::new);
+        var pedUpdateDtos = pedUpdates.stream().map(Converter::convert).toArray(UpdateDto[]::new);
+        var payload = new BatchedUpdateInfo(carUpdateDtos, bikeUpdateDtos, busUpdateDtos, pedUpdateDtos);
 
         webConnector.broadcastMessage(MessageType.BATCHED_UPDATE_INFO, payload);
     }

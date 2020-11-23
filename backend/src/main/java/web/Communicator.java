@@ -165,7 +165,7 @@ class Communicator {
 
     @Subscribe
     public void handle(BatchedUpdateEvent e) {
-        webService.batchedUpdate(e.carUpdates);
+        webService.batchedUpdate(e.carUpdates, e.bikeUpdates, e.busUpdates, e.pedUpdates);
     }
 
     private void onHandle(Object obj) {
