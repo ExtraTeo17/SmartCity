@@ -21,6 +21,8 @@ export const TROUBLE_POINT_VANISHED = "TP/VANISHED";
 export const TRAFFIC_JAM_STARTED = "TJ/STARTED";
 export const TRAFFIC_JAM_ENDED = "TJ/ENDED";
 
+export const BATCHED_UPDATE = "B/UPDATE";
+
 export const BUS_UPDATED = "Bus/UPDATED";
 export const BUS_FILL_STATE_UPDATED = "Bus/FILL";
 export const BUS_KILLED = "Bus/KILLED";
