@@ -1,7 +1,6 @@
 package web.abstractions;
 
 
-import events.web.models.UpdateObject;
 import osmproxy.elements.OSMNode;
 import routing.core.IGeoPosition;
 import smartcity.lights.core.Light;
@@ -64,6 +63,4 @@ public interface IWebService extends IStartable {
     void updateBike(int id, IGeoPosition position);
 
     void killBike(int id, int travelDistance, Long travelTime);
-
-    void batchedUpdate(List<UpdateObject> carUpdates);
 }

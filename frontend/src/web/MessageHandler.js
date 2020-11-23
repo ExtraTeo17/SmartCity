@@ -22,7 +22,6 @@ import {
   CREATE_BIKE_INFO,
   UPDATE_BIKE_INFO,
   KILL_BIKE_INFO,
-  BATCHED_UPDATE_INFO,
 } from "./MessageType";
 import { NOTIFY_SHOW_MS } from "../constants/global";
 import Dispatcher from "../redux/Dispatcher";
@@ -150,10 +149,6 @@ export default {
 
       case KILL_BIKE_INFO:
         Dispatcher.killBike(payload);
-        break;
-
-      case BATCHED_UPDATE_INFO:
-        Dispatcher.updateBatched(payload.carUpdates);
         break;
 
       default:

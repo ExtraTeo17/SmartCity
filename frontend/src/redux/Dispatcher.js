@@ -23,7 +23,6 @@ import {
   bikeUpdated,
   bikeCreated,
   bikeKilled,
-  batchedUpdate,
 } from "./core/actions";
 
 const fps = 20;
@@ -197,11 +196,6 @@ const Dispatcher = {
 
   killBike(data) {
     dispatch(bikeKilled(data));
-  },
-
-  updateBatched(carUpdates) {
-    // TODO: For all objects: batch(() => {}
-    dispatch(batchedUpdate(carUpdates));
   },
 };
 

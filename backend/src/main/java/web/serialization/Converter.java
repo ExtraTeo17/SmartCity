@@ -3,7 +3,6 @@ package web.serialization;
 
 import events.web.PrepareSimulationEvent;
 import events.web.StartSimulationEvent;
-import events.web.models.UpdateObject;
 import osmproxy.elements.OSMNode;
 import routing.core.IGeoPosition;
 import smartcity.TimeProvider;
@@ -15,7 +14,6 @@ import web.message.payloads.models.*;
 import web.message.payloads.requests.PrepareSimulationRequest;
 import web.message.payloads.requests.StartSimulationRequest;
 
-@SuppressWarnings("OverlyCoupledClass")
 public class Converter {
     public static Location convert(IGeoPosition geoPosition) {
         return new Location(geoPosition.getLat(), geoPosition.getLng());
@@ -61,11 +59,6 @@ public class Converter {
             case HIGH -> BusFillStateDto.HIGH;
         };
     }
-
-    public static UpdateDto convert(UpdateObject updateObject) {
-        return new UpdateDto(updateObject.id, convert(updateObject.position));
-    }
-
 
     public static PrepareSimulationEvent convert(PrepareSimulationRequest req) {
 
