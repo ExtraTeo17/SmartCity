@@ -26,6 +26,7 @@ import java.util.List;
 import java.util.Random;
 import java.util.Set;
 
+import static agents.AgentConstants.DEFAULT_BLOCK_ON_ERROR;
 import static agents.message.MessageManager.createMessage;
 import static agents.message.MessageManager.createProperties;
 import static routing.RoutingConstants.STEP_CONSTANT;
@@ -136,45 +137,49 @@ public class CarAgent extends AbstractAgent {
             @Override
             public void action() {
                 ACLMessage rcv = receive();
-                if (rcv != null) {
-                    switch (rcv.getPerformative()) {
-                        case ACLMessage.REQUEST -> {
-                            ACLMessage response = createMessage(ACLMessage.AGREE, rcv.getSender());
-                            Properties properties = createProperties(MessageParameter.VEHICLE);
-                            properties.setProperty(MessageParameter.ADJACENT_OSM_WAY_ID,
-                                    Long.toString(car.getAdjacentOsmWayId()));
-                            response.setAllUserDefinedParameters(properties);
-                            send(response);
+                if (rcv == null) {
+                    block();
+                    return;
+                }
 
-                            informLightManager(car);
-                            car.setState(DrivingState.PASSING_LIGHT);
+                switch (rcv.getPerformative()) {
+                    case ACLMessage.REQUEST -> {
+                        ACLMessage response = createMessage(ACLMessage.AGREE, rcv.getSender());
+                        Properties properties = createProperties(MessageParameter.VEHICLE);
+                        properties.setProperty(MessageParameter.ADJACENT_OSM_WAY_ID,
+                                Long.toString(car.getAdjacentOsmWayId()));
+                        response.setAllUserDefinedParameters(properties);
+                        send(response);
+
+                        informLightManager(car);
+                        car.setState(DrivingState.PASSING_LIGHT);
+                    }
+                    case ACLMessage.AGREE -> car.setState(DrivingState.WAITING_AT_LIGHT);
+                    case ACLMessage.PROPOSE -> {
+                        if (rcv.getUserDefinedParameter(MessageParameter.TYPEOFTROUBLE).equals(MessageParameter.CONSTRUCTION)) {
+                            logger.debug("Handle construction jam");
+                            handleConstructionJam(rcv);
                         }
-                        case ACLMessage.AGREE -> car.setState(DrivingState.WAITING_AT_LIGHT);
-                        case ACLMessage.PROPOSE -> {
-                            if (rcv.getUserDefinedParameter(MessageParameter.TYPEOFTROUBLE).equals(MessageParameter.CONSTRUCTION)) {
-                                logger.debug("Handle construction jam");
-                                handleConstructionJam(rcv);
+                        else if (rcv.getUserDefinedParameter(MessageParameter.TYPEOFTROUBLE).equals(MessageParameter.TRAFFIC_JAM)) {
+                            if (rcv.getSender().getLocalName().equals(TroubleManagerAgent.name)) {
+                                logger.debug("Handle traffic jams from trouble manager");
+                                handleTrafficJamsFromTroubleManager(rcv);
                             }
-                            else if (rcv.getUserDefinedParameter(MessageParameter.TYPEOFTROUBLE).equals(MessageParameter.TRAFFIC_JAM)) {
-                                if (rcv.getSender().getLocalName().equals(TroubleManagerAgent.name)) {
-                                    logger.debug("Handle traffic jams from trouble manager");
-                                    handleTrafficJamsFromTroubleManager(rcv);
-                                }
-                                else {
-                                    logger.debug("Handle traffic jams from light manager");
-                                    handleTrafficJamsFromLightManager(rcv, MessageParameter.SHOW);
-                                }
-                            }
-                        }
-                        case ACLMessage.CANCEL -> {
-                            if (rcv.getUserDefinedParameter(MessageParameter.TYPEOFTROUBLE).equals(MessageParameter.TRAFFIC_JAM)) {
-                                logger.debug("Handle traffic jam stop from light manager");
-                                handleTrafficJamsFromLightManager(rcv, MessageParameter.STOP);
+                            else {
+                                logger.debug("Handle traffic jams from light manager");
+                                handleTrafficJamsFromLightManager(rcv, MessageParameter.SHOW);
                             }
                         }
                     }
+                    case ACLMessage.CANCEL -> {
+                        if (rcv.getUserDefinedParameter(MessageParameter.TYPEOFTROUBLE).equals(MessageParameter.TRAFFIC_JAM)) {
+                            logger.debug("Handle traffic jam stop from light manager");
+                            handleTrafficJamsFromLightManager(rcv, MessageParameter.STOP);
+                        }
+                    }
+
+                    default -> block(DEFAULT_BLOCK_ON_ERROR);
                 }
-                block(100);
             }
 
             private void handleConstructionJam(ACLMessage rcv) {

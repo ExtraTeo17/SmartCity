@@ -28,6 +28,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Random;
 
+import static agents.AgentConstants.DEFAULT_BLOCK_ON_ERROR;
 import static agents.message.MessageManager.createMessage;
 import static agents.message.MessageManager.createProperties;
 import static smartcity.config.StaticConfig.USE_BATCHED_UPDATES;
@@ -156,15 +157,18 @@ public class BusAgent extends AbstractAgent {
         };
 
         Behaviour communication = new CyclicBehaviour() {
+            @SuppressWarnings("DuplicatedCode")
             @Override
             public void action() {
                 ACLMessage rcv = receive();
                 if (rcv == null) {
+                    block();
                     return;
                 }
 
                 String type = rcv.getUserDefinedParameter(MessageParameter.TYPE);
                 if (type == null) {
+                    block(DEFAULT_BLOCK_ON_ERROR);
                     logTypeError(rcv);
                     return;
                 }
@@ -199,8 +203,7 @@ public class BusAgent extends AbstractAgent {
                                 bus.setState(DrivingState.PASSING_STATION);
                             }
                         }
-                        else if (rcv.getPerformative() == ACLMessage.AGREE)
-                        {
+                        else if (rcv.getPerformative() == ACLMessage.AGREE) {
                             logger.info("GOT AGREE from station");
                             bus.setState(DrivingState.WAITING_AT_STATION);
                         }
@@ -230,7 +233,6 @@ public class BusAgent extends AbstractAgent {
 
                         break;
                 }
-                block(100);
             }
         };
 
@@ -240,7 +242,7 @@ public class BusAgent extends AbstractAgent {
 
     public void move() {
         bus.move();
-        if(!USE_BATCHED_UPDATES) {
+        if (!USE_BATCHED_UPDATES) {
             eventBus.post(new BusAgentUpdatedEvent(this.getId(), bus.getPosition()));
         }
     }
@@ -310,7 +312,7 @@ public class BusAgent extends AbstractAgent {
         return Optional.of(Siblings.of(stationsOnRoute.get(random.nextInt(halfIndex)),
                 stationsOnRoute.get(halfIndex + random.nextInt(halfIndex))));
     }
-    
+
     /**
      * @return If busAgent finished execution
      */

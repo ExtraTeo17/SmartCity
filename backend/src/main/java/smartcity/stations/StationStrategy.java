@@ -121,7 +121,7 @@ public class StationStrategy {
             }
             else if (actualTime.isAfter(scheduledTimeMinusWait) &&
                     actualTime.isBefore(scheduledTimePlusWait)) {
-                logger.info("------------------BUS WAS ON TIME-----------------------");
+                logger.debug("------------------BUS WAS ON TIME-----------------------");
 
 
                 if (configContainer.isStationStrategyActive()) {

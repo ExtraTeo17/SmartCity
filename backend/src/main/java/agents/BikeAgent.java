@@ -88,24 +88,26 @@ public class BikeAgent extends AbstractAgent {
             @Override
             public void action() {
                 ACLMessage rcv = receive();
-                if (rcv != null) {
-                    switch (rcv.getPerformative()) {
-                        case ACLMessage.REQUEST -> {
-                            ACLMessage response = createMessage(ACLMessage.AGREE, rcv.getSender());
-                            Properties properties = createProperties(MessageParameter.BIKE);
-                            properties.setProperty(MessageParameter.ADJACENT_OSM_WAY_ID,
-                                    Long.toString(vehicle.getAdjacentOsmWayId()));
-                            response.setAllUserDefinedParameters(properties);
-                            send(response);
-
-                            informLightManager(vehicle);
-                            vehicle.setState(DrivingState.PASSING_LIGHT);
-                        }
-                        case ACLMessage.AGREE -> vehicle.setState(DrivingState.WAITING_AT_LIGHT);
-
-                    }
+                if (rcv == null) {
+                    block();
+                    return;
                 }
-                block(100);
+
+                switch (rcv.getPerformative()) {
+                    case ACLMessage.REQUEST -> {
+                        ACLMessage response = createMessage(ACLMessage.AGREE, rcv.getSender());
+                        Properties properties = createProperties(MessageParameter.BIKE);
+                        properties.setProperty(MessageParameter.ADJACENT_OSM_WAY_ID,
+                                Long.toString(vehicle.getAdjacentOsmWayId()));
+                        response.setAllUserDefinedParameters(properties);
+                        send(response);
+
+                        informLightManager(vehicle);
+                        vehicle.setState(DrivingState.PASSING_LIGHT);
+                    }
+                    case ACLMessage.AGREE -> vehicle.setState(DrivingState.WAITING_AT_LIGHT);
+
+                }
             }
 
 
@@ -113,9 +115,7 @@ public class BikeAgent extends AbstractAgent {
 
         addBehaviour(move);
         addBehaviour(communication);
-
     }
-
 
     public MovingObject getVehicle() {
         return vehicle;

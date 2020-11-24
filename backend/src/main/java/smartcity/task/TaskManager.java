@@ -12,7 +12,6 @@ import routing.RoutingHelper;
 import routing.abstractions.IRoutingHelper;
 import routing.core.IZone;
 import routing.core.Zone;
-import smartcity.TimeProvider;
 import smartcity.config.abstractions.IGenerationConfigContainer;
 import smartcity.lights.core.SimpleLightGroup;
 import smartcity.task.abstractions.ITaskManager;
