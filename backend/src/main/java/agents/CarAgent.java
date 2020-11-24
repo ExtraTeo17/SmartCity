@@ -69,8 +69,7 @@ public class CarAgent extends AbstractAgent {
         if (configContainer.shouldUseFixedConstructionSites()) {
             long seed = ID_GENERATION_SEED * id + CONSTRUCTION_SITE_GENERATION_SEED;
             this.random = new Random(seed);
-        }
-        else {
+        } else {
             this.random = new Random();
         }
     }
@@ -115,8 +114,7 @@ public class CarAgent extends AbstractAgent {
                             car.setState(DrivingState.MOVING);
                             break;
                     }
-                }
-                else if (car.isAtDestination()) {
+                } else if (car.isAtDestination()) {
                     car.setState(DrivingState.AT_DESTINATION);
                     logger.debug("Reach destination");
 
@@ -126,8 +124,7 @@ public class CarAgent extends AbstractAgent {
                     msg.setAllUserDefinedParameters(prop);
                     send(msg);
                     doDelete();
-                }
-                else {
+                } else {
                     move();
                 }
             }
@@ -155,19 +152,19 @@ public class CarAgent extends AbstractAgent {
                         car.setState(DrivingState.PASSING_LIGHT);
                     }
                     case ACLMessage.AGREE -> car.setState(DrivingState.WAITING_AT_LIGHT);
-                    case ACLMessage.PROPOSE -> {
-                        if (rcv.getUserDefinedParameter(MessageParameter.TYPEOFTROUBLE).equals(MessageParameter.CONSTRUCTION)) {
-                            logger.debug("Handle construction jam");
-                            handleConstructionJam(rcv);
-                        }
-                        else if (rcv.getUserDefinedParameter(MessageParameter.TYPEOFTROUBLE).equals(MessageParameter.TRAFFIC_JAM)) {
-                            if (rcv.getSender().getLocalName().equals(TroubleManagerAgent.name)) {
-                                logger.debug("Handle traffic jams from trouble manager");
-                                handleTrafficJamsFromTroubleManager(rcv);
-                            }
-                            else {
-                                logger.debug("Handle traffic jams from light manager");
-                                handleTrafficJamsFromLightManager(rcv, MessageParameter.SHOW);
+                        case ACLMessage.AGREE -> car.setState(DrivingState.WAITING_AT_LIGHT);
+                        case ACLMessage.PROPOSE -> {
+                            if (rcv.getUserDefinedParameter(MessageParameter.TYPEOFTROUBLE).equals(MessageParameter.CONSTRUCTION)) {
+                                logger.debug("Handle construction jam");
+                                handleConstructionJam(rcv);
+                            } else if (rcv.getUserDefinedParameter(MessageParameter.TYPEOFTROUBLE).equals(MessageParameter.TRAFFIC_JAM)) {
+                                if (rcv.getSender().getLocalName().equals(TroubleManagerAgent.name)) {
+                                    logger.debug("Handle traffic jams from trouble manager");
+                                    handleTrafficJamsFromTroubleManager(rcv);
+                                } else {
+                                    logger.debug("Handle traffic jams from light manager");
+                                    handleTrafficJamsFromLightManager(rcv, MessageParameter.SHOW);
+                                }
                             }
                         }
                     }
@@ -196,8 +193,7 @@ public class CarAgent extends AbstractAgent {
 
                 if (indexOfRouteNodeWithEdge != null && indexOfRouteNodeWithEdge != car.getUniformRouteSize() - 1) {
                     handleConstructionSiteRouteChange(indexOfRouteNodeWithEdge);
-                }
-                else {
+                } else {
                     logger.info("Index of edge route is invalid: " + indexOfRouteNodeWithEdge);
                 }
             }
@@ -207,12 +203,10 @@ public class CarAgent extends AbstractAgent {
                 if (configContainer.shouldChangeRouteOnTroublePoint()) {
                     if (indexOfRouteNodeWithEdge - car.getMoveIndex() > THRESHOLD_UNTIL_INDEX_CHANGE) {
                         indexAfterWhichRouteChanges = car.getNextNonVirtualIndex(THRESHOLD_UNTIL_INDEX_CHANGE);
-                    }
-                    else {
+                    } else {
                         indexAfterWhichRouteChanges = car.getNextNonVirtualIndex();
                     }
-                }
-                else {
+                } else {
                     indexAfterWhichRouteChanges = car.getPrevNonVirtualIndexFromIndex(indexOfRouteNodeWithEdge - NO_CONSTRUCTION_SITE_STRATEGY_FACTOR);
                 }
 
@@ -320,8 +314,7 @@ public class CarAgent extends AbstractAgent {
                     }
                     trafficJamsEdgeId.add(edgeId);
                     jamStart = true;
-                }
-                else {
+                } else {
                     logger.debug("Traffic jam end on edge: " + edgeId);
                     trafficJamsEdgeId.remove(edgeId);
                     jamStart = false;
@@ -337,7 +330,7 @@ public class CarAgent extends AbstractAgent {
                         THRESHOLD_UNTIL_INDEX_CHANGE);
                 int indexAfterWhichRouteChanges;
                 if (indexOfRouteNodeWithEdge != null || !jamStart) {
-                    indexAfterWhichRouteChanges = car.getFarOnIndex(THRESHOLD_UNTIL_INDEX_CHANGE);
+                    indexAfterWhichRouteChanges = car.getNextNonVirtualIndex(THRESHOLD_UNTIL_INDEX_CHANGE);
                     if (indexAfterWhichRouteChanges == car.getUniformRouteSize() - 1) {
                         return;
                     }
@@ -348,21 +341,35 @@ public class CarAgent extends AbstractAgent {
             private void handleLightTrafficJamRouteChange(final int indexAfterWhichRouteChanges,
                                                           final double timeForTheEndWithJam, boolean bewareOfJammedEdge) {
                 logger.info("Jammed traffic light on route, handle it");
-                double timeForOfDynamicRoute;
-                final RouteMergeInfo mergeResult = createMergedWithOldRouteAlternativeRouteFromIndex(indexAfterWhichRouteChanges,
-                        bewareOfJammedEdge);
-                timeForOfDynamicRoute = car.getMillisecondsFromAToB(car.getMoveIndex(),
-                        mergeResult.newUniformRoute.size() - 1);
-                if (timeForTheEndWithJam > timeForOfDynamicRoute) {
-                    logger.info("Trip time through the jam: " + timeForTheEndWithJam + " is longer than alternative route time: "
-                            + timeForOfDynamicRoute + ", so route will be changed");
-                    // TODO: CHECK IF send refusal is on place // switchToNextLight was after this line
-                    updateVehicleRouteAfterMerge(indexAfterWhichRouteChanges, mergeResult);
-                }
-                else {
-                    logger.info("Trip time through the jam: " + timeForTheEndWithJam + " is shorter than alternative route time: "
-                            + timeForOfDynamicRoute + ", so route won't be changed");
-                }
+                borderlineIndex = indexAfterWhichRouteChanges;
+                ThreadedBehaviourFactory factory = new ThreadedBehaviourFactory();
+                Behaviour mergeUpdateBehaviour = new OneShotBehaviour() {
+
+                    @Override
+                    public void action() {
+                        double timeForOfDynamicRoute;
+                        final RouteMergeInfo mergeResult = createMergedWithOldRouteAlternativeRouteFromIndex(indexAfterWhichRouteChanges,
+                                bewareOfJammedEdge);
+                        timeForOfDynamicRoute = car.getMillisecondsFromAToB(car.getMoveIndex(),
+                                mergeResult.newUniformRoute.size() - 1);
+
+                        if (timeForTheEndWithJam > timeForOfDynamicRoute) {
+
+                            logger.info("Trip time through the jam: " + timeForTheEndWithJam + " is longer than alternative route time: "
+                                    + timeForOfDynamicRoute + ", so route will be changed");
+                            // TODO: CHECK IF send refusal is on place // switchToNextLight was after this line
+                            updateVehicleRouteAfterMerge(indexAfterWhichRouteChanges, mergeResult);
+
+                        } else {
+
+                            logger.info("Trip time through the jam: " + timeForTheEndWithJam + " is shorter than alternative route time: "
+                                    + timeForOfDynamicRoute + ", so route won't be changed");
+                        }
+                        borderlineIndex = null;
+                    }
+
+                };
+                addBehaviour(factory.wrap(mergeUpdateBehaviour));
             }
 
             private void sendRefusalMessageToLightManagerAfterRouteChange() {
@@ -400,8 +407,7 @@ public class CarAgent extends AbstractAgent {
                         troublePoint = new RouteNode(troublePointTmp.getLat(), troublePointTmp.getLng(),
                                 troublePointTmp.getInternalEdgeId());
                         sendMessageAboutConstructionTrouble(); //send message to boss Agent
-                    }
-                    else {
+                    } else {
                         logger.warn("Trouble point won't be generated because of too short path");
                     }
 
