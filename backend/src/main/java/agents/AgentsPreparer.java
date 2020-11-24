@@ -92,7 +92,7 @@ public class AgentsPreparer {
                     .flatMap(man -> man.getLights().stream())
                     .collect(Collectors.toList());
             var stations = agentsContainer.stream(StationAgent.class).map(
-                    StationAgent::getStation).collect(Collectors.toList());
+                    StationAgent::getStation).filter(OSMStation::isPlatform).collect(Collectors.toList());
             var buses = agentsContainer.stream(BusAgent.class).map(
                     BusAgent::getBus).collect(Collectors.toList());
             eventBus.post(new SimulationPreparedEvent(lights, stations, buses));
