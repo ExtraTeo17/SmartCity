@@ -20,9 +20,13 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Optional;
 
+import static vehicles.Constants.SPEED_SCALE;
+
 public class Bus extends MovingObject {
-    public static final int CAPACITY_MID = 10;
-    public static final int CAPACITY_HIGH = 25;
+    private static final int DEFAULT_SPEED = 50 * SPEED_SCALE;
+
+    static final int CAPACITY_MID = 10;
+    static final int CAPACITY_HIGH = 25;
 
     private final Logger logger;
     private final Timetable timetable;
@@ -45,7 +49,7 @@ public class Bus extends MovingObject {
                Timetable timetable,
                String busLine,
                String brigadeNr) {
-        super(timeProvider, agentId, 40, uniformRoute, simpleRoute);
+        super(timeProvider, agentId, DEFAULT_SPEED, uniformRoute, simpleRoute);
         this.timeProvider = timeProvider;
         this.eventBus = eventBus;
         this.timetable = timetable;

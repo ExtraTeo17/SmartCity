@@ -11,7 +11,11 @@ import vehicles.enums.VehicleType;
 import java.util.ArrayList;
 import java.util.List;
 
+import static vehicles.Constants.SPEED_SCALE;
+
 public class Pedestrian extends MovingObject {
+    private static final int DEFAULT_SPEED = 10 * SPEED_SCALE;
+
     private final String preferredBusLine;
     private final List<RouteNode> displayRouteBeforeBus;
     private final List<RouteNode> displayRouteAfterBus;
@@ -30,7 +34,7 @@ public class Pedestrian extends MovingObject {
                       StationNode startStation,
                       StationNode finishStation,
                       ITimeProvider timeProvider) {
-        super(timeProvider, agentId, 10, createRoute(startStation, uniformRouteToStation,
+        super(timeProvider, agentId, DEFAULT_SPEED, createRoute(startStation, uniformRouteToStation,
                 finishStation, uniformRouteFromStation));
         this.displayRouteBeforeBus = routeToStation;
         this.routeBeforeBus = uniformRouteToStation;
@@ -71,7 +75,7 @@ public class Pedestrian extends MovingObject {
 
     @VisibleForTesting
     Pedestrian(ITimeProvider timeProvider) {
-        super(timeProvider, 1, 10, new ArrayList<>());
+        super(timeProvider, 1, DEFAULT_SPEED, new ArrayList<>());
         preferredBusLine = "";
         displayRouteBeforeBus = new ArrayList<>();
         displayRouteAfterBus = new ArrayList<>();

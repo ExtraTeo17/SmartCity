@@ -216,7 +216,7 @@ public class TaskProvider implements ITaskProvider {
                     bikeUpdates.add(new UpdateObject(b.getId(), b.getPosition()));
                 });
 
-                var busUpdates = new ArrayList<UpdateObject>(agentsContainer.size(BusAgent.class));
+                var busUpdates = new ArrayList<UpdateObject>();
                 agentsContainer.forEach(BusAgent.class, b -> {
                     if (b.isAlive()) {
                         busUpdates.add(new UpdateObject(b.getId(), b.getPosition()));
