@@ -253,7 +253,7 @@ public class BusAgent extends AbstractAgent {
 
     private void informNextStation() {
         // finds next station and announces his arrival
-        System.out.println("informNextStation");
+        logger.info("informNextStation");
         var stationOpt = bus.findNextStation();
         if (stationOpt.isPresent()) {
             var station = stationOpt.get();
