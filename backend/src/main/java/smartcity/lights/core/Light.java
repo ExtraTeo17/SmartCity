@@ -128,11 +128,11 @@ public class Light extends Position {
 
     final void checkForTrafficJams(final OptimizationResult result) {
         if (trafficJamEmerged()) {
-            result.setShouldNotifyCarAboutStartOfTrafficJamOnThisLight(this, carQueue.size(), getOsmLightId());
+            result.setShouldNotifyCarAboutStartOfTrafficJamOnThisLight(this, carQueue.size(), getAdjacentWayId());
             result.setCarStuckInJam(carQueue.peek());
         }
         else if (trafficJamDisappeared()) {
-            result.setShouldNotifyCarAboutEndOfTrafficJamOnThisLight(getLat(), getLng(), getOsmLightId());
+            result.setShouldNotifyCarAboutEndOfTrafficJamOnThisLight(getLat(), getLng(), getAdjacentWayId());
         }
     }
 
