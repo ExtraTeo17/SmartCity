@@ -21,6 +21,7 @@ import routing.nodes.StationNode;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -75,7 +76,12 @@ final class Router implements
             finishingOsmNodeRef = routeInfo.getLast().findClosestNodeRefTo(pointB);
         }
 
-        routeInfo.determineRouteOrientationsAndFilterRelevantNodes(startingOsmNodeRef, finishingOsmNodeRef);
+        try {
+        	routeInfo.determineRouteOrientationsAndFilterRelevantNodes(startingOsmNodeRef, finishingOsmNodeRef);
+        } catch (NoSuchElementException e) {
+        	logger.info("GraphHopper API is not able to create route for provided points.");
+        	return new ArrayList<RouteNode>();
+        }
         var route = createRouteNodeList(routeInfo, isCar);
         return routeTransformer.uniformRouteNew(route, osmWayIdsAndEdgeList.getValue1());
     }

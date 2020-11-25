@@ -41,6 +41,10 @@ public class Light extends Position {
     public long getOsmLightId() {
         return osmLightId;
     }
+    
+    public void setTrafficJamOngoing(boolean trafficJamOngoing) {
+    	this.trafficJamOngoing = trafficJamOngoing;
+    }
 
     public long getAdjacentWayId() {
         return adjacentOsmWayId;
@@ -111,11 +115,7 @@ public class Light extends Position {
     }
 
     private boolean trafficJamEmerged() {
-        if (carQueue.size() >= TRAFFIC_JAM_THRESHOLD && !trafficJamOngoing) {
-            trafficJamOngoing = true;
-            return true;
-        }
-        return false;
+        return carQueue.size() >= TRAFFIC_JAM_THRESHOLD && !trafficJamOngoing;
     }
 
     private boolean trafficJamDisappeared() {

@@ -21,6 +21,7 @@ import smartcity.config.abstractions.ITroublePointsConfigContainer;
 import vehicles.MovingObject;
 import vehicles.enums.DrivingState;
 
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Random;
@@ -226,9 +227,11 @@ public class CarAgent extends AbstractAgent {
                 var newSimpleRouteEnd = routeGenerator.generateRouteInfo(positionAfterWhichRouteChanges,
                         oldUniformRoute.get(oldUniformRoute.size() - 1),
                         bewareOfJammedEdge);
-                var newRouteAfterChangeIndex = routeTransformer.uniformRoute(newSimpleRouteEnd);
+                if (newSimpleRouteEnd.size() == 0) { // Case when GraphHopper has problems
+                	newSimpleRouteEnd = new ArrayList<>(oldUniformRoute.subList(indexAfterWhichRouteChanges, oldUniformRoute.size()));
+                }
                 List<RouteNode> route = oldUniformRoute.subList(0, indexAfterWhichRouteChanges);
-                route.addAll(newRouteAfterChangeIndex);
+                route.addAll(newSimpleRouteEnd);
                 final RouteMergeInfo mergeResult = routeTransformer.mergeByDistance(car.getSimpleRoute(),
                         newSimpleRouteEnd);
                 mergeResult.newUniformRoute = route;
