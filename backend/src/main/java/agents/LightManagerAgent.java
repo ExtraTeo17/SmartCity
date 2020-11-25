@@ -67,7 +67,6 @@ public class LightManagerAgent extends AbstractAgent {
                 if (result.shouldNotifyCarAboutStartOfTrafficJamOnThisLight()) {
                     handleTrafficJams(result, agentStuckInJam);
                 }
-                if(false) {
                 if (result.shouldNotifyCarAboutStopOfTrafficJamOnThisLight()) {
                     sendMessageAboutTroubleStopToTroubleManager(result);
                 }
@@ -76,7 +75,6 @@ public class LightManagerAgent extends AbstractAgent {
                     for (String agentName : agentsFreeToProceed) {
                         answerCanProceed(agentName);
                     }
-                }
                 }
             }
 

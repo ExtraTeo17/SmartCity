@@ -227,7 +227,7 @@ public class CarAgent extends AbstractAgent {
                         oldUniformRoute.get(oldUniformRoute.size() - 1),
                         bewareOfJammedEdge);
                 var newRouteAfterChangeIndex = routeTransformer.uniformRoute(newSimpleRouteEnd);
-                var route = oldUniformRoute.subList(0, indexAfterWhichRouteChanges);
+                List<RouteNode> route = oldUniformRoute.subList(0, indexAfterWhichRouteChanges);
                 route.addAll(newRouteAfterChangeIndex);
                 final RouteMergeInfo mergeResult = routeTransformer.mergeByDistance(car.getSimpleRoute(),
                         newSimpleRouteEnd);
@@ -323,7 +323,7 @@ public class CarAgent extends AbstractAgent {
                 int indexAfterWhichRouteChanges;
                 if (indexOfRouteNodeWithEdge != null || !jamStart) {
                     indexAfterWhichRouteChanges = car.getNextNonVirtualIndex(THRESHOLD_UNTIL_INDEX_CHANGE);
-                    if (indexAfterWhichRouteChanges == car.getUniformRouteSize() - 1) {
+                    if (indexAfterWhichRouteChanges >= car.getUniformRouteSize() - 1) {
                         return;
                     }
                     handleLightTrafficJamRouteChange(indexAfterWhichRouteChanges, timeForTheEndWithJam, jamStart);
