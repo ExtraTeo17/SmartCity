@@ -46,7 +46,10 @@ const startSimulationData = {
   generateTroublePoints: false,
   timeBeforeTrouble: 5,
 
+  useFixedRoutes: true,
+  useFixedTroublePoints: false,
   startTime: new Date("2017-02-05T12:00:00Z"),
+  timeScale: 12,
 
   lightStrategyActive: true,
   extendLightTime: 30,
@@ -72,7 +75,7 @@ it("Passes correct data to ApiManager", async () => {
   expect(message).toBeTruthy();
   expect(message.type).toBe(START_SIMULATION_REQUEST);
   expect(message.payload).toBeTruthy();
-  expect(message.payload).toMatchObject({
+  expect({
     pedLimit: startSimulationData.pedLimit,
     testPedId: startSimulationData.testPedId,
 
@@ -87,7 +90,10 @@ it("Passes correct data to ApiManager", async () => {
     generateTroublePoints: startSimulationData.generateTroublePoints,
     timeBeforeTrouble: startSimulationData.timeBeforeTrouble,
 
+    useFixedRoutes: startSimulationData.useFixedRoutes,
+    useFixedTroublePoints: startSimulationData.useFixedTroublePoints,
     startTime: startSimulationData.startTime,
+    timeScale: startSimulationData.timeScale,
 
     lightStrategyActive: startSimulationData.lightStrategyActive,
     extendLightTime: startSimulationData.extendLightTime,
@@ -97,5 +103,5 @@ it("Passes correct data to ApiManager", async () => {
 
     changeRouteOnTroublePoint: startSimulationData.changeRouteOnTroublePoint,
     changeRouteOnTrafficJam: startSimulationData.changeRouteOnTrafficJam,
-  });
+  }).toMatchObject(message.payload);
 });
