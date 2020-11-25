@@ -14,7 +14,7 @@ import java.util.Map;
 import java.util.Queue;
 
 public class Light extends Position {
-    private static final int TRAFFIC_JAM_THRESHOLD = 2;
+    private static final int TRAFFIC_JAM_THRESHOLD = 1;
 
     private LightColor carLightColor;
     private final long adjacentOsmWayId;
