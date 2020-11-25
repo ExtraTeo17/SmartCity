@@ -7,7 +7,7 @@ import "../../styles/Menu.css";
 import { IS_DEBUG } from "../../constants/global";
 import { initialInteractionState } from "../../redux/reducers/interaction";
 
-const ScenariosMenu = props => {
+export const ScenariosMenuObj = props => {
   const { wasStarted, config = initialInteractionState } = props;
 
   const prepareSimulation = data => {
@@ -84,19 +84,43 @@ const ScenariosMenu = props => {
 
   return (
     <div className="form-border">
-      <button className="btn btn-primary btn-block" type="button" disabled={wasStarted} onClick={prepareCarZone}>
+      <button
+        id="prepareCarZoneBtn"
+        className="btn btn-primary btn-block"
+        type="button"
+        disabled={wasStarted}
+        onClick={prepareCarZone}
+      >
         Prepare car zone
       </button>
 
-      <button className="btn btn-primary btn-block mt-5" type="button" disabled={wasStarted} onClick={prepareBusZone}>
+      <button
+        id="prepareBusZoneBtn"
+        className="btn btn-primary btn-block mt-5"
+        type="button"
+        disabled={wasStarted}
+        onClick={prepareBusZone}
+      >
         Prepare bus zone
       </button>
 
-      <button className="btn btn-light btn-block mt-5" type="button" disabled={wasStarted} onClick={prepareRandomZoneForCars}>
+      <button
+        id="prepareRandomZoneBtn"
+        className="btn btn-light btn-block mt-5"
+        type="button"
+        disabled={wasStarted}
+        onClick={prepareRandomZoneForCars}
+      >
         Prepare random zone for cars
       </button>
 
-      <button className="btn btn-light btn-block mt-5" type="button" disabled={wasStarted} onClick={prepareAllInOneZone}>
+      <button
+        id="prepareAllZoneBtn"
+        className="btn btn-light btn-block mt-5"
+        type="button"
+        disabled={wasStarted}
+        onClick={prepareAllInOneZone}
+      >
         Prepare zone for all
       </button>
 
@@ -117,4 +141,4 @@ const mapStateToProps = (state /* , ownProps */) => {
   };
 };
 
-export default connect(mapStateToProps)(React.memo(ScenariosMenu));
+export default connect(mapStateToProps)(React.memo(ScenariosMenuObj));
