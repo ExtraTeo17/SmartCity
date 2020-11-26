@@ -11,7 +11,7 @@ import java.util.Map;
 public class OSMStation extends OSMNode implements Serializable {
     private final String stopId;
     private final String stopNumber;
-    private Map<String, StationInfo> busLineToAllStationsOnHisRoute = new HashMap<>();
+
     private Map<String, String> pedestrianAgentIDPreferredBusLine = new HashMap<>();
 
     public OSMStation(long osmId, double lat, double lng, final String stationRef) {
@@ -27,30 +27,12 @@ public class OSMStation extends OSMNode implements Serializable {
     public String getBusStopNr() {
         return stopNumber;
     }
-    public void addToBusLineStopMap( String busLine,
-                                     List<StationNode> mergedStationNodes) {
-        if (busLineToAllStationsOnHisRoute.containsKey(busLine)) {
-            busLineToAllStationsOnHisRoute.get(busLine).addAll(mergedStationNodes);
-        } else {
-            busLineToAllStationsOnHisRoute.put(busLine, new StationInfo(List.copyOf(mergedStationNodes)));
-        }
-    }
 
-    public String findBusLineFromStation(String stationOsmId) // BIG TODO: THREE THINGS
-    // 1/3: FIX THIS FUNCTION TO TAKE BEST LINE INTO CONSIDERATION, NOT FIRST
-    // 2/3: FIX PEDESTRIAN CHOOSING STOPS TO CHOOSE BETWEEN PREV AND NEXT, NOT ONLY NEXT
+
+
+    // 1/3: FIX THIS FUNCTION TO TAKE BEST LINE INTO CONSIDERATION, NOT FIRST - done - now in BusManager
+    // 2/3: FIX PEDESTRIAN CHOOSING STOPS TO CHOOSE BETWEEN PREV AND NEXT, NOT ONLY NEXT - done
     // 3/3: REFACTOR STATIC BUS CRASH GENERATION PREFERABLY TO TEST BUS
-    {
-        for (String busLine : busLineToAllStationsOnHisRoute.keySet())
-        {
-            if(busLineToAllStationsOnHisRoute.get(busLine).stream()
-                    .filter(node -> node.getOsmId() == Long.parseLong(stationOsmId)).findFirst().isPresent())
-            {
-                return busLine;
-            }
-        }
-      return null;
-    }
 
     public void addToAgentMap(String agentName, String desiredBusLine) {
         pedestrianAgentIDPreferredBusLine.put(agentName,desiredBusLine);

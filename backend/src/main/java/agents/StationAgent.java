@@ -97,7 +97,7 @@ public class StationAgent extends AbstractAgent {
                 var agentName = rcv.getSender().getLocalName();
                 if (messageKind == ACLMessage.INFORM) {
                 	print("Got INFORM from " + agentName);
-                    String desiredBusLine = getBusLineFromStationId(rcv.getUserDefinedParameter(MessageParameter.DESIRED_OSM_STATION_ID));
+                    String desiredBusLine = rcv.getUserDefinedParameter(MessageParameter.BUS_LINE);
                     station.addToAgentMap(agentName,desiredBusLine);
                     stationStrategy.addPedestrianToFarAwayQueue(agentName,desiredBusLine,
                             getDateParameter(rcv, MessageParameter.ARRIVAL_TIME));
@@ -172,10 +172,6 @@ public class StationAgent extends AbstractAgent {
 
         addBehaviour(communication);
         addBehaviour(checkState);
-    }
-
-    private String getBusLineFromStationId(String stationOsmId) {
-       return station.findBusLineFromStation(stationOsmId);
     }
 
     public OSMStation getStation() {

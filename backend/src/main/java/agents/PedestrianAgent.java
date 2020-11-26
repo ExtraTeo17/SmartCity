@@ -54,7 +54,9 @@ public class PedestrianAgent extends AbstractAgent {
 
     @Override
     protected void setup() {
-        getNextStation();
+       // getNextStation();
+        whichBusLine();
+
         informLightManager(pedestrian);
 
         pedestrian.setState(DrivingState.MOVING);
@@ -228,6 +230,8 @@ public class PedestrianAgent extends AbstractAgent {
                             messageToBusManager.addUserDefinedParameter(MessageParameter.STATION_FROM_ID,
                                     expectedNewStationNode.getOsmId()+"");
 
+                            messageToBusManager.addUserDefinedParameter(MessageParameter.EVENT,
+                                   MessageParameter.TROUBLE);
                             messageToBusManager.addUserDefinedParameter(MessageParameter.STATION_TO_ID,
                             		pedestrian.getTargetStation().getOsmId() + "");
 
@@ -239,27 +243,38 @@ public class PedestrianAgent extends AbstractAgent {
                         break;
                     case MessageParameter.BUS_MANAGER:
                     	if (rcv.getPerformative() == ACLMessage.INFORM) {
-                    	    logger.info("Got Inform message from BUS MANAGER");
-						long timeBetweenArrivalAtStationAndDesiredStation = Long.parseLong(rcv.getUserDefinedParameter(
-								MessageParameter.TIME_BETWEEN_PEDESTRIAN_AT_STATION_ARRIVAL_AND_REACHING_DESIRED_STOP));
-						//String newBusLine = rcv.getUserDefinedParameter(MessageParameter.BUS_LINE);
-						long busTimeMilliseconds = (pedestrian.getMillisecondsOnRoute(arrivingRouteToClosestStation))
-								+ (timeBetweenArrivalAtStationAndDesiredStation * 1000)
-								+ (pedestrian.getMillisecondsOnRoute(pedestrian.getUniformRoute()));
-						logger.info("Bike time in milliseconds: " + bikeTimeMilliseconds + " vs bus time in milliseconds: "
-								+ busTimeMilliseconds);
-						if (bikeTimeMilliseconds > busTimeMilliseconds) {
-							logger.info("Choose bus because bike time in milliseconds: " + bikeTimeMilliseconds
-									+ " vs bus time in milliseconds: " + busTimeMilliseconds);
-							restartAgentWithNewBusLine(arrivingRouteToClosestStation);
-						} else {
-							logger.info("Choose bike because bike time in milliseconds: " + bikeTimeMilliseconds
-									+ " vs bus time in milliseconds: " + busTimeMilliseconds);
-							performMetamorphosisToBike();
-                    		}
-                    	}
+
+                            if (rcv.getUserDefinedParameter(MessageParameter.EVENT).equals(MessageParameter.TROUBLE)) {
+                                troubleHandler(rcv);
+                            } else if (rcv.getUserDefinedParameter(MessageParameter.EVENT).equals(MessageParameter.START)) {
+                                getNextStation(rcv);
+                            }
+                        }
+
                 }
             }
+
+            private void troubleHandler(ACLMessage rcv) {
+                logger.info("Got Inform message from BUS MANAGER");
+                long timeBetweenArrivalAtStationAndDesiredStation = Long.parseLong(rcv.getUserDefinedParameter(
+                        MessageParameter.TIME_BETWEEN_PEDESTRIAN_AT_STATION_ARRIVAL_AND_REACHING_DESIRED_STOP));
+                //String newBusLine = rcv.getUserDefinedParameter(MessageParameter.BUS_LINE);
+                long busTimeMilliseconds = (pedestrian.getMillisecondsOnRoute(arrivingRouteToClosestStation))
+                        + (timeBetweenArrivalAtStationAndDesiredStation * 1000)
+                        + (pedestrian.getMillisecondsOnRoute(pedestrian.getUniformRoute()));
+                logger.info("Bike time in milliseconds: " + bikeTimeMilliseconds + " vs bus time in milliseconds: "
+                        + busTimeMilliseconds);
+                if (bikeTimeMilliseconds > busTimeMilliseconds) {
+                    logger.info("Choose bus because bike time in milliseconds: " + bikeTimeMilliseconds
+                            + " vs bus time in milliseconds: " + busTimeMilliseconds);
+                    restartAgentWithNewBusLine(arrivingRouteToClosestStation);
+                } else {
+                    logger.info("Choose bike because bike time in milliseconds: " + bikeTimeMilliseconds
+                            + " vs bus time in milliseconds: " + busTimeMilliseconds);
+                    performMetamorphosisToBike();
+                }
+            }
+
 
             private void performMetamorphosisToBike() {
 			  pedestrian.getTaskProvider().getCreateBikeTask(currentPosition, pedestrian.getEndPosition(),   pedestrian instanceof TestPedestrian).run();
@@ -277,7 +292,7 @@ public class PedestrianAgent extends AbstractAgent {
                 pedestrian.getStationFinish(),
                 pedestrian.getTimeProvider(),
                 pedestrian.getTaskProvider());
-                getNextStation();
+                whichBusLine();
                 informLightManager(pedestrian);
                 pedestrian.setTroubled(false);
 
@@ -315,7 +330,7 @@ public class PedestrianAgent extends AbstractAgent {
         addBehaviour(communication);
     }
 
-    private void getNextStation() {
+    private void getNextStation(ACLMessage rcv) {
         // finds next station and announces his arrival
         StationNode nextStation = pedestrian.findNextStation();
         pedestrian.setState(DrivingState.MOVING);
@@ -325,12 +340,26 @@ public class PedestrianAgent extends AbstractAgent {
             var currentTime = timeProvider.getCurrentSimulationTime();
             var predictedTime = currentTime.plusNanos(pedestrian.getMillisecondsToNextStation() * 1_000_000);
             properties.setProperty(MessageParameter.ARRIVAL_TIME, predictedTime.toString());
-            properties.setProperty(MessageParameter.DESIRED_OSM_STATION_ID, pedestrian.getTargetStation().getOsmId() + "");
+            properties.setProperty(MessageParameter.BUS_LINE, rcv.getUserDefinedParameter(MessageParameter.BUS_LINE));
             msg.setAllUserDefinedParameters(properties);
 
             send(msg);
             print("Sent INFORM to Station");
         }
+    }
+    private void whichBusLine(){
+      logger.info("Send inform about bus_line to to Bus");
+
+
+        ACLMessage msg = createMessage(ACLMessage.INFORM, BusManagerAgent.NAME);
+
+        var currentTime = timeProvider.getCurrentSimulationTime();
+        var predictedTime = currentTime.plusNanos(pedestrian.getMillisecondsToNextStation() * 1_000_000).toLocalTime();
+        msg.addUserDefinedParameter(MessageParameter.ARRIVAL_TIME, predictedTime.toString());
+        msg.addUserDefinedParameter(MessageParameter.STATION_FROM_ID, pedestrian.getStartingStation().getOsmId() + "");
+        msg.addUserDefinedParameter(MessageParameter.STATION_TO_ID,pedestrian.getStationFinish().getOsmId() + "");
+        msg.addUserDefinedParameter(MessageParameter.EVENT,MessageParameter.START);
+        send(msg);
     }
 
     private void move() {

@@ -250,7 +250,7 @@ public class AgentsPreparator {
                 logger.error("Stop present on way is not initiated as StationAgent: " + osmStop);
             }
         }
-        addInfoAboutAllBusStopsOnTheRouteAndBusLine(mergedOsmStops,busLine,mergedStationNodes);
+
         var timeNow = System.nanoTime();
         var route = routeGenerator.generateRouteInfoForBuses(osmRoute, mergedStationNodes);
         logger.info("Generating routeInfo finished. Took: " + (TimeProvider.getTimeInMs(timeNow)) + "ms");
@@ -258,18 +258,7 @@ public class AgentsPreparator {
         return route;
     }
 
-    private void addInfoAboutAllBusStopsOnTheRouteAndBusLine( List<OSMStation> osmStops,
-                                                             String busLine,
-                                                             List<StationNode> mergedStationNodes) {
 
-       // var stationIds = mergedStationNodes.stream().map(node -> node.getOsmId()).collect(Collectors.toList());
-        for (OSMStation el : osmStops)
-        {
-            el.addToBusLineStopMap(busLine, mergedStationNodes);
-        }
-
-
-    }
 
 
     private boolean prepareLightManagers() {

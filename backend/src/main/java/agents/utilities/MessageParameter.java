@@ -44,6 +44,8 @@ public class MessageParameter {
     public static final String LON_OF_NEXT_CLOSEST_STATION = "lon_of_next_closest_station" ;
 	public static final String TIME = "time";
 	public static final String TIME_BETWEEN_PEDESTRIAN_AT_STATION_ARRIVAL_AND_REACHING_DESIRED_STOP = "time_between_pedestrian_at_station_arrival_and_reaching_desired_stop";
+    public static final String EVENT = "event";
+    public static final String START = "start" ;
 
 
     public static String getTypeByMovingObject(MovingObject movingObject) {

@@ -59,6 +59,8 @@ public class BusAgent extends AbstractAgent {
             print("No stations on route!", LoggerLevel.ERROR);
             return;
         }
+
+
         
         //print("HELLO I AM A BUS: " + bus.getSuperExtraString());
 
@@ -297,7 +299,7 @@ public class BusAgent extends AbstractAgent {
                     properties.setProperty(MessageParameter.TROUBLE_LON, Double.toString(troublePoint.getLng()));
                     if(!isTroubleManager)
                     {
-                        properties.setProperty(MessageParameter.DESIRED_OSM_STATION_ID,((StationNode)bus.findNextStop()).getOsmId()+"");
+                        properties.setProperty(MessageParameter.DESIRED_OSM_STATION_ID, bus.findBestChoiceOfStation());
                         properties.setProperty(MessageParameter.AGENT_ID_OF_NEXT_CLOSEST_STATION,((StationNode)bus.findNextStop()).getAgentId()+"");
                         //maybe not needed
                         properties.setProperty(MessageParameter.LAT_OF_NEXT_CLOSEST_STATION,((StationNode)bus.findNextStop()).getLat()+"");
@@ -408,4 +410,6 @@ public class BusAgent extends AbstractAgent {
     public boolean shouldStart() {
         return bus.shouldStart();
     }
+
+
 }

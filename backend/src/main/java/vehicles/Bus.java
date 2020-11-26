@@ -67,15 +67,47 @@ public class Bus extends MovingObject {
         }
     }
 
+    public String findBestChoiceOfStation() {
+
+        int currentPosition = moveIndex;
+        Integer positionOfStationNext = null;
+        Integer positionOfStationPrev = null;
+        for (int i = currentPosition + 1; i < uniformRoute.size(); i++) {
+            if (uniformRoute.get(i) instanceof StationNode) {
+                positionOfStationNext = i;
+
+            }
+        }
+
+        for (int i = currentPosition; i > 0 ; i--) {
+            if (uniformRoute.get(i) instanceof StationNode) {
+                positionOfStationNext = i;
+
+            }
+        }
+
+        if (positionOfStationNext == null && positionOfStationPrev == null)
+            return null;
+
+
+        if (positionOfStationPrev == null || Math.abs(currentPosition - positionOfStationNext) < Math.abs(currentPosition - positionOfStationPrev)) {
+            return ((StationNode) uniformRoute.get(positionOfStationNext)).getOsmId() + "";
+        }
+        return ((StationNode) uniformRoute.get(positionOfStationPrev)).getOsmId() + "";
+
+
+    }
+
     public int getPassengersCount() {
         return passengersCount;
     }
-    public List<String> getAllPassangers(){
+
+    public List<String> getAllPassangers() {
         List<String> allPassengers = new ArrayList<>();
         Iterator it = stationsForPassengers.entrySet().iterator();
         while (it.hasNext()) {
-            var pair = (Map.Entry)it.next();
-            allPassengers.addAll((List<String>)pair.getValue());
+            var pair = (Map.Entry) it.next();
+            allPassengers.addAll((List<String>) pair.getValue());
             it.remove(); // avoids a ConcurrentModificationException
         }
         return allPassengers;
@@ -86,8 +118,7 @@ public class Bus extends MovingObject {
         ++passengersCount;
         if (passengersCount > CAPACITY_HIGH) {
             setFillState(BusFillState.HIGH);
-        }
-        else if (passengersCount > CAPACITY_MID) {
+        } else if (passengersCount > CAPACITY_MID) {
             setFillState(BusFillState.MID);
         }
     }
@@ -97,8 +128,7 @@ public class Bus extends MovingObject {
         --passengersCount;
         if (passengersCount <= CAPACITY_MID) {
             setFillState(BusFillState.LOW);
-        }
-        else if (passengersCount <= CAPACITY_HIGH) {
+        } else if (passengersCount <= CAPACITY_HIGH) {
             setFillState(BusFillState.MID);
         }
     }
@@ -119,8 +149,7 @@ public class Bus extends MovingObject {
         if (passengers != null) {
             passengers.add(name);
             increasePassengersCount();
-        }
-        else {
+        } else {
             logger.warn("Unrecognized station id: " + id);
         }
     }
@@ -161,6 +190,7 @@ public class Bus extends MovingObject {
         return VehicleType.BUS.toString();
     }
 
+
     public Optional<StationNode> findNextStation() {
         for (int i = moveIndex + 1; i < uniformRoute.size(); ++i) {
             if (uniformRoute.get(i) instanceof StationNode) {
@@ -189,8 +219,7 @@ public class Bus extends MovingObject {
         for (int i = moveIndex + 1; i < uniformRoute.size(); i++) {
             if (uniformRoute.get(i) instanceof StationNode) {
                 return uniformRoute.get(i);
-            }
-            else if (uniformRoute.get(i) instanceof LightManagerNode) {
+            } else if (uniformRoute.get(i) instanceof LightManagerNode) {
                 return uniformRoute.get(i);
             }
         }
@@ -233,7 +262,7 @@ public class Bus extends MovingObject {
         return hours == dateNow.getHour() && minutes == dateNow.getMinute();
     }
 
-	public String getSuperExtraString() {
-		return "BRIDAGE: " + brigadeNr + ", BUS LINE: " + busLine;
-	}
+    public String getSuperExtraString() {
+        return "BRIDAGE: " + brigadeNr + ", BUS LINE: " + busLine;
+    }
 }

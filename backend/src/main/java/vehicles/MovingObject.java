@@ -254,4 +254,6 @@ public abstract class MovingObject {
         }
         return index - 1;
     }
+
+
 }
