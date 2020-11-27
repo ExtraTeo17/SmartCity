@@ -263,6 +263,10 @@ public class Bus extends MovingObject {
     }
 
     public String getSuperExtraString() {
-        return "BRIDAGE: " + brigadeNr + ", BUS LINE: " + busLine;
+        return "Brigade: " + brigadeNr + ", bus line: " + busLine;
     }
+
+	public String getBrigade() {
+		return brigadeNr;
+	}
 }

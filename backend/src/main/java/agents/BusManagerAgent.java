@@ -68,15 +68,19 @@ public class BusManagerAgent extends AbstractAgent {
                 long stationOsmIdFrom = Long.parseLong(rcv.getUserDefinedParameter(MessageParameter.STATION_FROM_ID));
                 long stationOsmIdTo = Long.parseLong(rcv.getUserDefinedParameter(MessageParameter.STATION_TO_ID));
                 LocalTime arrivalTime = LocalTime.parse(rcv.getUserDefinedParameter(MessageParameter.ARRIVAL_TIME));
-                String event = rcv.getUserDefinedParameter(MessageParameter.EVENT);
-                ACLMessage msg = getBestMatch(rcv.createReply(), stationOsmIdFrom, stationOsmIdTo, arrivalTime,event);
-                send(msg);
+				String event = rcv.getUserDefinedParameter(MessageParameter.EVENT);
+				ACLMessage msg = getBestMatch(rcv.createReply(), stationOsmIdFrom, stationOsmIdTo, arrivalTime, event,
+						rcv.getUserDefinedParameter(MessageParameter.BUS_LINE),
+						rcv.getUserDefinedParameter(MessageParameter.BRIGADE));
+				send(msg);
                 logger.info("Send message to pedestrian ");
             }
 
-            private ACLMessage getBestMatch(ACLMessage response, long stationOsmIdFrom, long stationOsmIdTo, LocalTime timeOnStation, String event) {
-                long minimumTimeOverall = Long.MAX_VALUE;
+			private ACLMessage getBestMatch(ACLMessage response, long stationOsmIdFrom, long stationOsmIdTo,
+					LocalTime timeOnStation, String event, String troubledLine, String troubledBrigade) {
+				long minimumTimeOverall = Long.MAX_VALUE;
                 String preferredBusLine = null;
+                LocalTime TEST_preferredTimeOnStationFrom = null;
                 for (BusInfo info : busInfos) {
                     OSMStation stationFrom = null, stationTo = null;
                     for (OSMStation station : info.stops) {
@@ -92,6 +96,9 @@ public class BusManagerAgent extends AbstractAgent {
                         LocalTime minimumTimeOnStationFrom = null;
                         LocalTime minimumTimeOnStationTo = null;
                         for (BrigadeInfo brigInfo : info.brigadeList) {
+                        	if (info.busLine.equals(troubledLine) && brigInfo.brigadeId.equals(troubledBrigade)) {
+                        		continue;
+                        	}
                             for (Timetable table : brigInfo.timetables) {
                                 LocalTime timeOnStationFrom = table.getTimeOnStation(stationOsmIdFrom).get().toLocalTime();
                                 LocalTime timeOnStationTo = table.getTimeOnStation(stationOsmIdTo).get().toLocalTime();
@@ -108,14 +115,17 @@ public class BusManagerAgent extends AbstractAgent {
                         if (overallTravelTime < minimumTimeOverall) {
                             minimumTimeOverall = overallTravelTime;
                             preferredBusLine = info.busLine;
+                            TEST_preferredTimeOnStationFrom = minimumTimeOnStationFrom;
                         }
                     }
                 }
+                logger.info("PREFERRED BUS LINE: " + preferredBusLine);
+                logger.info("TIME ON STATION FROM: " + TEST_preferredTimeOnStationFrom);
                 response.addUserDefinedParameter(MessageParameter.TIME_BETWEEN_PEDESTRIAN_AT_STATION_ARRIVAL_AND_REACHING_DESIRED_STOP,
                         minimumTimeOverall + "");
                 response.addUserDefinedParameter(MessageParameter.BUS_LINE, preferredBusLine);
                 response.addUserDefinedParameter(MessageParameter.TYPE, MessageParameter.BUS_MANAGER);
-                response.addUserDefinedParameter(MessageParameter.EVENT,event);
+                response.addUserDefinedParameter(MessageParameter.EVENT, event);
                 logger.info("Prepared message for pedestrian");
                 return response;
             }

@@ -41,6 +41,7 @@ public class BusAgent extends AbstractAgent {
     private final ITroublePointsConfigContainer configContainer;
     private static final int THRESHOLD_UNTIL_INDEX_CHANGE = 50;
     private RouteNode troublePoint;
+    
     BusAgent(int busId, Bus bus,
              ITimeProvider timeProvider,
              EventBus eventBus,
@@ -60,9 +61,7 @@ public class BusAgent extends AbstractAgent {
             return;
         }
 
-
-        
-        //print("HELLO I AM A BUS: " + bus.getSuperExtraString());
+        print("Bus start: " + bus.getSuperExtraString());
 
         var firstStation = firstStationOpt.get();
         print("Started at station " + firstStation.getAgentId() + ".");
@@ -251,7 +250,7 @@ public class BusAgent extends AbstractAgent {
 
         if (configContainer.shouldGenerateCrashForBuses()) {
             var timeBeforeTroubleMs = this.configContainer.getTimeBeforeTrouble() * 1000;
-            Behaviour troubleGenerator = new TickerBehaviour(this, 7_000) {
+            Behaviour troubleGenerator = new TickerBehaviour(this, 8000) {
 
 				@Override
                 public void onTick() {
@@ -299,11 +298,14 @@ public class BusAgent extends AbstractAgent {
                     properties.setProperty(MessageParameter.TROUBLE_LON, Double.toString(troublePoint.getLng()));
                     if(!isTroubleManager)
                     {
-                        properties.setProperty(MessageParameter.DESIRED_OSM_STATION_ID, bus.findBestChoiceOfStation());
+                        properties.setProperty(MessageParameter.DESIRED_OSM_STATION_ID, ((StationNode)bus.findNextStop()).getOsmId()+"");
                         properties.setProperty(MessageParameter.AGENT_ID_OF_NEXT_CLOSEST_STATION,((StationNode)bus.findNextStop()).getAgentId()+"");
                         //maybe not needed
                         properties.setProperty(MessageParameter.LAT_OF_NEXT_CLOSEST_STATION,((StationNode)bus.findNextStop()).getLat()+"");
                         properties.setProperty(MessageParameter.LON_OF_NEXT_CLOSEST_STATION,((StationNode)bus.findNextStop()).getLng()+"");
+
+                        properties.setProperty(MessageParameter.BUS_LINE, getLine());
+                        properties.setProperty(MessageParameter.BRIGADE, bus.getBrigade());
                     }
                     msg.setAllUserDefinedParameters(properties);
                     return msg;
