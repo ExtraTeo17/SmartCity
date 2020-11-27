@@ -85,6 +85,10 @@ public class TaskProvider implements ITaskProvider {
                 logger.warn("Error generating route info", e);
                 return;
             }
+            if (route.size() == 0) {
+            	logger.debug("Generated route is empty, agent won't be created.");
+            	return;
+            }
 
             CarAgent agent = agentsFactory.create(route, testCar);
             if (agentsContainer.tryAdd(agent)) {
@@ -108,6 +112,10 @@ public class TaskProvider implements ITaskProvider {
             } catch (Exception e) {
                 logger.warn("Error generating route info", e);
                 return;
+            }
+            if (route.size() == 0) {
+            	logger.debug("Generated route is empty, agent won't be created.");
+            	return;
             }
 
             BikeAgent agent = agentsFactory.create(route, testBike, "");
@@ -142,6 +150,10 @@ public class TaskProvider implements ITaskProvider {
                         pedestrianFinishPoint,
                         String.valueOf(endStation.getOsmId()),
                         null);
+                if (routeToStation.size() == 0 || routeFromStation.size() == 0) {
+                	logger.debug("Generated route is empty, agent won't be created.");
+                	return;
+                }
 
                 PedestrianAgent agent = agentsFactory.create(routeToStation, routeFromStation,
                         busLine, startStation, endStation, testPedestrian);
