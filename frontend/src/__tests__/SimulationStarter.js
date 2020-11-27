@@ -7,15 +7,13 @@ import { SimulationStarterObj } from "../components/Menu/Main/SimulationStarter"
 import { START_SIMULATION_REQUEST } from "../web/MessageType";
 // eslint-disable-next-line no-unused-vars
 import WebServer from "../web/WebServer";
+import * as store from "../redux/store";
 
 let message;
-jest.mock("../web/WebServer", () => {
-  return {
-    send(msg) {
-      message = msg;
-    },
-  };
-});
+WebServer.send = msg => {
+  message = msg;
+};
+store.dispatch = () => {};
 
 let container = null;
 beforeEach(() => {
@@ -75,7 +73,7 @@ it("Passes correct data to ApiManager", async () => {
   expect(message).toBeTruthy();
   expect(message.type).toBe(START_SIMULATION_REQUEST);
   expect(message.payload).toBeTruthy();
-  expect({
+  expect(message.payload).toStrictEqual({
     pedLimit: startSimulationData.pedLimit,
     testPedId: startSimulationData.testPedId,
 
@@ -103,5 +101,5 @@ it("Passes correct data to ApiManager", async () => {
 
     changeRouteOnTroublePoint: startSimulationData.changeRouteOnTroublePoint,
     changeRouteOnTrafficJam: startSimulationData.changeRouteOnTrafficJam,
-  }).toMatchObject(message.payload);
+  });
 });
