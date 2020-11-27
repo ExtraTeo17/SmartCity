@@ -1,11 +1,8 @@
-// user.test.js
-
 import React from "react";
 import { render, unmountComponentAtNode } from "react-dom";
 import { act } from "react-dom/test-utils";
 import { SimulationStarterObj } from "../components/Menu/Main/SimulationStarter";
 import { START_SIMULATION_REQUEST } from "../web/MessageType";
-// eslint-disable-next-line no-unused-vars
 import WebServer from "../web/WebServer";
 import * as store from "../redux/store";
 
@@ -59,8 +56,7 @@ const startSimulationData = {
   changeRouteOnTrafficJam: false,
 };
 
-it("Passes correct data to ApiManager", async () => {
-  // Use the asynchronous version of act to apply resolved promises
+it("Passes correct data to ApiManager", () => {
   act(() => {
     render(<SimulationStarterObj startSimulationData={startSimulationData} wasPrepared wasStarted={false} />, container);
   });

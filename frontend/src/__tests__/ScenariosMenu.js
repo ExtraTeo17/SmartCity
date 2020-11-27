@@ -1,5 +1,3 @@
-// user.test.js
-
 import React from "react";
 import { render, unmountComponentAtNode } from "react-dom";
 import { act } from "react-dom/test-utils";
@@ -67,7 +65,7 @@ const config = {
 
 let container = null;
 let buttons = null;
-beforeAll(async () => {
+beforeAll(() => {
   // setup a DOM element as a render target
   container = document.createElement("div");
   document.body.appendChild(container);
@@ -77,7 +75,7 @@ beforeAll(async () => {
   });
 });
 
-afterAll(async () => {
+afterAll(() => {
   // cleanup on exiting
   unmountComponentAtNode(container);
   container.remove();

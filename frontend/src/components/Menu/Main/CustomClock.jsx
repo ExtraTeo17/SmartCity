@@ -3,9 +3,15 @@ import { connect } from "react-redux";
 import "../../../styles/CustomClock.css";
 
 const timeUpdateThresholdMs = 1000;
+const dateFormat = new Intl.DateTimeFormat("pl-PL", {
+  dateStyle: "short",
+});
+const timeFormat = new Intl.DateTimeFormat("pl-PL", {
+  timeStyle: "medium",
+});
 
 // https://css-tricks.com/using-requestanimationframe-with-react-hooks/
-const CustomClock = props => {
+export const CustomClockObj = props => {
   const { wasStarted, time, timeScale } = props;
   const [currTime, setCurrTime] = useState(time);
 
@@ -41,8 +47,8 @@ const CustomClock = props => {
   return (
     <div className="center-wrapper mt-4">
       <div id="clock" className="ml-4">
-        <div className="date">{currTime.toLocaleDateString("PL-pl")}</div>
-        <div className="time">{currTime.toLocaleTimeString("PL-pl")} </div>
+        <div className="date">{dateFormat.format(currTime)}</div>
+        <div className="time">{timeFormat.format(currTime)}</div>
       </div>
     </div>
   );
@@ -58,4 +64,4 @@ const mapStateToProps = (state /* , ownProps */) => {
   };
 };
 
-export default connect(mapStateToProps)(React.memo(CustomClock));
+export default connect(mapStateToProps)(React.memo(CustomClockObj));

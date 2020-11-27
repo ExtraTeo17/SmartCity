@@ -11,6 +11,7 @@ const RotatedMarker = props => {
     }
   };
 
+  // eslint-disable-next-line react/jsx-props-no-spreading
   return <Marker ref={setupMarker} {...props} />;
 };
 
