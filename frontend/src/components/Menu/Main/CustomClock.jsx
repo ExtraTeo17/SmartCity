@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { connect } from "react-redux";
 import "../../../styles/CustomClock.css";
 
-const timeUpdateThresholdMs = 1000;
+export const timeUpdateThresholdMs = 999;
 const dateFormat = new Intl.DateTimeFormat("pl-PL", {
   dateStyle: "short",
 });
@@ -37,6 +37,7 @@ export const CustomClockObj = props => {
         }
         requestRef.current = requestAnimationFrame(animate);
       };
+
       requestRef.current = requestAnimationFrame(animate);
 
       return () => cancelAnimationFrame(requestRef.current);

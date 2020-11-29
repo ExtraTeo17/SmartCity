@@ -66,7 +66,6 @@ const config = {
 let container = null;
 let buttons = null;
 beforeAll(() => {
-  // setup a DOM element as a render target
   container = document.createElement("div");
   document.body.appendChild(container);
   act(() => {
@@ -76,10 +75,10 @@ beforeAll(() => {
 });
 
 afterAll(() => {
-  // cleanup on exiting
   unmountComponentAtNode(container);
   container.remove();
   container = null;
+  jest.clearAllMocks();
 });
 
 describe("Menu", () => {
