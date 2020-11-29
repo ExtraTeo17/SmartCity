@@ -12,6 +12,7 @@ import jade.lang.acl.ACLMessage;
 import jade.util.leap.Properties;
 import jade.wrapper.AgentState;
 import routing.RoutingConstants;
+import routing.core.IGeoPosition;
 import routing.nodes.LightManagerNode;
 import routing.nodes.RouteNode;
 import routing.nodes.StationNode;
@@ -27,8 +28,10 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Random;
 
+import static agents.AgentConstants.DEFAULT_BLOCK_ON_ERROR;
 import static agents.message.MessageManager.createMessage;
 import static agents.message.MessageManager.createProperties;
+import static smartcity.config.StaticConfig.USE_BATCHED_UPDATES;
 
 @SuppressWarnings("serial")
 public class BusAgent extends AbstractAgent {
@@ -154,15 +157,18 @@ public class BusAgent extends AbstractAgent {
         };
 
         Behaviour communication = new CyclicBehaviour() {
+            @SuppressWarnings("DuplicatedCode")
             @Override
             public void action() {
                 ACLMessage rcv = receive();
                 if (rcv == null) {
+                    block();
                     return;
                 }
 
                 String type = rcv.getUserDefinedParameter(MessageParameter.TYPE);
                 if (type == null) {
+                    block(DEFAULT_BLOCK_ON_ERROR);
                     logTypeError(rcv);
                     return;
                 }
@@ -197,8 +203,7 @@ public class BusAgent extends AbstractAgent {
                                 bus.setState(DrivingState.PASSING_STATION);
                             }
                         }
-                        else if (rcv.getPerformative() == ACLMessage.AGREE)
-                        {
+                        else if (rcv.getPerformative() == ACLMessage.AGREE) {
                             logger.info("GOT AGREE from station");
                             bus.setState(DrivingState.WAITING_AT_STATION);
                         }
@@ -228,7 +233,6 @@ public class BusAgent extends AbstractAgent {
 
                         break;
                 }
-                block(100);
             }
         };
 
@@ -236,9 +240,20 @@ public class BusAgent extends AbstractAgent {
         addBehaviour(communication);
     }
 
+    public void move() {
+        bus.move();
+        if (!USE_BATCHED_UPDATES) {
+            eventBus.post(new BusAgentUpdatedEvent(this.getId(), bus.getPosition()));
+        }
+    }
+
+    public IGeoPosition getPosition() {
+        return bus.getPosition();
+    }
+
     private void informNextStation() {
         // finds next station and announces his arrival
-        System.out.println("informNextStation");
+        logger.info("informNextStation");
         var stationOpt = bus.findNextStation();
         if (stationOpt.isPresent()) {
             var station = stationOpt.get();
@@ -284,11 +299,6 @@ public class BusAgent extends AbstractAgent {
 
     public String getLine() {
         return bus.getLine();
-    }
-
-    public void move() {
-        bus.move();
-        eventBus.post(new BusAgentUpdatedEvent(this.getId(), bus.getPosition()));
     }
 
     // TODO: Fix situation where bus route contains only one station and pedestrians tries to choose two

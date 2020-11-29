@@ -20,8 +20,10 @@ import smartcity.SmartCityAgent;
 import vehicles.Pedestrian;
 import vehicles.enums.DrivingState;
 
+import static agents.AgentConstants.DEFAULT_BLOCK_ON_ERROR;
 import static agents.message.MessageManager.createMessage;
 import static agents.message.MessageManager.createProperties;
+import static smartcity.config.StaticConfig.USE_BATCHED_UPDATES;
 
 public class PedestrianAgent extends AbstractAgent {
     public static final String name = PedestrianAgent.class.getSimpleName().replace("Agent", "");
@@ -82,7 +84,7 @@ public class PedestrianAgent extends AbstractAgent {
                                     .toString());
                             msg.setAllUserDefinedParameters(properties);
                             send(msg);
-                           // print("Send REQUEST_WHEN to Station");
+                            // print("Send REQUEST_WHEN to Station");
 
                             pedestrian.setState(DrivingState.WAITING_AT_STATION);
                             break;
@@ -118,15 +120,18 @@ public class PedestrianAgent extends AbstractAgent {
         };
 
         Behaviour communication = new CyclicBehaviour() {
+            @SuppressWarnings("DuplicatedCode")
             @Override
             public void action() {
                 ACLMessage rcv = receive();
                 if (rcv == null) {
+                    block();
                     return;
                 }
 
                 String type = rcv.getUserDefinedParameter(MessageParameter.TYPE);
                 if (type == null) {
+                    block(DEFAULT_BLOCK_ON_ERROR);
                     logTypeError(rcv);
                     return;
                 }
@@ -215,7 +220,9 @@ public class PedestrianAgent extends AbstractAgent {
 
     private void move() {
         pedestrian.move();
-        eventBus.post(new PedestrianAgentUpdatedEvent(this.getId(), pedestrian.getPosition()));
+        if (!USE_BATCHED_UPDATES) {
+            eventBus.post(new PedestrianAgentUpdatedEvent(this.getId(), pedestrian.getPosition()));
+        }
     }
 
     private void enterBus() {

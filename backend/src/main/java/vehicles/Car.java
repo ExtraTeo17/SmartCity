@@ -6,10 +6,13 @@ import vehicles.enums.VehicleType;
 
 import java.util.List;
 
+import static vehicles.Constants.SPEED_SCALE;
+
 public class Car extends MovingObject {
+    private static final int DEFAULT_SPEED = 35 * SPEED_SCALE;
 
     public Car(int agentId, List<RouteNode> displayRoute, List<RouteNode> uniformRoute, ITimeProvider timeProvider) {
-        super(timeProvider, agentId, 35, uniformRoute, displayRoute);
+        super(timeProvider, agentId, DEFAULT_SPEED, uniformRoute, displayRoute);
     }
 
     Car(Car car) {

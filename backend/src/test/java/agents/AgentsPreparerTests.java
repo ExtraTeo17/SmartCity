@@ -40,7 +40,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 @SuppressWarnings("OverlyCoupledClass")
-class AgentsPreparatorTests {
+class AgentsPreparerTests {
     private final IZone defaultZone = Zone.of(52.23682, 21.01681, 600);
 
     @Test
@@ -122,7 +122,7 @@ class AgentsPreparatorTests {
                 "This lights should be in same group: (" + adjacentIds[0] + "," + adjacentIds[1] + ")");
     }
 
-    private AgentsPreparator setupAgentsCreator(IAgentsContainer agentsContainer) {
+    private AgentsPreparer setupAgentsCreator(IAgentsContainer agentsContainer) {
         var lightAccessManager = setupLightAccessManager();
         var configContainer = mock(ConfigContainer.class);
         var busLinesManager = mock(BusLinesManager.class);
@@ -133,7 +133,7 @@ class AgentsPreparatorTests {
         var osmContainer = mock(NodesContainer.class);
         var cacheWrapper = mock(ICacheWrapper.class);
 
-        return new AgentsPreparator(agentsContainer, configContainer, busLinesManager, agentsFactory,
+        return new AgentsPreparer(agentsContainer, configContainer, busLinesManager, agentsFactory,
                 eventBus, lightAccessManager, mapAccessManager, routeGenerator, cacheWrapper);
     }
 

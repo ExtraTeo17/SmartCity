@@ -12,7 +12,6 @@ import routing.RoutingHelper;
 import routing.abstractions.IRoutingHelper;
 import routing.core.IZone;
 import routing.core.Zone;
-import smartcity.TimeProvider;
 import smartcity.config.abstractions.IGenerationConfigContainer;
 import smartcity.lights.core.SimpleLightGroup;
 import smartcity.task.abstractions.ITaskManager;
@@ -145,7 +144,7 @@ public class TaskManager implements ITaskManager {
     @Override
     public void scheduleSimulationControl(BooleanSupplier testSimulationState, LocalDateTime simulationStartTime) {
         var simulationControlTask = taskProvider.getSimulationControlTask(simulationStartTime);
-        runWhile(testSimulationState, simulationControlTask, TimeProvider.MS_PER_TICK);
+        runWhile(testSimulationState, simulationControlTask, SIMULATION_CONTROL_INTERVAL);
     }
 
     @Override

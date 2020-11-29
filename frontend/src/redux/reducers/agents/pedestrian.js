@@ -4,6 +4,7 @@ import {
   PEDESTRIAN_KILLED,
   PEDESTRIAN_PUSHED,
   PEDESTRIAN_PULLED,
+  BATCHED_UPDATE,
 } from "../../core/constants";
 
 // Just for reference - defined in store.js
@@ -27,6 +28,20 @@ const pedestrian = (state = initialState, action) => {
       const newPedestrians = state.pedestrians.map(p => {
         if (p.id === ped.id) {
           return { ...p, location: ped.location };
+        }
+        return p;
+      });
+
+      return { ...state, pedestrians: newPedestrians };
+    }
+
+    case BATCHED_UPDATE: {
+      const { pedUpdates } = payload;
+
+      const newPedestrians = state.pedestrians.map(p => {
+        const update = pedUpdates.find(ped => ped.id === p.id);
+        if (update) {
+          return { ...p, location: update.location };
         }
         return p;
       });

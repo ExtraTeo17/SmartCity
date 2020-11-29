@@ -19,14 +19,14 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import osmproxy.ExtendedGraphHopper;
 import routing.core.Position;
-import smartcity.ITimeProvider;
 import smartcity.SimulationState;
 import smartcity.config.ConfigContainer;
 
-import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
+import static agents.AgentConstants.DEFAULT_BLOCK_ON_ERROR;
 import static agents.message.MessageManager.createProperties;
 
 public class TroubleManagerAgent extends Agent {
@@ -34,7 +34,6 @@ public class TroubleManagerAgent extends Agent {
     private final static Logger logger = LoggerFactory.getLogger(TroubleManagerAgent.class);
 
     private final IAgentsContainer agentsContainer;
-    private final ITimeProvider timeProvider;
     private final ConfigContainer configContainer;
     private final EventBus eventBus;
 
@@ -44,11 +43,9 @@ public class TroubleManagerAgent extends Agent {
 
     @Inject
     TroubleManagerAgent(IAgentsContainer agentsContainer,
-                        ITimeProvider timeProvider,
                         ConfigContainer configContainer,
                         EventBus eventBus) {
         this.agentsContainer = agentsContainer;
-        this.timeProvider = timeProvider;
         this.configContainer = configContainer;
         this.eventBus = eventBus;
 
@@ -57,9 +54,7 @@ public class TroubleManagerAgent extends Agent {
     }
 
     private void sendBroadcast(ACLMessage response) {
-        agentsContainer.forEach(CarAgent.class, CarAgent -> {
-            response.addReceiver(CarAgent.getAID());
-        });
+        agentsContainer.forEach(CarAgent.class, CarAgent -> response.addReceiver(CarAgent.getAID()));
         send(response);
         logger.debug("Sent broadcast");
     }
@@ -97,7 +92,7 @@ public class TroubleManagerAgent extends Agent {
         logger.debug("Got message about new troublePoint: " + troublePoint.getLat() + "  " + troublePoint.getLng());
         if (!mapOfConstructionSiteBlockedEdges.containsKey(edgeId)) {
             mapOfConstructionSiteBlockedEdges.put(edgeId, rcv.getUserDefinedParameter(MessageParameter.LENGTH_OF_JAM));
-            ExtendedGraphHopper.addForbiddenEdges(Arrays.asList(edgeId));
+            ExtendedGraphHopper.addForbiddenEdges(Collections.singletonList(edgeId));
         }
         sendBroadcast(generateMessageAboutTrouble(rcv, MessageParameter.CONSTRUCTION, MessageParameter.SHOW));
     }
@@ -111,7 +106,7 @@ public class TroubleManagerAgent extends Agent {
         logger.debug("Got message about light traffic jam start on: " + edgeId);
         if (!mapOfLightTrafficJamBlockedEdges.containsKey(edgeId)) {
             mapOfLightTrafficJamBlockedEdges.put(edgeId, rcv.getUserDefinedParameter(MessageParameter.LENGTH_OF_JAM));
-            ExtendedGraphHopper.addForbiddenEdges(Arrays.asList(edgeId));
+            ExtendedGraphHopper.addForbiddenEdges(Collections.singletonList(edgeId));
         }
         else {
             mapOfLightTrafficJamBlockedEdges.replace(edgeId, rcv.getUserDefinedParameter(MessageParameter.LENGTH_OF_JAM));
@@ -128,7 +123,7 @@ public class TroubleManagerAgent extends Agent {
         logger.debug("Got message about light traffic jam stop on: " + edgeId);
         if (mapOfLightTrafficJamBlockedEdges.containsKey(edgeId)) {
             mapOfLightTrafficJamBlockedEdges.remove(edgeId);
-            ExtendedGraphHopper.removeForbiddenEdges(Arrays.asList(edgeId));
+            ExtendedGraphHopper.removeForbiddenEdges(Collections.singletonList(edgeId));
         }
         sendBroadcast(generateMessageAboutTrouble(rcv, MessageParameter.TRAFFIC_JAM, MessageParameter.STOP));
     }
@@ -137,32 +132,35 @@ public class TroubleManagerAgent extends Agent {
     protected void setup() { // TODO: wysłać broadcact kiedy trouble się skończy
 
         Behaviour communication = new CyclicBehaviour() {
-
             @Override
             public void action() {
                 ACLMessage rcv = receive();
-                if (rcv != null) {
-                    switch (rcv.getPerformative()) {
-                        case ACLMessage.INFORM -> {
+                if (rcv == null) {
+                    block();
+                    return;
+                }
 
-                            if (rcv.getUserDefinedParameter(MessageParameter.TROUBLE).equals(MessageParameter.SHOW)) {
-                                //parsing received message
-                                if (rcv.getUserDefinedParameter(MessageParameter.TYPEOFTROUBLE).equals(MessageParameter.CONSTRUCTION)) {
-                                    constructionAppearedHandle(rcv);
-                                }
-                                else if (rcv.getUserDefinedParameter(MessageParameter.TYPEOFTROUBLE).equals(MessageParameter.TRAFFIC_JAM)) {
-                                    trafficJamsAppearedHandle(rcv);
-                                }
+                switch (rcv.getPerformative()) {
+                    case ACLMessage.INFORM -> {
+
+                        if (rcv.getUserDefinedParameter(MessageParameter.TROUBLE).equals(MessageParameter.SHOW)) {
+                            //parsing received message
+                            if (rcv.getUserDefinedParameter(MessageParameter.TYPEOFTROUBLE).equals(MessageParameter.CONSTRUCTION)) {
+                                constructionAppearedHandle(rcv);
                             }
-                            else if (rcv.getUserDefinedParameter(MessageParameter.TROUBLE).equals(MessageParameter.STOP)) {
-                                if (rcv.getUserDefinedParameter(MessageParameter.TYPEOFTROUBLE).equals(MessageParameter.TRAFFIC_JAM)) {
-                                    trafficJamsDisappearedHandle(rcv);
-                                }
+                            else if (rcv.getUserDefinedParameter(MessageParameter.TYPEOFTROUBLE).equals(MessageParameter.TRAFFIC_JAM)) {
+                                trafficJamsAppearedHandle(rcv);
+                            }
+                        }
+                        else if (rcv.getUserDefinedParameter(MessageParameter.TROUBLE).equals(MessageParameter.STOP)) {
+                            if (rcv.getUserDefinedParameter(MessageParameter.TYPEOFTROUBLE).equals(MessageParameter.TRAFFIC_JAM)) {
+                                trafficJamsDisappearedHandle(rcv);
                             }
                         }
                     }
+
+                    default -> block(DEFAULT_BLOCK_ON_ERROR);
                 }
-                block(100);
             }
         };
         addBehaviour(communication);
