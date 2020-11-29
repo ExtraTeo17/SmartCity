@@ -29,7 +29,7 @@ public class ConfigContainer extends ConfigMutator
     private boolean shouldUseFixedRoutes = false;
     private boolean shouldUseFixedConstructionSites = true;
     private boolean generateBatchesForCars = true;
-
+    private boolean busCrashGeneratedOnce = false;
 
     private int lightExtendTime = 30;
     private int extendWaitTime = 60;
@@ -63,6 +63,16 @@ public class ConfigContainer extends ConfigMutator
 
     public SimulationState getSimulationState() {
         return simulationState;
+    }
+    
+    @Override
+    public void setBusCrashGeneratedOnce(boolean busCrashGeneratedOnce) {
+    	this.busCrashGeneratedOnce = busCrashGeneratedOnce;
+    }
+    
+    @Override
+    public boolean getBusCrashGeneratedOnce() {
+    	return busCrashGeneratedOnce;
     }
 
     public void setSimulationState(SimulationState simulationState) {

@@ -22,7 +22,6 @@ public class MessageParameter {
     public static final String BUS_MANAGER = "bus_manager";
     
     public static final String SCHEDULE_ARRIVAL = "schedule_arrival";
-    //public static final String DESIRED_BUS_LINE = "desired_bus";
     public static final String BUS_LINE = "bus_line";
     public static final String TROUBLE_LON = "trouble_lon";
     public static final String TROUBLE_LAT = "trouble_lat";

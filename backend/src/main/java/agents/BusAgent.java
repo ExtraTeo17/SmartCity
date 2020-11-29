@@ -258,16 +258,12 @@ public class BusAgent extends AbstractAgent {
 
 				@Override
                 public void onTick() {
-                	if (StaticConfig.BUS_CRASH_GENERATED_ONCE) {
-                		logger.info("Already generated once");
+                	if (configContainer.getBusCrashGeneratedOnce()) {
+                		logger.info("Bus crash has already been generated once");
                 		return;
                 	}
-                	StaticConfig.BUS_CRASH_GENERATED_ONCE = true;
+                	configContainer.setBusCrashGeneratedOnce(true);
                     logger.info("Generated trouble");
-                    var route = bus.getUniformRoute();
-                  //Random random = new Random(523);
-                  //  var el = random.nextInt(route.size() - bus.getMoveIndex() - THRESHOLD_UNTIL_INDEX_CHANGE - 5 + 1) + bus.getMoveIndex()+ THRESHOLD_UNTIL_INDEX_CHANGE + 5; // TODO: from current index //choose trouble EdgeId
-                  //  RouteNode troublePointTmp = route.get(el);
                     int index = bus.getMoveIndex();
                     var trouble = bus.getUniformRoute().get(index);
                     troublePoint = new RouteNode(trouble.getLat(),trouble.getLng(),
@@ -393,13 +389,13 @@ public class BusAgent extends AbstractAgent {
 
     // TODO: Fix situation where bus route contains only one station and pedestrians tries to choose two
     public final Optional<Siblings<StationNode>> getTwoSubsequentStations(final Random random) {
+    	
         List<StationNode> stationsOnRoute = bus.getStationNodesOnRoute();
         if (stationsOnRoute.size() <= 1) {
         	return Optional.empty();
         }
         int halfIndex = (int)Math.ceil((double)stationsOnRoute.size() / 2.0);
 
-        
         return Optional.of(Siblings.of(stationsOnRoute.get(0),//random.nextInt(halfIndex)), // TODO: fix to consider first random when calculating second IMPORTANT
                 stationsOnRoute.get(2)));//halfIndex + random.nextInt(halfIndex)))); // TODO: for tests choose stations 1. and 3.
     }
