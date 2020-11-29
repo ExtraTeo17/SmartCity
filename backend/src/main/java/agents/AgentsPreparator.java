@@ -222,17 +222,17 @@ public class AgentsPreparator {
         logger.info("Closest startTime: " + closestTime.toLocalTime() + "\n" +
                 "    NUMBER OF BUS AGENTS: " + busCount);
         return true;
-    }
+	}
 
-    private void prepareBusManagerAgent(HashSet<BusInfo> busInfos) {
+	private void prepareBusManagerAgent(HashSet<BusInfo> busInfos) {
 		BusManagerAgent agent = factory.create(busInfos);
 		boolean result = agentsContainer.tryAdd(agent, true);
 		if (!result) {
-			logger.error("BusManagerAgent was not be created");
+			logger.error("BusManagerAgent was not added to the main container");
+			return;
 		}
 		agent.start();
 	}
-
 
 	private List<RouteNode> getBusRoute(List<OSMWay> osmRoute, List<OSMStation> osmStops,
                                         List<StationNode> allStations,String busLine) {

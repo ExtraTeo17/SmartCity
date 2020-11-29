@@ -20,7 +20,7 @@ public class ConfigContainer extends ConfigMutator
         IStationConfigContainer {
     private SimulationState simulationState = SimulationState.INITIAL;
     private boolean shouldGeneratePedestriansAndBuses = false;
-    private boolean shouldGenerateCrashForBuses = false;
+    private boolean shouldGenerateCrashForBuses = true;
     private boolean shouldGenerateConstructionSites = false;
 
     private boolean isLightStrategyActive = true;

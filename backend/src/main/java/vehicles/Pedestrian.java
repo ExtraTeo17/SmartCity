@@ -14,7 +14,6 @@ import java.util.List;
 
 public class Pedestrian extends MovingObject {
     private  ITaskProvider taskProvider = null;
-    // private final String preferredBusLine;
     private  List<RouteNode> displayRouteBeforeBus;
     private  List<RouteNode> displayRouteAfterBus;
     private  List<RouteNode> routeBeforeBus;
@@ -65,7 +64,6 @@ public class Pedestrian extends MovingObject {
 
         this.displayRouteAfterBus = ped.displayRouteAfterBus;
         this.stationIndex = ped.stationIndex;
-     //   this.preferredBusLine = ped.preferredBusLine;
 
         this.stationStart = ped.stationStart;
         this.stationFinish = ped.stationFinish;
@@ -75,7 +73,6 @@ public class Pedestrian extends MovingObject {
     @VisibleForTesting
     Pedestrian(ITimeProvider timeProvider) {
         super(timeProvider, 1, 10, new ArrayList<>());
-    //    preferredBusLine = "";
         displayRouteBeforeBus = new ArrayList<>();
         displayRouteAfterBus = new ArrayList<>();
         routeBeforeBus = new ArrayList<>();
@@ -91,12 +88,7 @@ public class Pedestrian extends MovingObject {
     public StationNode getTargetStation() {
         return (StationNode) uniformRoute.get(stationIndex + 1);
     }
-    public ITimeProvider getTimeProvider(){return timeProvider;}
     public StationNode getStationFinish(){return stationFinish;}
-    public ITaskProvider getTaskProvider(){return taskProvider;}
-    //public String getPreferredBusLine() {
-     //   return preferredBusLine;
-    //}
 
     @Override
     public long getAdjacentOsmWayId() {

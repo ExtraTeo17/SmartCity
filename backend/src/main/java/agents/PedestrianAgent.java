@@ -21,6 +21,7 @@ import routing.nodes.RouteNode;
 import routing.nodes.StationNode;
 import smartcity.ITimeProvider;
 import smartcity.SmartCityAgent;
+import smartcity.task.abstractions.ITaskProvider;
 import vehicles.Pedestrian;
 import vehicles.TestPedestrian;
 import vehicles.enums.DrivingState;
@@ -38,14 +39,17 @@ public class PedestrianAgent extends AbstractAgent {
     private final IRouteGenerator router;
     private List<RouteNode> arrivingRouteToClosestStation = null;
     private List<RouteNode> bikeRoute = null;
+	private ITaskProvider taskProvider;
 
 
     PedestrianAgent(int agentId,
                     Pedestrian pedestrian,
                     ITimeProvider timeProvider,
+                    ITaskProvider taskProvider,
                     EventBus eventBus,
                     IRouteGenerator router) {
         super(agentId, pedestrian.getVehicleType(), timeProvider, eventBus);
+        this.taskProvider = taskProvider;
         this.pedestrian = pedestrian;
         this.router = router;
     }
@@ -281,7 +285,7 @@ public class PedestrianAgent extends AbstractAgent {
 
 
             private void performMetamorphosisToBike() {
-			  pedestrian.getTaskProvider().getCreateBikeTask(currentPosition, pedestrian.getEndPosition(),   pedestrian instanceof TestPedestrian).run();
+			  taskProvider.getCreateBikeTask(currentPosition, pedestrian.getEndPosition(),   pedestrian instanceof TestPedestrian).run();
 			  myAgent.doDelete();
 			  logger.info("Kill Pedestrian Agent");
 			  }
@@ -294,8 +298,8 @@ public class PedestrianAgent extends AbstractAgent {
                         pedestrian.getDisplayRouteAfterBus(),
                         expectedNewStationNode,
                 pedestrian.getStationFinish(),
-                pedestrian.getTimeProvider(),
-                pedestrian.getTaskProvider());
+                timeProvider,
+                taskProvider);
                 getNextStation(busLine);
                 informLightManager(pedestrian);
                 pedestrian.setTroubled(false);
@@ -315,16 +319,6 @@ public class PedestrianAgent extends AbstractAgent {
 				LocalTime arrivingTime = now.plusNanos(pedestrian.getMillisecondsOnRoute(arrivingRouteToClosestStation) * 1_000_000);
 				return arrivingTime;
 			}
-
-
-
-
-            private StationNode getStationNodeFromMessage(ACLMessage rcv) {
-                return new StationNode(rcv.getUserDefinedParameter(MessageParameter.LAT_OF_NEXT_CLOSEST_STATION),
-                                rcv.getUserDefinedParameter(MessageParameter.LON_OF_NEXT_CLOSEST_STATION),
-                                rcv.getUserDefinedParameter(MessageParameter.OSM_ID_OF_NEXT_CLOSEST_STATION),
-                                rcv.getUserDefinedParameter(MessageParameter.AGENT_ID_OF_NEXT_CLOSEST_STATION));
-            }
         };
 
         addBehaviour(move);

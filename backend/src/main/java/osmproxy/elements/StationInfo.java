@@ -9,7 +9,7 @@ import routing.nodes.StationNode;
 
 public class StationInfo {
 	
-	private List<StationNode> nodes;
+	private final List<StationNode> nodes;
 
 	public StationInfo(List<StationNode> copyOf) {
 		nodes = new ArrayList<StationNode>(copyOf);
