@@ -17,6 +17,10 @@ export const getResultObj = (type, { id, travelTime, travelDistance }) => {
 
 export const { localStorage } = window;
 
+export const createLocalDataObject = state => {
+  return { prepareSimulationData: state.prepareSimulationData, startSimulationData: state.startSimulationData };
+};
+
 export const saveLocalData = data => {
   console.info("Saving data to localStorage");
   localStorage.setItem(storageKey, JSON.stringify(data));

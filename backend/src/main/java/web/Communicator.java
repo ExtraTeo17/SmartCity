@@ -2,6 +2,7 @@ package web;
 
 import com.google.common.eventbus.Subscribe;
 import com.google.inject.Inject;
+import events.web.BatchedUpdateEvent;
 import events.web.SimulationPreparedEvent;
 import events.web.SimulationStartedEvent;
 import events.web.SwitchLightsEvent;
@@ -51,7 +52,7 @@ class Communicator {
 
     @Subscribe
     public void handle(CarAgentCreatedEvent e) {
-        onHandle(e);
+        onHandle(e, "Id: " + e.agentId);
         webService.createCar(e.agentId, e.agentPosition, e.route, e.isTestCar);
     }
 
@@ -160,6 +161,11 @@ class Communicator {
     public void handle(BikeAgentDeadEvent e) {
         onHandle(e);
         webService.killBike(e.id, e.travelDistance, e.travelTime);
+    }
+
+    @Subscribe
+    public void handle(BatchedUpdateEvent e) {
+        webService.batchedUpdate(e.carUpdates, e.bikeUpdates, e.busUpdates, e.pedUpdates);
     }
 
     private void onHandle(Object obj) {

@@ -2,6 +2,7 @@ package vehicles;
 
 import com.google.common.annotations.VisibleForTesting;
 import smartcity.ITimeProvider;
+import smartcity.task.abstractions.ITaskProvider;
 import vehicles.enums.DrivingState;
 import vehicles.enums.VehicleType;
 

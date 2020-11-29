@@ -1,6 +1,8 @@
 package smartcity.task.abstractions;
 
 import smartcity.lights.core.Light;
+import smartcity.lights.core.SimpleLightGroup;
+import utilities.Siblings;
 
 import java.time.LocalDateTime;
 import java.util.Collection;
@@ -15,7 +17,7 @@ public interface ITaskManager {
 
     void scheduleBusControl(BooleanSupplier testSimulationState);
 
-    void scheduleSwitchLightTask(int managerId, Collection<Light> lights);
+    void scheduleSwitchLightTask(int managerId, Siblings<SimpleLightGroup> lights);
 
     void scheduleSimulationControl(BooleanSupplier testSimulationState, LocalDateTime simulationStartTime);
 

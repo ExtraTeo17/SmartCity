@@ -17,6 +17,7 @@ import smartcity.stations.StationStrategy;
 
 import java.util.List;
 
+import static agents.AgentConstants.DEFAULT_BLOCK_ON_ERROR;
 import static agents.message.MessageManager.createMessage;
 import static agents.message.MessageManager.createProperties;
 
@@ -34,22 +35,26 @@ public class StationAgent extends AbstractAgent {
         this.station = station;
 
         Behaviour communication = new CyclicBehaviour() {
+            @SuppressWarnings("DuplicatedCode")
             @Override
             public void action() {
-
                 ACLMessage rcv = receive();
-                if (rcv != null) {
-                    String type = rcv.getUserDefinedParameter(MessageParameter.TYPE);
-                    if (type == null) {
-                        logTypeError(rcv);
-                        return;
-                    }
-                    switch (type) {
-                        case MessageParameter.BUS -> handleMessageFromBus(rcv);
-                        case MessageParameter.PEDESTRIAN -> handleMessageFromPedestrian(rcv);
-                    }
+                if (rcv == null) {
+                    block();
+                    return;
                 }
-                block(100);
+
+                String type = rcv.getUserDefinedParameter(MessageParameter.TYPE);
+                if (type == null) {
+                    block(DEFAULT_BLOCK_ON_ERROR);
+                    logTypeError(rcv);
+                    return;
+                }
+
+                switch (type) {
+                    case MessageParameter.BUS -> handleMessageFromBus(rcv);
+                    case MessageParameter.PEDESTRIAN -> handleMessageFromPedestrian(rcv);
+                }
             }
 
 
@@ -109,15 +114,15 @@ public class StationAgent extends AbstractAgent {
                     stationStrategy.addPedestrianToQueue(agentName, desiredBusLine,
                             getDateParameter(rcv, MessageParameter.ARRIVAL_TIME));
 
-                    stationStrategy.removeFromToWhomWaitMap(agentName,desiredBusLine);
+                    stationStrategy.removeFromToWhomWaitMap(agentName, desiredBusLine);
 
 
                     //var msg = createMessage(ACLMessage.REQUEST, rcv.getSender());
                     // TODO: This is send to pedestrian without type - won't be handled
                     //  But also needs busAgent name parameter or Pedestrian will die
                     //  I am not sure if needed
-                   // var properties = createProperties(MessageParameter.STATION);
-                   // msg.setAllUserDefinedParameters(createProperties(MessageParameter.STATION));
+                    // var properties = createProperties(MessageParameter.STATION);
+                    // msg.setAllUserDefinedParameters(createProperties(MessageParameter.STATION));
                     //send(msg);
                 }
                 else if (messageKind == ACLMessage.AGREE) {

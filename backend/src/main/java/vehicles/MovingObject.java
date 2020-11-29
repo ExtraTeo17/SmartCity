@@ -12,6 +12,8 @@ import vehicles.enums.DrivingState;
 import java.util.ArrayList;
 import java.util.List;
 
+import static routing.RoutingConstants.CALCULATION_DELTA_PER_INDEX;
+
 // TODO: Change name to IVehicle/AbstractVehicle
 public abstract class MovingObject {
     final ITimeProvider timeProvider;
@@ -124,7 +126,7 @@ public abstract class MovingObject {
     /**
      * Checks whether an edge exists on the uniformRoute
      *
-     * @param ID of the edge checked for existence
+     * @param edgeId of the edge checked for existence
      * @return Index of the RouteNode on uniformRoute
      * which contains the edge if edge is found, otherwise null
      */
@@ -215,7 +217,8 @@ public abstract class MovingObject {
     }
 
     public int getMillisecondsToNextLight() {
-        return ((closestLightIndex - moveIndex) * RoutingConstants.STEP_CONSTANT) / getSpeed();
+        var distance = ((closestLightIndex - moveIndex) * RoutingConstants.STEP_CONSTANT);
+        return (int) (distance * CALCULATION_DELTA_PER_INDEX) + (int) (distance / getSpeed());
     }
 
     public int getMillisecondsFromAToB(int startIndex, int finishIndex) {
@@ -244,15 +247,22 @@ public abstract class MovingObject {
         return getNextNonVirtualIndexFromIndex(moveIndex);
     }
 
-    public int getNextNonVirtualIndex(int thresholdUntilIndexChange) {
-        return getNextNonVirtualIndexFromIndex(moveIndex + thresholdUntilIndexChange);
+    public int getNextNonVirtualIndex(int threshold) {
+        return getNextNonVirtualIndexFromIndex(moveIndex + threshold);
     }
 
-    private int getNextNonVirtualIndexFromIndex(int index) {
-        while (index < uniformRoute.size() && uniformRoute.get(index).isVirtual()) {
+    public int getNextNonVirtualIndexFromIndex(int index) {
+        while (index < uniformRoute.size() - 1 && uniformRoute.get(index).isVirtual()) {
             ++index;
         }
-        return index - 1;
+        return index;
+    }
+
+    public int getPrevNonVirtualIndexFromIndex(int index) {
+        while (index > 0 && uniformRoute.get(index).isVirtual()) {
+            --index;
+        }
+        return index;
     }
 
 

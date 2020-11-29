@@ -18,6 +18,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import static agents.AgentConstants.DEFAULT_BLOCK_ON_ERROR;
 import static agents.message.MessageManager.*;
 
 public class LightManagerAgent extends AbstractAgent {
@@ -88,7 +89,8 @@ public class LightManagerAgent extends AbstractAgent {
                 var jammedLight = result.getJammedLightPosition();
                 properties.setProperty(MessageParameter.TROUBLE_LAT, Double.toString(jammedLight.getLat()));
                 properties.setProperty(MessageParameter.TROUBLE_LON, Double.toString(jammedLight.getLng()));
-                properties.setProperty(MessageParameter.EDGE_ID, trafficJammedEdgeSet.get(String.valueOf(result.getOsmWayId())));
+                properties.setProperty(MessageParameter.EDGE_ID, trafficJammedEdgeSet.get(
+                		String.valueOf(result.getOsmWayId())));
                 trafficJammedEdgeSet.remove(Long.toString(result.getOsmWayId()));
                 msg.setAllUserDefinedParameters(properties);
                 logger.debug("Send message to " + TroubleManagerAgent.name + " for request of EdgeID when stopping traffic jam");
@@ -131,24 +133,25 @@ public class LightManagerAgent extends AbstractAgent {
             @Override
             public void action() {
                 ACLMessage rcv = receive();
-                if (rcv != null) {
-                    handleMessageFromRecipient(rcv);
-                }
-                else {
+                if (rcv == null) {
                     block();
+                    return;
                 }
-            }
 
-            private void handleMessageFromRecipient(ACLMessage rcv) {
                 String type = rcv.getUserDefinedParameter(MessageParameter.TYPE);
                 if (type == null) {
+                    block(DEFAULT_BLOCK_ON_ERROR);
                     logTypeError(rcv);
                     return;
                 }
+
+                handleMessageByType(rcv, type);
+            }
+
+            private void handleMessageByType(ACLMessage rcv, String type) {
                 switch (type) {
-                    case MessageParameter.VEHICLE -> handleMessageFromVehicle(rcv);
+                    case MessageParameter.VEHICLE, MessageParameter.BIKE -> handleMessageFromVehicle(rcv);
                     case MessageParameter.PEDESTRIAN -> handleMessageFromPedestrian(rcv);
-                    case MessageParameter.BIKE -> handleMessageFromVehicle(rcv);
                 }
             }
 
@@ -173,16 +176,19 @@ public class LightManagerAgent extends AbstractAgent {
                         crossroad.addCarToQueue(getIntParameter(rcv, MessageParameter.ADJACENT_OSM_WAY_ID), agentName);
                     }
                     case ACLMessage.AGREE -> {
-                    	logger.debug("Remove " + agentName + " from close queue");
+                        logger.debug("Remove " + agentName + " from close queue");
                         crossroad.removeCarFromQueue(getIntParameter(rcv, MessageParameter.ADJACENT_OSM_WAY_ID));
                     }
                     case ACLMessage.REFUSE -> {
-                    	logger.debug("Remove " + agentName + " from far away queue");
+                        logger.debug("Remove " + agentName + " from far away queue");
                         crossroad.removeCarFromFarAwayQueue(getIntParameter(rcv, MessageParameter.ADJACENT_OSM_WAY_ID), agentName);
                     }
                     case ACLMessage.CONFIRM -> {
-                    	logger.debug("Add edge " + rcv.getUserDefinedParameter(MessageParameter.EDGE_ID) + " from " + agentName + " to jammed edge set");
-                        trafficJammedEdgeSet.put(rcv.getUserDefinedParameter(MessageParameter.ADJACENT_OSM_WAY_ID), rcv.getUserDefinedParameter(MessageParameter.EDGE_ID));
+                        logger.debug("Add edge " + rcv.getUserDefinedParameter(MessageParameter.EDGE_ID) + " from " + agentName + " to jammed edge set");
+                    	String wayIdOsm = rcv.getUserDefinedParameter(MessageParameter.ADJACENT_OSM_WAY_ID);
+                        trafficJammedEdgeSet.put(wayIdOsm, rcv.getUserDefinedParameter(MessageParameter.EDGE_ID));
+                        crossroad.getLights().stream().filter(el -> el.getAdjacentWayId() == Long.parseLong(wayIdOsm))
+                        		.findFirst().ifPresent(el -> el.setTrafficJamOngoing(true));
                     }
                     default -> logger.debug("Wait");
                 }

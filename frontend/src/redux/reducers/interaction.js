@@ -29,9 +29,11 @@ import {
   D_LNG,
   D_RAD,
   D_GENERATE_PEDS,
+  D_USE_FIXED_ROUTES,
+  D_USE_FIXED_TP,
 } from "../../constants/defaults";
 import { ConfigState, getNextConfigState } from "../models/states";
-import { saveLocalData } from "../dataUtils/helpers";
+import { createLocalDataObject, saveLocalData } from "../dataUtils/helpers";
 
 // Just for reference - defined in store.js
 export const initialInteractionState = {
@@ -55,6 +57,8 @@ export const initialInteractionState = {
     generateTroublePoints: D_GENERATE_TP,
     timeBeforeTrouble: D_TIME_BEFORE_TROUBLE,
 
+    useFixedRoutes: D_USE_FIXED_ROUTES,
+    useFixedTroublePoints: D_USE_FIXED_TP,
     startTime: D_START_TIME,
     timeScale: D_TIME_SCALE,
 
@@ -102,7 +106,7 @@ const interaction = (state = initialInteractionState, action) => {
     }
 
     case SHOULD_START_SIMULATION: {
-      saveLocalData({ prepareSimulationData: state.prepareSimulationData, startSimulationData: state.startSimulationData });
+      saveLocalData(createLocalDataObject(state));
 
       return state;
     }

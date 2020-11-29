@@ -1,7 +1,6 @@
 package vehicles;
 
 import com.google.common.annotations.VisibleForTesting;
-import routing.RoutingConstants;
 import routing.nodes.LightManagerNode;
 import routing.nodes.RouteNode;
 import routing.nodes.StationNode;
@@ -12,12 +11,16 @@ import vehicles.enums.VehicleType;
 import java.util.ArrayList;
 import java.util.List;
 
+import static vehicles.Constants.SPEED_SCALE;
+
 public class Pedestrian extends MovingObject {
-    private  ITaskProvider taskProvider = null;
-    private  List<RouteNode> displayRouteBeforeBus;
-    private  List<RouteNode> displayRouteAfterBus;
-    private  List<RouteNode> routeBeforeBus;
-    private  StationNode stationStart;
+
+    private static final int DEFAULT_SPEED = 10 * SPEED_SCALE;
+
+    private List<RouteNode> displayRouteBeforeBus;
+    private final List<RouteNode> displayRouteAfterBus;
+    private List<RouteNode> routeBeforeBus;
+    private StationNode stationStart;
     private final StationNode stationFinish;
     private boolean troubled = false;
 
@@ -32,7 +35,7 @@ public class Pedestrian extends MovingObject {
                       StationNode finishStation,
                       ITimeProvider timeProvider,
                       ITaskProvider taskProvider) {
-        super(timeProvider, agentId, 10, createRoute(startStation, uniformRouteToStation,
+        super(timeProvider, agentId, DEFAULT_SPEED, createRoute(startStation, uniformRouteToStation,
                 finishStation, uniformRouteFromStation));
         this.displayRouteBeforeBus = routeToStation;
         this.routeBeforeBus = uniformRouteToStation;
@@ -42,7 +45,6 @@ public class Pedestrian extends MovingObject {
         this.stationIndex = routeBeforeBus.size() - 1;
         this.stationStart = startStation;
         this.stationFinish = finishStation;
-        this.taskProvider = taskProvider;
     }
 
     private static List<RouteNode> createRoute(StationNode startStation,
@@ -67,18 +69,16 @@ public class Pedestrian extends MovingObject {
 
         this.stationStart = ped.stationStart;
         this.stationFinish = ped.stationFinish;
-        this.taskProvider = ped.taskProvider;
     }
 
     @VisibleForTesting
     Pedestrian(ITimeProvider timeProvider) {
-        super(timeProvider, 1, 10, new ArrayList<>());
+        super(timeProvider, 1, DEFAULT_SPEED, new ArrayList<>());
         displayRouteBeforeBus = new ArrayList<>();
         displayRouteAfterBus = new ArrayList<>();
         routeBeforeBus = new ArrayList<>();
         stationStart = new StationNode(5, 5, 1L, 1);
         stationFinish = new StationNode(5, 10, 2L, 2);
-
     }
 
     public StationNode getStartingStation() {
@@ -156,7 +156,7 @@ public class Pedestrian extends MovingObject {
     }
     public void setStationStart(StationNode newStationStart)
     {
-        this.stationStart = newStationStart ;
+        this.stationStart = newStationStart;
     }
     public void setStationIndex(int index)
     {

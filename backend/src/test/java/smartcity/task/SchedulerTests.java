@@ -8,17 +8,18 @@ import org.junit.jupiter.api.Test;
 import smartcity.ITimeProvider;
 import smartcity.config.ConfigContainer;
 import smartcity.config.ConfigMutator;
+import smartcity.lights.LightColor;
 import smartcity.task.abstractions.ITaskManager;
 import testutils.ReflectionHelper;
+import utilities.Siblings;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
-import java.util.Arrays;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import static mocks.TestInstanceCreator.createEventBus;
-import static mocks.TestInstanceCreator.createLight;
+import static mocks.TestInstanceCreator.createLightGroup;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
@@ -37,8 +38,9 @@ class SchedulerTests {
             return null;
         }).when(taskManager).scheduleSwitchLightTask(any(int.class), any());
         var scheduler = createScheduler(taskManager);
-        var lights = Arrays.asList(createLight(), createLight(), createLight());
-        var event = new SwitchLightsStartEvent(1, lights);
+        var lightsA = createLightGroup(LightColor.RED);
+        var lightsB = createLightGroup(LightColor.GREEN);
+        var event = new SwitchLightsStartEvent(1, Siblings.of(lightsA, lightsB));
 
         // Act
         scheduler.handle(event);
@@ -110,6 +112,8 @@ class SchedulerTests {
         int pedestriansLimit = 155;
         int testPedestrianId = 555;
 
+        boolean useFixedRoutes = true;
+        boolean useFixedConstructionSites = true;
         var startTime = LocalDateTime.of(LocalDate.of(2020, 10, 14),
                 LocalTime.of(10, 10, 10));
         var timeScale = 12;
@@ -122,7 +126,8 @@ class SchedulerTests {
 
         var event = new StartSimulationEvent(shouldGenerateCars, carsNum, testCarId,
                 shouldGenerateBikes, bikesNum, testBikeId, shouldGenerateTP, timeBeforeTrouble,
-                pedestriansLimit, testPedestrianId, startTime, timeScale, lightStrategyActive, extendLightTime,
+                pedestriansLimit, testPedestrianId, useFixedRoutes, useFixedConstructionSites,
+                startTime, timeScale, lightStrategyActive, extendLightTime,
                 stationStrategyActive, extendWaitTime, changeRouteStrategyActive, shouldGenerateTrafficJams
         );
 
@@ -148,6 +153,8 @@ class SchedulerTests {
         assertEquals(extendWaitTime, configContainer.getExtendWaitTime());
         assertEquals(changeRouteStrategyActive, configContainer.shouldChangeRouteOnTroublePoint());
 
+        assertEquals(useFixedRoutes, configContainer.shouldUseFixedRoutes());
+        assertEquals(useFixedConstructionSites, configContainer.shouldUseFixedConstructionSites());
         assertEquals(timeScale, ref.timeScale);
     }
 
@@ -182,8 +189,9 @@ class SchedulerTests {
 
     private StartSimulationEvent prepareSimulationEvent(LocalDateTime startTime) {
         return new StartSimulationEvent(false, 111, 112, false, 444,
-                222, true, 5005, 222, 223, startTime, 31,
-                false, 333, false, 354, false,
+                222, true, 5005, 222, 223, false,
+                true, startTime, 31, false, 333, false,
+                354, false,
                 false
         );
     }

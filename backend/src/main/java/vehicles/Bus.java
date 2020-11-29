@@ -22,7 +22,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
+import static vehicles.Constants.SPEED_SCALE;
+
 public class Bus extends MovingObject {
+
+	private static final int DEFAULT_SPEED = 50 * SPEED_SCALE;
 	public static final int CAPACITY_MID = 10;
 	public static final int CAPACITY_HIGH = 25;
 
@@ -42,7 +46,7 @@ public class Bus extends MovingObject {
 	// TODO: Factory for vehicles - inject
 	public Bus(EventBus eventBus, ITimeProvider timeProvider, int agentId, List<RouteNode> simpleRoute,
 			List<RouteNode> uniformRoute, Timetable timetable, String busLine, String brigadeNr) {
-		super(timeProvider, agentId, 50, uniformRoute, simpleRoute);
+		super(timeProvider, agentId, DEFAULT_SPEED, uniformRoute, simpleRoute);
 		this.brigadeNr = brigadeNr;
 		this.timeProvider = timeProvider;
 		this.eventBus = eventBus;

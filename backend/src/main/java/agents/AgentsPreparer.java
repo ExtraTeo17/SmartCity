@@ -43,8 +43,8 @@ import java.util.stream.Collectors;
 import static smartcity.config.StaticConfig.USE_DEPRECATED_XML_FOR_LIGHT_MANAGERS;
 
 @SuppressWarnings("OverlyCoupledClass")
-public class AgentsPreparator {
-    private static final Logger logger = LoggerFactory.getLogger(AgentsPreparator.class);
+public class AgentsPreparer {
+    private static final Logger logger = LoggerFactory.getLogger(AgentsPreparer.class);
     private final IAgentsContainer agentsContainer;
     private final ConfigContainer configContainer;
     private final IBusLinesManager busLinesManager;
@@ -56,15 +56,15 @@ public class AgentsPreparator {
     private final ICacheWrapper cacheWrapper;
 
     @Inject
-    public AgentsPreparator(IAgentsContainer agentsContainer,
-                            ConfigContainer configContainer,
-                            IBusLinesManager busLinesManager,
-                            IAgentsFactory factory,
-                            EventBus eventBus,
-                            ILightAccessManager lightAccessManager,
-                            IMapAccessManager mapAccessManager,
-                            IRouteGenerator routeGenerator,
-                            ICacheWrapper cacheWrapper) {
+    public AgentsPreparer(IAgentsContainer agentsContainer,
+                          ConfigContainer configContainer,
+                          IBusLinesManager busLinesManager,
+                          IAgentsFactory factory,
+                          EventBus eventBus,
+                          ILightAccessManager lightAccessManager,
+                          IMapAccessManager mapAccessManager,
+                          IRouteGenerator routeGenerator,
+                          ICacheWrapper cacheWrapper) {
         this.agentsContainer = agentsContainer;
         this.configContainer = configContainer;
         this.busLinesManager = busLinesManager;

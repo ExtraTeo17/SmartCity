@@ -1,7 +1,7 @@
 package smartcity.task.data;
 
 public interface ISwitchLightsContext {
-    boolean haveAlreadyExtendedGreen();
+    boolean haveAlreadyExtended();
 
-    void setExtendedGreen(boolean value);
+    void setAlreadyExtendedGreen(boolean value);
 }

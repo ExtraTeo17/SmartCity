@@ -1,4 +1,4 @@
-import { BIKE_KILLED, BIKE_CREATED, BIKE_UPDATED } from "../../core/constants";
+import { BIKE_KILLED, BIKE_CREATED, BIKE_UPDATED, BATCHED_UPDATE } from "../../core/constants";
 
 // Just for reference - defined in store.js
 const initialState = {
@@ -8,14 +8,15 @@ const initialState = {
 const deletedBikeIds = [];
 
 const bike = (state = initialState, action) => {
+  const { payload } = action;
   switch (action.type) {
     case BIKE_CREATED: {
-      const bike = action.payload;
+      const bike = payload;
       return { ...state, bikes: [...state.bikes, bike] };
     }
 
     case BIKE_UPDATED: {
-      const bike = action.payload;
+      const bike = payload;
 
       let unrecognized = true;
       const newBikes = state.bikes.map(c => {
@@ -33,8 +34,22 @@ const bike = (state = initialState, action) => {
       return { ...state, bikes: newBikes };
     }
 
+    case BATCHED_UPDATE: {
+      const { bikeUpdates } = payload;
+
+      const newBikes = state.bikes.map(b => {
+        const update = bikeUpdates.find(bike => bike.id === b.id);
+        if (update) {
+          return { ...b, location: update.location };
+        }
+        return b;
+      });
+
+      return { ...state, bikes: newBikes };
+    }
+
     case BIKE_KILLED: {
-      const { id } = action.payload;
+      const { id } = payload;
       const newBikes = state.bikes.filter(c => c.id !== id);
       deletedBikeIds.push(id);
 

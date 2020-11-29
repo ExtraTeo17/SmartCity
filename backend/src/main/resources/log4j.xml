@@ -13,7 +13,7 @@
             <param name="MaxIndex" value="12"/>
         </rollingPolicy>
         <triggeringPolicy class="org.apache.log4j.rolling.SizeBasedTriggeringPolicy">
-            <param name="MaxFileSize" value="10485760"/>
+            <param name="MaxFileSize" value="104857600"/>
         </triggeringPolicy>
         <layout class="org.apache.log4j.PatternLayout">
             <param name="ConversionPattern" value="(%d{dd.MM HH:mm:ss.SSS}) [%t] [%-p] [%c] - %m%n"/>

@@ -35,6 +35,9 @@ export default {
     generateTroublePoints,
     timeBeforeTrouble,
 
+    useFixedRoutes,
+    useFixedTroublePoints,
+
     startTime,
     timeScale,
 
@@ -62,6 +65,9 @@ export default {
 
         generateTroublePoints,
         timeBeforeTrouble,
+
+        useFixedRoutes,
+        useFixedTroublePoints,
 
         startTime,
         timeScale,

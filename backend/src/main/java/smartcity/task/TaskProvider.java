@@ -10,9 +10,11 @@ import com.google.common.collect.HashBasedTable;
 import com.google.common.collect.Table;
 import com.google.common.eventbus.EventBus;
 import com.google.inject.Inject;
+import events.web.BatchedUpdateEvent;
 import events.web.bike.BikeAgentCreatedEvent;
 import events.web.bus.BusAgentStartedEvent;
 import events.web.car.CarAgentCreatedEvent;
+import events.web.models.UpdateObject;
 import events.web.pedestrian.PedestrianAgentCreatedEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -23,15 +25,18 @@ import routing.nodes.RouteNode;
 import routing.nodes.StationNode;
 import smartcity.ITimeProvider;
 import smartcity.config.ConfigContainer;
-import smartcity.lights.core.Light;
+import smartcity.lights.core.SimpleLightGroup;
 import smartcity.task.abstractions.ITaskProvider;
 import smartcity.task.data.ISwitchLightsContext;
 import smartcity.task.functional.IFunctionalTaskFactory;
+import utilities.Siblings;
 
 import java.time.LocalDateTime;
-import java.util.Collection;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Supplier;
+
+import static smartcity.config.StaticConfig.USE_BATCHED_UPDATES;
 
 @SuppressWarnings("OverlyCoupledClass")
 public class TaskProvider implements ITaskProvider {
@@ -40,7 +45,6 @@ public class TaskProvider implements ITaskProvider {
 
     private final ConfigContainer configContainer;
     private final IRouteGenerator routeGenerator;
-    private final IRoutingHelper routingHelper;
     private final IAgentsFactory agentsFactory;
     private final IAgentsContainer agentsContainer;
     private final IFunctionalTaskFactory functionalTaskFactory;
@@ -50,8 +54,8 @@ public class TaskProvider implements ITaskProvider {
     private final Table<IGeoPosition, IGeoPosition, List<RouteNode>> routeInfoCache;
 
     @Inject
-    public TaskProvider(ConfigContainer configContainer, IRouteGenerator routeGenerator,
-                        IRoutingHelper routingHelper,
+    public TaskProvider(ConfigContainer configContainer,
+                        IRouteGenerator routeGenerator,
                         IAgentsFactory agentsFactory,
                         IAgentsContainer agentsContainer,
                         IFunctionalTaskFactory functionalTaskFactory,
@@ -59,7 +63,6 @@ public class TaskProvider implements ITaskProvider {
                         EventBus eventBus) {
         this.configContainer = configContainer;
         this.routeGenerator = routeGenerator;
-        this.routingHelper = routingHelper;
         this.agentsFactory = agentsFactory;
         this.agentsContainer = agentsContainer;
         this.functionalTaskFactory = functionalTaskFactory;
@@ -82,6 +85,10 @@ public class TaskProvider implements ITaskProvider {
                 logger.warn("Error generating route info", e);
                 return;
             }
+            if (route.size() == 0) {
+            	logger.debug("Generated route is empty, agent won't be created.");
+            	return;
+            }
 
             CarAgent agent = agentsFactory.create(route, testCar);
             if (agentsContainer.tryAdd(agent)) {
@@ -99,11 +106,16 @@ public class TaskProvider implements ITaskProvider {
                 route = routeInfoCache.get(start, end);
                 if (route == null) {
                     route = routeGenerator.generateRouteInfo(start, end, "bike");
+                    // TODO: If car start & end will be equal to bike, then car can receive bike route.
                     routeInfoCache.put(start, end, route);
                 }
             } catch (Exception e) {
                 logger.warn("Error generating route info", e);
                 return;
+            }
+            if (route.size() == 0) {
+            	logger.debug("Generated route is empty, agent won't be created.");
+            	return;
             }
 
             BikeAgent agent = agentsFactory.create(route, testBike, "");
@@ -115,9 +127,9 @@ public class TaskProvider implements ITaskProvider {
         };
     }
 
-
     @Override
-    public Runnable getCreatePedestrianTask(StationNode startStation, StationNode endStation,
+    public Runnable getCreatePedestrianTask(IRoutingHelper routingHelper,
+                                            StationNode startStation, StationNode endStation,
                                             boolean testPedestrian) {
         return () -> {
             try {
@@ -138,6 +150,10 @@ public class TaskProvider implements ITaskProvider {
                         pedestrianFinishPoint,
                         String.valueOf(endStation.getOsmId()),
                         null);
+                if (routeToStation.size() == 0 || routeFromStation.size() == 0) {
+                	logger.debug("Generated route is empty, agent won't be created.");
+                	return;
+                }
 
                 PedestrianAgent agent = agentsFactory.create(routeToStation, routeFromStation,
                          startStation, endStation, testPedestrian);
@@ -176,21 +192,21 @@ public class TaskProvider implements ITaskProvider {
     }
 
     @Override
-    public Supplier<Integer> getSwitchLightsTask(int managerId, Collection<Light> lights) {
+    public Supplier<Integer> getSwitchLightsTask(int managerId, Siblings<SimpleLightGroup> lights) {
         var switchLights = functionalTaskFactory
-                .createLightSwitcher(managerId, configContainer.getExtendWaitTime(), lights);
+                .createLightSwitcher(managerId, configContainer.getExtendLightTime(), lights);
         // Can be moved somewhere else if needed and passed as parameter
         var switchLightsContext = new ISwitchLightsContext() {
-            private boolean alreadyExtendedGreen = false;
+            private boolean haveAlreadyExtended = false;
 
             @Override
-            public boolean haveAlreadyExtendedGreen() {
-                return alreadyExtendedGreen;
+            public boolean haveAlreadyExtended() {
+                return haveAlreadyExtended;
             }
 
             @Override
-            public void setExtendedGreen(boolean value) {
-                alreadyExtendedGreen = value;
+            public void setAlreadyExtendedGreen(boolean value) {
+                haveAlreadyExtended = value;
             }
         };
 
@@ -199,7 +215,34 @@ public class TaskProvider implements ITaskProvider {
 
     @Override
     public Runnable getSimulationControlTask(LocalDateTime simulationStartTime) {
-        // TODO: Batch update of cars positions: eventBus.post();
-        return timeProvider.getUpdateTimeTask(simulationStartTime);
+        var updateTimeTask = timeProvider.getUpdateTimeTask(simulationStartTime);
+        return () -> {
+            if (USE_BATCHED_UPDATES) {
+                var carUpdates = new ArrayList<UpdateObject>(agentsContainer.size(CarAgent.class));
+                agentsContainer.forEach(CarAgent.class, c -> {
+                    carUpdates.add(new UpdateObject(c.getId(), c.getPosition()));
+                });
+
+                var bikeUpdates = new ArrayList<UpdateObject>(agentsContainer.size(BikeAgent.class));
+                agentsContainer.forEach(BikeAgent.class, b -> {
+                    bikeUpdates.add(new UpdateObject(b.getId(), b.getPosition()));
+                });
+
+                var busUpdates = new ArrayList<UpdateObject>();
+                agentsContainer.forEach(BusAgent.class, b -> {
+                    if (b.isAlive()) {
+                        busUpdates.add(new UpdateObject(b.getId(), b.getPosition()));
+                    }
+                });
+
+                var pedUpdates = new ArrayList<UpdateObject>(agentsContainer.size(PedestrianAgent.class));
+                agentsContainer.forEach(PedestrianAgent.class, p -> {
+                    pedUpdates.add(new UpdateObject(p.getId(), p.getPosition()));
+                });
+
+                eventBus.post(new BatchedUpdateEvent(carUpdates, bikeUpdates, busUpdates, pedUpdates));
+            }
+            updateTimeTask.run();
+        };
     }
 }

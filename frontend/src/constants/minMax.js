@@ -17,7 +17,7 @@ export const LAT_MIN = -90;
 export const LAT_MAX = 90;
 export const LNG_MIN = -180;
 export const LNG_MAX = 180;
-export const RAD_MIN = 1;
+export const RAD_MIN = 10;
 export const RAD_MAX = 5000;
 
 export const LIGHT_EXTEND_MIN = 1;
@@ -26,7 +26,7 @@ export const LIGHT_EXTEND_MAX = 120;
 export const STATION_EXTEND_MIN = 1;
 export const STATION_EXTEND_MAX = 300;
 
-export const TIME_BEFORE_TP_MIN = 5;
+export const TIME_BEFORE_TP_MIN = 1;
 export const TIME_BEFORE_TP_MAX = 120;
 
 export const TIME_SCALE_MIN = 1;

@@ -2,8 +2,9 @@ import React, { useEffect, useState } from "react";
 import { connect } from "react-redux";
 import "../../../styles/CustomClock.css";
 
-// https://css-tricks.com/using-requestanimationframe-with-react-hooks/
+const timeUpdateThresholdMs = 1000;
 
+// https://css-tricks.com/using-requestanimationframe-with-react-hooks/
 const CustomClock = props => {
   const { wasStarted, time, timeScale } = props;
   const [currTime, setCurrTime] = useState(time);
@@ -20,9 +21,14 @@ const CustomClock = props => {
       const animate = time => {
         if (previousTimeRef.current !== undefined) {
           const deltaTime = time - previousTimeRef.current;
-          setCurrTime(prevTime => new Date(prevTime.getTime() + timeScale * deltaTime));
+          const scaledDeltaTime = timeScale * deltaTime;
+          if (scaledDeltaTime > timeUpdateThresholdMs) {
+            setCurrTime(prevTime => new Date(prevTime.getTime() + scaledDeltaTime));
+            previousTimeRef.current = time;
+          }
+        } else {
+          previousTimeRef.current = time;
         }
-        previousTimeRef.current = time;
         requestRef.current = requestAnimationFrame(animate);
       };
       requestRef.current = requestAnimationFrame(animate);

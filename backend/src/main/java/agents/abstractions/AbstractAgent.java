@@ -93,6 +93,7 @@ public abstract class AbstractAgent extends Agent {
         var simulationTime = timeProvider.getCurrentSimulationTime();
         var msToNextLight = movingObject.getMillisecondsToNextLight();
         var predictedTime = simulationTime.plus(msToNextLight, ChronoUnit.MILLIS);
+        logger.info("I will be at next light at: " + predictedTime);
         properties.setProperty(MessageParameter.ARRIVAL_TIME, "" + predictedTime);
         properties.setProperty(MessageParameter.ADJACENT_OSM_WAY_ID, "" + managerNode.getAdjacentWayId());
         msg.setAllUserDefinedParameters(properties);

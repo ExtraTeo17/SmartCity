@@ -6,10 +6,7 @@ import routing.core.IZone;
 import routing.core.Position;
 import routing.core.Zone;
 import smartcity.SimulationState;
-import smartcity.config.abstractions.ILightConfigContainer;
-import smartcity.config.abstractions.IStationConfigContainer;
-import smartcity.config.abstractions.ITroublePointsConfigContainer;
-import smartcity.config.abstractions.IZoneMutator;
+import smartcity.config.abstractions.*;
 
 
 @SuppressWarnings("ClassWithTooManyFields")
@@ -17,7 +14,9 @@ public class ConfigContainer extends ConfigMutator
         implements IZoneMutator,
         ILightConfigContainer,
         ITroublePointsConfigContainer,
-        IStationConfigContainer {
+        IStationConfigContainer,
+        IGenerationConfigContainer {
+
     private SimulationState simulationState = SimulationState.INITIAL;
     private boolean shouldGeneratePedestriansAndBuses = false;
     private boolean shouldGenerateCrashForBuses = true;
@@ -27,6 +26,8 @@ public class ConfigContainer extends ConfigMutator
     private boolean changeRouteOnTroublePoint = false;
     private boolean isStationStrategyActive = true;
     private boolean changeRouteOnTrafficJam = false;
+    private boolean shouldUseFixedRoutes = false;
+    private boolean shouldUseFixedConstructionSites = true;
 
     private int lightExtendTime = 30;
     private int extendWaitTime = 60;
@@ -149,6 +150,26 @@ public class ConfigContainer extends ConfigMutator
     @Override
     public void setChangeRouteOnTrafficJam(boolean changeRouteOnTrafficJam) {
         this.changeRouteOnTrafficJam = changeRouteOnTrafficJam;
+    }
+
+    @Override
+    public boolean shouldUseFixedRoutes() {
+        return shouldUseFixedRoutes;
+    }
+
+    @Override
+    public void setUseFixedRoutes(boolean value) {
+        shouldUseFixedRoutes = value;
+    }
+
+    @Override
+    public boolean shouldUseFixedConstructionSites() {
+        return shouldUseFixedConstructionSites;
+    }
+
+    @Override
+    public void setUseFixedConstructionSites(boolean value) {
+        shouldUseFixedConstructionSites = value;
     }
 
 }
