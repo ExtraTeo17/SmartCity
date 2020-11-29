@@ -1,11 +1,11 @@
 package vehicles;
 
 import com.google.common.annotations.VisibleForTesting;
-import routing.RoutingConstants;
 import routing.nodes.LightManagerNode;
 import routing.nodes.RouteNode;
 import routing.nodes.StationNode;
 import smartcity.ITimeProvider;
+import smartcity.task.abstractions.ITaskProvider;
 import vehicles.enums.VehicleType;
 
 import java.util.ArrayList;
@@ -14,14 +14,15 @@ import java.util.List;
 import static vehicles.Constants.SPEED_SCALE;
 
 public class Pedestrian extends MovingObject {
+
     private static final int DEFAULT_SPEED = 10 * SPEED_SCALE;
 
-    private final String preferredBusLine;
-    private final List<RouteNode> displayRouteBeforeBus;
+    private List<RouteNode> displayRouteBeforeBus;
     private final List<RouteNode> displayRouteAfterBus;
-    private final List<RouteNode> routeBeforeBus;
-    private final StationNode stationStart;
+    private List<RouteNode> routeBeforeBus;
+    private StationNode stationStart;
     private final StationNode stationFinish;
+    private boolean troubled = false;
 
     private transient int stationIndex = 0;
 
@@ -30,10 +31,10 @@ public class Pedestrian extends MovingObject {
                       List<RouteNode> uniformRouteToStation,
                       List<RouteNode> routeFromStation,
                       List<RouteNode> uniformRouteFromStation,
-                      String preferredBusLine,
                       StationNode startStation,
                       StationNode finishStation,
-                      ITimeProvider timeProvider) {
+                      ITimeProvider timeProvider,
+                      ITaskProvider taskProvider) {
         super(timeProvider, agentId, DEFAULT_SPEED, createRoute(startStation, uniformRouteToStation,
                 finishStation, uniformRouteFromStation));
         this.displayRouteBeforeBus = routeToStation;
@@ -42,8 +43,6 @@ public class Pedestrian extends MovingObject {
 
         this.displayRouteAfterBus = routeFromStation;
         this.stationIndex = routeBeforeBus.size() - 1;
-        this.preferredBusLine = preferredBusLine;
-
         this.stationStart = startStation;
         this.stationFinish = finishStation;
     }
@@ -67,7 +66,6 @@ public class Pedestrian extends MovingObject {
 
         this.displayRouteAfterBus = ped.displayRouteAfterBus;
         this.stationIndex = ped.stationIndex;
-        this.preferredBusLine = ped.preferredBusLine;
 
         this.stationStart = ped.stationStart;
         this.stationFinish = ped.stationFinish;
@@ -76,7 +74,6 @@ public class Pedestrian extends MovingObject {
     @VisibleForTesting
     Pedestrian(ITimeProvider timeProvider) {
         super(timeProvider, 1, DEFAULT_SPEED, new ArrayList<>());
-        preferredBusLine = "";
         displayRouteBeforeBus = new ArrayList<>();
         displayRouteAfterBus = new ArrayList<>();
         routeBeforeBus = new ArrayList<>();
@@ -91,10 +88,7 @@ public class Pedestrian extends MovingObject {
     public StationNode getTargetStation() {
         return (StationNode) uniformRoute.get(stationIndex + 1);
     }
-
-    public String getPreferredBusLine() {
-        return preferredBusLine;
-    }
+    public StationNode getStationFinish(){return stationFinish;}
 
     @Override
     public long getAdjacentOsmWayId() {
@@ -134,12 +128,39 @@ public class Pedestrian extends MovingObject {
         return displayRouteAfterBus;
     }
 
-    public int getMillisecondsToNextStation() {
-        return ((routeBeforeBus.size() - 1 - moveIndex) * RoutingConstants.STEP_CONSTANT) / getSpeed();
 
+
+    public int getMillisecondsToNextStation() {
+        return getMillisecondsOnRoute(routeBeforeBus, moveIndex);
     }
 
     public StationNode findNextStation() {
         return stationStart;
     }
+    
+    public void setTroubled(boolean troubled) {
+    	this.troubled = troubled;
+    }
+
+	public boolean isTroubled() {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	public void setDisplayRouteBeforeBus(List<RouteNode> displayRouteToStation){
+        this.displayRouteBeforeBus = displayRouteToStation;
+    }
+    public void setRouteBeforeBus(List<RouteNode> routeBeforeBus)
+    {
+        this.routeBeforeBus = routeBeforeBus;
+    }
+    public void setStationStart(StationNode newStationStart)
+    {
+        this.stationStart = newStationStart;
+    }
+    public void setStationIndex(int index)
+    {
+        this.stationIndex = index ;
+    }
+
 }

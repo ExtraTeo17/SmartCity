@@ -19,18 +19,21 @@ public class ConfigContainer extends ConfigMutator
 
     private SimulationState simulationState = SimulationState.INITIAL;
     private boolean shouldGeneratePedestriansAndBuses = false;
+    private boolean shouldGenerateCrashForBuses = true;
     private boolean shouldGenerateConstructionSites = false;
 
     private boolean isLightStrategyActive = true;
     private boolean changeRouteOnTroublePoint = false;
     private boolean isStationStrategyActive = true;
-    private boolean changeRouteOnTrafficJam = false;
+    private boolean changeRouteOnTrafficJam = true;
     private boolean shouldUseFixedRoutes = false;
     private boolean shouldUseFixedConstructionSites = true;
+    private boolean generateBatchesForCars = true;
+    private boolean busCrashGeneratedOnce = false;
 
     private int lightExtendTime = 30;
     private int extendWaitTime = 60;
-    private int timeBeforeTrouble = 5000;
+    private int timeBeforeTrouble = 100000;
 
     private final IZone zone;
 
@@ -61,6 +64,16 @@ public class ConfigContainer extends ConfigMutator
     public SimulationState getSimulationState() {
         return simulationState;
     }
+    
+    @Override
+    public void setBusCrashGeneratedOnce(boolean busCrashGeneratedOnce) {
+    	this.busCrashGeneratedOnce = busCrashGeneratedOnce;
+    }
+    
+    @Override
+    public boolean getBusCrashGeneratedOnce() {
+    	return busCrashGeneratedOnce;
+    }
 
     public void setSimulationState(SimulationState simulationState) {
         if (this.simulationState != simulationState) {
@@ -81,6 +94,11 @@ public class ConfigContainer extends ConfigMutator
     @Override
     public int getExtendWaitTime() {
         return extendWaitTime;
+    }
+
+
+    public boolean getGenerateBatchesForCars() {
+        return generateBatchesForCars;
     }
 
     @Override
@@ -112,6 +130,9 @@ public class ConfigContainer extends ConfigMutator
     public boolean shouldGenerateConstructionSites() {
         return shouldGenerateConstructionSites;
     }
+
+    @Override
+    public boolean shouldGenerateCrashForBuses() { return shouldGenerateCrashForBuses;}
 
     @Override
     public void setShouldGenerateConstructionSites(boolean constructionSiteGenerationActive) {

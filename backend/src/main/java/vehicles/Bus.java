@@ -17,214 +17,258 @@ import vehicles.enums.VehicleType;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 import static vehicles.Constants.SPEED_SCALE;
 
 public class Bus extends MovingObject {
-    private static final int DEFAULT_SPEED = 50 * SPEED_SCALE;
 
-    static final int CAPACITY_MID = 10;
-    static final int CAPACITY_HIGH = 25;
+	private static final int DEFAULT_SPEED = 50 * SPEED_SCALE;
+	public static final int CAPACITY_MID = 10;
+	public static final int CAPACITY_HIGH = 25;
 
-    private final Logger logger;
-    private final Timetable timetable;
-    private final HashMap<Integer, List<String>> stationsForPassengers;
-    private final List<StationNode> stationNodesOnRoute;
-    private final String busLine;
-    private final ITimeProvider timeProvider;
-    private final EventBus eventBus;
+	private final Logger logger;
+	private final Timetable timetable;
+	private final HashMap<Integer, List<String>> stationsForPassengers;
+	private final List<StationNode> stationNodesOnRoute;
+	private final String busLine;
+	private final ITimeProvider timeProvider;
+	private final EventBus eventBus;
+	private final String brigadeNr;
 
-    private BusFillState fillState;
-    private int closestStationIndex = -1;
-    private int passengersCount = 0;
+	private BusFillState fillState;
+	private int closestStationIndex = -1;
+	private int passengersCount = 0;
 
-    // TODO: Factory for vehicles - inject
-    public Bus(EventBus eventBus,
-               ITimeProvider timeProvider,
-               int agentId,
-               List<RouteNode> simpleRoute,
-               List<RouteNode> uniformRoute,
-               Timetable timetable,
-               String busLine,
-               String brigadeNr) {
-        super(timeProvider, agentId, DEFAULT_SPEED, uniformRoute, simpleRoute);
-        this.timeProvider = timeProvider;
-        this.eventBus = eventBus;
-        this.timetable = timetable;
-        this.busLine = busLine;
-        this.fillState = BusFillState.LOW;
-        this.logger = LoggerFactory.getLogger(Bus.class.getName() + " (l_" + busLine + ") (br_" + brigadeNr + ")");
+	// TODO: Factory for vehicles - inject
+	public Bus(EventBus eventBus, ITimeProvider timeProvider, int agentId, List<RouteNode> simpleRoute,
+			List<RouteNode> uniformRoute, Timetable timetable, String busLine, String brigadeNr) {
+		super(timeProvider, agentId, DEFAULT_SPEED, uniformRoute, simpleRoute);
+		this.brigadeNr = brigadeNr;
+		this.timeProvider = timeProvider;
+		this.eventBus = eventBus;
+		this.timetable = timetable;
+		this.busLine = busLine;
+		this.fillState = BusFillState.LOW;
+		this.logger = LoggerFactory.getLogger(Bus.class.getName() + " (l_" + busLine + ") (br_" + brigadeNr + ")");
 
-        this.stationsForPassengers = new HashMap<>();
-        this.stationNodesOnRoute = new ArrayList<>();
-        for (RouteNode node : simpleRoute) {
-            if (node instanceof StationNode) {
-                StationNode station = (StationNode) node;
-                stationsForPassengers.put(station.getAgentId(), new ArrayList<>());
-                stationNodesOnRoute.add(station);
-            }
-        }
+		this.stationsForPassengers = new HashMap<>();
+		this.stationNodesOnRoute = new ArrayList<>();
+		for (RouteNode node : simpleRoute) {
+			if (node instanceof StationNode) {
+				StationNode station = (StationNode) node;
+				stationsForPassengers.put(station.getAgentId(), new ArrayList<>());
+				stationNodesOnRoute.add(station);
+			}
+		}
 
-        if (stationNodesOnRoute.size() < 2) {
-            logger.debug("Only one station on route");
-        }
-    }
+		if (stationNodesOnRoute.size() < 2) {
+			logger.debug("Only one station on route");
+		}
+	}
 
-    public int getPassengersCount() {
-        return passengersCount;
-    }
+	public String findBestChoiceOfStation() {
 
-    @VisibleForTesting
-    void increasePassengersCount() {
-        ++passengersCount;
-        if (passengersCount > CAPACITY_HIGH) {
-            setFillState(BusFillState.HIGH);
-        }
-        else if (passengersCount > CAPACITY_MID) {
-            setFillState(BusFillState.MID);
-        }
-    }
+		int currentPosition = moveIndex;
+		Integer positionOfStationNext = null;
+		Integer positionOfStationPrev = null;
+		for (int i = currentPosition + 1; i < uniformRoute.size(); i++) {
+			if (uniformRoute.get(i) instanceof StationNode) {
+				positionOfStationNext = i;
 
-    @VisibleForTesting
-    void decreasePassengersCount() {
-        --passengersCount;
-        if (passengersCount <= CAPACITY_MID) {
-            setFillState(BusFillState.LOW);
-        }
-        else if (passengersCount <= CAPACITY_HIGH) {
-            setFillState(BusFillState.MID);
-        }
-    }
+			}
+		}
 
-    private void setFillState(BusFillState newState) {
-        if (this.fillState != newState) {
-            this.fillState = newState;
-            eventBus.post(new BusAgentFillStateUpdatedEvent(agentId, newState));
-        }
-    }
+		for (int i = currentPosition; i > 0; i--) {
+			if (uniformRoute.get(i) instanceof StationNode) {
+				positionOfStationNext = i;
 
-    public BusFillState getFillState() {
-        return fillState;
-    }
+			}
+		}
 
-    public void addPassengerToStation(int id, String name) {
-        var passengers = stationsForPassengers.get(id);
-        if (passengers != null) {
-            passengers.add(name);
-            increasePassengersCount();
-        }
-        else {
-            logger.warn("Unrecognized station id: " + id);
-        }
-    }
+		if (positionOfStationNext == null && positionOfStationPrev == null)
+			return null;
 
-    public boolean removePassengerFromStation(int id, String name) {
-        if (getPassengers(id).remove(name)) {
-            decreasePassengersCount();
-            return true;
-        }
+		if (positionOfStationPrev == null || Math.abs(currentPosition - positionOfStationNext) < Math
+				.abs(currentPosition - positionOfStationPrev)) {
+			return ((StationNode) uniformRoute.get(positionOfStationNext)).getOsmId() + "";
+		}
+		return ((StationNode) uniformRoute.get(positionOfStationPrev)).getOsmId() + "";
 
-        return false;
-    }
+	}
 
-    public List<String> getPassengers(int id) {
-        var result = stationsForPassengers.get(id);
-        if (result == null) {
-            return new ArrayList<>();
-        }
+	public int getPassengersCount() {
+		return passengersCount;
+	}
 
-        return result;
-    }
+	public List<String> getAllPassangers() {
+		List<String> allPassengers = new ArrayList<>();
+		Iterator it = stationsForPassengers.entrySet().iterator();
+		while (it.hasNext()) {
+			var pair = (Map.Entry) it.next();
+			allPassengers.addAll((List<String>) pair.getValue());
+			it.remove(); // avoids a ConcurrentModificationException
+		}
+		return allPassengers;
+	}
 
-    public final String getLine() {
-        return busLine;
-    }
+	@VisibleForTesting
+	void increasePassengersCount() {
+		++passengersCount;
+		if (passengersCount > CAPACITY_HIGH) {
+			setFillState(BusFillState.HIGH);
+		} else if (passengersCount > CAPACITY_MID) {
+			setFillState(BusFillState.MID);
+		}
+	}
 
-    public final List<StationNode> getStationNodesOnRoute() {
-        return stationNodesOnRoute;
-    }
+	@VisibleForTesting
+	void decreasePassengersCount() {
+		--passengersCount;
+		if (passengersCount <= CAPACITY_MID) {
+			setFillState(BusFillState.LOW);
+		} else if (passengersCount <= CAPACITY_HIGH) {
+			setFillState(BusFillState.MID);
+		}
+	}
 
-    @Override
-    public long getAdjacentOsmWayId() {
-        return ((LightManagerNode) uniformRoute.get(moveIndex)).getAdjacentWayId();
-    }
+	private void setFillState(BusFillState newState) {
+		if (this.fillState != newState) {
+			this.fillState = newState;
+			eventBus.post(new BusAgentFillStateUpdatedEvent(agentId, newState));
+		}
+	}
 
-    @Override
-    public String getVehicleType() {
-        return VehicleType.BUS.toString();
-    }
+	public BusFillState getFillState() {
+		return fillState;
+	}
 
-    public Optional<StationNode> findNextStation() {
-        for (int i = moveIndex + 1; i < uniformRoute.size(); ++i) {
-            if (uniformRoute.get(i) instanceof StationNode) {
-                closestStationIndex = i;
-                return Optional.of((StationNode) uniformRoute.get(i));
-            }
-        }
-        closestStationIndex = -1;
-        return Optional.empty();
-    }
+	public void addPassengerToStation(int id, String name) {
+		var passengers = stationsForPassengers.get(id);
+		if (passengers != null) {
+			passengers.add(name);
+			increasePassengersCount();
+		} else {
+			logger.warn("Unrecognized station id: " + id);
+		}
+	}
 
-    public Optional<LocalDateTime> getTimeOnStation(String stationId) {
-        return getTimeOnStation(Long.parseLong(stationId));
-    }
+	public boolean removePassengerFromStation(int id, String name) {
+		if (getPassengers(id).remove(name)) {
+			decreasePassengersCount();
+			return true;
+		}
 
-    public Optional<LocalDateTime> getTimeOnStation(long stationId) {
-        var timeOnStation = timetable.getTimeOnStation(stationId);
-        if (timeOnStation.isEmpty()) {
-            logger.warn("Could not retrieve time for " + stationId);
-        }
+		return false;
+	}
 
-        return timeOnStation;
-    }
+	public List<String> getPassengers(int id) {
+		var result = stationsForPassengers.get(id);
+		if (result == null) {
+			return new ArrayList<>();
+		}
 
-    public RouteNode findNextStop() {
-        for (int i = moveIndex + 1; i < uniformRoute.size(); i++) {
-            if (uniformRoute.get(i) instanceof StationNode) {
-                return uniformRoute.get(i);
-            }
-            else if (uniformRoute.get(i) instanceof LightManagerNode) {
-                return uniformRoute.get(i);
-            }
-        }
-        return null;
-    }
+		return result;
+	}
 
-    public boolean isAtStation() {
-        if (moveIndex == uniformRoute.size()) {
-            return false;
-        }
-        return uniformRoute.get(moveIndex) instanceof StationNode;
-    }
+	public final String getLine() {
+		return busLine;
+	}
 
-    public Optional<StationNode> getCurrentStationNode() {
-        if (closestStationIndex == -1) {
-            return Optional.empty();
-        }
-        return Optional.of((StationNode) (uniformRoute.get(closestStationIndex)));
-    }
+	public final List<StationNode> getStationNodesOnRoute() {
+		return stationNodesOnRoute;
+	}
 
-    @Override
-    public void move() {
-        ++moveIndex;
-    }
+	@Override
+	public long getAdjacentOsmWayId() {
+		return ((LightManagerNode) uniformRoute.get(moveIndex)).getAdjacentWayId();
+	}
 
-    // TODO: Are they though?
-    //  Suppose Bus.move task is late by 5ms because of lags (performance issues)
-    //  Then his speed is actually 3600 / (9ms + 5ms) = 257 / TIME_SCALE = 25.7 instead of 40
-    //  This calculation is highly dependent on processor speed :(
-    public int getMillisecondsToNextStation() {
-        return ((closestStationIndex - moveIndex) * RoutingConstants.STEP_CONSTANT) / getSpeed();
-    }
+	@Override
+	public String getVehicleType() {
+		return VehicleType.BUS.toString();
+	}
 
-    public boolean shouldStart() {
-        var dateNow = timeProvider.getCurrentSimulationTime();
-        var boardingTime = timetable.getBoardingTime();
-        long hours = boardingTime.getHour();
-        long minutes = boardingTime.getMinute();
+	public Optional<StationNode> findNextStation() {
+		for (int i = moveIndex + 1; i < uniformRoute.size(); ++i) {
+			if (uniformRoute.get(i) instanceof StationNode) {
+				closestStationIndex = i;
+				return Optional.of((StationNode) uniformRoute.get(i));
+			}
+		}
+		closestStationIndex = -1;
+		return Optional.empty();
+	}
 
-        return hours == dateNow.getHour() && minutes == dateNow.getMinute();
-    }
+	public Optional<LocalDateTime> getTimeOnStation(String stationId) {
+		return getTimeOnStation(Long.parseLong(stationId));
+	}
+
+	public Optional<LocalDateTime> getTimeOnStation(long stationId) {
+		var timeOnStation = timetable.getTimeOnStation(stationId);
+		if (timeOnStation.isEmpty()) {
+			logger.warn("Could not retrieve time for " + stationId);
+		}
+
+		return timeOnStation;
+	}
+
+	public RouteNode findNextStop() {
+		for (int i = moveIndex + 1; i < uniformRoute.size(); i++) {
+			if (uniformRoute.get(i) instanceof StationNode) {
+				return uniformRoute.get(i);
+			} else if (uniformRoute.get(i) instanceof LightManagerNode) {
+				return uniformRoute.get(i);
+			}
+		}
+		return null;
+	}
+
+	public boolean isAtStation() {
+		if (moveIndex == uniformRoute.size()) {
+			return false;
+		}
+		return uniformRoute.get(moveIndex) instanceof StationNode;
+	}
+
+	public Optional<StationNode> getCurrentStationNode() {
+		if (closestStationIndex == -1) {
+			return Optional.empty();
+		}
+		return Optional.of((StationNode) (uniformRoute.get(closestStationIndex)));
+	}
+
+	@Override
+	public void move() {
+		++moveIndex;
+	}
+
+	// TODO: Are they though?
+	// Suppose Bus.move task is late by 5ms because of lags (performance issues)
+	// Then his speed is actually 3600 / (9ms + 5ms) = 257 / TIME_SCALE = 25.7
+	// instead of 40
+	// This calculation is highly dependent on processor speed :(
+	public int getMillisecondsToNextStation() {
+		return ((closestStationIndex - moveIndex) * RoutingConstants.STEP_CONSTANT) / getSpeed();
+	}
+
+	public boolean shouldStart() {
+		var dateNow = timeProvider.getCurrentSimulationTime();
+		var boardingTime = timetable.getBoardingTime();
+		long hours = boardingTime.getHour();
+		long minutes = boardingTime.getMinute();
+
+		return hours == dateNow.getHour() && minutes == dateNow.getMinute();
+	}
+
+	public String getSuperExtraString() {
+		return "Brigade: " + brigadeNr + ", bus line: " + busLine;
+	}
+
+	public String getBrigade() {
+		return brigadeNr;
+	}
 }

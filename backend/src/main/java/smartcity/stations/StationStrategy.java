@@ -59,11 +59,13 @@ public class StationStrategy {
     }
 
     public void addPedestrianToFarAwayQueue(String agentName, String desiredBusLine, LocalDateTime arrivalTime) {
+
         var farAwayPedestriansForLine = busLineToFarAwayPedestrians
                 .computeIfAbsent(desiredBusLine, key -> new ArrayList<>());
         var arrivalInfo = new ArrivalInfo(agentName, arrivalTime);
         farAwayPedestriansForLine.add(arrivalInfo);
     }
+
 
     public boolean removePedestrianFromFarAwayQueue(String agentName, String busLine) {
         var arrivalInfos = busLineToFarAwayPedestrians.get(busLine);
@@ -80,6 +82,7 @@ public class StationStrategy {
                 .computeIfAbsent(desiredBusLine, key -> new ArrayList<>());
         var arrivalInfo = new ArrivalInfo(agentName, arrivalTime);
         pedestriansOnStation.add(arrivalInfo);
+        var arrivalInfos = busLineToPedestriansOnStation.get(desiredBusLine);
     }
 
     public boolean removePedestrianFromQueue(String agentName, String busLine) {
@@ -93,9 +96,7 @@ public class StationStrategy {
     }
 
     public OptimizationResult requestBusesAndPeopleFreeToGo() {
-        // TODO: Inject config container
-        //  #Przemek: What to inject here? waitTimeExtend is already in configContainer
-        var result = new OptimizationResult(0, 0);
+        var result = OptimizationResult.empty();
         for (var entry : busAgentOnStationToArrivalTime.entrySet()) {
             var busLine = entry.getKey();
             var scheduledArrival = entry.getValue();
@@ -114,6 +115,7 @@ public class StationStrategy {
                     currentTime.getMinute(), 1, 0);   // scheduledArrival.actual;
             logger.debug("Scheduled time + seconds " + scheduledTimePlusWait);
             logger.debug("Actual time: " + actualTime);
+
             if (actualTime.isAfter(scheduledTimePlusWait)) {
                 logger.debug("------------------BUS WAS LATE-----------------------");
                 List<String> passengersThatCanLeave = getPassengersWhoAreReadyToGo(busLine);
@@ -129,8 +131,8 @@ public class StationStrategy {
                     if (!busesFreeToGo.containsKey(busAgentNameToLine.get(busLine))) {
                         busesFreeToGo.put(busAgentNameToLine.get(busLine), false);
                         toWhichPassengersStrategyWaits.put(busAgentNameToLine.get(busLine), farPassengers);
-                        logger.info("INIALISATION OF WAITING");
-                        logger.info("far passangers" + farPassengers.size());
+                        logger.debug("INIALISATION OF WAITING");
+                        logger.debug("far passangers" + farPassengers.size());
 
                     }
 
@@ -172,8 +174,13 @@ public class StationStrategy {
         if (arrivalInfos == null) {
             return new ArrayList<>();
         }
-
         return arrivalInfos.stream().map(info -> info.agentName).collect(Collectors.toList());
+    }
+    
+    private void logDebugArrivalInfos(final List<ArrivalInfo> arrivalInfos) {
+        StringBuilder builder = new StringBuilder();
+        arrivalInfos.forEach(info -> builder.append(info.agentName + ", "));
+        logger.info("Arrival infos size: " + arrivalInfos.size() + ", agent names inside: " + builder.toString());
     }
 
     private List<String> getPassengersWhoAreFar(String busAgentName, LocalDateTime deadline) {

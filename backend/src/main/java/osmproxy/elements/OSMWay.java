@@ -365,4 +365,15 @@ public class OSMWay extends OSMElement implements Serializable {
 		}
 		return closestNodeRef;
 	}
+
+	// TODO: NEW function -- in case of new bugs start debugging here
+	public void determineRouteOrientationAndFilterRelevantNodes(String startingOsmNodeRef, String finishingOsmNodeRef) {
+		Optional<Integer> startingIndex = indexOf(startingOsmNodeRef);
+		Optional<Integer> finishingIndex = indexOf(finishingOsmNodeRef);
+		determineRouteOrientationAndFilterRelevantNodes(
+				startingIndex.orElseThrow(() -> new IllegalArgumentException(
+						"Starting OSM node ref: " + startingOsmNodeRef + " was not on way: " + getId())),
+				finishingIndex.orElseThrow(() -> new IllegalArgumentException(
+						"Starting OSM node ref: " + startingOsmNodeRef + " was not on way: " + getId())));
+	}
 }

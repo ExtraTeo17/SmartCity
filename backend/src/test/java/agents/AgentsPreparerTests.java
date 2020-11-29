@@ -25,6 +25,7 @@ import smartcity.lights.abstractions.ICrossroadFactory;
 import smartcity.lights.core.CrossroadFactory;
 import smartcity.lights.core.CrossroadParser;
 import smartcity.lights.core.Light;
+import smartcity.task.TaskProvider;
 import testutils.FileLoader;
 import testutils.ReflectionHelper;
 
@@ -153,7 +154,7 @@ class AgentsPreparerTests {
         var eventBus = new EventBus();
 
         return new AgentsFactory(idGenerator, eventBus, timeProvider, routeTransformer,
-                crossroadFactory, mock(IRouteGenerator.class), mock(ConfigContainer.class));
+                crossroadFactory, mock(IRouteGenerator.class), mock(ConfigContainer.class),mock(TaskProvider.class));
     }
 
     private ICrossroadFactory setupCrossroadFactory() {

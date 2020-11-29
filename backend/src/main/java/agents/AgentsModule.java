@@ -17,7 +17,8 @@ public class AgentsModule extends AbstractModule {
             LightManagerAgent.class,
             StationAgent.class,
             PedestrianAgent.class,
-            BikeAgent.class
+            BikeAgent.class,
+            BusManagerAgent.class
     };
 
     @Override
@@ -26,6 +27,7 @@ public class AgentsModule extends AbstractModule {
         binder.bind(IAgentsFactory.class).to(AgentsFactory.class).in(Singleton.class);
         binder.bind(AgentsPreparer.class).asEagerSingleton();
         binder.bind(TroubleManagerAgent.class).in(Singleton.class);
+
         binder.bind(SingletonAgentsActivator.class).asEagerSingleton();
     }
 
