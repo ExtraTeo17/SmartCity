@@ -66,6 +66,7 @@ public class LightManagerAgent extends AbstractAgent {
 
                 final String agentStuckInJam = result.getAgentStuckInJam();
                 if (result.shouldNotifyCarAboutStartOfTrafficJamOnThisLight()) {
+                    logger.info("KOOOOOOOOOOOOOOREK");
                     handleTrafficJams(result, agentStuckInJam);
                 }
                 if (result.shouldNotifyCarAboutStopOfTrafficJamOnThisLight()) {

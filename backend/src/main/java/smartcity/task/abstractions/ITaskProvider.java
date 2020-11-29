@@ -14,10 +14,9 @@ public interface ITaskProvider {
 
     Runnable getCreateBikeTask(IGeoPosition start, IGeoPosition end, boolean testBike);
 
-
     Runnable getCreatePedestrianTask(IRoutingHelper routingHelper,
                                      StationNode startStation, StationNode endStation,
-                                     String busLine, boolean testPedestrian);
+                                     boolean testPedestrian);
 
     Runnable getScheduleBusControlTask();
 

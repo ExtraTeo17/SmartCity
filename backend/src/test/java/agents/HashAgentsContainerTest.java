@@ -17,6 +17,7 @@ import routing.abstractions.IRouteTransformer;
 import smartcity.config.ConfigContainer;
 import smartcity.lights.abstractions.ICrossroad;
 import smartcity.stations.StationStrategy;
+import smartcity.task.abstractions.ITaskProvider;
 import vehicles.Bus;
 import vehicles.MovingObject;
 import vehicles.Pedestrian;
@@ -88,7 +89,7 @@ class HashAgentsContainerTest {
         var ped = mock(Pedestrian.class);
         when(ped.getVehicleType()).thenReturn(VehicleType.PEDESTRIAN.toString());
         return new PedestrianAgent(idGenerator.get(PedestrianAgent.class), ped,
-                createTimeProvider(), createEventBus());
+                createTimeProvider(), mock(ITaskProvider.class), createEventBus(), mock(IRouteGenerator.class));
     }
 
     BikeAgent getBikeAgent() {
@@ -118,7 +119,7 @@ class HashAgentsContainerTest {
 
     BusAgent getBusAgent() {
         return new BusAgent(idGenerator.get(BusAgent.class), mock(Bus.class),
-                createTimeProvider(), createEventBus());
+                createTimeProvider(), createEventBus(),mock(ConfigContainer.class));
     }
 
 

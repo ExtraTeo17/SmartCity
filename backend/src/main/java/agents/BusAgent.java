@@ -18,6 +18,8 @@ import routing.nodes.RouteNode;
 import routing.nodes.StationNode;
 import smartcity.ITimeProvider;
 import smartcity.SmartCityAgent;
+import smartcity.config.StaticConfig;
+import smartcity.config.abstractions.ITroublePointsConfigContainer;
 import utilities.ConditionalExecutor;
 import utilities.Siblings;
 import vehicles.Bus;
@@ -31,6 +33,7 @@ import java.util.Random;
 import static agents.AgentConstants.DEFAULT_BLOCK_ON_ERROR;
 import static agents.message.MessageManager.createMessage;
 import static agents.message.MessageManager.createProperties;
+import static java.lang.Thread.sleep;
 import static smartcity.config.StaticConfig.USE_BATCHED_UPDATES;
 
 @SuppressWarnings("serial")
@@ -38,13 +41,18 @@ public class BusAgent extends AbstractAgent {
     public static final String name = BusAgent.class.getSimpleName().replace("Agent", "");
     private final ITimeProvider timeProvider;
     private final Bus bus;
-
+    private final ITroublePointsConfigContainer configContainer;
+    private static final int THRESHOLD_UNTIL_INDEX_CHANGE = 50;
+    private RouteNode troublePoint;
+    
     BusAgent(int busId, Bus bus,
              ITimeProvider timeProvider,
-             EventBus eventBus) {
+             EventBus eventBus,
+             ITroublePointsConfigContainer configContainer) {
         super(busId, name, timeProvider, eventBus);
         this.timeProvider = timeProvider;
         this.bus = bus;
+        this.configContainer = configContainer;
     }
 
     @Override
@@ -55,6 +63,8 @@ public class BusAgent extends AbstractAgent {
             print("No stations on route!", LoggerLevel.ERROR);
             return;
         }
+
+        print("Bus start: " + bus.getSuperExtraString());
 
         var firstStation = firstStationOpt.get();
         print("Started at station " + firstStation.getAgentId() + ".");
@@ -99,6 +109,8 @@ public class BusAgent extends AbstractAgent {
                             }
                             var station = stationOpt.get();
                             List<String> passengerNames = bus.getPassengers(station.getAgentId());
+                            
+                            //System.out.println("PASSENGER NAMES SIZE: " + passengerNames.size());
 
                             if (passengerNames.size() > 0) {
                                 ACLMessage leave = createMessage(ACLMessage.REQUEST, passengerNames);
@@ -112,7 +124,7 @@ public class BusAgent extends AbstractAgent {
                             Properties properties = createProperties(MessageParameter.BUS);
 
                             var timeOnStation = bus.getTimeOnStation(station.getOsmId());
-                            logger.info("CASE MOVING");
+                            //logger.info("CASE MOVING");
                             timeOnStation.ifPresent(time -> properties.setProperty(MessageParameter.SCHEDULE_ARRIVAL, time
                                     .toString()));
                             properties.setProperty(MessageParameter.ARRIVAL_TIME, timeProvider.getCurrentSimulationTime()
@@ -238,6 +250,81 @@ public class BusAgent extends AbstractAgent {
 
         addBehaviour(move);
         addBehaviour(communication);
+
+
+        if (configContainer.shouldGenerateCrashForBuses()) {
+            var timeBeforeTroubleMs = this.configContainer.getTimeBeforeTrouble() * 1000;
+            Behaviour troubleGenerator = new TickerBehaviour(this, 8000) {
+
+				@Override
+                public void onTick() {
+                	if (configContainer.getBusCrashGeneratedOnce()) {
+                		logger.info("Bus crash has already been generated once");
+                		return;
+                	}
+                	configContainer.setBusCrashGeneratedOnce(true);
+                    logger.info("Generated trouble");
+                    int index = bus.getMoveIndex();
+                    var trouble = bus.getUniformRoute().get(index);
+                    troublePoint = new RouteNode(trouble.getLat(),trouble.getLng(),
+                            trouble.getInternalEdgeId());
+                    sendMessageAboutCrashTroubleToTroubleManager(); //send message to boss Agent/ maybe not so important in case of buses
+                    sendMessageAboutCrashTroubleToPedestrians();
+
+                    try {
+                        sleep(10000000);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                    stop();
+                    //TODO: agent dies
+                }
+
+                private void sendMessageAboutCrashTroubleToPedestrians() {
+                    for (String pedestrian : bus.getAllPassangers()) {
+                        ACLMessage msg = createMessageAboutCrash(pedestrian,false);
+                        logger.info("Send message about crash to pedestrian: " + pedestrian);
+                        send(msg);
+                    }
+                }
+
+                private ACLMessage createMessageAboutCrash(String agentName, boolean isTroubleManager) {
+
+                    ACLMessage msg = createMessage(ACLMessage.INFORM, agentName);
+                    Properties properties = createProperties(MessageParameter.BUS);
+                    properties.setProperty(MessageParameter.TYPEOFTROUBLE, MessageParameter.CRASH);
+                    properties.setProperty(MessageParameter.TROUBLE, MessageParameter.SHOW);
+                    properties.setProperty(MessageParameter.TROUBLE_LAT, Double.toString(troublePoint.getLat()));
+                    properties.setProperty(MessageParameter.TROUBLE_LON, Double.toString(troublePoint.getLng()));
+                    if(!isTroubleManager)
+                    {
+                        properties.setProperty(MessageParameter.DESIRED_OSM_STATION_ID, ((StationNode)bus.findNextStop()).getOsmId()+"");
+                        properties.setProperty(MessageParameter.AGENT_ID_OF_NEXT_CLOSEST_STATION,((StationNode)bus.findNextStop()).getAgentId()+"");
+                        //maybe not needed
+                        properties.setProperty(MessageParameter.LAT_OF_NEXT_CLOSEST_STATION,((StationNode)bus.findNextStop()).getLat()+"");
+                        properties.setProperty(MessageParameter.LON_OF_NEXT_CLOSEST_STATION,((StationNode)bus.findNextStop()).getLng()+"");
+
+                        properties.setProperty(MessageParameter.BUS_LINE, getLine());
+                        properties.setProperty(MessageParameter.BRIGADE, bus.getBrigade());
+                    }
+                    msg.setAllUserDefinedParameters(properties);
+                    return msg;
+                }
+
+                private void sendMessageAboutCrashTroubleToTroubleManager() {
+
+                    ACLMessage msg = createMessageAboutCrash(TroubleManagerAgent.name,true);
+                    logger.info("Send message about crash to Trouble Manager ");
+                    send(msg);
+                }
+
+            };
+
+            addBehaviour(troubleGenerator);
+
+        }
+
+
     }
 
     public void move() {
@@ -253,7 +340,6 @@ public class BusAgent extends AbstractAgent {
 
     private void informNextStation() {
         // finds next station and announces his arrival
-        logger.info("informNextStation");
         var stationOpt = bus.findNextStation();
         if (stationOpt.isPresent()) {
             var station = stationOpt.get();
@@ -303,14 +389,15 @@ public class BusAgent extends AbstractAgent {
 
     // TODO: Fix situation where bus route contains only one station and pedestrians tries to choose two
     public final Optional<Siblings<StationNode>> getTwoSubsequentStations(final Random random) {
+    	
         List<StationNode> stationsOnRoute = bus.getStationNodesOnRoute();
-        int halfIndex = stationsOnRoute.size() / 2;
-        if (halfIndex < 1) {
-            return Optional.empty();
+        if (stationsOnRoute.size() <= 1) {
+        	return Optional.empty();
         }
+        int halfIndex = (int)Math.ceil((double)stationsOnRoute.size() / 2.0);
 
-        return Optional.of(Siblings.of(stationsOnRoute.get(random.nextInt(halfIndex)),
-                stationsOnRoute.get(halfIndex + random.nextInt(halfIndex))));
+        return Optional.of(Siblings.of(stationsOnRoute.get(0),//random.nextInt(halfIndex)), // TODO: fix to consider first random when calculating second IMPORTANT
+                stationsOnRoute.get(2)));//halfIndex + random.nextInt(halfIndex)))); // TODO: for tests choose stations 1. and 3.
     }
 
     /**
@@ -332,4 +419,6 @@ public class BusAgent extends AbstractAgent {
     public boolean shouldStart() {
         return bus.shouldStart();
     }
+
+
 }

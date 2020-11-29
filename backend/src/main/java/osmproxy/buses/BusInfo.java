@@ -16,7 +16,7 @@ public class BusInfo implements
     public final List<OSMWay> route;
     public final List<OSMStation> stops;
 
-    private final List<BrigadeInfo> brigadeList;
+    public final List<BrigadeInfo> brigadeList;
 
     BusInfo(String busLine, List<OSMWay> route) {
         this.busLine = busLine;

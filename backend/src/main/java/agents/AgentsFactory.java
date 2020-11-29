@@ -6,6 +6,8 @@ import com.google.inject.Inject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Node;
+
+import osmproxy.buses.BusInfo;
 import osmproxy.buses.Timetable;
 import osmproxy.elements.OSMNode;
 import osmproxy.elements.OSMStation;
@@ -17,8 +19,10 @@ import smartcity.ITimeProvider;
 import smartcity.config.ConfigContainer;
 import smartcity.lights.abstractions.ICrossroadFactory;
 import smartcity.stations.StationStrategy;
+import smartcity.task.abstractions.ITaskProvider;
 import vehicles.*;
 
+import java.util.HashSet;
 import java.util.List;
 
 @SuppressWarnings("OverlyCoupledClass")
@@ -32,6 +36,7 @@ class AgentsFactory implements IAgentsFactory {
     private final ICrossroadFactory crossroadFactory;
     private final EventBus eventBus;
     private final ConfigContainer configContainer;
+    private final ITaskProvider taskProvider;
 
     @Inject
     public AgentsFactory(IdGenerator idGenerator,
@@ -40,7 +45,8 @@ class AgentsFactory implements IAgentsFactory {
                          IRouteTransformer routeTransformer,
                          ICrossroadFactory crossroadFactory,
                          IRouteGenerator routeGenerator,
-                         ConfigContainer configContainer) {
+                         ConfigContainer configContainer,
+                         ITaskProvider taskProvider) {
         this.idGenerator = idGenerator;
         this.timeProvider = timeProvider;
         this.routeTransformer = routeTransformer;
@@ -48,6 +54,7 @@ class AgentsFactory implements IAgentsFactory {
         this.eventBus = eventBus;
         this.routeGenerator = routeGenerator;
         this.configContainer = configContainer;
+        this.taskProvider = taskProvider;
     }
 
     @Override
@@ -102,7 +109,7 @@ class AgentsFactory implements IAgentsFactory {
         var uniformRoute = routeTransformer.uniformRoute(route);
         logger.trace("DisplayRoute size: " + route.size() + ", routeSize: " + uniformRoute.size());
         var bus = new Bus(eventBus, timeProvider, id, route, uniformRoute, timetable, busLine, brigadeNr);
-        return new BusAgent(id, bus, timeProvider, eventBus);
+        return new BusAgent(id, bus, timeProvider, eventBus,configContainer);
     }
 
     @Deprecated
@@ -123,7 +130,6 @@ class AgentsFactory implements IAgentsFactory {
     // TODO: Simplify to avoid 6 arguments
     @Override
     public PedestrianAgent create(List<RouteNode> routeToStation, List<RouteNode> routeFromStation,
-                                  String preferredBusLine,
                                   StationNode startStation, StationNode finishStation,
                                   boolean testPedestrian) {
         var id = idGenerator.get(PedestrianAgent.class);
@@ -131,19 +137,23 @@ class AgentsFactory implements IAgentsFactory {
         var uniformRouteFromStation = routeTransformer.uniformRoute(routeFromStation);
         var pedestrian = new Pedestrian(id, routeToStation, uniformRouteToStation,
                 routeFromStation, uniformRouteFromStation,
-                preferredBusLine,
                 startStation, finishStation,
-                timeProvider);
+                timeProvider,taskProvider);
         if (testPedestrian) {
             pedestrian = new TestPedestrian(pedestrian);
         }
 
-        return new PedestrianAgent(id, pedestrian, timeProvider, eventBus);
+        return new PedestrianAgent(id, pedestrian, timeProvider, taskProvider, eventBus, routeGenerator);
     }
 
     @Override
-    public PedestrianAgent create(List<RouteNode> routeToStation, List<RouteNode> routeFromStation, String preferredBusLine,
+    public PedestrianAgent create(List<RouteNode> routeToStation, List<RouteNode> routeFromStation,
                                   StationNode startStation, StationNode finishStation) {
-        return create(routeToStation, routeFromStation, preferredBusLine, startStation, finishStation, false);
+        return create(routeToStation, routeFromStation,  startStation, finishStation, false);
     }
+
+	@Override
+	public BusManagerAgent create(HashSet<BusInfo> busInfos) {
+		return new BusManagerAgent(timeProvider, eventBus, busInfos);
+	}
 }
