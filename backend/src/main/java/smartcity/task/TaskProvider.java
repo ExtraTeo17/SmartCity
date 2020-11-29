@@ -43,6 +43,9 @@ public class TaskProvider implements ITaskProvider {
     private static final Logger logger = LoggerFactory.getLogger(TaskProvider.class);
     private final int pedestrianRouteOffset = 200;
 
+    IGeoPosition startForBatches = null;
+    IGeoPosition endForBatches = null;
+
     private final ConfigContainer configContainer;
     private final IRouteGenerator routeGenerator;
     private final IAgentsFactory agentsFactory;
@@ -75,19 +78,37 @@ public class TaskProvider implements ITaskProvider {
     public Runnable getCreateCarTask(IGeoPosition start, IGeoPosition end, boolean testCar) {
         return () -> {
             List<RouteNode> route;
+
             try {
-                route = routeInfoCache.get(start, end);
-                if (route == null) {
+
+
+                if (configContainer.getGenerateBatchesForCars()) {
+                    if (startForBatches == null && endForBatches == null) {
+                        startForBatches = start;
+                        endForBatches = end;
+                    }
+                    route = routeInfoCache.get(startForBatches, endForBatches);
+
+                } else {
+                    route = routeInfoCache.get(start, end);
+                }
+
+                if (route == null && !configContainer.getGenerateBatchesForCars()) {
                     route = routeGenerator.generateRouteInfo(start, end, false);
                     routeInfoCache.put(start, end, route);
                 }
+                else{
+                    route = routeGenerator.generateRouteInfo(startForBatches, endForBatches, false);
+                    routeInfoCache.put(startForBatches, endForBatches, route);
+                }
+
             } catch (Exception e) {
                 logger.warn("Error generating route info", e);
                 return;
             }
             if (route.size() == 0) {
-            	logger.debug("Generated route is empty, agent won't be created.");
-            	return;
+                logger.debug("Generated route is empty, agent won't be created.");
+                return;
             }
 
             CarAgent agent = agentsFactory.create(route, testCar);
@@ -114,8 +135,8 @@ public class TaskProvider implements ITaskProvider {
                 return;
             }
             if (route.size() == 0) {
-            	logger.debug("Generated route is empty, agent won't be created.");
-            	return;
+                logger.debug("Generated route is empty, agent won't be created.");
+                return;
             }
 
             BikeAgent agent = agentsFactory.create(route, testBike, "");
@@ -151,12 +172,12 @@ public class TaskProvider implements ITaskProvider {
                         String.valueOf(endStation.getOsmId()),
                         null);
                 if (routeToStation.size() == 0 || routeFromStation.size() == 0) {
-                	logger.debug("Generated route is empty, agent won't be created.");
-                	return;
+                    logger.debug("Generated route is empty, agent won't be created.");
+                    return;
                 }
 
                 PedestrianAgent agent = agentsFactory.create(routeToStation, routeFromStation,
-                         startStation, endStation, testPedestrian);
+                        startStation, endStation, testPedestrian);
                 if (agentsContainer.tryAdd(agent)) {
                     agent.start();
                     eventBus.post(new PedestrianAgentCreatedEvent(agent.getId(), agent.getPosition(),
