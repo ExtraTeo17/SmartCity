@@ -17,6 +17,11 @@ export default createSelector([getBuses], buses => {
   const positionsSet = new Set();
   const routesSet = new Set();
   buses.forEach(b => {
+    if (b.startedMoving) {
+      result.push(b);
+      return;
+    }
+
     const locHash = getLocationHash(b.location);
     if (!positionsSet.has(locHash)) {
       positionsSet.add(locHash);

@@ -111,7 +111,7 @@ describe("Selector for buses without routes", () => {
     for (let i = 0; i < busesNum; ++i) {
       newBuses[i] = createBus(i, { lat: defLat, lng: defLng });
     }
-    newBuses[0] = createBus(0, { lat: defLat, lng: 0.01 });
+    newBuses[0] = { ...newBuses[0], location: { lat: defLat, lng: 0.01 }, startedMoving: true };
     updateStateWithNewBuses(newBuses);
 
     let timeSum = 0;
@@ -123,7 +123,7 @@ describe("Selector for buses without routes", () => {
       expect(res1).toHaveLength(2);
 
       newBuses = [...newBuses];
-      newBuses[0] = createBus(0, { lat: defLat, lng: i + 0.3 });
+      newBuses[0] = { ...newBuses[0], location: { lat: defLat, lng: i + 0.3 } };
       updateStateWithNewBuses(newBuses);
     }
     expect(timeSum).toBeLessThan(normalSelectMs * 25);
@@ -189,19 +189,19 @@ describe("Selector for buses with routes", () => {
     const res1 = busesSelector(state);
     expect(res1).toHaveLength(3);
 
-    buses = buses.map(b => (b.id === 4 ? { ...b, location: createLoc(defLat, defLng + 1) } : b));
+    buses = buses.map(b => (b.id === 4 ? { ...b, location: createLoc(defLat, defLng + 1), startedMoving: true } : b));
     updateStateWithNewBuses(buses);
     const res2 = busesSelector(state);
     // Assert - new location but previous is occupied by many other
-    expect(res2).toHaveLength(3);
+    expect(res2).toHaveLength(4);
 
-    buses = buses.map(b => (b.id === 5 ? { ...b, location: createLoc(defLat, defLng + 2) } : b));
+    buses = buses.map(b => (b.id === 5 ? { ...b, location: createLoc(defLat, defLng + 2), startedMoving: true } : b));
     updateStateWithNewBuses(buses);
     const res3 = busesSelector(state);
     // Assert - same routes but different locations now
     expect(res3).toHaveLength(4);
 
-    buses = buses.map(b => (b.id === 3 ? { ...b, location: createLoc(defLat, defLng + 1) } : b));
+    buses = buses.map(b => (b.id === 3 ? { ...b, location: createLoc(defLat, defLng + 1), startedMoving: true } : b));
     updateStateWithNewBuses(buses);
     const res4 = busesSelector(state);
     // Assert - new location, but no other route of this type
@@ -210,8 +210,8 @@ describe("Selector for buses with routes", () => {
     buses = buses.map(b => (b.id === 4 ? { ...b, location: createLoc(defLat, defLng + 2) } : b));
     updateStateWithNewBuses(buses);
     const res5 = busesSelector(state);
-    // Assert - new location, same as other with same route
-    expect(res5).toHaveLength(3);
+    // Assert - new location, same as other with same route, but started moving
+    expect(res5).toHaveLength(4);
   });
 
   it("chooses many buses fast", () => {
@@ -262,7 +262,7 @@ describe("Selector for buses with routes", () => {
     for (let i = 0; i < busesNum; ++i) {
       newBuses[i] = createBusWithRoute(i, i & 1 ? routeB : routeA);
     }
-    newBuses[0] = createBusWithRoute(0, routeC, { lat: defLat, lng: 0.01 });
+    newBuses[0] = { ...newBuses[0], route: routeC, location: { lat: defLat, lng: 0.01 }, startedMoving: true };
     updateStateWithNewBuses(newBuses);
 
     let timeSum = 0;
@@ -274,7 +274,8 @@ describe("Selector for buses with routes", () => {
       expect(res1).toHaveLength(3);
 
       newBuses = [...newBuses];
-      newBuses[0] = createBusWithRoute(0, routeC, { lat: defLat, lng: i + 0.3 });
+
+      newBuses[0] = { ...newBuses[0], location: { lat: defLat, lng: i + 0.3 } };
       updateStateWithNewBuses(newBuses);
     }
     expect(timeSum).toBeLessThan(normalSelectMs * 40);
