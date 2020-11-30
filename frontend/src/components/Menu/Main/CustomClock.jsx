@@ -2,7 +2,8 @@ import React, { useEffect, useState } from "react";
 import { connect } from "react-redux";
 import "../../../styles/CustomClock.css";
 
-export const timeUpdateThresholdMs = 999;
+export const timeUpdateScaledThresholdMs = 999;
+export const timeUpdateThresholdMs = 49;
 const dateFormat = new Intl.DateTimeFormat("pl-PL", {
   dateStyle: "short",
 });
@@ -25,16 +26,21 @@ export const CustomClockObj = props => {
   useEffect(() => {
     if (wasStarted) {
       const animate = time => {
-        if (previousTimeRef.current !== undefined) {
-          const deltaTime = time - previousTimeRef.current;
-          const scaledDeltaTime = timeScale * deltaTime;
-          if (scaledDeltaTime > timeUpdateThresholdMs) {
-            setCurrTime(prevTime => new Date(prevTime.getTime() + scaledDeltaTime));
-            previousTimeRef.current = time;
-          }
-        } else {
+        if (!previousTimeRef.current) {
+          previousTimeRef.current = time;
+          requestRef.current = requestAnimationFrame(animate);
+          return;
+        }
+
+        const deltaTime = time - previousTimeRef.current;
+        const scaledDeltaTime = timeScale * deltaTime;
+        if (scaledDeltaTime > timeUpdateScaledThresholdMs && deltaTime > timeUpdateThresholdMs) {
+          console.log(`dt0 ${deltaTime}`);
+          console.log(`dt1 ${scaledDeltaTime}`);
+          setCurrTime(prevTime => new Date(prevTime.getTime() + scaledDeltaTime));
           previousTimeRef.current = time;
         }
+
         requestRef.current = requestAnimationFrame(animate);
       };
 

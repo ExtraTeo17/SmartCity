@@ -2,15 +2,16 @@ import React from "react";
 import { render, unmountComponentAtNode } from "react-dom";
 import { act } from "react-dom/test-utils";
 import { mount } from "enzyme";
-import { CustomClockObj, timeUpdateThresholdMs } from "../components/Menu/Main/CustomClock";
+import { CustomClockObj, timeUpdateScaledThresholdMs, timeUpdateThresholdMs } from "../components/Menu/Main/CustomClock";
 
-const timeGreaterThreshold = timeUpdateThresholdMs + 1;
+const timeScaledGreaterThreshold = timeUpdateScaledThresholdMs + 1;
+const timeGreaterThresholdMs = timeUpdateThresholdMs + 1;
 
 let container = null;
 let currentTimeFrame;
 let frameInterval = 100;
 // 2 intervals will pass, because we set time after first frame
-let maxFrameTimeElapsed = timeGreaterThreshold * 2 + frameInterval + 1;
+let maxFrameTimeElapsed = timeScaledGreaterThreshold * 2 + frameInterval + 1;
 beforeEach(() => {
   container = document.createElement("div");
   document.body.appendChild(container);
@@ -69,14 +70,27 @@ describe("Clock", () => {
     expect(clock.text()).toBe(getTimeStringAfterStarted(scale));
   });
 
-  it("does not update if refresh interval didn't pass", () => {
+  it("does not update if scaled refresh interval didn't pass", () => {
     const scale = 1;
-    frameInterval = timeGreaterThreshold / 10;
-    maxFrameTimeElapsed = timeGreaterThreshold * 1.5;
+    frameInterval = timeScaledGreaterThreshold / 10;
+    maxFrameTimeElapsed = timeScaledGreaterThreshold * 1.5;
+    expect(maxFrameTimeElapsed - frameInterval).toBeGreaterThan(timeScaledGreaterThreshold);
 
     const wrapper = mount(<CustomClockObj wasStarted time={initTime} timeScale={scale} />);
 
     const clock = wrapper.find("#clock");
     expect(clock.text()).toBe(getTimeStringAfterStarted(scale));
+  });
+
+  it("does not update if normal refresh interval didn't pass", () => {
+    const scale = 30;
+    maxFrameTimeElapsed = timeGreaterThresholdMs * 0.75;
+    frameInterval = maxFrameTimeElapsed / 10;
+    expect((maxFrameTimeElapsed - frameInterval) * scale).toBeGreaterThan(timeScaledGreaterThreshold);
+
+    const wrapper = mount(<CustomClockObj wasStarted time={initTime} timeScale={scale} />);
+
+    const clock = wrapper.find("#clock");
+    expect(clock.text()).toBe(timeStringLocale);
   });
 });
