@@ -96,7 +96,7 @@ public class ConfigContainer extends ConfigMutator
         return extendWaitTime;
     }
 
-
+    @Override
     public boolean getGenerateBatchesForCars() {
         return generateBatchesForCars;
     }

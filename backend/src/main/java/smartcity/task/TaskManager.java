@@ -60,8 +60,13 @@ public class TaskManager implements ITaskManager {
             var randomPositions = customRoutingHelper.getRandomPositions(adjustedZone);
             taskProvider.getCreateCarTask(randomPositions.first, randomPositions.second, runCount == testCarId).run();
         };
+        if (configContainer.getGenerateBatchesForCars()) {
+            runIf(() -> agentsContainer.size(CarAgent.class) < carsLimit, createCars, CREATE_CAR_INTERVAL_FOR_BATCHES, true);
 
-        runIf(() -> agentsContainer.size(CarAgent.class) < carsLimit, createCars, CREATE_CAR_INTERVAL, true);
+        } else {
+            runIf(() -> agentsContainer.size(CarAgent.class) < carsLimit, createCars, CREATE_CAR_INTERVAL, true);
+
+        }
     }
 
     private IRoutingHelper getRoutingHelper(int seed) {
@@ -89,8 +94,7 @@ public class TaskManager implements ITaskManager {
         if (configContainer.shouldUseFixedRoutes()) {
             random = new Random(FIXED_PED_SEED);
             customRoutingHelper = RoutingHelper.of(random);
-        }
-        else {
+        } else {
             random = new Random();
             customRoutingHelper = this.routingHelper;
         }
