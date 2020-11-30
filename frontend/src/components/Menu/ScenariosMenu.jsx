@@ -70,7 +70,7 @@ export const ScenariosMenuObj = props => {
       timeScale: 7,
 
       lightStrategyActive: true,
-      extendLightTime: 33,
+      extendLightTime: 32,
 
       stationStrategyActive: true,
       extendWaitTime: 61,

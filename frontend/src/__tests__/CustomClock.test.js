@@ -1,7 +1,7 @@
 import React from "react";
 import { render, unmountComponentAtNode } from "react-dom";
 import { act } from "react-dom/test-utils";
-import { mount } from "../enzyme";
+import { mount } from "enzyme";
 import { CustomClockObj, timeUpdateThresholdMs } from "../components/Menu/Main/CustomClock";
 
 const timeGreaterThreshold = timeUpdateThresholdMs + 1;
@@ -9,7 +9,7 @@ const timeGreaterThreshold = timeUpdateThresholdMs + 1;
 let container = null;
 let currentTimeFrame;
 let frameInterval = 100;
-// 2 seconds will pass, because we set time after first 100ms
+// 2 intervals will pass, because we set time after first frame
 let maxFrameTimeElapsed = timeGreaterThreshold * 2 + frameInterval + 1;
 beforeEach(() => {
   container = document.createElement("div");
