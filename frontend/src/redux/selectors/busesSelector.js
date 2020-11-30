@@ -1,34 +1,42 @@
 import { createSelector } from "reselect";
 import { getLocationHash } from "../../utils/helpers";
 
-const positionsSet = new Set();
-const routesSet = new Set();
-const busSet = new Set();
+const ROUTE_HASH_SHIFT = 100000;
 const getBuses = state => state.bus.buses;
 
+const getRouteHash = route => {
+  const routeStart = route[0];
+  const routeEnd = route[route.length - 1];
+  return ROUTE_HASH_SHIFT * getLocationHash(routeStart) + getLocationHash(routeEnd);
+};
+
+const isRouteValid = route => route && route.length > 1;
+
 export default createSelector([getBuses], buses => {
-  const result = new Array(buses.length);
+  const result = [];
+  const positionsSet = new Set();
+  const routesSet = new Set();
   buses.forEach(b => {
-    if (busSet.has(b.id)) {
+    if (b.startedMoving) {
       result.push(b);
       return;
     }
 
     const locHash = getLocationHash(b.location);
-    if (positionsSet.has(locHash) === false) {
+    if (!positionsSet.has(locHash)) {
       positionsSet.add(locHash);
-      busSet.add(b.id);
+      if (isRouteValid(b.route)) {
+        routesSet.add(getRouteHash(b.route));
+      }
       result.push(b);
       return;
     }
 
-    if (b.route) {
-      const routeStart = b.route[0];
-      const routeEnd = b.route[b.route.length - 1];
-      const routeHash = 100000 * getLocationHash(routeStart) + getLocationHash(routeEnd);
+    const { route } = b;
+    if (isRouteValid(route)) {
+      const routeHash = getRouteHash(route);
       if (routesSet.has(routeHash) === false) {
         routesSet.add(routeHash);
-        busSet.add(b.id);
         result.push(b);
       }
     }

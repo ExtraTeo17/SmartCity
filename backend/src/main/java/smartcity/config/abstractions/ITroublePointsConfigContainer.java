@@ -5,13 +5,13 @@ public interface ITroublePointsConfigContainer {
     boolean shouldChangeRouteOnTroublePoint();
 
     void setChangeRouteOnTroublePoint(boolean constructionSiteStrategyActive);
-    
+
     void setBusCrashGeneratedOnce(boolean busCrashGeneratedOnce);
-    
+
     boolean getBusCrashGeneratedOnce();
 
     boolean shouldGenerateConstructionSites();
-    
+
     boolean shouldGenerateCrashForBuses();
 
     void setShouldGenerateConstructionSites(boolean constructionSiteGenerationActive);

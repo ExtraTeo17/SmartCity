@@ -9,7 +9,7 @@ import java.util.List;
 import static vehicles.Constants.SPEED_SCALE;
 
 public class Bike extends MovingObject {
-    public static final int DEFAULT_SPEED = 10 * SPEED_SCALE;
+    public static final int DEFAULT_SPEED = (int) (10 * SPEED_SCALE);
 
     public Bike(int agentId, List<RouteNode> displayRoute, List<RouteNode> uniformRoute, ITimeProvider timeProvider) {
         super(timeProvider, agentId, DEFAULT_SPEED, uniformRoute, displayRoute);

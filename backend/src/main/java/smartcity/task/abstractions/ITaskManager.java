@@ -1,11 +1,9 @@
 package smartcity.task.abstractions;
 
-import smartcity.lights.core.Light;
 import smartcity.lights.core.SimpleLightGroup;
 import utilities.Siblings;
 
 import java.time.LocalDateTime;
-import java.util.Collection;
 import java.util.function.BooleanSupplier;
 
 public interface ITaskManager {

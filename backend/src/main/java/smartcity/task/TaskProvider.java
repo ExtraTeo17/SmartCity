@@ -89,7 +89,8 @@ public class TaskProvider implements ITaskProvider {
                     }
                     route = routeInfoCache.get(startForBatches, endForBatches);
 
-                } else {
+                }
+                else {
                     route = routeInfoCache.get(start, end);
                 }
 
@@ -97,7 +98,7 @@ public class TaskProvider implements ITaskProvider {
                     route = routeGenerator.generateRouteInfo(start, end, false);
                     routeInfoCache.put(start, end, route);
                 }
-                else{
+                else {
                     route = routeGenerator.generateRouteInfo(startForBatches, endForBatches, false);
                     routeInfoCache.put(startForBatches, endForBatches, route);
                 }

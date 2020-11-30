@@ -1,5 +1,5 @@
 package vehicles;
 
 class Constants {
-    public static final int SPEED_SCALE = 1;
+    public static final float SPEED_SCALE = 1.0f;
 }

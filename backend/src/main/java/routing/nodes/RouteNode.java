@@ -23,19 +23,19 @@ public class RouteNode extends Position {
         super(pos);
         virtual = true;
     }
-    
-    
-    public RouteNode(double lat, double lng, boolean virtual) {
-		super(lat, lng);
-		this.virtual = virtual;
-	}
 
-	public void setInternalEdgeId(int edgeId) { this.internalEdgeId = edgeId; }
+
+    public RouteNode(double lat, double lng, boolean virtual) {
+        super(lat, lng);
+        this.virtual = virtual;
+    }
+
+    public void setInternalEdgeId(int edgeId) { this.internalEdgeId = edgeId; }
 
     public int getInternalEdgeId() { return internalEdgeId;}
-    
+
     public final boolean isVirtual() {
-    	return virtual;
+        return virtual;
     }
 
     @Override

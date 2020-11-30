@@ -200,9 +200,7 @@ const Dispatcher = {
   },
 
   updateBatched(carUpdates, bikeUpdates, busUpdates, pedUpdates) {
-    batch(() => {
-      dispatch(batchedUpdate({ carUpdates, bikeUpdates, busUpdates, pedUpdates }));
-    });
+    dispatch(batchedUpdate({ carUpdates, bikeUpdates, busUpdates, pedUpdates }));
   },
 };
 

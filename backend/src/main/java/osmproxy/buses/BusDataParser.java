@@ -206,12 +206,15 @@ public class BusDataParser implements IBusDataParser {
 
         boolean isPresentVal = isPresent.test(osmId);
         if (!isPresentVal && zone.contains(Position.of(lat, lon))) {
-            var stationNumberOpt = searchForStationNumber(node.getChildNodes());
-            if (stationNumberOpt.isPresent()) {
-                var stationNumber = stationNumberOpt.get();
+            var numberAndTypeOpt = searchForStationNumberAndType(node.getChildNodes());
+            if (numberAndTypeOpt.isPresent()) {
+                var numberAndType = numberAndTypeOpt.get();
+                var stationNumber = numberAndType.first;
+                var type = numberAndType.second;
+                var isPlatform = type.equals("platform");
 
                 logger.debug("Parsing station with number: " + stationNumber);
-                return Optional.of(new OSMStation(osmId, lat, lon, stationNumber));
+                return Optional.of(new OSMStation(osmId, lat, lon, stationNumber, isPlatform));
             }
         }
 
@@ -220,15 +223,28 @@ public class BusDataParser implements IBusDataParser {
         return Optional.empty();
     }
 
-    private Optional<String> searchForStationNumber(NodeList nodes) {
-        return IterableNodeList.of(nodes)
+    private Optional<Siblings<String>> searchForStationNumberAndType(NodeList nodes) {
+        var filteredNodes = IterableNodeList.of(nodes)
                 .stream()
                 .filter(n -> n.getNodeName().equals("tag"))
                 .map(Node::getAttributes)
                 .dropWhile(attr -> !attr.getNamedItem("k").getNodeValue().equals("public_transport"))
-                .filter(attr -> attr.getNamedItem("k").getNodeValue().equals("ref"))
-                .findFirst()
-                .map(attr -> attr.getNamedItem("v").getNodeValue());
+                .collect(Collectors.toList());
+
+        if (filteredNodes.isEmpty()) {
+            return Optional.empty();
+        }
+
+        var type = filteredNodes.get(0).getNamedItem("v").getNodeValue();
+        for (int i = 1; i < filteredNodes.size(); ++i) {
+            var nodesMap = filteredNodes.get(i);
+            if (nodesMap.getNamedItem("k").getNodeValue().equals("ref")) {
+                var nodeNumber = nodesMap.getNamedItem("v").getNodeValue();
+                return Optional.of(Siblings.of(nodeNumber, type));
+            }
+        }
+
+        return Optional.empty();
     }
 
     private Collection<BrigadeInfo> generateBrigadeInfos(String busLine, Collection<OSMStation> osmStations) {
