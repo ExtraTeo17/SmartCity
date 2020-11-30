@@ -8,7 +8,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
-
 import routing.core.IGeoPosition;
 import routing.core.IZone;
 import routing.core.Position;
@@ -353,27 +352,27 @@ public class OSMWay extends OSMElement implements Serializable {
         FRONT
     }
 
-	public String findClosestNodeRefTo(IGeoPosition pointA) {
-		String closestNodeRef = null;
-		double minDist = Double.MAX_VALUE;
-		for (final OSMWaypoint point : waypoints) {
-			double currDist = point.distance(pointA);
-			if (currDist < minDist) {
-				minDist = currDist;
-				closestNodeRef = point.getOsmNodeRef();
-			}
-		}
-		return closestNodeRef;
-	}
+    public String findClosestNodeRefTo(IGeoPosition pointA) {
+        String closestNodeRef = null;
+        double minDist = Double.MAX_VALUE;
+        for (final OSMWaypoint point : waypoints) {
+            double currDist = point.distance(pointA);
+            if (currDist < minDist) {
+                minDist = currDist;
+                closestNodeRef = point.getOsmNodeRef();
+            }
+        }
+        return closestNodeRef;
+    }
 
-	// TODO: NEW function -- in case of new bugs start debugging here
-	public void determineRouteOrientationAndFilterRelevantNodes(String startingOsmNodeRef, String finishingOsmNodeRef) {
-		Optional<Integer> startingIndex = indexOf(startingOsmNodeRef);
-		Optional<Integer> finishingIndex = indexOf(finishingOsmNodeRef);
-		determineRouteOrientationAndFilterRelevantNodes(
-				startingIndex.orElseThrow(() -> new IllegalArgumentException(
-						"Starting OSM node ref: " + startingOsmNodeRef + " was not on way: " + getId())),
-				finishingIndex.orElseThrow(() -> new IllegalArgumentException(
-						"Starting OSM node ref: " + startingOsmNodeRef + " was not on way: " + getId())));
-	}
+    // TODO: NEW function -- in case of new bugs start debugging here
+    public void determineRouteOrientationAndFilterRelevantNodes(String startingOsmNodeRef, String finishingOsmNodeRef) {
+        Optional<Integer> startingIndex = indexOf(startingOsmNodeRef);
+        Optional<Integer> finishingIndex = indexOf(finishingOsmNodeRef);
+        determineRouteOrientationAndFilterRelevantNodes(
+                startingIndex.orElseThrow(() -> new IllegalArgumentException(
+                        "Starting OSM node ref: " + startingOsmNodeRef + " was not on way: " + getId())),
+                finishingIndex.orElseThrow(() -> new IllegalArgumentException(
+                        "Starting OSM node ref: " + startingOsmNodeRef + " was not on way: " + getId())));
+    }
 }

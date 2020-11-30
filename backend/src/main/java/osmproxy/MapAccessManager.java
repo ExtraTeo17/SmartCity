@@ -106,7 +106,7 @@ public class MapAccessManager implements IMapAccessManager {
             if (responseCode == 429) {
                 logger.warn("Current API: " + CURRENT_API + " is overloaded with our requests.");
                 CURRENT_API = CURRENT_API.equals(ALTERNATE_OVERPASS_API_1) ? ALTERNATE_OVERPASS_API_2 :
-                              CURRENT_API.equals(ALTERNATE_OVERPASS_API_2) ? OVERPASS_API :
+                        CURRENT_API.equals(ALTERNATE_OVERPASS_API_2) ? OVERPASS_API :
                                 ALTERNATE_OVERPASS_API_1;
                 logger.info("Switching to " + CURRENT_API);
                 connection = sendRequest(query);

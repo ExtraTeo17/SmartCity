@@ -20,7 +20,7 @@ public class MessageParameter {
     public static final String STATION_FROM_ID = "station_from_id";
     public static final String STATION_TO_ID = "station_to_id";
     public static final String BUS_MANAGER = "bus_manager";
-    
+
     public static final String SCHEDULE_ARRIVAL = "schedule_arrival";
     public static final String BUS_LINE = "bus_line";
     public static final String TROUBLE_LON = "trouble_lon";
@@ -37,15 +37,15 @@ public class MessageParameter {
     public static final String LENGTH_OF_JAM = "length_of_jam";
 
     public static final String DESIRED_OSM_STATION_ID = "desired_osm_station_id";
-    public static final String OSM_ID_OF_NEXT_CLOSEST_STATION = "osm_id_of_next_closest_station" ;
+    public static final String OSM_ID_OF_NEXT_CLOSEST_STATION = "osm_id_of_next_closest_station";
     public static final String AGENT_ID_OF_NEXT_CLOSEST_STATION = "agent_id_of_next_closest_station";
-    public static final String LAT_OF_NEXT_CLOSEST_STATION = "lat_of_next_closest_station" ;
-    public static final String LON_OF_NEXT_CLOSEST_STATION = "lon_of_next_closest_station" ;
-	public static final String TIME = "time";
-	public static final String TIME_BETWEEN_PEDESTRIAN_AT_STATION_ARRIVAL_AND_REACHING_DESIRED_STOP = "time_between_pedestrian_at_station_arrival_and_reaching_desired_stop";
+    public static final String LAT_OF_NEXT_CLOSEST_STATION = "lat_of_next_closest_station";
+    public static final String LON_OF_NEXT_CLOSEST_STATION = "lon_of_next_closest_station";
+    public static final String TIME = "time";
+    public static final String TIME_BETWEEN_PEDESTRIAN_AT_STATION_ARRIVAL_AND_REACHING_DESIRED_STOP = "time_between_pedestrian_at_station_arrival_and_reaching_desired_stop";
     public static final String EVENT = "event";
-    public static final String START = "start" ;
-	public static final String BRIGADE = "brigade";
+    public static final String START = "start";
+    public static final String BRIGADE = "brigade";
 
 
     public static String getTypeByMovingObject(MovingObject movingObject) {

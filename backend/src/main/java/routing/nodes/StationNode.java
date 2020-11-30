@@ -14,12 +14,14 @@ public class StationNode extends RouteNode {
         this.osmId = osmId;
         this.agentId = agentId;
     }
+
     public StationNode(String lat, String lon,
                        String osmId, String agentId) {
         super(Double.valueOf(lat), Double.valueOf(lon));
         this.osmId = Long.parseLong(osmId);
         this.agentId = Integer.valueOf(agentId);
     }
+
     public StationNode(OSMStation station, int agentId) {
         this(station.getLat(), station.getLng(), station.getId(), agentId);
     }

@@ -176,7 +176,7 @@ public class StationStrategy {
         }
         return arrivalInfos.stream().map(info -> info.agentName).collect(Collectors.toList());
     }
-    
+
     private void logDebugArrivalInfos(final List<ArrivalInfo> arrivalInfos) {
         StringBuilder builder = new StringBuilder();
         arrivalInfos.forEach(info -> builder.append(info.agentName + ", "));

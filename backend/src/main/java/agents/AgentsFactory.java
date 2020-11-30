@@ -6,7 +6,6 @@ import com.google.inject.Inject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Node;
-
 import osmproxy.buses.BusInfo;
 import osmproxy.buses.Timetable;
 import osmproxy.elements.OSMNode;
@@ -109,7 +108,7 @@ class AgentsFactory implements IAgentsFactory {
         var uniformRoute = routeTransformer.uniformRoute(route);
         logger.trace("DisplayRoute size: " + route.size() + ", routeSize: " + uniformRoute.size());
         var bus = new Bus(eventBus, timeProvider, id, route, uniformRoute, timetable, busLine, brigadeNr);
-        return new BusAgent(id, bus, timeProvider, eventBus,configContainer);
+        return new BusAgent(id, bus, timeProvider, eventBus, configContainer);
     }
 
     @Deprecated
@@ -138,7 +137,7 @@ class AgentsFactory implements IAgentsFactory {
         var pedestrian = new Pedestrian(id, routeToStation, uniformRouteToStation,
                 routeFromStation, uniformRouteFromStation,
                 startStation, finishStation,
-                timeProvider,taskProvider);
+                timeProvider, taskProvider);
         if (testPedestrian) {
             pedestrian = new TestPedestrian(pedestrian);
         }
@@ -149,11 +148,11 @@ class AgentsFactory implements IAgentsFactory {
     @Override
     public PedestrianAgent create(List<RouteNode> routeToStation, List<RouteNode> routeFromStation,
                                   StationNode startStation, StationNode finishStation) {
-        return create(routeToStation, routeFromStation,  startStation, finishStation, false);
+        return create(routeToStation, routeFromStation, startStation, finishStation, false);
     }
 
-	@Override
-	public BusManagerAgent create(HashSet<BusInfo> busInfos) {
-		return new BusManagerAgent(timeProvider, eventBus, busInfos);
-	}
+    @Override
+    public BusManagerAgent create(HashSet<BusInfo> busInfos) {
+        return new BusManagerAgent(timeProvider, eventBus, busInfos);
+    }
 }

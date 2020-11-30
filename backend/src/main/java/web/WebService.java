@@ -2,7 +2,6 @@ package web;
 
 import com.google.inject.Inject;
 import events.web.models.UpdateObject;
-import osmproxy.elements.OSMNode;
 import osmproxy.elements.OSMStation;
 import routing.core.IGeoPosition;
 import smartcity.lights.core.Light;

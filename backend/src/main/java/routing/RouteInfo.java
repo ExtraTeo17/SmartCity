@@ -43,12 +43,12 @@ public class RouteInfo implements Iterable<OSMWay> {
             logger.info("No ways to determine for: " + startingOsmNodeRef + "-" + finishingOsmNodeRef);
             return;
         }
-		if (ways.size() == 1) {
-			logger.info("Determine route orientation for single way route info: " + startingOsmNodeRef + "-"
-					+ finishingOsmNodeRef);
-			ways.get(0).determineRouteOrientationAndFilterRelevantNodes(startingOsmNodeRef, finishingOsmNodeRef);
-			return;
-		}
+        if (ways.size() == 1) {
+            logger.info("Determine route orientation for single way route info: " + startingOsmNodeRef + "-"
+                    + finishingOsmNodeRef);
+            ways.get(0).determineRouteOrientationAndFilterRelevantNodes(startingOsmNodeRef, finishingOsmNodeRef);
+            return;
+        }
 
         int startingNodeIndex = ways.get(0).
                 determineRouteOrientationAndFilterRelevantNodes(ways.get(1), startingOsmNodeRef);

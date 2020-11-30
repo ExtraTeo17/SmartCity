@@ -11,7 +11,6 @@ import events.ClearSimulationEvent;
 import events.LightManagersReadyEvent;
 import events.web.PrepareSimulationEvent;
 import events.web.SimulationPreparedEvent;
-
 import org.javatuples.Pair;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -33,11 +32,7 @@ import smartcity.TimeProvider;
 import smartcity.config.ConfigContainer;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import static smartcity.config.StaticConfig.USE_DEPRECATED_XML_FOR_LIGHT_MANAGERS;
@@ -190,16 +185,16 @@ public class AgentsPreparer {
         Set<Pair<Pair<String, String>, String>> addedLinesBrigades = new HashSet<>();
         for (var busInfo : busData.busInfos) {
             var busLine = busInfo.busLine;
-            var route = getBusRoute(busInfo.route, busInfo.stops, allStations,busLine);
+            var route = getBusRoute(busInfo.route, busInfo.stops, allStations, busLine);
             for (var brigade : busInfo) {
                 var brigadeNr = brigade.brigadeId;
                 for (Timetable timetable : brigade) {
-                	Pair<String, String> lineBrigade = Pair.with(busLine, brigadeNr);
-                	Pair<Pair<String, String>, String> lbTable = Pair.with(lineBrigade, timetable.getBoardingTime().toString());
-                	if (addedLinesBrigades.contains(lbTable)) {
-                		continue;
-                	}
-            		addedLinesBrigades.add(lbTable);
+                    Pair<String, String> lineBrigade = Pair.with(busLine, brigadeNr);
+                    Pair<Pair<String, String>, String> lbTable = Pair.with(lineBrigade, timetable.getBoardingTime().toString());
+                    if (addedLinesBrigades.contains(lbTable)) {
+                        continue;
+                    }
+                    addedLinesBrigades.add(lbTable);
                     BusAgent agent = factory.create(route, timetable, busLine, brigadeNr);
                     boolean result = agentsContainer.tryAdd(agent, true);
                     if (result) {
@@ -222,20 +217,20 @@ public class AgentsPreparer {
         logger.info("Closest startTime: " + closestTime.toLocalTime() + "\n" +
                 "    NUMBER OF BUS AGENTS: " + busCount);
         return true;
-	}
+    }
 
-	private void prepareBusManagerAgent(HashSet<BusInfo> busInfos) {
-		BusManagerAgent agent = factory.create(busInfos);
-		boolean result = agentsContainer.tryAdd(agent, true);
-		if (!result) {
-			logger.error("BusManagerAgent was not added to the main container");
-			return;
-		}
-		agent.start();
-	}
+    private void prepareBusManagerAgent(HashSet<BusInfo> busInfos) {
+        BusManagerAgent agent = factory.create(busInfos);
+        boolean result = agentsContainer.tryAdd(agent, true);
+        if (!result) {
+            logger.error("BusManagerAgent was not added to the main container");
+            return;
+        }
+        agent.start();
+    }
 
-	private List<RouteNode> getBusRoute(List<OSMWay> osmRoute, List<OSMStation> osmStops,
-                                        List<StationNode> allStations,String busLine) {
+    private List<RouteNode> getBusRoute(List<OSMWay> osmRoute, List<OSMStation> osmStops,
+                                        List<StationNode> allStations, String busLine) {
         List<StationNode> mergedStationNodes = new ArrayList<>(osmStops.size());
         List<OSMStation> mergedOsmStops = new ArrayList<>(osmStops.size());
 
@@ -257,8 +252,6 @@ public class AgentsPreparer {
 
         return route;
     }
-
-
 
 
     private boolean prepareLightManagers() {
@@ -288,7 +281,8 @@ public class AgentsPreparer {
                         ++managersCounter;
                     }
                 }
-            } else {
+            }
+            else {
                 var lights = lightAccessManager.getLightsOfTypeA();
                 for (final OSMNode centerCrossroad : lights) {
                     if (centerCrossroad.determineParentOrientationsTowardsCrossroad()) {

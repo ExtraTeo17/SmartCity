@@ -5,7 +5,6 @@ import events.web.PrepareSimulationEvent;
 import events.web.StartSimulationEvent;
 import events.web.models.UpdateObject;
 import osmproxy.elements.OSMNode;
-import osmproxy.elements.OSMStation;
 import routing.core.IGeoPosition;
 import smartcity.TimeProvider;
 import smartcity.lights.LightColor;

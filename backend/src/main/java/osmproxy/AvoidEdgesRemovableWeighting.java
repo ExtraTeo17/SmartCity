@@ -46,8 +46,9 @@ public class AvoidEdgesRemovableWeighting extends AvoidEdgesWeighting {
     @Override
     public double calcWeight(EdgeIteratorState edgeState, boolean reverse, int prevOrNextEdgeId) {
         double weight = superWeighting.calcWeight(edgeState, reverse, prevOrNextEdgeId);
-        if (visitedEdges.contains(edgeState.getEdge()))
+        if (visitedEdges.contains(edgeState.getEdge())) {
             return Double.MAX_VALUE;
+        }
 
         return weight;
     }
