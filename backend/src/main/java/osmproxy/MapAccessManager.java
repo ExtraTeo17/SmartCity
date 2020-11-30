@@ -54,7 +54,7 @@ public class MapAccessManager implements IMapAccessManager {
     private static final String OVERPASS_API = "https://lz4.overpass-api.de/api/interpreter";
     private static final String ALTERNATE_OVERPASS_API_1 = "https://z.overpass-api.de/api/interpreter";
     private static final String ALTERNATE_OVERPASS_API_2 = "https://overpass.kumi.systems/api/interpreter";
-    private static String CURRENT_API =OVERPASS_API;
+    private static String CURRENT_API = ALTERNATE_OVERPASS_API_2;
     private static final String CROSSROADS_LOCATIONS_PATH = "config/crossroads.xml";
 
     private final DocumentBuilderFactory xmlBuilderFactory;
@@ -106,7 +106,8 @@ public class MapAccessManager implements IMapAccessManager {
             if (responseCode == 429) {
                 logger.warn("Current API: " + CURRENT_API + " is overloaded with our requests.");
                 CURRENT_API = CURRENT_API.equals(ALTERNATE_OVERPASS_API_1) ? ALTERNATE_OVERPASS_API_2 :
-                        ALTERNATE_OVERPASS_API_1;
+                              CURRENT_API.equals(ALTERNATE_OVERPASS_API_2) ? OVERPASS_API :
+                                ALTERNATE_OVERPASS_API_1;
                 logger.info("Switching to " + CURRENT_API);
                 connection = sendRequest(query);
             }
@@ -211,7 +212,7 @@ public class MapAccessManager implements IMapAccessManager {
 
         return osmLights;
     }
-    
+
     @Override
     public Optional<RouteInfo> getRouteInfo(List<Long> osmWayIds, boolean isCar) {
         var query = OsmQueryManager.getMultipleWayAndItsNodesQuery(osmWayIds);
@@ -229,7 +230,7 @@ public class MapAccessManager implements IMapAccessManager {
 
         return Optional.of(info);
     }
-    
+
     private static RouteInfo parseWayAndNodes(Document nodesViaOverpass, boolean isCar) {
         final RouteInfo info = new RouteInfo();
         final String tagType = isCar ? "highway" : "crossing";

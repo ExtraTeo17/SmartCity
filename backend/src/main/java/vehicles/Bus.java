@@ -26,7 +26,7 @@ import static vehicles.Constants.SPEED_SCALE;
 
 public class Bus extends MovingObject {
 
-	private static final int DEFAULT_SPEED = 50 * SPEED_SCALE;
+	private static final int DEFAULT_SPEED = (int)( 50 * SPEED_SCALE);
 	public static final int CAPACITY_MID = 10;
 	public static final int CAPACITY_HIGH = 25;
 

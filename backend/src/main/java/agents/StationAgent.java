@@ -157,7 +157,7 @@ public class StationAgent extends AbstractAgent {
 
             private void answerPedestriansCanProceed(String busAgentName, List<String> pedestriansAgentsNames) {
                 for (String name : pedestriansAgentsNames) {
-                	print("Send REQUEST to " + name);
+                	logger.debug("Send REQUEST to " + name);
                     ACLMessage msg = createMessage(ACLMessage.REQUEST, name);
                     var properties = createProperties(MessageParameter.STATION);
                     properties.setProperty(MessageParameter.BUS_AGENT_NAME, busAgentName);
@@ -167,7 +167,7 @@ public class StationAgent extends AbstractAgent {
             }
 
             private void answerBusCanProceed(String busAgentName) {
-                print("Send REQUEST to " + busAgentName);
+                logger.debug("Send REQUEST to " + busAgentName);
                 ACLMessage msg = createMessage(ACLMessage.REQUEST, busAgentName);
                 Properties properties = createProperties(MessageParameter.STATION);
                 msg.setAllUserDefinedParameters(properties);

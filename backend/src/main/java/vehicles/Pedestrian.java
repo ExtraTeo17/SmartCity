@@ -15,15 +15,15 @@ import static vehicles.Constants.SPEED_SCALE;
 
 public class Pedestrian extends MovingObject {
 
-    private static final int DEFAULT_SPEED = 10 * SPEED_SCALE;
+    private static final int DEFAULT_SPEED =  (int)(10 * SPEED_SCALE);
 
     private List<RouteNode> displayRouteBeforeBus;
     private final List<RouteNode> displayRouteAfterBus;
     private List<RouteNode> routeBeforeBus;
     private StationNode stationStart;
     private final StationNode stationFinish;
-    private boolean troubled = false;
 
+    private transient boolean troubled = false;
     private transient int stationIndex = 0;
 
     public Pedestrian(int agentId,
