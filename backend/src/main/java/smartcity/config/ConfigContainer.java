@@ -97,7 +97,7 @@ public class ConfigContainer extends ConfigMutator
     }
 
 
-    public boolean getGenerateBatchesForCars() {
+    public boolean generateBatchesForCars() {
         return generateBatchesForCars;
     }
 

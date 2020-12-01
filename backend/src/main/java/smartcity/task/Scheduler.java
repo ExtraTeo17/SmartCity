@@ -1,5 +1,6 @@
 package smartcity.task;
 
+import agents.BusAgent;
 import agents.LightManagerAgent;
 import agents.abstractions.AbstractAgent;
 import agents.abstractions.IAgentsContainer;
@@ -10,6 +11,7 @@ import events.ClearSimulationEvent;
 import events.SwitchLightsStartEvent;
 import events.web.SimulationStartedEvent;
 import events.web.StartSimulationEvent;
+import events.web.bus.BusAgentCrashedEvent;
 import smartcity.ITimeProvider;
 import smartcity.SimulationState;
 import smartcity.config.ConfigContainer;
@@ -86,4 +88,7 @@ public class Scheduler {
     public void handle(ClearSimulationEvent e) {
         taskManager.cancelAll();
     }
+
+    @Subscribe
+    public void handle(BusAgentCrashedEvent e) {agentsContainer.remove(BusAgent.class, e.id);}
 }
