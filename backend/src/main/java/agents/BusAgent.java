@@ -247,7 +247,7 @@ public class BusAgent extends AbstractAgent {
         addBehaviour(communication);
 
 
-        if (configContainer.shouldGenerateCrashForBuses()) {
+        if (configContainer.shouldGenerateBusFailures()) {
             var timeBeforeTroubleMs = this.configContainer.getTimeBeforeTrouble() * 1000;
             Behaviour troubleGenerator = new TickerBehaviour(this, 8000) {
 

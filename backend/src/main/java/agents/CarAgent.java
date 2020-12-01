@@ -206,7 +206,7 @@ public class CarAgent extends AbstractAgent {
 
             private void handleConstructionSiteRouteChange(final int indexOfRouteNodeWithEdge) {
                 int indexAfterWhichRouteChanges;
-                if (configContainer.shouldChangeRouteOnTroublePoint()) {
+                if (configContainer.isConstructionSiteStrategyActive()) {
                     if (indexOfRouteNodeWithEdge - car.getMoveIndex() > THRESHOLD_UNTIL_INDEX_CHANGE) {
                         indexAfterWhichRouteChanges = car.getNextNonVirtualIndex(THRESHOLD_UNTIL_INDEX_CHANGE);
                     }
