@@ -23,17 +23,18 @@ const Bus = props => {
 
   const markerRef = React.useRef();
 
-  useEffect(() => {}, [crashed]);
+  useEffect(() => {
+    if (crashed) {
+      console.info("Crashed!");
+      const htmlElem = markerRef.current.getElement();
+      htmlElem.classList.add("crashed");
+      markerRef.current.openPopup();
+    }
+  }, [crashed]);
 
   function initMarker(ref) {
     if (ref) {
       markerRef.current = ref.leafletElement;
-      if (crashed) {
-        console.info("Crashed!");
-        const htmlElem = markerRef.current.getElement();
-        htmlElem.classList.add("crashed");
-        // markerRef.current.openPopup();
-      }
     }
   }
 
@@ -52,21 +53,6 @@ const Bus = props => {
     }
   }
 
-  const popup = crashed ? (
-    <Popup
-      offset={[0, 22]}
-      closeOnClick={false}
-      closeOnEscapeKey={false}
-      closeButton={false}
-      keepInView={false}
-      className="trans-popup"
-    >
-      &#128369;
-    </Popup>
-  ) : (
-    <Popup>I am a bus-{id}!</Popup>
-  );
-
   return (
     <RotatedMarker
       customRef={initMarker}
@@ -76,7 +62,19 @@ const Bus = props => {
       icon={getIcon()}
       zIndexOffset={BUS_MOVING_Z_INDEX}
     >
-      {popup}
+      {crashed && (
+        <Popup
+          offset={[-4, 21]}
+          closeOnClick={false}
+          closeOnEscapeKey={false}
+          closeButton={false}
+          keepInView={false}
+          className="trans-popup"
+        >
+          &#128369;
+        </Popup>
+      )}
+      {!crashed && <Popup>I am a bus-{id}!</Popup>}
     </RotatedMarker>
   );
 };

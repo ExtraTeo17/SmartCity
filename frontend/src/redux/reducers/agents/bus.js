@@ -19,7 +19,11 @@ const bus = (state = initialState, action) => {
   const { payload } = action;
   switch (action.type) {
     case SIMULATION_PREPARED: {
-      return { ...state, buses: action.payload.buses };
+      const buses = payload.buses.map(b => {
+        return { ...b, startedMoving: false, crashed: false };
+      });
+
+      return { ...state, buses };
     }
 
     case BUS_UPDATED: {
@@ -46,8 +50,8 @@ const bus = (state = initialState, action) => {
 
       const newBuses = state.buses.map(b => {
         const update = busUpdates.find(bus => bus.id === b.id);
-        if (update) {
-          return { ...b, location: update.location };
+        if (update && b.location !== update.location) {
+          return { ...b, location: update.location, startedMoving: true };
         }
         return b;
       });
