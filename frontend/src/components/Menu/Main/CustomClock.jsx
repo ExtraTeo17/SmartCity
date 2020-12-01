@@ -35,8 +35,6 @@ export const CustomClockObj = props => {
         const deltaTime = time - previousTimeRef.current;
         const scaledDeltaTime = timeScale * deltaTime;
         if (scaledDeltaTime > timeUpdateScaledThresholdMs && deltaTime > timeUpdateThresholdMs) {
-          console.log(`dt0 ${deltaTime}`);
-          console.log(`dt1 ${scaledDeltaTime}`);
           setCurrTime(prevTime => new Date(prevTime.getTime() + scaledDeltaTime));
           previousTimeRef.current = time;
         }
