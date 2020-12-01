@@ -29,7 +29,7 @@ public class ConfigContainer extends ConfigMutator
     private boolean stationStrategyActive = false;
     private boolean constructionSiteStrategyActive = false;
     private boolean trafficJamStrategyActive = false;
-    private boolean transportChangeStrategyActive = false; // TODO
+    private boolean transportChangeStrategyActive = false;
 
     private boolean shouldUseFixedRoutes = false;
     private boolean shouldUseFixedConstructionSites = true;

@@ -11,7 +11,7 @@ public interface ITroublePointsConfigContainer {
     boolean getBusCrashGeneratedOnce();
 
     boolean shouldGenerateConstructionSites();
-    
+
     boolean shouldDetectTrafficJams();
     
     boolean shouldGenerateBusFailures();
