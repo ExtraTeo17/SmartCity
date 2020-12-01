@@ -4,6 +4,7 @@ import agents.abstractions.AbstractAgent;
 import agents.utilities.LoggerLevel;
 import agents.utilities.MessageParameter;
 import com.google.common.eventbus.EventBus;
+import events.web.bus.BusAgentCrashedEvent;
 import events.web.bus.BusAgentUpdatedEvent;
 import jade.core.behaviours.Behaviour;
 import jade.core.behaviours.CyclicBehaviour;
@@ -109,8 +110,6 @@ public class BusAgent extends AbstractAgent {
                             var station = stationOpt.get();
                             List<String> passengerNames = bus.getPassengers(station.getAgentId());
 
-                            //System.out.println("PASSENGER NAMES SIZE: " + passengerNames.size());
-
                             if (passengerNames.size() > 0) {
                                 ACLMessage leave = createMessage(ACLMessage.REQUEST, passengerNames);
                                 Properties properties = createProperties(MessageParameter.BUS);
@@ -123,7 +122,6 @@ public class BusAgent extends AbstractAgent {
                             Properties properties = createProperties(MessageParameter.BUS);
 
                             var timeOnStation = bus.getTimeOnStation(station.getOsmId());
-                            //logger.info("CASE MOVING");
                             timeOnStation.ifPresent(time -> properties.setProperty(MessageParameter.SCHEDULE_ARRIVAL, time
                                     .toString()));
                             properties.setProperty(MessageParameter.ARRIVAL_TIME, timeProvider.getCurrentSimulationTime()
@@ -252,31 +250,28 @@ public class BusAgent extends AbstractAgent {
 
 
         if (configContainer.shouldGenerateCrashForBuses()) {
-            var timeBeforeTroubleMs = this.configContainer.getTimeBeforeTrouble() * 1000;
             Behaviour troubleGenerator = new TickerBehaviour(this, 8000) {
 
                 @Override
                 public void onTick() {
-                    if (configContainer.getBusCrashGeneratedOnce()) {
-                        logger.info("Bus crash has already been generated once");
+                    if (configContainer.wasBusCrashGeneratedOnce()) {
+                        logger.trace("Bus crash has already been generated once");
+                		stop();
                         return;
                     }
                     configContainer.setBusCrashGeneratedOnce(true);
-                    logger.info("Generated trouble");
+
                     int index = bus.getMoveIndex();
                     var trouble = bus.getUniformRoute().get(index);
                     troublePoint = new RouteNode(trouble.getLat(), trouble.getLng(),
                             trouble.getInternalEdgeId());
-                    sendMessageAboutCrashTroubleToTroubleManager(); //send message to boss Agent/ maybe not so important in case of buses
+                    //send message to boss Agent/ maybe not so important in case of buses
+                    sendMessageAboutCrashTroubleToTroubleManager();
                     sendMessageAboutCrashTroubleToPedestrians();
+                    logger.info("Generated trouble");
 
-                    try {
-                        sleep(10000000);
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
-                    stop();
-                    //TODO: agent dies
+                    eventBus.post(new BusAgentCrashedEvent(getId()));
+                    doDelete();
                 }
 
                 private void sendMessageAboutCrashTroubleToPedestrians() {
@@ -319,10 +314,7 @@ public class BusAgent extends AbstractAgent {
             };
 
             addBehaviour(troubleGenerator);
-
         }
-
-
     }
 
     public void move() {
@@ -393,9 +385,10 @@ public class BusAgent extends AbstractAgent {
             return Optional.empty();
         }
         int halfIndex = (int) Math.ceil((double) stationsOnRoute.size() / 2.0);
-
-        return Optional.of(Siblings.of(stationsOnRoute.get(0),//random.nextInt(halfIndex)), // TODO: fix to consider first random when calculating second IMPORTANT
-                stationsOnRoute.get(2)));//halfIndex + random.nextInt(halfIndex)))); // TODO: for tests choose stations 1. and 3.
+        // TODO: fix to consider first random when calculating second IMPORTANT
+        // TODO: for tests choose stations 1. and 3.
+        return Optional.of(Siblings.of(stationsOnRoute.get(0),
+                stationsOnRoute.get(2)));
     }
 
     /**

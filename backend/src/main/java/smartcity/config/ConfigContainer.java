@@ -71,7 +71,7 @@ public class ConfigContainer extends ConfigMutator
     }
 
     @Override
-    public boolean getBusCrashGeneratedOnce() {
+    public boolean wasBusCrashGeneratedOnce() {
         return busCrashGeneratedOnce;
     }
 

@@ -69,4 +69,6 @@ public interface IWebService extends IStartable {
                        List<UpdateObject> bikeUpdates,
                        List<UpdateObject> busUpdates,
                        List<UpdateObject> pedUpdates);
+
+    void crashBus(int id);
 }

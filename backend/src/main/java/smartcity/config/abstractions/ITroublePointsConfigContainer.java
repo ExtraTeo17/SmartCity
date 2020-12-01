@@ -8,7 +8,7 @@ public interface ITroublePointsConfigContainer {
 
     void setBusCrashGeneratedOnce(boolean busCrashGeneratedOnce);
 
-    boolean getBusCrashGeneratedOnce();
+    boolean wasBusCrashGeneratedOnce();
 
     boolean shouldGenerateConstructionSites();
 
