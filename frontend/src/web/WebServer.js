@@ -64,8 +64,12 @@ export default {
    * @param {{ type: number; payload: object; }} msgObj
    */
   send(msgObj) {
-    console.group("Send");
+    if (socketContainer.socket.readyState !== WebSocket.OPEN) {
+      notify.show("Please wait for connection", "warning", NOTIFY_SHOW_MS / 2);
+      return;
+    }
 
+    console.group("Send");
     const msg = {
       type: msgObj.type,
       payload: JSON.stringify(msgObj.payload),

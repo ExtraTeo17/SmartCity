@@ -1,5 +1,12 @@
 import { BusFillState } from "../../../components/Models/BusFillState";
-import { SIMULATION_PREPARED, BUS_UPDATED, BUS_FILL_STATE_UPDATED, BUS_KILLED, BATCHED_UPDATE } from "../../core/constants";
+import {
+  SIMULATION_PREPARED,
+  BUS_UPDATED,
+  BUS_FILL_STATE_UPDATED,
+  BUS_KILLED,
+  BATCHED_UPDATE,
+  BUS_CRASHED,
+} from "../../core/constants";
 
 // Just for reference - defined in store.js
 const initialState = {
@@ -64,10 +71,24 @@ const bus = (state = initialState, action) => {
     }
 
     case BUS_KILLED: {
-      console.info(`Killed bus: ${payload}`);
       const id = payload;
+      console.info(`Killed bus: ${id}`);
+
       const newBuses = state.buses.filter(b => b.id !== id);
       deletedBusIds.push(id);
+
+      return { ...state, buses: newBuses };
+    }
+
+    case BUS_CRASHED: {
+      const id = payload;
+      console.info(`Crashed bus: ${payload}`);
+      const newBuses = state.buses.map(b => {
+        if (b.id === id) {
+          return { ...b, crashed: true };
+        }
+        return b;
+      });
 
       return { ...state, buses: newBuses };
     }

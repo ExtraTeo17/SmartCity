@@ -7,7 +7,8 @@ const RotatedMarker = props => {
   const setupMarker = marker => {
     if (marker) {
       if (props.rotationAngle) marker.leafletElement.setRotationAngle(props.rotationAngle);
-      marker.leafletElement.setRotationOrigin(props.rotationOrigin);
+      if (props.rotationOrigin) marker.leafletElement.setRotationOrigin(props.rotationOrigin);
+      if (props.customRef) props.customRef(marker);
     }
   };
 

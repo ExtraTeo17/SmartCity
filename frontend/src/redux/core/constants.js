@@ -26,6 +26,7 @@ export const BATCHED_UPDATE = "B/UPDATE";
 export const BUS_UPDATED = "Bus/UPDATED";
 export const BUS_FILL_STATE_UPDATED = "Bus/FILL";
 export const BUS_KILLED = "Bus/KILLED";
+export const BUS_CRASHED = "Bus/CRASHED";
 
 export const PEDESTRIAN_CREATED = "Ped/CREATED";
 export const PEDESTRIAN_UPDATED = "Ped/UPDATED";

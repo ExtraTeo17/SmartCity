@@ -24,6 +24,7 @@ import {
   bikeCreated,
   bikeKilled,
   batchedUpdate,
+  busCrashed,
 } from "./core/actions";
 
 const fps = 20;
@@ -158,6 +159,11 @@ const Dispatcher = {
 
   killBus(id) {
     dispatch(busKilled(id));
+    busUpdateQueue.delete(id);
+  },
+
+  crashBus(id) {
+    dispatch(busCrashed(id));
     busUpdateQueue.delete(id);
   },
 

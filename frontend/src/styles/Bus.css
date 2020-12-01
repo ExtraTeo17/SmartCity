@@ -1,0 +1,28 @@
+.crashed {
+  filter: grayscale(100%);
+}
+
+.trans-popup {
+  bottom: 0;
+  margin: 0;
+  left: 0;
+}
+
+.trans-popup .leaflet-popup-content-wrapper {
+  text-align: center;
+  background-color: transparent;
+  box-shadow: none;
+  border: 0;
+  bottom: 0;
+  left: 0;
+  font-size: 40px;
+  font-weight: bold;
+  color: rgb(17, 16, 13);
+}
+
+.trans-popup .leaflet-popup-content {
+}
+
+.trans-popup .leaflet-popup-tip-container {
+  display: none;
+}

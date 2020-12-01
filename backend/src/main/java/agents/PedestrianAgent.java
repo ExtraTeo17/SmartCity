@@ -1,6 +1,7 @@
 package agents;
 
 import agents.abstractions.AbstractAgent;
+import agents.utilities.LoggerLevel;
 import agents.utilities.MessageParameter;
 import com.google.common.eventbus.EventBus;
 import events.web.pedestrian.PedestrianAgentEnteredBusEvent;
@@ -377,13 +378,13 @@ public class PedestrianAgent extends AbstractAgent {
     }
 
     private void enterBus() {
-        print("Enter bus");
+        print("Enter bus", LoggerLevel.DEBUG);
         pedestrian.setState(DrivingState.IN_BUS);
         eventBus.post(new PedestrianAgentEnteredBusEvent(this.getId()));
     }
 
     private void quitBus() {
-        print("Quit bus");
+        print("Quit bus", LoggerLevel.DEBUG);
         pedestrian.move();
         pedestrian.setState(DrivingState.PASSING_STATION);
         eventBus.post(new PedestrianAgentLeftBusEvent(this.getId(), pedestrian.getPosition()));

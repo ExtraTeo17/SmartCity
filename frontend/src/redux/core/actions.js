@@ -29,6 +29,7 @@ import {
   BIKE_CREATED,
   CONFIG_REPLACED,
   BATCHED_UPDATE,
+  BUS_CRASHED,
 } from "./constants";
 
 export const configReplaced = createAction(CONFIG_REPLACED);
@@ -72,6 +73,7 @@ export const batchedUpdate = createAction(BATCHED_UPDATE);
 export const busUpdated = createAction(BUS_UPDATED);
 export const busFillStateUpdated = createAction(BUS_FILL_STATE_UPDATED);
 export const busKilled = createAction(BUS_KILLED);
+export const busCrashed = createAction(BUS_CRASHED);
 
 export const pedestrianCreated = createAction(PEDESTRIAN_CREATED);
 export const pedestrianUpdated = createAction(PEDESTRIAN_UPDATED);
