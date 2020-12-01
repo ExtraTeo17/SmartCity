@@ -22,13 +22,13 @@ public class ConfigContainer extends ConfigMutator
     private boolean generateBatchesForCars = false;
     private boolean shouldGeneratePedestriansAndBuses = false;
     private boolean shouldGenerateConstructionSites = false;
-    private boolean shouldDetectTrafficJams = false; // TODO
+    private boolean shouldDetectTrafficJams = false;
     private boolean shouldGenerateBusFailures = false;
 
     private boolean lightStrategyActive = true;
     private boolean stationStrategyActive = false;
     private boolean constructionSiteStrategyActive = false;
-    private boolean trafficJamStrategyActive = false; // TODO
+    private boolean trafficJamStrategyActive = false;
     private boolean transportChangeStrategyActive = false; // TODO
 
     private boolean shouldUseFixedRoutes = false;
