@@ -258,6 +258,11 @@ public class PedestrianAgent extends AbstractAgent {
 
                             send(messageToBusManager);
 
+                            if(expectedNewStationNode.equals(pedestrian.getStationFinish()))
+                            {
+                                performMetamorphosisToBike();
+                                break;
+                            }
                             if (troublePointsConfigContainer.isTransportChangeStrategyActive()) {
                             	computeBikeTime(currentPosition, pedestrian.getUniformRoute()
                             			.get(pedestrian.getUniformRouteSize() - 1));
