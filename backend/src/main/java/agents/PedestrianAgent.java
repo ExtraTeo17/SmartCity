@@ -130,12 +130,7 @@ public class PedestrianAgent extends AbstractAgent {
                 else if (pedestrian.isAtDestination()) {
                     pedestrian.setState(DrivingState.AT_DESTINATION);
                     print("Reached destination.");
-
-                    ACLMessage msg = createMessage(ACLMessage.INFORM, SmartCityAgent.name);
-                    Properties prop = createProperties(MessageParameter.PEDESTRIAN);
-                    prop.setProperty(MessageParameter.AT_DESTINATION, String.valueOf(Boolean.TRUE));
-                    msg.setAllUserDefinedParameters(prop);
-                    send(msg);
+                    sendMessageAboutReachingDestinationToSmartCityAgent();
                     doDelete();
                 }
                 else if (!pedestrian.isTroubled()) {
@@ -322,6 +317,7 @@ public class PedestrianAgent extends AbstractAgent {
 
             private void performMetamorphosisToBike() {
                 taskProvider.getCreateBikeTask(currentPosition, pedestrian.getEndPosition(), pedestrian instanceof TestPedestrian).run();
+                sendMessageAboutReachingDestinationToSmartCityAgent();
                 myAgent.doDelete();
                 logger.info("Kill Pedestrian Agent");
             }
@@ -359,6 +355,14 @@ public class PedestrianAgent extends AbstractAgent {
 
         addBehaviour(move);
         addBehaviour(communication);
+    }
+
+    private void sendMessageAboutReachingDestinationToSmartCityAgent() {
+        ACLMessage msg = createMessage(ACLMessage.INFORM, SmartCityAgent.name);
+        Properties prop = createProperties(MessageParameter.PEDESTRIAN);
+        prop.setProperty(MessageParameter.AT_DESTINATION, String.valueOf(Boolean.TRUE));
+        msg.setAllUserDefinedParameters(prop);
+        send(msg);
     }
 
     private void getNextStation(final String busLine) {
