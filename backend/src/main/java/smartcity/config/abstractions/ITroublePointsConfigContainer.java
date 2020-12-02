@@ -2,9 +2,9 @@ package smartcity.config.abstractions;
 
 public interface ITroublePointsConfigContainer {
 
-    boolean shouldChangeRouteOnTroublePoint();
+    boolean isConstructionSiteStrategyActive();
 
-    void setChangeRouteOnTroublePoint(boolean constructionSiteStrategyActive);
+    void setConstructionSiteStrategyActive(boolean constructionSiteStrategyActive);
 
     void setBusCrashGeneratedOnce(boolean busCrashGeneratedOnce);
 
@@ -12,7 +12,9 @@ public interface ITroublePointsConfigContainer {
 
     boolean shouldGenerateConstructionSites();
 
-    boolean shouldGenerateCrashForBuses();
+    boolean shouldDetectTrafficJams();
+    
+    boolean shouldGenerateBusFailures();
 
     void setShouldGenerateConstructionSites(boolean constructionSiteGenerationActive);
 
@@ -25,10 +27,16 @@ public interface ITroublePointsConfigContainer {
      * @param timeBeforeTrouble time before accident in seconds
      */
     void setTimeBeforeTrouble(int timeBeforeTrouble);
+    
+    void setShouldDetectTrafficJam(boolean shouldDetectTrafficJam);
 
-    boolean shouldChangeRouteOnTrafficJam();
+    boolean isTrafficJamStrategyActive();
+    
+    boolean isTransportChangeStrategyActive();
+    
+    void setTransportChangeStrategyActive(boolean transportChangeStrategyActive);
 
-    void setChangeRouteOnTrafficJam(boolean changeRouteOnTrafficJam);
+    void setTrafficJamStrategyActive(boolean changeRouteOnTrafficJam);
 
     boolean shouldUseFixedConstructionSites();
 

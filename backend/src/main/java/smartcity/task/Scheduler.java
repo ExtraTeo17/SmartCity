@@ -43,11 +43,11 @@ public class Scheduler {
         timeProvider.setTimeScale(e.timeScale);
 
         activateLightManagerAgents();
-        configContainer.setChangeRouteOnTrafficJam(
+        configContainer.setTrafficJamStrategyActive(
                 agentsContainer.size(LightManagerAgent.class) > 0 && e.changeRouteOnTrafficJam);
         configContainer.setShouldGenerateConstructionSites(e.shouldGenerateTroublePoints);
         configContainer.setTimeBeforeTrouble(e.timeBeforeTrouble);
-        configContainer.setChangeRouteOnTroublePoint(e.changeRouteOnTroublePoint);
+        configContainer.setConstructionSiteStrategyActive(e.changeRouteOnTroublePoint);
         configContainer.setUseFixedRoutes(e.useFixedRoutes);
         configContainer.setUseFixedConstructionSites(e.useFixedRoutes && e.useFixedConstructionSites);
 

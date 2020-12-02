@@ -202,7 +202,7 @@ public class CarAgent extends AbstractAgent {
 
             private void handleConstructionSiteRouteChange(final int indexOfRouteNodeWithEdge) {
                 int indexAfterWhichRouteChanges;
-                if (configContainer.shouldChangeRouteOnTroublePoint()) {
+                if (configContainer.isConstructionSiteStrategyActive()) {
                     if (indexOfRouteNodeWithEdge - car.getMoveIndex() > THRESHOLD_UNTIL_INDEX_CHANGE) {
                         indexAfterWhichRouteChanges = car.getNextNonVirtualIndex(THRESHOLD_UNTIL_INDEX_CHANGE);
                     }
@@ -362,16 +362,16 @@ public class CarAgent extends AbstractAgent {
 
                         if (timeForTheEndWithJam > timeForOfDynamicRoute) {
 
-                            logger.info("Trip time through the jam: " + timeForTheEndWithJam + " is longer than alternative route time: "
-                                    + timeForOfDynamicRoute + ", so route will be changed");
+                            logger.info("Trip time through the jam: " + timeForTheEndWithJam + " vs "
+                                    + timeForOfDynamicRoute + ", so route WILL be changed");
                             // TODO: CHECK IF send refusal is on place // switchToNextLight was after this line
                             updateVehicleRouteAfterMerge(indexAfterWhichRouteChanges, mergeResult);
 
                         }
                         else {
 
-                            logger.info("Trip time through the jam: " + timeForTheEndWithJam + " is shorter than alternative route time: "
-                                    + timeForOfDynamicRoute + ", so route won't be changed");
+                            logger.info("Trip time through the jam: " + timeForTheEndWithJam + " vs "
+                                    + timeForOfDynamicRoute + ", so route will NOT be changed");
                         }
                         borderlineIndex = null;
                     }

@@ -165,7 +165,7 @@ public class TroubleManagerAgent extends Agent {
         };
         addBehaviour(communication);
 
-        Behaviour sayAboutTroubles = new TickerBehaviour(this, 2000) {
+        Behaviour sayAboutTroubles = new TickerBehaviour(this, 5000) {
             @Override
             protected void onTick() {
 

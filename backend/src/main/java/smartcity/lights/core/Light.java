@@ -14,7 +14,7 @@ import java.util.Map;
 import java.util.Queue;
 
 public class Light extends Position {
-    private static final int TRAFFIC_JAM_THRESHOLD = 1;
+    private static final int TRAFFIC_JAM_THRESHOLD = 3;
 
     private LightColor carLightColor;
     private final long adjacentOsmWayId;
@@ -129,6 +129,8 @@ public class Light extends Position {
     final void checkForTrafficJams(final OptimizationResult result) {
         if (trafficJamEmerged()) {
             result.setShouldNotifyCarAboutStartOfTrafficJamOnThisLight(this, carQueue.size(), getAdjacentWayId());
+            // TODO: consider making it a list of jammed traffic lights !!! or some more clever way
+            // just not to ignore it
             result.setCarStuckInJam(carQueue.peek());
         }
         else if (trafficJamDisappeared()) {

@@ -20,6 +20,7 @@ import routing.nodes.RouteNode;
 import routing.nodes.StationNode;
 import smartcity.ITimeProvider;
 import smartcity.SmartCityAgent;
+import smartcity.config.abstractions.ITroublePointsConfigContainer;
 import smartcity.task.abstractions.ITaskProvider;
 import vehicles.Bike;
 import vehicles.Pedestrian;
@@ -41,7 +42,8 @@ public class PedestrianAgent extends AbstractAgent {
     private final IRouteGenerator router;
     private List<RouteNode> arrivingRouteToClosestStation = null;
     private List<RouteNode> bikeRoute = null;
-    private ITaskProvider taskProvider;
+	  private ITaskProvider taskProvider;
+	  private ITroublePointsConfigContainer troublePointsConfigContainer;
 
 
     PedestrianAgent(int agentId,
@@ -49,11 +51,13 @@ public class PedestrianAgent extends AbstractAgent {
                     ITimeProvider timeProvider,
                     ITaskProvider taskProvider,
                     EventBus eventBus,
-                    IRouteGenerator router) {
+                    IRouteGenerator router,
+                    ITroublePointsConfigContainer troublePointsConfigContainer) {
         super(agentId, pedestrian.getVehicleType(), timeProvider, eventBus);
         this.taskProvider = taskProvider;
         this.pedestrian = pedestrian;
         this.router = router;
+        this.troublePointsConfigContainer = troublePointsConfigContainer;
     }
 
     public boolean isInBus() { return DrivingState.IN_BUS == pedestrian.getState(); }
@@ -253,8 +257,11 @@ public class PedestrianAgent extends AbstractAgent {
                                     rcv.getUserDefinedParameter(MessageParameter.BRIGADE));
 
                             send(messageToBusManager);
-                            computeBikeTime(currentPosition, pedestrian.getUniformRoute()
-                                    .get(pedestrian.getUniformRouteSize() - 1));
+
+                            if (troublePointsConfigContainer.isTransportChangeStrategyActive()) {
+                            	computeBikeTime(currentPosition, pedestrian.getUniformRoute()
+                            			.get(pedestrian.getUniformRouteSize() - 1));
+                            }
                             //decideWhereToGo(rcv);
                         }
                         break;
@@ -280,7 +287,15 @@ public class PedestrianAgent extends AbstractAgent {
                 long busTimeMilliseconds = (pedestrian.getMillisecondsOnRoute(arrivingRouteToClosestStation))
                         + (timeBetweenArrivalAtStationAndDesiredStation * 1000)
                         + (pedestrian.getMillisecondsOnRoute(pedestrian.getUniformRoute()));
-                logger.info("Bike time in milliseconds: " + bikeTimeMilliseconds + " vs bus time in milliseconds: "
+                if (troublePointsConfigContainer.isTransportChangeStrategyActive()) {
+                	handleTransportChangeWithStrategy(rcv, busTimeMilliseconds);
+				} else {
+					handleTransportChangeWithoutStrategy(rcv, busTimeMilliseconds);
+                }
+            }
+
+            private void handleTransportChangeWithStrategy(final ACLMessage rcv, final long busTimeMilliseconds) {
+                logger.info("Transport change strategy is acitve: Bike time in milliseconds: " + bikeTimeMilliseconds + " vs bus time in milliseconds: "
                         + busTimeMilliseconds);
                 if (bikeTimeMilliseconds > busTimeMilliseconds) {
                     logger.info("Choose bus because bike time in milliseconds: " + bikeTimeMilliseconds
@@ -292,8 +307,13 @@ public class PedestrianAgent extends AbstractAgent {
                             + " vs bus time in milliseconds: " + busTimeMilliseconds);
                     performMetamorphosisToBike();
                 }
-            }
+			}
 
+			private void handleTransportChangeWithoutStrategy(final ACLMessage rcv, final long busTimeMilliseconds) {
+				logger.info("Transport change strategy is not active. Bus time in milliseconds: "
+						+ busTimeMilliseconds + " -- seeking another bus");
+                restartAgentWithNewBusLine(arrivingRouteToClosestStation, rcv.getUserDefinedParameter(MessageParameter.BUS_LINE));
+			}
 
             private void performMetamorphosisToBike() {
                 taskProvider.getCreateBikeTask(currentPosition, pedestrian.getEndPosition(), pedestrian instanceof TestPedestrian).run();

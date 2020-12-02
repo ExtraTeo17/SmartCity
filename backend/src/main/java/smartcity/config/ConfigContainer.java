@@ -13,22 +13,26 @@ import smartcity.config.abstractions.*;
 public class ConfigContainer extends ConfigMutator
         implements IZoneMutator,
         ILightConfigContainer,
-        ITroublePointsConfigContainer,
+        IGenerationConfigContainer,
         IStationConfigContainer,
-        IGenerationConfigContainer {
+        ITroublePointsConfigContainer {
 
     private SimulationState simulationState = SimulationState.INITIAL;
-    private boolean shouldGeneratePedestriansAndBuses = false;
-    private boolean shouldGenerateCrashForBuses = true;
-    private boolean shouldGenerateConstructionSites = false;
 
-    private boolean isLightStrategyActive = true;
-    private boolean changeRouteOnTroublePoint = false;
-    private boolean isStationStrategyActive = true;
-    private boolean changeRouteOnTrafficJam = true;
+    private boolean generateBatchesForCars = false;
+    private boolean shouldGeneratePedestriansAndBuses = false;
+    private boolean shouldGenerateConstructionSites = false;
+    private boolean shouldDetectTrafficJams = false;
+    private boolean shouldGenerateBusFailures = false;
+
+    private boolean lightStrategyActive = true;
+    private boolean stationStrategyActive = false;
+    private boolean constructionSiteStrategyActive = false;
+    private boolean trafficJamStrategyActive = false;
+    private boolean transportChangeStrategyActive = false;
+
     private boolean shouldUseFixedRoutes = false;
     private boolean shouldUseFixedConstructionSites = true;
-    private boolean generateBatchesForCars = true;
     private boolean busCrashGeneratedOnce = false;
 
     private int lightExtendTime = 30;
@@ -83,12 +87,12 @@ public class ConfigContainer extends ConfigMutator
 
     @Override
     public boolean isLightStrategyActive() {
-        return isLightStrategyActive;
+        return lightStrategyActive;
     }
 
     @Override
     public void setLightStrategyActive(boolean lightStrategyActive) {
-        isLightStrategyActive = lightStrategyActive;
+        this.lightStrategyActive = lightStrategyActive;
     }
 
     @Override
@@ -96,7 +100,7 @@ public class ConfigContainer extends ConfigMutator
         return extendWaitTime;
     }
 
-
+    @Override
     public boolean getGenerateBatchesForCars() {
         return generateBatchesForCars;
     }
@@ -117,13 +121,13 @@ public class ConfigContainer extends ConfigMutator
     }
 
     @Override
-    public boolean shouldChangeRouteOnTroublePoint() {
-        return changeRouteOnTroublePoint;
+    public boolean isConstructionSiteStrategyActive() {
+        return constructionSiteStrategyActive;
     }
 
     @Override
-    public void setChangeRouteOnTroublePoint(boolean changeRouteOnTroublePoint) {
-        this.changeRouteOnTroublePoint = changeRouteOnTroublePoint;
+    public void setConstructionSiteStrategyActive(boolean constructionSiteStrategyActive) {
+        this.constructionSiteStrategyActive = constructionSiteStrategyActive;
     }
 
     @Override
@@ -132,7 +136,7 @@ public class ConfigContainer extends ConfigMutator
     }
 
     @Override
-    public boolean shouldGenerateCrashForBuses() { return shouldGenerateCrashForBuses;}
+    public boolean shouldGenerateBusFailures() { return shouldGenerateBusFailures; }
 
     @Override
     public void setShouldGenerateConstructionSites(boolean constructionSiteGenerationActive) {
@@ -141,12 +145,12 @@ public class ConfigContainer extends ConfigMutator
 
     @Override
     public boolean isStationStrategyActive() {
-        return isStationStrategyActive;
+        return stationStrategyActive;
     }
 
     @Override
     public void setStationStrategyActive(boolean stationStrategyActive) {
-        isStationStrategyActive = stationStrategyActive;
+        this.stationStrategyActive = stationStrategyActive;
     }
 
     @Override
@@ -160,13 +164,13 @@ public class ConfigContainer extends ConfigMutator
     }
 
     @Override
-    public boolean shouldChangeRouteOnTrafficJam() {
-        return changeRouteOnTrafficJam;
+    public boolean isTrafficJamStrategyActive() {
+        return trafficJamStrategyActive;
     }
 
     @Override
-    public void setChangeRouteOnTrafficJam(boolean changeRouteOnTrafficJam) {
-        this.changeRouteOnTrafficJam = changeRouteOnTrafficJam;
+    public void setTrafficJamStrategyActive(boolean isTrafficJamStrategyActive) {
+        this.trafficJamStrategyActive = isTrafficJamStrategyActive;
     }
 
     @Override
@@ -185,8 +189,28 @@ public class ConfigContainer extends ConfigMutator
     }
 
     @Override
-    public void setUseFixedConstructionSites(boolean value) {
-        shouldUseFixedConstructionSites = value;
+    public void setUseFixedConstructionSites(boolean useFixedConstructionSites) {
+        shouldUseFixedConstructionSites = useFixedConstructionSites;
     }
+
+	@Override
+	public boolean shouldDetectTrafficJams() {
+		return shouldDetectTrafficJams;
+	}
+
+	@Override
+	public void setShouldDetectTrafficJam(boolean shouldDetectTrafficJam) {
+		this.shouldDetectTrafficJams = shouldDetectTrafficJam;
+	}
+
+	@Override
+	public boolean isTransportChangeStrategyActive() {
+		return transportChangeStrategyActive;
+	}
+
+	@Override
+	public void setTransportChangeStrategyActive(boolean transportChangeStrategyActive) {
+		this.transportChangeStrategyActive = transportChangeStrategyActive;
+	}
 
 }

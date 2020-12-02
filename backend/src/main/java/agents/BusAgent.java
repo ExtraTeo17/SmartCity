@@ -97,8 +97,7 @@ public class BusAgent extends AbstractAgent {
                             bus.setState(DrivingState.MOVING);
                             break;
                     }
-                }
-                else if (bus.isAtStation()) {
+                } else if (bus.isAtStation()) {
                     switch (bus.getState()) {
                         case MOVING:
                             var stationOpt = bus.getCurrentStationNode();
@@ -150,8 +149,7 @@ public class BusAgent extends AbstractAgent {
                             move();
                             break;
                     }
-                }
-                else if (bus.isAtDestination()) {
+                } else if (bus.isAtDestination()) {
                     bus.setState(DrivingState.AT_DESTINATION);
                     logger.info("isAtDestination");
                     ACLMessage msg = createMessage(ACLMessage.INFORM, SmartCityAgent.name);
@@ -160,8 +158,7 @@ public class BusAgent extends AbstractAgent {
                     msg.setAllUserDefinedParameters(prop);
                     send(msg);
                     doDelete();
-                }
-                else {
+                } else {
                     move();
                 }
             }
@@ -213,8 +210,7 @@ public class BusAgent extends AbstractAgent {
                                 informNextStation();
                                 bus.setState(DrivingState.PASSING_STATION);
                             }
-                        }
-                        else if (rcv.getPerformative() == ACLMessage.AGREE) {
+                        } else if (rcv.getPerformative() == ACLMessage.AGREE) {
                             logger.info("GOT AGREE from station");
                             bus.setState(DrivingState.WAITING_AT_STATION);
                         }
@@ -235,8 +231,7 @@ public class BusAgent extends AbstractAgent {
                                 stationId = Integer.parseInt(rcv.getUserDefinedParameter(MessageParameter.STATION_ID));
                                 if (bus.removePassengerFromStation(stationId, rcv.getSender().getLocalName())) {
                                     print("Passengers: " + bus.getPassengersCount());
-                                }
-                                else {
+                                } else {
                                     print("Removing passenger failed");
                                 }
                                 break;
@@ -251,7 +246,7 @@ public class BusAgent extends AbstractAgent {
         addBehaviour(communication);
 
 
-        if (configContainer.shouldGenerateCrashForBuses()) {
+        if (configContainer.shouldGenerateBusFailures()) {
             var timeBeforeTroubleMs = this.configContainer.getTimeBeforeTrouble() * 1000;
             Behaviour troubleGenerator = new TickerBehaviour(this, 8000) {
 
@@ -353,8 +348,7 @@ public class BusAgent extends AbstractAgent {
             var timeOnStation = bus.getTimeOnStation(osmId);
             if (timeOnStation.isPresent()) {
                 properties.setProperty(MessageParameter.SCHEDULE_ARRIVAL, timeOnStation.get().toString());
-            }
-            else {
+            } else {
                 ConditionalExecutor.debug(this::logAllStations);
             }
 
@@ -392,10 +386,13 @@ public class BusAgent extends AbstractAgent {
         if (stationsOnRoute.size() <= 1) {
             return Optional.empty();
         }
-        int halfIndex = (int) Math.ceil((double) stationsOnRoute.size() / 2.0);
 
-        return Optional.of(Siblings.of(stationsOnRoute.get(0),//random.nextInt(halfIndex)), // TODO: fix to consider first random when calculating second IMPORTANT
-                stationsOnRoute.get(2)));//halfIndex + random.nextInt(halfIndex)))); // TODO: for tests choose stations 1. and 3.
+        int halfIndex = (int) Math.ceil((double) stationsOnRoute.size() / 2.0);
+        int firstIndex = random.nextInt(halfIndex);
+        int secondIndex = firstIndex + random.nextInt(stationsOnRoute.size() - firstIndex - 1) + 1;
+
+        return Optional.of(Siblings.of(stationsOnRoute.get(firstIndex),
+                stationsOnRoute.get(secondIndex)));
     }
 
     /**
