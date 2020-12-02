@@ -23,9 +23,9 @@ public class ConfigContainer extends ConfigMutator
     private boolean shouldGeneratePedestriansAndBuses = false;
     private boolean shouldGenerateConstructionSites = false;
     private boolean shouldDetectTrafficJams = false;
-    private boolean shouldGenerateBusFailures = false;
+    private boolean shouldGenerateBusFailures = true;
 
-    private boolean lightStrategyActive = true;
+    private boolean lightStrategyActive = false;
     private boolean stationStrategyActive = false;
     private boolean constructionSiteStrategyActive = false;
     private boolean trafficJamStrategyActive = false;
@@ -33,13 +33,13 @@ public class ConfigContainer extends ConfigMutator
 
     private boolean shouldUseFixedRoutes = false;
     private boolean shouldUseFixedConstructionSites = true;
-    private boolean busCrashGeneratedOnce = false;
 
     private int lightExtendTime = 30;
     private int extendWaitTime = 60;
     private int timeBeforeTrouble = 100000;
 
     private final IZone zone;
+    private boolean busCrashGeneratedOnce = false;
 
     @Inject
     public ConfigContainer() {
