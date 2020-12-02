@@ -140,10 +140,11 @@ class AgentsFactory implements IAgentsFactory {
                 timeProvider, taskProvider);
         if (testPedestrian) {
             pedestrian = new TestPedestrian(pedestrian);
-        }
+		}
 
-        return new PedestrianAgent(id, pedestrian, timeProvider, taskProvider, eventBus, routeGenerator);
-    }
+		return new PedestrianAgent(id, pedestrian, timeProvider, taskProvider, eventBus, routeGenerator,
+				configContainer);
+	}
 
     @Override
     public PedestrianAgent create(List<RouteNode> routeToStation, List<RouteNode> routeFromStation,

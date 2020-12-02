@@ -66,7 +66,7 @@ public class LightManagerAgent extends AbstractAgent {
 
                 final String agentStuckInJam = result.getAgentStuckInJam();
                 if (result.shouldNotifyCarAboutStartOfTrafficJamOnThisLight()) {
-                    logger.info("KOOOOOOOOOOOOOOREK");
+                    logger.info("KOREK");
                     handleTrafficJams(result, agentStuckInJam);
                 }
                 if (result.shouldNotifyCarAboutStopOfTrafficJamOnThisLight()) {
@@ -101,7 +101,13 @@ public class LightManagerAgent extends AbstractAgent {
             private void handleTrafficJams(OptimizationResult result, String nameOfAgent) {
                 // TODO shouldNotifyCarAboutTrafficJamOnThisLight have an old state to stop the jam
                 // TODO: use result.getJammedLight(...)
-                sendMessageAboutTroubleToVehicle(result, nameOfAgent);
+            	if (configContainer.isTrafficJamStrategyActive()) {
+            		sendMessageAboutTroubleToVehicle(result, nameOfAgent);
+            	}
+            	// TODO FOR PRZEMEK: add eventBus.startTrafficJamEvent here IN THIS LINE
+            	// and delete in TroubleManager (the pulsowanie should start here, not
+            	// after the message goes through car to TroubleManager
+            	// You have the coordinates in result.getJammedLightPosition()
             }
 
             private void sendMessageAboutTroubleToVehicle(OptimizationResult result, String nameOfAgent) {

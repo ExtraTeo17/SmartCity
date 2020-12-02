@@ -21,6 +21,7 @@ import routing.nodes.RouteNode;
 import routing.nodes.StationNode;
 import smartcity.ITimeProvider;
 import smartcity.SmartCityAgent;
+import smartcity.config.abstractions.ITroublePointsConfigContainer;
 import smartcity.task.abstractions.ITaskProvider;
 import vehicles.Bike;
 import vehicles.Pedestrian;
@@ -38,22 +39,26 @@ import static smartcity.config.StaticConfig.USE_BATCHED_UPDATES;
 public class PedestrianAgent extends AbstractAgent {
     public static final String name = PedestrianAgent.class.getSimpleName().replace("Agent", "");
 
-    private Pedestrian pedestrian;
     private final IRouteGenerator router;
-    private List<RouteNode> arrivingRouteToClosestStation = null;
-    private List<RouteNode> bikeRoute = null;
     private final ITaskProvider taskProvider;
+    private final ITroublePointsConfigContainer troublePointsConfigContainer;
+
+    private Pedestrian pedestrian;
+    private List<RouteNode> arrivingRouteToClosestStation;
+    private List<RouteNode> bikeRoute;
 
     PedestrianAgent(int agentId,
                     Pedestrian pedestrian,
                     ITimeProvider timeProvider,
                     ITaskProvider taskProvider,
                     EventBus eventBus,
-                    IRouteGenerator router) {
+                    IRouteGenerator router,
+                    ITroublePointsConfigContainer troublePointsConfigContainer) {
         super(agentId, pedestrian.getVehicleType(), timeProvider, eventBus);
         this.taskProvider = taskProvider;
         this.pedestrian = pedestrian;
         this.router = router;
+        this.troublePointsConfigContainer = troublePointsConfigContainer;
     }
 
     public boolean isInBus() { return DrivingState.IN_BUS == pedestrian.getState(); }
@@ -125,12 +130,7 @@ public class PedestrianAgent extends AbstractAgent {
                 else if (pedestrian.isAtDestination()) {
                     pedestrian.setState(DrivingState.AT_DESTINATION);
                     print("Reached destination.");
-
-                    ACLMessage msg = createMessage(ACLMessage.INFORM, SmartCityAgent.name);
-                    Properties prop = createProperties(MessageParameter.PEDESTRIAN);
-                    prop.setProperty(MessageParameter.AT_DESTINATION, String.valueOf(Boolean.TRUE));
-                    msg.setAllUserDefinedParameters(prop);
-                    send(msg);
+                    sendMessageAboutReachingDestinationToSmartCityAgent();
                     doDelete();
                 }
                 else if (!pedestrian.isTroubled()) {
@@ -252,8 +252,15 @@ public class PedestrianAgent extends AbstractAgent {
                                     rcv.getUserDefinedParameter(MessageParameter.BRIGADE));
 
                             send(messageToBusManager);
-                            computeBikeTime(currentPosition, pedestrian.getUniformRoute()
-                                    .get(pedestrian.getUniformRouteSize() - 1));
+
+                            if (expectedNewStationNode.equals(pedestrian.getStationFinish())) {
+                                performMetamorphosisToBike();
+                                break;
+                            }
+                            if (troublePointsConfigContainer.isTransportChangeStrategyActive()) {
+                                var route = pedestrian.getUniformRoute();
+                                computeBikeTime(currentPosition, route.get(route.size() - 1));
+                            }
                         }
                         break;
                     case MessageParameter.BUS_MANAGER:
@@ -277,7 +284,16 @@ public class PedestrianAgent extends AbstractAgent {
                 long busTimeMilliseconds = (pedestrian.getMillisecondsOnRoute(arrivingRouteToClosestStation))
                         + (timeBetweenArrivalAtStationAndDesiredStation * 1000)
                         + (pedestrian.getMillisecondsOnRoute(pedestrian.getUniformRoute()));
-                logger.info("Bike time in milliseconds: " + bikeTimeMilliseconds + " vs bus time in milliseconds: "
+                if (troublePointsConfigContainer.isTransportChangeStrategyActive()) {
+                    handleTransportChangeWithStrategy(rcv, busTimeMilliseconds);
+                }
+                else {
+                    handleTransportChangeWithoutStrategy(rcv, busTimeMilliseconds);
+                }
+            }
+
+            private void handleTransportChangeWithStrategy(final ACLMessage rcv, final long busTimeMilliseconds) {
+                logger.info("Transport change strategy is acitve: Bike time in milliseconds: " + bikeTimeMilliseconds + " vs bus time in milliseconds: "
                         + busTimeMilliseconds);
                 if (bikeTimeMilliseconds > busTimeMilliseconds) {
                     logger.info("Choose bus because bike time in milliseconds: " + bikeTimeMilliseconds
@@ -291,12 +307,17 @@ public class PedestrianAgent extends AbstractAgent {
                 }
             }
 
+            private void handleTransportChangeWithoutStrategy(final ACLMessage rcv, final long busTimeMilliseconds) {
+                logger.info("Transport change strategy is not active. Bus time in milliseconds: "
+                        + busTimeMilliseconds + " -- seeking another bus");
+                restartAgentWithNewBusLine(arrivingRouteToClosestStation, rcv.getUserDefinedParameter(MessageParameter.BUS_LINE));
+            }
 
             private void performMetamorphosisToBike() {
                 var isTestPedestrian = pedestrian instanceof TestPedestrian;
                 taskProvider.getCreateBikeTask(currentPosition, pedestrian.getEndPosition(),
                         isTestPedestrian).run();
-
+                sendMessageAboutReachingDestinationToSmartCityAgent();
                 myAgent.doDelete();
                 logger.info("Kill pedestrian agent");
             }
@@ -333,6 +354,14 @@ public class PedestrianAgent extends AbstractAgent {
 
         addBehaviour(move);
         addBehaviour(communication);
+    }
+
+    private void sendMessageAboutReachingDestinationToSmartCityAgent() {
+        ACLMessage msg = createMessage(ACLMessage.INFORM, SmartCityAgent.name);
+        Properties prop = createProperties(MessageParameter.PEDESTRIAN);
+        prop.setProperty(MessageParameter.AT_DESTINATION, String.valueOf(Boolean.TRUE));
+        msg.setAllUserDefinedParameters(prop);
+        send(msg);
     }
 
     private void getNextStation(final String busLine) {

@@ -88,7 +88,7 @@ class SimpleCrossroad implements ICrossroad {
         }
 
         final OptimizationResult result = new OptimizationResult(extendTimeSeconds, defaultExecutionDelay);
-        boolean shouldCheckForJams = configContainer.shouldChangeRouteOnTrafficJam();
+        boolean shouldCheckForJams = configContainer.shouldDetectTrafficJams();
 
         for (Light light : allLights) {
 

@@ -143,7 +143,7 @@ class SchedulerTests {
 
         assertEquals(shouldGenerateTP, configContainer.shouldGenerateConstructionSites());
         assertEquals(timeBeforeTrouble, configContainer.getTimeBeforeTrouble());
-        assertEquals(shouldGenerateTrafficJams, configContainer.shouldChangeRouteOnTrafficJam());
+        assertEquals(shouldGenerateTrafficJams, configContainer.isTrafficJamStrategyActive());
 
         assertEquals(pedestriansLimit, ref.pedLimit);
         assertEquals(testPedestrianId, ref.testPedId);
@@ -151,7 +151,7 @@ class SchedulerTests {
         assertEquals(extendLightTime, configContainer.getExtendLightTime());
         assertEquals(stationStrategyActive, configContainer.isStationStrategyActive());
         assertEquals(extendWaitTime, configContainer.getExtendWaitTime());
-        assertEquals(changeRouteStrategyActive, configContainer.shouldChangeRouteOnTroublePoint());
+        assertEquals(changeRouteStrategyActive, configContainer.isConstructionSiteStrategyActive());
 
         assertEquals(useFixedRoutes, configContainer.shouldUseFixedRoutes());
         assertEquals(useFixedConstructionSites, configContainer.shouldUseFixedConstructionSites());
