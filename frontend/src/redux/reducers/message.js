@@ -70,7 +70,7 @@ const message = (state = initialState, action) => {
     }
 
     case TROUBLE_POINT_CREATED: {
-      const isConstruction = getRandomInt(0, 2) % 2 === 0;
+      const isConstruction = getRandomInt(0, 1) % 2 === 0;
       const troublePoint = { ...action.payload, isConstruction };
 
       return { ...state, troublePoints: [...state.troublePoints, troublePoint] };
