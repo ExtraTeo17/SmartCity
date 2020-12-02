@@ -260,7 +260,7 @@ public class PedestrianAgent extends AbstractAgent {
                         if (rcv.getPerformative() == ACLMessage.INFORM) {
 
                             if (rcv.getUserDefinedParameter(MessageParameter.EVENT).equals(MessageParameter.TROUBLE)) {
-                                troubleHandler(rcv);
+                                handleTrouble(rcv);
                             }
                             else if (rcv.getUserDefinedParameter(MessageParameter.EVENT).equals(MessageParameter.START)) {
                                 getNextStation(rcv.getUserDefinedParameter(MessageParameter.BUS_LINE));
@@ -270,7 +270,7 @@ public class PedestrianAgent extends AbstractAgent {
                 }
             }
 
-            private void troubleHandler(ACLMessage rcv) {
+            private void handleTrouble(ACLMessage rcv) {
                 logger.info("Got Inform message from BUS MANAGER");
                 long timeBetweenArrivalAtStationAndDesiredStation = Long.parseLong(rcv.getUserDefinedParameter(
                         MessageParameter.TIME_BETWEEN_PEDESTRIAN_AT_STATION_ARRIVAL_AND_REACHING_DESIRED_STOP));
@@ -293,9 +293,12 @@ public class PedestrianAgent extends AbstractAgent {
 
 
             private void performMetamorphosisToBike() {
-                taskProvider.getCreateBikeTask(currentPosition, pedestrian.getEndPosition(), pedestrian instanceof TestPedestrian).run();
+                var isTestPedestrian = pedestrian instanceof TestPedestrian;
+                taskProvider.getCreateBikeTask(currentPosition, pedestrian.getEndPosition(),
+                        isTestPedestrian).run();
+
                 myAgent.doDelete();
-                logger.info("Kill Pedestrian Agent");
+                logger.info("Kill pedestrian agent");
             }
 
             private void restartAgentWithNewBusLine(List<RouteNode> arrivingRouteToClosestStation, String busLine) {
@@ -324,8 +327,7 @@ public class PedestrianAgent extends AbstractAgent {
             private LocalTime computeArrivalTime(IGeoPosition pointA, IGeoPosition pointB, String desiredOsmStationId) {
                 LocalTime now = timeProvider.getCurrentSimulationTime().toLocalTime();
                 arrivingRouteToClosestStation = router.generateRouteForPedestrians(pointA, pointB, null, desiredOsmStationId);
-                LocalTime arrivingTime = now.plusNanos(pedestrian.getMillisecondsOnRoute(arrivingRouteToClosestStation) * 1_000_000);
-                return arrivingTime;
+                return now.plusNanos(pedestrian.getMillisecondsOnRoute(arrivingRouteToClosestStation) * 1_000_000L);
             }
         };
 
@@ -341,7 +343,7 @@ public class PedestrianAgent extends AbstractAgent {
             ACLMessage msg = createMessageById(ACLMessage.INFORM, StationAgent.name, nextStation.getAgentId());
             Properties properties = createProperties(MessageParameter.PEDESTRIAN);
             var currentTime = timeProvider.getCurrentSimulationTime();
-            var predictedTime = currentTime.plusNanos(pedestrian.getMillisecondsToNextStation() * 1_000_000);
+            var predictedTime = currentTime.plusNanos(pedestrian.getMillisecondsToNextStation() * 1_000_000L);
             properties.setProperty(MessageParameter.ARRIVAL_TIME, predictedTime.toString());
             properties.setProperty(MessageParameter.BUS_LINE, busLine);
             msg.setAllUserDefinedParameters(properties);
@@ -358,7 +360,7 @@ public class PedestrianAgent extends AbstractAgent {
         ACLMessage msg = createMessage(ACLMessage.INFORM, BusManagerAgent.NAME);
 
         var currentTime = timeProvider.getCurrentSimulationTime();
-        var predictedTime = currentTime.plusNanos(pedestrian.getMillisecondsToNextStation() * 1_000_000).toLocalTime();
+        var predictedTime = currentTime.plusNanos(pedestrian.getMillisecondsToNextStation() * 1_000_000L).toLocalTime();
         msg.addUserDefinedParameter(MessageParameter.ARRIVAL_TIME, predictedTime.toString());
         msg.addUserDefinedParameter(MessageParameter.STATION_FROM_ID, pedestrian.getStartingStation().getOsmId() + "");
         msg.addUserDefinedParameter(MessageParameter.STATION_TO_ID, pedestrian.getStationFinish().getOsmId() + "");
