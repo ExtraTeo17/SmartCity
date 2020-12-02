@@ -94,8 +94,8 @@ public class TaskProvider implements ITaskProvider {
 
                 route = routeInfoCache.get(effectiveStart, effectiveEnd);
                 if (route == null) {
-                    route = routeGenerator.generateRouteInfo(effectiveEnd, effectiveEnd, false);
-                    routeInfoCache.put(effectiveEnd, effectiveEnd, route);
+                    route = routeGenerator.generateRouteInfo(effectiveStart, effectiveEnd, false);
+                    routeInfoCache.put(effectiveStart, effectiveEnd, route);
                 }
             } catch (Exception e) {
                 logger.warn("Error generating route info", e);
@@ -103,7 +103,10 @@ public class TaskProvider implements ITaskProvider {
             }
 
             if (route.size() == 0) {
-                logger.debug("Generated route is empty, agent won't be created.");
+                logger.warn("Generated route is empty, agent won't be created.");
+                if (startForBatches != null) {
+                    startForBatches = endForBatches = null;
+                }
                 return;
             }
 

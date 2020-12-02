@@ -42,8 +42,7 @@ public class PedestrianAgent extends AbstractAgent {
     private final IRouteGenerator router;
     private List<RouteNode> arrivingRouteToClosestStation = null;
     private List<RouteNode> bikeRoute = null;
-    private ITaskProvider taskProvider;
-
+    private final ITaskProvider taskProvider;
 
     PedestrianAgent(int agentId,
                     Pedestrian pedestrian,
@@ -61,8 +60,7 @@ public class PedestrianAgent extends AbstractAgent {
 
     @Override
     protected void setup() {
-        //getNextStation();
-        whichBusLine();
+        informWhichBusLine();
 
         informLightManager(pedestrian);
 
@@ -256,7 +254,6 @@ public class PedestrianAgent extends AbstractAgent {
                             send(messageToBusManager);
                             computeBikeTime(currentPosition, pedestrian.getUniformRoute()
                                     .get(pedestrian.getUniformRouteSize() - 1));
-                            //decideWhereToGo(rcv);
                         }
                         break;
                     case MessageParameter.BUS_MANAGER:
@@ -277,7 +274,6 @@ public class PedestrianAgent extends AbstractAgent {
                 logger.info("Got Inform message from BUS MANAGER");
                 long timeBetweenArrivalAtStationAndDesiredStation = Long.parseLong(rcv.getUserDefinedParameter(
                         MessageParameter.TIME_BETWEEN_PEDESTRIAN_AT_STATION_ARRIVAL_AND_REACHING_DESIRED_STOP));
-                //String newBusLine = rcv.getUserDefinedParameter(MessageParameter.BUS_LINE);
                 long busTimeMilliseconds = (pedestrian.getMillisecondsOnRoute(arrivingRouteToClosestStation))
                         + (timeBetweenArrivalAtStationAndDesiredStation * 1000)
                         + (pedestrian.getMillisecondsOnRoute(pedestrian.getUniformRoute()));
@@ -355,7 +351,7 @@ public class PedestrianAgent extends AbstractAgent {
         }
     }
 
-    private void whichBusLine() {
+    private void informWhichBusLine() {
         logger.info("Send inform about bus_line to to Bus");
 
 

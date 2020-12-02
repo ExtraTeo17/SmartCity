@@ -33,16 +33,14 @@ import java.util.Random;
 import static agents.AgentConstants.DEFAULT_BLOCK_ON_ERROR;
 import static agents.message.MessageManager.createMessage;
 import static agents.message.MessageManager.createProperties;
-import static java.lang.Thread.sleep;
 import static smartcity.config.StaticConfig.USE_BATCHED_UPDATES;
 
-@SuppressWarnings("serial")
 public class BusAgent extends AbstractAgent {
     public static final String name = BusAgent.class.getSimpleName().replace("Agent", "");
+
     private final ITimeProvider timeProvider;
     private final Bus bus;
     private final ITroublePointsConfigContainer configContainer;
-    private static final int THRESHOLD_UNTIL_INDEX_CHANGE = 50;
     private RouteNode troublePoint;
 
     BusAgent(int busId, Bus bus,
@@ -256,7 +254,7 @@ public class BusAgent extends AbstractAgent {
                 public void onTick() {
                     if (configContainer.wasBusCrashGeneratedOnce()) {
                         logger.trace("Bus crash has already been generated once");
-                		stop();
+                        stop();
                         return;
                     }
                     configContainer.setBusCrashGeneratedOnce(true);
@@ -294,8 +292,8 @@ public class BusAgent extends AbstractAgent {
                         properties.setProperty(MessageParameter.DESIRED_OSM_STATION_ID, ((StationNode) bus.findNextStop()).getOsmId() + "");
                         properties.setProperty(MessageParameter.AGENT_ID_OF_NEXT_CLOSEST_STATION, ((StationNode) bus.findNextStop()).getAgentId() + "");
                         //maybe not needed
-                        properties.setProperty(MessageParameter.LAT_OF_NEXT_CLOSEST_STATION, ((StationNode) bus.findNextStop()).getLat() + "");
-                        properties.setProperty(MessageParameter.LON_OF_NEXT_CLOSEST_STATION, ((StationNode) bus.findNextStop()).getLng() + "");
+                        properties.setProperty(MessageParameter.LAT_OF_NEXT_CLOSEST_STATION, bus.findNextStop().getLat() + "");
+                        properties.setProperty(MessageParameter.LON_OF_NEXT_CLOSEST_STATION, bus.findNextStop().getLng() + "");
 
                         properties.setProperty(MessageParameter.BUS_LINE, getLine());
                         properties.setProperty(MessageParameter.BRIGADE, bus.getBrigade());
@@ -337,7 +335,7 @@ public class BusAgent extends AbstractAgent {
             ACLMessage msg = createMessageById(ACLMessage.INFORM, StationAgent.name, stationId);
             var properties = createProperties(MessageParameter.BUS);
             var currentTime = timeProvider.getCurrentSimulationTime();
-            var predictedTime = currentTime.plusNanos(bus.getMillisecondsToNextStation() * 1_000_000);
+            var predictedTime = currentTime.plusNanos(bus.getMillisecondsToNextStation() * 1_000_000L);
             properties.setProperty(MessageParameter.ARRIVAL_TIME, predictedTime.toString());
             properties.setProperty(MessageParameter.BUS_LINE, bus.getLine());
 
@@ -373,7 +371,7 @@ public class BusAgent extends AbstractAgent {
         return bus;
     }
 
-    public String getLine() {
+    private String getLine() {
         return bus.getLine();
     }
 
