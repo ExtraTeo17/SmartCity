@@ -110,7 +110,7 @@ class DataMergerTests {
         for (var id : idsSet) {
             var lat = random.nextDouble();
             var lng = random.nextDouble();
-            result.put(id, new OSMStation(id, lat, lng, "ref" + id));
+            result.put(id, new OSMStation(id, lat, lng, "ref" + id, true));
         }
 
         return result;

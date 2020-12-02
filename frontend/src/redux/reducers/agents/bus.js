@@ -22,7 +22,7 @@ const bus = (state = initialState, action) => {
       const newBuses = state.buses.map(b => {
         if (b.id === bus.id) {
           unrecognized = false;
-          return { ...b, location: bus.location };
+          return { ...b, location: bus.location, startedMoving: true };
         }
         return b;
       });

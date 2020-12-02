@@ -18,7 +18,6 @@ import routing.nodes.RouteNode;
 import routing.nodes.StationNode;
 import smartcity.ITimeProvider;
 import smartcity.SmartCityAgent;
-import smartcity.config.StaticConfig;
 import smartcity.config.abstractions.ITroublePointsConfigContainer;
 import utilities.ConditionalExecutor;
 import utilities.Siblings;

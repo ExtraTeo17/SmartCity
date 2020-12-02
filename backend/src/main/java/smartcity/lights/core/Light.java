@@ -41,9 +41,9 @@ public class Light extends Position {
     public long getOsmLightId() {
         return osmLightId;
     }
-    
+
     public void setTrafficJamOngoing(boolean trafficJamOngoing) {
-    	this.trafficJamOngoing = trafficJamOngoing;
+        this.trafficJamOngoing = trafficJamOngoing;
     }
 
     public long getAdjacentWayId() {

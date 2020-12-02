@@ -5,9 +5,9 @@ public interface ITroublePointsConfigContainer {
     boolean isConstructionSiteStrategyActive();
 
     void setConstructionSiteStrategyActive(boolean constructionSiteStrategyActive);
-    
+
     void setBusCrashGeneratedOnce(boolean busCrashGeneratedOnce);
-    
+
     boolean getBusCrashGeneratedOnce();
 
     boolean shouldGenerateConstructionSites();

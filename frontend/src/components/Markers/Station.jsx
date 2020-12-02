@@ -8,7 +8,7 @@ const Station = props => {
 
   return (
     <Marker position={station.location} opacity={0.95} icon={stationIcon} zIndexOffset={STATIC_Z_INDEX}>
-      <Popup>I am a station!</Popup>
+      <Popup>I am a station-{station.id}!</Popup>
     </Marker>
   );
 };

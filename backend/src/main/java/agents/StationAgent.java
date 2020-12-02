@@ -101,10 +101,10 @@ public class StationAgent extends AbstractAgent {
                 var messageKind = rcv.getPerformative();
                 var agentName = rcv.getSender().getLocalName();
                 if (messageKind == ACLMessage.INFORM) {
-                	print("Got INFORM from " + agentName);
+                    print("Got INFORM from " + agentName);
                     String desiredBusLine = rcv.getUserDefinedParameter(MessageParameter.BUS_LINE);
-                    station.addToAgentMap(agentName,desiredBusLine);
-                    stationStrategy.addPedestrianToFarAwayQueue(agentName,desiredBusLine,
+                    station.addToAgentMap(agentName, desiredBusLine);
+                    stationStrategy.addPedestrianToFarAwayQueue(agentName, desiredBusLine,
                             getDateParameter(rcv, MessageParameter.ARRIVAL_TIME));
                 }
                 else if (messageKind == ACLMessage.REQUEST_WHEN) {
@@ -128,7 +128,7 @@ public class StationAgent extends AbstractAgent {
                 else if (messageKind == ACLMessage.AGREE) {
                     print("-----GET AGREE from PEDESTRIAN------", LoggerLevel.DEBUG);
 
-                    var desiredBusLine =  station.getFromAgentMap(agentName);
+                    var desiredBusLine = station.getFromAgentMap(agentName);
                     station.removeFromAgentMap(agentName);
                     if (!stationStrategy.removePedestrianFromQueue(agentName, desiredBusLine)) {
                         stationStrategy.removePedestrianFromFarAwayQueue(agentName, desiredBusLine);
@@ -157,7 +157,7 @@ public class StationAgent extends AbstractAgent {
 
             private void answerPedestriansCanProceed(String busAgentName, List<String> pedestriansAgentsNames) {
                 for (String name : pedestriansAgentsNames) {
-                	print("Send REQUEST to " + name);
+                    logger.debug("Send REQUEST to " + name);
                     ACLMessage msg = createMessage(ACLMessage.REQUEST, name);
                     var properties = createProperties(MessageParameter.STATION);
                     properties.setProperty(MessageParameter.BUS_AGENT_NAME, busAgentName);
@@ -167,7 +167,7 @@ public class StationAgent extends AbstractAgent {
             }
 
             private void answerBusCanProceed(String busAgentName) {
-                print("Send REQUEST to " + busAgentName);
+                logger.debug("Send REQUEST to " + busAgentName);
                 ACLMessage msg = createMessage(ACLMessage.REQUEST, busAgentName);
                 Properties properties = createProperties(MessageParameter.STATION);
                 msg.setAllUserDefinedParameters(properties);

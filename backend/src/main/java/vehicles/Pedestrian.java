@@ -15,15 +15,15 @@ import static vehicles.Constants.SPEED_SCALE;
 
 public class Pedestrian extends MovingObject {
 
-    private static final int DEFAULT_SPEED = 10 * SPEED_SCALE;
+    private static final int DEFAULT_SPEED = (int) (10 * SPEED_SCALE);
 
     private List<RouteNode> displayRouteBeforeBus;
     private final List<RouteNode> displayRouteAfterBus;
     private List<RouteNode> routeBeforeBus;
     private StationNode stationStart;
     private final StationNode stationFinish;
-    private boolean troubled = false;
 
+    private transient boolean troubled = false;
     private transient int stationIndex = 0;
 
     public Pedestrian(int agentId,
@@ -88,7 +88,8 @@ public class Pedestrian extends MovingObject {
     public StationNode getTargetStation() {
         return (StationNode) uniformRoute.get(stationIndex + 1);
     }
-    public StationNode getStationFinish(){return stationFinish;}
+
+    public StationNode getStationFinish() {return stationFinish;}
 
     @Override
     public long getAdjacentOsmWayId() {
@@ -129,7 +130,6 @@ public class Pedestrian extends MovingObject {
     }
 
 
-
     public int getMillisecondsToNextStation() {
         return getMillisecondsOnRoute(routeBeforeBus, moveIndex);
     }
@@ -137,30 +137,30 @@ public class Pedestrian extends MovingObject {
     public StationNode findNextStation() {
         return stationStart;
     }
-    
+
     public void setTroubled(boolean troubled) {
-    	this.troubled = troubled;
+        this.troubled = troubled;
     }
 
-	public boolean isTroubled() {
-		// TODO Auto-generated method stub
-		return false;
-	}
+    public boolean isTroubled() {
+        // TODO Auto-generated method stub
+        return false;
+    }
 
-	public void setDisplayRouteBeforeBus(List<RouteNode> displayRouteToStation){
+    public void setDisplayRouteBeforeBus(List<RouteNode> displayRouteToStation) {
         this.displayRouteBeforeBus = displayRouteToStation;
     }
-    public void setRouteBeforeBus(List<RouteNode> routeBeforeBus)
-    {
+
+    public void setRouteBeforeBus(List<RouteNode> routeBeforeBus) {
         this.routeBeforeBus = routeBeforeBus;
     }
-    public void setStationStart(StationNode newStationStart)
-    {
+
+    public void setStationStart(StationNode newStationStart) {
         this.stationStart = newStationStart;
     }
-    public void setStationIndex(int index)
-    {
-        this.stationIndex = index ;
+
+    public void setStationIndex(int index) {
+        this.stationIndex = index;
     }
 
 }

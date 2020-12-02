@@ -158,7 +158,7 @@ public class LightSwitcher implements Function<ISwitchLightsContext, Integer> {
             redGroupObjects += CAR_TO_PEDESTRIAN_LIGHT_RATE * lightGroups[0];
         }
 
-        return new int[] { greenGroupObjects, redGroupObjects };
+        return new int[]{greenGroupObjects, redGroupObjects};
     }
 
     private void switchLights() {

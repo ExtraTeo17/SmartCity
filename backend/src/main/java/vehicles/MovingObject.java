@@ -226,15 +226,15 @@ public abstract class MovingObject {
     }
 
     public int getMillisecondsOnRoute(List<RouteNode> route) {
-    	return getMillisecondsOnRoute(route, 0);
+        return getMillisecondsOnRoute(route, 0);
     }
-    
+
     public int getMillisecondsOnRoute(List<RouteNode> route, int index) {
-    	return getMillisecondsOnRoute(route, index, getSpeed());
+        return getMillisecondsOnRoute(route, index, getSpeed());
     }
-    
+
     public int getMillisecondsOnRoute(List<RouteNode> route, int index, int speed) {
-    	return ((route.size() - 1 - index) * RoutingConstants.STEP_CONSTANT) / speed;
+        return ((route.size() - 1 - index) * RoutingConstants.STEP_CONSTANT) / speed;
     }
 
     public List<RouteNode> getSimpleRoute() { return simpleRoute; }

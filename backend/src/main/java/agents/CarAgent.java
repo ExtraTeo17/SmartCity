@@ -21,11 +21,7 @@ import smartcity.config.abstractions.ITroublePointsConfigContainer;
 import vehicles.MovingObject;
 import vehicles.enums.DrivingState;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Random;
-import java.util.Set;
+import java.util.*;
 
 import static agents.AgentConstants.DEFAULT_BLOCK_ON_ERROR;
 import static agents.message.MessageManager.createMessage;
@@ -243,7 +239,7 @@ public class CarAgent extends AbstractAgent {
                         oldUniformRoute.get(oldUniformRoute.size() - 1),
                         bewareOfJammedEdge);
                 if (newSimpleRouteEnd.size() == 0) { // Case when GraphHopper has problems
-                	newSimpleRouteEnd = new ArrayList<>(oldUniformRoute.subList(indexAfterWhichRouteChanges, oldUniformRoute.size()));
+                    newSimpleRouteEnd = new ArrayList<>(oldUniformRoute.subList(indexAfterWhichRouteChanges, oldUniformRoute.size()));
                 }
                 List<RouteNode> route = oldUniformRoute.subList(0, indexAfterWhichRouteChanges);
                 route.addAll(newSimpleRouteEnd);

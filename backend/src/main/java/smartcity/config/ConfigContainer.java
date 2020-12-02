@@ -68,15 +68,15 @@ public class ConfigContainer extends ConfigMutator
     public SimulationState getSimulationState() {
         return simulationState;
     }
-    
+
     @Override
     public void setBusCrashGeneratedOnce(boolean busCrashGeneratedOnce) {
-    	this.busCrashGeneratedOnce = busCrashGeneratedOnce;
+        this.busCrashGeneratedOnce = busCrashGeneratedOnce;
     }
-    
+
     @Override
     public boolean getBusCrashGeneratedOnce() {
-    	return busCrashGeneratedOnce;
+        return busCrashGeneratedOnce;
     }
 
     public void setSimulationState(SimulationState simulationState) {
