@@ -1,6 +1,6 @@
 package osmproxy.elements;
 
-import org.junit.Assert;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import testutils.FileLoader;
 import utilities.IterableNodeList;
@@ -19,7 +19,7 @@ class OSMWay_determineRouteOrientationAndFilterRelevantNodes_Tests {
                 .filter(node -> node.getNodeName().equals("way"))
                 .collect(Collectors.toList());
         if (nodes.size() < 2) {
-            Assert.fail("Invalid xml document provided");
+            Assertions.fail("Invalid xml document provided");
         }
 
         var firstWay = new OSMWay(nodes.get(0));
@@ -29,8 +29,8 @@ class OSMWay_determineRouteOrientationAndFilterRelevantNodes_Tests {
         int result = firstWay.determineRouteOrientationAndFilterRelevantNodes(secondWay, 0);
 
         // Assert
-        Assert.assertEquals(3, result);
-        Assert.assertEquals(OSMWay.RouteOrientation.FRONT, firstWay.getRouteOrientation());
+        Assertions.assertEquals(3, result);
+        Assertions.assertEquals(OSMWay.RouteOrientation.FRONT, firstWay.getRouteOrientation());
     }
 
     @Test
@@ -43,7 +43,7 @@ class OSMWay_determineRouteOrientationAndFilterRelevantNodes_Tests {
                 .filter(node -> node.getNodeName().equals("way"))
                 .collect(Collectors.toList());
         if (nodes.size() < 2) {
-            Assert.fail("Invalid xml document provided");
+            Assertions.fail("Invalid xml document provided");
         }
 
         var firstWay = new OSMWay(nodes.get(0));
@@ -53,7 +53,7 @@ class OSMWay_determineRouteOrientationAndFilterRelevantNodes_Tests {
         int result = firstWay.determineRouteOrientationAndFilterRelevantNodes(secondWay, 3);
 
         // Assert
-        Assert.assertEquals(3, result);
-        Assert.assertEquals(OSMWay.RouteOrientation.BACK, firstWay.getRouteOrientation());
+        Assertions.assertEquals(3, result);
+        Assertions.assertEquals(OSMWay.RouteOrientation.BACK, firstWay.getRouteOrientation());
     }
 }

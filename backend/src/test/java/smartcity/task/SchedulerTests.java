@@ -64,13 +64,13 @@ class SchedulerTests {
         var configContainer = new ConfigContainer();
         configContainer.setGeneratePedestriansAndBuses(true);
         var ref = new Object() {
-            int carsLimit = 0;
-            int testCarId = 0;
-            int bikesLimit = 0;
-            int testBikeId = 0;
-            int pedLimit = 0;
-            int testPedId = 0;
-            int timeScale = 0;
+            private int carsLimit = 0;
+            private int testCarId = 0;
+            private int bikesLimit = 0;
+            private int testBikeId = 0;
+            private int pedLimit = 0;
+            private int testPedId = 0;
+            private int timeScale = 0;
         };
         var taskManager = mock(ITaskManager.class);
         doAnswer(invocationOnMock -> {

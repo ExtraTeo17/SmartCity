@@ -1,6 +1,6 @@
 package web.serialization;
 
-import org.junit.Assert;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import routing.core.IGeoPosition;
 import routing.core.Position;
@@ -16,7 +16,7 @@ class ConverterTest {
 
         Location result = Converter.convert(geoPosition);
 
-        Assert.assertEquals(lat, result.latitude, 0);
-        Assert.assertEquals(lng, result.longitude, 0);
+        Assertions.assertEquals(lat, result.latitude, 0);
+        Assertions.assertEquals(lng, result.longitude, 0);
     }
 }

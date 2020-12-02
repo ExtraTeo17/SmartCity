@@ -18,9 +18,7 @@ import static org.mockito.Mockito.when;
 public class TestInstanceCreator {
     private static final Random random = new Random();
 
-    public static Light createLight(LightColor color) {
-
-
+    private static Light createLight(LightColor color) {
         var info = new LightInfo(random.nextInt(), random.nextInt(),
                 Position.of(90 * random.nextDouble(), 80 * random.nextDouble()), "1", "2");
         return new Light(info, color);
@@ -38,7 +36,8 @@ public class TestInstanceCreator {
     public static Siblings<SimpleLightGroup> createLights(boolean firstGreen) {
         var a = createLightGroup(LightColor.GREEN);
         var b = createLightGroup(LightColor.RED);
-        return Siblings.of(a, b);
+
+        return firstGreen ? Siblings.of(a, b) : Siblings.of(b, a);
     }
 
     public static ITimeProvider createTimeProvider() {

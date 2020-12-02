@@ -6,7 +6,6 @@ import jade.lang.acl.ACLMessage;
 import jade.mtp.MTPDescriptor;
 import jade.security.Credentials;
 import jade.security.JADEPrincipal;
-import jade.security.JADESecurityException;
 import jade.wrapper.ContainerController;
 import jade.wrapper.ContainerProxy;
 
@@ -29,45 +28,45 @@ public class ContainerControllerMock extends ContainerController {
     private static ContainerProxy createContainerProxyMock() {
         return new ContainerProxy() {
             @Override
-            public void createAgent(AID aid, String s, Object[] objects) throws Throwable {
+            public void createAgent(AID aid, String s, Object[] objects) {
             }
 
             @Override
-            public void killContainer() throws Throwable {
+            public void killContainer() {
             }
 
             @Override
-            public MTPDescriptor installMTP(String s, String s1) throws Throwable {
+            public MTPDescriptor installMTP(String s, String s1) {
                 return null;
             }
 
             @Override
-            public void uninstallMTP(String s) throws Throwable {
+            public void uninstallMTP(String s) {
 
             }
 
             @Override
-            public void suspendAgent(AID aid) throws Throwable {
+            public void suspendAgent(AID aid) {
 
             }
 
             @Override
-            public void activateAgent(AID aid) throws Throwable {
+            public void activateAgent(AID aid) {
 
             }
 
             @Override
-            public void killAgent(AID aid) throws Throwable {
+            public void killAgent(AID aid) {
 
             }
 
             @Override
-            public void moveAgent(AID aid, Location location) throws Throwable {
+            public void moveAgent(AID aid, Location location) {
 
             }
 
             @Override
-            public void cloneAgent(AID aid, Location location, String s) throws Throwable {
+            public void cloneAgent(AID aid, Location location, String s) {
 
             }
         };
@@ -79,7 +78,7 @@ public class ContainerControllerMock extends ContainerController {
 
             @Override
             public void initAgent(AID aid, Agent agent, JADEPrincipal jadePrincipal, Credentials credentials)
-                    throws NameClashException, IMTPException, NotFoundException, JADESecurityException {
+                    throws NameClashException {
                 if (!agentsIds.add(aid)) {
                     throw new NameClashException();
                 }
@@ -131,7 +130,7 @@ public class ContainerControllerMock extends ContainerController {
             }
 
             @Override
-            public void powerUpLocalAgent(AID aid) throws NotFoundException {
+            public void powerUpLocalAgent(AID aid) {
 
             }
 

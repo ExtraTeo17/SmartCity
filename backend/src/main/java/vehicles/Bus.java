@@ -19,6 +19,7 @@ import java.util.*;
 
 import static vehicles.Constants.SPEED_SCALE;
 
+@SuppressWarnings("ClassWithTooManyFields")
 public class Bus extends MovingObject {
 
     private static final int DEFAULT_SPEED = (int) (50 * SPEED_SCALE);

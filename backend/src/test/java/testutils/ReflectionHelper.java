@@ -15,7 +15,7 @@ public class ReflectionHelper {
         setStatic(field, newValue);
     }
 
-    static void setStatic(Field field, Object newValue) {
+    private static void setStatic(Field field, Object newValue) {
         field.setAccessible(true);
 
         try {
@@ -37,7 +37,7 @@ public class ReflectionHelper {
         setField(field, object, newValue);
     }
 
-    static void setField(Field field, Object object, Object newValue) {
+    private static void setField(Field field, Object object, Object newValue) {
         field.setAccessible(true);
 
         try {
