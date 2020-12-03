@@ -100,35 +100,41 @@ class SchedulerTests {
         var shouldGenerateCars = true;
         var carsNum = 111;
         var testCarId = 112;
+        var shouldGenerateBatchesForCars = true;
 
         var shouldGenerateBikes = true;
         var bikesNum = 116;
         var testBikeId = 142;
 
         var shouldGenerateTP = true;
-        var shouldGenerateTrafficJams = true;
+        var shouldDetectTrafficJams = true;
         var timeBeforeTrouble = 5006;
 
         int pedestriansLimit = 155;
         int testPedestrianId = 555;
+        var shouldGenerateBusFailures = false;
 
-        boolean useFixedRoutes = true;
-        boolean useFixedConstructionSites = true;
+        var useFixedRoutes = true;
+        var useFixedConstructionSites = true;
         var startTime = LocalDateTime.of(LocalDate.of(2020, 10, 14),
                 LocalTime.of(10, 10, 10));
         var timeScale = 12;
 
         var lightStrategyActive = false;
         var extendLightTime = 333;
+
         var stationStrategyActive = false;
         var extendWaitTime = 354;
+
         var changeRouteStrategyActive = false;
+        var trafficJamStrategyActive = false;
+        var transportChangeStrategyActive = true;
 
         var event = new StartSimulationEvent(shouldGenerateCars, carsNum, testCarId,
                 shouldGenerateBikes, bikesNum, testBikeId, shouldGenerateTP, timeBeforeTrouble,
                 pedestriansLimit, testPedestrianId, useFixedRoutes, useFixedConstructionSites,
                 startTime, timeScale, lightStrategyActive, extendLightTime,
-                stationStrategyActive, extendWaitTime, changeRouteStrategyActive, shouldGenerateTrafficJams
+                stationStrategyActive, extendWaitTime, changeRouteStrategyActive, shouldDetectTrafficJams
         );
 
         // Act
@@ -137,24 +143,34 @@ class SchedulerTests {
         // Assert
         assertEquals(carsNum, ref.carsLimit);
         assertEquals(testCarId, ref.testCarId);
+        assertEquals(shouldGenerateBatchesForCars, configContainer.shouldGenerateBatchesForCars());
 
         assertEquals(bikesNum, ref.bikesLimit);
         assertEquals(testBikeId, ref.testBikeId);
 
-        assertEquals(shouldGenerateTP, configContainer.shouldGenerateConstructionSites());
-        assertEquals(timeBeforeTrouble, configContainer.getTimeBeforeTrouble());
-        assertEquals(shouldGenerateTrafficJams, configContainer.isTrafficJamStrategyActive());
-
         assertEquals(pedestriansLimit, ref.pedLimit);
         assertEquals(testPedestrianId, ref.testPedId);
+
+        assertEquals(shouldGenerateBusFailures, configContainer.shouldGenerateBusFailures());
+        
+        assertEquals(shouldGenerateTP, configContainer.shouldGenerateConstructionSites());
+        assertEquals(timeBeforeTrouble, configContainer.getTimeBeforeTrouble());
+
+        assertEquals(shouldDetectTrafficJams, configContainer.shouldDetectTrafficJams());
+
         assertEquals(lightStrategyActive, configContainer.isLightStrategyActive());
         assertEquals(extendLightTime, configContainer.getExtendLightTime());
+
         assertEquals(stationStrategyActive, configContainer.isStationStrategyActive());
         assertEquals(extendWaitTime, configContainer.getExtendWaitTime());
+
         assertEquals(changeRouteStrategyActive, configContainer.isConstructionSiteStrategyActive());
+        assertEquals(trafficJamStrategyActive, configContainer.isTrafficJamStrategyActive());
+        assertEquals(transportChangeStrategyActive, configContainer.isTransportChangeStrategyActive());
 
         assertEquals(useFixedRoutes, configContainer.shouldUseFixedRoutes());
         assertEquals(useFixedConstructionSites, configContainer.shouldUseFixedConstructionSites());
+
         assertEquals(timeScale, ref.timeScale);
     }
 
