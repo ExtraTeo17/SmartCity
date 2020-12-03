@@ -109,7 +109,7 @@ public class ConfigContainer extends ConfigMutator
     }
 
     @Override
-    public void setGenerateBatchesForCars(boolean generateBatchesForCars) {
+    public void setShouldGenerateBatchesForCars(boolean generateBatchesForCars) {
         this.shouldGenerateBatchesForCars = generateBatchesForCars;
     }
 
@@ -147,7 +147,7 @@ public class ConfigContainer extends ConfigMutator
     public boolean shouldGenerateBusFailures() { return shouldGenerateBusFailures; }
 
     @Override
-    public void setGenerateBusFailures(boolean generateBusFailures) {
+    public void setShouldGenerateBusFailures(boolean generateBusFailures) {
         shouldGenerateBusFailures = generateBusFailures;
     }
 

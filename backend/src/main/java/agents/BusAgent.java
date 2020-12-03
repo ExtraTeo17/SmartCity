@@ -96,7 +96,8 @@ public class BusAgent extends AbstractAgent {
                             bus.setState(DrivingState.MOVING);
                             break;
                     }
-                } else if (bus.isAtStation()) {
+                }
+                else if (bus.isAtStation()) {
                     switch (bus.getState()) {
                         case MOVING:
                             var stationOpt = bus.getCurrentStationNode();
@@ -145,7 +146,8 @@ public class BusAgent extends AbstractAgent {
                             move();
                             break;
                     }
-                } else if (bus.isAtDestination()) {
+                }
+                else if (bus.isAtDestination()) {
                     bus.setState(DrivingState.AT_DESTINATION);
                     logger.info("isAtDestination");
                     ACLMessage msg = createMessage(ACLMessage.INFORM, SmartCityAgent.name);
@@ -154,7 +156,8 @@ public class BusAgent extends AbstractAgent {
                     msg.setAllUserDefinedParameters(prop);
                     send(msg);
                     doDelete();
-                } else {
+                }
+                else {
                     move();
                 }
             }
@@ -206,7 +209,8 @@ public class BusAgent extends AbstractAgent {
                                 informNextStation();
                                 bus.setState(DrivingState.PASSING_STATION);
                             }
-                        } else if (rcv.getPerformative() == ACLMessage.AGREE) {
+                        }
+                        else if (rcv.getPerformative() == ACLMessage.AGREE) {
                             logger.info("GOT AGREE from station");
                             bus.setState(DrivingState.WAITING_AT_STATION);
                         }
@@ -227,7 +231,8 @@ public class BusAgent extends AbstractAgent {
                                 stationId = Integer.parseInt(rcv.getUserDefinedParameter(MessageParameter.STATION_ID));
                                 if (bus.removePassengerFromStation(stationId, rcv.getSender().getLocalName())) {
                                     print("Passengers: " + bus.getPassengersCount());
-                                } else {
+                                }
+                                else {
                                     print("Removing passenger failed");
                                 }
                                 break;
@@ -268,7 +273,7 @@ public class BusAgent extends AbstractAgent {
                 }
 
                 private void sendMessageAboutCrashTroubleToPedestrians() {
-                    for (String pedestrian : bus.getAllPassangers()) {
+                    for (String pedestrian : bus.getAllPassengers()) {
                         ACLMessage msg = createMessageAboutCrash(pedestrian, false);
                         logger.info("Send message about crash to pedestrian: " + pedestrian);
                         send(msg);
@@ -338,7 +343,8 @@ public class BusAgent extends AbstractAgent {
             var timeOnStation = bus.getTimeOnStation(osmId);
             if (timeOnStation.isPresent()) {
                 properties.setProperty(MessageParameter.SCHEDULE_ARRIVAL, timeOnStation.get().toString());
-            } else {
+            }
+            else {
                 ConditionalExecutor.debug(this::logAllStations);
             }
 

@@ -80,15 +80,20 @@ public class Converter {
                 req.generateCars,
                 req.carsLimit,
                 req.testCarId,
+                req.generateBatchesForCars,
 
                 req.generateBikes,
                 req.bikesLimit,
                 req.testBikeId,
 
-                req.generateTroublePoints,
-                req.timeBeforeTrouble,
                 req.pedestriansLimit,
                 req.testPedestrianId,
+
+                req.generateTroublePoints,
+                req.timeBeforeTrouble,
+
+                req.generateBusFailures,
+                req.detectTrafficJams,
 
                 req.useFixedRoutes,
                 req.useFixedTroublePoints,
@@ -102,8 +107,9 @@ public class Converter {
                 req.stationStrategyActive,
                 req.extendWaitTime,
 
-                req.changeRouteOnTroublePoint,
-                req.changeRouteOnTrafficJam
+                req.troublePointStrategyActive,
+                req.trafficJamStrategyActive,
+                req.transportChangeStrategyActive
         );
     }
 }

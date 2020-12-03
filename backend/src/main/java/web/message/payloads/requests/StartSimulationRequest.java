@@ -8,23 +8,27 @@ import java.time.ZonedDateTime;
 
 @SuppressWarnings("ClassWithTooManyFields")
 public class StartSimulationRequest extends AbstractPayload {
+
     public final boolean generateCars;
     public final int carsLimit;
     public final int testCarId;
+    public final boolean generateBatchesForCars;
 
     public final boolean generateBikes;
     public final int bikesLimit;
     public final int testBikeId;
 
-    public final boolean changeRouteOnTrafficJam;
-    public final boolean generateTroublePoints;
-    public final int timeBeforeTrouble;
-
     public final int pedestriansLimit;
     public final int testPedestrianId;
 
+    public final boolean generateTroublePoints;
+    public final int timeBeforeTrouble;
+
+    public final boolean detectTrafficJams;
+    public final boolean generateBusFailures;
+
     public final boolean useFixedRoutes;
-    public boolean useFixedTroublePoints;
+    public final boolean useFixedTroublePoints;
 
     public final ZonedDateTime startTime;
     public final int timeScale;
@@ -35,22 +39,28 @@ public class StartSimulationRequest extends AbstractPayload {
     public final boolean stationStrategyActive;
     public final int extendWaitTime;
 
-    public final boolean changeRouteOnTroublePoint;
+    public final boolean troublePointStrategyActive;
+    public final boolean trafficJamStrategyActive;
+    public final boolean transportChangeStrategyActive;
 
     @JsonCreator(mode = JsonCreator.Mode.PROPERTIES)
     public StartSimulationRequest(@JsonProperty("generateCars") boolean generateCars,
                                   @JsonProperty("carsLimit") int carsLimit,
                                   @JsonProperty("testCarId") int testCarId,
+                                  @JsonProperty("generateBatchesForCars") boolean generateBatchesForCars,
 
                                   @JsonProperty("generateBikes") boolean generateBikes,
                                   @JsonProperty("bikesLimit") int bikesLimit,
                                   @JsonProperty("testBikeId") int testBikeId,
 
+                                  @JsonProperty("pedLimit") int pedestriansLimit,
+                                  @JsonProperty("testPedId") int testPedestrianId,
+
                                   @JsonProperty("generateTroublePoints") boolean generateTroublePoints,
                                   @JsonProperty("timeBeforeTrouble") int timeBeforeTrouble,
 
-                                  @JsonProperty("pedLimit") int pedestriansLimit,
-                                  @JsonProperty("testPedId") int testPedestrianId,
+                                  @JsonProperty("detectTrafficJams") boolean detectTrafficJams,
+                                  @JsonProperty("generateBusFailures") boolean generateBusFailures,
 
                                   @JsonProperty("useFixedRoutes") boolean useFixedRoutes,
                                   @JsonProperty("useFixedTroublePoints") boolean useFixedTroublePoints,
@@ -64,28 +74,42 @@ public class StartSimulationRequest extends AbstractPayload {
                                   @JsonProperty("stationStrategyActive") boolean stationStrategyActive,
                                   @JsonProperty("extendWaitTime") int extendWaitTime,
 
-                                  @JsonProperty("changeRouteOnTroublePoint") boolean changeRouteOnTroublePoint,
-                                  @JsonProperty("changeRouteOnTrafficJam") boolean changeRouteOnTrafficJam) {
+                                  @JsonProperty("changeRouteOnTroublePoint") boolean troublePointStrategyActive,
+                                  @JsonProperty("changeRouteOnTrafficJam") boolean trafficJamStrategyActive,
+                                  @JsonProperty("transportChangeStrategyActive") boolean transportChangeStrategyActive) {
 
+        this.generateCars = generateCars;
         this.carsLimit = carsLimit;
         this.testCarId = testCarId;
-        this.generateCars = generateCars;
+        this.generateBatchesForCars = generateBatchesForCars;
+
         this.generateBikes = generateBikes;
         this.bikesLimit = bikesLimit;
         this.testBikeId = testBikeId;
-        this.generateTroublePoints = generateTroublePoints;
-        this.timeBeforeTrouble = timeBeforeTrouble;
+
         this.pedestriansLimit = pedestriansLimit;
         this.testPedestrianId = testPedestrianId;
-        this.startTime = startTime;
-        this.lightStrategyActive = lightStrategyActive;
-        this.extendLightTime = extendLightTime;
-        this.stationStrategyActive = stationStrategyActive;
-        this.extendWaitTime = extendWaitTime;
-        this.changeRouteOnTroublePoint = changeRouteOnTroublePoint;
-        this.changeRouteOnTrafficJam = changeRouteOnTrafficJam;
-        this.timeScale = timeScale;
+
+        this.generateTroublePoints = generateTroublePoints;
+        this.timeBeforeTrouble = timeBeforeTrouble;
+
+        this.detectTrafficJams = detectTrafficJams;
+        this.generateBusFailures = generateBusFailures;
+
         this.useFixedRoutes = useFixedRoutes;
         this.useFixedTroublePoints = useFixedTroublePoints;
+
+        this.startTime = startTime;
+        this.timeScale = timeScale;
+
+        this.lightStrategyActive = lightStrategyActive;
+        this.extendLightTime = extendLightTime;
+
+        this.stationStrategyActive = stationStrategyActive;
+        this.extendWaitTime = extendWaitTime;
+
+        this.troublePointStrategyActive = troublePointStrategyActive;
+        this.trafficJamStrategyActive = trafficJamStrategyActive;
+        this.transportChangeStrategyActive = transportChangeStrategyActive;
     }
 }

@@ -40,20 +40,26 @@ public class Scheduler {
     @SuppressWarnings("FeatureEnvy")
     @Subscribe
     public void handle(StartSimulationEvent e) {
-        configContainer.setExtendLightTime(e.extendLightTime);
-        configContainer.setLightStrategyActive(e.lightStrategyActive);
         timeProvider.setTimeScale(e.timeScale);
 
-        activateLightManagerAgents();
-        configContainer.setTrafficJamStrategyActive(
-                agentsContainer.size(LightManagerAgent.class) > 0 && e.changeRouteOnTrafficJam);
         configContainer.setShouldGenerateConstructionSites(e.shouldGenerateTroublePoints);
         configContainer.setTimeBeforeTrouble(e.timeBeforeTrouble);
-        configContainer.setConstructionSiteStrategyActive(e.changeRouteOnTroublePoint);
+
+        configContainer.setShouldDetectTrafficJam(e.shouldDetectTrafficJams);
+        configContainer.setShouldGenerateBusFailures(e.shouldGenerateBusFailures);
+
         configContainer.setUseFixedRoutes(e.useFixedRoutes);
         configContainer.setUseFixedConstructionSites(e.useFixedRoutes && e.useFixedConstructionSites);
 
+        configContainer.setLightStrategyActive(e.lightStrategyActive);
+        configContainer.setExtendLightTime(e.extendLightTime);
+        activateLightManagerAgents();
+
         if (e.shouldGenerateCars) {
+            configContainer.setShouldGenerateBatchesForCars(e.shouldGenerateBatchesForCars);
+            configContainer.setTrafficJamStrategyActive(
+                    agentsContainer.size(LightManagerAgent.class) > 0 && e.trafficJamStrategyActive);
+            configContainer.setConstructionSiteStrategyActive(e.troublePointStrategyActive);
             taskManager.scheduleCarCreation(e.carsNum, e.testCarId);
         }
 
@@ -64,11 +70,12 @@ public class Scheduler {
         if (configContainer.shouldGeneratePedestriansAndBuses()) {
             configContainer.setStationStrategyActive(e.stationStrategyActive);
             configContainer.setExtendWaitTime(e.extendWaitTime);
+            configContainer.setTransportChangeStrategyActive(e.isTransportChangeStrategyActive);
 
             taskManager.schedulePedestrianCreation(e.pedestriansLimit, e.testPedestrianId);
             taskManager.scheduleBusControl(() -> configContainer.getSimulationState() == SimulationState.RUNNING);
         }
-
+        
         configContainer.setSimulationState(SimulationState.RUNNING);
         taskManager.scheduleSimulationControl(() -> configContainer.getSimulationState() == SimulationState.RUNNING,
                 e.startTime);

@@ -8,7 +8,7 @@ public interface IGenerationConfigContainer {
 
     boolean shouldGenerateBatchesForCars();
 
-    void setGenerateBatchesForCars(boolean generateBatchesForCars);
+    void setShouldGenerateBatchesForCars(boolean generateBatchesForCars);
 
     boolean shouldUseFixedRoutes();
 

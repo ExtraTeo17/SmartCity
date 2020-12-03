@@ -4,7 +4,7 @@ public interface IChangeTransportConfigContainer {
 
     boolean shouldGenerateBusFailures();
 
-    void setGenerateBusFailures(boolean generateBusFailures);
+    void setShouldGenerateBusFailures(boolean generateBusFailures);
 
     boolean wasBusCrashGeneratedOnce();
 

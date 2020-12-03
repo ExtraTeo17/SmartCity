@@ -66,6 +66,7 @@ public class Bus extends MovingObject {
         }
     }
 
+    // TODO: unused?
     public String findBestChoiceOfStation() {
 
         int currentPosition = moveIndex;
@@ -101,12 +102,12 @@ public class Bus extends MovingObject {
         return passengersCount;
     }
 
-    public List<String> getAllPassangers() {
+    public List<String> getAllPassengers() {
         List<String> allPassengers = new ArrayList<>();
-        Iterator it = stationsForPassengers.entrySet().iterator();
+        var it = stationsForPassengers.entrySet().iterator();
         while (it.hasNext()) {
-            var pair = (Map.Entry) it.next();
-            allPassengers.addAll((List<String>) pair.getValue());
+            var pair =  it.next();
+            allPassengers.addAll(pair.getValue());
             it.remove(); // avoids a ConcurrentModificationException
         }
         return allPassengers;
