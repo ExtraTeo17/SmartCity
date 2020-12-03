@@ -2,7 +2,7 @@
 import { connect } from "react-redux";
 import React from "react";
 import { dispatch } from "../../redux/store";
-import { startSimulationDataUpdated } from "../../redux/core/actions";
+import { startSimulationDataUpdated, generatePedestriansUpdated } from "../../redux/core/actions";
 import "../../styles/Menu.css";
 import { setIfValidInt } from "../../utils/helpers";
 import { LIGHT_EXTEND_MIN, LIGHT_EXTEND_MAX, STATION_EXTEND_MAX, STATION_EXTEND_MIN } from "../../constants/minMax";
@@ -12,8 +12,9 @@ const StrategyMenu = props => {
     configState,
     wasStarted,
     startSimulationData: {
-      useFixedRoutes,
-      useFixedTroublePoints,
+      generateCars,
+      generateBikes,
+      generateTroublePoints,
 
       lightStrategyActive,
       extendLightTime,
@@ -25,41 +26,50 @@ const StrategyMenu = props => {
       changeRouteOnTrafficJam,
     },
     generatePedestrians,
-    generateTroublePoints,
   } = props;
 
+  function dispatchUpdate(data) {
+    dispatch(startSimulationDataUpdated(data));
+  }
+
+  function evSetGenerateCars(e) {
+    dispatchUpdate({ generateCars: e.target.checked });
+  }
+
+  function evSetGenerateBikes(e) {
+    dispatchUpdate({ generateBikes: e.target.checked });
+  }
+
+  function evSetGenerateTroublePoints(e) {
+    dispatchUpdate({ generateTroublePoints: e.target.checked });
+  }
+
   function evSetLightStrategyActive(e) {
-    dispatch(startSimulationDataUpdated({ lightStrategyActive: e.target.checked }));
+    dispatchUpdate({ lightStrategyActive: e.target.checked });
   }
 
   function evSetLightExtend(e) {
-    setIfValidInt(e, LIGHT_EXTEND_MIN, LIGHT_EXTEND_MAX, val => dispatch(startSimulationDataUpdated({ extendLightTime: val })));
+    setIfValidInt(e, LIGHT_EXTEND_MIN, LIGHT_EXTEND_MAX, val => dispatchUpdate({ extendLightTime: val }));
   }
 
   function evSetStationStrategyActive(e) {
-    dispatch(startSimulationDataUpdated({ stationStrategyActive: e.target.checked }));
+    dispatchUpdate({ stationStrategyActive: e.target.checked });
   }
 
   function evSetWaitExtend(e) {
-    setIfValidInt(e, STATION_EXTEND_MIN, STATION_EXTEND_MAX, val =>
-      dispatch(startSimulationDataUpdated({ extendWaitTime: val }))
-    );
+    setIfValidInt(e, STATION_EXTEND_MIN, STATION_EXTEND_MAX, val => dispatchUpdate({ extendWaitTime: val }));
   }
 
   function evSetChangeRouteOnTroublePoint(e) {
-    dispatch(startSimulationDataUpdated({ changeRouteOnTroublePoint: e.target.checked }));
+    dispatchUpdate({ changeRouteOnTroublePoint: e.target.checked });
   }
 
   function evSetChangeRouteOnTrafficJam(e) {
-    dispatch(startSimulationDataUpdated({ changeRouteOnTrafficJam: e.target.checked }));
+    dispatchUpdate({ changeRouteOnTrafficJam: e.target.checked });
   }
 
-  function evSetUseFixedRoutes(e) {
-    dispatch(startSimulationDataUpdated({ useFixedRoutes: e.target.checked }));
-  }
-
-  function evSetUseFixedTroublePoints(e) {
-    dispatch(startSimulationDataUpdated({ useFixedTroublePoints: e.target.checked }));
+  function evSetGeneratePedestrians(e) {
+    dispatch(generatePedestriansUpdated(e.target.checked));
   }
 
   return (
@@ -68,30 +78,59 @@ const StrategyMenu = props => {
         <div className="form-check user-select-none">
           <input
             type="checkbox"
-            className="form-check-input"
-            id="useFixedRoutes"
-            checked={useFixedRoutes}
             disabled={wasStarted}
-            onChange={evSetUseFixedRoutes}
+            checked={generateCars}
+            className="form-check-input"
+            id="generateCars"
+            onChange={evSetGenerateCars}
           />
-          <label htmlFor="useFixedRoutes" className="form-check-label">
-            Use fixed routes
+          <label htmlFor="generateCars" className="form-check-label">
+            Generate cars
           </label>
         </div>
+
         <div className="form-check user-select-none">
           <input
             type="checkbox"
+            checked={generatePedestrians}
             className="form-check-input"
-            id="useFixedTroublePoints"
-            checked={useFixedTroublePoints}
-            disabled={wasStarted || !useFixedRoutes}
-            onChange={evSetUseFixedTroublePoints}
+            id="generatePedestrians"
+            onChange={evSetGeneratePedestrians}
           />
-          <label htmlFor="useFixedTroublePoints" className="form-check-label">
-            Use fixed trouble points
+          <label htmlFor="generatePedestrians" className="form-check-label">
+            Generate buses & pedestrians & stations
+          </label>
+        </div>
+
+        <div className="form-check user-select-none">
+          <input
+            type="checkbox"
+            disabled={wasStarted}
+            checked={generateBikes}
+            className="form-check-input"
+            id="generateBikes"
+            onChange={evSetGenerateBikes}
+          />
+          <label htmlFor="generateBikes" className="form-check-label">
+            Generate bikes
+          </label>
+        </div>
+
+        <div className="form-check user-select-none">
+          <input
+            type="checkbox"
+            checked={generateTroublePoints}
+            disabled={!generateCars || wasStarted}
+            className="form-check-input"
+            id="generateTroublePoints"
+            onChange={evSetGenerateTroublePoints}
+          />
+          <label htmlFor="generateTroublePoints" className="form-check-label">
+            Generate trouble points
           </label>
         </div>
       </div>
+
       <div className="mb-4 form-border">
         <div className="form-check user-select-none">
           <input
@@ -122,58 +161,6 @@ const StrategyMenu = props => {
             />
           </div>
         )}
-      </div>
-      {generatePedestrians && (
-        <div className="mb-4 form-border">
-          <div className="form-check user-select-none">
-            <input
-              type="checkbox"
-              className="form-check-input"
-              id="stationStrategyActive"
-              checked={stationStrategyActive}
-              disabled={wasStarted}
-              onChange={evSetStationStrategyActive}
-            />
-            <label htmlFor="stationStrategyActive" className="form-check-label">
-              Station strategy
-            </label>
-          </div>
-          {stationStrategyActive && (
-            <div className="form-group mt-2" key={`ss-${configState}`}>
-              <label htmlFor="extendWaitTime">Bus extension wait time</label>
-              <input
-                type="number"
-                className="form-control"
-                id="extendWaitTime"
-                defaultValue={extendWaitTime}
-                disabled={wasStarted}
-                placeholder="Enter bus extension wait time"
-                onChange={evSetWaitExtend}
-              />
-            </div>
-          )}
-        </div>
-      )}
-
-      {generateTroublePoints && (
-        <div className="mb-4 form-border">
-          <div className="form-check user-select-none">
-            <input
-              type="checkbox"
-              className="form-check-input"
-              id="changeRouteOnTroublePoint"
-              checked={changeRouteOnTroublePoint}
-              disabled={wasStarted}
-              onChange={evSetChangeRouteOnTroublePoint}
-            />
-            <label htmlFor="changeRouteOnTroublePoint" className="form-check-label">
-              Change route on trouble point
-            </label>
-          </div>
-        </div>
-      )}
-
-      <div className="mb-4 form-border">
         <div className="form-check user-select-none">
           <input
             type="checkbox"
@@ -185,6 +172,51 @@ const StrategyMenu = props => {
           />
           <label htmlFor="changeRouteOnTrafficJam" className="form-check-label">
             Change route on traffic jam
+          </label>
+        </div>
+      </div>
+      <div className="mb-4 form-border">
+        <div className="form-check user-select-none">
+          <input
+            type="checkbox"
+            className="form-check-input"
+            id="stationStrategyActive"
+            checked={stationStrategyActive}
+            disabled={!generatePedestrians || wasStarted}
+            onChange={evSetStationStrategyActive}
+          />
+          <label htmlFor="stationStrategyActive" className="form-check-label">
+            Station strategy
+          </label>
+        </div>
+        {stationStrategyActive && (
+          <div className="form-group mt-2" key={`ss-${configState}`}>
+            <label htmlFor="extendWaitTime">Bus extension wait time</label>
+            <input
+              type="number"
+              className="form-control"
+              id="extendWaitTime"
+              defaultValue={extendWaitTime}
+              disabled={wasStarted}
+              placeholder="Enter bus extension wait time"
+              onChange={evSetWaitExtend}
+            />
+          </div>
+        )}
+      </div>
+
+      <div className="mb-4 form-border">
+        <div className="form-check user-select-none">
+          <input
+            type="checkbox"
+            className="form-check-input"
+            id="changeRouteOnTroublePoint"
+            checked={changeRouteOnTroublePoint}
+            disabled={!generateTroublePoints || wasStarted}
+            onChange={evSetChangeRouteOnTroublePoint}
+          />
+          <label htmlFor="changeRouteOnTroublePoint" className="form-check-label">
+            Change route on trouble point
           </label>
         </div>
       </div>
@@ -204,7 +236,6 @@ const mapStateToProps = (state /* , ownProps */) => {
     wasStarted,
     startSimulationData,
     generatePedestrians,
-    generateTroublePoints: startSimulationData.generateTroublePoints,
   };
 };
 

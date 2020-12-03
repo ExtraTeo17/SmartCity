@@ -2,7 +2,7 @@
 import { connect } from "react-redux";
 import React from "react";
 import ApiManager from "../../../web/ApiManager";
-import { centerMenuUpdated, generatePedestriansUpdated } from "../../../redux/core/actions";
+import { centerMenuUpdated } from "../../../redux/core/actions";
 import { dispatch } from "../../../redux/store";
 
 import { D_DECIMAL_PLACES } from "../../../constants/defaults";
@@ -26,18 +26,12 @@ const PrepareMenu = props => {
     setIfValidFloat(e, RAD_MIN, RAD_MAX, val => dispatch(centerMenuUpdated({ rad: val })));
   };
 
-  const setGeneratePedestrians = e => {
-    const val = e.target.checked;
-    dispatch(generatePedestriansUpdated(val));
-  };
-
   const prepareSimulation = () => {
     ApiManager.prepareSimulation(prepareSimulationData);
   };
 
   let {
     center: { lat, lng, rad },
-    generatePedestrians,
   } = prepareSimulationData;
   lat = lat.toFixed(D_DECIMAL_PLACES);
   lng = lng.toFixed(D_DECIMAL_PLACES);
@@ -94,19 +88,6 @@ const PrepareMenu = props => {
               <span className="input-group-text">meters</span>
             </div>
           </div>
-        </div>
-
-        <div className="form-check user-select-none">
-          <input
-            type="checkbox"
-            checked={generatePedestrians}
-            className="form-check-input"
-            id="generatePedestrians"
-            onChange={setGeneratePedestrians}
-          />
-          <label htmlFor="generatePedestrians" className="form-check-label">
-            Generate pedestrians, buses and stations
-          </label>
         </div>
       </div>
 
