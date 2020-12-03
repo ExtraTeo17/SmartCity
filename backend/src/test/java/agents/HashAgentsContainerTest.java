@@ -13,6 +13,7 @@ import osmproxy.elements.OSMStation;
 import routing.abstractions.IRouteGenerator;
 import routing.abstractions.IRouteTransformer;
 import smartcity.config.ConfigContainer;
+import smartcity.config.abstractions.IChangeTransportConfigContainer;
 import smartcity.config.abstractions.ITroublePointsConfigContainer;
 import smartcity.lights.abstractions.ICrossroad;
 import smartcity.stations.StationStrategy;
@@ -89,7 +90,7 @@ class HashAgentsContainerTest {
         when(ped.getVehicleType()).thenReturn(VehicleType.PEDESTRIAN.toString());
         return new PedestrianAgent(idGenerator.get(PedestrianAgent.class), ped,
                 createTimeProvider(), mock(ITaskProvider.class), createEventBus(), mock(IRouteGenerator.class),
-                mock(ITroublePointsConfigContainer.class));
+                mock(IChangeTransportConfigContainer.class));
     }
 
     private BikeAgent getBikeAgent() {

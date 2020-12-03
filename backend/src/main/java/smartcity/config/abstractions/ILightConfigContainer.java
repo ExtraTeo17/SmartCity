@@ -11,4 +11,12 @@ public interface ILightConfigContainer {
     int getExtendLightTime();
 
     void setExtendLightTime(int lightExtendTime);
+
+    boolean shouldDetectTrafficJams();
+
+    void setShouldDetectTrafficJam(boolean shouldDetectTrafficJam);
+
+    boolean isTrafficJamStrategyActive();
+
+    void setTrafficJamStrategyActive(boolean changeRouteOnTrafficJam);
 }

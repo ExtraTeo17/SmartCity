@@ -19,7 +19,7 @@ import routing.nodes.RouteNode;
 import routing.nodes.StationNode;
 import smartcity.ITimeProvider;
 import smartcity.SmartCityAgent;
-import smartcity.config.abstractions.ITroublePointsConfigContainer;
+import smartcity.config.abstractions.IChangeTransportConfigContainer;
 import utilities.ConditionalExecutor;
 import utilities.Siblings;
 import vehicles.Bus;
@@ -40,13 +40,13 @@ public class BusAgent extends AbstractAgent {
 
     private final ITimeProvider timeProvider;
     private final Bus bus;
-    private final ITroublePointsConfigContainer configContainer;
+    private final IChangeTransportConfigContainer configContainer;
     private RouteNode troublePoint;
 
     BusAgent(int busId, Bus bus,
              ITimeProvider timeProvider,
              EventBus eventBus,
-             ITroublePointsConfigContainer configContainer) {
+             IChangeTransportConfigContainer configContainer) {
         super(busId, name, timeProvider, eventBus);
         this.timeProvider = timeProvider;
         this.bus = bus;

@@ -4,6 +4,7 @@ import com.google.common.eventbus.EventBus;
 import com.google.inject.Inject;
 import org.w3c.dom.Node;
 import osmproxy.elements.OSMNode;
+import smartcity.config.abstractions.ILightConfigContainer;
 import smartcity.config.abstractions.ITroublePointsConfigContainer;
 import smartcity.lights.LightColor;
 import smartcity.lights.abstractions.ICrossroad;
@@ -17,12 +18,12 @@ import java.util.List;
 public class CrossroadFactory implements ICrossroadFactory {
     private final EventBus eventBus;
     private final ICrossroadParser crossroadParser;
-    private final ITroublePointsConfigContainer configContainer;
+    private final ILightConfigContainer configContainer;
 
     @Inject
     public CrossroadFactory(EventBus eventBus,
                             ICrossroadParser crossroadParser,
-                            ITroublePointsConfigContainer configContainer) {
+                            ILightConfigContainer configContainer) {
         this.eventBus = eventBus;
         this.crossroadParser = crossroadParser;
         this.configContainer = configContainer;

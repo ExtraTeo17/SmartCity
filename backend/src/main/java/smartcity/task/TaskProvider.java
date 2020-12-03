@@ -82,7 +82,7 @@ public class TaskProvider implements ITaskProvider {
             try {
                 var effectiveStart = start;
                 var effectiveEnd = end;
-                if (configContainer.generateBatchesForCars()) {
+                if (configContainer.shouldGenerateBatchesForCars()) {
                     if (startForBatches == null && endForBatches == null) {
                         startForBatches = start;
                         endForBatches = end;

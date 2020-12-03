@@ -21,7 +21,7 @@ import routing.nodes.RouteNode;
 import routing.nodes.StationNode;
 import smartcity.ITimeProvider;
 import smartcity.SmartCityAgent;
-import smartcity.config.abstractions.ITroublePointsConfigContainer;
+import smartcity.config.abstractions.IChangeTransportConfigContainer;
 import smartcity.task.abstractions.ITaskProvider;
 import vehicles.Bike;
 import vehicles.Pedestrian;
@@ -41,7 +41,7 @@ public class PedestrianAgent extends AbstractAgent {
 
     private final IRouteGenerator router;
     private final ITaskProvider taskProvider;
-    private final ITroublePointsConfigContainer troublePointsConfigContainer;
+    private final IChangeTransportConfigContainer troublePointsConfigContainer;
 
     private Pedestrian pedestrian;
     private List<RouteNode> arrivingRouteToClosestStation;
@@ -53,7 +53,7 @@ public class PedestrianAgent extends AbstractAgent {
                     ITaskProvider taskProvider,
                     EventBus eventBus,
                     IRouteGenerator router,
-                    ITroublePointsConfigContainer troublePointsConfigContainer) {
+                    IChangeTransportConfigContainer troublePointsConfigContainer) {
         super(agentId, pedestrian.getVehicleType(), timeProvider, eventBus);
         this.taskProvider = taskProvider;
         this.pedestrian = pedestrian;

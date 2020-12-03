@@ -60,7 +60,7 @@ public class TaskManager implements ITaskManager {
             var randomPositions = customRoutingHelper.getRandomPositions(adjustedZone);
             taskProvider.getCreateCarTask(randomPositions.first, randomPositions.second, runCount == testCarId).run();
         };
-        if (configContainer.generateBatchesForCars()) {
+        if (configContainer.shouldGenerateBatchesForCars()) {
             runIf(() -> agentsContainer.size(CarAgent.class) < carsLimit, createCars, CREATE_CAR_INTERVAL_FOR_BATCHES, true);
 
         }
