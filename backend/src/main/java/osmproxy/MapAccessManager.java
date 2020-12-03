@@ -54,7 +54,7 @@ public class MapAccessManager implements IMapAccessManager {
     private static final String OVERPASS_API = "https://lz4.overpass-api.de/api/interpreter";
     private static final String ALTERNATE_OVERPASS_API_1 = "https://z.overpass-api.de/api/interpreter";
     private static final String ALTERNATE_OVERPASS_API_2 = "https://overpass.kumi.systems/api/interpreter";
-    private static String CURRENT_API = ALTERNATE_OVERPASS_API_2;
+    private static String CURRENT_API = OVERPASS_API;
     private static final String CROSSROADS_LOCATIONS_PATH = "config/crossroads.xml";
 
     private final DocumentBuilderFactory xmlBuilderFactory;
@@ -103,7 +103,7 @@ public class MapAccessManager implements IMapAccessManager {
         var connection = sendRequest(query);
         try {
             var responseCode = connection.getResponseCode();
-            if (responseCode == 429) {
+            if (responseCode == 429 || responseCode == 504) {
                 logger.warn("Current API: " + CURRENT_API + " is overloaded with our requests.");
                 CURRENT_API = CURRENT_API.equals(ALTERNATE_OVERPASS_API_1) ? ALTERNATE_OVERPASS_API_2 :
                         CURRENT_API.equals(ALTERNATE_OVERPASS_API_2) ? OVERPASS_API :

@@ -38,13 +38,21 @@ const pedestrian = (state = initialState, action) => {
     case BATCHED_UPDATE: {
       const { pedUpdates } = payload;
 
+      let any = false;
       const newPedestrians = state.pedestrians.map(p => {
-        const update = pedUpdates.find(ped => ped.id === p.id);
-        if (update) {
-          return { ...p, location: update.location };
+        if (!p.hidden) {
+          const update = pedUpdates.find(ped => ped.id === p.id);
+          if (update && update.location !== p.location) {
+            any = true;
+            return { ...p, location: update.location };
+          }
         }
         return p;
       });
+
+      if (!any) {
+        return state;
+      }
 
       return { ...state, pedestrians: newPedestrians };
     }
