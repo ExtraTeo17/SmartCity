@@ -320,9 +320,11 @@ public class PedestrianAgent extends AbstractAgent {
 
             private void performMetamorphosisToBike() {
                 logger.info("Perform metamorphosis to bike");
+
                 if (pedestrian instanceof TestPedestrian) {
                 	eventBus.register(this);
                 } else {
+                    pedestrian.setState(DrivingState.AT_DESTINATION);
                 	sendMessageAboutReachingDestinationToSmartCityAgent(null);
             		myAgent.doDelete();
             		logger.info("Kill pedestrian agent (metamorphosis to bike)");
@@ -332,8 +334,9 @@ public class PedestrianAgent extends AbstractAgent {
 
             @Subscribe
             public void handle(BikeAgentCreatedEvent event) {
-            	if (event.agentPosition.equals(currentPosition) && event.isTestBike) {
+            	if ( event.isTestBike) {
             		eventBus.unregister(this);
+                    pedestrian.setState(DrivingState.AT_DESTINATION);
                     sendMessageAboutReachingDestinationToSmartCityAgent(event.agentId);
             		myAgent.doDelete();
             		logger.info("Kill pedestrian agent (metamorphosis to bike)");

@@ -29,8 +29,9 @@ public class SmartCityAgent extends Agent {
 
     private final IAgentsContainer agentsContainer;
     private final EventBus eventBus;
-	private int testBikeAgentId;
+	private int testBikeAgentId = -1;
 	private Long transformedPedestrianResultTime;
+    private int transformedPedestrianDistance;
 
     @Inject
     SmartCityAgent(IAgentsContainer agentsContainer,
@@ -81,13 +82,14 @@ public class SmartCityAgent extends Agent {
             var pedestrian = agent.getPedestrian();
 
             Long resultTime = getTimeIfTestable(pedestrian);
-            
+            int distance = pedestrian.getUniformRouteSize() * RoutingConstants.STEP_SIZE_METERS;
             final boolean isMetamorphosis = rcv.getUserDefinedParameter(MessageParameter.TEST_BIKE_AGENT_ID) != null;
             if (isMetamorphosis) {
             	testBikeAgentId = Integer.parseInt(rcv.getUserDefinedParameter(MessageParameter.TEST_BIKE_AGENT_ID));
             	transformedPedestrianResultTime = resultTime;
+                transformedPedestrianDistance = distance;
             }
-            int distance = pedestrian.getUniformRouteSize() * RoutingConstants.STEP_SIZE_METERS;
+
             if (agentsContainer.remove(agent)) {
                 eventBus.post(new PedestrianAgentDeadEvent(agent.getId(), distance, isMetamorphosis ? null : resultTime));
             }
@@ -100,12 +102,13 @@ public class SmartCityAgent extends Agent {
         if (agentOpt.isPresent()) {
             var agent = agentOpt.get();
             var vehicle = agent.getVehicle();
-
+            int distance = vehicle.getUniformRouteSize() * RoutingConstants.STEP_SIZE_METERS;
             Long resultTime = getTimeIfTestable(vehicle);
             if (agent.getId() == testBikeAgentId) {
             	resultTime += transformedPedestrianResultTime;
+                distance += transformedPedestrianDistance;
             }
-            int distance = vehicle.getUniformRouteSize() * RoutingConstants.STEP_SIZE_METERS;
+
             if (agentsContainer.remove(agent)) {
                 eventBus.post(new BikeAgentDeadEvent(agent.getId(), distance, resultTime));
             }

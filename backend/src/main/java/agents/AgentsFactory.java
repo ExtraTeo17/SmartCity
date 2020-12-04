@@ -82,8 +82,7 @@ class AgentsFactory implements IAgentsFactory {
         logger.trace("DisplayRoute size: " + route.size() + ", routeSize: " + uniformRoute.size());
         var bike = new Bike(id, route, uniformRoute, timeProvider);
         if (testBike) {
-            // TODO: CHANGE TO TEST BIKE
-            //  bike = new Bike(bike, timeProvider);
+          bike = new TestBike(bike, timeProvider);
         }
 
         return new BikeAgent(id, bike, timeProvider,
