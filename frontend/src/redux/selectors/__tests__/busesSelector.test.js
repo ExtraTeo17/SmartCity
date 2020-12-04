@@ -278,6 +278,6 @@ describe("Selector for buses with routes", () => {
       newBuses[0] = { ...newBuses[0], location: { lat: defLat, lng: i + 0.3 } };
       updateStateWithNewBuses(newBuses);
     }
-    expect(timeSum).toBeLessThan(normalSelectMs * 50);
+    expect(timeSum).toBeLessThan(normalSelectMs * 100);
   });
 });

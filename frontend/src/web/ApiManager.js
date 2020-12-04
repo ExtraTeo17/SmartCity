@@ -20,20 +20,23 @@ export default {
   },
 
   startSimulation({
-    pedLimit,
-    testPedId,
-
     generateCars,
     carsLimit,
     testCarId,
+    generateBatchesForCars,
 
     generateBikes,
     bikesLimit,
     testBikeId,
 
-    changeRouteOnTrafficJam,
+    pedLimit,
+    testPedId,
+
     generateTroublePoints,
     timeBeforeTrouble,
+
+    generateBusFailures,
+    detectTrafficJams,
 
     useFixedRoutes,
     useFixedTroublePoints,
@@ -47,24 +50,30 @@ export default {
     stationStrategyActive,
     extendWaitTime,
 
-    changeRouteOnTroublePoint,
+    troublePointStrategyActive,
+    trafficJamStrategyActive,
+    transportChangeStrategyActive,
   }) {
     const msg = {
       type: START_SIMULATION_REQUEST,
       payload: {
-        pedLimit,
-        testPedId,
-
         generateCars,
         carsLimit,
         testCarId,
+        generateBatchesForCars,
 
         generateBikes,
         bikesLimit,
         testBikeId,
 
+        pedLimit,
+        testPedId,
+
         generateTroublePoints,
         timeBeforeTrouble,
+
+        generateBusFailures,
+        detectTrafficJams,
 
         useFixedRoutes,
         useFixedTroublePoints,
@@ -78,8 +87,9 @@ export default {
         stationStrategyActive,
         extendWaitTime,
 
-        changeRouteOnTroublePoint,
-        changeRouteOnTrafficJam,
+        troublePointStrategyActive,
+        trafficJamStrategyActive,
+        transportChangeStrategyActive,
       },
     };
     WebServer.send(msg);

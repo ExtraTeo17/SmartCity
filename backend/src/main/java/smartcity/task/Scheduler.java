@@ -70,12 +70,12 @@ public class Scheduler {
         if (configContainer.shouldGeneratePedestriansAndBuses()) {
             configContainer.setStationStrategyActive(e.stationStrategyActive);
             configContainer.setExtendWaitTime(e.extendWaitTime);
-            configContainer.setTransportChangeStrategyActive(e.isTransportChangeStrategyActive);
+            configContainer.setTransportChangeStrategyActive(e.transportChangeStrategyActive);
 
             taskManager.schedulePedestrianCreation(e.pedestriansLimit, e.testPedestrianId);
             taskManager.scheduleBusControl(() -> configContainer.getSimulationState() == SimulationState.RUNNING);
         }
-        
+
         configContainer.setSimulationState(SimulationState.RUNNING);
         taskManager.scheduleSimulationControl(() -> configContainer.getSimulationState() == SimulationState.RUNNING,
                 e.startTime);

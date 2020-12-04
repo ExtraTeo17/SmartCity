@@ -74,8 +74,8 @@ public class StartSimulationRequest extends AbstractPayload {
                                   @JsonProperty("stationStrategyActive") boolean stationStrategyActive,
                                   @JsonProperty("extendWaitTime") int extendWaitTime,
 
-                                  @JsonProperty("changeRouteOnTroublePoint") boolean troublePointStrategyActive,
-                                  @JsonProperty("changeRouteOnTrafficJam") boolean trafficJamStrategyActive,
+                                  @JsonProperty("troublePointStrategyActive") boolean troublePointStrategyActive,
+                                  @JsonProperty("trafficJamStrategyActive") boolean trafficJamStrategyActive,
                                   @JsonProperty("transportChangeStrategyActive") boolean transportChangeStrategyActive) {
 
         this.generateCars = generateCars;

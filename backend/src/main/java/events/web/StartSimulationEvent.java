@@ -36,7 +36,7 @@ public class StartSimulationEvent {
 
     public final boolean troublePointStrategyActive;
     public final boolean trafficJamStrategyActive;
-    public final boolean isTransportChangeStrategyActive;
+    public final boolean transportChangeStrategyActive;
 
     public StartSimulationEvent(boolean shouldGenerateCars,
                                 int carsNum,
@@ -61,7 +61,7 @@ public class StartSimulationEvent {
                                 int extendWaitTime,
                                 boolean troublePointStrategyActive,
                                 boolean trafficJamStrategyActive,
-                                boolean isTransportChangeStrategyActive) {
+                                boolean transportChangeStrategyActive) {
 
         this.shouldGenerateCars = shouldGenerateCars;
         this.carsNum = carsNum;
@@ -86,6 +86,6 @@ public class StartSimulationEvent {
         this.extendWaitTime = extendWaitTime;
         this.troublePointStrategyActive = troublePointStrategyActive;
         this.trafficJamStrategyActive = trafficJamStrategyActive;
-        this.isTransportChangeStrategyActive = isTransportChangeStrategyActive;
+        this.transportChangeStrategyActive = transportChangeStrategyActive;
     }
 }

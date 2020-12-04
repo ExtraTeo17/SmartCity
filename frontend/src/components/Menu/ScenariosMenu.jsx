@@ -75,8 +75,8 @@ export const ScenariosMenuObj = props => {
       stationStrategyActive: true,
       extendWaitTime: 61,
 
-      changeRouteOnTroublePoint: true,
-      changeRouteOnTrafficJam: true,
+      troublePointStrategyActive: true,
+      trafficJamStrategyActive: true,
     };
     dispatch(configReplaced(state));
     prepareSimulation(state.prepareSimulationData);

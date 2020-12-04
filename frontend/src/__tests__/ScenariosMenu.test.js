@@ -48,8 +48,8 @@ const startSimulationData = {
   stationStrategyActive: false,
   extendWaitTime: 60,
 
-  changeRouteOnTroublePoint: true,
-  changeRouteOnTrafficJam: false,
+  troublePointStrategyActive: true,
+  trafficJamStrategyActive: false,
 };
 
 const prepareSimulationData = {
@@ -169,8 +169,8 @@ describe("Menu", () => {
           stationStrategyActive: expect.any(Boolean),
           extendWaitTime: expect.any(Number),
 
-          changeRouteOnTroublePoint: expect.any(Boolean),
-          changeRouteOnTrafficJam: expect.any(Boolean),
+          troublePointStrategyActive: expect.any(Boolean),
+          trafficJamStrategyActive: expect.any(Boolean),
         })
       );
     }

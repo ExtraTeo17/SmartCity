@@ -22,8 +22,8 @@ const StrategyMenu = props => {
       stationStrategyActive,
       extendWaitTime,
 
-      changeRouteOnTroublePoint,
-      changeRouteOnTrafficJam,
+      troublePointStrategyActive,
+      trafficJamStrategyActive,
     },
     generatePedestrians,
   } = props;
@@ -60,12 +60,12 @@ const StrategyMenu = props => {
     setIfValidInt(e, STATION_EXTEND_MIN, STATION_EXTEND_MAX, val => dispatchUpdate({ extendWaitTime: val }));
   }
 
-  function evSetChangeRouteOnTroublePoint(e) {
-    dispatchUpdate({ changeRouteOnTroublePoint: e.target.checked });
+  function evSetTroublePointStrategyActive(e) {
+    dispatchUpdate({ troublePointStrategyActive: e.target.checked });
   }
 
   function evSetChangeRouteOnTrafficJam(e) {
-    dispatchUpdate({ changeRouteOnTrafficJam: e.target.checked });
+    dispatchUpdate({ trafficJamStrategyActive: e.target.checked });
   }
 
   function evSetGeneratePedestrians(e) {
@@ -165,12 +165,12 @@ const StrategyMenu = props => {
           <input
             type="checkbox"
             className="form-check-input"
-            id="changeRouteOnTrafficJam"
-            checked={changeRouteOnTrafficJam}
+            id="trafficJamStrategyActive"
+            checked={trafficJamStrategyActive}
             disabled={wasStarted}
             onChange={evSetChangeRouteOnTrafficJam}
           />
-          <label htmlFor="changeRouteOnTrafficJam" className="form-check-label">
+          <label htmlFor="trafficJamStrategyActive" className="form-check-label">
             Change route on traffic jam
           </label>
         </div>
@@ -210,12 +210,12 @@ const StrategyMenu = props => {
           <input
             type="checkbox"
             className="form-check-input"
-            id="changeRouteOnTroublePoint"
-            checked={changeRouteOnTroublePoint}
+            id="troublePointStrategyActive"
+            checked={troublePointStrategyActive}
             disabled={!generateTroublePoints || wasStarted}
-            onChange={evSetChangeRouteOnTroublePoint}
+            onChange={evSetTroublePointStrategyActive}
           />
-          <label htmlFor="changeRouteOnTroublePoint" className="form-check-label">
+          <label htmlFor="troublePointStrategyActive" className="form-check-label">
             Change route on trouble point
           </label>
         </div>

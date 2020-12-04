@@ -7,30 +7,34 @@ import {
   CENTER_MENU_UPDATED,
 } from "../core/constants";
 import {
-  D_CHANGE_ROUTE_TP_ACTIVE,
+  D_TP_STRATEGY_ACTIVE,
   D_STATION_STRATEGY_ACTIVE,
   D_PEDS_NUM,
   D_TEST_PED,
-  D_GENERATE_CARS,
   D_CARS_NUM,
   D_TEST_CAR,
-  D_GENERATE_BIKES,
-  D_BIKES_NUM,
-  D_TEST_BIKE,
+  D_GENERATE_CARS,
   D_GENERATE_TP,
-  D_CHANGE_ROUTE_TJ_ACTIVE,
+  D_TJ_STRATEGY_ACTIVE,
   D_TIME_BEFORE_TROUBLE,
   D_LIGHT_STRATEGY_ACTIVE,
   D_EXTEND_LIGHT_TIME,
   D_EXTEND_WAIT_TIME,
   D_START_TIME,
   D_TIME_SCALE,
-  D_LAT,
-  D_LNG,
+  D_GENERATE_BIKES,
+  D_BIKES_NUM,
+  D_TEST_BIKE,
   D_RAD,
+  D_LNG,
+  D_LAT,
   D_GENERATE_PEDS,
   D_USE_FIXED_ROUTES,
   D_USE_FIXED_TP,
+  D_GENERATE_BATCHES_FOR_CARS,
+  D_GENERATE_BUS_FAILURES,
+  D_DETECT_TRAFFIC_JAMS,
+  D_TRANSPORT_CHANGE_STRATEGY_ACTIVE,
 } from "../../constants/defaults";
 import { ConfigState, getNextConfigState } from "../models/states";
 import { createLocalDataObject, saveLocalData } from "../dataUtils/helpers";
@@ -43,22 +47,27 @@ export const initialInteractionState = {
     generatePedestrians: D_GENERATE_PEDS,
   },
   startSimulationData: {
-    pedLimit: D_PEDS_NUM,
-    testPedId: D_TEST_PED,
-
     generateCars: D_GENERATE_CARS,
     carsLimit: D_CARS_NUM,
     testCarId: D_TEST_CAR,
+    generateBatchesForCars: D_GENERATE_BATCHES_FOR_CARS,
 
     generateBikes: D_GENERATE_BIKES,
     bikesLimit: D_BIKES_NUM,
     testBikeId: D_TEST_BIKE,
 
+    pedLimit: D_PEDS_NUM,
+    testPedId: D_TEST_PED,
+
     generateTroublePoints: D_GENERATE_TP,
     timeBeforeTrouble: D_TIME_BEFORE_TROUBLE,
 
+    generateBusFailures: D_GENERATE_BUS_FAILURES,
+    detectTrafficJams: D_DETECT_TRAFFIC_JAMS,
+
     useFixedRoutes: D_USE_FIXED_ROUTES,
     useFixedTroublePoints: D_USE_FIXED_TP,
+
     startTime: D_START_TIME,
     timeScale: D_TIME_SCALE,
 
@@ -68,8 +77,9 @@ export const initialInteractionState = {
     stationStrategyActive: D_STATION_STRATEGY_ACTIVE,
     extendWaitTime: D_EXTEND_WAIT_TIME,
 
-    changeRouteOnTroublePoint: D_CHANGE_ROUTE_TP_ACTIVE,
-    changeRouteOnTrafficJam: D_CHANGE_ROUTE_TJ_ACTIVE,
+    troublePointStrategyActive: D_TP_STRATEGY_ACTIVE,
+    trafficJamStrategyActive: D_TJ_STRATEGY_ACTIVE,
+    transportChangeStrategyActive: D_TRANSPORT_CHANGE_STRATEGY_ACTIVE,
   },
 };
 
