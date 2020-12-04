@@ -11,8 +11,18 @@
   display: flex;
   align-items: center;
 }
+
 .form-check-input {
   margin-top: 2px;
+}
+
+.custom-radio {
+  display: flex;
+  align-items: center;
+}
+
+.small-text {
+  font-size: calc(7px + 1vmin);
 }
 
 .card {
@@ -21,4 +31,30 @@
 
 .invalid-input {
   border: 3px solid red;
+}
+
+.gp-label {
+  vertical-align: middle;
+  width: 100%;
+}
+.gp-left {
+  margin: 0;
+  padding-right: 1px;
+}
+
+.gp-right {
+  flex: 1 1 auto;
+}
+
+.gp-right,
+.gp-right-up,
+.gp-right-down {
+  margin: 0;
+  padding: 0;
+}
+
+#gp-wrapper {
+  display: flex;
+  flex-flow: row nowrap;
+  align-items: center;
 }

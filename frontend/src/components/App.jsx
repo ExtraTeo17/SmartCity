@@ -13,11 +13,11 @@ const App = () => (
     <Notifications />
     <div className="App">
       <header className="App-header">
-        <div className="row w-100 main-container">
-          <div className="col" onContextMenu={e => e.preventDefault()}>
+        <div className="row w-100">
+          <div className="col map-container" onContextMenu={e => e.preventDefault()}>
             <CityMap />
           </div>
-          <div className="col-3 menu-col">
+          <div className="col-3 menu-container">
             <MenusContainer />
           </div>
         </div>

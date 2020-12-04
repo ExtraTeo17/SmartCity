@@ -86,6 +86,10 @@ const StrategyMenu = props => {
     dispatchUpdate({ generateBusFailures: e.target.checked });
   }
 
+  function evSetGenerateBatchesForCars() {
+    dispatchUpdate({ generateBatchesForCars: !generateBatchesForCars });
+  }
+
   function evSetGeneratePedestrians(e) {
     dispatch(generatePedestriansUpdated(e.target.checked));
   }
@@ -107,15 +111,29 @@ const StrategyMenu = props => {
           </label>
         </div>
         {generateCars && (
-          <div className="ml-2 small-text">
+          <div className="ml-4 small-text">
             <div className="custom-control custom-radio">
-              <input type="radio" id="carsRandom" name="carsRadio" className="custom-control-input" />
+              <input
+                type="radio"
+                checked={!generateBatchesForCars}
+                name="carsRadio"
+                className="custom-control-input"
+                id="carsRandom"
+                onChange={evSetGenerateBatchesForCars}
+              />
               <label className="custom-control-label" htmlFor="carsRandom">
                 Random
               </label>
             </div>
             <div className="custom-control custom-radio">
-              <input type="radio" id="carsBatched" name="carsRadio" className="custom-control-input" />
+              <input
+                type="radio"
+                checked={generateBatchesForCars}
+                name="carsRadio"
+                className="custom-control-input"
+                id="carsBatched"
+                onChange={evSetGenerateBatchesForCars}
+              />
               <label className="custom-control-label" htmlFor="carsBatched">
                 Batched
               </label>
@@ -131,8 +149,14 @@ const StrategyMenu = props => {
             id="generatePedestrians"
             onChange={evSetGeneratePedestrians}
           />
-          <label htmlFor="generatePedestrians" className="form-check-label">
-            Generate buses & pedestrians & stations
+          <label htmlFor="generatePedestrians" className="form-check-label gp-label">
+            <div id="gp-wrapper" className="m-0">
+              <div className="gp-left">Generate buses &</div>
+              <div className="gp-right ml-2">
+                <div className="gp-right-up">pedestrians</div>
+                <div className="gp-right-down">stations</div>
+              </div>
+            </div>
           </label>
         </div>
 
