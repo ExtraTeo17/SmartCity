@@ -3,6 +3,9 @@ package agents;
 import agents.abstractions.AbstractAgent;
 import agents.utilities.MessageParameter;
 import com.google.common.eventbus.EventBus;
+import com.google.common.eventbus.Subscribe;
+
+import events.web.bike.BikeAgentCreatedEvent;
 import events.web.pedestrian.PedestrianAgentEnteredBusEvent;
 import events.web.pedestrian.PedestrianAgentLeftBusEvent;
 import events.web.pedestrian.PedestrianAgentUpdatedEvent;
@@ -130,7 +133,7 @@ public class PedestrianAgent extends AbstractAgent {
                 else if (pedestrian.isAtDestination()) {
                     pedestrian.setState(DrivingState.AT_DESTINATION);
                     print("Reached destination.");
-                    sendMessageAboutReachingDestinationToSmartCityAgent();
+                    sendMessageAboutReachingDestinationToSmartCityAgent(null);
                     doDelete();
                 }
                 else if (!pedestrian.isTroubled()) {
@@ -316,10 +319,25 @@ public class PedestrianAgent extends AbstractAgent {
 			}
 
             private void performMetamorphosisToBike() {
+                logger.info("Perform metamorphosis to bike");
+                if (pedestrian instanceof TestPedestrian) {
+                	eventBus.register(this);
+                } else {
+                	sendMessageAboutReachingDestinationToSmartCityAgent(null);
+            		myAgent.doDelete();
+            		logger.info("Kill pedestrian agent (metamorphosis to bike)");
+                }
                 taskProvider.getCreateBikeTask(currentPosition, pedestrian.getEndPosition(), pedestrian instanceof TestPedestrian).run();
-                sendMessageAboutReachingDestinationToSmartCityAgent();
-                myAgent.doDelete();
-                logger.info("Kill Pedestrian Agent");
+            }
+
+            @Subscribe
+            public void handle(BikeAgentCreatedEvent event) {
+            	if (event.agentPosition.equals(currentPosition) && event.isTestBike) {
+            		eventBus.unregister(this);
+                    sendMessageAboutReachingDestinationToSmartCityAgent(event.agentId);
+            		myAgent.doDelete();
+            		logger.info("Kill pedestrian agent (metamorphosis to bike)");
+            	}
             }
 
             private void restartAgentWithNewBusLine(List<RouteNode> arrivingRouteToClosestStation, String busLine) {
@@ -357,10 +375,13 @@ public class PedestrianAgent extends AbstractAgent {
         addBehaviour(communication);
     }
 
-    private void sendMessageAboutReachingDestinationToSmartCityAgent() {
+    private void sendMessageAboutReachingDestinationToSmartCityAgent(Integer testBikeAgentId) {
         ACLMessage msg = createMessage(ACLMessage.INFORM, SmartCityAgent.name);
         Properties prop = createProperties(MessageParameter.PEDESTRIAN);
         prop.setProperty(MessageParameter.AT_DESTINATION, String.valueOf(Boolean.TRUE));
+        if (testBikeAgentId != null) {
+        	prop.setProperty(MessageParameter.TEST_BIKE_AGENT_ID, testBikeAgentId.toString());
+        }
         msg.setAllUserDefinedParameters(prop);
         send(msg);
     }
