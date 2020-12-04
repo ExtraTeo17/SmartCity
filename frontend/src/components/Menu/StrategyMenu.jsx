@@ -3,9 +3,10 @@ import { connect } from "react-redux";
 import React from "react";
 import { dispatch } from "../../redux/store";
 import { startSimulationDataUpdated, generatePedestriansUpdated } from "../../redux/core/actions";
-import "../../styles/Menu.css";
 import { setIfValidInt } from "../../utils/helpers";
 import { LIGHT_EXTEND_MIN, LIGHT_EXTEND_MAX, STATION_EXTEND_MAX, STATION_EXTEND_MIN } from "../../constants/minMax";
+
+import "../../styles/Menu.css";
 
 const StrategyMenu = props => {
   const {
@@ -13,8 +14,12 @@ const StrategyMenu = props => {
     wasStarted,
     startSimulationData: {
       generateCars,
+      generateBatchesForCars,
       generateBikes,
+
       generateTroublePoints,
+      detectTrafficJams,
+      generateBusFailures,
 
       lightStrategyActive,
       extendLightTime,
@@ -24,6 +29,7 @@ const StrategyMenu = props => {
 
       troublePointStrategyActive,
       trafficJamStrategyActive,
+      transportChangeStrategyActive,
     },
     generatePedestrians,
   } = props;
@@ -64,8 +70,20 @@ const StrategyMenu = props => {
     dispatchUpdate({ troublePointStrategyActive: e.target.checked });
   }
 
-  function evSetChangeRouteOnTrafficJam(e) {
+  function evSetTrafficJamStrategyActive(e) {
     dispatchUpdate({ trafficJamStrategyActive: e.target.checked });
+  }
+
+  function evSetTransportChangeStrategyActive(e) {
+    dispatchUpdate({ transportChangeStrategyActive: e.target.checked });
+  }
+
+  function evSetDetectTrafficJams(e) {
+    dispatchUpdate({ detectTrafficJams: e.target.checked });
+  }
+
+  function evSetGenerateBusFailures(e) {
+    dispatchUpdate({ generateBusFailures: e.target.checked });
   }
 
   function evSetGeneratePedestrians(e) {
@@ -88,6 +106,22 @@ const StrategyMenu = props => {
             Generate cars
           </label>
         </div>
+        {generateCars && (
+          <div className="ml-2 small-text">
+            <div className="custom-control custom-radio">
+              <input type="radio" id="carsRandom" name="carsRadio" className="custom-control-input" />
+              <label className="custom-control-label" htmlFor="carsRandom">
+                Random
+              </label>
+            </div>
+            <div className="custom-control custom-radio">
+              <input type="radio" id="carsBatched" name="carsRadio" className="custom-control-input" />
+              <label className="custom-control-label" htmlFor="carsBatched">
+                Batched
+              </label>
+            </div>
+          </div>
+        )}
 
         <div className="form-check user-select-none">
           <input
@@ -129,6 +163,33 @@ const StrategyMenu = props => {
             Generate trouble points
           </label>
         </div>
+
+        <div className="form-check user-select-none">
+          <input
+            type="checkbox"
+            checked={detectTrafficJams}
+            disabled={!generateCars || wasStarted}
+            className="form-check-input"
+            id="detectTrafficJams"
+            onChange={evSetDetectTrafficJams}
+          />
+          <label htmlFor="detectTrafficJams" className="form-check-label">
+            Detect traffic jams
+          </label>
+        </div>
+        <div className="form-check user-select-none">
+          <input
+            type="checkbox"
+            checked={generateBusFailures}
+            disabled={!generatePedestrians || wasStarted}
+            className="form-check-input"
+            id="generateBusFailures"
+            onChange={evSetGenerateBusFailures}
+          />
+          <label htmlFor="generateBusFailures" className="form-check-label">
+            Generate bus failures
+          </label>
+        </div>
       </div>
 
       <div className="mb-4 form-border">
@@ -161,19 +222,6 @@ const StrategyMenu = props => {
             />
           </div>
         )}
-        <div className="form-check user-select-none">
-          <input
-            type="checkbox"
-            className="form-check-input"
-            id="trafficJamStrategyActive"
-            checked={trafficJamStrategyActive}
-            disabled={wasStarted}
-            onChange={evSetChangeRouteOnTrafficJam}
-          />
-          <label htmlFor="trafficJamStrategyActive" className="form-check-label">
-            Change route on traffic jam
-          </label>
-        </div>
       </div>
       <div className="mb-4 form-border">
         <div className="form-check user-select-none">
@@ -186,7 +234,7 @@ const StrategyMenu = props => {
             onChange={evSetStationStrategyActive}
           />
           <label htmlFor="stationStrategyActive" className="form-check-label">
-            Station strategy
+            Bus station strategy
           </label>
         </div>
         {stationStrategyActive && (
@@ -204,7 +252,6 @@ const StrategyMenu = props => {
           </div>
         )}
       </div>
-
       <div className="mb-4 form-border">
         <div className="form-check user-select-none">
           <input
@@ -216,7 +263,38 @@ const StrategyMenu = props => {
             onChange={evSetTroublePointStrategyActive}
           />
           <label htmlFor="troublePointStrategyActive" className="form-check-label">
-            Change route on trouble point
+            Trouble point strategy
+          </label>
+        </div>
+      </div>
+      <div className="mb-4 form-border">
+        <div className="form-check user-select-none">
+          <input
+            type="checkbox"
+            className="form-check-input"
+            id="trafficJamStrategyActive"
+            checked={trafficJamStrategyActive}
+            disabled={wasStarted}
+            onChange={evSetTrafficJamStrategyActive}
+          />
+          <label htmlFor="trafficJamStrategyActive" className="form-check-label">
+            Traffic jam strategy
+          </label>
+        </div>
+      </div>
+
+      <div className="mb-4 form-border">
+        <div className="form-check user-select-none">
+          <input
+            type="checkbox"
+            className="form-check-input"
+            id="transportChangeStrategyActive"
+            checked={transportChangeStrategyActive}
+            disabled={wasStarted}
+            onChange={evSetTransportChangeStrategyActive}
+          />
+          <label htmlFor="transportChangeStrategyActive" className="form-check-label">
+            Transport change strategy
           </label>
         </div>
       </div>

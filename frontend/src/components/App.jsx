@@ -3,10 +3,10 @@ import { Provider } from "react-redux";
 import Notifications from "react-notify-toast";
 
 import CityMap from "./CityMap";
-import "../styles/App.css";
-
 import store from "../redux/store";
 import MenusContainer from "./Menu/MenusContainer";
+
+import "../styles/App.css";
 
 const App = () => (
   <Provider store={store}>
