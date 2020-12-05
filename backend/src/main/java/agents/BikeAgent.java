@@ -13,15 +13,18 @@ import routing.core.IGeoPosition;
 import routing.nodes.LightManagerNode;
 import smartcity.ITimeProvider;
 import smartcity.SmartCityAgent;
+import vehicles.ITestable;
 import vehicles.MovingObject;
 import vehicles.enums.DrivingState;
+
+import java.time.LocalDateTime;
 
 import static agents.message.MessageManager.createMessage;
 import static agents.message.MessageManager.createProperties;
 import static routing.RoutingConstants.STEP_CONSTANT;
 import static smartcity.config.StaticConfig.USE_BATCHED_UPDATES;
 
-public class BikeAgent extends AbstractAgent {
+public class BikeAgent extends AbstractAgent  {
     private final MovingObject vehicle;
 
     BikeAgent(int id, MovingObject vehicle,
@@ -131,4 +134,5 @@ public class BikeAgent extends AbstractAgent {
     public IGeoPosition getPosition() {
         return vehicle.getPosition();
     }
+
 }

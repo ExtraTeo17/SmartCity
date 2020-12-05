@@ -4,6 +4,7 @@ public enum VehicleType {
     REGULAR_CAR("RegularCar"),
     BIKE("Bike"),
     TEST_CAR("TestCar"),
+    TEST_BIKE("TestBike"),
     BUS("Bus"),
     PEDESTRIAN("Pedestrian"),
     TEST_PEDESTRIAN("TestPedestrian");

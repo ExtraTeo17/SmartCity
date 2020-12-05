@@ -46,13 +46,14 @@ public class MessageParameter {
     public static final String EVENT = "event";
     public static final String START = "start";
     public static final String BRIGADE = "brigade";
+	public static final String TEST_BIKE_AGENT_ID = "test_bike_agent_id";
 
 
     public static String getTypeByMovingObject(MovingObject movingObject) {
         var type = movingObject.getVehicleType();
         var value = VehicleType.getValue(type);
         return switch (value) {
-            case BIKE -> BIKE;
+            case BIKE, TEST_BIKE -> BIKE;
             case BUS -> BUS;
             case PEDESTRIAN, TEST_PEDESTRIAN -> PEDESTRIAN;
             case REGULAR_CAR, TEST_CAR -> VEHICLE;
