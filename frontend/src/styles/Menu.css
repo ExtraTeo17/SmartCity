@@ -21,6 +21,10 @@
   line-height: calc(1.8 * (7px + 0.8vmin));
 }
 
+.neg-mt2 {
+  margin-top: -0.5rem !important;
+}
+
 .card {
   min-height: 300px;
 }

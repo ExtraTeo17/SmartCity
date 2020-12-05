@@ -111,7 +111,7 @@ const StrategyMenu = props => {
           </label>
         </div>
 
-        <div className="ml-4 small-text">
+        <div className="ml-4 mt-1 small-text">
           <div className="custom-control custom-radio">
             <input
               type="radio"
@@ -142,7 +142,7 @@ const StrategyMenu = props => {
           </div>
         </div>
 
-        <div className="form-check user-select-none">
+        <div className="form-check user-select-none neg-mt2">
           <input
             type="checkbox"
             checked={generatePedestrians}
