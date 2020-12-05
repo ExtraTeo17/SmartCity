@@ -5,7 +5,6 @@ import com.google.inject.Inject;
 import org.w3c.dom.Node;
 import osmproxy.elements.OSMNode;
 import smartcity.config.abstractions.ILightConfigContainer;
-import smartcity.config.abstractions.ITroublePointsConfigContainer;
 import smartcity.lights.LightColor;
 import smartcity.lights.abstractions.ICrossroad;
 import smartcity.lights.abstractions.ICrossroadFactory;

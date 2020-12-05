@@ -218,7 +218,7 @@ public abstract class MovingObject {
 
     public int getMillisecondsToNextLight() {
         var distance = ((closestLightIndex - moveIndex) * RoutingConstants.STEP_CONSTANT);
-        return (int) (distance * CALCULATION_DELTA_PER_INDEX) + (int) (distance / getSpeed());
+        return (int) (distance * CALCULATION_DELTA_PER_INDEX) + (distance / getSpeed());
     }
 
     public int getMillisecondsFromAToB(int startIndex, int finishIndex) {

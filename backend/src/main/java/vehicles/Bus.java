@@ -15,7 +15,10 @@ import vehicles.enums.BusFillState;
 import vehicles.enums.VehicleType;
 
 import java.time.LocalDateTime;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Optional;
 
 import static vehicles.Constants.SPEED_SCALE;
 
@@ -106,7 +109,7 @@ public class Bus extends MovingObject {
         List<String> allPassengers = new ArrayList<>();
         var it = stationsForPassengers.entrySet().iterator();
         while (it.hasNext()) {
-            var pair =  it.next();
+            var pair = it.next();
             allPassengers.addAll(pair.getValue());
             it.remove(); // avoids a ConcurrentModificationException
         }

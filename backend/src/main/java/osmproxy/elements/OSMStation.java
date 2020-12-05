@@ -17,7 +17,6 @@ public class OSMStation extends OSMNode implements Serializable {
         this.stopId = stationRef.substring(0, stationRef.length() - 2);
         this.isPlatform = isPlatform;
         this.pedestrianAgentIDPreferredBusLine = new HashMap<>();
-        ;
     }
 
     public String getBusStopId() {

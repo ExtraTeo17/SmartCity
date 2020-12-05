@@ -80,7 +80,7 @@ final class Router implements
             routeInfo.determineRouteOrientationsAndFilterRelevantNodes(startingOsmNodeRef, finishingOsmNodeRef);
         } catch (NoSuchElementException e) {
             logger.info("GraphHopper API is not able to create route for provided points.");
-            return new ArrayList<RouteNode>();
+            return new ArrayList<>();
         }
         var route = createRouteNodeList(routeInfo, isCar);
         return routeTransformer.uniformRouteNew(route, osmWayIdsAndEdgeList.getValue1());

@@ -41,7 +41,7 @@ class TaskManagerTests {
             boolean ranOnce = false;
             boolean ranEndless = false;
         };
-        when(runnableFactory.createDelay(ArgumentMatchers.<Supplier<Integer>>any(), any(boolean.class))).thenReturn(new IVariableExecutionRunnable() {
+        when(runnableFactory.createDelay(ArgumentMatchers.any(), any(boolean.class))).thenReturn(new IVariableExecutionRunnable() {
             @Override
             public void runOnce(int initialDelay, TimeUnit timeUnit) {
                 runContext.ranOnce = true;
