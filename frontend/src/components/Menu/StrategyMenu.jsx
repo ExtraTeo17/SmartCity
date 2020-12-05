@@ -149,12 +149,12 @@ const StrategyMenu = props => {
             id="generatePedestrians"
             onChange={evSetGeneratePedestrians}
           />
-          <label htmlFor="generatePedestrians" className="form-check-label gp-label">
-            <div id="gp-wrapper" className="m-0">
-              <div className="gp-left">Generate buses &</div>
-              <div className="gp-right ml-2">
-                <div className="gp-right-up">pedestrians</div>
-                <div className="gp-right-down">stations</div>
+          <label htmlFor="generatePedestrians" className="form-check-label">
+            <div className="gp-wrapper">
+              <div className="p-0 mr-2">Generate buses &</div>
+              <div className="m-0 p-0">
+                <div className="m-0 p-0">pedestrians</div>
+                <div className="m-0 p-0">stations</div>
               </div>
             </div>
           </label>
