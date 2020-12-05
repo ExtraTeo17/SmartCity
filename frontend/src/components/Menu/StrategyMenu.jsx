@@ -224,10 +224,16 @@ const StrategyMenu = props => {
             className="form-check-input"
             id="lightStrategyActive"
             checked={lightStrategyActive}
-            disabled={wasStarted}
+            disabled={!(generateCars || generatePedestrians || generateBikes) || wasStarted}
             onChange={evSetLightStrategyActive}
           />
-          <label htmlFor="lightStrategyActive" className="form-check-label" data-toggle="tooltip" data-placement="top" title="">
+          <label
+            htmlFor="lightStrategyActive"
+            className="form-check-label"
+            data-toggle="tooltip"
+            data-placement="top"
+            title="You need to generate cars, bikes or pedestrians to use this strategy."
+          >
             Light strategy
           </label>
         </div>
@@ -257,7 +263,13 @@ const StrategyMenu = props => {
             disabled={!generatePedestrians || wasStarted}
             onChange={evSetStationStrategyActive}
           />
-          <label htmlFor="stationStrategyActive" className="form-check-label">
+          <label
+            htmlFor="stationStrategyActive"
+            className="form-check-label"
+            data-toggle="tooltip"
+            data-placement="top"
+            title="You need to generate buses to use this strategy."
+          >
             Bus station strategy
           </label>
         </div>
@@ -282,10 +294,16 @@ const StrategyMenu = props => {
             className="form-check-input"
             id="troublePointStrategyActive"
             checked={troublePointStrategyActive}
-            disabled={!generateTroublePoints || wasStarted}
+            disabled={!generateCars || !generateTroublePoints || wasStarted}
             onChange={evSetTroublePointStrategyActive}
           />
-          <label htmlFor="troublePointStrategyActive" className="form-check-label">
+          <label
+            htmlFor="troublePointStrategyActive"
+            className="form-check-label"
+            data-toggle="tooltip"
+            data-placement="top"
+            title="You need to generate cars and trouble points to use this strategy."
+          >
             Trouble point strategy
           </label>
         </div>
@@ -296,10 +314,16 @@ const StrategyMenu = props => {
             className="form-check-input"
             id="trafficJamStrategyActive"
             checked={trafficJamStrategyActive}
-            disabled={wasStarted}
+            disabled={!generateCars || !detectTrafficJams || wasStarted}
             onChange={evSetTrafficJamStrategyActive}
           />
-          <label htmlFor="trafficJamStrategyActive" className="form-check-label">
+          <label
+            htmlFor="trafficJamStrategyActive"
+            className="form-check-label"
+            data-toggle="tooltip"
+            data-placement="top"
+            title="You need to generate cars and detect traffic jams to use this strategy."
+          >
             Traffic jam strategy
           </label>
         </div>
@@ -310,10 +334,16 @@ const StrategyMenu = props => {
             className="form-check-input"
             id="transportChangeStrategyActive"
             checked={transportChangeStrategyActive}
-            disabled={wasStarted}
+            disabled={!generatePedestrians || !generateBusFailures || wasStarted}
             onChange={evSetTransportChangeStrategyActive}
           />
-          <label htmlFor="transportChangeStrategyActive" className="form-check-label">
+          <label
+            htmlFor="transportChangeStrategyActive"
+            className="form-check-label"
+            data-toggle="tooltip"
+            data-placement="top"
+            title="You need to generate buses and bus failures to use this strategy."
+          >
             Transport change strategy
           </label>
         </div>
