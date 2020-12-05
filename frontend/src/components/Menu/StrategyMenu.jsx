@@ -184,7 +184,14 @@ const StrategyMenu = props => {
             id="generateTroublePoints"
             onChange={evSetGenerateTroublePoints}
           />
-          <label htmlFor="generateTroublePoints" className="form-check-label">
+          <label
+            htmlFor="generateTroublePoints"
+            className="form-check-label"
+            data-toggle="tooltip"
+            data-placement="top"
+            data-html="true"
+            title="You need to generate <b>cars</b> to generate trouble points."
+          >
             Generate trouble points
           </label>
         </div>
@@ -198,7 +205,14 @@ const StrategyMenu = props => {
             id="detectTrafficJams"
             onChange={evSetDetectTrafficJams}
           />
-          <label htmlFor="detectTrafficJams" className="form-check-label">
+          <label
+            htmlFor="detectTrafficJams"
+            className="form-check-label"
+            data-toggle="tooltip"
+            data-placement="top"
+            data-html="true"
+            title="You need to generate <b>cars</b> to detect traffic jams."
+          >
             Detect traffic jams
           </label>
         </div>
@@ -211,7 +225,14 @@ const StrategyMenu = props => {
             id="generateBusFailures"
             onChange={evSetGenerateBusFailures}
           />
-          <label htmlFor="generateBusFailures" className="form-check-label">
+          <label
+            htmlFor="generateBusFailures"
+            className="form-check-label"
+            data-toggle="tooltip"
+            data-placement="top"
+            data-html="true"
+            title="You need to generate <b>buses</b> to generate bus failures."
+          >
             Generate bus failures
           </label>
         </div>
@@ -232,7 +253,8 @@ const StrategyMenu = props => {
             className="form-check-label"
             data-toggle="tooltip"
             data-placement="top"
-            title="You need to generate cars, bikes or pedestrians to use this strategy."
+            data-html="true"
+            title="You need to generate <b>cars</b> or <b>bikes</b> or <b>pedestrians</b> to use this strategy."
           >
             Light strategy
           </label>
@@ -268,7 +290,8 @@ const StrategyMenu = props => {
             className="form-check-label"
             data-toggle="tooltip"
             data-placement="top"
-            title="You need to generate buses to use this strategy."
+            data-html="true"
+            title="You need to generate <b>buses</b> to use this strategy."
           >
             Bus station strategy
           </label>
@@ -302,7 +325,8 @@ const StrategyMenu = props => {
             className="form-check-label"
             data-toggle="tooltip"
             data-placement="top"
-            title="You need to generate cars and trouble points to use this strategy."
+            data-html="true"
+            title="You need to generate <b>cars</b> and <b>trouble points</b> to use this strategy."
           >
             Trouble point strategy
           </label>
@@ -322,7 +346,8 @@ const StrategyMenu = props => {
             className="form-check-label"
             data-toggle="tooltip"
             data-placement="top"
-            title="You need to generate cars and detect traffic jams to use this strategy."
+            data-html="true"
+            title="You need to generate <b>cars</b> and <b>detect traffic jams</b> to use this strategy."
           >
             Traffic jam strategy
           </label>
@@ -342,7 +367,8 @@ const StrategyMenu = props => {
             className="form-check-label"
             data-toggle="tooltip"
             data-placement="top"
-            title="You need to generate buses and bus failures to use this strategy."
+            data-html="true"
+            title="You need to generate <b>buses</b> and <b>bus failures</b> to use this strategy."
           >
             Transport change strategy
           </label>
