@@ -1,25 +1,16 @@
-package agents;
+package vehicles;
 
-import com.google.common.annotations.VisibleForTesting;
-import smartcity.ITimeProvider;
-import vehicles.Bike;
-import vehicles.Car;
-import vehicles.ITestable;
-import vehicles.Pedestrian;
 import vehicles.enums.DrivingState;
 import vehicles.enums.VehicleType;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 
 public class TestBike extends Bike implements ITestable {
     private LocalDateTime start;
     private LocalDateTime end;
-    ITimeProvider timeProvider;
 
-    public TestBike(Bike bike, ITimeProvider timeProvider) {
+    public TestBike(Bike bike) {
         super(bike);
-        this.timeProvider = timeProvider;
     }
 
     @Override

@@ -15,7 +15,7 @@ public class Bike extends MovingObject {
         super(timeProvider, agentId, DEFAULT_SPEED, uniformRoute, displayRoute);
     }
 
-   public Bike(Bike bike) {
+    Bike(Bike bike) {
         super(bike.timeProvider, bike.agentId, bike.speed, bike.uniformRoute, bike.simpleRoute);
     }
 

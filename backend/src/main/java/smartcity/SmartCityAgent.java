@@ -21,6 +21,7 @@ import routing.RoutingConstants;
 import vehicles.ITestable;
 import vehicles.MovingObject;
 
+import javax.annotation.Nullable;
 import java.time.temporal.ChronoUnit;
 
 public class SmartCityAgent extends Agent {
@@ -29,8 +30,8 @@ public class SmartCityAgent extends Agent {
 
     private final IAgentsContainer agentsContainer;
     private final EventBus eventBus;
-	private int testBikeAgentId = -1;
-	private Long transformedPedestrianResultTime;
+    private int transformedTestBikeId = -1;
+    private Long transformedPedestrianResultTime;
     private int transformedPedestrianDistance;
 
     @Inject
@@ -83,10 +84,11 @@ public class SmartCityAgent extends Agent {
 
             Long resultTime = getTimeIfTestable(pedestrian);
             int distance = pedestrian.getUniformRouteSize() * RoutingConstants.STEP_SIZE_METERS;
-            final boolean isMetamorphosis = rcv.getUserDefinedParameter(MessageParameter.TEST_BIKE_AGENT_ID) != null;
+            var testBikeId = rcv.getUserDefinedParameter(MessageParameter.TEST_BIKE_AGENT_ID);
+            var isMetamorphosis = testBikeId != null;
             if (isMetamorphosis) {
-            	testBikeAgentId = Integer.parseInt(rcv.getUserDefinedParameter(MessageParameter.TEST_BIKE_AGENT_ID));
-            	transformedPedestrianResultTime = resultTime;
+                transformedTestBikeId = Integer.parseInt(testBikeId);
+                transformedPedestrianResultTime = resultTime;
                 transformedPedestrianDistance = distance;
             }
 
@@ -104,8 +106,8 @@ public class SmartCityAgent extends Agent {
             var vehicle = agent.getVehicle();
             int distance = vehicle.getUniformRouteSize() * RoutingConstants.STEP_SIZE_METERS;
             Long resultTime = getTimeIfTestable(vehicle);
-            if (agent.getId() == testBikeAgentId) {
-            	resultTime += transformedPedestrianResultTime;
+            if (agent.getId() == transformedTestBikeId) {
+                resultTime += transformedPedestrianResultTime;
                 distance += transformedPedestrianDistance;
             }
 
@@ -130,12 +132,14 @@ public class SmartCityAgent extends Agent {
         }
     }
 
+    @Nullable
     private Long getTimeIfTestable(MovingObject movingObject) {
+        Long result = null;
         if (movingObject instanceof ITestable) {
             var testable = (ITestable) movingObject;
-            return ChronoUnit.SECONDS.between(testable.getStart(), testable.getEnd());
+            result = ChronoUnit.SECONDS.between(testable.getStart(), testable.getEnd());
         }
-        return null;
+        return result;
     }
 
     private void onReceiveBus(ACLMessage rcv) {

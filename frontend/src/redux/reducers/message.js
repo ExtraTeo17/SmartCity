@@ -10,6 +10,7 @@ import {
   SIMULATION_STARTED,
   TROUBLE_POINT_VANISHED,
   CAR_KILLED,
+  BIKE_KILLED,
   PEDESTRIAN_KILLED,
   TRAFFIC_JAM_STARTED,
   TRAFFIC_JAM_ENDED,
@@ -111,6 +112,11 @@ const message = (state = initialState, action) => {
     case CAR_KILLED: {
       return onKilled(state, action.payload, "Car");
     }
+
+    case BIKE_KILLED: {
+      return onKilled(state, action.payload, "Bike");
+    }
+
     case PEDESTRIAN_KILLED: {
       return onKilled(state, action.payload, "Pedestrian");
     }

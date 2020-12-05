@@ -53,7 +53,7 @@ public class MessageParameter {
         var type = movingObject.getVehicleType();
         var value = VehicleType.getValue(type);
         return switch (value) {
-            case BIKE -> BIKE;
+            case BIKE, TEST_BIKE -> BIKE;
             case BUS -> BUS;
             case PEDESTRIAN, TEST_PEDESTRIAN -> PEDESTRIAN;
             case REGULAR_CAR, TEST_CAR -> VEHICLE;

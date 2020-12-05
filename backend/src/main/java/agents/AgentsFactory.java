@@ -82,7 +82,7 @@ class AgentsFactory implements IAgentsFactory {
         logger.trace("DisplayRoute size: " + route.size() + ", routeSize: " + uniformRoute.size());
         var bike = new Bike(id, route, uniformRoute, timeProvider);
         if (testBike) {
-          bike = new TestBike(bike, timeProvider);
+            bike = new TestBike(bike);
         }
 
         return new BikeAgent(id, bike, timeProvider,
@@ -139,11 +139,11 @@ class AgentsFactory implements IAgentsFactory {
                 timeProvider, taskProvider);
         if (testPedestrian) {
             pedestrian = new TestPedestrian(pedestrian);
-		}
+        }
 
-		return new PedestrianAgent(id, pedestrian, timeProvider, taskProvider, eventBus, routeGenerator,
-				configContainer);
-	}
+        return new PedestrianAgent(id, pedestrian, timeProvider, taskProvider, eventBus, routeGenerator,
+                configContainer);
+    }
 
     @Override
     public PedestrianAgent create(List<RouteNode> routeToStation, List<RouteNode> routeFromStation,
