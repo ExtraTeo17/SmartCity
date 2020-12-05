@@ -16,13 +16,9 @@
   margin-top: 2px;
 }
 
-.custom-radio {
-  display: flex;
-  align-items: center;
-}
-
 .small-text {
-  font-size: calc(7px + 1vmin);
+  font-size: calc(7px + 0.8vmin);
+  line-height: calc(1.8 * (7px + 0.8vmin));
 }
 
 .card {

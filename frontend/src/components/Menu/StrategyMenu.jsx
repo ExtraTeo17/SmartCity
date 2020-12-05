@@ -110,36 +110,37 @@ const StrategyMenu = props => {
             Generate cars
           </label>
         </div>
-        {generateCars && (
-          <div className="ml-4 small-text">
-            <div className="custom-control custom-radio">
-              <input
-                type="radio"
-                checked={!generateBatchesForCars}
-                name="carsRadio"
-                className="custom-control-input"
-                id="carsRandom"
-                onChange={evSetGenerateBatchesForCars}
-              />
-              <label className="custom-control-label" htmlFor="carsRandom">
-                Random
-              </label>
-            </div>
-            <div className="custom-control custom-radio">
-              <input
-                type="radio"
-                checked={generateBatchesForCars}
-                name="carsRadio"
-                className="custom-control-input"
-                id="carsBatched"
-                onChange={evSetGenerateBatchesForCars}
-              />
-              <label className="custom-control-label" htmlFor="carsBatched">
-                Batched
-              </label>
-            </div>
+
+        <div className="ml-4 small-text">
+          <div className="custom-control custom-radio">
+            <input
+              type="radio"
+              disabled={!generateCars}
+              checked={!generateBatchesForCars}
+              name="carsRadio"
+              className="custom-control-input"
+              id="carsRandom"
+              onChange={evSetGenerateBatchesForCars}
+            />
+            <label className="custom-control-label" htmlFor="carsRandom">
+              Random
+            </label>
           </div>
-        )}
+          <div className="custom-control custom-radio">
+            <input
+              type="radio"
+              disabled={!generateCars}
+              checked={generateBatchesForCars}
+              name="carsRadio"
+              className="custom-control-input"
+              id="carsBatched"
+              onChange={evSetGenerateBatchesForCars}
+            />
+            <label className="custom-control-label" htmlFor="carsBatched">
+              Batched
+            </label>
+          </div>
+        </div>
 
         <div className="form-check user-select-none">
           <input
