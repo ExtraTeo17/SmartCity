@@ -227,13 +227,13 @@ const StrategyMenu = props => {
             disabled={wasStarted}
             onChange={evSetLightStrategyActive}
           />
-          <label htmlFor="lightStrategyActive" className="form-check-label">
+          <label htmlFor="lightStrategyActive" className="form-check-label" data-toggle="tooltip" data-placement="top" title="">
             Light strategy
           </label>
         </div>
         {lightStrategyActive && (
           <div className="form-group mt-2" key={`ls-${configState}`}>
-            <label htmlFor="extendLightTime">Green lights extension time</label>
+            <label htmlFor="extendLightTime">Extension time</label>
             <input
               type="number"
               className="form-control"
@@ -247,8 +247,7 @@ const StrategyMenu = props => {
             />
           </div>
         )}
-      </div>
-      <div className="mb-4 form-border">
+
         <div className="form-check user-select-none">
           <input
             type="checkbox"
@@ -264,7 +263,7 @@ const StrategyMenu = props => {
         </div>
         {stationStrategyActive && (
           <div className="form-group mt-2" key={`ss-${configState}`}>
-            <label htmlFor="extendWaitTime">Bus extension wait time</label>
+            <label htmlFor="extendWaitTime">Extension time</label>
             <input
               type="number"
               className="form-control"
@@ -276,8 +275,7 @@ const StrategyMenu = props => {
             />
           </div>
         )}
-      </div>
-      <div className="mb-4 form-border">
+
         <div className="form-check user-select-none">
           <input
             type="checkbox"
@@ -291,8 +289,7 @@ const StrategyMenu = props => {
             Trouble point strategy
           </label>
         </div>
-      </div>
-      <div className="mb-4 form-border">
+
         <div className="form-check user-select-none">
           <input
             type="checkbox"
@@ -306,9 +303,7 @@ const StrategyMenu = props => {
             Traffic jam strategy
           </label>
         </div>
-      </div>
 
-      <div className="mb-4 form-border">
         <div className="form-check user-select-none">
           <input
             type="checkbox"
