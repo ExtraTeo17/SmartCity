@@ -47,10 +47,10 @@ const MenusContainer = ({
     };
   }
 
-  useEffect(createEffect(generatePedestrians, [setLimitsClassName, setStrategyClassName]), [generatePedestrians]);
-  useEffect(createEffect(generateCars, [setLimitsClassName, setStrategyClassName]), [generateCars]);
+  useEffect(createEffect(generatePedestrians, [setLimitsClassName]), [generatePedestrians]);
+  useEffect(createEffect(generateCars, [setLimitsClassName]), [generateCars]);
   useEffect(createEffect(generateBikes, [setLimitsClassName]), [generateBikes]);
-  useEffect(createEffect(generateTroublePoints, [setLimitsClassName, setStrategyClassName]), [generateTroublePoints]);
+  useEffect(createEffect(generateTroublePoints, [setLimitsClassName]), [generateTroublePoints]);
 
   const onSelect = key => {
     if (key === "limits") {
