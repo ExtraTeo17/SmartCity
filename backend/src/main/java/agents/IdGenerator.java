@@ -10,7 +10,7 @@ public class IdGenerator implements IRegistrable {
     public static final int resetValue = 1;
     private final ConcurrentMap<Class<?>, AtomicInteger> idMap;
 
-    IdGenerator() {
+   public IdGenerator() {
         this.idMap = new ConcurrentHashMap<>();
     }
 

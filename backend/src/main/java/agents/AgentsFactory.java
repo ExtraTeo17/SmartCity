@@ -25,6 +25,7 @@ import java.util.HashSet;
 import java.util.List;
 
 @SuppressWarnings("OverlyCoupledClass")
+public
 class AgentsFactory implements IAgentsFactory {
     private static final Logger logger = LoggerFactory.getLogger(AgentsFactory.class);
 

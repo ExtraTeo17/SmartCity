@@ -1,12 +1,17 @@
 package vehicles;
 
+import org.javatuples.Pair;
+import org.junit.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
+import routing.core.IGeoPosition;
+import routing.core.Position;
 import routing.nodes.LightManagerNode;
 import routing.nodes.RouteNode;
 import smartcity.ITimeProvider;
 
+import java.lang.reflect.Array;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Stream;
@@ -17,6 +22,7 @@ import static org.junit.jupiter.params.provider.Arguments.arguments;
 import static org.mockito.Mockito.mock;
 
 class MovingObjectTests {
+
 
     @ParameterizedTest
     @MethodSource("routesProvider")
@@ -33,6 +39,20 @@ class MovingObjectTests {
         if (expectedLightIndex < route.size()) {
             assertSame(route.get(expectedLightIndex), result, testCaseName + ": light manager instance should match");
         }
+    }
+
+    @ParameterizedTest
+    @MethodSource("routesProviderForAdjacentOSMWayId")
+    void findLightManagerNodeAndGetAdjacemntOsmWayID(String testCaseName, int initialMoveIndex, List<RouteNode> route, int expectedOsmWayId) {
+        // Arrange
+        var movingObject = new Car(1, route, route, mock(ITimeProvider.class));
+        movingObject.moveIndex = initialMoveIndex;
+
+        // Act
+        var adjOsmWayId = movingObject.getAdjacentOsmWayId(0);
+
+        // Assert
+        assertEquals(expectedOsmWayId, adjOsmWayId);
     }
 
 
@@ -63,8 +83,38 @@ class MovingObjectTests {
         );
     }
 
+    static Stream<Arguments> routesProviderForAdjacentOSMWayId() {
+        var begRoute = Arrays.asList(createInitialisedLightManagerNode(123), createRouteNode(), createRouteNode());
+        var middleRoute = Arrays.asList(createRouteNode(), createInitialisedLightManagerNode(123), createRouteNode());
+        var doubledRoute = Arrays.asList(createRouteNode(), createInitialisedLightManagerNode(123), createRouteNode(),
+                createInitialisedLightManagerNode(456), createRouteNode(), createRouteNode());
+        var endRoute = Arrays.asList(createRouteNode(), createRouteNode(), createInitialisedLightManagerNode(123));
+        var noneRoute = Arrays.asList(createRouteNode(), createRouteNode(), createRouteNode(), createRouteNode());
+
+
+        return Stream.of(
+                arguments("At beginning - at", 0, begRoute, 123),
+                arguments("At beginning - after", 1, begRoute, 123),
+                arguments("In middle - before", 0, middleRoute, -1),
+                arguments("In middle - at", 1, middleRoute, 123),
+                arguments("In middle - after", 2, middleRoute, 123),
+                arguments("Doubled - before first", 0, doubledRoute, -1),
+                arguments("Doubled - at first", 1, doubledRoute, 123),
+                arguments("Doubled - after first = before second", 2, doubledRoute, 123),
+                arguments("Doubled - at second", 3, doubledRoute, 456),
+                arguments("Doubled - after second", 4, doubledRoute, 456),
+                arguments("At end - before", 1, endRoute, -1),
+                arguments("None - start", 0, noneRoute, -1),
+                arguments("None - end", 3, noneRoute, -1)
+        );
+    }
+
     private static LightManagerNode createLightManagerNode() {
         return mock(LightManagerNode.class);
+    }
+
+    private static LightManagerNode createInitialisedLightManagerNode(int adjOsmWayId) {
+        return new LightManagerNode(Position.of(52, 27), adjOsmWayId, 0, (long) 0, 0, 0);
     }
 
     private static RouteNode createRouteNode() {

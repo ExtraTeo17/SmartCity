@@ -42,7 +42,7 @@ import static org.mockito.Mockito.when;
 
 @SuppressWarnings("OverlyCoupledClass")
 class AgentsPreparerTests {
-    private final IZone defaultZone = Zone.of(52.23682, 21.01681, 600);
+
 
     @Test
     void tryConstructLightManagers_defaultCarZone() {
@@ -53,7 +53,8 @@ class AgentsPreparerTests {
         // Arrange
         var agentsContainer = new HashAgentsContainer(new ContainerControllerMock());
         agentsContainer.register(LightManagerAgent.class);
-        var creator = setupAgentsCreator(agentsContainer);
+        var agentHelper = new AgentUtills();
+        var creator = agentHelper.setupAgentsCreator(agentsContainer);
 
         // Act
         var success = creator.tryConstructLightManagers();
@@ -92,6 +93,7 @@ class AgentsPreparerTests {
                         "  distance:" + distance);
             }
         }
+
     }
 
     private void assertLightsCorrectForOsmId(String osmId, List<Light> greenLights, List<Light> redLights) {
@@ -123,46 +125,7 @@ class AgentsPreparerTests {
                 "This lights should be in same group: (" + adjacentIds[0] + "," + adjacentIds[1] + ")");
     }
 
-    private AgentsPreparer setupAgentsCreator(IAgentsContainer agentsContainer) {
-        var lightAccessManager = setupLightAccessManager();
-        var configContainer = mock(ConfigContainer.class);
-        var busLinesManager = mock(BusLinesManager.class);
-        var agentsFactory = setupAgentsFactory();
-        var eventBus = new EventBus();
-        var mapAccessManager = mock(IMapAccessManager.class);
-        var routeGenerator = mock(IRouteGenerator.class);
-        var osmContainer = mock(NodesContainer.class);
-        var cacheWrapper = mock(ICacheWrapper.class);
 
-        return new AgentsPreparer(agentsContainer, configContainer, busLinesManager, agentsFactory,
-                eventBus, lightAccessManager, mapAccessManager, routeGenerator, cacheWrapper);
-    }
 
-    private ILightAccessManager setupLightAccessManager() {
-        var mapAccessManager = mock(IMapAccessManager.class);
-        var lightsFile = FileLoader.getDocument("DefaultCarZoneLights.xml");
-        when(mapAccessManager.getNodesDocument(any())).thenReturn(Optional.of(lightsFile));
-        return new LightAccessManager(mapAccessManager, defaultZone);
-    }
 
-    private IAgentsFactory setupAgentsFactory() {
-        var idGenerator = new IdGenerator();
-        idGenerator.register(LightManagerAgent.class);
-        var timeProvider = mock(ITimeProvider.class);
-        var routeTransformer = mock(IRouteTransformer.class);
-        var crossroadFactory = setupCrossroadFactory();
-        var eventBus = new EventBus();
-
-        return new AgentsFactory(idGenerator, eventBus, timeProvider, routeTransformer,
-                crossroadFactory, mock(IRouteGenerator.class), mock(ConfigContainer.class),mock(TaskProvider.class));
-    }
-
-    private ICrossroadFactory setupCrossroadFactory() {
-        var eventBus = new EventBus();
-        var crossroadParser = new CrossroadParser();
-        ReflectionHelper.setStatic("counter", ConfigMutator.class, 0);
-        var configContainer = new ConfigContainer();
-
-        return new CrossroadFactory(eventBus, crossroadParser, configContainer);
-    }
 }

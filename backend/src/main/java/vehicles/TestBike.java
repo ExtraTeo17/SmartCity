@@ -1,9 +1,12 @@
 package vehicles;
 
+import com.google.common.annotations.VisibleForTesting;
+import smartcity.ITimeProvider;
 import vehicles.enums.DrivingState;
 import vehicles.enums.VehicleType;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 
 public class TestBike extends Bike implements ITestable {
     private LocalDateTime start;
@@ -40,5 +43,9 @@ public class TestBike extends Bike implements ITestable {
     @Override
     public LocalDateTime getEnd() {
         return end;
+    }
+    @VisibleForTesting
+    TestBike(ITimeProvider timeProvider) {
+        super(1, new ArrayList<>(), new ArrayList<>(), timeProvider );
     }
 }

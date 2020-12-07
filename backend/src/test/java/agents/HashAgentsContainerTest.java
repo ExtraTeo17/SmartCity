@@ -86,7 +86,7 @@ class HashAgentsContainerTest {
         }
     }
 
-    PedestrianAgent getPedestrianAgent() {
+    public PedestrianAgent getPedestrianAgent() {
         var ped = mock(Pedestrian.class);
         when(ped.getVehicleType()).thenReturn(VehicleType.PEDESTRIAN.toString());
         return new PedestrianAgent(idGenerator.get(PedestrianAgent.class), ped,

@@ -189,6 +189,10 @@ public abstract class MovingObject {
     // TODO: Sometimes index goes to 0
     public long getAdjacentOsmWayId(int indexFar) {
         int index = moveIndex + indexFar;
+        if(index >= uniformRoute.size())
+        {
+            return -1;
+        }
         while (index >= 0 && !(uniformRoute.get(index) instanceof LightManagerNode)) {
             --index;
         }

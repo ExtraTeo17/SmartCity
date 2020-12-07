@@ -72,7 +72,7 @@ public class Pedestrian extends MovingObject {
     }
 
     @VisibleForTesting
-    Pedestrian(ITimeProvider timeProvider) {
+    public Pedestrian(ITimeProvider timeProvider) {
         super(timeProvider, 1, DEFAULT_SPEED, new ArrayList<>());
         displayRouteBeforeBus = new ArrayList<>();
         displayRouteAfterBus = new ArrayList<>();
@@ -143,7 +143,6 @@ public class Pedestrian extends MovingObject {
     }
 
     public boolean isTroubled() {
-        // TODO Auto-generated method stub
         return false;
     }
 
