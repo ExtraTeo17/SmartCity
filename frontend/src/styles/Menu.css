@@ -27,21 +27,6 @@
   margin-bottom: 0.8rem;
 }
 
-.neg-mt2 {
-  margin-top: -0.5rem !important;
-}
-
-.card {
-  min-height: 300px;
-}
-
 .invalid-input {
   border: 3px solid red;
-}
-
-.gp-wrapper {
-  margin: 0;
-  display: flex;
-  flex-flow: row nowrap;
-  align-items: center;
 }
