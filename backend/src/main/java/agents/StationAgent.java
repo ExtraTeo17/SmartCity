@@ -21,6 +21,13 @@ import static agents.AgentConstants.DEFAULT_BLOCK_ON_ERROR;
 import static agents.message.MessageManager.createMessage;
 import static agents.message.MessageManager.createProperties;
 
+/**
+ * StationManager agent represents a bus stop. The main aim of it is to
+ * manage arriving buses and passengers. He is informed about time of arrival of
+ * approaching buses, as well as pedestrians. Thanks to that information
+ * StationManager can apply strategy and decide whether particular bus
+ * should wait for arriving passengers.
+ */
 public class StationAgent extends AbstractAgent {
     public static final String name = StationAgent.class.getSimpleName().replace("Agent", "");
 
