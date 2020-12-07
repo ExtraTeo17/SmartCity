@@ -111,7 +111,7 @@ const StrategyMenu = props => {
           </label>
         </div>
 
-        <div className="ml-4 mt-1 small-text">
+        <div className="ml-4 mt-1 mb-1 small-text">
           <div className="custom-control custom-radio">
             <input
               type="radio"
@@ -142,7 +142,7 @@ const StrategyMenu = props => {
           </div>
         </div>
 
-        <div className="form-check user-select-none neg-mt2">
+        <div className="form-check user-select-none">
           <input
             type="checkbox"
             checked={generatePedestrians}
@@ -151,13 +151,7 @@ const StrategyMenu = props => {
             onChange={evSetGeneratePedestrians}
           />
           <label htmlFor="generatePedestrians" className="form-check-label">
-            <div className="gp-wrapper">
-              <div className="p-0 mr-2">Generate buses &</div>
-              <div className="m-0 p-0">
-                <div className="m-0 p-0">pedestrians</div>
-                <div className="m-0 p-0">stations</div>
-              </div>
-            </div>
+            Generate buses & stations & pedestrians
           </label>
         </div>
 
