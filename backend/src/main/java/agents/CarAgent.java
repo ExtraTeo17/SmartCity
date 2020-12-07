@@ -29,6 +29,18 @@ import static agents.message.MessageManager.createProperties;
 import static routing.RoutingConstants.STEP_CONSTANT;
 import static smartcity.config.StaticConfig.USE_BATCHED_UPDATES;
 
+/**
+ * The main aim of Car agent is to get from point A to B. Car agent follows the
+ * route calculated at the beginning of the simulation. As soon as it passes
+ * through one light, it sends information to the next about his upcoming
+ * arrival. When Car is just in front of the traffic light, he is sending a pass
+ * request to {@link LightManagerAgent}. Once approved, Car drives through the
+ * light and communicates with the next one until it reaches its destination.
+ * Moreover, on the road can appear obstacles (e.g. construction
+ * sites/accidents, traffic jams). By processing information from
+ * {@link TroubleManagerAgent}, Car agent can apply chosen strategy and,
+ * therefore, change the initial route.
+ */
 @SuppressWarnings("serial")
 public class CarAgent extends AbstractAgent {
     private static final int THRESHOLD_UNTIL_INDEX_CHANGE = 50;
