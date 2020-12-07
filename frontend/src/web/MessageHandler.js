@@ -42,7 +42,6 @@ export default {
     const { payload } = msg;
     switch (msg.type) {
       case PREPARE_SIMULATION_RESPONSE: {
-        notify.show("Simulation prepared!", "success", NOTIFY_SHOW_MS);
         console.groupCollapsed("Prepared");
         console.info(msg.payload);
         console.groupEnd();

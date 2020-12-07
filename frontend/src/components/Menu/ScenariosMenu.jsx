@@ -1,6 +1,6 @@
 import React from "react";
 import { connect } from "react-redux";
-import { configReplaced } from "../../redux/core/actions";
+import { configReplaced, simulationPrepareStarted } from "../../redux/core/actions";
 import { dispatch } from "../../redux/store";
 import ApiManager from "../../web/ApiManager";
 import { IS_DEBUG } from "../../constants/global";
@@ -9,11 +9,14 @@ import { initialInteractionState } from "../../redux/reducers/interaction";
 import "../../styles/Menu.css";
 
 export const ScenariosMenuObj = props => {
-  const { wasStarted, config = initialInteractionState } = props;
+  const { inPreparation, wasStarted, config = initialInteractionState } = props;
 
-  const prepareSimulation = data => {
-    ApiManager.prepareSimulation(data);
-  };
+  function prepareSimulation(data) {
+    if (ApiManager.isConnected()) {
+      dispatch(simulationPrepareStarted());
+      ApiManager.prepareSimulation(data);
+    }
+  }
 
   function prepareLightScenario() {
     const state = config;
@@ -62,7 +65,7 @@ export const ScenariosMenuObj = props => {
         id="lightScenarioBtn"
         className="btn btn-primary btn-block"
         type="button"
-        disabled={wasStarted}
+        disabled={inPreparation || wasStarted}
         onClick={prepareLightScenario}
       >
         Light scenario
@@ -72,7 +75,7 @@ export const ScenariosMenuObj = props => {
         id="prepareBusStationsScenarioBtn"
         className="btn btn-light btn-block mt-5"
         type="button"
-        disabled={wasStarted}
+        disabled={inPreparation || wasStarted}
         onClick={prepareBusStationsScenario}
       >
         Bus stations scenario
@@ -82,7 +85,7 @@ export const ScenariosMenuObj = props => {
         id="prepareTroublePointsScenario"
         className="btn btn-primary btn-block mt-5"
         type="button"
-        disabled={wasStarted}
+        disabled={inPreparation || wasStarted}
         onClick={prepareTroublePointsScenario}
       >
         Trouble points scenario
@@ -92,7 +95,7 @@ export const ScenariosMenuObj = props => {
         id="prepareTrafficJamsScenarioBtn"
         className="btn btn-light btn-block mt-5"
         type="button"
-        disabled={wasStarted}
+        disabled={inPreparation || wasStarted}
         onClick={prepareTrafficJamsScenario}
       >
         Traffic jams scenario
@@ -102,7 +105,7 @@ export const ScenariosMenuObj = props => {
         id="prepareTransportChangeScenarioBtn"
         className="btn btn-primary btn-block mt-5"
         type="button"
-        disabled={wasStarted}
+        disabled={inPreparation || wasStarted}
         onClick={prepareTransportChangeScenario}
       >
         Transport change scenario
@@ -118,8 +121,9 @@ export const ScenariosMenuObj = props => {
 };
 
 const mapStateToProps = (state /* , ownProps */) => {
-  const { wasStarted } = state.message;
+  const { inPreparation, wasStarted } = state.message;
   return {
+    inPreparation,
     wasStarted,
     config: state.interaction,
   };

@@ -14,6 +14,7 @@ let message;
 WebServer.send = msg => {
   message = msg;
 };
+WebServer.isConnected = () => true;
 
 let configPayload;
 actions.configReplaced = payload => {

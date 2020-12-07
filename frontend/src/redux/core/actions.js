@@ -5,6 +5,7 @@ import {
   CAR_CREATED,
   CENTER_UPDATED,
   CENTER_MENU_UPDATED,
+  SIMULATION_PREPARE_STARTED,
   SIMULATION_PREPARED,
   SIMULATION_STARTED,
   LIGHTS_SWITCHED,
@@ -47,6 +48,7 @@ export const shouldStartSimulation = createAction(SHOULD_START_SIMULATION);
 
 export const generatePedestriansUpdated = createAction(GENERATE_PEDESTRIANS_UPDATED);
 
+export const simulationPrepareStarted = createAction(SIMULATION_PREPARE_STARTED);
 export const simulationPrepared = createAction(
   SIMULATION_PREPARED,
   simulationData => simulationData,

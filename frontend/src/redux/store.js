@@ -81,6 +81,7 @@ const initialState = {
     lights: [],
     stations: [],
     troublePoints: [],
+    inPreparation: false,
     wasPrepared: 0,
     wasStarted: false,
     timeResults: [],

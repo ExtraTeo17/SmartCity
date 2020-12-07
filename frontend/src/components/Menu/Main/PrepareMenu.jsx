@@ -2,7 +2,7 @@
 import { connect } from "react-redux";
 import React from "react";
 import ApiManager from "../../../web/ApiManager";
-import { centerMenuUpdated } from "../../../redux/core/actions";
+import { centerMenuUpdated, simulationPrepareStarted } from "../../../redux/core/actions";
 import { dispatch } from "../../../redux/store";
 
 import { D_DECIMAL_PLACES } from "../../../constants/defaults";
@@ -12,23 +12,26 @@ import "../../../styles/Menu.css";
 import { setIfValidFloat } from "../../../utils/helpers";
 
 const PrepareMenu = props => {
-  const { configState, wasPrepared, wasStarted, prepareSimulationData } = props;
+  const { configState, inPreparation, wasPrepared, wasStarted, prepareSimulationData } = props;
 
-  const setLat = e => {
+  function setLat(e) {
     setIfValidFloat(e, LAT_MIN, LAT_MAX, val => dispatch(centerMenuUpdated({ lat: val })));
-  };
+  }
 
-  const setLng = e => {
+  function setLng(e) {
     setIfValidFloat(e, LNG_MIN, LNG_MAX, val => dispatch(centerMenuUpdated({ lng: val })));
-  };
+  }
 
-  const setRad = e => {
+  function setRad(e) {
     setIfValidFloat(e, RAD_MIN, RAD_MAX, val => dispatch(centerMenuUpdated({ rad: val })));
-  };
+  }
 
-  const prepareSimulation = () => {
-    ApiManager.prepareSimulation(prepareSimulationData);
-  };
+  function prepareSimulation() {
+    if (ApiManager.isConnected()) {
+      dispatch(simulationPrepareStarted());
+      ApiManager.prepareSimulation(prepareSimulationData);
+    }
+  }
 
   let {
     center: { lat, lng, rad },
@@ -94,7 +97,7 @@ const PrepareMenu = props => {
       <div className="center-wrapper mt-3">
         <button
           className="btn btn-primary"
-          disabled={wasStarted}
+          disabled={inPreparation || wasStarted}
           title={wasStarted ? "Simulation already started!" : wasPrepared ? "Simulation already prepared!" : "Prepare simulation"}
           type="button"
           onClick={prepareSimulation}
@@ -107,11 +110,12 @@ const PrepareMenu = props => {
 };
 
 const mapStateToProps = (state /* , ownProps */) => {
-  const { wasPrepared, wasStarted } = state.message;
+  const { inPreparation, wasPrepared, wasStarted } = state.message;
   const { prepareSimulationData, configState } = state.interaction;
   return {
     configState,
     prepareSimulationData,
+    inPreparation,
     wasPrepared,
     wasStarted,
   };

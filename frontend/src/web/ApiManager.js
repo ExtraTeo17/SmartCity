@@ -4,6 +4,10 @@ import WebServer from "./WebServer";
 /** PUBLIC INTERFACE ---------------------------------------------------------- */
 
 export default {
+  isConnected() {
+    return WebServer.isConnected();
+  },
+
   prepareSimulation(
     { center: { lat, lng, rad }, generatePedestrians } = { center: { lat: 0, lng: 0, rad: 0 }, generatePedestrians: false }
   ) {

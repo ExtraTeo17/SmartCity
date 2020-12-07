@@ -1,4 +1,5 @@
 import { useEffect, useRef } from "react";
+import { notify } from "react-notify-toast";
 
 // https://stackoverflow.com/a/1527820/6841224
 export const getRandomInt = (min, max) => {
@@ -96,3 +97,5 @@ export const angleFromCoordinates = (loc1, loc2) => {
 
   return heading;
 };
+
+export const showQueued = notify.createShowQueue();

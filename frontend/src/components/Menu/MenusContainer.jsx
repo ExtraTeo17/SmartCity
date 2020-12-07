@@ -1,18 +1,23 @@
 import React, { useState, useEffect, useRef } from "react";
 import { connect } from "react-redux";
+import { notify } from "react-notify-toast";
 import Tabs from "react-bootstrap/Tabs";
 import Tab from "react-bootstrap/Tab";
 import Menu from "./Main/Menu";
 import StrategyMenu from "./StrategyMenu";
 import ResultsMenu from "./ResultsMenu";
-import "../../styles/MenusContainer.css";
 import ScenariosMenu from "./ScenariosMenu";
 import LimitsMenu from "./LimitsMenu";
+import { NOTIFY_INFO_COLOR, NOTIFY_SHOW_MS } from "../../constants/global";
+
+import "../../styles/MenusContainer.css";
 
 const animationEffectsCount = 4;
+const notifyShowAfterHideDelay = 750;
 
 const MenusContainer = ({
   timeResults,
+  inPreparation,
   wasPrepared,
   wasStarted,
   generatePedestrians,
@@ -23,6 +28,17 @@ const MenusContainer = ({
   const [key, setKey] = useState("main");
   const [limitsClassName, setLimitsClassName] = useState("");
   const [strategyClassName, setStrategyClassName] = useState("");
+
+  useEffect(() => {
+    if (inPreparation) {
+      notify.show("Preparing simulation...", "custom", -1, NOTIFY_INFO_COLOR);
+    } else if (wasPrepared) {
+      notify.hide();
+      setTimeout(() => {
+        notify.show("Simulation prepared!", "success", NOTIFY_SHOW_MS);
+      }, notifyShowAfterHideDelay);
+    }
+  }, [inPreparation]);
 
   useEffect(() => {
     if (wasPrepared) {
@@ -87,7 +103,7 @@ const MenusContainer = ({
 };
 
 const mapStateToProps = (state /* , ownProps */) => {
-  const { timeResults, wasPrepared, wasStarted } = state.message;
+  const { timeResults, inPreparation, wasPrepared, wasStarted } = state.message;
   const {
     startSimulationData: { generateCars, generateBikes, generateTroublePoints },
     prepareSimulationData: { generatePedestrians },
@@ -95,6 +111,7 @@ const mapStateToProps = (state /* , ownProps */) => {
 
   return {
     timeResults,
+    inPreparation,
     wasPrepared,
     wasStarted,
     generatePedestrians,

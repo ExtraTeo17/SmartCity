@@ -5,12 +5,14 @@ import MessageHandler from "./MessageHandler";
 const socketContainer = {
   socket: {},
   reconnecting: false,
+  connected: false,
 };
 
 const createSocket = () => {
   const socket = new WebSocket(SERVER_ADDRESS);
   socket.onopen = () => {
     console.info("Connected !!!");
+    socketContainer.connected = true;
     socketContainer.reconnecting = false;
     notify.hide();
     notify.show("Sucessfully connected", "success", NOTIFY_SHOW_MS);
@@ -46,6 +48,7 @@ const createSocket = () => {
       notify.show("Error encountered, trying to reconnect...", "error", -1);
     }
 
+    socketContainer.connected = false;
     setTimeout(() => {
       socketContainer.reconnecting = true;
       socketContainer.socket = createSocket();
@@ -79,5 +82,9 @@ export default {
     socketContainer.socket.send(JSON.stringify(msg));
 
     console.groupEnd();
+  },
+
+  isConnected() {
+    return socketContainer.connected;
   },
 };
