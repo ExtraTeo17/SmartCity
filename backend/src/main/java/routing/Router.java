@@ -51,12 +51,12 @@ final class Router implements
                                              String startingOsmNodeRef, String finishingOsmNodeRef,
                                              String typeOfVehicle,
                                              boolean bewareOfJammedEdge) {
-        boolean isCar = typeOfVehicle.equals("car");
+        boolean notPedestrian = !typeOfVehicle.equals("foot");
         var osmWayIdsAndEdgeList = findRoute(pointA, pointB, typeOfVehicle, bewareOfJammedEdge);
         var osmWayIds = osmWayIdsAndEdgeList.getValue0();
 
         // TODO: refactor inside to throw exception if not car or pedestrian
-        var routeInfoOpt = mapAccessManager.getRouteInfo(osmWayIds, isCar);
+        var routeInfoOpt = mapAccessManager.getRouteInfo(osmWayIds, notPedestrian);
         if (routeInfoOpt.isEmpty()) {
             logger.warn("Generating route failed because of empty routeInfo");
             return new ArrayList<>();
@@ -82,7 +82,7 @@ final class Router implements
             logger.info("GraphHopper API is not able to create route for provided points.");
             return new ArrayList<>();
         }
-        var route = createRouteNodeList(routeInfo, isCar);
+        var route = createRouteNodeList(routeInfo, notPedestrian);
         return routeTransformer.uniformRouteNew(route, osmWayIdsAndEdgeList.getValue1());
     }
 

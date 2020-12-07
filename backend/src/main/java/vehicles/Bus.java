@@ -182,7 +182,7 @@ public class Bus extends MovingObject {
         return busLine;
     }
 
-    public final List<StationNode> getStationNodesOnRoute() {
+    public List<StationNode> getStationNodesOnRoute() {
         return stationNodesOnRoute;
     }
 
