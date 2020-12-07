@@ -63,13 +63,16 @@ const config = {
   startSimulationData,
 };
 
+const configCopy = JSON.parse(JSON.stringify(config));
+configCopy.startSimulationData.startTime = startSimulationData.startTime;
+
 let container = null;
 let buttons = null;
 beforeAll(() => {
   container = document.createElement("div");
   document.body.appendChild(container);
   act(() => {
-    render(<ScenariosMenuObj config={JSON.parse(JSON.stringify(config))} wasStarted={false} />, container);
+    render(<ScenariosMenuObj config={configCopy} wasStarted={false} />, container);
     buttons = document.getElementsByTagName("button");
   });
 });
