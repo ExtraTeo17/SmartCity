@@ -196,7 +196,7 @@ public class CarAgent extends AbstractAgent {
                     handleConstructionSiteRouteChange(indexOfRouteNodeWithEdge);
                 }
                 else {
-                    logger.info("Index of edge route is invalid: " + indexOfRouteNodeWithEdge);
+                    logger.info("Index of edge: " + indexOfRouteNodeWithEdge + " is not on the route");
                 }
             }
 

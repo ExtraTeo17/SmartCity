@@ -214,7 +214,7 @@ public class MapAccessManager implements IMapAccessManager {
     }
 
     @Override
-    public Optional<RouteInfo> getRouteInfo(List<Long> osmWayIds, boolean isCar) {
+    public Optional<RouteInfo> getRouteInfo(List<Long> osmWayIds, boolean notPedestrian) {
         var query = OsmQueryManager.getMultipleWayAndItsNodesQuery(osmWayIds);
         var overpassNodes = getNodesDocument(query);
         if (overpassNodes.isEmpty()) {
@@ -222,7 +222,7 @@ public class MapAccessManager implements IMapAccessManager {
         }
         RouteInfo info;
         try {
-            info = parseWayAndNodes(overpassNodes.get(), isCar);
+            info = parseWayAndNodes(overpassNodes.get(), notPedestrian);
         } catch (Exception e) {
             logger.warn("Error trying to get route info", e);
             return Optional.empty();
@@ -231,9 +231,9 @@ public class MapAccessManager implements IMapAccessManager {
         return Optional.of(info);
     }
 
-    private static RouteInfo parseWayAndNodes(Document nodesViaOverpass, boolean isCar) {
+    private static RouteInfo parseWayAndNodes(Document nodesViaOverpass, boolean notPedestrian) {
         final RouteInfo info = new RouteInfo();
-        final String tagType = isCar ? "highway" : "crossing";
+        final String tagType = notPedestrian ? "highway" : "crossing";
         Node osmRoot = nodesViaOverpass.getFirstChild();
         NodeList osmXMLNodes = osmRoot.getChildNodes();
         for (int i = 1; i < osmXMLNodes.getLength(); i++) {
