@@ -4,7 +4,9 @@ import vehicles.enums.DrivingState;
 import vehicles.enums.VehicleType;
 
 import java.time.LocalDateTime;
-
+/**
+ * The bike for which measurements of its travel time shall be performed.
+ */
 public class TestBike extends Bike implements ITestable {
     private LocalDateTime start;
     private LocalDateTime end;

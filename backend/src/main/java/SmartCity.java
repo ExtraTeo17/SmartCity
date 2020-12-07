@@ -17,6 +17,10 @@ import java.lang.reflect.Field;
 import java.net.URL;
 import java.util.Properties;
 
+/**
+ * The main module of the application which creates all the other necessary
+ * modules.
+ */
 public class SmartCity {
     private static final Logger logger = LoggerFactory.getLogger(SmartCity.class);
 
