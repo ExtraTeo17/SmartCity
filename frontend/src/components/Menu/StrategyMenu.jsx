@@ -239,10 +239,10 @@ const StrategyMenu = props => {
       </div>
 
       <div className="mb-4 form-border">
-        <div className="form-check user-select-none">
+        <div className="custom-control custom-switch user-select-none">
           <input
             type="checkbox"
-            className="form-check-input"
+            className="custom-control-input"
             id="lightStrategyActive"
             checked={lightStrategyActive}
             disabled={!(generateCars || generatePedestrians || generateBikes) || wasStarted}
@@ -250,7 +250,7 @@ const StrategyMenu = props => {
           />
           <label
             htmlFor="lightStrategyActive"
-            className="form-check-label"
+            className="custom-control-label"
             data-toggle="tooltip"
             data-placement="top"
             data-html="true"
@@ -276,10 +276,10 @@ const StrategyMenu = props => {
           </div>
         )}
 
-        <div className="form-check user-select-none">
+        <div className="custom-control custom-switch user-select-none">
           <input
             type="checkbox"
-            className="form-check-input"
+            className="custom-control-input"
             id="stationStrategyActive"
             checked={stationStrategyActive}
             disabled={!generatePedestrians || wasStarted}
@@ -287,7 +287,7 @@ const StrategyMenu = props => {
           />
           <label
             htmlFor="stationStrategyActive"
-            className="form-check-label"
+            className="custom-control-label"
             data-toggle="tooltip"
             data-placement="top"
             data-html="true"
@@ -305,16 +305,16 @@ const StrategyMenu = props => {
               id="extendWaitTime"
               defaultValue={extendWaitTime}
               disabled={wasStarted}
-              placeholder="Enter bus extension wait time"
+              placeholder="Enter bus wait extension time"
               onChange={evSetWaitExtend}
             />
           </div>
         )}
 
-        <div className="form-check user-select-none">
+        <div className="custom-control custom-switch user-select-none">
           <input
             type="checkbox"
-            className="form-check-input"
+            className="custom-control-input"
             id="troublePointStrategyActive"
             checked={troublePointStrategyActive}
             disabled={!generateCars || !generateTroublePoints || wasStarted}
@@ -322,7 +322,7 @@ const StrategyMenu = props => {
           />
           <label
             htmlFor="troublePointStrategyActive"
-            className="form-check-label"
+            className="custom-control-label"
             data-toggle="tooltip"
             data-placement="top"
             data-html="true"
@@ -332,10 +332,10 @@ const StrategyMenu = props => {
           </label>
         </div>
 
-        <div className="form-check user-select-none">
+        <div className="custom-control custom-switch user-select-none">
           <input
             type="checkbox"
-            className="form-check-input"
+            className="custom-control-input"
             id="trafficJamStrategyActive"
             checked={trafficJamStrategyActive}
             disabled={!generateCars || !detectTrafficJams || wasStarted}
@@ -343,7 +343,7 @@ const StrategyMenu = props => {
           />
           <label
             htmlFor="trafficJamStrategyActive"
-            className="form-check-label"
+            className="custom-control-label"
             data-toggle="tooltip"
             data-placement="top"
             data-html="true"
@@ -353,10 +353,10 @@ const StrategyMenu = props => {
           </label>
         </div>
 
-        <div className="form-check user-select-none">
+        <div className="custom-control custom-switch user-select-none">
           <input
             type="checkbox"
-            className="form-check-input"
+            className="custom-control-input"
             id="transportChangeStrategyActive"
             checked={transportChangeStrategyActive}
             disabled={!generatePedestrians || !generateBusFailures || wasStarted}
@@ -364,7 +364,7 @@ const StrategyMenu = props => {
           />
           <label
             htmlFor="transportChangeStrategyActive"
-            className="form-check-label"
+            className="custom-control-label"
             data-toggle="tooltip"
             data-placement="top"
             data-html="true"
