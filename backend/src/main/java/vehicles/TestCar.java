@@ -8,6 +8,9 @@ import vehicles.enums.VehicleType;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 
+/**
+ * The car for which measurements of its travel time shall be performed.
+ */
 public class TestCar extends Car implements ITestable {
     private final ITimeProvider timeProvider;
 

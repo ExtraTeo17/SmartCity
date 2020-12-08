@@ -20,16 +20,17 @@ public class ConfigContainer extends ConfigMutator
 
     private SimulationState simulationState = SimulationState.INITIAL;
 
+    private boolean generateBatchesForCars = false;
     private boolean shouldGeneratePedestriansAndBuses = false;
-    private boolean shouldGenerateConstructionSites = false;
+    private boolean shouldGenerateConstructionSites = true;
     private boolean shouldDetectTrafficJams = false;
-    private boolean shouldGenerateBusFailures = true;
+    private boolean shouldGenerateBusFailures = false;
     private boolean shouldGenerateBatchesForCars = false;
 
     private boolean lightStrategyActive = false;
     private boolean stationStrategyActive = false;
-    private boolean constructionSiteStrategyActive = false;
-    private boolean trafficJamStrategyActive = true;
+    private boolean constructionSiteStrategyActive = true;
+    private boolean trafficJamStrategyActive = false;
     private boolean transportChangeStrategyActive = false;
 
     private boolean shouldUseFixedRoutes = false;

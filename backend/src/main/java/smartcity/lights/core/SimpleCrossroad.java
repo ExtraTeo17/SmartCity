@@ -82,7 +82,7 @@ class SimpleCrossroad implements ICrossroad {
 
     @Override
     public OptimizationResult requestOptimizations(int extendTimeSeconds) {
-        if (defaultExecutionDelay < 0) {
+        if (!lightSwitcherStarted()) {
             logger.warn("Light switcher did not start yet.");
             return OptimizationResult.empty();
         }
@@ -112,7 +112,11 @@ class SimpleCrossroad implements ICrossroad {
         return result;
     }
 
-    @Override
+    private boolean lightSwitcherStarted() {
+		return defaultExecutionDelay >= 0;
+	}
+
+	@Override
     public List<Light> getLights() {
         return new ArrayList<>(allLights);
     }

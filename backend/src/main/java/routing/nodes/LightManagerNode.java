@@ -1,5 +1,6 @@
 package routing.nodes;
 
+import com.google.common.annotations.VisibleForTesting;
 import com.google.common.primitives.Longs;
 import routing.core.IGeoPosition;
 import smartcity.lights.core.Light;
@@ -10,7 +11,7 @@ public class LightManagerNode extends RouteNode {
     private final int lightManagerId;
     private final long crossingOsmId1;
     private final Long crossingOsmId2;
-    private final long adjacentWayId;
+    private long adjacentWayId;
     private final long osmLightId;
 
     public LightManagerNode(IGeoPosition pos, long adjacentWayId, long adjacentCrossingOsmId1,
@@ -43,6 +44,9 @@ public class LightManagerNode extends RouteNode {
     public long getOsmLightId() {
         return osmLightId;
     }
+
+    @VisibleForTesting
+    public void setAdjacentWayId(Long adjacentWayId){ this.adjacentWayId = adjacentWayId ; }
 
     @Override
     public boolean equals(Object obj) {

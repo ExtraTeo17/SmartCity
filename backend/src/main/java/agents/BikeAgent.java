@@ -21,6 +21,10 @@ import static agents.message.MessageManager.createProperties;
 import static routing.RoutingConstants.STEP_CONSTANT;
 import static smartcity.config.StaticConfig.USE_BATCHED_UPDATES;
 
+/**
+ * The main aim of Bike agent is to get from point A to point B.
+ * Bike agent could communicate with {@link LightManagerAgent} in order to cross the road.
+ */
 public class BikeAgent extends AbstractAgent {
     private final MovingObject vehicle;
 

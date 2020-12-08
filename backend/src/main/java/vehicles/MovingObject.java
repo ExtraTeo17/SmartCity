@@ -14,7 +14,10 @@ import java.util.List;
 
 import static routing.RoutingConstants.CALCULATION_DELTA_PER_INDEX;
 
-// TODO: Change name to IVehicle/AbstractVehicle
+/**
+ * Represents an object which performs a movement over the provided route with a
+ * predefined speed.
+ */
 public abstract class MovingObject {
     final ITimeProvider timeProvider;
     final Logger logger;
@@ -25,6 +28,8 @@ public abstract class MovingObject {
     int moveIndex;
     int closestLightIndex;
     DrivingState state;
+
+    // TODO: Change name to IVehicle/AbstractVehicle
 
     MovingObject(ITimeProvider timeProvider, int agentId, int speed, List<RouteNode> uniformRoute, List<RouteNode> simpleRoute) {
         this.timeProvider = timeProvider;
@@ -189,6 +194,10 @@ public abstract class MovingObject {
     // TODO: Sometimes index goes to 0
     public long getAdjacentOsmWayId(int indexFar) {
         int index = moveIndex + indexFar;
+        if(index >= uniformRoute.size())
+        {
+            return -1;
+        }
         while (index >= 0 && !(uniformRoute.get(index) instanceof LightManagerNode)) {
             --index;
         }

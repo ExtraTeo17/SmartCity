@@ -37,9 +37,14 @@ class TestPedestrianTests {
         var timeProvider = mock(ITimeProvider.class);
         var taskProvider = mock(ITaskProvider.class);
         when(timeProvider.getCurrentSimulationTime()).thenReturn(time);
+
         var pedestrian = createPedestrian(timeProvider, taskProvider);
 
         // Act
+
+
+        // Act
+
         pedestrian.setState(DrivingState.AT_DESTINATION);
 
         // Assert
@@ -50,12 +55,31 @@ class TestPedestrianTests {
         assertEquals(time, end);
     }
 
+    @Test
+    void pedestrian_is_troubled_shouldNotMove() {
+        // Arrange
+        var time = LocalDateTime.of(2020, 10, 12, 10, 10);
+        var timeProvider = mock(ITimeProvider.class);
+        var taskProvider = mock(ITaskProvider.class);
+        var pedestrian = createPedestrian(timeProvider, taskProvider);
 
-    private TestPedestrian createPedestrian() {
-        return createPedestrian(mock(ITimeProvider.class), mock(ITaskProvider.class));
+
+        var moveIndexBeforeTrouble = pedestrian.getMoveIndex();
+        // Act
+        pedestrian.setTroubled(false);
+
+        // Assert
+        var moveIndexAfterTrouble = pedestrian.getMoveIndex();
+        assertEquals(moveIndexBeforeTrouble, moveIndexAfterTrouble);
+
     }
+
+
 
     private TestPedestrian createPedestrian(ITimeProvider timeProvider, ITaskProvider taskProvider) {
         return new TestPedestrian(timeProvider);
     }
+   // private void addPedestrianAgent(ITimeProvider timeProvider, ITaskProvider taskProvider) {
+     //   return new TestPedestrian(timeProvider);
+   // }
 }

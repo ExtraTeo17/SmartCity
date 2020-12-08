@@ -14,7 +14,6 @@ import routing.abstractions.IRouteGenerator;
 import routing.abstractions.IRouteTransformer;
 import smartcity.config.ConfigContainer;
 import smartcity.config.abstractions.IChangeTransportConfigContainer;
-import smartcity.config.abstractions.ITroublePointsConfigContainer;
 import smartcity.lights.abstractions.ICrossroad;
 import smartcity.stations.StationStrategy;
 import smartcity.task.abstractions.ITaskProvider;

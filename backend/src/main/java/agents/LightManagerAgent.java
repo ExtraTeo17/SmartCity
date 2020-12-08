@@ -21,6 +21,14 @@ import java.util.Map;
 import static agents.AgentConstants.DEFAULT_BLOCK_ON_ERROR;
 import static agents.message.MessageManager.*;
 
+/**
+ * The main aim of LightManager agent is to manage a specific group of
+ * lights and control traffic. Moreover, LightManager collects
+ * information from cars/pedestrians/bikes about the time they arrive, and
+ * receives requests to pass from the cars/pedestrians/bikes.
+ * LightManager decides when a particular light should switch color,
+ * which depends on a chosen strategy.
+ */
 public class LightManagerAgent extends AbstractAgent {
     public static final String name = LightManagerAgent.class.getSimpleName().replace("Agent", "");
     private final ICrossroad crossroad;

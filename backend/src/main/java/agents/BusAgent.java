@@ -35,6 +35,17 @@ import static agents.message.MessageManager.createMessage;
 import static agents.message.MessageManager.createProperties;
 import static smartcity.config.StaticConfig.USE_BATCHED_UPDATES;
 
+/**
+ * The main aim of Bus agent if to circulate between point A and B and
+ * stop at bus stops in order to gather all Traveler agents. As soon as
+ * the bus reaches a stop, it sends information to the next one about its
+ * upcoming arrival. When he is at the stop, he informs the
+ * {@link StationAgent} about it and waits for the command to depart.
+ * In addition, when boarding, passengers send him information where they are
+ * going. This allows the bus to control the number of passengers and inform
+ * them about destination stop. Besides that, on the road of Bus can appear only
+ * one type of obstacles - traffic jams.
+ */
 public class BusAgent extends AbstractAgent {
     public static final String name = BusAgent.class.getSimpleName().replace("Agent", "");
 
