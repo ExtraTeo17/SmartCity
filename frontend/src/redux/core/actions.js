@@ -41,61 +41,144 @@ import {
  */
 
 /**
- * @typedef {Object} Location - Represents location on map
- * @property {number} lat - Latitude in degrees
- * @property {number} lng - Longtitude in degrees
+ * @function
  */
-
 export const configReplaced = createAction(CONFIG_REPLACED);
 
 /**
- * @param {{ lat: Number, lng: Number, rad: Number }} center
+ * @function
  */
 export const centerUpdated = createAction(CENTER_UPDATED);
 
+/**
+ * @function
+ */
 export const centerMenuUpdated = createAction(CENTER_MENU_UPDATED);
 
+/**
+ * @function
+ */
 export const startSimulationDataUpdated = createAction(START_SIMULATION_DATA_UPDATED);
 
+/**
+ * @function
+ */
 export const shouldStartSimulation = createAction(SHOULD_START_SIMULATION);
 
+/**
+ * @function
+ */
 export const generatePedestriansUpdated = createAction(GENERATE_PEDESTRIANS_UPDATED);
 
+/**
+ * @function
+ */
 export const simulationPrepareStarted = createAction(SIMULATION_PREPARE_STARTED);
+
+/**
+ * @function
+ */
 export const simulationPrepared = createAction(
   SIMULATION_PREPARED,
   simulationData => simulationData,
   () => ({ lights: [], stations: [], buses: [] })
 );
 
+/**
+ * @function
+ */
 export const simulationStarted = createAction(SIMULATION_STARTED);
 
 /**
+ * @function
  * @param {{ id: Number, location: Location, route:Array<Location>, isTestCar:Boolean }} car
  */
 export const carCreated = createAction(CAR_CREATED);
+/**
+ * @function
+ */
 export const carUpdated = createAction(CAR_UPDATED);
+/**
+ * @function
+ */
 export const carKilled = createAction(CAR_KILLED);
+/**
+ * @function
+ */
 export const carRouteChanged = createAction(CAR_ROUTE_CHANGED);
 
+/**
+ * @function
+ */
 export const lightsSwitched = createAction(LIGHTS_SWITCHED);
+/**
+ * @function
+ */
 export const troublePointCreated = createAction(TROUBLE_POINT_CREATED);
+/**
+ * @function
+ */
 export const troublePointVanished = createAction(TROUBLE_POINT_VANISHED);
+/**
+ * @function
+ */
 export const trafficJamStarted = createAction(TRAFFIC_JAM_STARTED);
+/**
+ * @function
+ */
 export const trafficJamEnded = createAction(TRAFFIC_JAM_ENDED);
+/**
+ * @function
+ */
 export const batchedUpdate = createAction(BATCHED_UPDATE);
 
+/**
+ * @function
+ */
 export const busUpdated = createAction(BUS_UPDATED);
+/**
+ * @function
+ */
 export const busFillStateUpdated = createAction(BUS_FILL_STATE_UPDATED);
+/**
+ * @function
+ */
 export const busKilled = createAction(BUS_KILLED);
+/**
+ * @function
+ */
 export const busCrashed = createAction(BUS_CRASHED);
 
+/**
+ * @function
+ */
 export const pedestrianCreated = createAction(PEDESTRIAN_CREATED);
+/**
+ * @function
+ */
 export const pedestrianUpdated = createAction(PEDESTRIAN_UPDATED);
+/**
+ * @function
+ */
 export const pedestrianPushedIntoBus = createAction(PEDESTRIAN_PUSHED);
+/**
+ * @function
+ */
 export const pedestrianPulledFromBus = createAction(PEDESTRIAN_PULLED);
+/**
+ * @function
+ */
 export const pedestrianKilled = createAction(PEDESTRIAN_KILLED);
 
+/**
+ * @function
+ */
 export const bikeCreated = createAction(BIKE_CREATED);
+/**
+ * @function
+ */
 export const bikeUpdated = createAction(BIKE_UPDATED);
+/**
+ * @function
+ */
 export const bikeKilled = createAction(BIKE_KILLED);
