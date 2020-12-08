@@ -1,3 +1,9 @@
+/**
+ * Message type constants
+ * @category Web
+ * @module MessageType
+ */
+
 const PREPARE_SIMULATION_REQUEST = 1;
 const PREPARE_SIMULATION_RESPONSE = 2;
 const START_SIMULATION_REQUEST = 3;
@@ -31,6 +37,10 @@ const CREATE_BIKE_INFO = 50;
 const UPDATE_BIKE_INFO = 51;
 const KILL_BIKE_INFO = 52;
 
+/**
+ * @typedef {Number} MessageType
+ * @enum {MessageType}
+ */
 export {
   PREPARE_SIMULATION_REQUEST,
   PREPARE_SIMULATION_RESPONSE,

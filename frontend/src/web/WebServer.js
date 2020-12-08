@@ -2,13 +2,29 @@ import { notify } from "react-notify-toast";
 import { SERVER_ADDRESS, RECONNECT_INTERVAL_SEC, NOTIFY_SHOW_MS } from "../constants/global";
 import MessageHandler from "./MessageHandler";
 
+/**
+ * Used for interaction with web sockets.
+ * @category Web
+ * @module WebServer
+ */
+
+/**
+ * @typedef {Object} Message - object used for communication with sever
+ * @property {module:MessageType~MessageType} type
+ * @property {Object} payload - message-specific data
+ */
+
 const socketContainer = {
   socket: {},
   reconnecting: false,
   connected: false,
 };
 
-const createSocket = () => {
+/**
+ * Initializes and returns WebSocket with automatic reconnection
+ * @returns {WebSocket} Opened socket
+ */
+function createSocket() {
   const socket = new WebSocket(SERVER_ADDRESS);
   socket.onopen = () => {
     console.info("Connected !!!");
@@ -19,10 +35,9 @@ const createSocket = () => {
   };
 
   /**
-   * @param {{ data: object; }} e
+   * @param {{ data: Object }} e
    */
   socket.onmessage = e => {
-    // logMessage(e);
     const msgDto = JSON.parse(e.data);
     const msg = { type: msgDto.type, payload: JSON.parse(msgDto.payload) };
     MessageHandler.handle(msg);
@@ -56,15 +71,14 @@ const createSocket = () => {
   };
 
   return socket;
-};
-
-/** PUBLIC INTERFACE ---------------------------------------------------------- */
+}
 
 socketContainer.socket = createSocket();
 
 export default {
   /**
-   * @param {{ type: number; payload: object; }} msgObj
+   * Sends stringified JSON message to connected server
+   * @param {Message} msgObj
    */
   send(msgObj) {
     if (socketContainer.socket.readyState !== WebSocket.OPEN) {
@@ -84,6 +98,10 @@ export default {
     console.groupEnd();
   },
 
+  /**
+   * Returns state of connection
+   * @returns {Boolean} True if connected, false otherwise
+   */
   isConnected() {
     return socketContainer.connected;
   },
