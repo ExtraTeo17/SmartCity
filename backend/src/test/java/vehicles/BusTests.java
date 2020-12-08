@@ -124,16 +124,16 @@ class BusTests {
 
 
     private static Bus createBus() {
-        return new Bus(mock(EventBus.class),mock(ITimeProvider.class), 1, new ArrayList<>(), new ArrayList<>(),
+        return new Bus(mock(EventBus.class), mock(ITimeProvider.class), 1, new ArrayList<>(), new ArrayList<>(),
                 mock(Timetable.class), "523", "01");
     }
 
-    private static void setupPassengerCount(Bus bus, int count){
+    private static void setupPassengerCount(Bus bus, int count) {
         ReflectionHelper.setField("passengersCount", bus, count);
-        if(count > Bus.CAPACITY_HIGH){
+        if (count > Bus.CAPACITY_HIGH) {
             ReflectionHelper.setField("fillState", bus, BusFillState.HIGH);
         }
-        else if(count > Bus.CAPACITY_MID){
+        else if (count > Bus.CAPACITY_MID) {
             ReflectionHelper.setField("fillState", bus, BusFillState.MID);
         }
     }

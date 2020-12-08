@@ -41,10 +41,6 @@ class TestPedestrianTests {
         var pedestrian = createPedestrian(timeProvider, taskProvider);
 
         // Act
-
-
-        // Act
-
         pedestrian.setState(DrivingState.AT_DESTINATION);
 
         // Assert
@@ -75,11 +71,7 @@ class TestPedestrianTests {
     }
 
 
-
     private TestPedestrian createPedestrian(ITimeProvider timeProvider, ITaskProvider taskProvider) {
         return new TestPedestrian(timeProvider);
     }
-   // private void addPedestrianAgent(ITimeProvider timeProvider, ITaskProvider taskProvider) {
-     //   return new TestPedestrian(timeProvider);
-   // }
 }

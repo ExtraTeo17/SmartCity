@@ -113,10 +113,10 @@ class SimpleCrossroad implements ICrossroad {
     }
 
     private boolean lightSwitcherStarted() {
-		return defaultExecutionDelay >= 0;
-	}
+        return defaultExecutionDelay >= 0;
+    }
 
-	@Override
+    @Override
     public List<Light> getLights() {
         return new ArrayList<>(allLights);
     }

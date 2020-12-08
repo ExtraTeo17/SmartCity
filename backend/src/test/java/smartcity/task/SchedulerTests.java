@@ -222,7 +222,7 @@ class SchedulerTests {
 
     private StartSimulationEvent prepareStartEvent(LocalDateTime startTime) {
         return new StartSimulationEvent(false, 111, 112, false, true, 444,
-                222,  5005, 222, true, 223, false,
+                222, 5005, 222, true, 223, false,
                 true, false, true, startTime, 333, false,
                 354, false, 33,
                 false, true, false
