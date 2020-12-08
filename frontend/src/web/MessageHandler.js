@@ -29,7 +29,17 @@ import { NOTIFY_SHOW_MS } from "../constants/global";
 import Dispatcher from "../redux/Dispatcher";
 import { BusFillState } from "../components/Models/BusFillState";
 
-// eslint-disable-next-line
+/**
+ * Handles all incoming messages
+ * @category Web
+ * @module MessageHandler
+ */
+
+/**
+ * Helper function for logging messages
+ * @param {Object} payload
+ */
+// eslint-disable-next-line no-unused-vars
 function logMessage(payload) {
   console.groupCollapsed("HandledMessage");
   console.info("Message received.");
@@ -38,6 +48,10 @@ function logMessage(payload) {
 }
 
 export default {
+  /**
+   * Handles message by invoking appropriate Dispatcher method
+   * @param {module:WebServer~Message} msg - Message to handle
+   */
   handle(msg) {
     const { payload } = msg;
     switch (msg.type) {

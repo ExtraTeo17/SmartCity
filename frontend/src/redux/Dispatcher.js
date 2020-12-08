@@ -27,6 +27,11 @@ import {
   busCrashed,
 } from "./core/actions";
 
+/**
+ * @category Redux
+ * @module Dispatcher
+ */
+
 const fps = 20;
 const fpsInterval = 1000 / fps;
 let timer = null;
@@ -43,11 +48,19 @@ const pushPedQueue = [];
 
 let start = window.performance.now();
 
+/**
+ * @param {any} action
+ * @param {any} key
+ * @param {Map} map
+ */
 function dispatchFromMap(action, key, map) {
   map.delete(key);
   dispatch(action);
 }
 
+/**
+ * @param {number} now
+ */
 function update(now) {
   const elapsed = now - start;
 
@@ -86,11 +99,20 @@ function onDetectStartedSimulation() {
     // eslint-disable-next-line no-use-before-define
     Dispatcher.prepareSimulation([], [], []);
     // eslint-disable-next-line no-use-before-define
-    Dispatcher.startSimulation(10);
+    Dispatcher.startSimulation();
   });
 }
 
+/**
+ * @category Redux
+ * @namespace Dispatcher
+ */
 const Dispatcher = {
+  /**
+   * @param {any[]} lights
+   * @param {any[]} stations
+   * @param {any[]} buses
+   */
   prepareSimulation(lights, stations, buses) {
     localWasPrepared = true;
     dispatch(simulationPrepared({ lights, stations, buses }));
@@ -102,6 +124,9 @@ const Dispatcher = {
     dispatch(simulationStarted());
   },
 
+  /**
+   * @param {any} car
+   */
   createCar(car) {
     dispatch(carCreated(car));
     if (timer === null) {
@@ -109,18 +134,30 @@ const Dispatcher = {
     }
   },
 
+  /**
+   * @param {{ id: any }} car
+   */
   updateCar(car) {
     carUpdateQueue.set(car.id, carUpdated(car));
   },
 
+  /**
+   * @param {any} data
+   */
   killCar(data) {
     dispatch(carKilled(data));
   },
 
+  /**
+   * @param {any} routeInfo
+   */
   updateCarRoute(routeInfo) {
     dispatch(carRouteChanged(routeInfo));
   },
 
+  /**
+   * @param {any} id
+   */
   switchLights(id) {
     // WARN: May cause unwanted behaviour
     if (switchLightsQueue.has(id)) {
@@ -130,26 +167,44 @@ const Dispatcher = {
     }
   },
 
+  /**
+   * @param {any} troublePoint
+   */
   createTroublePoint(troublePoint) {
     dispatch(troublePointCreated(troublePoint));
   },
 
+  /**
+   * @param {any} id
+   */
   hideTroublePoint(id) {
     dispatch(troublePointVanished(id));
   },
 
+  /**
+   * @param {any} id
+   */
   startTrafficJam(id) {
     dispatch(trafficJamStarted(id));
   },
 
+  /**
+   * @param {any} id
+   */
   endTrafficJam(id) {
     dispatch(trafficJamEnded(id));
   },
 
+  /**
+   * @param {{ id: any }} bus
+   */
   updateBus(bus) {
     busUpdateQueue.set(bus.id, busUpdated(bus));
   },
 
+  /**
+   * @param {any} busData
+   */
   updateBusFillState(busData) {
     dispatch(busFillStateUpdated(busData));
     if (timer === null) {
@@ -157,16 +212,25 @@ const Dispatcher = {
     }
   },
 
+  /**
+   * @param {any} id
+   */
   killBus(id) {
     dispatch(busKilled(id));
     busUpdateQueue.delete(id);
   },
 
+  /**
+   * @param {any} id
+   */
   crashBus(id) {
     dispatch(busCrashed(id));
     busUpdateQueue.delete(id);
   },
 
+  /**
+   * @param {any} pedestrian
+   */
   createPedestrian(pedestrian) {
     dispatch(pedestrianCreated(pedestrian));
     if (timer === null) {
@@ -174,22 +238,37 @@ const Dispatcher = {
     }
   },
 
+  /**
+   * @param {{ id: any }} pedData
+   */
   updatePedestrian(pedData) {
     pedestrianUpdateQueue.set(pedData.id, pedestrianUpdated(pedData));
   },
 
+  /**
+   * @param {any} id
+   */
   pushPedestrianIntoBus(id) {
     pushPedQueue.push(pedestrianPushedIntoBus(id));
   },
 
+  /**
+   * @param {any} pedData
+   */
   pullPedestrianFromBus(pedData) {
     pullKillPedQueue.push(pedestrianPulledFromBus(pedData));
   },
 
+  /**
+   * @param {any} pedData
+   */
   killPedestrian(pedData) {
     pullKillPedQueue.push(pedestrianKilled(pedData));
   },
 
+  /**
+   * @param {any} bike
+   */
   createBike(bike) {
     dispatch(bikeCreated(bike));
     if (timer === null) {
@@ -197,14 +276,26 @@ const Dispatcher = {
     }
   },
 
+  /**
+   * @param {{ id: any }} bike
+   */
   updateBike(bike) {
     bikeUpdateQueue.set(bike.id, bikeUpdated(bike));
   },
 
+  /**
+   * @param {any} data
+   */
   killBike(data) {
     dispatch(bikeKilled(data));
   },
 
+  /**
+   * @param {Object[]} carUpdates
+   * @param {Object[]} bikeUpdates
+   * @param {Object[]} busUpdates
+   * @param {Object[]} pedUpdates
+   */
   updateBatched(carUpdates, bikeUpdates, busUpdates, pedUpdates) {
     dispatch(batchedUpdate({ carUpdates, bikeUpdates, busUpdates, pedUpdates }));
   },

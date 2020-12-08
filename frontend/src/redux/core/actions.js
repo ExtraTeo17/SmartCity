@@ -33,10 +33,22 @@ import {
   BUS_CRASHED,
 } from "./constants";
 
+/**
+ * @category Redux
+ * @subcategory Core
+ * @module actions
+ */
+
+/**
+ * @typedef {Object} Location - Represents location on map
+ * @property {number} lat - Latitude in degrees
+ * @property {number} lng - Longtitude in degrees
+ */
+
 export const configReplaced = createAction(CONFIG_REPLACED);
 
 /**
- * @param {{ lat: number; lng:number; rad:number }} center
+ * @param {{ lat: Number, lng: Number, rad: Number }} center
  */
 export const centerUpdated = createAction(CENTER_UPDATED);
 
@@ -58,7 +70,7 @@ export const simulationPrepared = createAction(
 export const simulationStarted = createAction(SIMULATION_STARTED);
 
 /**
- * @param {{id:number; location:{lat:number; lng:number;}; route:Array<> isTestCar:boolean; }} car
+ * @param {{ id: Number, location: Location, route:Array<Location>, isTestCar:Boolean }} car
  */
 export const carCreated = createAction(CAR_CREATED);
 export const carUpdated = createAction(CAR_UPDATED);
