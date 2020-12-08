@@ -9,10 +9,7 @@ import events.web.SwitchLightsEvent;
 import events.web.bike.BikeAgentCreatedEvent;
 import events.web.bike.BikeAgentDeadEvent;
 import events.web.bike.BikeAgentUpdatedEvent;
-import events.web.bus.BusAgentDeadEvent;
-import events.web.bus.BusAgentFillStateUpdatedEvent;
-import events.web.bus.BusAgentStartedEvent;
-import events.web.bus.BusAgentUpdatedEvent;
+import events.web.bus.*;
 import events.web.car.CarAgentCreatedEvent;
 import events.web.car.CarAgentDeadEvent;
 import events.web.car.CarAgentRouteChangedEvent;
@@ -166,6 +163,11 @@ class Communicator {
     @Subscribe
     public void handle(BatchedUpdateEvent e) {
         webService.batchedUpdate(e.carUpdates, e.bikeUpdates, e.busUpdates, e.pedUpdates);
+    }
+
+    @Subscribe
+    public void handle(BusAgentCrashedEvent e) {
+        webService.crashBus(e.id);
     }
 
     private void onHandle(Object obj) {

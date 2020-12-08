@@ -13,11 +13,8 @@ import routing.core.IGeoPosition;
 import routing.nodes.LightManagerNode;
 import smartcity.ITimeProvider;
 import smartcity.SmartCityAgent;
-import vehicles.ITestable;
 import vehicles.MovingObject;
 import vehicles.enums.DrivingState;
-
-import java.time.LocalDateTime;
 
 import static agents.message.MessageManager.createMessage;
 import static agents.message.MessageManager.createProperties;
@@ -28,7 +25,7 @@ import static smartcity.config.StaticConfig.USE_BATCHED_UPDATES;
  * The main aim of Bike agent is to get from point A to point B.
  * Bike agent could communicate with {@link LightManagerAgent} in order to cross the road.
  */
-public class BikeAgent extends AbstractAgent  {
+public class BikeAgent extends AbstractAgent {
     private final MovingObject vehicle;
 
     BikeAgent(int id, MovingObject vehicle,

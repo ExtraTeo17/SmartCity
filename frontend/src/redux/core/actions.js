@@ -5,6 +5,7 @@ import {
   CAR_CREATED,
   CENTER_UPDATED,
   CENTER_MENU_UPDATED,
+  SIMULATION_PREPARE_STARTED,
   SIMULATION_PREPARED,
   SIMULATION_STARTED,
   LIGHTS_SWITCHED,
@@ -29,6 +30,7 @@ import {
   BIKE_CREATED,
   CONFIG_REPLACED,
   BATCHED_UPDATE,
+  BUS_CRASHED,
 } from "./constants";
 
 export const configReplaced = createAction(CONFIG_REPLACED);
@@ -46,6 +48,7 @@ export const shouldStartSimulation = createAction(SHOULD_START_SIMULATION);
 
 export const generatePedestriansUpdated = createAction(GENERATE_PEDESTRIANS_UPDATED);
 
+export const simulationPrepareStarted = createAction(SIMULATION_PREPARE_STARTED);
 export const simulationPrepared = createAction(
   SIMULATION_PREPARED,
   simulationData => simulationData,
@@ -72,6 +75,7 @@ export const batchedUpdate = createAction(BATCHED_UPDATE);
 export const busUpdated = createAction(BUS_UPDATED);
 export const busFillStateUpdated = createAction(BUS_FILL_STATE_UPDATED);
 export const busKilled = createAction(BUS_KILLED);
+export const busCrashed = createAction(BUS_CRASHED);
 
 export const pedestrianCreated = createAction(PEDESTRIAN_CREATED);
 export const pedestrianUpdated = createAction(PEDESTRIAN_UPDATED);

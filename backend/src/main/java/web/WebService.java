@@ -12,6 +12,7 @@ import web.message.MessageType;
 import web.message.payloads.infos.create.*;
 import web.message.payloads.infos.kill.*;
 import web.message.payloads.infos.other.ChangeCarRouteInfo;
+import web.message.payloads.infos.other.CrashBusInfo;
 import web.message.payloads.infos.other.SwitchLightsInfo;
 import web.message.payloads.infos.update.*;
 import web.message.payloads.models.*;
@@ -233,5 +234,12 @@ class WebService implements IWebService {
         var payload = new BatchedUpdateInfo(carUpdateDtos, bikeUpdateDtos, busUpdateDtos, pedUpdateDtos);
 
         webConnector.broadcastMessage(MessageType.BATCHED_UPDATE_INFO, payload);
+    }
+
+    @Override
+    public void crashBus(int id) {
+        var payload = new CrashBusInfo(id);
+
+        webConnector.broadcastMessage(MessageType.CRASH_BUS_INFO, payload);
     }
 }

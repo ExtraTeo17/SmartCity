@@ -179,7 +179,7 @@ const LimitsMenu = props => {
         </div>
       )}
 
-      {generateTroublePoints && (
+      {generateCars && generateTroublePoints && (
         <div className="mb-4 form-border">
           <div className="form-group mt-2">
             <label htmlFor="timeBeforeTrouble">Time before road trouble occurs</label>

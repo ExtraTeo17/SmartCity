@@ -38,13 +38,10 @@ import java.util.function.Supplier;
 
 import static smartcity.config.StaticConfig.USE_BATCHED_UPDATES;
 
-@SuppressWarnings("OverlyCoupledClass")
+@SuppressWarnings({"OverlyCoupledClass", "ClassWithTooManyFields"})
 public class TaskProvider implements ITaskProvider {
     private static final Logger logger = LoggerFactory.getLogger(TaskProvider.class);
     private final int pedestrianRouteOffset = 200;
-
-    IGeoPosition startForBatches = null;
-    IGeoPosition endForBatches = null;
 
     private final ConfigContainer configContainer;
     private final IRouteGenerator routeGenerator;
@@ -55,6 +52,9 @@ public class TaskProvider implements ITaskProvider {
     private final EventBus eventBus;
 
     private final Table<IGeoPosition, IGeoPosition, List<RouteNode>> routeInfoCache;
+
+    private IGeoPosition startForBatches;
+    private IGeoPosition endForBatches;
 
     @Inject
     public TaskProvider(ConfigContainer configContainer,
@@ -80,35 +80,33 @@ public class TaskProvider implements ITaskProvider {
             List<RouteNode> route;
 
             try {
-
-
-                if (configContainer.getGenerateBatchesForCars()) {
+                var effectiveStart = start;
+                var effectiveEnd = end;
+                if (configContainer.shouldGenerateBatchesForCars()) {
                     if (startForBatches == null && endForBatches == null) {
                         startForBatches = start;
                         endForBatches = end;
                     }
-                    route = routeInfoCache.get(startForBatches, endForBatches);
 
-                }
-                else {
-                    route = routeInfoCache.get(start, end);
+                    effectiveStart = startForBatches;
+                    effectiveEnd = endForBatches;
                 }
 
-                if (route == null && !configContainer.getGenerateBatchesForCars()) {
-                    route = routeGenerator.generateRouteInfo(start, end, false);
-                    routeInfoCache.put(start, end, route);
+                route = routeInfoCache.get(effectiveStart, effectiveEnd);
+                if (route == null) {
+                    route = routeGenerator.generateRouteInfo(effectiveStart, effectiveEnd, false);
+                    routeInfoCache.put(effectiveStart, effectiveEnd, route);
                 }
-                else {
-                    route = routeGenerator.generateRouteInfo(startForBatches, endForBatches, false);
-                    routeInfoCache.put(startForBatches, endForBatches, route);
-                }
-
             } catch (Exception e) {
                 logger.warn("Error generating route info", e);
                 return;
             }
+
             if (route.size() == 0) {
-                logger.debug("Generated route is empty, agent won't be created.");
+                logger.warn("Generated route is empty, agent won't be created.");
+                if (startForBatches != null) {
+                    startForBatches = endForBatches = null;
+                }
                 return;
             }
 

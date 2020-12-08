@@ -7,9 +7,11 @@ import { angleFromCoordinates } from "../../utils/helpers";
 import { getRotationReducer } from "./Extensions/reducers";
 import RotatedMarker from "./Extensions/RotatedMarker";
 
+import "../../styles/Bus.css";
+
 const Bus = props => {
   const {
-    bus: { id, route, location, fillState },
+    bus: { id, route, location, fillState, crashed },
   } = props;
 
   const defaultAngle = route ? angleFromCoordinates(route[0], route[1]) : 0;
@@ -18,6 +20,23 @@ const Bus = props => {
   useEffect(() => {
     dispatch({ payload: location });
   }, [location]);
+
+  const markerRef = React.useRef();
+
+  useEffect(() => {
+    if (crashed) {
+      console.info("Crashed!");
+      const htmlElem = markerRef.current.getElement();
+      htmlElem.classList.add("crashed");
+      markerRef.current.openPopup();
+    }
+  }, [crashed]);
+
+  function initMarker(ref) {
+    if (ref) {
+      markerRef.current = ref.leafletElement;
+    }
+  }
 
   function getIcon() {
     switch (fillState) {
@@ -36,13 +55,26 @@ const Bus = props => {
 
   return (
     <RotatedMarker
+      customRef={initMarker}
       rotationAngle={state.angle}
       rotationOrigin="center"
       position={state.loc}
       icon={getIcon()}
       zIndexOffset={BUS_MOVING_Z_INDEX}
     >
-      <Popup>I am a bus-{id}!</Popup>
+      {crashed && (
+        <Popup
+          offset={[-4, 21]}
+          closeOnClick={false}
+          closeOnEscapeKey={false}
+          closeButton={false}
+          keepInView={false}
+          className="trans-popup"
+        >
+          &#128369;
+        </Popup>
+      )}
+      {!crashed && <Popup>I am a bus-{id}!</Popup>}
     </RotatedMarker>
   );
 };

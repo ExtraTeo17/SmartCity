@@ -126,7 +126,7 @@ describe("Selector for buses without routes", () => {
       newBuses[0] = { ...newBuses[0], location: { lat: defLat, lng: i + 0.3 } };
       updateStateWithNewBuses(newBuses);
     }
-    expect(timeSum).toBeLessThan(normalSelectMs * 25);
+    expect(timeSum).toBeLessThan(normalSelectMs * 50);
   });
 });
 
@@ -255,7 +255,7 @@ describe("Selector for buses with routes", () => {
     res1 = busesSelector(state);
     end = performance.now();
     expect(res1).toHaveLength(2);
-    expect(end - start).toBeLessThan(normalSelectMs);
+    expect(end - start).toBeLessThan(1.5 * normalSelectMs);
 
     // Fourth select - one moving - normal many times
     newBuses = new Array(busesNum);
@@ -278,6 +278,6 @@ describe("Selector for buses with routes", () => {
       newBuses[0] = { ...newBuses[0], location: { lat: defLat, lng: i + 0.3 } };
       updateStateWithNewBuses(newBuses);
     }
-    expect(timeSum).toBeLessThan(normalSelectMs * 40);
+    expect(timeSum).toBeLessThan(normalSelectMs * 100);
   });
 });

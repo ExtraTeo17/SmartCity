@@ -11,12 +11,20 @@
   display: flex;
   align-items: center;
 }
+
 .form-check-input {
   margin-top: 2px;
 }
 
-.card {
-  min-height: 300px;
+.small-text {
+  font-size: calc(7px + 0.8vmin);
+  line-height: calc(1.7 * (7px + 0.8vmin));
+}
+
+/* Height adjustment - relative to font-size */
+.custom-switch {
+  line-height: calc(1.1 * (10px + 1vmin));
+  margin-bottom: 0.8rem;
 }
 
 .invalid-input {

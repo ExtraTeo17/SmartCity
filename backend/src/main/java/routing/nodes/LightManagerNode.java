@@ -46,7 +46,7 @@ public class LightManagerNode extends RouteNode {
     }
 
     @VisibleForTesting
-    public void setAdjacentWayId(Long adjacentWayId){ this.adjacentWayId = adjacentWayId ; }
+    public void setAdjacentWayId(Long adjacentWayId) { this.adjacentWayId = adjacentWayId; }
 
     @Override
     public boolean equals(Object obj) {

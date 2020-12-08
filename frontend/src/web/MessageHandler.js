@@ -23,6 +23,7 @@ import {
   UPDATE_BIKE_INFO,
   KILL_BIKE_INFO,
   BATCHED_UPDATE_INFO,
+  CRASH_BUS_INFO,
 } from "./MessageType";
 import { NOTIFY_SHOW_MS } from "../constants/global";
 import Dispatcher from "../redux/Dispatcher";
@@ -41,7 +42,6 @@ export default {
     const { payload } = msg;
     switch (msg.type) {
       case PREPARE_SIMULATION_RESPONSE: {
-        notify.show("Simulation prepared!", "success", NOTIFY_SHOW_MS);
         console.groupCollapsed("Prepared");
         console.info(msg.payload);
         console.groupEnd();
@@ -112,6 +112,11 @@ export default {
 
       case KILL_BUS_INFO: {
         Dispatcher.killBus(payload.id);
+        break;
+      }
+
+      case CRASH_BUS_INFO: {
+        Dispatcher.crashBus(payload.id);
         break;
       }
 

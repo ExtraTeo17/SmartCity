@@ -6,6 +6,7 @@ import agents.CarAgent;
 import agents.PedestrianAgent;
 import agents.abstractions.IAgentsContainer;
 import agents.utilities.MessageParameter;
+import com.google.common.base.Strings;
 import com.google.common.eventbus.EventBus;
 import com.google.inject.Inject;
 import events.web.bike.BikeAgentDeadEvent;
@@ -85,7 +86,7 @@ public class SmartCityAgent extends Agent {
             Long resultTime = getTimeIfTestable(pedestrian);
             int distance = pedestrian.getUniformRouteSize() * RoutingConstants.STEP_SIZE_METERS;
             var testBikeId = rcv.getUserDefinedParameter(MessageParameter.TEST_BIKE_AGENT_ID);
-            var isMetamorphosis = testBikeId != null;
+            var isMetamorphosis = !Strings.isNullOrEmpty(testBikeId);
             if (isMetamorphosis) {
                 transformedTestBikeId = Integer.parseInt(testBikeId);
                 transformedPedestrianResultTime = resultTime;

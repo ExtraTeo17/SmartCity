@@ -12,10 +12,11 @@ import smartcity.config.abstractions.*;
 @SuppressWarnings("ClassWithTooManyFields")
 public class ConfigContainer extends ConfigMutator
         implements IZoneMutator,
-        ILightConfigContainer,
         IGenerationConfigContainer,
+        ILightConfigContainer,
         IStationConfigContainer,
-        ITroublePointsConfigContainer {
+        ITroublePointsConfigContainer,
+        IChangeTransportConfigContainer {
 
     private SimulationState simulationState = SimulationState.INITIAL;
 
@@ -24,6 +25,7 @@ public class ConfigContainer extends ConfigMutator
     private boolean shouldGenerateConstructionSites = true;
     private boolean shouldDetectTrafficJams = false;
     private boolean shouldGenerateBusFailures = false;
+    private boolean shouldGenerateBatchesForCars = false;
 
     private boolean lightStrategyActive = false;
     private boolean stationStrategyActive = false;
@@ -48,14 +50,6 @@ public class ConfigContainer extends ConfigMutator
         this.zone = Zone.of(warsawPos, defaultRadius);
     }
 
-    public boolean shouldGeneratePedestriansAndBuses() {
-        return shouldGeneratePedestriansAndBuses;
-    }
-
-    public void setGeneratePedestriansAndBuses(boolean value) {
-        this.shouldGeneratePedestriansAndBuses = value;
-    }
-
     public IZone getZone() {
         return zone;
     }
@@ -69,20 +63,30 @@ public class ConfigContainer extends ConfigMutator
         return simulationState;
     }
 
+    public void setSimulationState(SimulationState simulationState) {
+        if (this.simulationState != simulationState) {
+            this.simulationState = simulationState;
+        }
+    }
+
+    @Override
+    public boolean shouldGeneratePedestriansAndBuses() {
+        return shouldGeneratePedestriansAndBuses;
+    }
+
+    @Override
+    public void setGeneratePedestriansAndBuses(boolean value) {
+        this.shouldGeneratePedestriansAndBuses = value;
+    }
+
     @Override
     public void setBusCrashGeneratedOnce(boolean busCrashGeneratedOnce) {
         this.busCrashGeneratedOnce = busCrashGeneratedOnce;
     }
 
     @Override
-    public boolean getBusCrashGeneratedOnce() {
+    public boolean wasBusCrashGeneratedOnce() {
         return busCrashGeneratedOnce;
-    }
-
-    public void setSimulationState(SimulationState simulationState) {
-        if (this.simulationState != simulationState) {
-            this.simulationState = simulationState;
-        }
     }
 
     @Override
@@ -101,8 +105,13 @@ public class ConfigContainer extends ConfigMutator
     }
 
     @Override
-    public boolean getGenerateBatchesForCars() {
-        return generateBatchesForCars;
+    public boolean shouldGenerateBatchesForCars() {
+        return shouldGenerateBatchesForCars;
+    }
+
+    @Override
+    public void setShouldGenerateBatchesForCars(boolean generateBatchesForCars) {
+        this.shouldGenerateBatchesForCars = generateBatchesForCars;
     }
 
     @Override
@@ -139,8 +148,13 @@ public class ConfigContainer extends ConfigMutator
     public boolean shouldGenerateBusFailures() { return shouldGenerateBusFailures; }
 
     @Override
-    public void setShouldGenerateConstructionSites(boolean constructionSiteGenerationActive) {
-        shouldGenerateConstructionSites = constructionSiteGenerationActive;
+    public void setShouldGenerateBusFailures(boolean generateBusFailures) {
+        shouldGenerateBusFailures = generateBusFailures;
+    }
+
+    @Override
+    public void setShouldGenerateConstructionSites(boolean shouldGenerateConstructionSites) {
+        this.shouldGenerateConstructionSites = shouldGenerateConstructionSites;
     }
 
     @Override
@@ -193,24 +207,23 @@ public class ConfigContainer extends ConfigMutator
         shouldUseFixedConstructionSites = useFixedConstructionSites;
     }
 
-	@Override
-	public boolean shouldDetectTrafficJams() {
-		return shouldDetectTrafficJams;
-	}
+    @Override
+    public boolean shouldDetectTrafficJams() {
+        return shouldDetectTrafficJams;
+    }
 
-	@Override
-	public void setShouldDetectTrafficJam(boolean shouldDetectTrafficJam) {
-		this.shouldDetectTrafficJams = shouldDetectTrafficJam;
-	}
+    @Override
+    public void setShouldDetectTrafficJam(boolean shouldDetectTrafficJam) {
+        this.shouldDetectTrafficJams = shouldDetectTrafficJam;
+    }
 
-	@Override
-	public boolean isTransportChangeStrategyActive() {
-		return transportChangeStrategyActive;
-	}
+    @Override
+    public boolean isTransportChangeStrategyActive() {
+        return transportChangeStrategyActive;
+    }
 
-	@Override
-	public void setTransportChangeStrategyActive(boolean transportChangeStrategyActive) {
-		this.transportChangeStrategyActive = transportChangeStrategyActive;
-	}
-
+    @Override
+    public void setTransportChangeStrategyActive(boolean transportChangeStrategyActive) {
+        this.transportChangeStrategyActive = transportChangeStrategyActive;
+    }
 }

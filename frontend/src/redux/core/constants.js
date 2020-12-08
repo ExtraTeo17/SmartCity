@@ -1,10 +1,13 @@
 export const CENTER_UPDATED = "Center/UPDATED";
 export const CENTER_MENU_UPDATED = "Center/MENU_UPDATED";
+
 export const START_SIMULATION_DATA_UPDATED = "StartData/UPDATED";
 export const SHOULD_START_SIMULATION = "Start/SHOULD";
+
 export const GENERATE_PEDESTRIANS_UPDATED = "GenPed/UPDATED";
 export const CONFIG_REPLACED = "Config/REPLACED";
 
+export const SIMULATION_PREPARE_STARTED = "Simulation/P_STARTED";
 export const SIMULATION_PREPARED = "Simulation/PREPARED";
 export const SIMULATION_STARTED = "Simulation/STARTED";
 
@@ -26,6 +29,7 @@ export const BATCHED_UPDATE = "B/UPDATE";
 export const BUS_UPDATED = "Bus/UPDATED";
 export const BUS_FILL_STATE_UPDATED = "Bus/FILL";
 export const BUS_KILLED = "Bus/KILLED";
+export const BUS_CRASHED = "Bus/CRASHED";
 
 export const PEDESTRIAN_CREATED = "Ped/CREATED";
 export const PEDESTRIAN_UPDATED = "Ped/UPDATED";

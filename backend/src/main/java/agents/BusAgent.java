@@ -4,6 +4,7 @@ import agents.abstractions.AbstractAgent;
 import agents.utilities.LoggerLevel;
 import agents.utilities.MessageParameter;
 import com.google.common.eventbus.EventBus;
+import events.web.bus.BusAgentCrashedEvent;
 import events.web.bus.BusAgentUpdatedEvent;
 import jade.core.behaviours.Behaviour;
 import jade.core.behaviours.CyclicBehaviour;
@@ -18,7 +19,7 @@ import routing.nodes.RouteNode;
 import routing.nodes.StationNode;
 import smartcity.ITimeProvider;
 import smartcity.SmartCityAgent;
-import smartcity.config.abstractions.ITroublePointsConfigContainer;
+import smartcity.config.abstractions.IChangeTransportConfigContainer;
 import utilities.ConditionalExecutor;
 import utilities.Siblings;
 import vehicles.Bus;
@@ -32,7 +33,6 @@ import java.util.Random;
 import static agents.AgentConstants.DEFAULT_BLOCK_ON_ERROR;
 import static agents.message.MessageManager.createMessage;
 import static agents.message.MessageManager.createProperties;
-import static java.lang.Thread.sleep;
 import static smartcity.config.StaticConfig.USE_BATCHED_UPDATES;
 
 /**
@@ -46,19 +46,18 @@ import static smartcity.config.StaticConfig.USE_BATCHED_UPDATES;
  * them about destination stop. Besides that, on the road of Bus can appear only
  * one type of obstacles - traffic jams.
  */
-@SuppressWarnings("serial")
 public class BusAgent extends AbstractAgent {
     public static final String name = BusAgent.class.getSimpleName().replace("Agent", "");
+
     private final ITimeProvider timeProvider;
     private final Bus bus;
-    private final ITroublePointsConfigContainer configContainer;
-    private static final int THRESHOLD_UNTIL_INDEX_CHANGE = 50;
+    private final IChangeTransportConfigContainer configContainer;
     private RouteNode troublePoint;
 
     BusAgent(int busId, Bus bus,
              ITimeProvider timeProvider,
              EventBus eventBus,
-             ITroublePointsConfigContainer configContainer) {
+             IChangeTransportConfigContainer configContainer) {
         super(busId, name, timeProvider, eventBus);
         this.timeProvider = timeProvider;
         this.bus = bus;
@@ -108,7 +107,8 @@ public class BusAgent extends AbstractAgent {
                             bus.setState(DrivingState.MOVING);
                             break;
                     }
-                } else if (bus.isAtStation()) {
+                }
+                else if (bus.isAtStation()) {
                     switch (bus.getState()) {
                         case MOVING:
                             var stationOpt = bus.getCurrentStationNode();
@@ -118,8 +118,6 @@ public class BusAgent extends AbstractAgent {
                             }
                             var station = stationOpt.get();
                             List<String> passengerNames = bus.getPassengers(station.getAgentId());
-
-                            //System.out.println("PASSENGER NAMES SIZE: " + passengerNames.size());
 
                             if (passengerNames.size() > 0) {
                                 ACLMessage leave = createMessage(ACLMessage.REQUEST, passengerNames);
@@ -133,7 +131,6 @@ public class BusAgent extends AbstractAgent {
                             Properties properties = createProperties(MessageParameter.BUS);
 
                             var timeOnStation = bus.getTimeOnStation(station.getOsmId());
-                            //logger.info("CASE MOVING");
                             timeOnStation.ifPresent(time -> properties.setProperty(MessageParameter.SCHEDULE_ARRIVAL, time
                                     .toString()));
                             properties.setProperty(MessageParameter.ARRIVAL_TIME, timeProvider.getCurrentSimulationTime()
@@ -160,7 +157,8 @@ public class BusAgent extends AbstractAgent {
                             move();
                             break;
                     }
-                } else if (bus.isAtDestination()) {
+                }
+                else if (bus.isAtDestination()) {
                     bus.setState(DrivingState.AT_DESTINATION);
                     logger.info("isAtDestination");
                     ACLMessage msg = createMessage(ACLMessage.INFORM, SmartCityAgent.name);
@@ -169,7 +167,8 @@ public class BusAgent extends AbstractAgent {
                     msg.setAllUserDefinedParameters(prop);
                     send(msg);
                     doDelete();
-                } else {
+                }
+                else {
                     move();
                 }
             }
@@ -221,7 +220,8 @@ public class BusAgent extends AbstractAgent {
                                 informNextStation();
                                 bus.setState(DrivingState.PASSING_STATION);
                             }
-                        } else if (rcv.getPerformative() == ACLMessage.AGREE) {
+                        }
+                        else if (rcv.getPerformative() == ACLMessage.AGREE) {
                             logger.info("GOT AGREE from station");
                             bus.setState(DrivingState.WAITING_AT_STATION);
                         }
@@ -242,7 +242,8 @@ public class BusAgent extends AbstractAgent {
                                 stationId = Integer.parseInt(rcv.getUserDefinedParameter(MessageParameter.STATION_ID));
                                 if (bus.removePassengerFromStation(stationId, rcv.getSender().getLocalName())) {
                                     print("Passengers: " + bus.getPassengersCount());
-                                } else {
+                                }
+                                else {
                                     print("Removing passenger failed");
                                 }
                                 break;
@@ -258,35 +259,32 @@ public class BusAgent extends AbstractAgent {
 
 
         if (configContainer.shouldGenerateBusFailures()) {
-            var timeBeforeTroubleMs = this.configContainer.getTimeBeforeTrouble() * 1000;
             Behaviour troubleGenerator = new TickerBehaviour(this, 8000) {
 
                 @Override
                 public void onTick() {
-                    if (configContainer.getBusCrashGeneratedOnce()) {
-                        logger.info("Bus crash has already been generated once");
+                    if (configContainer.wasBusCrashGeneratedOnce()) {
+                        logger.trace("Bus crash has already been generated once");
+                        stop();
                         return;
                     }
                     configContainer.setBusCrashGeneratedOnce(true);
-                    logger.info("Generated trouble");
+
                     int index = bus.getMoveIndex();
                     var trouble = bus.getUniformRoute().get(index);
                     troublePoint = new RouteNode(trouble.getLat(), trouble.getLng(),
                             trouble.getInternalEdgeId());
-                    sendMessageAboutCrashTroubleToTroubleManager(); //send message to boss Agent/ maybe not so important in case of buses
+                    //send message to boss Agent/ maybe not so important in case of buses
+                    sendMessageAboutCrashTroubleToTroubleManager();
                     sendMessageAboutCrashTroubleToPedestrians();
+                    logger.info("Generated trouble");
 
-                    try {
-                        sleep(10000000);
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
-                    stop();
-                    //TODO: agent dies
+                    eventBus.post(new BusAgentCrashedEvent(getId()));
+                    doDelete();
                 }
 
                 private void sendMessageAboutCrashTroubleToPedestrians() {
-                    for (String pedestrian : bus.getAllPassangers()) {
+                    for (String pedestrian : bus.getAllPassengers()) {
                         ACLMessage msg = createMessageAboutCrash(pedestrian, false);
                         logger.info("Send message about crash to pedestrian: " + pedestrian);
                         send(msg);
@@ -305,8 +303,8 @@ public class BusAgent extends AbstractAgent {
                         properties.setProperty(MessageParameter.DESIRED_OSM_STATION_ID, ((StationNode) bus.findNextStop()).getOsmId() + "");
                         properties.setProperty(MessageParameter.AGENT_ID_OF_NEXT_CLOSEST_STATION, ((StationNode) bus.findNextStop()).getAgentId() + "");
                         //maybe not needed
-                        properties.setProperty(MessageParameter.LAT_OF_NEXT_CLOSEST_STATION, ((StationNode) bus.findNextStop()).getLat() + "");
-                        properties.setProperty(MessageParameter.LON_OF_NEXT_CLOSEST_STATION, ((StationNode) bus.findNextStop()).getLng() + "");
+                        properties.setProperty(MessageParameter.LAT_OF_NEXT_CLOSEST_STATION, bus.findNextStop().getLat() + "");
+                        properties.setProperty(MessageParameter.LON_OF_NEXT_CLOSEST_STATION, bus.findNextStop().getLng() + "");
 
                         properties.setProperty(MessageParameter.BUS_LINE, getLine());
                         properties.setProperty(MessageParameter.BRIGADE, bus.getBrigade());
@@ -325,10 +323,7 @@ public class BusAgent extends AbstractAgent {
             };
 
             addBehaviour(troubleGenerator);
-
         }
-
-
     }
 
     public void move() {
@@ -351,7 +346,7 @@ public class BusAgent extends AbstractAgent {
             ACLMessage msg = createMessageById(ACLMessage.INFORM, StationAgent.name, stationId);
             var properties = createProperties(MessageParameter.BUS);
             var currentTime = timeProvider.getCurrentSimulationTime();
-            var predictedTime = currentTime.plusNanos(bus.getMillisecondsToNextStation() * 1_000_000);
+            var predictedTime = currentTime.plusNanos(bus.getMillisecondsToNextStation() * 1_000_000L);
             properties.setProperty(MessageParameter.ARRIVAL_TIME, predictedTime.toString());
             properties.setProperty(MessageParameter.BUS_LINE, bus.getLine());
 
@@ -359,7 +354,8 @@ public class BusAgent extends AbstractAgent {
             var timeOnStation = bus.getTimeOnStation(osmId);
             if (timeOnStation.isPresent()) {
                 properties.setProperty(MessageParameter.SCHEDULE_ARRIVAL, timeOnStation.get().toString());
-            } else {
+            }
+            else {
                 ConditionalExecutor.debug(this::logAllStations);
             }
 
@@ -386,7 +382,7 @@ public class BusAgent extends AbstractAgent {
         return bus;
     }
 
-    public String getLine() {
+    private String getLine() {
         return bus.getLine();
     }
 

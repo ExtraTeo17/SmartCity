@@ -1,10 +1,10 @@
 package agents;
 
 import agents.abstractions.AbstractAgent;
+import agents.utilities.LoggerLevel;
 import agents.utilities.MessageParameter;
 import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
-
 import events.web.bike.BikeAgentCreatedEvent;
 import events.web.pedestrian.PedestrianAgentEnteredBusEvent;
 import events.web.pedestrian.PedestrianAgentLeftBusEvent;
@@ -14,6 +14,7 @@ import jade.core.behaviours.CyclicBehaviour;
 import jade.core.behaviours.TickerBehaviour;
 import jade.lang.acl.ACLMessage;
 import jade.util.leap.Properties;
+import org.jetbrains.annotations.NotNull;
 import routing.RoutingConstants;
 import routing.abstractions.IRouteGenerator;
 import routing.core.IGeoPosition;
@@ -23,7 +24,7 @@ import routing.nodes.RouteNode;
 import routing.nodes.StationNode;
 import smartcity.ITimeProvider;
 import smartcity.SmartCityAgent;
-import smartcity.config.abstractions.ITroublePointsConfigContainer;
+import smartcity.config.abstractions.IChangeTransportConfigContainer;
 import smartcity.task.abstractions.ITaskProvider;
 import vehicles.Bike;
 import vehicles.Pedestrian;
@@ -41,13 +42,13 @@ import static smartcity.config.StaticConfig.USE_BATCHED_UPDATES;
 public class PedestrianAgent extends AbstractAgent {
     public static final String name = PedestrianAgent.class.getSimpleName().replace("Agent", "");
 
-    private Pedestrian pedestrian;
     private final IRouteGenerator router;
-    private List<RouteNode> arrivingRouteToClosestStation = null;
-    private List<RouteNode> bikeRoute = null;
-	  private ITaskProvider taskProvider;
-	  private ITroublePointsConfigContainer troublePointsConfigContainer;
+    private final ITaskProvider taskProvider;
+    private final IChangeTransportConfigContainer troublePointsConfigContainer;
 
+    private Pedestrian pedestrian;
+    private List<RouteNode> arrivingRouteToClosestStation;
+    private List<RouteNode> bikeRoute;
 
     PedestrianAgent(int agentId,
                     Pedestrian pedestrian,
@@ -55,7 +56,7 @@ public class PedestrianAgent extends AbstractAgent {
                     ITaskProvider taskProvider,
                     EventBus eventBus,
                     IRouteGenerator router,
-                    ITroublePointsConfigContainer troublePointsConfigContainer) {
+                    IChangeTransportConfigContainer troublePointsConfigContainer) {
         super(agentId, pedestrian.getVehicleType(), timeProvider, eventBus);
         this.taskProvider = taskProvider;
         this.pedestrian = pedestrian;
@@ -67,8 +68,7 @@ public class PedestrianAgent extends AbstractAgent {
 
     @Override
     protected void setup() {
-        //getNextStation();
-        whichBusLine();
+        informWhichBusLine();
 
         informLightManager(pedestrian);
 
@@ -83,7 +83,8 @@ public class PedestrianAgent extends AbstractAgent {
                             ACLMessage msg = createMessageById(ACLMessage.REQUEST_WHEN, LightManagerAgent.name,
                                     light.getLightManagerId());
                             Properties properties = createProperties(MessageParameter.PEDESTRIAN);
-                            properties.setProperty(MessageParameter.ADJACENT_OSM_WAY_ID, Long.toString(pedestrian.getAdjacentOsmWayId()));
+                            properties.setProperty(MessageParameter.ADJACENT_OSM_WAY_ID,
+                                    Long.toString(pedestrian.getAdjacentOsmWayId()));
                             msg.setAllUserDefinedParameters(properties);
                             send(msg);
                             pedestrian.setState(DrivingState.WAITING_AT_LIGHT);
@@ -133,7 +134,7 @@ public class PedestrianAgent extends AbstractAgent {
                 else if (pedestrian.isAtDestination()) {
                     pedestrian.setState(DrivingState.AT_DESTINATION);
                     print("Reached destination.");
-                    sendMessageAboutReachingDestinationToSmartCityAgent(null);
+                    sendMessageAboutReachingDestinationToSmartCityAgent();
                     doDelete();
                 }
                 else if (!pedestrian.isTroubled()) {
@@ -243,12 +244,12 @@ public class PedestrianAgent extends AbstractAgent {
                             messageToBusManager.addUserDefinedParameter(MessageParameter.ARRIVAL_TIME, arrivalTime.toString());
 
                             messageToBusManager.addUserDefinedParameter(MessageParameter.STATION_FROM_ID,
-                                    expectedNewStationNode.getOsmId() + "");
+                                    String.valueOf(expectedNewStationNode.getOsmId()));
 
                             messageToBusManager.addUserDefinedParameter(MessageParameter.EVENT,
                                     MessageParameter.TROUBLE);
                             messageToBusManager.addUserDefinedParameter(MessageParameter.STATION_TO_ID,
-                                    pedestrian.getTargetStation().getOsmId() + "");
+                                    String.valueOf(pedestrian.getTargetStation().getOsmId()));
                             messageToBusManager.addUserDefinedParameter(MessageParameter.BUS_LINE,
                                     rcv.getUserDefinedParameter(MessageParameter.BUS_LINE));
                             messageToBusManager.addUserDefinedParameter(MessageParameter.BRIGADE,
@@ -256,49 +257,46 @@ public class PedestrianAgent extends AbstractAgent {
 
                             send(messageToBusManager);
 
-                            if(expectedNewStationNode.equals(pedestrian.getStationFinish()))
-                            {
+                            if (expectedNewStationNode.equals(pedestrian.getStationFinish())) {
                                 performMetamorphosisToBike();
                                 break;
                             }
+
                             if (troublePointsConfigContainer.isTransportChangeStrategyActive()) {
-                            	computeBikeTime(currentPosition, pedestrian.getUniformRoute()
-                            			.get(pedestrian.getUniformRouteSize() - 1));
+                                var route = pedestrian.getUniformRoute();
+                                computeBikeTime(currentPosition, route.get(route.size() - 1));
                             }
-                            //decideWhereToGo(rcv);
                         }
                         break;
                     case MessageParameter.BUS_MANAGER:
                         if (rcv.getPerformative() == ACLMessage.INFORM) {
-
                             if (rcv.getUserDefinedParameter(MessageParameter.EVENT).equals(MessageParameter.TROUBLE)) {
-                                troubleHandler(rcv);
+                                handleTrouble(rcv);
                             }
                             else if (rcv.getUserDefinedParameter(MessageParameter.EVENT).equals(MessageParameter.START)) {
                                 getNextStation(rcv.getUserDefinedParameter(MessageParameter.BUS_LINE));
                             }
                         }
-
                 }
             }
 
-            private void troubleHandler(ACLMessage rcv) {
+            private void handleTrouble(ACLMessage rcv) {
                 logger.info("Got Inform message from BUS MANAGER");
                 long timeBetweenArrivalAtStationAndDesiredStation = Long.parseLong(rcv.getUserDefinedParameter(
                         MessageParameter.TIME_BETWEEN_PEDESTRIAN_AT_STATION_ARRIVAL_AND_REACHING_DESIRED_STOP));
-                //String newBusLine = rcv.getUserDefinedParameter(MessageParameter.BUS_LINE);
                 long busTimeMilliseconds = (pedestrian.getMillisecondsOnRoute(arrivingRouteToClosestStation))
                         + (timeBetweenArrivalAtStationAndDesiredStation * 1000)
                         + (pedestrian.getMillisecondsOnRoute(pedestrian.getUniformRoute()));
                 if (troublePointsConfigContainer.isTransportChangeStrategyActive()) {
-                	handleTransportChangeWithStrategy(rcv, busTimeMilliseconds);
-				} else {
-					handleTransportChangeWithoutStrategy(rcv, busTimeMilliseconds);
+                    handleTransportChangeWithStrategy(rcv, busTimeMilliseconds);
+                }
+                else {
+                    handleTransportChangeWithoutStrategy(rcv, busTimeMilliseconds);
                 }
             }
 
             private void handleTransportChangeWithStrategy(final ACLMessage rcv, final long busTimeMilliseconds) {
-                logger.info("Transport change strategy is acitve: Bike time in milliseconds: " + bikeTimeMilliseconds + " vs bus time in milliseconds: "
+                logger.info("Transport change strategy is active: Bike time in milliseconds: " + bikeTimeMilliseconds + " vs bus time in milliseconds: "
                         + busTimeMilliseconds);
                 if (bikeTimeMilliseconds > busTimeMilliseconds) {
                     logger.info("Choose bus because bike time in milliseconds: " + bikeTimeMilliseconds
@@ -310,37 +308,40 @@ public class PedestrianAgent extends AbstractAgent {
                             + " vs bus time in milliseconds: " + busTimeMilliseconds);
                     performMetamorphosisToBike();
                 }
-			}
+            }
 
-			private void handleTransportChangeWithoutStrategy(final ACLMessage rcv, final long busTimeMilliseconds) {
-				logger.info("Transport change strategy is not active. Bus time in milliseconds: "
-						+ busTimeMilliseconds + " -- seeking another bus");
+            private void handleTransportChangeWithoutStrategy(final ACLMessage rcv, final long busTimeMilliseconds) {
+                logger.info("Transport change strategy is not active. Bus time in milliseconds: "
+                        + busTimeMilliseconds + " -- seeking another bus");
                 restartAgentWithNewBusLine(arrivingRouteToClosestStation, rcv.getUserDefinedParameter(MessageParameter.BUS_LINE));
-			}
+            }
 
             private void performMetamorphosisToBike() {
                 logger.info("Perform metamorphosis to bike");
 
-                if (pedestrian instanceof TestPedestrian) {
-                	eventBus.register(this);
-                } else {
-                    pedestrian.setState(DrivingState.AT_DESTINATION);
-                	sendMessageAboutReachingDestinationToSmartCityAgent(null);
-            		myAgent.doDelete();
-            		logger.info("Kill pedestrian agent (metamorphosis to bike)");
+                var isTestPedestrian = pedestrian instanceof TestPedestrian;
+                if (isTestPedestrian) {
+                    eventBus.register(this);
                 }
-                taskProvider.getCreateBikeTask(currentPosition, pedestrian.getEndPosition(), pedestrian instanceof TestPedestrian).run();
+                else {
+                    pedestrian.setState(DrivingState.AT_DESTINATION);
+                    sendMessageAboutReachingDestinationToSmartCityAgent();
+                    myAgent.doDelete();
+                    logger.info("Kill pedestrian agent (metamorphosis to bike)");
+                }
+                taskProvider.getCreateBikeTask(currentPosition, pedestrian.getEndPosition(),
+                        isTestPedestrian).run();
             }
 
             @Subscribe
-            public void handle(BikeAgentCreatedEvent event) {
-            	if ( event.isTestBike) {
-            		eventBus.unregister(this);
+            public void handle(BikeAgentCreatedEvent e) {
+                if (e.isTestBike) {
+                    eventBus.unregister(this);
                     pedestrian.setState(DrivingState.AT_DESTINATION);
-                    sendMessageAboutReachingDestinationToSmartCityAgent(event.agentId);
-            		myAgent.doDelete();
-            		logger.info("Kill pedestrian agent (metamorphosis to bike)");
-            	}
+                    sendMessageAboutReachingDestinationToSmartCityAgent(String.valueOf(e.agentId));
+                    myAgent.doDelete();
+                    logger.info("Kill pedestrian agent (metamorphosis to bike)");
+                }
             }
 
             private void restartAgentWithNewBusLine(List<RouteNode> arrivingRouteToClosestStation, String busLine) {
@@ -362,15 +363,16 @@ public class PedestrianAgent extends AbstractAgent {
 
             private void computeBikeTime(IGeoPosition pointA, IGeoPosition pointB) {
                 bikeRoute = router.generateRouteInfo(pointA, pointB, "bike");
-                int firstIndex = 0, bikeSpeed = Bike.DEFAULT_SPEED;
+                int firstIndex = 0;
+                int bikeSpeed = Bike.DEFAULT_SPEED;
                 bikeTimeMilliseconds = pedestrian.getMillisecondsOnRoute(bikeRoute, firstIndex, bikeSpeed);
             }
 
             private LocalTime computeArrivalTime(IGeoPosition pointA, IGeoPosition pointB, String desiredOsmStationId) {
                 LocalTime now = timeProvider.getCurrentSimulationTime().toLocalTime();
-                arrivingRouteToClosestStation = router.generateRouteForPedestrians(pointA, pointB, null, desiredOsmStationId);
-                LocalTime arrivingTime = now.plusNanos(pedestrian.getMillisecondsOnRoute(arrivingRouteToClosestStation) * 1_000_000);
-                return arrivingTime;
+                arrivingRouteToClosestStation = router.generateRouteForPedestrians(pointA, pointB, null,
+                        desiredOsmStationId);
+                return now.plusNanos(pedestrian.getMillisecondsOnRoute(arrivingRouteToClosestStation) * 1_000_000L);
             }
         };
 
@@ -378,16 +380,19 @@ public class PedestrianAgent extends AbstractAgent {
         addBehaviour(communication);
     }
 
-    private void sendMessageAboutReachingDestinationToSmartCityAgent(Integer testBikeAgentId) {
+    private void sendMessageAboutReachingDestinationToSmartCityAgent() {
+        sendMessageAboutReachingDestinationToSmartCityAgent("");
+    }
+
+    private void sendMessageAboutReachingDestinationToSmartCityAgent(@NotNull String testBikeAgentId) {
         ACLMessage msg = createMessage(ACLMessage.INFORM, SmartCityAgent.name);
         Properties prop = createProperties(MessageParameter.PEDESTRIAN);
         prop.setProperty(MessageParameter.AT_DESTINATION, String.valueOf(Boolean.TRUE));
-        if (testBikeAgentId != null) {
-        	prop.setProperty(MessageParameter.TEST_BIKE_AGENT_ID, testBikeAgentId.toString());
-        }
+        prop.setProperty(MessageParameter.TEST_BIKE_AGENT_ID, testBikeAgentId);
         msg.setAllUserDefinedParameters(prop);
         send(msg);
     }
+
 
     private void getNextStation(final String busLine) {
         // finds next station and announces his arrival
@@ -397,7 +402,7 @@ public class PedestrianAgent extends AbstractAgent {
             ACLMessage msg = createMessageById(ACLMessage.INFORM, StationAgent.name, nextStation.getAgentId());
             Properties properties = createProperties(MessageParameter.PEDESTRIAN);
             var currentTime = timeProvider.getCurrentSimulationTime();
-            var predictedTime = currentTime.plusNanos(pedestrian.getMillisecondsToNextStation() * 1_000_000);
+            var predictedTime = currentTime.plusNanos(pedestrian.getMillisecondsToNextStation() * 1_000_000L);
             properties.setProperty(MessageParameter.ARRIVAL_TIME, predictedTime.toString());
             properties.setProperty(MessageParameter.BUS_LINE, busLine);
             msg.setAllUserDefinedParameters(properties);
@@ -407,14 +412,13 @@ public class PedestrianAgent extends AbstractAgent {
         }
     }
 
-    private void whichBusLine() {
+    private void informWhichBusLine() {
         logger.info("Send inform about bus_line to to Bus");
-
 
         ACLMessage msg = createMessage(ACLMessage.INFORM, BusManagerAgent.NAME);
 
         var currentTime = timeProvider.getCurrentSimulationTime();
-        var predictedTime = currentTime.plusNanos(pedestrian.getMillisecondsToNextStation() * 1_000_000).toLocalTime();
+        var predictedTime = currentTime.plusNanos(pedestrian.getMillisecondsToNextStation() * 1_000_000L).toLocalTime();
         msg.addUserDefinedParameter(MessageParameter.ARRIVAL_TIME, predictedTime.toString());
         msg.addUserDefinedParameter(MessageParameter.STATION_FROM_ID, pedestrian.getStartingStation().getOsmId() + "");
         msg.addUserDefinedParameter(MessageParameter.STATION_TO_ID, pedestrian.getStationFinish().getOsmId() + "");
@@ -430,13 +434,13 @@ public class PedestrianAgent extends AbstractAgent {
     }
 
     private void enterBus() {
-        print("Enter bus");
+        print("Enter bus", LoggerLevel.DEBUG);
         pedestrian.setState(DrivingState.IN_BUS);
         eventBus.post(new PedestrianAgentEnteredBusEvent(this.getId()));
     }
 
     private void quitBus() {
-        print("Quit bus");
+        print("Quit bus", LoggerLevel.DEBUG);
         pedestrian.move();
         pedestrian.setState(DrivingState.PASSING_STATION);
         eventBus.post(new PedestrianAgentLeftBusEvent(this.getId(), pedestrian.getPosition()));

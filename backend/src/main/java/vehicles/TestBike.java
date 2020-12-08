@@ -6,7 +6,6 @@ import vehicles.enums.DrivingState;
 import vehicles.enums.VehicleType;
 
 import java.time.LocalDateTime;
-
 import java.util.ArrayList;
 
 
@@ -50,8 +49,9 @@ public class TestBike extends Bike implements ITestable {
     public LocalDateTime getEnd() {
         return end;
     }
+
     @VisibleForTesting
     TestBike(ITimeProvider timeProvider) {
-        super(1, new ArrayList<>(), new ArrayList<>(), timeProvider );
+        super(1, new ArrayList<>(), new ArrayList<>(), timeProvider);
     }
 }

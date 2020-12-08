@@ -29,10 +29,12 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-public class AgentUtills {
-    private final IZone defaultZone = Zone.of(52.23682, 21.01681, 600);
+@SuppressWarnings("OverlyCoupledClass")
+class AgentUtils {
+    private static final IZone defaultZone = Zone.of(52.23682, 21.01681, 600);
+    private static final IdGenerator idGenerator = new IdGenerator();
 
-    public IAgentsFactory setupAgentsFactory() {
+    private static IAgentsFactory setupAgentsFactory() {
         var idGenerator = new IdGenerator();
         idGenerator.register(LightManagerAgent.class);
         var timeProvider = mock(ITimeProvider.class);
@@ -41,10 +43,10 @@ public class AgentUtills {
         var eventBus = new EventBus();
 
         return new AgentsFactory(idGenerator, eventBus, timeProvider, routeTransformer,
-                crossroadFactory, mock(IRouteGenerator.class), mock(ConfigContainer.class),mock(TaskProvider.class));
+                crossroadFactory, mock(IRouteGenerator.class), mock(ConfigContainer.class), mock(TaskProvider.class));
     }
 
-    public ICrossroadFactory setupCrossroadFactory() {
+    private static ICrossroadFactory setupCrossroadFactory() {
         var eventBus = new EventBus();
         var crossroadParser = new CrossroadParser();
         ReflectionHelper.setStatic("counter", ConfigMutator.class, 0);
@@ -52,12 +54,12 @@ public class AgentUtills {
 
         return new CrossroadFactory(eventBus, crossroadParser, configContainer);
     }
-    public AgentsPreparer setupAgentsCreator(IAgentsContainer agentsContainer) {
-        var agentUtills = new AgentUtills();
+
+    static AgentsPreparer setupAgentsCreator(IAgentsContainer agentsContainer) {
         var lightAccessManager = setupLightAccessManager();
         var configContainer = mock(ConfigContainer.class);
         var busLinesManager = mock(BusLinesManager.class);
-        var agentsFactory = agentUtills.setupAgentsFactory();
+        var agentsFactory = setupAgentsFactory();
         var eventBus = new EventBus();
         var mapAccessManager = mock(IMapAccessManager.class);
         var routeGenerator = mock(IRouteGenerator.class);
@@ -68,10 +70,11 @@ public class AgentUtills {
                 eventBus, lightAccessManager, mapAccessManager, routeGenerator, cacheWrapper);
     }
 
-    private ILightAccessManager setupLightAccessManager() {
+    private static ILightAccessManager setupLightAccessManager() {
         var mapAccessManager = mock(IMapAccessManager.class);
         var lightsFile = FileLoader.getDocument("DefaultCarZoneLights.xml");
         when(mapAccessManager.getNodesDocument(any())).thenReturn(Optional.of(lightsFile));
         return new LightAccessManager(mapAccessManager, defaultZone);
     }
+
 }

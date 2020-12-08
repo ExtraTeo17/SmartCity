@@ -1,17 +1,13 @@
 package vehicles;
 
-import org.javatuples.Pair;
-import org.junit.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
-import routing.core.IGeoPosition;
 import routing.core.Position;
 import routing.nodes.LightManagerNode;
 import routing.nodes.RouteNode;
 import smartcity.ITimeProvider;
 
-import java.lang.reflect.Array;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Stream;
@@ -22,7 +18,6 @@ import static org.junit.jupiter.params.provider.Arguments.arguments;
 import static org.mockito.Mockito.mock;
 
 class MovingObjectTests {
-
 
     @ParameterizedTest
     @MethodSource("routesProvider")

@@ -4,6 +4,10 @@ import WebServer from "./WebServer";
 /** PUBLIC INTERFACE ---------------------------------------------------------- */
 
 export default {
+  isConnected() {
+    return WebServer.isConnected();
+  },
+
   prepareSimulation(
     { center: { lat, lng, rad }, generatePedestrians } = { center: { lat: 0, lng: 0, rad: 0 }, generatePedestrians: false }
   ) {
@@ -20,20 +24,23 @@ export default {
   },
 
   startSimulation({
-    pedLimit,
-    testPedId,
-
     generateCars,
     carsLimit,
     testCarId,
+    generateBatchesForCars,
 
     generateBikes,
     bikesLimit,
     testBikeId,
 
-    changeRouteOnTrafficJam,
+    pedLimit,
+    testPedId,
+
     generateTroublePoints,
     timeBeforeTrouble,
+
+    generateBusFailures,
+    detectTrafficJams,
 
     useFixedRoutes,
     useFixedTroublePoints,
@@ -47,24 +54,30 @@ export default {
     stationStrategyActive,
     extendWaitTime,
 
-    changeRouteOnTroublePoint,
+    troublePointStrategyActive,
+    trafficJamStrategyActive,
+    transportChangeStrategyActive,
   }) {
     const msg = {
       type: START_SIMULATION_REQUEST,
       payload: {
-        pedLimit,
-        testPedId,
-
         generateCars,
         carsLimit,
         testCarId,
+        generateBatchesForCars,
 
         generateBikes,
         bikesLimit,
         testBikeId,
 
+        pedLimit,
+        testPedId,
+
         generateTroublePoints,
         timeBeforeTrouble,
+
+        generateBusFailures,
+        detectTrafficJams,
 
         useFixedRoutes,
         useFixedTroublePoints,
@@ -78,8 +91,9 @@ export default {
         stationStrategyActive,
         extendWaitTime,
 
-        changeRouteOnTroublePoint,
-        changeRouteOnTrafficJam,
+        troublePointStrategyActive,
+        trafficJamStrategyActive,
+        transportChangeStrategyActive,
       },
     };
     WebServer.send(msg);

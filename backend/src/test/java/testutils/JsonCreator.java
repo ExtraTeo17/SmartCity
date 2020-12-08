@@ -1,7 +1,7 @@
 package testutils;
 
 public class JsonCreator {
-    public static String createArray(String name, String... objects) {
+    static String createArray(String name, String... objects) {
         return createArrayProperty(name, createArray(objects));
     }
 
@@ -19,7 +19,7 @@ public class JsonCreator {
         return builder.toString();
     }
 
-    public static String createObject(String... properties) {
+    static String createObject(String... properties) {
         if (properties.length == 0) {
             return "{}";
         }
@@ -33,11 +33,11 @@ public class JsonCreator {
         return builder.toString();
     }
 
-    public static String createProperty(String key, String value) {
+    static String createProperty(String key, String value) {
         return "\"" + key + "\":" + "\"" + value + "\"";
     }
 
-    public static String createArrayProperty(String key, String array) {
+    private static String createArrayProperty(String key, String array) {
         return "\"" + key + "\":" + array;
     }
 }

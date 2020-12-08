@@ -14,6 +14,7 @@ let message;
 WebServer.send = msg => {
   message = msg;
 };
+WebServer.isConnected = () => true;
 
 let configPayload;
 actions.configReplaced = payload => {
@@ -48,8 +49,8 @@ const startSimulationData = {
   stationStrategyActive: false,
   extendWaitTime: 60,
 
-  changeRouteOnTroublePoint: true,
-  changeRouteOnTrafficJam: false,
+  troublePointStrategyActive: true,
+  trafficJamStrategyActive: false,
 };
 
 const prepareSimulationData = {
@@ -63,13 +64,16 @@ const config = {
   startSimulationData,
 };
 
+const configCopy = JSON.parse(JSON.stringify(config));
+configCopy.startSimulationData.startTime = startSimulationData.startTime;
+
 let container = null;
 let buttons = null;
 beforeAll(() => {
   container = document.createElement("div");
   document.body.appendChild(container);
   act(() => {
-    render(<ScenariosMenuObj config={JSON.parse(JSON.stringify(config))} wasStarted={false} />, container);
+    render(<ScenariosMenuObj config={configCopy} wasStarted={false} />, container);
     buttons = document.getElementsByTagName("button");
   });
 });
@@ -169,8 +173,8 @@ describe("Menu", () => {
           stationStrategyActive: expect.any(Boolean),
           extendWaitTime: expect.any(Number),
 
-          changeRouteOnTroublePoint: expect.any(Boolean),
-          changeRouteOnTrafficJam: expect.any(Boolean),
+          troublePointStrategyActive: expect.any(Boolean),
+          trafficJamStrategyActive: expect.any(Boolean),
         })
       );
     }

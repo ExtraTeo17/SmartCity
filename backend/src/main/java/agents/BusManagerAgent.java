@@ -12,20 +12,20 @@ import osmproxy.buses.Timetable;
 import osmproxy.elements.OSMStation;
 import smartcity.ITimeProvider;
 
+import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.HashSet;
 
 import static java.time.temporal.ChronoUnit.MILLIS;
 
 public class BusManagerAgent extends AbstractAgent {
-
     private static final String NAME_PREFIX = "BusManager";
     private static final int ID = 1;
     public static final String NAME = NAME_PREFIX + ID;
 
-    private HashSet<BusInfo> busInfos;
+    private final HashSet<BusInfo> busInfos;
 
-    public BusManagerAgent(ITimeProvider timeProvider, EventBus eventBus, HashSet<BusInfo> busInfos) {
+    BusManagerAgent(ITimeProvider timeProvider, EventBus eventBus, HashSet<BusInfo> busInfos) {
         super(ID, NAME_PREFIX, timeProvider, eventBus);
         this.busInfos = busInfos;
     }
@@ -42,10 +42,7 @@ public class BusManagerAgent extends AbstractAgent {
                         case ACLMessage.INFORM -> {
                             logger.info("GET info from pedestrian about");
                             handleRouteQuery(rcv);
-                            break;
-
                         }
-
                     }
                 }
                 block(100);
@@ -88,18 +85,28 @@ public class BusManagerAgent extends AbstractAgent {
                                 continue;
                             }
                             for (Timetable table : brigInfo.timetables) {
-                                LocalTime timeOnStationFrom = table.getTimeOnStation(stationOsmIdFrom).get().toLocalTime();
-                                LocalTime timeOnStationTo = table.getTimeOnStation(stationOsmIdTo).get().toLocalTime();
+                                var timeOnStationFromOpt = table.getTimeOnStation(stationOsmIdFrom).orElse(LocalDateTime.MAX);
+                                var timeOnStationToOpt = table.getTimeOnStation(stationOsmIdTo).orElse(LocalDateTime.MIN);
+
+                                var timeOnStationFrom = timeOnStationFromOpt.toLocalTime();
+                                var timeOnStationTo = timeOnStationToOpt.toLocalTime();
 
                                 long timeInSeconds = differenceInSeconds(timeOnStationFrom, timeOnStation);
-                                if (minimumTimeDistanceBetweenStationFromAndBusArrival > timeInSeconds) { // TODO: take stationTo into consideration
+                                // TODO: take stationTo into consideration
+                                if (minimumTimeDistanceBetweenStationFromAndBusArrival > timeInSeconds) {
                                     minimumTimeDistanceBetweenStationFromAndBusArrival = timeInSeconds;
                                     minimumTimeOnStationFrom = timeOnStationFrom;
                                     minimumTimeOnStationTo = timeOnStationTo;
                                 }
                             }
                         }
-                        long overallTravelTime = minimumTimeDistanceBetweenStationFromAndBusArrival + differenceInSeconds(minimumTimeOnStationTo, minimumTimeOnStationFrom);
+
+                        if (minimumTimeOnStationTo == null) {
+                            minimumTimeOnStationTo = LocalTime.MAX;
+                        }
+
+                        long overallTravelTime = minimumTimeDistanceBetweenStationFromAndBusArrival
+                                + differenceInSeconds(minimumTimeOnStationTo, minimumTimeOnStationFrom);
                         if (overallTravelTime < minimumTimeOverall) {
                             minimumTimeOverall = overallTravelTime;
                             preferredBusLine = info.busLine;

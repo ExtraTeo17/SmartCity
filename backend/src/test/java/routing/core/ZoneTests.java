@@ -1,6 +1,6 @@
 package routing.core;
 
-import org.junit.Assert;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
@@ -40,14 +40,14 @@ class ZoneTests {
         boolean result = zone.contains(eiffelTower);
 
         // Assert
-        Assert.assertEquals(latA, parisHotelDeVille.getLat(), 0);
-        Assert.assertEquals(lngA, parisHotelDeVille.getLng(), 0);
-        Assert.assertEquals(parisHotelDeVille.compareTo(zone.getCenter()), 0);
-        Assert.assertEquals(radius, zone.getRadius());
-        Assert.assertEquals(latB, eiffelTower.getLat(), 0);
-        Assert.assertEquals(lngB, eiffelTower.getLng(), 0);
+        Assertions.assertEquals(latA, parisHotelDeVille.getLat(), 0);
+        Assertions.assertEquals(lngA, parisHotelDeVille.getLng(), 0);
+        Assertions.assertEquals(parisHotelDeVille.compareTo(zone.getCenter()), 0);
+        Assertions.assertEquals(radius, zone.getRadius());
+        Assertions.assertEquals(latB, eiffelTower.getLat(), 0);
+        Assertions.assertEquals(lngB, eiffelTower.getLng(), 0);
 
-        Assert.assertEquals("Eiffel Tower is in Paris, isn't it?", expectedResult, result);
+        Assertions.assertEquals(expectedResult, result, "Eiffel Tower is in Paris, isn't it?");
     }
 
     static Stream<Arguments> warsawZoneProvider() {
@@ -74,14 +74,14 @@ class ZoneTests {
         boolean result = zone.contains(monumentToBartolomeoColleoni);
 
         // Assert
-        Assert.assertEquals(latA, warsawTD.getLat(), 0);
-        Assert.assertEquals(lngA, warsawTD.getLng(), 0);
-        Assert.assertEquals(warsawTD.compareTo(zone.getCenter()), 0);
-        Assert.assertEquals(radius, zone.getRadius());
-        Assert.assertEquals(latB, monumentToBartolomeoColleoni.getLat(), 0);
-        Assert.assertEquals(lngB, monumentToBartolomeoColleoni.getLng(), 0);
+        Assertions.assertEquals(latA, warsawTD.getLat(), 0);
+        Assertions.assertEquals(lngA, warsawTD.getLng(), 0);
+        Assertions.assertEquals(warsawTD.compareTo(zone.getCenter()), 0);
+        Assertions.assertEquals(radius, zone.getRadius());
+        Assertions.assertEquals(latB, monumentToBartolomeoColleoni.getLat(), 0);
+        Assertions.assertEquals(lngB, monumentToBartolomeoColleoni.getLng(), 0);
 
-        Assert.assertEquals("Bartolomeo Colleoni is disappointed with you", expectedResult, result);
+        Assertions.assertEquals(expectedResult, result, "Bartolomeo Colleoni is disappointed with you");
     }
 
     @Test
@@ -108,8 +108,8 @@ class ZoneTests {
         mutator.setZone(newLocation, newRadius);
 
         // Assert
-        Assert.assertEquals(newLocation.compareTo(warsawZone.getCenter()), 0);
-        Assert.assertEquals(newRadius, warsawZone.getRadius());
+        Assertions.assertEquals(newLocation.compareTo(warsawZone.getCenter()), 0);
+        Assertions.assertEquals(newRadius, warsawZone.getRadius());
     }
 
     @Test
@@ -119,8 +119,8 @@ class ZoneTests {
         new ConfigMutator() {};
 
         // Act & Assert
-        assertThrows(IllegalCallerException.class, () -> {
-            new ConfigMutator() {};
-        }, "You should not try to create second mutator.\n");
+        assertThrows(IllegalCallerException.class,
+                () -> new ConfigMutator() {},
+                "You should not try to create second mutator.\n");
     }
 }

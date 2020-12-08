@@ -1,22 +1,24 @@
 import { useEffect, useRef } from "react";
+import { notify } from "react-notify-toast";
 
+// https://stackoverflow.com/a/1527820/6841224
 export const getRandomInt = (min, max) => {
-  // eslint-disable-next-line no-bitwise
-  return (Math.random() * (max - min + 1) + min) | 0;
+  const minC = Math.ceil(min);
+  const maxF = Math.floor(max);
+  return Math.floor(Math.random() * (maxF - minC + 1)) + minC;
 };
 
 // https://stackoverflow.com/a/5365036/6841224
-
 export const generateRandomColor = (minLight = 0, maxLight = 7) => {
-  const colorDigits = new Array(6);
   let result = 0;
   for (let i = 0; i < 6; ++i) {
+    let colorDigit;
     if (i % 2 === 1) {
-      colorDigits[i] = getRandomInt(minLight, maxLight);
+      colorDigit = getRandomInt(minLight, maxLight);
     } else {
-      colorDigits[i] = getRandomInt(0, 0xf);
+      colorDigit = getRandomInt(0, 0xf);
     }
-    result |= colorDigits[i] << (4 * i);
+    result |= colorDigit << (4 * i);
   }
 
   return `#${result.toString(16)}`;
@@ -95,3 +97,5 @@ export const angleFromCoordinates = (loc1, loc2) => {
 
   return heading;
 };
+
+export const showQueued = notify.createShowQueue();

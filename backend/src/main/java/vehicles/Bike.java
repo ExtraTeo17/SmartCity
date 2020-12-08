@@ -1,11 +1,9 @@
 package vehicles;
 
-import com.google.common.annotations.VisibleForTesting;
 import routing.nodes.RouteNode;
 import smartcity.ITimeProvider;
 import vehicles.enums.VehicleType;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import static vehicles.Constants.SPEED_SCALE;

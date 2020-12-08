@@ -6,7 +6,7 @@ import events.LightSwitcherStartedEvent;
 import events.SwitchLightsStartEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import smartcity.config.abstractions.ITroublePointsConfigContainer;
+import smartcity.config.abstractions.ILightConfigContainer;
 import smartcity.lights.OptimizationResult;
 import smartcity.lights.abstractions.ICrossroad;
 import smartcity.stations.ArrivalInfo;
@@ -22,7 +22,7 @@ import java.util.stream.Collectors;
 class SimpleCrossroad implements ICrossroad {
     private final Logger logger;
     private final EventBus eventBus;
-    private final ITroublePointsConfigContainer configContainer;
+    private final ILightConfigContainer configContainer;
     private final int managerId;
 
     @SuppressWarnings("MismatchedQueryAndUpdateOfCollection")
@@ -34,7 +34,7 @@ class SimpleCrossroad implements ICrossroad {
     private int defaultExecutionDelay = -1;
 
     SimpleCrossroad(EventBus eventBus,
-                    ITroublePointsConfigContainer configContainer,
+                    ILightConfigContainer configContainer,
                     int managerId,
                     Siblings<SimpleLightGroup> lightGroups) {
         this.logger = LoggerFactory.getLogger("SimpleCrossroad" + managerId);
@@ -113,10 +113,10 @@ class SimpleCrossroad implements ICrossroad {
     }
 
     private boolean lightSwitcherStarted() {
-		return defaultExecutionDelay >= 0;
-	}
+        return defaultExecutionDelay >= 0;
+    }
 
-	@Override
+    @Override
     public List<Light> getLights() {
         return new ArrayList<>(allLights);
     }

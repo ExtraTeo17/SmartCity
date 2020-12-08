@@ -1,44 +1,19 @@
 package agents;
 
-import agents.abstractions.IAgentsContainer;
-import agents.abstractions.IAgentsFactory;
-import com.google.common.eventbus.EventBus;
 import mocks.ContainerControllerMock;
 import org.junit.jupiter.api.Test;
-import osmproxy.LightAccessManager;
-import osmproxy.abstractions.ICacheWrapper;
-import osmproxy.abstractions.ILightAccessManager;
-import osmproxy.abstractions.IMapAccessManager;
-import osmproxy.buses.BusLinesManager;
 import routing.RoutingConstants;
-import routing.abstractions.IRouteGenerator;
-import routing.abstractions.IRouteTransformer;
 import routing.core.IGeoPosition;
-import routing.core.IZone;
-import routing.core.Zone;
-import routing.nodes.NodesContainer;
-import smartcity.ITimeProvider;
-import smartcity.config.ConfigContainer;
-import smartcity.config.ConfigMutator;
 import smartcity.config.StaticConfig;
-import smartcity.lights.abstractions.ICrossroadFactory;
-import smartcity.lights.core.CrossroadFactory;
-import smartcity.lights.core.CrossroadParser;
 import smartcity.lights.core.Light;
-import smartcity.task.TaskProvider;
-import testutils.FileLoader;
-import testutils.ReflectionHelper;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
+import static agents.AgentUtils.setupAgentsCreator;
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 
 @SuppressWarnings("OverlyCoupledClass")
 class AgentsPreparerTests {
@@ -53,8 +28,7 @@ class AgentsPreparerTests {
         // Arrange
         var agentsContainer = new HashAgentsContainer(new ContainerControllerMock());
         agentsContainer.register(LightManagerAgent.class);
-        var agentHelper = new AgentUtills();
-        var creator = agentHelper.setupAgentsCreator(agentsContainer);
+        var creator = setupAgentsCreator(agentsContainer);
 
         // Act
         var success = creator.tryConstructLightManagers();
@@ -124,8 +98,6 @@ class AgentsPreparerTests {
                         redLights.stream().allMatch(areSameGroup),
                 "This lights should be in same group: (" + adjacentIds[0] + "," + adjacentIds[1] + ")");
     }
-
-
 
 
 }

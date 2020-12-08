@@ -1,22 +1,6 @@
 package agents;
 
-import agents.abstractions.AbstractAgent;
-import mocks.ContainerControllerMock;
-import org.junit.jupiter.api.Test;
-import routing.abstractions.IRouteGenerator;
-import smartcity.ITimeProvider;
-import smartcity.config.abstractions.ITroublePointsConfigContainer;
-import smartcity.task.abstractions.ITaskProvider;
-import vehicles.Pedestrian;
-
-import java.time.LocalDateTime;
-import java.util.HashSet;
-
-import static mocks.TestInstanceCreator.createEventBus;
-import static mocks.TestInstanceCreator.createTimeProvider;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.Mockito.mock;
- /*
+/*
 public class PedestrianAgentTest {
     @Test
     void pedestrian_is_troubled_shouldNotMove() {

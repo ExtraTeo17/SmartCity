@@ -1,24 +1,26 @@
 package osmproxy.elements;
 
-import org.junit.Assert;
-import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.TestInstance.Lifecycle;
-
 import routing.core.Position;
 import testutils.FileLoader;
 import utilities.IterableNodeList;
 
 import java.util.stream.Collectors;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.fail;
+
 @TestInstance(Lifecycle.PER_CLASS)
 class OSMWay_findClosestNodeRefTo_Tests {
 
-	OSMWay firstWay, secondWay;
+    private OSMWay firstWay;
+    private OSMWay secondWay;
 
-	@BeforeAll
-	void prepareWaysFromXmlDocument() {
+    @BeforeAll
+    void prepareWaysFromXmlDocument() {
         // Arrange
         var document = FileLoader.getDocument("OSMTwoWays.xml");
         var mainNode = document.getFirstChild();
@@ -27,11 +29,12 @@ class OSMWay_findClosestNodeRefTo_Tests {
                 .filter(node -> node.getNodeName().equals("way"))
                 .collect(Collectors.toList());
         if (nodes.size() < 2) {
-            Assert.fail("Invalid xml document provided");
+            fail("Invalid xml document provided");
         }
+
         firstWay = new OSMWay(nodes.get(0));
         secondWay = new OSMWay(nodes.get(1));
-	}
+    }
 
     @Test
     void positionBehindFirstNode_pointsOutFirstNodeAsClosest() {
@@ -43,7 +46,7 @@ class OSMWay_findClosestNodeRefTo_Tests {
         String closestNodeRef = secondWay.findClosestNodeRefTo(position);
 
         // Assert
-        Assert.assertEquals(expectedClosestNodeRef, closestNodeRef);
+        assertEquals(expectedClosestNodeRef, closestNodeRef);
     }
 
     @Test
@@ -56,6 +59,6 @@ class OSMWay_findClosestNodeRefTo_Tests {
         String closestNodeRef = secondWay.findClosestNodeRefTo(position);
 
         // Assert
-        Assert.assertEquals(expectedClosestNodeRef, closestNodeRef);
+        assertEquals(expectedClosestNodeRef, closestNodeRef);
     }
 }

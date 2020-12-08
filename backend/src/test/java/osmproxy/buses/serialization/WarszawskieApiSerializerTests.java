@@ -7,7 +7,6 @@ import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
-import org.junit.Assert;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -57,7 +56,7 @@ class WarszawskieApiSerializerTests {
         var timetables = serializer.serializeTimetables(jsonString);
 
         // Assert
-        Assert.assertEquals(expectedCount, timetables.size());
+        assertEquals(expectedCount, timetables.size());
 
         var first = timetables.get(0);
         assertEquals(timeFirst, first.timeOnStop);
@@ -355,8 +354,8 @@ class WarszawskieApiSerializerTests {
 
     private void assertValuesAreEqual(List<ApiKeyValue> values, String key, String value) {
         var pair = values.stream().filter(keyValue -> keyValue.key.equals(key)).findFirst();
-        Assert.assertTrue("Key " + key + "should be present", pair.isPresent());
-        Assert.assertEquals("Value " + value + "should be set for " + key,
-                value, pair.get().value);
+        Assertions.assertTrue(pair.isPresent(), "Key " + key + "should be present");
+        assertEquals(
+                value, pair.get().value, "Value " + value + "should be set for " + key);
     }
 }

@@ -8,7 +8,7 @@ import Flatpickr from "react-flatpickr";
 import { dispatch } from "../../../redux/store";
 import { startSimulationDataUpdated } from "../../../redux/core/actions";
 import PrepareMenu from "./PrepareMenu";
-import GenerationSubMenu from "./GenerationSubMenu";
+import SubMenu from "./SubMenu";
 import SimulationStarter from "./SimulationStarter";
 
 import CustomClock from "./CustomClock";
@@ -34,7 +34,7 @@ const Menu = props => {
       {!wasStarted && <PrepareMenu />}
 
       <form className="form-border">
-        <GenerationSubMenu />
+        <SubMenu />
 
         <div className="mt-3" key={`sT-${configState}`}>
           <label htmlFor="simulationTime">Simulation start time</label>

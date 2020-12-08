@@ -4,6 +4,7 @@ import { LightColor } from "../../components/Models/LightColor";
 import { getResultObj } from "../dataUtils/helpers";
 import { getRandomInt } from "../../utils/helpers";
 import {
+  SIMULATION_PREPARE_STARTED,
   SIMULATION_PREPARED,
   LIGHTS_SWITCHED,
   TROUBLE_POINT_CREATED,
@@ -21,6 +22,7 @@ const initialState = {
   lights: [],
   stations: [],
   troublePoints: [],
+  inPreparation: false,
   wasPrepared: 0,
   wasStarted: false,
   timeResults: [],
@@ -38,12 +40,17 @@ function onKilled(state, data, type) {
 
 const message = (state = initialState, action) => {
   switch (action.type) {
+    case SIMULATION_PREPARE_STARTED: {
+      return { ...state, inPreparation: true };
+    }
+
     case SIMULATION_PREPARED: {
       const { lights, stations } = action.payload;
       return {
         ...state,
         lights,
         stations,
+        inPreparation: false,
         wasPrepared: state.wasPrepared + 1,
         wasStarted: false,
       };

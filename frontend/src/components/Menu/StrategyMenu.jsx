@@ -2,18 +2,24 @@
 import { connect } from "react-redux";
 import React from "react";
 import { dispatch } from "../../redux/store";
-import { startSimulationDataUpdated } from "../../redux/core/actions";
-import "../../styles/Menu.css";
+import { startSimulationDataUpdated, generatePedestriansUpdated } from "../../redux/core/actions";
 import { setIfValidInt } from "../../utils/helpers";
 import { LIGHT_EXTEND_MIN, LIGHT_EXTEND_MAX, STATION_EXTEND_MAX, STATION_EXTEND_MIN } from "../../constants/minMax";
+
+import "../../styles/Menu.css";
 
 const StrategyMenu = props => {
   const {
     configState,
     wasStarted,
     startSimulationData: {
-      useFixedRoutes,
-      useFixedTroublePoints,
+      generateCars,
+      generateBatchesForCars,
+      generateBikes,
+
+      generateTroublePoints,
+      detectTrafficJams,
+      generateBusFailures,
 
       lightStrategyActive,
       extendLightTime,
@@ -21,45 +27,71 @@ const StrategyMenu = props => {
       stationStrategyActive,
       extendWaitTime,
 
-      changeRouteOnTroublePoint,
-      changeRouteOnTrafficJam,
+      troublePointStrategyActive,
+      trafficJamStrategyActive,
+      transportChangeStrategyActive,
     },
     generatePedestrians,
-    generateTroublePoints,
   } = props;
 
+  function dispatchUpdate(data) {
+    dispatch(startSimulationDataUpdated(data));
+  }
+
+  function evSetGenerateCars(e) {
+    dispatchUpdate({ generateCars: e.target.checked });
+  }
+
+  function evSetGenerateBikes(e) {
+    dispatchUpdate({ generateBikes: e.target.checked });
+  }
+
+  function evSetGenerateTroublePoints(e) {
+    dispatchUpdate({ generateTroublePoints: e.target.checked });
+  }
+
   function evSetLightStrategyActive(e) {
-    dispatch(startSimulationDataUpdated({ lightStrategyActive: e.target.checked }));
+    dispatchUpdate({ lightStrategyActive: e.target.checked });
   }
 
   function evSetLightExtend(e) {
-    setIfValidInt(e, LIGHT_EXTEND_MIN, LIGHT_EXTEND_MAX, val => dispatch(startSimulationDataUpdated({ extendLightTime: val })));
+    setIfValidInt(e, LIGHT_EXTEND_MIN, LIGHT_EXTEND_MAX, val => dispatchUpdate({ extendLightTime: val }));
   }
 
   function evSetStationStrategyActive(e) {
-    dispatch(startSimulationDataUpdated({ stationStrategyActive: e.target.checked }));
+    dispatchUpdate({ stationStrategyActive: e.target.checked });
   }
 
   function evSetWaitExtend(e) {
-    setIfValidInt(e, STATION_EXTEND_MIN, STATION_EXTEND_MAX, val =>
-      dispatch(startSimulationDataUpdated({ extendWaitTime: val }))
-    );
+    setIfValidInt(e, STATION_EXTEND_MIN, STATION_EXTEND_MAX, val => dispatchUpdate({ extendWaitTime: val }));
   }
 
-  function evSetChangeRouteOnTroublePoint(e) {
-    dispatch(startSimulationDataUpdated({ changeRouteOnTroublePoint: e.target.checked }));
+  function evSetTroublePointStrategyActive(e) {
+    dispatchUpdate({ troublePointStrategyActive: e.target.checked });
   }
 
-  function evSetChangeRouteOnTrafficJam(e) {
-    dispatch(startSimulationDataUpdated({ changeRouteOnTrafficJam: e.target.checked }));
+  function evSetTrafficJamStrategyActive(e) {
+    dispatchUpdate({ trafficJamStrategyActive: e.target.checked });
   }
 
-  function evSetUseFixedRoutes(e) {
-    dispatch(startSimulationDataUpdated({ useFixedRoutes: e.target.checked }));
+  function evSetTransportChangeStrategyActive(e) {
+    dispatchUpdate({ transportChangeStrategyActive: e.target.checked });
   }
 
-  function evSetUseFixedTroublePoints(e) {
-    dispatch(startSimulationDataUpdated({ useFixedTroublePoints: e.target.checked }));
+  function evSetDetectTrafficJams(e) {
+    dispatchUpdate({ detectTrafficJams: e.target.checked });
+  }
+
+  function evSetGenerateBusFailures(e) {
+    dispatchUpdate({ generateBusFailures: e.target.checked });
+  }
+
+  function evSetGenerateBatchesForCars() {
+    dispatchUpdate({ generateBatchesForCars: !generateBatchesForCars });
+  }
+
+  function evSetGeneratePedestrians(e) {
+    dispatch(generatePedestriansUpdated(e.target.checked));
   }
 
   return (
@@ -68,47 +100,162 @@ const StrategyMenu = props => {
         <div className="form-check user-select-none">
           <input
             type="checkbox"
-            className="form-check-input"
-            id="useFixedRoutes"
-            checked={useFixedRoutes}
             disabled={wasStarted}
-            onChange={evSetUseFixedRoutes}
+            checked={generateCars}
+            className="form-check-input"
+            id="generateCars"
+            onChange={evSetGenerateCars}
           />
-          <label htmlFor="useFixedRoutes" className="form-check-label">
-            Use fixed routes
+          <label htmlFor="generateCars" className="form-check-label">
+            Generate cars
+          </label>
+        </div>
+
+        <div className="ml-4 mt-1 mb-1 small-text">
+          <div className="custom-control custom-radio">
+            <input
+              type="radio"
+              disabled={!generateCars}
+              checked={!generateBatchesForCars}
+              name="carsRadio"
+              className="custom-control-input"
+              id="carsRandom"
+              onChange={evSetGenerateBatchesForCars}
+            />
+            <label className="custom-control-label" htmlFor="carsRandom">
+              Random
+            </label>
+          </div>
+          <div className="custom-control custom-radio">
+            <input
+              type="radio"
+              disabled={!generateCars}
+              checked={generateBatchesForCars}
+              name="carsRadio"
+              className="custom-control-input"
+              id="carsBatched"
+              onChange={evSetGenerateBatchesForCars}
+            />
+            <label className="custom-control-label" htmlFor="carsBatched">
+              Batched
+            </label>
+          </div>
+        </div>
+
+        <div className="form-check user-select-none">
+          <input
+            type="checkbox"
+            checked={generatePedestrians}
+            className="form-check-input"
+            id="generatePedestrians"
+            onChange={evSetGeneratePedestrians}
+          />
+          <label htmlFor="generatePedestrians" className="form-check-label">
+            Generate buses & stations & pedestrians
+          </label>
+        </div>
+
+        <div className="form-check user-select-none">
+          <input
+            type="checkbox"
+            disabled={wasStarted}
+            checked={generateBikes}
+            className="form-check-input"
+            id="generateBikes"
+            onChange={evSetGenerateBikes}
+          />
+          <label htmlFor="generateBikes" className="form-check-label">
+            Generate bikes
+          </label>
+        </div>
+
+        <div className="form-check user-select-none">
+          <input
+            type="checkbox"
+            checked={generateTroublePoints}
+            disabled={!generateCars || wasStarted}
+            className="form-check-input"
+            id="generateTroublePoints"
+            onChange={evSetGenerateTroublePoints}
+          />
+          <label
+            htmlFor="generateTroublePoints"
+            className="form-check-label"
+            data-toggle="tooltip"
+            data-placement="top"
+            data-html="true"
+            title="You need to generate <b>cars</b> to generate trouble points."
+          >
+            Generate trouble points
+          </label>
+        </div>
+
+        <div className="form-check user-select-none">
+          <input
+            type="checkbox"
+            checked={detectTrafficJams}
+            disabled={!generateCars || wasStarted}
+            className="form-check-input"
+            id="detectTrafficJams"
+            onChange={evSetDetectTrafficJams}
+          />
+          <label
+            htmlFor="detectTrafficJams"
+            className="form-check-label"
+            data-toggle="tooltip"
+            data-placement="top"
+            data-html="true"
+            title="You need to generate <b>cars</b> to detect traffic jams."
+          >
+            Detect traffic jams
           </label>
         </div>
         <div className="form-check user-select-none">
           <input
             type="checkbox"
+            checked={generateBusFailures}
+            disabled={!generatePedestrians || wasStarted}
             className="form-check-input"
-            id="useFixedTroublePoints"
-            checked={useFixedTroublePoints}
-            disabled={wasStarted || !useFixedRoutes}
-            onChange={evSetUseFixedTroublePoints}
+            id="generateBusFailures"
+            onChange={evSetGenerateBusFailures}
           />
-          <label htmlFor="useFixedTroublePoints" className="form-check-label">
-            Use fixed trouble points
+          <label
+            htmlFor="generateBusFailures"
+            className="form-check-label"
+            data-toggle="tooltip"
+            data-placement="top"
+            data-html="true"
+            title="You need to generate <b>buses</b> to generate bus failures."
+          >
+            Generate bus failures
           </label>
         </div>
       </div>
+
       <div className="mb-4 form-border">
-        <div className="form-check user-select-none">
+        <div className="custom-control custom-switch user-select-none">
           <input
             type="checkbox"
-            className="form-check-input"
+            className="custom-control-input"
             id="lightStrategyActive"
             checked={lightStrategyActive}
-            disabled={wasStarted}
+            disabled={!(generateCars || generatePedestrians || generateBikes) || wasStarted}
             onChange={evSetLightStrategyActive}
           />
-          <label htmlFor="lightStrategyActive" className="form-check-label">
+          <label
+            htmlFor="lightStrategyActive"
+            className="custom-control-label"
+            data-toggle="tooltip"
+            data-placement="top"
+            data-html="true"
+            title="You need to generate <b>cars</b> or <b>bikes</b> or <b>pedestrians</b> to use this strategy."
+          >
             Light strategy
           </label>
         </div>
         {lightStrategyActive && (
           <div className="form-group mt-2" key={`ls-${configState}`}>
-            <label htmlFor="extendLightTime">Green lights extension time</label>
+            <label htmlFor="extendLightTime">Extension time</label>
             <input
               type="number"
               className="form-control"
@@ -122,69 +269,102 @@ const StrategyMenu = props => {
             />
           </div>
         )}
-      </div>
-      {generatePedestrians && (
-        <div className="mb-4 form-border">
-          <div className="form-check user-select-none">
-            <input
-              type="checkbox"
-              className="form-check-input"
-              id="stationStrategyActive"
-              checked={stationStrategyActive}
-              disabled={wasStarted}
-              onChange={evSetStationStrategyActive}
-            />
-            <label htmlFor="stationStrategyActive" className="form-check-label">
-              Station strategy
-            </label>
-          </div>
-          {stationStrategyActive && (
-            <div className="form-group mt-2" key={`ss-${configState}`}>
-              <label htmlFor="extendWaitTime">Bus extension wait time</label>
-              <input
-                type="number"
-                className="form-control"
-                id="extendWaitTime"
-                defaultValue={extendWaitTime}
-                disabled={wasStarted}
-                placeholder="Enter bus extension wait time"
-                onChange={evSetWaitExtend}
-              />
-            </div>
-          )}
-        </div>
-      )}
 
-      {generateTroublePoints && (
-        <div className="mb-4 form-border">
-          <div className="form-check user-select-none">
-            <input
-              type="checkbox"
-              className="form-check-input"
-              id="changeRouteOnTroublePoint"
-              checked={changeRouteOnTroublePoint}
-              disabled={wasStarted}
-              onChange={evSetChangeRouteOnTroublePoint}
-            />
-            <label htmlFor="changeRouteOnTroublePoint" className="form-check-label">
-              Change route on trouble point
-            </label>
-          </div>
-        </div>
-      )}
-
-      <div className="mb-4 form-border">
-        <div className="form-check user-select-none">
+        <div className="custom-control custom-switch user-select-none">
           <input
             type="checkbox"
-            className="form-check-input"
-            id="changeRouteOnTrafficJam"
-            checked={changeRouteOnTrafficJam}
-            disabled={wasStarted}
-            onChange={evSetChangeRouteOnTrafficJam}
+            className="custom-control-input"
+            id="stationStrategyActive"
+            checked={stationStrategyActive}
+            disabled={!generatePedestrians || wasStarted}
+            onChange={evSetStationStrategyActive}
           />
-          <label htmlFor="changeRouteOnTrafficJam" className="form-check-label">
-            Change route on traffic jam
+          <label
+            htmlFor="stationStrategyActive"
+            className="custom-control-label"
+            data-toggle="tooltip"
+            data-placement="top"
+            data-html="true"
+            title="You need to generate <b>buses</b> to use this strategy."
+          >
+            Bus station strategy
+          </label>
+        </div>
+        {stationStrategyActive && (
+          <div className="form-group mt-2" key={`ss-${configState}`}>
+            <label htmlFor="extendWaitTime">Extension time</label>
+            <input
+              type="number"
+              className="form-control"
+              id="extendWaitTime"
+              defaultValue={extendWaitTime}
+              disabled={wasStarted}
+              placeholder="Enter bus wait extension time"
+              onChange={evSetWaitExtend}
+            />
+          </div>
+        )}
+
+        <div className="custom-control custom-switch user-select-none">
+          <input
+            type="checkbox"
+            className="custom-control-input"
+            id="troublePointStrategyActive"
+            checked={troublePointStrategyActive}
+            disabled={!generateCars || !generateTroublePoints || wasStarted}
+            onChange={evSetTroublePointStrategyActive}
+          />
+          <label
+            htmlFor="troublePointStrategyActive"
+            className="custom-control-label"
+            data-toggle="tooltip"
+            data-placement="top"
+            data-html="true"
+            title="You need to generate <b>cars</b> and <b>trouble points</b> to use this strategy."
+          >
+            Trouble point strategy
+          </label>
+        </div>
+
+        <div className="custom-control custom-switch user-select-none">
+          <input
+            type="checkbox"
+            className="custom-control-input"
+            id="trafficJamStrategyActive"
+            checked={trafficJamStrategyActive}
+            disabled={!generateCars || !detectTrafficJams || wasStarted}
+            onChange={evSetTrafficJamStrategyActive}
+          />
+          <label
+            htmlFor="trafficJamStrategyActive"
+            className="custom-control-label"
+            data-toggle="tooltip"
+            data-placement="top"
+            data-html="true"
+            title="You need to generate <b>cars</b> and <b>detect traffic jams</b> to use this strategy."
+          >
+            Traffic jam strategy
+          </label>
+        </div>
+
+        <div className="custom-control custom-switch user-select-none">
+          <input
+            type="checkbox"
+            className="custom-control-input"
+            id="transportChangeStrategyActive"
+            checked={transportChangeStrategyActive}
+            disabled={!generatePedestrians || !generateBusFailures || wasStarted}
+            onChange={evSetTransportChangeStrategyActive}
+          />
+          <label
+            htmlFor="transportChangeStrategyActive"
+            className="custom-control-label"
+            data-toggle="tooltip"
+            data-placement="top"
+            data-html="true"
+            title="You need to generate <b>buses</b> and <b>bus failures</b> to use this strategy."
+          >
+            Transport change strategy
           </label>
         </div>
       </div>
@@ -204,7 +384,6 @@ const mapStateToProps = (state /* , ownProps */) => {
     wasStarted,
     startSimulationData,
     generatePedestrians,
-    generateTroublePoints: startSimulationData.generateTroublePoints,
   };
 };
 

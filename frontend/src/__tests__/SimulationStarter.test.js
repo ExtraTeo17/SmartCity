@@ -32,6 +32,7 @@ const startSimulationData = {
   generateCars: true,
   carsLimit: 22,
   testCarId: 10,
+  generateBatchesForCars: false,
 
   generateBikes: true,
   bikesLimit: 55,
@@ -39,6 +40,9 @@ const startSimulationData = {
 
   generateTroublePoints: false,
   timeBeforeTrouble: 5,
+
+  generateBusFailures: true,
+  detectTrafficJams: false,
 
   useFixedRoutes: true,
   useFixedTroublePoints: false,
@@ -51,8 +55,9 @@ const startSimulationData = {
   stationStrategyActive: false,
   extendWaitTime: 60,
 
-  changeRouteOnTroublePoint: true,
-  changeRouteOnTrafficJam: false,
+  troublePointStrategyActive: true,
+  trafficJamStrategyActive: false,
+  transportChangeStrategyActive: true,
 };
 
 it("Passes correct data to ApiManager", () => {
@@ -75,6 +80,7 @@ it("Passes correct data to ApiManager", () => {
     generateCars: startSimulationData.generateCars,
     carsLimit: startSimulationData.carsLimit,
     testCarId: startSimulationData.testCarId,
+    generateBatchesForCars: startSimulationData.generateBatchesForCars,
 
     generateBikes: startSimulationData.generateBikes,
     bikesLimit: startSimulationData.bikesLimit,
@@ -82,6 +88,9 @@ it("Passes correct data to ApiManager", () => {
 
     generateTroublePoints: startSimulationData.generateTroublePoints,
     timeBeforeTrouble: startSimulationData.timeBeforeTrouble,
+
+    generateBusFailures: startSimulationData.generateBusFailures,
+    detectTrafficJams: startSimulationData.detectTrafficJams,
 
     useFixedRoutes: startSimulationData.useFixedRoutes,
     useFixedTroublePoints: startSimulationData.useFixedTroublePoints,
@@ -94,7 +103,8 @@ it("Passes correct data to ApiManager", () => {
     stationStrategyActive: startSimulationData.stationStrategyActive,
     extendWaitTime: startSimulationData.extendWaitTime,
 
-    changeRouteOnTroublePoint: startSimulationData.changeRouteOnTroublePoint,
-    changeRouteOnTrafficJam: startSimulationData.changeRouteOnTrafficJam,
+    troublePointStrategyActive: startSimulationData.troublePointStrategyActive,
+    trafficJamStrategyActive: startSimulationData.trafficJamStrategyActive,
+    transportChangeStrategyActive: startSimulationData.transportChangeStrategyActive,
   });
 });

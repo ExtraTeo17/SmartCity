@@ -1,5 +1,12 @@
 import { BusFillState } from "../../../components/Models/BusFillState";
-import { SIMULATION_PREPARED, BUS_UPDATED, BUS_FILL_STATE_UPDATED, BUS_KILLED, BATCHED_UPDATE } from "../../core/constants";
+import {
+  SIMULATION_PREPARED,
+  BUS_UPDATED,
+  BUS_FILL_STATE_UPDATED,
+  BUS_KILLED,
+  BATCHED_UPDATE,
+  BUS_CRASHED,
+} from "../../core/constants";
 
 // Just for reference - defined in store.js
 const initialState = {
@@ -12,7 +19,11 @@ const bus = (state = initialState, action) => {
   const { payload } = action;
   switch (action.type) {
     case SIMULATION_PREPARED: {
-      return { ...state, buses: action.payload.buses };
+      const buses = payload.buses.map(b => {
+        return { ...b, startedMoving: false, crashed: false };
+      });
+
+      return { ...state, buses };
     }
 
     case BUS_UPDATED: {
@@ -39,8 +50,8 @@ const bus = (state = initialState, action) => {
 
       const newBuses = state.buses.map(b => {
         const update = busUpdates.find(bus => bus.id === b.id);
-        if (update) {
-          return { ...b, location: update.location };
+        if (update && b.location !== update.location) {
+          return { ...b, location: update.location, startedMoving: true };
         }
         return b;
       });
@@ -64,10 +75,24 @@ const bus = (state = initialState, action) => {
     }
 
     case BUS_KILLED: {
-      console.info(`Killed bus: ${payload}`);
       const id = payload;
+      console.info(`Killed bus: ${id}`);
+
       const newBuses = state.buses.filter(b => b.id !== id);
       deletedBusIds.push(id);
+
+      return { ...state, buses: newBuses };
+    }
+
+    case BUS_CRASHED: {
+      const id = payload;
+      console.info(`Crashed bus: ${payload}`);
+      const newBuses = state.buses.map(b => {
+        if (b.id === id) {
+          return { ...b, crashed: true };
+        }
+        return b;
+      });
 
       return { ...state, buses: newBuses };
     }

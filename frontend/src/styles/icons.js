@@ -83,9 +83,9 @@ export const testPedestrianIcon = new L.Icon({
 export const troublePointIcon = new L.Icon({
   iconUrl: "/images/trouble_point.png",
   iconRetinaUrl: "/images/trouble_point.png",
-  iconAnchor: [16, 16],
-  popupAnchor: [8, 8],
-  iconSize: [32, 32],
+  iconAnchor: [14, 14],
+  popupAnchor: [7, 7],
+  iconSize: [28, 28],
 });
 
 export const accidentIcon = new L.Icon({

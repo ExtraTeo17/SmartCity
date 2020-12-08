@@ -1,16 +1,17 @@
 package web.message.payloads;
 
-import java.lang.reflect.Field;
 import java.util.Arrays;
 import java.util.stream.Collectors;
 
 public abstract class AbstractPayload {
     @Override
     public String toString() {
-        Field[] fields = this.getClass().getFields();
-        return "(" + Arrays.stream(fields).map(f -> {
+        var fields = Arrays.stream(this.getClass().getDeclaredFields())
+                .filter(f -> !f.getName().startsWith("this$0"));
+        return "(" + fields.map(f -> {
             String result = f.getName() + ": ";
             try {
+                f.setAccessible(true);
                 var value = f.get(this);
                 result += value.toString();
             } catch (IllegalAccessException e) {
