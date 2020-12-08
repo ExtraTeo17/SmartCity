@@ -25,6 +25,9 @@ import java.util.HashSet;
 import java.util.List;
 
 @SuppressWarnings("OverlyCoupledClass")
+/**
+ * The class responsible for creating all types of agents
+ */
 public
 class AgentsFactory implements IAgentsFactory {
     private static final Logger logger = LoggerFactory.getLogger(AgentsFactory.class);
@@ -56,7 +59,12 @@ class AgentsFactory implements IAgentsFactory {
         this.configContainer = configContainer;
         this.taskProvider = taskProvider;
     }
-
+    /**
+     * Creates fully filled car agent
+     * @param route              The defined route of vehicle
+     * @param testCar            Decision variable, showing is the object to be created should be Test
+     *@return Filled {@link CarAgent} object.
+     */
     @Override
     public CarAgent create(List<RouteNode> route, boolean testCar) {
         var id = idGenerator.get(CarAgent.class);
@@ -75,9 +83,14 @@ class AgentsFactory implements IAgentsFactory {
     public CarAgent create(List<RouteNode> route) {
         return create(route, false);
     }
-
+    /**
+     * Creates fully filled bike agent
+     * @param route              The defined route of vehicle
+     * @param testBike           Decision variable, showing is the object to be created should be Test
+     * @return Filled {@link BikeAgent} object.
+     */
     @Override
-    public BikeAgent create(List<RouteNode> route, boolean testBike, String check) {
+    public BikeAgent createBike(List<RouteNode> route, boolean testBike) {
         var id = idGenerator.get(CarAgent.class);
         var uniformRoute = routeTransformer.uniformRoute(route);
         logger.trace("DisplayRoute size: " + route.size() + ", routeSize: " + uniformRoute.size());
@@ -91,17 +104,28 @@ class AgentsFactory implements IAgentsFactory {
     }
 
     @Override
-    public BikeAgent create(List<RouteNode> route, String check) {
-        return create(route, false, check);
+    public BikeAgent createBike(List<RouteNode> route) {
+        return createBike(route, false);
     }
-
+    /**
+     * Creates fully filled station manager agent
+     * @param station            object, which contains essential information for work of StationAgent
+     * @return Filled {@link StationAgent} object.
+     */
     @Override
     public StationAgent create(OSMStation station) {
         var id = idGenerator.get(StationAgent.class);
         var stationStrategy = new StationStrategy(id, configContainer, timeProvider);
         return new StationAgent(id, station, stationStrategy, timeProvider, eventBus);
     }
-
+    /**
+     * Creates fully filled bus agent
+     * @param route           The defined route of vehicle
+     * @param timetable       Timetable of specific bus
+     * @param busLine         Bus line number
+     * @param brigadeNr       Number of the brigade of the object
+     * @return Filled {@link BusAgent} object.
+     */
     @Override
     public BusAgent create(List<RouteNode> route, Timetable timetable, String busLine, String brigadeNr) {
         var id = idGenerator.get(BusAgent.class);
@@ -118,14 +142,27 @@ class AgentsFactory implements IAgentsFactory {
         var crossroad = crossroadFactory.create(id, crossroadNode);
         return new LightManagerAgent(id, crossroad, timeProvider, eventBus, configContainer);
     }
-
+    /**
+     * Creates fully filled LightManagerAgent
+     * @param centerCrossroad object,that conatins information about crossroad,
+     *                        which will be managed by created Light Manager
+     * @return Filled {@link LightManagerAgent} object.
+     */
     @Override
     public LightManagerAgent create(OSMNode centerCrossroad) {
         var id = idGenerator.get(LightManagerAgent.class);
         var crossroad = crossroadFactory.create(id, centerCrossroad);
         return new LightManagerAgent(id, crossroad, timeProvider, eventBus, configContainer);
     }
-
+    /**
+     * Creates fully filled bus agent
+     * @param routeToStation       route from start point to startStation
+     * @param routeFromStation    route from finishStation to target point
+     * @param startStation        start station of the pedestrian
+     * @param finishStation       destination station
+     * @param testPedestrian      if the created agent, should be test
+     * @return Filled {@link PedestrianAgent} object.
+     */
     // TODO: Simplify to avoid 6 arguments
     @Override
     public PedestrianAgent create(List<RouteNode> routeToStation, List<RouteNode> routeFromStation,
@@ -151,7 +188,11 @@ class AgentsFactory implements IAgentsFactory {
                                   StationNode startStation, StationNode finishStation) {
         return create(routeToStation, routeFromStation, startStation, finishStation, false);
     }
-
+    /**
+     * Creates fully filled BusManagerAgent
+     * @param busInfos      information about schedules of buses and their stations
+     * @return Filled {@link PedestrianAgent} object.
+     */
     @Override
     public BusManagerAgent create(HashSet<BusInfo> busInfos) {
         return new BusManagerAgent(timeProvider, eventBus, busInfos);

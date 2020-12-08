@@ -17,7 +17,9 @@ import java.time.LocalTime;
 import java.util.HashSet;
 
 import static java.time.temporal.ChronoUnit.MILLIS;
-
+/**
+ * The class handles communication with bus agent and pedestrian agent in case of trouble on the road
+ */
 public class BusManagerAgent extends AbstractAgent {
     private static final String NAME_PREFIX = "BusManager";
     private static final int ID = 1;

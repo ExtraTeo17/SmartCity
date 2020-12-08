@@ -21,7 +21,9 @@ import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 
 import static agents.message.MessageManager.createProperties;
-
+/**
+ * Agent which is parent class for all moving agents, as well as BusManagerAgent, LightManagerAgent
+ */
 public abstract class AbstractAgent extends Agent {
     private final int id;
     private final String namePrefix;

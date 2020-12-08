@@ -11,15 +11,17 @@ import routing.nodes.StationNode;
 
 import java.util.HashSet;
 import java.util.List;
-
+/**
+ * Creates all agents
+ */
 public interface IAgentsFactory {
     CarAgent create(List<RouteNode> route, boolean testCar);
 
     CarAgent create(List<RouteNode> route);
 
-    BikeAgent create(List<RouteNode> route, boolean testCar, String check);
+    BikeAgent createBike(List<RouteNode> route, boolean testCar);
 
-    BikeAgent create(List<RouteNode> route, String check);
+    BikeAgent createBike(List<RouteNode> route);
 
     StationAgent create(OSMStation station);
 

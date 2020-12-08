@@ -28,7 +28,19 @@ import java.util.Map;
 
 import static agents.AgentConstants.DEFAULT_BLOCK_ON_ERROR;
 import static agents.message.MessageManager.createProperties;
-
+/**
+ * There is one TroubleManager agent in the system. It is an agent, which manages
+ * trouble places and traffic jams in the system. In the field of construction/accidents places management,
+ * the agent receives information from an affected car agent about the trouble place location,
+ * which was detected by this car agent on its route. The TroubleManager agent then makes a broadcast
+ * to all the car agents to inform them about the incidence of the reported trouble point, so that they
+ * can act accordingly. In the field of traffic jam management, the agent receives information about the
+ * traffic jam from the car agent about the traffic jam location, which it further broadcasts
+ * to all the cars analogically. It could also receive an information from the LightManager agent
+ * about a mitigated traffic jam, triggering the TroubleManager agent to perform broadcast about the traffic
+ * jam stop. Another responsibility of theTroubleManager agent is to perform the aforementioned
+ * broadcasts periodically, so that newly created cars could also act upon trouble places/traffic jams.
+ */
 public class TroubleManagerAgent extends Agent {
     public static final String name = TroubleManagerAgent.class.getSimpleName().replace("Agent", "");
     private final static Logger logger = LoggerFactory.getLogger(TroubleManagerAgent.class);

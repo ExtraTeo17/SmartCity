@@ -5,7 +5,9 @@ import agents.abstractions.IRegistrable;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.atomic.AtomicInteger;
-
+/**
+ * Generates ID for agents
+ */
 public class IdGenerator implements IRegistrable {
     public static final int resetValue = 1;
     private final ConcurrentMap<Class<?>, AtomicInteger> idMap;

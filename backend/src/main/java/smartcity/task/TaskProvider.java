@@ -138,7 +138,7 @@ public class TaskProvider implements ITaskProvider {
                 return;
             }
 
-            BikeAgent agent = agentsFactory.create(route, testBike, "");
+            BikeAgent agent = agentsFactory.createBike(route, testBike);
             if (agentsContainer.tryAdd(agent)) {
                 agent.start();
                 logger.info("Started: " + agent.getLocalName());

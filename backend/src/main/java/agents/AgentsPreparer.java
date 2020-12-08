@@ -36,7 +36,9 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 import static smartcity.config.StaticConfig.USE_DEPRECATED_XML_FOR_LIGHT_MANAGERS;
-
+/**
+ * Prepares all agents that need more time to be created
+ */
 @SuppressWarnings("OverlyCoupledClass")
 public class AgentsPreparer {
     private static final Logger logger = LoggerFactory.getLogger(AgentsPreparer.class);

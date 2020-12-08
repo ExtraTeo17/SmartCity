@@ -38,7 +38,13 @@ import static agents.AgentConstants.DEFAULT_BLOCK_ON_ERROR;
 import static agents.message.MessageManager.createMessage;
 import static agents.message.MessageManager.createProperties;
 import static smartcity.config.StaticConfig.USE_BATCHED_UPDATES;
-
+/**
+ * The number of PedestrianAgent agents in the system is configurable from the GUI. It is an agent,
+ * which behaves similarly to the car agents in terms of travelling manner (from point A to point B)
+ * and in terms of communication with the PedestrianAgent agents throughout its route. Its core
+ * responsibility is to communicate with the bus station agent to inform it about the need of travelling
+ * with a certain bus line and wait until proposal to enter the bus.
+ */
 public class PedestrianAgent extends AbstractAgent {
     public static final String name = PedestrianAgent.class.getSimpleName().replace("Agent", "");
 
