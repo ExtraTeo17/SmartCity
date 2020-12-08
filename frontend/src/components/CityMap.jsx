@@ -5,7 +5,6 @@ import { notify } from "react-notify-toast";
 import { dispatch } from "../redux/store";
 import { centerUpdated } from "../redux/core/actions";
 
-import "../styles/CityMap.css";
 import LightsLayer from "./Layers/LightsLayer";
 import StationsLayer from "./Layers/StationsLayer";
 import TroublePointsLayer from "./Layers/TroublePointsLayer";
@@ -17,9 +16,16 @@ import { NOTIFY_SHOW_MS } from "../constants/global";
 import { D_ZOOM } from "../constants/defaults";
 import { BaseLayers } from "./Layers/BaseLayers";
 
+import "../styles/CityMap.css";
+
 const { Overlay } = LayersControl;
 
-const CityMap = ({ center, wasStarted }) => {
+/**
+ * @category Main
+ * @component
+ */
+const CityMap = props => {
+  const { center, wasStarted } = props;
   const [zoom, setZoom] = useState(D_ZOOM);
 
   useEffect(() => {
