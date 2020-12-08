@@ -33,6 +33,18 @@ import {
   BUS_CRASHED,
 } from "./constants";
 
+/**
+ * @category Redux
+ * @subcategory Core
+ * @module actions
+ */
+
+/**
+ * @typedef {Object} Location - Represents location on map
+ * @property {number} lat - Latitude in degrees
+ * @property {number} lng - Longtitude in degrees
+ */
+
 export const configReplaced = createAction(CONFIG_REPLACED);
 
 /**
@@ -56,12 +68,6 @@ export const simulationPrepared = createAction(
 );
 
 export const simulationStarted = createAction(SIMULATION_STARTED);
-
-/**
- * @typedef {Object} Location - Represents location on map
- * @property {number} lat - Latitude in degrees
- * @property {number} lng - Longtitude in degrees
- */
 
 /**
  * @param {{ id: Number, location: Location, route:Array<Location>, isTestCar:Boolean }} car
