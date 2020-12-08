@@ -37,7 +37,7 @@
     "global-require": 0,
     "max-len": [
       2,
-      130,
+      140,
       2, // tabs
       {
         "ignoreUrls": true,
