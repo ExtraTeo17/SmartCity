@@ -27,11 +27,6 @@ import {
   busCrashed,
 } from "./core/actions";
 
-/**
- * @category Redux
- * @module Dispatcher
- */
-
 const fps = 20;
 const fpsInterval = 1000 / fps;
 let timer = null;
@@ -49,6 +44,7 @@ const pushPedQueue = [];
 let start = window.performance.now();
 
 /**
+ * @ignore
  * @param {any} action
  * @param {any} key
  * @param {Map} map
@@ -59,6 +55,7 @@ function dispatchFromMap(action, key, map) {
 }
 
 /**
+ * @ignore
  * @param {number} now
  */
 function update(now) {

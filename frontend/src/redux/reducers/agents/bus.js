@@ -8,6 +8,13 @@ import {
   BUS_CRASHED,
 } from "../../core/constants";
 
+/**
+ * Handles bus-agent-related interaction
+ * @category Redux
+ * @subcategory Reducers
+ * @module bus
+ */
+
 // Just for reference - defined in store.js
 const initialState = {
   buses: [],

@@ -1,5 +1,12 @@
 import { CAR_KILLED, CAR_CREATED, CAR_UPDATED, CAR_ROUTE_CHANGED, BATCHED_UPDATE } from "../../core/constants";
 
+/**
+ * Handles car-agent-related interaction
+ * @category Redux
+ * @subcategory Reducers
+ * @module car
+ */
+
 // Just for reference - defined in store.js
 const initialState = {
   cars: [],

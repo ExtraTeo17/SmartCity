@@ -39,6 +39,13 @@ import {
 import { ConfigState, getNextConfigState } from "../models/states";
 import { createLocalDataObject, saveLocalData } from "../dataUtils/helpers";
 
+/**
+ * Handles interaction with user interface
+ * @category Redux
+ * @subcategory Reducers
+ * @module interaction
+ */
+
 // Just for reference - defined in store.js
 export const initialInteractionState = {
   configState: ConfigState.Initial,

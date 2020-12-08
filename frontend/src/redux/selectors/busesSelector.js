@@ -12,6 +12,17 @@ const getRouteHash = route => {
 
 const isRouteValid = route => route && route.length > 1;
 
+/**
+ * @category Redux
+ */
+
+/**
+ * Filters buses to display based on position and route.
+ * Used for performance reasons.
+ * @func busesSelector
+ * @memberof module:selectors
+ * @returns {Object[]} - filtered buses
+ */
 export default createSelector([getBuses], buses => {
   const result = [];
   const positionsSet = new Set();

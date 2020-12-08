@@ -17,6 +17,13 @@ import {
   TRAFFIC_JAM_ENDED,
 } from "../core/constants";
 
+/**
+ * Handles interaction with from server
+ * @category Redux
+ * @subcategory Reducers
+ * @module message
+ */
+
 // Just for reference - defined in store.js
 const initialState = {
   lights: [],

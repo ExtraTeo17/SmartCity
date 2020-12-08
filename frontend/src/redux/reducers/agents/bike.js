@@ -1,5 +1,12 @@
 import { BIKE_KILLED, BIKE_CREATED, BIKE_UPDATED, BATCHED_UPDATE } from "../../core/constants";
 
+/**
+ * Handles bike-agent-related interaction
+ * @category Redux
+ * @subcategory Reducers
+ * @module bike
+ */
+
 // Just for reference - defined in store.js
 const initialState = {
   bikes: [],

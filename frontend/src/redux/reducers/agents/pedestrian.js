@@ -7,6 +7,13 @@ import {
   BATCHED_UPDATE,
 } from "../../core/constants";
 
+/**
+ * Handles pedestrian-agent-related interaction
+ * @category Redux
+ * @subcategory Reducers
+ * @module pedestrian
+ */
+
 // Just for reference - defined in store.js
 const initialState = {
   pedestrians: [],

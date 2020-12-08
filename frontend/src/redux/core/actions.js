@@ -34,6 +34,7 @@ import {
 } from "./constants";
 
 /**
+ * Defines actions which pass data for reducers
  * @category Redux
  * @subcategory Core
  * @module actions

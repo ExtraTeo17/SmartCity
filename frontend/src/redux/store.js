@@ -34,13 +34,26 @@ import { loadLocalData } from "./dataUtils/helpers";
 import { ConfigState } from "./models/states";
 import appReducer from "./reducers/index";
 
+/**
+ *  * Handles creation of redux store
+ * @category Redux
+ * @module store
+ */
+
 const initialState = {
   interaction: {
     configState: ConfigState.Initial,
+    /**
+     * @type {module:ApiManager~PrepareSimulationData}
+     */
     prepareSimulationData: {
       center: { lat: D_LAT, lng: D_LNG, rad: D_RAD },
       generatePedestrians: D_GENERATE_PEDS,
     },
+
+    /**
+     * @type {module:ApiManager~StartSimulationData}
+     */
     startSimulationData: {
       generateCars: D_GENERATE_CARS,
       carsLimit: D_CARS_NUM,
