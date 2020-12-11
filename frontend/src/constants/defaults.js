@@ -64,12 +64,12 @@ const D_GENERATE_CARS = true;
  * @constant
  * @default
  */
-const D_CARS_NUM = 1;
+const D_CARS_NUM = 10;
 /**
  * @constant
  * @default
  */
-const D_TEST_CAR = 2;
+const D_TEST_CAR = 5;
 /**
  * @constant
  * @default
