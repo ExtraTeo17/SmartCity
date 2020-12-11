@@ -9,9 +9,12 @@ public class PullPedestrianInfo extends AbstractPayload {
     private final int id;
     @JsonProperty("location")
     private final Location location;
+    @JsonProperty("showRoute")
+    private final boolean showRoute;
 
-    public PullPedestrianInfo(int id, Location location) {
+    public PullPedestrianInfo(int id, Location location, boolean showRoute) {
         this.id = id;
         this.location = location;
+        this.showRoute = showRoute;
     }
 }
