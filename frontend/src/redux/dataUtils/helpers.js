@@ -72,7 +72,16 @@ export const loadLocalData = () => {
   const localDataString = localStorage.getItem(storageKey);
   if (localDataString) {
     const data = JSON.parse(localDataString);
-    data.startSimulationData.startTime = new Date();
+
+    const startData = data.startSimulationData;
+    const newDate = new Date(startData.startTime);
+    const dateToday = new Date();
+    if (newDate.getDate() !== dateToday.getDate()) {
+      startData.startTime = dateToday;
+    } else {
+      startData.startTime = newDate;
+    }
+
     return data;
   }
 

@@ -21,9 +21,14 @@ const Bus = props => {
     dispatch({ payload: location });
   }, [location]);
 
+  const elemRef = React.useRef();
   function initMarker(ref) {
-    if (ref && crashed) {
-      const elem = ref.leafletElement;
+    if (ref) {
+      elemRef.current = ref;
+    }
+
+    if (elemRef.current && crashed) {
+      const elem = elemRef.current.leafletElement;
       const htmlElem = elem.getElement();
       htmlElem.classList.add("crashed");
       elem.openPopup();
