@@ -19,6 +19,7 @@ import vehicles.MovingObject;
 
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
+import java.util.function.Consumer;
 
 import static agents.message.MessageManager.createProperties;
 /**
@@ -132,5 +133,17 @@ public abstract class AbstractAgent extends Agent {
         ConditionalExecutor.debug(() ->
                 print("Received message from" + rcv.getSender() + " without type:" + rcv, LoggerLevel.WARN)
         );
+    }
+
+    protected Consumer<Exception> createErrorConsumer(Object event){
+        return (Exception e)->{
+            logger.error("Terminating!", e);
+            eventBus.post(event);
+            doDelete();
+        };
+    }
+
+    protected Consumer<Exception> createErrorConsumer(){
+       return createErrorConsumer("");
     }
 }

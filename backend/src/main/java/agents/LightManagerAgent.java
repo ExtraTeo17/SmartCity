@@ -20,6 +20,7 @@ import java.util.Map;
 
 import static agents.AgentConstants.DEFAULT_BLOCK_ON_ERROR;
 import static agents.message.MessageManager.*;
+import static agents.utilities.BehaviourWrapper.wrapErrors;
 
 /**
  * The main aim of LightManager agent is to manage a specific group of
@@ -145,6 +146,7 @@ public class LightManagerAgent extends AbstractAgent {
 
         var communicate = new CyclicBehaviour() {
 
+            @SuppressWarnings("DuplicatedCode")
             @Override
             public void action() {
                 ACLMessage rcv = receive();
@@ -238,9 +240,9 @@ public class LightManagerAgent extends AbstractAgent {
                 }
             }
         };
-
-        addBehaviour(notifyCarAboutGreen);
-        addBehaviour(communicate);
+        var onError = createErrorConsumer();
+        addBehaviour(wrapErrors(notifyCarAboutGreen, onError));
+        addBehaviour(wrapErrors(communicate, onError));
     }
 
     public List<Light> getLights() {

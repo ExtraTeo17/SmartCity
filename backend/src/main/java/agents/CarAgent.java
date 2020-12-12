@@ -3,6 +3,7 @@ package agents;
 import agents.abstractions.AbstractAgent;
 import agents.utilities.MessageParameter;
 import com.google.common.eventbus.EventBus;
+import events.web.car.CarAgentDeadEvent;
 import events.web.car.CarAgentRouteChangedEvent;
 import events.web.car.CarAgentUpdatedEvent;
 import jade.core.behaviours.*;
@@ -26,6 +27,7 @@ import java.util.*;
 import static agents.AgentConstants.DEFAULT_BLOCK_ON_ERROR;
 import static agents.message.MessageManager.createMessage;
 import static agents.message.MessageManager.createProperties;
+import static agents.utilities.BehaviourWrapper.wrapErrors;
 import static routing.RoutingConstants.STEP_CONSTANT;
 import static smartcity.config.StaticConfig.USE_BATCHED_UPDATES;
 
@@ -41,7 +43,6 @@ import static smartcity.config.StaticConfig.USE_BATCHED_UPDATES;
  * {@link TroubleManagerAgent}, Car agent can apply chosen strategy and,
  * therefore, change the initial route.
  */
-@SuppressWarnings("serial")
 public class CarAgent extends AbstractAgent {
     private static final int THRESHOLD_UNTIL_INDEX_CHANGE = 50;
     // Lower values provide risk of car ignoring the trouble point and passing through it
@@ -95,6 +96,8 @@ public class CarAgent extends AbstractAgent {
             return;
         }
 
+        var onError = createErrorConsumer(new CarAgentDeadEvent(this.getId(),
+                this.car.getUniformRouteSize(), null));
         var movePeriodMs = STEP_CONSTANT / speed;
         Behaviour move = new TickerBehaviour(this, movePeriodMs) {
             @Override
@@ -239,7 +242,7 @@ public class CarAgent extends AbstractAgent {
                     }
 
                 };
-                addBehaviour(factory.wrap(mergeUpdateBehaviour));
+                addBehaviour(wrapErrors(factory.wrap(mergeUpdateBehaviour), onError));
             }
 
             private RouteMergeInfo createMergedWithOldRouteAlternativeRouteFromIndex(final int indexAfterWhichRouteChanges,
@@ -389,7 +392,7 @@ public class CarAgent extends AbstractAgent {
                     }
 
                 };
-                addBehaviour(factory.wrap(mergeUpdateBehaviour));
+                addBehaviour(wrapErrors(factory.wrap(mergeUpdateBehaviour), onError));
             }
 
             private void sendRefusalMessageToLightManagerAfterRouteChange() {
@@ -405,9 +408,8 @@ public class CarAgent extends AbstractAgent {
             }
         };
 
-        addBehaviour(move);
-
-        addBehaviour(communication);
+        addBehaviour(wrapErrors(move, onError));
+        addBehaviour(wrapErrors(communication, onError));
 
         if (configContainer.shouldGenerateConstructionSites()) {
             var timeBeforeTroubleMs = this.configContainer.getTimeBeforeTrouble() * 1000;
@@ -479,7 +481,7 @@ public class CarAgent extends AbstractAgent {
 
             };
 
-            addBehaviour(troubleGenerator);
+            addBehaviour(wrapErrors(troubleGenerator, onError));
 
         }
     }

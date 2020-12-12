@@ -6,6 +6,7 @@ import agents.utilities.MessageParameter;
 import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
 import events.web.bike.BikeAgentCreatedEvent;
+import events.web.pedestrian.PedestrianAgentDeadEvent;
 import events.web.pedestrian.PedestrianAgentEnteredBusEvent;
 import events.web.pedestrian.PedestrianAgentLeftBusEvent;
 import events.web.pedestrian.PedestrianAgentUpdatedEvent;
@@ -37,6 +38,7 @@ import java.util.List;
 import static agents.AgentConstants.DEFAULT_BLOCK_ON_ERROR;
 import static agents.message.MessageManager.createMessage;
 import static agents.message.MessageManager.createProperties;
+import static agents.utilities.BehaviourWrapper.wrapErrors;
 import static smartcity.config.StaticConfig.USE_BATCHED_UPDATES;
 
 /**
@@ -382,9 +384,10 @@ public class PedestrianAgent extends AbstractAgent {
                 return now.plusNanos(pedestrian.getMillisecondsOnRoute(arrivingRouteToClosestStation) * 1_000_000L);
             }
         };
-
-        addBehaviour(move);
-        addBehaviour(communication);
+        var onError = createErrorConsumer(new PedestrianAgentDeadEvent(this.getId(),
+                this.pedestrian.getUniformRouteSize(), null));
+        addBehaviour(wrapErrors(move, onError));
+        addBehaviour(wrapErrors(communication, onError));
     }
 
     private void sendMessageAboutReachingDestinationToSmartCityAgent() {
