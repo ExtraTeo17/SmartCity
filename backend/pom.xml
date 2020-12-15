@@ -3,7 +3,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>agent.systems</groupId>
     <artifactId>smartCity</artifactId>
-    <version>0.0.1-SNAPSHOT</version>
+    <version>2.0</version>
     <repositories>
         <repository>
             <id>jade-repo</id>
@@ -20,6 +20,7 @@
         <slf4j.version>1.7.21</slf4j.version>
         <java.version>14</java.version>
         <resourceFolder>src/main/resources/</resourceFolder>
+        <packageFolder>${project.basedir}/package</packageFolder>
     </properties>
     <build>
         <plugins>
@@ -46,7 +47,7 @@
                             <goal>copy-dependencies</goal>
                         </goals>
                         <configuration>
-                            <outputDirectory>${project.build.directory}/lib</outputDirectory>
+                            <outputDirectory>${packageFolder}/lib</outputDirectory>
                         </configuration>
                     </execution>
                 </executions>
@@ -64,6 +65,7 @@
                             <mainClass>SmartCity</mainClass>
                         </manifest>
                     </archive>
+                    <outputDirectory>${packageFolder}</outputDirectory>
                 </configuration>
             </plugin>
             <!-- JUnit 5 requires Surefire version 2.22.0 or higher -->
