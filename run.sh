@@ -1,15 +1,18 @@
 #!/bin/bash
 
+set -e
+
 buildDir="SmartCity-build";
+currDir=`basename "$PWD"`
 
-if [ ! -d "$buildDir" ]; then
-    ./build.sh;
+if [ "$currDir" != "$buildDir" ]; then
+    if [ ! -d "$buildDir" ]; then
+        ./build.sh;
+    fi
+    cd $buildDir
 fi
-
-cd $buildDir
 
 serve -s frontend &
 start http://localhost:5000
 
 java -jar backend/smartCity-2.0.jar
-

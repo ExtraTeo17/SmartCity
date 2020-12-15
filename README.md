@@ -1,6 +1,6 @@
 ## Introduction
 
-Welcome in SmartCity!
+Welcome in SmartCity!   
 We hope, you will have a nice journey.  
 
 
@@ -19,7 +19,7 @@ See also: https://maven.apache.org/install.html
 2. Java 14   
 Download link: https://jdk.java.net/java-se-ri/14
 
-3. Node.js   
+3. Node.js 14.15.1  
 Download link: https://nodejs.org/en/download/  
 
 ## Run guide
