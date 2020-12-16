@@ -6,6 +6,7 @@ import agents.utilities.MessageParameter;
 import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
 import events.web.bike.BikeAgentCreatedEvent;
+import events.web.pedestrian.PedestrianAgentDeadEvent;
 import events.web.pedestrian.PedestrianAgentEnteredBusEvent;
 import events.web.pedestrian.PedestrianAgentLeftBusEvent;
 import events.web.pedestrian.PedestrianAgentUpdatedEvent;
@@ -37,7 +38,9 @@ import java.util.List;
 import static agents.AgentConstants.DEFAULT_BLOCK_ON_ERROR;
 import static agents.message.MessageManager.createMessage;
 import static agents.message.MessageManager.createProperties;
+import static agents.utilities.BehaviourWrapper.wrapErrors;
 import static smartcity.config.StaticConfig.USE_BATCHED_UPDATES;
+
 /**
  * The number of PedestrianAgent agents in the system is configurable from the GUI. It is an agent,
  * which behaves similarly to the car agents in terms of travelling manner (from point A to point B)
@@ -364,7 +367,7 @@ public class PedestrianAgent extends AbstractAgent {
                 informLightManager(pedestrian);
                 pedestrian.setTroubled(false);
                 pedestrian.setState(DrivingState.MOVING);
-                quitBus();
+                quitBus(false);
             }
 
             private void computeBikeTime(IGeoPosition pointA, IGeoPosition pointB) {
@@ -381,9 +384,10 @@ public class PedestrianAgent extends AbstractAgent {
                 return now.plusNanos(pedestrian.getMillisecondsOnRoute(arrivingRouteToClosestStation) * 1_000_000L);
             }
         };
-
-        addBehaviour(move);
-        addBehaviour(communication);
+        var onError = createErrorConsumer(new PedestrianAgentDeadEvent(this.getId(),
+                this.pedestrian.getUniformRouteSize(), null));
+        addBehaviour(wrapErrors(move, onError));
+        addBehaviour(wrapErrors(communication, onError));
     }
 
     private void sendMessageAboutReachingDestinationToSmartCityAgent() {
@@ -446,10 +450,14 @@ public class PedestrianAgent extends AbstractAgent {
     }
 
     private void quitBus() {
+        quitBus(true);
+    }
+
+    private void quitBus(boolean shouldShowRoute) {
         print("Quit bus", LoggerLevel.DEBUG);
         pedestrian.move();
         pedestrian.setState(DrivingState.PASSING_STATION);
-        eventBus.post(new PedestrianAgentLeftBusEvent(this.getId(), pedestrian.getPosition()));
+        eventBus.post(new PedestrianAgentLeftBusEvent(this.getId(), pedestrian.getPosition(), shouldShowRoute));
     }
 
     public IGeoPosition getPosition() {

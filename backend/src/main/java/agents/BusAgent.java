@@ -5,6 +5,7 @@ import agents.utilities.LoggerLevel;
 import agents.utilities.MessageParameter;
 import com.google.common.eventbus.EventBus;
 import events.web.bus.BusAgentCrashedEvent;
+import events.web.bus.BusAgentDeadEvent;
 import events.web.bus.BusAgentUpdatedEvent;
 import jade.core.behaviours.Behaviour;
 import jade.core.behaviours.CyclicBehaviour;
@@ -29,10 +30,12 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.Random;
+import java.util.function.Consumer;
 
 import static agents.AgentConstants.DEFAULT_BLOCK_ON_ERROR;
 import static agents.message.MessageManager.createMessage;
 import static agents.message.MessageManager.createProperties;
+import static agents.utilities.BehaviourWrapper.wrapErrors;
 import static smartcity.config.StaticConfig.USE_BATCHED_UPDATES;
 
 /**
@@ -254,8 +257,9 @@ public class BusAgent extends AbstractAgent {
             }
         };
 
-        addBehaviour(move);
-        addBehaviour(communication);
+        var onError = createErrorConsumer(new BusAgentDeadEvent(this.getId()));
+        addBehaviour(wrapErrors(move, onError));
+        addBehaviour(wrapErrors(communication, onError));
 
 
         if (configContainer.shouldGenerateBusFailures()) {
@@ -322,7 +326,7 @@ public class BusAgent extends AbstractAgent {
 
             };
 
-            addBehaviour(troubleGenerator);
+            addBehaviour(wrapErrors(troubleGenerator, onError));
         }
     }
 

@@ -140,7 +140,7 @@ class InjectorTests {
         eventBus.post(new PedestrianAgentCreatedEvent(1, null, new ArrayList<>(), new ArrayList<>(), false));
         eventBus.post(new PedestrianAgentUpdatedEvent(1, null));
         eventBus.post(new PedestrianAgentEnteredBusEvent(1));
-        eventBus.post(new PedestrianAgentLeftBusEvent(1, null));
+        eventBus.post(new PedestrianAgentLeftBusEvent(1, null, false));
         eventBus.post(new PedestrianAgentDeadEvent(1, 0, null));
 
         int expectedDeadEvents = 3;

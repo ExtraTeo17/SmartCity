@@ -38,7 +38,7 @@ const MenusContainer = ({
         notify.show("Simulation prepared!", "success", NOTIFY_SHOW_MS);
       }, notifyShowAfterHideDelay);
     }
-  }, [inPreparation]);
+  }, [inPreparation, wasPrepared]);
 
   useEffect(() => {
     if (wasPrepared) {

@@ -25,9 +25,12 @@ import smartcity.config.ConfigContainer;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.function.Consumer;
 
 import static agents.AgentConstants.DEFAULT_BLOCK_ON_ERROR;
 import static agents.message.MessageManager.createProperties;
+import static agents.utilities.BehaviourWrapper.wrapErrors;
+
 /**
  * There is one TroubleManager agent in the system. It is an agent, which manages
  * trouble places and traffic jams in the system. In the field of construction/accidents places management,
@@ -175,7 +178,7 @@ public class TroubleManagerAgent extends Agent {
                 }
             }
         };
-        addBehaviour(communication);
+
 
         Behaviour sayAboutTroubles = new TickerBehaviour(this, 5000) {
             @Override
@@ -197,7 +200,13 @@ public class TroubleManagerAgent extends Agent {
                 }
             }
         };
-        addBehaviour(sayAboutTroubles);
+
+        Consumer<Exception> onError = e -> {
+            logger.error("Terminating!", e);
+            doDelete();
+        };
+        addBehaviour(wrapErrors(communication, onError));
+        addBehaviour(wrapErrors(sayAboutTroubles, onError));
     }
 
     @Subscribe

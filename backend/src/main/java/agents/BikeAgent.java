@@ -3,6 +3,7 @@ package agents;
 import agents.abstractions.AbstractAgent;
 import agents.utilities.MessageParameter;
 import com.google.common.eventbus.EventBus;
+import events.web.bike.BikeAgentDeadEvent;
 import events.web.bike.BikeAgentUpdatedEvent;
 import jade.core.behaviours.Behaviour;
 import jade.core.behaviours.CyclicBehaviour;
@@ -18,6 +19,7 @@ import vehicles.enums.DrivingState;
 
 import static agents.message.MessageManager.createMessage;
 import static agents.message.MessageManager.createProperties;
+import static agents.utilities.BehaviourWrapper.wrapErrors;
 import static routing.RoutingConstants.STEP_CONSTANT;
 import static smartcity.config.StaticConfig.USE_BATCHED_UPDATES;
 
@@ -117,8 +119,10 @@ public class BikeAgent extends AbstractAgent {
 
         };
 
-        addBehaviour(move);
-        addBehaviour(communication);
+        var onError = createErrorConsumer(new BikeAgentDeadEvent(this.getId(),
+                this.vehicle.getUniformRouteSize(), null));
+        addBehaviour(wrapErrors(move, onError));
+        addBehaviour(wrapErrors(communication, onError));
     }
 
     public MovingObject getVehicle() {

@@ -20,41 +20,169 @@ export const ScenariosMenuObj = props => {
 
   function prepareLightScenario() {
     const state = config;
-    state.prepareSimulationData.center = { lat: 52.23682, lng: 21.01681, rad: 600 };
-    state.prepareSimulationData.generatePedestrians = false;
-    state.startSimulationData.generateCars = true;
-    state.startSimulationData.carsLimit = 10;
-    state.startSimulationData.testCarId = 5;
+    const prepareData = state.prepareSimulationData;
+    const startData = state.startSimulationData;
+
+    prepareData.center = { lat: 52.23643, lng: 21.01448, rad: 370 };
+
+    startData.generateCars = true;
+    startData.carsLimit = 10;
+    startData.testCarId = 5;
+    startData.generateBatchesForCars = false;
+    startData.generateBikes = true;
+    startData.bikesLimit = 8;
+    startData.testBikeId = 4;
+
+    startData.useFixedRoutes = true;
+    startData.startTime = new Date();
+    startData.timeScale = 10;
+    startData.lightStrategyActive = true;
+    startData.extendLightTime = 20;
+
+    prepareData.generatePedestrians = false;
+    startData.generateTroublePoints = false;
+    startData.generateBusFailures = false;
+    startData.detectTrafficJams = false;
+
+    startData.stationStrategyActive = false;
+    startData.troublePointStrategyActive = false;
+    startData.trafficJamStrategyActive = false;
+    startData.transportChangeStrategyActive = false;
+
     dispatch(configReplaced(state));
     prepareSimulation(state.prepareSimulationData);
   }
 
   function prepareBusStationsScenario() {
     const state = config;
-    state.prepareSimulationData.center = { lat: 52.203342, lng: 20.861213, rad: 300 };
-    state.prepareSimulationData.generatePedestrians = true;
-    state.startSimulationData.generateCars = false;
+    const prepareData = state.prepareSimulationData;
+    const startData = state.startSimulationData;
+
+    prepareData.center = { lat: 52.20334, lng: 20.86121, rad: 300 };
+
+    prepareData.generatePedestrians = true;
+    startData.pedLimit = 20;
+    startData.testPedId = 5;
+
+    startData.useFixedRoutes = true;
+    const date = new Date();
+    date.setHours(8);
+    date.setMinutes(40);
+    date.setSeconds(0);
+    startData.startTime = date;
+    startData.timeScale = 10;
+    startData.stationStrategyActive = true;
+    startData.extendWaitTime = 60;
+
+    startData.generateCars = false;
+    startData.generateBatchesForCars = false;
+    startData.generateBikes = false;
+    startData.generateTroublePoints = false;
+    startData.generateBusFailures = false;
+    startData.detectTrafficJams = false;
+
+    startData.lightStrategyActive = false;
+    startData.troublePointStrategyActive = false;
+    startData.trafficJamStrategyActive = false;
+    startData.transportChangeStrategyActive = false;
+
     dispatch(configReplaced(state));
     prepareSimulation(state.prepareSimulationData);
   }
 
   function prepareTroublePointsScenario() {
-    // TODO: fill data
     const state = config;
+    const prepareData = state.prepareSimulationData;
+    const startData = state.startSimulationData;
+
+    prepareData.center = { lat: 52.25808, lng: 21.16241, rad: 610 };
+
+    startData.generateCars = true;
+    startData.carsLimit = 10;
+    startData.testCarId = 5;
+    startData.generateBatchesForCars = false;
+
+    startData.useFixedRoutes = true;
+    startData.startTime = new Date();
+    startData.timeScale = 10;
+    startData.generateTroublePoints = true;
+    startData.timeBeforeTrouble = 5;
+    startData.troublePointStrategyActive = true;
+
+    prepareData.generatePedestrians = false;
+    startData.generateBikes = false;
+    startData.generateBusFailures = false;
+    startData.detectTrafficJams = false;
+
+    startData.lightStrategyActive = false;
+    startData.stationStrategyActive = false;
+    startData.trafficJamStrategyActive = false;
+    startData.transportChangeStrategyActive = false;
+
     dispatch(configReplaced(state));
     prepareSimulation(state.prepareSimulationData);
   }
 
   function prepareTrafficJamsScenario() {
-    // TODO: fill data
     const state = config;
+    const prepareData = state.prepareSimulationData;
+    const startData = state.startSimulationData;
+
+    prepareData.center = { lat: 52.27633, lng: 20.95363, rad: 430 };
+
+    startData.generateCars = true;
+    startData.carsLimit = 15;
+    startData.testCarId = 11;
+    startData.generateBatchesForCars = true;
+
+    startData.useFixedRoutes = true;
+    startData.startTime = new Date();
+    startData.timeScale = 10;
+    startData.detectTrafficJams = true;
+    startData.trafficJamStrategyActive = true;
+
+    prepareData.generatePedestrians = false;
+    startData.generateBikes = false;
+    startData.generateTroublePoints = false;
+    startData.generateBusFailures = false;
+
+    startData.lightStrategyActive = false;
+    startData.stationStrategyActive = false;
+    startData.troublePointStrategyActive = false;
+    startData.transportChangeStrategyActive = false;
+
     dispatch(configReplaced(state));
     prepareSimulation(state.prepareSimulationData);
   }
 
   function prepareTransportChangeScenario() {
-    // TODO: fill data
     const state = config;
+    const prepareData = state.prepareSimulationData;
+    const startData = state.startSimulationData;
+
+    prepareData.center = { lat: 52.20199, lng: 20.97899, rad: 341 };
+
+    prepareData.generatePedestrians = true;
+    startData.pedLimit = 20;
+    startData.testPedId = 5;
+
+    startData.useFixedRoutes = true;
+    startData.startTime = new Date();
+    startData.timeScale = 10;
+    startData.generateBusFailures = true;
+    startData.transportChangeStrategyActive = true;
+
+    startData.generateCars = false;
+    startData.generateBatchesForCars = false;
+    startData.generateBikes = false;
+    startData.generateTroublePoints = false;
+    startData.detectTrafficJams = false;
+
+    startData.lightStrategyActive = false;
+    startData.stationStrategyActive = false;
+    startData.troublePointStrategyActive = false;
+    startData.trafficJamStrategyActive = false;
+
     dispatch(configReplaced(state));
     prepareSimulation(state.prepareSimulationData);
   }

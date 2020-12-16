@@ -84,7 +84,7 @@ const pedestrian = (state = initialState, action) => {
 
       const newPedestrians = state.pedestrians.map(p => {
         if (p.id === pedData.id) {
-          return { ...p, location: pedData.location, hidden: false, route: p.routeFromStation };
+          return { ...p, location: pedData.location, hidden: false, route: pedData.showRoute ? p.routeFromStation : [] };
         }
         return p;
       });

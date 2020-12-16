@@ -20,6 +20,7 @@ import java.util.List;
 import static agents.AgentConstants.DEFAULT_BLOCK_ON_ERROR;
 import static agents.message.MessageManager.createMessage;
 import static agents.message.MessageManager.createProperties;
+import static agents.utilities.BehaviourWrapper.wrapErrors;
 
 /**
  * StationManager agent represents a bus stop. The main aim of it is to
@@ -182,8 +183,9 @@ public class StationAgent extends AbstractAgent {
             }
         };
 
-        addBehaviour(communication);
-        addBehaviour(checkState);
+        var onError = createErrorConsumer();
+        addBehaviour(wrapErrors(communication, onError));
+        addBehaviour(wrapErrors(checkState, onError));
     }
 
     public OSMStation getStation() {

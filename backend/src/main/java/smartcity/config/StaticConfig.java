@@ -6,4 +6,5 @@ public class StaticConfig {
     public static final boolean TRACE = false;
     public static final boolean USE_FRESH_DATA = false;
     public static final boolean USE_BATCHED_UPDATES = true;
+    public static final boolean HANDLE_UNPREDICTED_ERRORS = false;
 }

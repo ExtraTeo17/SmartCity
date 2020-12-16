@@ -16,6 +16,7 @@ import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.HashSet;
 
+import static agents.utilities.BehaviourWrapper.wrapErrors;
 import static java.time.temporal.ChronoUnit.MILLIS;
 /**
  * The class handles communication with bus agent and pedestrian agent in case of trouble on the road
@@ -131,7 +132,8 @@ public class BusManagerAgent extends AbstractAgent {
                 return time1.isBefore(time2) ? Long.MAX_VALUE : Math.abs(MILLIS.between(time1, time2) / 1000);
             }
         };
-        addBehaviour(communication);
+        var onError = createErrorConsumer();
+        addBehaviour(wrapErrors(communication, onError));
 
     }
 

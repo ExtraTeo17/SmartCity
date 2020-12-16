@@ -5,76 +5,184 @@
  * @module constants
  */
 
-/** @name CENTER_UPDATED */
+/**
+ * @constant
+ * @default
+ */
 export const CENTER_UPDATED = "Center/UPDATED";
-/** @name CENTER_MENU_UPDATED */
+
+/**
+ * @constant
+ * @default
+ */
 export const CENTER_MENU_UPDATED = "Center/MENU_UPDATED";
 
-/** @name START_SIMULATION_DATA_UPDATED */
+/**
+ * @constant
+ * @default
+ */
 export const START_SIMULATION_DATA_UPDATED = "StartData/UPDATED";
-/** @name SHOULD_START_SIMULATION */
+/**
+ * @constant
+ * @default
+ */
 export const SHOULD_START_SIMULATION = "Start/SHOULD";
 
-/** @name GENERATE_PEDESTRIANS_UPDATED */
+/**
+ * @constant
+ * @default
+ */
 export const GENERATE_PEDESTRIANS_UPDATED = "GenPed/UPDATED";
-/** @name CONFIG_REPLACED */
+/**
+ * @constant
+ * @default
+ */
 export const CONFIG_REPLACED = "Config/REPLACED";
 
-/** @name SIMULATION_PREPARE_STARTED */
+/**
+ * @constant
+ * @default
+ */
 export const SIMULATION_PREPARE_STARTED = "Simulation/P_STARTED";
-/** @name SIMULATION_PREPARED */
+/**
+ * @constant
+ * @default
+ */
 export const SIMULATION_PREPARED = "Simulation/PREPARED";
-/** @name SIMULATION_STARTED */
+/**
+ * @constant
+ * @default
+ */
 export const SIMULATION_STARTED = "Simulation/STARTED";
 
-/** @name LIGHTS_SWITCHED */
+/**
+ * @constant
+ * @default
+ */
 export const LIGHTS_SWITCHED = "Lights/SWITCHED";
 
-/** @name CAR_CREATED */
+/**
+ * @constant
+ * @default
+ */
 export const CAR_CREATED = "Car/CREATED";
-/** @name CAR_UPDATED */
+
+/**
+ * @constant
+ * @default
+ */
 export const CAR_UPDATED = "Car/UPDATED";
-/** @name CAR_KILLED */
+
+/**
+ * @constant
+ * @default
+ */
 export const CAR_KILLED = "Car/KILLED";
-/** @name CAR_ROUTE_CHANGED */
+
+/**
+ * @constant
+ * @default
+ */
 export const CAR_ROUTE_CHANGED = "Car/ROUTE_CHANGED";
 
-/** @name TROUBLE_POINT_CREATED */
+/**
+ * @constant
+ * @default
+ */
 export const TROUBLE_POINT_CREATED = "TP/CREATED";
-/** @name TROUBLE_POINT_VANISHED */
+
+/**
+ * @constant
+ * @default
+ */
 export const TROUBLE_POINT_VANISHED = "TP/VANISHED";
 
-/** @name TRAFFIC_JAM_STARTED */
+/**
+ * @constant
+ * @default
+ */
 export const TRAFFIC_JAM_STARTED = "TJ/STARTED";
-/** @name TRAFFIC_JAM_ENDED */
+
+/**
+ * @constant
+ * @default
+ */
 export const TRAFFIC_JAM_ENDED = "TJ/ENDED";
 
-/** @name BATCHED_UPDATE */
+/**
+ * @constant
+ * @default
+ */
 export const BATCHED_UPDATE = "B/UPDATE";
 
-/** @name BUS_UPDATED */
+/**
+ * @constant
+ * @default
+ */
 export const BUS_UPDATED = "Bus/UPDATED";
-/** @name BUS_FILL_STATE_UPDATED */
+
+/**
+ * @constant
+ * @default
+ */
 export const BUS_FILL_STATE_UPDATED = "Bus/FILL";
-/** @name BUS_KILLED */
+
+/**
+ * @constant
+ * @default
+ */
 export const BUS_KILLED = "Bus/KILLED";
-/** @name BUS_CRASHED */
+
+/**
+ * @constant
+ * @default
+ */
 export const BUS_CRASHED = "Bus/CRASHED";
 
-/** @name PEDESTRIAN_CREATED */
+/**
+ * @constant
+ * @default
+ */
 export const PEDESTRIAN_CREATED = "Ped/CREATED";
-/** @name PEDESTRIAN_UPDATED */
+
+/**
+ * @constant
+ * @default
+ */
 export const PEDESTRIAN_UPDATED = "Ped/UPDATED";
-/** @name PEDESTRIAN_PUSHED */
+
+/**
+ * @constant
+ * @default
+ */
 export const PEDESTRIAN_PUSHED = "Ped/PUSHED";
-/** @name PEDESTRIAN_PULLED */
+
+/**
+ * @constant
+ * @default
+ */
 export const PEDESTRIAN_PULLED = "Ped/PULLED";
-/** @name PEDESTRIAN_KILLED */
+
+/**
+ * @constant
+ * @default
+ */
 export const PEDESTRIAN_KILLED = "Ped/KILLED";
 
-/** @name BIKE_CREATED */
+/**
+ * @constant
+ * @default
+ */
 export const BIKE_CREATED = "Bike/CREATED";
-/** @name BIKE_UPDATED */
+
+/**
+ * @constant
+ * @default
+ */
 export const BIKE_UPDATED = "Bike/UPDATED";
-/** @name BIKE_KILLED */
+
+/**
+ * @constant
+ * @default
+ */
 export const BIKE_KILLED = "Bike/KILLED";
