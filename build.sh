@@ -2,7 +2,7 @@
 
 buildDir="SmartCity-build";
 
-rm -r $buildDir
+rm -rf $buildDir
 mkdir $buildDir
 
 # backend
