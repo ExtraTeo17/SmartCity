@@ -6,6 +6,7 @@ import jade.lang.acl.ACLMessage;
 import jade.util.leap.Properties;
 
 import java.util.List;
+
 /**
  * Helper class to send messages between agents
  */
@@ -14,9 +15,11 @@ public class MessageManager {
         var receiver = new AID(receiverName, AID.ISLOCALNAME);
         return createMessage(type, receiver);
     }
+
     /**
      * Create message
-     * @param type  type of message
+     *
+     * @param type     type of message
      * @param receiver to whom message will be sent
      * @return message with all necessary information
      */
@@ -25,9 +28,11 @@ public class MessageManager {
         msg.addReceiver(receiver);
         return msg;
     }
+
     /**
      * Create message
-     * @param type  type of message
+     *
+     * @param type      type of message
      * @param receivers list to whom messages will be sent
      * @return message with all necessary information
      */
@@ -38,8 +43,8 @@ public class MessageManager {
         }
         return msg;
     }
+
     /**
-     *
      * @param senderType the name of sender, ex. MessageParameter.BIKE
      * @return object with properties
      */

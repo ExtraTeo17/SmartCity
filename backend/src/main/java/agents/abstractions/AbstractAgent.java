@@ -22,6 +22,7 @@ import java.time.temporal.ChronoUnit;
 import java.util.function.Consumer;
 
 import static agents.message.MessageManager.createProperties;
+
 /**
  * Agent which is parent class for all moving agents, as well as BusManagerAgent, LightManagerAgent
  */
@@ -135,15 +136,15 @@ public abstract class AbstractAgent extends Agent {
         );
     }
 
-    protected Consumer<Exception> createErrorConsumer(Object event){
-        return (Exception e)->{
+    protected Consumer<Exception> createErrorConsumer(Object event) {
+        return (Exception e) -> {
             logger.error("Terminating!", e);
             eventBus.post(event);
             doDelete();
         };
     }
 
-    protected Consumer<Exception> createErrorConsumer(){
-       return createErrorConsumer("");
+    protected Consumer<Exception> createErrorConsumer() {
+        return createErrorConsumer("");
     }
 }

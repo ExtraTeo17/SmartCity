@@ -18,6 +18,7 @@ import java.util.HashSet;
 
 import static agents.utilities.BehaviourWrapper.wrapErrors;
 import static java.time.temporal.ChronoUnit.MILLIS;
+
 /**
  * The class handles communication with bus agent and pedestrian agent in case of trouble on the road
  */

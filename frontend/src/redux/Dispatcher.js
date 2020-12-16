@@ -16,7 +16,7 @@ import {
   pedestrianCreated,
   pedestrianUpdated,
   pedestrianPushedIntoBus,
-  pedestrianPulledFromBus,
+  pedestrianPulledAwayFromBus,
   pedestrianKilled,
   trafficJamStarted,
   trafficJamEnded,
@@ -252,8 +252,8 @@ const Dispatcher = {
   /**
    * @param {any} pedData
    */
-  pullPedestrianFromBus(pedData) {
-    pullKillPedQueue.push(pedestrianPulledFromBus(pedData));
+  pullPedestrianAwayFromBus(pedData) {
+    pullKillPedQueue.push(pedestrianPulledAwayFromBus(pedData));
   },
 
   /**

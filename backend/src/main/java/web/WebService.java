@@ -170,11 +170,11 @@ class WebService implements IWebService {
     }
 
     @Override
-    public void pullPedestrianFromBus(int id, IGeoPosition position, boolean showRoute) {
+    public void pullPedestrianAwayFromBus(int id, IGeoPosition position, boolean showRoute) {
         var location = Converter.convert(position);
-        var payload = new PullPedestrianInfo(id, location, showRoute);
+        var payload = new PullPedestrianAwayFromBusInfo(id, location, showRoute);
 
-        webConnector.broadcastMessage(MessageType.PULL_PEDESTRIAN_FROM_BUS_INFO, payload);
+        webConnector.broadcastMessage(MessageType.PULL_PEDESTRIAN_AWAY_FROM_BUS_INFO, payload);
     }
 
     @Override
