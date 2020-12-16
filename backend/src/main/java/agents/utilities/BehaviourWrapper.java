@@ -16,12 +16,11 @@ public class BehaviourWrapper {
                 try {
                     super.action();
                 } catch (Exception e) {
-                    if (HANDLE_UNPREDICTED_ERRORS) {
-                        onError.accept(e);
-                    }
-                    else {
+                    if (!HANDLE_UNPREDICTED_ERRORS) {
                         throw e;
                     }
+
+                    onError.accept(e);
                 }
             }
         };

@@ -59,11 +59,13 @@ class AgentsFactory implements IAgentsFactory {
         this.configContainer = configContainer;
         this.taskProvider = taskProvider;
     }
+
     /**
      * Creates fully filled car agent
-     * @param route              The defined route of vehicle
-     * @param testCar            Decision variable, showing is the object to be created should be Test
-     *@return Filled {@link CarAgent} object.
+     *
+     * @param route   The defined route of vehicle
+     * @param testCar Decision variable, showing is the object to be created should be Test
+     * @return Filled {@link CarAgent} object.
      */
     @Override
     public CarAgent create(List<RouteNode> route, boolean testCar) {
@@ -83,10 +85,12 @@ class AgentsFactory implements IAgentsFactory {
     public CarAgent create(List<RouteNode> route) {
         return create(route, false);
     }
+
     /**
      * Creates fully filled bike agent
-     * @param route              The defined route of vehicle
-     * @param testBike           Decision variable, showing is the object to be created should be Test
+     *
+     * @param route    The defined route of vehicle
+     * @param testBike Decision variable, showing is the object to be created should be Test
      * @return Filled {@link BikeAgent} object.
      */
     @Override
@@ -107,9 +111,11 @@ class AgentsFactory implements IAgentsFactory {
     public BikeAgent createBike(List<RouteNode> route) {
         return createBike(route, false);
     }
+
     /**
      * Creates fully filled station manager agent
-     * @param station            object, which contains essential information for work of StationAgent
+     *
+     * @param station object, which contains essential information for work of StationAgent
      * @return Filled {@link StationAgent} object.
      */
     @Override
@@ -118,12 +124,14 @@ class AgentsFactory implements IAgentsFactory {
         var stationStrategy = new StationStrategy(id, configContainer, timeProvider);
         return new StationAgent(id, station, stationStrategy, timeProvider, eventBus);
     }
+
     /**
      * Creates fully filled bus agent
-     * @param route           The defined route of vehicle
-     * @param timetable       Timetable of specific bus
-     * @param busLine         Bus line number
-     * @param brigadeNr       Number of the brigade of the object
+     *
+     * @param route     The defined route of vehicle
+     * @param timetable Timetable of specific bus
+     * @param busLine   Bus line number
+     * @param brigadeNr Number of the brigade of the object
      * @return Filled {@link BusAgent} object.
      */
     @Override
@@ -142,8 +150,10 @@ class AgentsFactory implements IAgentsFactory {
         var crossroad = crossroadFactory.create(id, crossroadNode);
         return new LightManagerAgent(id, crossroad, timeProvider, eventBus, configContainer);
     }
+
     /**
      * Creates fully filled LightManagerAgent
+     *
      * @param centerCrossroad object,that conatins information about crossroad,
      *                        which will be managed by created Light Manager
      * @return Filled {@link LightManagerAgent} object.
@@ -154,13 +164,15 @@ class AgentsFactory implements IAgentsFactory {
         var crossroad = crossroadFactory.create(id, centerCrossroad);
         return new LightManagerAgent(id, crossroad, timeProvider, eventBus, configContainer);
     }
+
     /**
      * Creates fully filled bus agent
-     * @param routeToStation       route from start point to startStation
-     * @param routeFromStation    route from finishStation to target point
-     * @param startStation        start station of the pedestrian
-     * @param finishStation       destination station
-     * @param testPedestrian      if the created agent, should be test
+     *
+     * @param routeToStation   route from start point to startStation
+     * @param routeFromStation route from finishStation to target point
+     * @param startStation     start station of the pedestrian
+     * @param finishStation    destination station
+     * @param testPedestrian   if the created agent, should be test
      * @return Filled {@link PedestrianAgent} object.
      */
     // TODO: Simplify to avoid 6 arguments
@@ -188,9 +200,11 @@ class AgentsFactory implements IAgentsFactory {
                                   StationNode startStation, StationNode finishStation) {
         return create(routeToStation, routeFromStation, startStation, finishStation, false);
     }
+
     /**
      * Creates fully filled BusManagerAgent
-     * @param busInfos      information about schedules of buses and their stations
+     *
+     * @param busInfos information about schedules of buses and their stations
      * @return Filled {@link PedestrianAgent} object.
      */
     @Override

@@ -17,7 +17,7 @@ import {
   CREATE_PEDESTRIAN_INFO,
   UPDATE_PEDESTRIAN_INFO,
   PUSH_PEDESTRIAN_INTO_BUS_INFO,
-  PULL_PEDESTRIAN_FROM_BUS_INFO,
+  PULL_PEDESTRIAN_AWAY_FROM_BUS_INFO,
   KILL_PEDESTRIAN_INFO,
   CREATE_BIKE_INFO,
   UPDATE_BIKE_INFO,
@@ -149,8 +149,8 @@ export default {
         break;
       }
 
-      case PULL_PEDESTRIAN_FROM_BUS_INFO: {
-        Dispatcher.pullPedestrianFromBus(payload);
+      case PULL_PEDESTRIAN_AWAY_FROM_BUS_INFO: {
+        Dispatcher.pullPedestrianAwayFromBus(payload);
         break;
       }
 

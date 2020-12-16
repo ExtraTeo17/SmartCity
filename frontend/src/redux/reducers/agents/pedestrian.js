@@ -3,7 +3,7 @@ import {
   PEDESTRIAN_UPDATED,
   PEDESTRIAN_KILLED,
   PEDESTRIAN_PUSHED,
-  PEDESTRIAN_PULLED,
+  PEDESTRIAN_PULLED_AWAY,
   BATCHED_UPDATE,
 } from "../../core/constants";
 
@@ -76,7 +76,7 @@ const pedestrian = (state = initialState, action) => {
       return { ...state, pedestrians: newPedestrians };
     }
 
-    case PEDESTRIAN_PULLED: {
+    case PEDESTRIAN_PULLED_AWAY: {
       const pedData = payload;
       if (deletedPedestrianIds.includes(pedData.id)) {
         return state;

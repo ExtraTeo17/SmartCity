@@ -17,7 +17,7 @@ import {
   PEDESTRIAN_CREATED,
   PEDESTRIAN_UPDATED,
   PEDESTRIAN_PUSHED,
-  PEDESTRIAN_PULLED,
+  PEDESTRIAN_PULLED_AWAY,
   PEDESTRIAN_KILLED,
   TROUBLE_POINT_VANISHED,
   START_SIMULATION_DATA_UPDATED,
@@ -164,7 +164,7 @@ export const pedestrianPushedIntoBus = createAction(PEDESTRIAN_PUSHED);
 /**
  * @function
  */
-export const pedestrianPulledFromBus = createAction(PEDESTRIAN_PULLED);
+export const pedestrianPulledAwayFromBus = createAction(PEDESTRIAN_PULLED_AWAY);
 /**
  * @function
  */

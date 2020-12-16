@@ -121,7 +121,7 @@ class Communicator {
 
     @Subscribe
     public void handle(PedestrianAgentLeftBusEvent e) {
-        webService.pullPedestrianFromBus(e.id, e.position, e.shouldShowRoute);
+        webService.pullPedestrianAwayFromBus(e.id, e.position, e.shouldShowRoute);
     }
 
     @Subscribe

@@ -161,7 +161,7 @@ export const PEDESTRIAN_PUSHED = "Ped/PUSHED";
  * @constant
  * @default
  */
-export const PEDESTRIAN_PULLED = "Ped/PULLED";
+export const PEDESTRIAN_PULLED_AWAY = "Ped/PULLED_A";
 
 /**
  * @constant
