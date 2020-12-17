@@ -1,5 +1,5 @@
 import { notify } from "react-notify-toast";
-import { SERVER_ADDRESS, RECONNECT_INTERVAL_SEC, NOTIFY_SHOW_MS } from "../constants/global";
+import { RECONNECT_INTERVAL_SEC, NOTIFY_SHOW_MS } from "../constants/global";
 import MessageHandler from "./MessageHandler";
 
 /**
@@ -25,7 +25,7 @@ const socketContainer = {
  * @returns {WebSocket} Opened socket
  */
 function createSocket() {
-  const socket = new WebSocket(SERVER_ADDRESS);
+  const socket = new WebSocket(process.env.REACT_APP_SERVER_ADDRESS);
   socket.onopen = () => {
     console.info("Connected !!!");
     socketContainer.connected = true;
