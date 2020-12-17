@@ -1,5 +1,4 @@
 #!/bin/bash
-
 set -e
 
 buildDir="SmartCity-build";
@@ -7,7 +6,9 @@ currDir=`basename "$PWD"`
 
 if [ "$currDir" != "$buildDir" ]; then
     if [ ! -d "$buildDir" ]; then
+        cd scripts
         ./build.sh;
+        cd ..
     fi
     cd $buildDir
 fi

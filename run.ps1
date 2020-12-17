@@ -5,7 +5,9 @@ $currDir = (Split-Path -Path (Get-Location) -Leaf)
 
 if  (!($currDir -eq $buildDir)) {
     if (!(Test-Path -Path $buildDir)){
-        .\scripts\build.ps1;
+        Set-Location scripts
+        .\build.ps1;
+        Set-Location ..
     }
     Set-Location $buildDir
 }
