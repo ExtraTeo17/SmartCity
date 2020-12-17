@@ -9,7 +9,7 @@ We hope, you will have a nice journey.
 
 ## Build guide
 
-To run `build.sh` script following dependencies are required:  
+To run `build.sh \ build.ps1` script following dependencies are required:  
 
 1. Maven >= 3.6.0: 
 Download link: https://maven.apache.org/download.cgi   
@@ -28,12 +28,12 @@ Check by `node --version`
 
 ## Run guide
 
-To run `run.sh` script following dependencies are required:  
+To run `run.sh \ run.ps1` script following dependencies are required:  
 
 1. Java >= 14
 2. Node.js >= 14.15.1  
 
 See above for instructions.
 
-Run `run.sh` script to boot the application.    
+Run `run.sh  \ run.ps1` script to boot the application.    
 By default it will be present on address: `localhost:5000` - it should open in your browser automatically.   
