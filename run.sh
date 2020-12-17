@@ -15,4 +15,4 @@ fi
 serve -s frontend &
 start http://localhost:5000
 
-$JAVA_HOME/bin/java -jar backend/smartCity-2.0.jar
+"$JAVA_HOME/bin/java" -jar ./backend/smartCity-2.0.jar
