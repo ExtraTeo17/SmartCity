@@ -148,7 +148,7 @@ public class StationStrategy {
                     }
                     else if (!busesFreeToGo.containsKey(busAgentNameToLine.get(busLine))
                             && toWhichPassengersStrategyWaits.get(busAgentNameToLine.get(busLine)).size() == 0) {
-                        logger.info("ZOSTALO 0 toWhichPassengersStrategyWaits");
+                        logger.debug("ZOSTALO 0 toWhichPassengersStrategyWaits");
                         result.addBusAndPedestrianGrantedPassthrough(busLine, passengersThatCanLeave);
                         toWhichPassengersStrategyWaits.remove(busAgentNameToLine.get(busLine));
                     }

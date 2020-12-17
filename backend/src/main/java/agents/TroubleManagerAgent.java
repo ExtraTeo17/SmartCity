@@ -166,6 +166,7 @@ public class TroubleManagerAgent extends Agent {
                             else if (rcv.getUserDefinedParameter(MessageParameter.TYPEOFTROUBLE).equals(MessageParameter.TRAFFIC_JAM)) {
                                 trafficJamsAppearedHandle(rcv);
                             }
+
                         }
                         else if (rcv.getUserDefinedParameter(MessageParameter.TROUBLE).equals(MessageParameter.STOP)) {
                             if (rcv.getUserDefinedParameter(MessageParameter.TYPEOFTROUBLE).equals(MessageParameter.TRAFFIC_JAM)) {
@@ -207,6 +208,10 @@ public class TroubleManagerAgent extends Agent {
         };
         addBehaviour(wrapErrors(communication, onError));
         addBehaviour(wrapErrors(sayAboutTroubles, onError));
+    }
+
+    private void handleBusAccident(ACLMessage rcv) {
+
     }
 
     @Subscribe
