@@ -1,4 +1,5 @@
 #!/bin/bash
+set -e
 
 mainDir="..";
 buildDirName="SmartCity-build"
