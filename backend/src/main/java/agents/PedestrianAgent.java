@@ -385,7 +385,10 @@ public class PedestrianAgent extends AbstractAgent {
                 informLightManager(pedestrian);
                 pedestrian.setTroubled(false);
                 pedestrian.setState(DrivingState.MOVING);
-                if (pedestrian.getState() == DrivingState.IN_BUS) {
+
+                logger.info("------------"+pedestrian.getState());
+                logger.info("+++++++++++++"+ pedestrian.isAtStation());
+              if (!pedestrian.isAtStation()) {
                     quitBus(false);
                 }
             }
