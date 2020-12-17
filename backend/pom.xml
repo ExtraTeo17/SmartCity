@@ -23,6 +23,16 @@
         <packageFolder>${project.basedir}/package</packageFolder>
     </properties>
     <build>
+        <resources>
+            <resource>
+                <directory>${resourceFolder}</directory>
+                <targetPath>${project.build.directory}</targetPath>
+                <includes>
+                    <include>log4j.xml</include>
+                    <include>config.properties</include>
+                </includes>
+            </resource>
+        </resources>
         <plugins>
             <!-- For build -->
             <plugin>
@@ -35,38 +45,68 @@
                     <encoding>UTF-8</encoding>
                 </configuration>
             </plugin>
-            <!-- For copying dependencies -->
+            <!-- For copying folders -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-dependency-plugin</artifactId>
-                <version>2.4</version>
+                <artifactId>maven-resources-plugin</artifactId>
+                <version>3.1.0</version>
                 <executions>
                     <execution>
+                        <id>copy-resources</id>
                         <phase>package</phase>
                         <goals>
-                            <goal>copy-dependencies</goal>
+                            <goal>copy-resources</goal>
                         </goals>
                         <configuration>
-                            <outputDirectory>${packageFolder}/lib</outputDirectory>
+                            <outputDirectory>${packageFolder}</outputDirectory>
+                            <resources>
+                                <resource>
+                                    <directory>${resourceFolder}</directory>
+                                    <filtering>true</filtering>
+                                </resource>
+                                <resource>
+                                    <directory>${basedir}</directory>
+                                    <includes>
+                                        <include>config/**</include>
+                                        <include>mazowieckie-latest.osm-gh/**</include>
+                                    </includes>
+                                </resource>
+                            </resources>
                         </configuration>
                     </execution>
                 </executions>
             </plugin>
-            <!-- For executable JAR -->
+            <!-- For assembly JAR -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-jar-plugin</artifactId>
-                <version>3.1.2</version>
+                <artifactId>maven-assembly-plugin</artifactId>
+                <version>3.3.0</version>
                 <configuration>
+                    <outputDirectory>${packageFolder}</outputDirectory>
                     <archive>
                         <manifest>
                             <addClasspath>true</addClasspath>
                             <classpathPrefix>lib/</classpathPrefix>
                             <mainClass>SmartCity</mainClass>
                         </manifest>
+                        <manifestEntries>
+                            <Class-Path>.</Class-Path>
+                        </manifestEntries>
                     </archive>
-                    <outputDirectory>${packageFolder}</outputDirectory>
+                    <descriptorRefs>
+                        <descriptorRef>jar-with-dependencies</descriptorRef>
+                    </descriptorRefs>
+                    <appendAssemblyId>false</appendAssemblyId>
                 </configuration>
+                <executions>
+                    <execution>
+                        <id>make-assembly</id> <!-- this is used for inheritance merges -->
+                        <phase>package</phase> <!-- bind to the packaging phase -->
+                        <goals>
+                            <goal>single</goal>
+                        </goals>
+                    </execution>
+                </executions>
             </plugin>
             <!-- JUnit 5 requires Surefire version 2.22.0 or higher -->
             <plugin>
