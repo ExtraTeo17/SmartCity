@@ -55,6 +55,7 @@ public class BusAgent extends AbstractAgent {
     private final Bus bus;
     private final IChangeTransportConfigContainer configContainer;
     private RouteNode troublePoint;
+    private int numberOfPassedStations = 0 ;
 
     BusAgent(int busId, Bus bus,
              ITimeProvider timeProvider,
@@ -154,7 +155,7 @@ public class BusAgent extends AbstractAgent {
                                 informLightManager(bus);
                             }
                             informNextStation();
-
+                            numberOfPassedStations++;
                             bus.setState(DrivingState.MOVING);
                             move();
                             break;
@@ -288,9 +289,11 @@ public class BusAgent extends AbstractAgent {
                 }
 
                 private void sendMessageAboutCrashTroubleToIncomingStations() {
-                    for(StationNode station : bus.getStationNodesOnRoute())
+
+                    var stations = bus.getStationNodesOnRoute();
+                    for(int i = numberOfPassedStations;i< stations.size();i++ )
                     {
-                        ACLMessage msg = createMessageAboutCrash(StationAgent.name+station.getAgentId(), false);
+                        ACLMessage msg = createMessageAboutCrash(StationAgent.name+stations.get(i).getAgentId(), false);
                         logger.info("Send message about crash to incoming stations ");
                         send(msg);
                     }

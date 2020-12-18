@@ -255,15 +255,21 @@ public class PedestrianAgent extends AbstractAgent {
 
                 expectedNewStationNode = parseCrashMessageFromBus(rcv);
 
-                currentPosition = Position.of(rcv.getUserDefinedParameter(MessageParameter.TROUBLE_LAT),
+                var troublePoint =  Position.of(rcv.getUserDefinedParameter(MessageParameter.TROUBLE_LAT),
                         rcv.getUserDefinedParameter(MessageParameter.TROUBLE_LON));
-
                 IGeoPosition nextClosestStationPosition = Position.of(expectedNewStationNode.getLat() + "",
                         expectedNewStationNode.getLng() + "");
+                if(troublePoint.equals(nextClosestStationPosition)) {
+                    currentPosition = pedestrian.getPosition();
+                }
+                else{
+                    currentPosition = troublePoint;
+                }
+
 
                 LocalTime arrivalTime = LocalTime.of(0,0,0,0);
                         if(currentPosition!=nextClosestStationPosition) {
-                            logger.info("currentPosition: " + currentPosition + "nextclos: "+ nextClosestStationPosition);
+
                             arrivalTime = computeArrivalTime(currentPosition, nextClosestStationPosition,
                                     expectedNewStationNode.getOsmId() + "");
                         }
@@ -386,8 +392,7 @@ public class PedestrianAgent extends AbstractAgent {
                 pedestrian.setTroubled(false);
                 pedestrian.setState(DrivingState.MOVING);
 
-                logger.info("------------"+pedestrian.getState());
-                logger.info("+++++++++++++"+ pedestrian.isAtStation());
+              
               if (!pedestrian.isAtStation()) {
                     quitBus(false);
                 }
