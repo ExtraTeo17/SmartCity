@@ -5,7 +5,6 @@ mainDir="..";
 buildDirName="SmartCity-build"
 buildDir="../$buildDirName";
 
-
 rm -rf $buildDir
 mkdir $buildDir
 

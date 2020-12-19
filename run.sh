@@ -2,18 +2,28 @@
 set -e
 
 buildDir="SmartCity-build";
-currDir=`basename "$PWD"`
+jarFile="backend/smartCity-2.0.jar"
 
-if [ "$currDir" != "$buildDir" ]; then
+if [ ! -f "$jarFile" ] || [ ! -f "frontend/index.html" ]; then
     if [ ! -d "$buildDir" ]; then
-        cd scripts
-        ./build.sh;
-        cd ..
+        if [ -d "scripts" ]; then
+            cd scripts
+            ./build.sh;
+            cd ..
+        else 
+            echo Missing files required to run app
+            exit 1;
+        fi
     fi
     cd $buildDir
 fi
 
-serve -s frontend &
-start http://localhost:5000
+serve -s -n frontend &
+if command -v start &> /dev/null; then
+    start http://localhost:5000
+else
+    echo You need to start localhost:5000 by yourself
+fi
 
-"$JAVA_HOME/bin/java" -jar ./backend/smartCity-2.0.jar
+
+"$JAVA_HOME/bin/java" -jar "$jarFile"
