@@ -12,6 +12,7 @@ mvn package --errors '-Dmaven.test.skip=true' --file $mainDir\backend\pom.xml
 
 # frontend
 Set-Location .\$mainDir\frontend
+npm install
 npm run build
 Set-Location ..
 

@@ -13,6 +13,7 @@ mvn package --errors -Dmaven.test.skip=true --file $mainDir/backend/pom.xml
 
 # frontend
 cd $mainDir/frontend
+npm install
 npm run build
 cd ..
 
