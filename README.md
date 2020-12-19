@@ -32,6 +32,7 @@ To run `run.sh \ run.ps1` script following dependencies are required:
 
 1. Java >= 14
 2. Node.js >= 14.15.1  
+3. Serve ( `npm install -g serve`)
 
 See above for instructions.
 
