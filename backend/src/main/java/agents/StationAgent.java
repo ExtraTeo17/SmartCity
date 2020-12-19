@@ -4,6 +4,7 @@ import agents.abstractions.AbstractAgent;
 import agents.utilities.LoggerLevel;
 import agents.utilities.MessageParameter;
 import com.google.common.eventbus.EventBus;
+import jade.core.AID;
 import jade.core.behaviours.Behaviour;
 import jade.core.behaviours.CyclicBehaviour;
 import jade.core.behaviours.TickerBehaviour;
@@ -11,11 +12,13 @@ import jade.lang.acl.ACLMessage;
 import jade.util.leap.Properties;
 import org.javatuples.Pair;
 import osmproxy.elements.OSMStation;
+import routing.nodes.StationNode;
 import smartcity.ITimeProvider;
 import smartcity.lights.OptimizationResult;
 import smartcity.stations.StationStrategy;
 
 import java.util.List;
+import java.util.Map;
 
 import static agents.AgentConstants.DEFAULT_BLOCK_ON_ERROR;
 import static agents.message.MessageManager.createMessage;
@@ -70,15 +73,23 @@ public class StationAgent extends AbstractAgent {
                 var messageKind = rcv.getPerformative();
                 String agentName = rcv.getSender().getLocalName();
                 if (messageKind == ACLMessage.INFORM) {
-                    print("Got INFORM from " + agentName);
-                    String busLine = rcv.getUserDefinedParameter(MessageParameter.BUS_LINE);
-                    stationStrategy.addBusAgentWithLine(agentName, busLine);
+                    if(rcv.getUserDefinedParameter(MessageParameter.TYPEOFTROUBLE)!=null &&
+                            rcv.getUserDefinedParameter(MessageParameter.TYPEOFTROUBLE).equals(MessageParameter.CRASH)) {
 
-                    var scheduled = getDateParameter(rcv, MessageParameter.SCHEDULE_ARRIVAL);
-                    var actual = getDateParameter(rcv, MessageParameter.ARRIVAL_TIME);
-                    stationStrategy.addBusToFarAwayQueue(agentName, scheduled, actual);
+                        handleCrashFromBusToConcernedPassengers(rcv);
 
-                    // TODO: SEND MESSAGE ABOUT PASSENGERS
+                    }
+                    else {
+                        print("Got INFORM from " + agentName);
+                        String busLine = rcv.getUserDefinedParameter(MessageParameter.BUS_LINE);
+                        stationStrategy.addBusAgentWithLine(agentName, busLine);
+
+                        var scheduled = getDateParameter(rcv, MessageParameter.SCHEDULE_ARRIVAL);
+                        var actual = getDateParameter(rcv, MessageParameter.ARRIVAL_TIME);
+                        stationStrategy.addBusToFarAwayQueue(agentName, scheduled, actual);
+
+                        // TODO: SEND MESSAGE ABOUT PASSENGERS
+                    }
                 }
                 else if (messageKind == ACLMessage.REQUEST_WHEN) {
                     print("Got REQUEST_WHEN from " + agentName);
@@ -104,6 +115,44 @@ public class StationAgent extends AbstractAgent {
                     print("Unknown message type from " + agentName + ", type: " + messageKind, LoggerLevel.WARN);
                 }
             }
+
+            private void handleCrashFromBusToConcernedPassengers(ACLMessage rcv) {
+                String crashedLine = rcv.getUserDefinedParameter(MessageParameter.BUS_LINE);
+                ACLMessage responseToCrash = createResponseToCrash(rcv);
+
+
+                    for (Map.Entry<String, String> entry : station.getAgentMap().entrySet()) {
+                        if (entry.getValue().equals(crashedLine)) {
+                            responseToCrash.addReceiver(new AID(entry.getKey(),AID.ISLOCALNAME));
+                        }
+                    }
+                    send(responseToCrash);
+            }
+
+            private ACLMessage createResponseToCrash(ACLMessage rcv) {
+                ACLMessage msg = new ACLMessage(ACLMessage.INFORM);
+                msg.addReceiver(new AID(name, AID.ISLOCALNAME));
+
+                Properties properties = createProperties(MessageParameter.STATION);
+                properties.setProperty(MessageParameter.TROUBLE, MessageParameter.SHOW);
+                properties.setProperty(MessageParameter.TYPEOFTROUBLE, MessageParameter.CRASH);
+                properties.setProperty(MessageParameter.TROUBLE, MessageParameter.SHOW);
+                properties.setProperty(MessageParameter.TROUBLE_LAT, station.getLat()+"");
+                properties.setProperty(MessageParameter.TROUBLE_LON,station.getLng()+"");
+                properties.setProperty(MessageParameter.DESIRED_OSM_STATION_ID, station.getId() + "");
+                properties.setProperty(MessageParameter.AGENT_ID_OF_NEXT_CLOSEST_STATION, getId()+"" );
+                    //maybe not needed
+                properties.setProperty(MessageParameter.LAT_OF_NEXT_CLOSEST_STATION,station.getLat()+ "");
+                properties.setProperty(MessageParameter.LON_OF_NEXT_CLOSEST_STATION, station.getLng() + "");
+
+                properties.setProperty(MessageParameter.BUS_LINE,rcv.getUserDefinedParameter(MessageParameter.BUS_LINE));
+                properties.setProperty(MessageParameter.BRIGADE,rcv.getUserDefinedParameter(MessageParameter.BRIGADE));
+
+                msg.setAllUserDefinedParameters(properties);
+                return msg;
+            }
+
+
 
             private void handleMessageFromPedestrian(ACLMessage rcv) {
                 var messageKind = rcv.getPerformative();

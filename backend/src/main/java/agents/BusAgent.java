@@ -55,6 +55,7 @@ public class BusAgent extends AbstractAgent {
     private final Bus bus;
     private final IChangeTransportConfigContainer configContainer;
     private RouteNode troublePoint;
+    private int numberOfPassedStations = 0 ;
 
     BusAgent(int busId, Bus bus,
              ITimeProvider timeProvider,
@@ -154,7 +155,7 @@ public class BusAgent extends AbstractAgent {
                                 informLightManager(bus);
                             }
                             informNextStation();
-
+                            numberOfPassedStations++;
                             bus.setState(DrivingState.MOVING);
                             move();
                             break;
@@ -279,11 +280,23 @@ public class BusAgent extends AbstractAgent {
                             trouble.getInternalEdgeId());
                     //send message to boss Agent/ maybe not so important in case of buses
                     sendMessageAboutCrashTroubleToTroubleManager();
+                    sendMessageAboutCrashTroubleToIncomingStations();
                     sendMessageAboutCrashTroubleToPedestrians();
                     logger.info("Generated trouble");
 
                     eventBus.post(new BusAgentCrashedEvent(getId()));
                     doDelete();
+                }
+
+                private void sendMessageAboutCrashTroubleToIncomingStations() {
+
+                    var stations = bus.getStationNodesOnRoute();
+                    for(int i = numberOfPassedStations;i< stations.size();i++ )
+                    {
+                        ACLMessage msg = createMessageAboutCrash(StationAgent.name+stations.get(i).getAgentId(), false);
+                        logger.info("Send message about crash to incoming stations ");
+                        send(msg);
+                    }
                 }
 
                 private void sendMessageAboutCrashTroubleToPedestrians() {
@@ -298,6 +311,7 @@ public class BusAgent extends AbstractAgent {
 
                     ACLMessage msg = createMessage(ACLMessage.INFORM, agentName);
                     Properties properties = createProperties(MessageParameter.BUS);
+                    properties.setProperty(MessageParameter.TROUBLE, MessageParameter.SHOW);
                     properties.setProperty(MessageParameter.TYPEOFTROUBLE, MessageParameter.CRASH);
                     properties.setProperty(MessageParameter.TROUBLE, MessageParameter.SHOW);
                     properties.setProperty(MessageParameter.TROUBLE_LAT, Double.toString(troublePoint.getLat()));

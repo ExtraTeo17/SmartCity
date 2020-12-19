@@ -32,17 +32,15 @@ public class OSMStation extends OSMNode implements Serializable {
         return isPlatform;
     }
 
-
-    // 1/3: FIX THIS FUNCTION TO TAKE BEST LINE INTO CONSIDERATION, NOT FIRST - done - now in BusManager
-    // 2/3: FIX PEDESTRIAN CHOOSING STOPS TO CHOOSE BETWEEN PREV AND NEXT, NOT ONLY NEXT - done
-    // 3/3: REFACTOR STATIC BUS CRASH GENERATION PREFERABLY TO  ARGUMENT IN CONSTRUCTOR(looks the same as testCar)
-
     public void addToAgentMap(String agentName, String desiredBusLine) {
         pedestrianAgentIDPreferredBusLine.put(agentName, desiredBusLine);
     }
 
     public String getFromAgentMap(String agentName) {
         return pedestrianAgentIDPreferredBusLine.get(agentName);
+    }
+    public Map<String, String> getAgentMap() {
+        return pedestrianAgentIDPreferredBusLine;
     }
 
     public void removeFromAgentMap(String agentName) {
