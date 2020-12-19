@@ -22,6 +22,14 @@ public class FileWrapper {
     private static final TransformerFactory transformerFactory = TransformerFactory.newInstance();
     private static final ObjectMapper mapper = new ObjectMapper();
 
+    static {
+        var dir = new File(DEFAULT_OUTPUT_PATH_CACHE);
+        if (!dir.exists()){
+            //noinspection ResultOfMethodCallIgnored
+            dir.mkdirs();
+        }
+    }
+
     public static void write(Document xmlDoc) {
         write(xmlDoc, DEFAULT_OUTPUT_PATH_XML);
     }
