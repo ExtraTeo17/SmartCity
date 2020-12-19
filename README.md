@@ -38,3 +38,13 @@ See above for instructions.
 
 Run `run.sh  \ run.ps1` script to boot the application.    
 By default it will be present on address: `localhost:5000` - it should open in your browser automatically.   
+
+
+## Docker
+To use in docker: 
+```
+    docker build -t smart_city-image .
+    docker run -dit -p 4000:4000 -p 9000:9000 -p 5000:5000 
+       --name smartCity smart_city-image:latest
+```
+Then open your browser on `localhost:5000`.

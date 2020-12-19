@@ -14,3 +14,6 @@ RUN npm install serve -g
 
 # copy SmartCity-build
 COPY SmartCity-build ./SmartCity
+
+# automatically start app
+CMD ["sh","-c","cd SmartCity && ./run.sh"]
