@@ -1,6 +1,7 @@
 package agents;
 
 import agents.abstractions.AbstractAgent;
+import agents.utilities.CrashInfo;
 import agents.utilities.MessageParameter;
 import com.google.common.eventbus.EventBus;
 import jade.core.behaviours.Behaviour;
@@ -14,7 +15,9 @@ import smartcity.ITimeProvider;
 
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 
 import static agents.utilities.BehaviourWrapper.wrapErrors;
 import static java.time.temporal.ChronoUnit.MILLIS;
@@ -28,6 +31,8 @@ public class BusManagerAgent extends AbstractAgent {
     public static final String NAME = NAME_PREFIX + ID;
 
     private final HashSet<BusInfo> busInfos;
+
+    List<CrashInfo> troubleCases = new ArrayList<>();
 
     BusManagerAgent(ITimeProvider timeProvider, EventBus eventBus, HashSet<BusInfo> busInfos) {
         super(ID, NAME_PREFIX, timeProvider, eventBus);
@@ -44,12 +49,22 @@ public class BusManagerAgent extends AbstractAgent {
                 if (rcv != null) {
                     switch (rcv.getPerformative()) {
                         case ACLMessage.INFORM -> {
-                            logger.info("GET info from pedestrian about");
-                            handleRouteQuery(rcv);
+                            if (rcv.getSender().getLocalName().contains("Bus")) {
+                                initialiseCrash(rcv);
+                            } else {
+                                handleRouteQuery(rcv);
+                            }
                         }
                     }
                 }
                 block(100);
+            }
+
+            private void initialiseCrash(ACLMessage rcv) {
+                    troubleCases.add(new CrashInfo(LocalTime.parse(rcv.getUserDefinedParameter(MessageParameter.CRASH_TIME)),
+                            rcv.getUserDefinedParameter(MessageParameter.BUS_LINE),
+                            rcv.getUserDefinedParameter(MessageParameter.BRIGADE)));
+
             }
 
             private void handleRouteQuery(ACLMessage rcv) {
@@ -59,13 +74,15 @@ public class BusManagerAgent extends AbstractAgent {
                 String event = rcv.getUserDefinedParameter(MessageParameter.EVENT);
                 ACLMessage msg = getBestMatch(rcv.createReply(), stationOsmIdFrom, stationOsmIdTo, arrivalTime, event,
                         rcv.getUserDefinedParameter(MessageParameter.BUS_LINE),
-                        rcv.getUserDefinedParameter(MessageParameter.BRIGADE));
+                        rcv.getUserDefinedParameter(MessageParameter.BRIGADE),rcv);
                 send(msg);
+
+
                 logger.info("Send message to pedestrian");
             }
 
             private ACLMessage getBestMatch(ACLMessage response, long stationOsmIdFrom, long stationOsmIdTo,
-                                            LocalTime timeOnStation, String event, String troubledLine, String troubledBrigade) {
+                                            LocalTime timeOnStation, String event, String troubledLine, String troubledBrigade, ACLMessage rcv) {
                 long minimumTimeOverall = Long.MAX_VALUE;
                 String preferredBusLine = null;
                 for (BusInfo info : busInfos) {
@@ -84,7 +101,7 @@ public class BusManagerAgent extends AbstractAgent {
                         LocalTime minimumTimeOnStationTo = LocalTime.MIN;
 
                         for (BrigadeInfo brigInfo : info.brigadeList) {
-                            if (info.busLine.equals(troubledLine) && brigInfo.brigadeId.equals(troubledBrigade)) {
+                            if (checkCrashedBuses(info.busLine,brigInfo.brigadeId,rcv)) {
                                 continue;
                             }
                             for (Timetable table : brigInfo.timetables) {
@@ -121,8 +138,22 @@ public class BusManagerAgent extends AbstractAgent {
                 return response;
             }
 
+            private boolean checkCrashedBuses(String busLine, String brigadeId, ACLMessage rcv) {
+                for(CrashInfo crash : troubleCases)
+                {
+                    if(busLine.equals(crash.busLine) && brigadeId.equals(crash.brigade))
+                    {
+
+
+                        logger.info(rcv.getSender().getLocalName() + "------------------------------------busLine " + crash.busLine+" brigade " + crash.brigade);
+                        return true;
+                    }
+                }
+                return false;
+            }
+
             private long differenceInSeconds(LocalTime time1, LocalTime time2) {
-            	return time1.isBefore(time2) ? Long.MAX_VALUE : Math.abs(MILLIS.between(time1, time2) / 1000);
+                return time1.isBefore(time2) ? Long.MAX_VALUE : Math.abs(MILLIS.between(time1, time2) / 1000);
             }
         };
         var onError = createErrorConsumer();

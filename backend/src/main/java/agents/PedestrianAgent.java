@@ -77,6 +77,8 @@ public class PedestrianAgent extends AbstractAgent {
 
     @Override
     protected void setup() {
+        logger.info("osm start station"+ pedestrian.getStartingStation().getOsmId() + "osm finish station" + pedestrian.getStationFinish().getOsmId());
+        logger.info(pedestrian.getDisplayRouteAfterBus().get(pedestrian.getDisplayRouteAfterBus().size()-1)+"");
         informWhichBusLine();
 
         informLightManager(pedestrian);
