@@ -52,7 +52,6 @@ public class BusManagerAgent extends AbstractAgent {
                 block(100);
             }
 
-
             private void handleRouteQuery(ACLMessage rcv) {
                 long stationOsmIdFrom = Long.parseLong(rcv.getUserDefinedParameter(MessageParameter.STATION_FROM_ID));
                 long stationOsmIdTo = Long.parseLong(rcv.getUserDefinedParameter(MessageParameter.STATION_TO_ID));
@@ -62,14 +61,13 @@ public class BusManagerAgent extends AbstractAgent {
                         rcv.getUserDefinedParameter(MessageParameter.BUS_LINE),
                         rcv.getUserDefinedParameter(MessageParameter.BRIGADE));
                 send(msg);
-                logger.info("Send message to pedestrian ");
+                logger.info("Send message to pedestrian");
             }
 
             private ACLMessage getBestMatch(ACLMessage response, long stationOsmIdFrom, long stationOsmIdTo,
                                             LocalTime timeOnStation, String event, String troubledLine, String troubledBrigade) {
                 long minimumTimeOverall = Long.MAX_VALUE;
                 String preferredBusLine = null;
-                LocalTime TEST_preferredTimeOnStationFrom = null;
                 for (BusInfo info : busInfos) {
                     OSMStation stationFrom = null, stationTo = null;
                     for (OSMStation station : info.stops) {
@@ -82,8 +80,9 @@ public class BusManagerAgent extends AbstractAgent {
                     }
                     if (stationFrom != null && stationTo != null) {
                         long minimumTimeDistanceBetweenStationFromAndBusArrival = Long.MAX_VALUE;
-                        LocalTime minimumTimeOnStationFrom = null;
-                        LocalTime minimumTimeOnStationTo = null;
+                        LocalTime minimumTimeOnStationFrom = LocalTime.MAX;
+                        LocalTime minimumTimeOnStationTo = LocalTime.MIN;
+
                         for (BrigadeInfo brigInfo : info.brigadeList) {
                             if (info.busLine.equals(troubledLine) && brigInfo.brigadeId.equals(troubledBrigade)) {
                                 continue;
@@ -91,7 +90,6 @@ public class BusManagerAgent extends AbstractAgent {
                             for (Timetable table : brigInfo.timetables) {
                                 var timeOnStationFromOpt = table.getTimeOnStation(stationOsmIdFrom).orElse(LocalDateTime.MAX);
                                 var timeOnStationToOpt = table.getTimeOnStation(stationOsmIdTo).orElse(LocalDateTime.MIN);
-
                                 var timeOnStationFrom = timeOnStationFromOpt.toLocalTime();
                                 var timeOnStationTo = timeOnStationToOpt.toLocalTime();
 
@@ -105,21 +103,15 @@ public class BusManagerAgent extends AbstractAgent {
                             }
                         }
 
-                        if (minimumTimeOnStationTo == null) {
-                            minimumTimeOnStationTo = LocalTime.MAX;
-                        }
-
                         long overallTravelTime = minimumTimeDistanceBetweenStationFromAndBusArrival
                                 + differenceInSeconds(minimumTimeOnStationTo, minimumTimeOnStationFrom);
                         if (overallTravelTime < minimumTimeOverall) {
                             minimumTimeOverall = overallTravelTime;
                             preferredBusLine = info.busLine;
-                            TEST_preferredTimeOnStationFrom = minimumTimeOnStationFrom;
                         }
                     }
                 }
-                logger.info("PREFERRED BUS LINE: " + preferredBusLine);
-                logger.info("TIME ON STATION FROM: " + TEST_preferredTimeOnStationFrom);
+                logger.info("Preferred bus line: " + preferredBusLine);
                 response.addUserDefinedParameter(MessageParameter.TIME_BETWEEN_PEDESTRIAN_AT_STATION_ARRIVAL_AND_REACHING_DESIRED_STOP,
                         minimumTimeOverall + "");
                 response.addUserDefinedParameter(MessageParameter.BUS_LINE, preferredBusLine);
@@ -130,13 +122,10 @@ public class BusManagerAgent extends AbstractAgent {
             }
 
             private long differenceInSeconds(LocalTime time1, LocalTime time2) {
-                return time1.isBefore(time2) ? Long.MAX_VALUE : Math.abs(MILLIS.between(time1, time2) / 1000);
+            	return time1.isBefore(time2) ? Long.MAX_VALUE : Math.abs(MILLIS.between(time1, time2) / 1000);
             }
         };
         var onError = createErrorConsumer();
         addBehaviour(wrapErrors(communication, onError));
-
     }
-
-
 }

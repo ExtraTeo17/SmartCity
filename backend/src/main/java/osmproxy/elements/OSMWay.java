@@ -74,11 +74,11 @@ public class OSMWay extends OSMElement implements Serializable {
     public String toString() {
         StringBuilder builder = new StringBuilder()
                 .append(super.toString())
-                .append(", waypoints:" + "\n");
+                .append(", waypoints: ");
         for (final OSMWaypoint waypoint : waypoints) {
             builder.append(waypoint).append(", ");
         }
-        return builder.append("\n").toString();
+        return builder.toString();
     }
 
     // TODO: Result is not queried anywhere, why are we adding it?

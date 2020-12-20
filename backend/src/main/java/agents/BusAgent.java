@@ -412,8 +412,8 @@ public class BusAgent extends AbstractAgent {
         }
 
         int halfIndex = (int) Math.ceil((double) stationsOnRoute.size() / 2.0);
-        int firstIndex = random.nextInt(halfIndex);
-        int secondIndex = firstIndex + random.nextInt(stationsOnRoute.size() - firstIndex - 1) + 1;
+        int firstIndex = 0;//random.nextInt(halfIndex);
+        int secondIndex = 2;//firstIndex + random.nextInt(stationsOnRoute.size() - firstIndex - 1) + 1;
 
         return Optional.of(Siblings.of(stationsOnRoute.get(firstIndex),
                 stationsOnRoute.get(secondIndex)));

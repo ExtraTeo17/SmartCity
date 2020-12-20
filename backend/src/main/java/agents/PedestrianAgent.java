@@ -135,7 +135,6 @@ public class PedestrianAgent extends AbstractAgent {
 
                             break;
                         case PASSING_STATION:
-                            System.out.println("IS AT STATION: PASSING STATION");
                             move();
                             pedestrian.setState(DrivingState.MOVING);
                             break;

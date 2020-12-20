@@ -125,14 +125,13 @@ public class AgentsPreparer {
         if (stationNodes.size() == 0) {
             return false;
         }
-        logger.info("Stations are created! Took: " + TimeProvider.getTimeInMs(time) + "ms\n");
-
+        logger.info("Stations are created! Took: " + TimeProvider.getTimeInMs(time) + "ms");
         logger.info("Buses creation started.");
         time = System.nanoTime();
         if (!preparesBuses(busData, stationNodes)) {
             return false;
         }
-        logger.info("Buses are created! Took: " + TimeProvider.getTimeInMs(time) + "ms\n");
+        logger.info("Buses are created! Took: " + TimeProvider.getTimeInMs(time) + "ms");
 
         return true;
     }
@@ -147,7 +146,7 @@ public class AgentsPreparer {
             logger.info("Starting bus data preparation.");
             long time = System.nanoTime();
             busData = busLinesManager.getBusData();
-            logger.info("Bus data preparation finished! Took: " + TimeProvider.getTimeInMs(time) + "ms\n");
+            logger.info("Bus data preparation finished! Took: " + TimeProvider.getTimeInMs(time) + "ms");
             cacheWrapper.cacheData(busData);
         }
 
@@ -176,7 +175,7 @@ public class AgentsPreparer {
             return stationNodes;
         }
 
-        logger.info("NUMBER OF STATION AGENTS: " + stationsCount);
+        logger.info("Number of station agents: " + stationsCount);
         return stationNodes;
     }
 
@@ -217,8 +216,7 @@ public class AgentsPreparer {
             logger.error("No buses were created");
             return false;
         }
-        logger.info("Closest startTime: " + closestTime.toLocalTime() + "\n" +
-                "    NUMBER OF BUS AGENTS: " + busCount);
+        logger.info("Closest startTime: " + closestTime.toLocalTime() + ", number of bus agents: " + busCount);
         return true;
     }
 
