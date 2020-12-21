@@ -113,10 +113,6 @@ public class TroubleManagerAgent extends Agent {
     }
 
     private void trafficJamsAppearedHandle(ACLMessage rcv) {
-        var lat = Double.parseDouble(rcv.getUserDefinedParameter(MessageParameter.TROUBLE_LAT));
-        var lng = Double.parseDouble(rcv.getUserDefinedParameter(MessageParameter.TROUBLE_LON));
-        eventBus.post(new TrafficJamStartedEvent(Position.longHash(lat, lng)));
-
         int edgeId = Integer.parseInt(rcv.getUserDefinedParameter(MessageParameter.EDGE_ID));
         logger.debug("Got message about light traffic jam start on: " + edgeId);
         if (!mapOfLightTrafficJamBlockedEdges.containsKey(edgeId)) {
