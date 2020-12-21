@@ -71,6 +71,7 @@ const StrategyMenu = props => {
   }
 
   function evSetTrafficJamStrategyActive(e) {
+	  console.log("-----------------------------------")
     dispatchUpdate({ trafficJamStrategyActive: e.target.checked });
   }
 

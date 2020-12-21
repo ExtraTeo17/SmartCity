@@ -118,6 +118,7 @@ public class StationAgent extends AbstractAgent {
 
             private void handleCrashFromBusToConcernedPassengers(ACLMessage rcv) {
                 String crashedLine = rcv.getUserDefinedParameter(MessageParameter.BUS_LINE);
+
                 ACLMessage responseToCrash = createResponseToCrash(rcv);
 
 
@@ -132,9 +133,10 @@ public class StationAgent extends AbstractAgent {
             private ACLMessage createResponseToCrash(ACLMessage rcv) {
                 ACLMessage msg = new ACLMessage(ACLMessage.INFORM);
                 msg.addReceiver(new AID(name, AID.ISLOCALNAME));
-
+                String crashTime = rcv.getUserDefinedParameter(MessageParameter.CRASH_TIME);
                 Properties properties = createProperties(MessageParameter.STATION);
                 properties.setProperty(MessageParameter.TROUBLE, MessageParameter.SHOW);
+                properties.setProperty(MessageParameter.CRASH_TIME, crashTime);
                 properties.setProperty(MessageParameter.TYPEOFTROUBLE, MessageParameter.CRASH);
                 properties.setProperty(MessageParameter.TROUBLE, MessageParameter.SHOW);
                 properties.setProperty(MessageParameter.TROUBLE_LAT, station.getLat()+"");

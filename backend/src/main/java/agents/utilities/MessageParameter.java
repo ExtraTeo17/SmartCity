@@ -47,6 +47,7 @@ public class MessageParameter {
     public static final String START = "start";
     public static final String BRIGADE = "brigade";
     public static final String TEST_BIKE_AGENT_ID = "test_bike_agent_id";
+    public static final String CRASH_TIME = "crash_time";
 
 
     public static String getTypeByMovingObject(MovingObject movingObject) {

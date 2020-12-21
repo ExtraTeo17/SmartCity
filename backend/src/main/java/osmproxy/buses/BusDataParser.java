@@ -62,7 +62,7 @@ public class BusDataParser implements IBusDataParser {
                     if (++errors < 5) {
                         continue;
                     }
-                    throw new RuntimeException("Too much errors when parsing busInfo");
+                    throw new RuntimeException("Too many errors when parsing busInfo");
                 }
                 busInfoDataSet.add(busInfoData.get());
             }
@@ -73,10 +73,19 @@ public class BusDataParser implements IBusDataParser {
         }
 
         var busInfos = busDataMerger.getBusInfosWithStops(busInfoDataSet, busStopsMap);
+        
+        List<String> busLinesOfInfosToRemoveCauseOfMissingTimetableInWarszawskieAPI = new ArrayList<>();
         for (var busInfo : busInfos) {
             var brigadeInfos = generateBrigadeInfos(busInfo.busLine, busInfo.stops);
-            busInfo.addBrigades(brigadeInfos);
-        }
+            if (brigadeInfos.size() > 0) {
+                busInfo.addBrigades(brigadeInfos);
+            } else {
+            	busLinesOfInfosToRemoveCauseOfMissingTimetableInWarszawskieAPI.add(busInfo.busLine);
+            	logger.info("Warning: Timetable for bus line " + busInfo.busLine + " is empty in Warszawskie API. Line will not be considered");
+            }
+		}
+		busInfos.removeIf(info -> busLinesOfInfosToRemoveCauseOfMissingTimetableInWarszawskieAPI.stream()
+				.anyMatch(line -> info.busLine.equals(line)));
 
         return new BusPreparationData(busInfos, busStopsMap);
     }

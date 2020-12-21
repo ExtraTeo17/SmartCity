@@ -77,6 +77,8 @@ public class PedestrianAgent extends AbstractAgent {
 
     @Override
     protected void setup() {
+        logger.info("osm start station"+ pedestrian.getStartingStation().getOsmId() + "osm finish station" + pedestrian.getStationFinish().getOsmId());
+        logger.info(pedestrian.getDisplayRouteAfterBus().get(pedestrian.getDisplayRouteAfterBus().size()-1)+"");
         informWhichBusLine();
 
         informLightManager(pedestrian);
@@ -135,7 +137,6 @@ public class PedestrianAgent extends AbstractAgent {
 
                             break;
                         case PASSING_STATION:
-                            System.out.println("IS AT STATION: PASSING STATION");
                             move();
                             pedestrian.setState(DrivingState.MOVING);
                             break;
