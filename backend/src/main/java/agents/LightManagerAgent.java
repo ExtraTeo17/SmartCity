@@ -3,10 +3,12 @@ package agents;
 import agents.abstractions.AbstractAgent;
 import agents.utilities.MessageParameter;
 import com.google.common.eventbus.EventBus;
+import events.web.roadblocks.TrafficJamStartedEvent;
 import jade.core.behaviours.CyclicBehaviour;
 import jade.core.behaviours.TickerBehaviour;
 import jade.lang.acl.ACLMessage;
 import jade.util.leap.Properties;
+import routing.core.Position;
 import smartcity.ITimeProvider;
 import smartcity.config.ConfigContainer;
 import smartcity.lights.OptimizationResult;
@@ -113,10 +115,8 @@ public class LightManagerAgent extends AbstractAgent {
                 if (configContainer.isTrafficJamStrategyActive()) {
                     sendMessageAboutTroubleToVehicle(result, nameOfAgent);
                 }
-                // TODO FOR PRZEMEK: add eventBus.startTrafficJamEvent here IN THIS LINE
-                // and delete in TroubleManager (the pulsowanie should start here, not
-                // after the message goes through car to TroubleManager
-                // You have the coordinates in result.getJammedLightPosition()
+                var pos = result.getJammedLightPosition();
+                eventBus.post(new TrafficJamStartedEvent(Position.longHash(pos.getLat(), pos.getLng())));
             }
 
             private void sendMessageAboutTroubleToVehicle(OptimizationResult result, String nameOfAgent) {
@@ -127,8 +127,9 @@ public class LightManagerAgent extends AbstractAgent {
                 properties.setProperty(MessageParameter.TYPEOFTROUBLE, MessageParameter.TRAFFIC_JAM);
                 properties.setProperty(MessageParameter.TROUBLE, MessageParameter.SHOW);
                 properties.setProperty(MessageParameter.LENGTH_OF_JAM, Double.toString(result.getLengthOfJam()));
-                properties.setProperty(MessageParameter.TROUBLE_LAT, Double.toString(result.getJammedLightPosition().getLat()));
-                properties.setProperty(MessageParameter.TROUBLE_LON, Double.toString(result.getJammedLightPosition().getLng()));
+                var pos = result.getJammedLightPosition();
+                properties.setProperty(MessageParameter.TROUBLE_LAT, Double.toString(pos.getLat()));
+                properties.setProperty(MessageParameter.TROUBLE_LON, Double.toString(pos.getLng()));
                 properties.setProperty(MessageParameter.ADJACENT_OSM_WAY_ID, Long.toString(result.getOsmWayId()));
                 msg.setAllUserDefinedParameters(properties);
                 logger.debug("Send message to " + nameOfAgent + " for request of EdgeID when starting traffic jam");
