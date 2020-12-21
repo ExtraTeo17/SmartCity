@@ -71,7 +71,6 @@ const StrategyMenu = props => {
   }
 
   function evSetTrafficJamStrategyActive(e) {
-	  console.log("-----------------------------------")
     dispatchUpdate({ trafficJamStrategyActive: e.target.checked });
   }
 
@@ -271,7 +270,7 @@ const StrategyMenu = props => {
           </div>
         )}
 
-        <div className="custom-control custom-switch user-select-none">
+        <div className="custom-control custom-switch user-select-none mt-4">
           <input
             type="checkbox"
             className="custom-control-input"
@@ -306,7 +305,7 @@ const StrategyMenu = props => {
           </div>
         )}
 
-        <div className="custom-control custom-switch user-select-none">
+        <div className="custom-control custom-switch user-select-none mt-4">
           <input
             type="checkbox"
             className="custom-control-input"
@@ -327,7 +326,7 @@ const StrategyMenu = props => {
           </label>
         </div>
 
-        <div className="custom-control custom-switch user-select-none">
+        <div className="custom-control custom-switch user-select-none mt-4">
           <input
             type="checkbox"
             className="custom-control-input"
@@ -348,7 +347,7 @@ const StrategyMenu = props => {
           </label>
         </div>
 
-        <div className="custom-control custom-switch user-select-none">
+        <div className="custom-control custom-switch user-select-none mt-4">
           <input
             type="checkbox"
             className="custom-control-input"
