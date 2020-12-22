@@ -166,13 +166,13 @@ public abstract class MovingObject {
         return null;
     }
 
-    private void displayRouteDebug(List<RouteNode> route) {
-        logger.debug("Display route debug of size: " + route.size());
+    protected void displayRouteDebug(List<RouteNode> route) {
+        logger.info("Display route debug of size: " + route.size());
         StringBuilder builder = new StringBuilder();
         for (int i = 0; i < route.size(); ++i) {
             builder.append("R[" + i + "]: " + route.get(i).getDebugString(route.get(i) instanceof LightManagerNode) + "; ");
         }
-        logger.debug(builder.toString());
+        logger.info(builder.toString());
     }
 
     public boolean isAtTrafficLights() {

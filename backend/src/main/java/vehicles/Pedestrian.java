@@ -40,7 +40,6 @@ public class Pedestrian extends MovingObject {
         this.displayRouteBeforeBus = routeToStation;
         this.routeBeforeBus = uniformRouteToStation;
         this.routeBeforeBus.add(startStation);
-
         this.displayRouteAfterBus = routeFromStation;
         this.stationIndex = routeBeforeBus.size() - 1;
         this.stationStart = startStation;
