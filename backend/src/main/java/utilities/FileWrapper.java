@@ -102,7 +102,8 @@ public class FileWrapper {
                 data = objectStream.readObject();
             }
         } catch (Exception e) {
-            logger.warn("Could read file: " + path, e);
+            logger.warn("Could not read file: " + path, e);
+            tryDeleteFile(path);
         }
 
         try {
