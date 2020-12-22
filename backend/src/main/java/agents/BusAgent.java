@@ -326,7 +326,7 @@ public class BusAgent extends AbstractAgent {
                     properties.setProperty(MessageParameter.TROUBLE_LAT, Double.toString(troublePoint.getLat()));
                     properties.setProperty(MessageParameter.TROUBLE_LON, Double.toString(troublePoint.getLng()));
                     if (!isTroubleManager) {
-                        properties.setProperty(MessageParameter.DESIRED_OSM_STATION_ID, ((StationNode) bus.findNextStop()).getOsmId() + "");
+                    	properties.setProperty(MessageParameter.DESIRED_OSM_STATION_ID, ((StationNode) bus.findNextStop()).getOsmId() + "");
                         properties.setProperty(MessageParameter.AGENT_ID_OF_NEXT_CLOSEST_STATION, ((StationNode) bus.findNextStop()).getAgentId() + "");
                         //maybe not needed
                         properties.setProperty(MessageParameter.LAT_OF_NEXT_CLOSEST_STATION, bus.findNextStop().getLat() + "");
@@ -421,8 +421,8 @@ public class BusAgent extends AbstractAgent {
         }
 
         int halfIndex = (int) Math.ceil((double) stationsOnRoute.size() / 2.0);
-        int firstIndex = 0;//random.nextInt(halfIndex);
-        int secondIndex = 2;//firstIndex + random.nextInt(stationsOnRoute.size() - firstIndex - 1) + 1;
+        int firstIndex = random.nextInt(halfIndex);
+        int secondIndex = firstIndex + random.nextInt(stationsOnRoute.size() - firstIndex - 1) + 1;
 
         return Optional.of(Siblings.of(stationsOnRoute.get(firstIndex),
                 stationsOnRoute.get(secondIndex)));

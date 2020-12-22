@@ -20,4 +20,18 @@ public class BusPreparationData implements Serializable {
         this.busInfos = new HashSet<>();
         this.stations = new HashMap<>();
     }
+
+    @Override
+    public String toString() {
+		StringBuilder builder = new StringBuilder();
+    	builder.append("#########################################\n");
+		builder.append("All stations:\n[:");
+		int i = 0;
+		for (OSMStation station : stations.values()) {
+			builder.append("stations[" + i++ + "]=" + station.getBusStopId() + "/" + station.getBusStopNr() + "/" + station.getId() + ":");
+		}
+		builder.append("]\n");
+    	builder.append("#########################################");
+		return builder.toString();
+    }
 }

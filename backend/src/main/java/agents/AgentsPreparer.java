@@ -240,7 +240,7 @@ public class AgentsPreparer {
             var station = allStations.stream().filter(node -> node.getOsmId() == stopId).findAny();
             if (station.isPresent()) {
                 mergedStationNodes.add(station.get());
-                mergedOsmStops.add(osmStop);
+                mergedOsmStops.add(osmStop); // TODO: mergedosmstops is not used wtf
             }
             else {
                 logger.error("Stop present on way is not initiated as StationAgent: " + osmStop);

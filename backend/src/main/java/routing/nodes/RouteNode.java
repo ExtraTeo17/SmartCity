@@ -43,10 +43,10 @@ public class RouteNode extends Position {
         return "(" + getLat() + ", " + getLng() + ")\n";
     }
 
-    public final String getDebugString(boolean isLightManager) {
+    public final String getDebugString(boolean isStationNode) {
         final StringBuilder builder = new StringBuilder();
         builder.append("[");
-        builder.append(isLightManager ? "LMN" : "RN");
+        builder.append(isStationNode ? "SN" : "RN");
         builder.append(": ");
         builder.append("(" + getLat() + ", " + getLng() + ")");
         builder.append("]");
