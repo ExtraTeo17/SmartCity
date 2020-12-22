@@ -36,27 +36,23 @@ public final class RouteTransformer implements // TODO: We'll make it private ot
 
             double distance = RoutingHelper.getDistance(nodeA, nodeB);
             if (distance == 0) {
-            	if (doubledNodes.isEmpty()) {
-            		doubledNodes.add(nodeA);
-            	}
-            	doubledNodes.add(nodeB);
+                if (doubledNodes.isEmpty()) {
+                    doubledNodes.add(nodeA);
+                }
+                doubledNodes.add(nodeB);
                 continue;
-			} else if (!doubledNodes.isEmpty()) {
-				List<RouteNode> specialNodes = doubledNodes.stream()
-						.filter(node -> node instanceof LightManagerNode || node instanceof StationNode)
-						.collect(Collectors.toList());
-				switch (specialNodes.size()) {
-            		case 0:
-            			nodeA = doubledNodes.get(0);
-            			break;
-            		case 1:
-            			nodeA = specialNodes.get(0);
-            			break;
-            		default:
-            			throw new IllegalStateException("There is more than one special node of same position on the route");
-            	}
-            	distance = RoutingHelper.getDistance(nodeA, nodeB);
-            	doubledNodes.clear();
+            }
+            else if (!doubledNodes.isEmpty()) {
+                List<RouteNode> specialNodes = doubledNodes.stream()
+                        .filter(node -> node instanceof LightManagerNode || node instanceof StationNode)
+                        .collect(Collectors.toList());
+                nodeA = switch (specialNodes.size()) {
+                    case 0 -> doubledNodes.get(0);
+                    case 1 -> specialNodes.get(0);
+                    default -> throw new IllegalStateException("There is more than one special node of same position on the route");
+                };
+                distance = RoutingHelper.getDistance(nodeA, nodeB);
+                doubledNodes.clear();
             }
 
             double x = nodeB.getLng() - nodeA.getLng();
