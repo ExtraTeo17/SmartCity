@@ -3,6 +3,15 @@ import { connect } from "react-redux";
 
 import "../../styles/Menu.css";
 
+/**
+ * @category Menu
+ * Menu tab, which holds all results of generated test objects (i.e. pedestrian, bike, car).
+ * Each result has following properties:
+ *  - object name, e.g.Pedestrian
+ *  - travelled distance in meters
+ *  - travel time in minutes / seconds
+ * @component
+ */
 const ResultsMenu = props => {
   const { timeResults } = props;
 

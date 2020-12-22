@@ -8,6 +8,11 @@ import MenusContainer from "./Menu/MenusContainer";
 
 import "../styles/App.css";
 
+/**
+ * @category Main
+ * Central component, which holds both map and menu
+ * @component
+ */
 const App = () => (
   <Provider store={store}>
     <Notifications />

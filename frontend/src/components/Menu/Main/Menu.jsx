@@ -1,3 +1,4 @@
+// @ts-nocheck
 /* eslint-disable no-restricted-globals */
 /* eslint-disable indent */
 import { connect } from "react-redux";
@@ -18,6 +19,14 @@ import { setIfValidInt } from "../../../utils/helpers";
 import "flatpickr/dist/themes/material_blue.css";
 import "../../../styles/Menu.css";
 
+/**
+ * @category Menu
+ * Main menu tab, contains:
+ *  - zone data, i.e. coordinates and radius
+ *  - time and time-scale of simulation
+ *  - use-fixed-routes checkbox - routes stay the same for each re-run at the same position
+ * @component
+ */
 const Menu = props => {
   const { configState, wasStarted, timeScaleConfig, timeStartConfig } = props;
 

@@ -22,6 +22,8 @@ const { Overlay } = LayersControl;
 
 /**
  * @category Main
+ * Central map component. Holds all objects layers and zone center.
+ * Manages map control overlay (in the upper right corner).
  * @component
  */
 const CityMap = props => {
