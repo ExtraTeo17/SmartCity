@@ -9,8 +9,9 @@ import MenusContainer from "./Menu/MenusContainer";
 import "../styles/App.css";
 
 /**
- * @category Main
  * Central component, which holds both map and menu
+ * @category Main
+ * @module App
  * @component
  */
 const App = () => (

@@ -9,11 +9,11 @@ import { initialInteractionState } from "../../redux/reducers/interaction";
 import "../../styles/Menu.css";
 
 /**
- * @category Menu
- * Menu tab, which holds all scenarios, i.e. predefined settings for all configurations.
+ * Menu tab, which holds all scenarios, i.e. predefined settings for all configurations. <br/>
  * Each scenario has coresponding strategy in StrategyMenu.
  * Each scenario button prepares the simulation automatically.
- * @component
+ * @category Menu
+ * @module ScenariosMenu
  */
 export const ScenariosMenuObj = props => {
   const { inPreparation, wasStarted, config = initialInteractionState } = props;

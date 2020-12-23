@@ -9,15 +9,15 @@ import { LIGHT_EXTEND_MIN, LIGHT_EXTEND_MAX, STATION_EXTEND_MAX, STATION_EXTEND_
 import "../../styles/Menu.css";
 
 /**
- * @category Menu
- * Menu tab, which holds all strategy and generation switches.
+ * Menu tab, which holds all strategy and generation switches. <br/>
  * Each strategy requires some generation checkboxes on:
  * - light -> car | bike | pedestrian generation
  * - station -> bus generation
  * - trouble points -> car generation
  * - traffic jams -> car generation
  * - bus failure -> bus generation
- * @component
+ * @category Menu
+ * @module StrategyMenu
  */
 const StrategyMenu = props => {
   const {

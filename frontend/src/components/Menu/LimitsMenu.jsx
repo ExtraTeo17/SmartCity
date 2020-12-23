@@ -21,14 +21,15 @@ import "../../styles/Menu.css";
 import { setIfValidInt } from "../../utils/helpers";
 
 /**
- * @category Menu
  * Menu tab, which holds all limits for generated objects.
  * For cars, bike and pedestrians:
  *  - limit - number of generated objects at the same time, generation starts again when object disappear
  *  - test-object-id - number of generated test object, can be > limit
+ *
  * For trouble points:
  *  - time before trouble - time of car ride (in simulation time) before road trouble occurs
- * @component
+ * @category Menu
+ * @module LimitsMenu
  */
 const LimitsMenu = props => {
   const {
