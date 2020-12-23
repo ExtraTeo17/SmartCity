@@ -197,9 +197,9 @@ public class CarAgent extends AbstractAgent {
 
             private void handleConstructionJam(ACLMessage rcv) {
                 Long edgeId = Long.parseLong(rcv.getUserDefinedParameter(MessageParameter.EDGE_ID));
-                logger.info("Got propose to change the route and exclude: " + edgeId);
+                logger.debug("Got propose to change the route and exclude: " + edgeId);
                 if (constructionsEdgeId.contains(edgeId)) {
-                    logger.info("Already notified about construction place on edge: " + edgeId);
+                    logger.debug("Already notified about construction place on edge: " + edgeId);
                     return;
                 }
                 constructionsEdgeId.add(edgeId);
