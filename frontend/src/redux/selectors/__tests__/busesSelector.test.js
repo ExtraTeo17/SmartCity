@@ -126,7 +126,7 @@ describe("Selector for buses without routes", () => {
       newBuses[0] = { ...newBuses[0], location: { lat: defLat, lng: i + 0.3 } };
       updateStateWithNewBuses(newBuses);
     }
-    expect(timeSum).toBeLessThan(normalSelectMs * 50);
+    expect(timeSum).toBeLessThan(normalSelectMs * 60);
   });
 });
 
@@ -227,7 +227,7 @@ describe("Selector for buses with routes", () => {
     updateStateWithNewBuses(newBuses);
 
     // Act & Assert
-    const normalSelectMs = 20;
+    const normalSelectMs = 25;
     const memoizeSelectMs = 1;
 
     // First select - init - normal
