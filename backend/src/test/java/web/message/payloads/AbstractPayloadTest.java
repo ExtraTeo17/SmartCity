@@ -1,17 +1,19 @@
 package web.message.payloads;
 
-import org.junit.Assert;
-import org.junit.Test;
+
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class AbstractPayloadTest {
 
     @Test
-    public void toString_fourFields_correctResult() {
+    void toString_fourFields_correctResult() {
         var payloadImpl = new AbstractPayload() {
-            public final int val1 = 1;
-            public final float val2 = 10.022f;
-            public final double val3 = 0.044;
-            public final String val4 = "My_string";
+            private final int val1 = 1;
+            private final float val2 = 10.022f;
+            private final double val3 = 0.044;
+            private final String val4 = "My_string";
         };
 
         String result = payloadImpl.toString();
@@ -21,16 +23,16 @@ class AbstractPayloadTest {
                 ", val3: " + payloadImpl.val3 +
                 ", val4: " + payloadImpl.val4 +
                 ")";
-        Assert.assertEquals(expected, result);
+        assertEquals(expected, result);
     }
 
     @Test
-    public void toString_noFields_emptyResult() {
+    void toString_noFields_emptyResult() {
         var payloadImpl = new AbstractPayload() {};
 
         String result = payloadImpl.toString();
 
         String expected = "()";
-        Assert.assertEquals(expected, result);
+        assertEquals(expected, result);
     }
 }

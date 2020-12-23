@@ -18,7 +18,7 @@ public interface IMapAccessManager {
 
     List<OSMLight> getOsmLights(List<Long> osmWayIds);
 
-    Optional<RouteInfo> getRouteInfo(List<Long> osmWayIds);
+    Optional<RouteInfo> getRouteInfo(List<Long> osmWayIds, boolean notPedestrian);
 
     List<Node> getLightManagersNodes(IZone zone);
 

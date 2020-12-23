@@ -10,32 +10,30 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.net.InetSocketAddress;
-import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.List;
-import java.util.function.Consumer;
-import java.util.stream.Collectors;
 
 class SocketServer extends WebSocketServer {
+    public static final int CONNECTION_LOST_TIMEOUT = 600;
     private static final Logger logger = LoggerFactory.getLogger(SocketServer.class);
     private final MessageHandler messageHandler;
-    private final HashSet<WebSocket> sockets;
+    private final LinkedList<WebSocket> sockets;
 
     @Inject
     SocketServer(@Named("WEB_PORT") Integer port,
                  MessageHandler messageHandler) {
         super(getSocketAddress(port));
         this.messageHandler = messageHandler;
-        sockets = new HashSet<>();
+        this.setConnectionLostTimeout(CONNECTION_LOST_TIMEOUT);
+        sockets = new LinkedList<>();
     }
 
     private static InetSocketAddress getSocketAddress(int port) {
         return new InetSocketAddress(port);
     }
 
-    List<Consumer<String>> getMessageBuses() {
-        return sockets.stream()
-                .map(s -> (Consumer<String>) s::send)
-                .collect(Collectors.toList());
+    List<WebSocket> getMessageBuses() {
+        return sockets;
     }
 
     /**

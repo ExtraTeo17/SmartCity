@@ -2,6 +2,8 @@ package vehicles;
 
 import org.junit.jupiter.api.Test;
 import smartcity.ITimeProvider;
+import smartcity.task.abstractions.ITaskProvider;
+import vehicles.enums.DrivingState;
 
 import java.time.LocalDateTime;
 
@@ -16,8 +18,9 @@ class TestPedestrianTests {
         // Arrange
         var time = LocalDateTime.of(2020, 10, 12, 10, 10);
         var timeProvider = mock(ITimeProvider.class);
+        var taskProvider = mock(ITaskProvider.class);
         when(timeProvider.getCurrentSimulationTime()).thenReturn(time);
-        var pedestrian = createPedestrian(timeProvider);
+        var pedestrian = createPedestrian(timeProvider, taskProvider);
 
         // Act
         pedestrian.setState(DrivingState.MOVING);
@@ -32,8 +35,10 @@ class TestPedestrianTests {
         // Arrange
         var time = LocalDateTime.of(2020, 10, 12, 10, 10);
         var timeProvider = mock(ITimeProvider.class);
+        var taskProvider = mock(ITaskProvider.class);
         when(timeProvider.getCurrentSimulationTime()).thenReturn(time);
-        var pedestrian = createPedestrian(timeProvider);
+
+        var pedestrian = createPedestrian(timeProvider, taskProvider);
 
         // Act
         pedestrian.setState(DrivingState.AT_DESTINATION);
@@ -46,12 +51,27 @@ class TestPedestrianTests {
         assertEquals(time, end);
     }
 
+    @Test
+    void pedestrian_is_troubled_shouldNotMove() {
+        // Arrange
+        var time = LocalDateTime.of(2020, 10, 12, 10, 10);
+        var timeProvider = mock(ITimeProvider.class);
+        var taskProvider = mock(ITaskProvider.class);
+        var pedestrian = createPedestrian(timeProvider, taskProvider);
 
-    private TestPedestrian createPedestrian() {
-        return createPedestrian(mock(ITimeProvider.class));
+
+        var moveIndexBeforeTrouble = pedestrian.getMoveIndex();
+        // Act
+        pedestrian.setTroubled(false);
+
+        // Assert
+        var moveIndexAfterTrouble = pedestrian.getMoveIndex();
+        assertEquals(moveIndexBeforeTrouble, moveIndexAfterTrouble);
+
     }
 
-    private TestPedestrian createPedestrian(ITimeProvider timeProvider) {
+
+    private TestPedestrian createPedestrian(ITimeProvider timeProvider, ITaskProvider taskProvider) {
         return new TestPedestrian(timeProvider);
     }
 }

@@ -1,19 +1,26 @@
 package smartcity.task.abstractions;
 
-import routing.StationNode;
+import routing.abstractions.IRoutingHelper;
 import routing.core.IGeoPosition;
-import smartcity.lights.core.Light;
+import routing.nodes.StationNode;
+import smartcity.lights.core.SimpleLightGroup;
+import utilities.Siblings;
 
-import java.util.Collection;
+import java.time.LocalDateTime;
 import java.util.function.Supplier;
 
 public interface ITaskProvider {
     Runnable getCreateCarTask(IGeoPosition start, IGeoPosition end, boolean testCar);
 
-    Runnable getCreatePedestrianTask(StationNode startStation, StationNode endStation,
-                                     String busLine, boolean testPedestrian);
+    Runnable getCreateBikeTask(IGeoPosition start, IGeoPosition end, boolean testBike);
+
+    Runnable getCreatePedestrianTask(IRoutingHelper routingHelper,
+                                     StationNode startStation, StationNode endStation,
+                                     boolean testPedestrian);
 
     Runnable getScheduleBusControlTask();
 
-    Supplier<Integer> getSwitchLightsTask(Collection<Light> lights);
+    Supplier<Integer> getSwitchLightsTask(int managerId, Siblings<SimpleLightGroup> lights);
+
+    Runnable getSimulationControlTask(LocalDateTime simulationStartTime);
 }

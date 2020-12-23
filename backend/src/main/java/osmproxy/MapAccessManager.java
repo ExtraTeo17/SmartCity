@@ -103,10 +103,11 @@ public class MapAccessManager implements IMapAccessManager {
         var connection = sendRequest(query);
         try {
             var responseCode = connection.getResponseCode();
-            if (responseCode == 429) {
+            if (responseCode == 429 || responseCode == 504) {
                 logger.warn("Current API: " + CURRENT_API + " is overloaded with our requests.");
-                CURRENT_API = CURRENT_API.equals(ALTERNATE_OVERPASS_API_1) ? ALTERNATE_OVERPASS_API_2:
-                        ALTERNATE_OVERPASS_API_1;
+                CURRENT_API = CURRENT_API.equals(ALTERNATE_OVERPASS_API_1) ? ALTERNATE_OVERPASS_API_2 :
+                        CURRENT_API.equals(ALTERNATE_OVERPASS_API_2) ? OVERPASS_API :
+                                ALTERNATE_OVERPASS_API_1;
                 logger.info("Switching to " + CURRENT_API);
                 connection = sendRequest(query);
             }
@@ -213,16 +214,15 @@ public class MapAccessManager implements IMapAccessManager {
     }
 
     @Override
-    public Optional<RouteInfo> getRouteInfo(List<Long> osmWayIds) {
+    public Optional<RouteInfo> getRouteInfo(List<Long> osmWayIds, boolean notPedestrian) {
         var query = OsmQueryManager.getMultipleWayAndItsNodesQuery(osmWayIds);
         var overpassNodes = getNodesDocument(query);
         if (overpassNodes.isEmpty()) {
             return Optional.empty();
         }
-
         RouteInfo info;
         try {
-            info = parseWayAndNodes(overpassNodes.get());
+            info = parseWayAndNodes(overpassNodes.get(), notPedestrian);
         } catch (Exception e) {
             logger.warn("Error trying to get route info", e);
             return Optional.empty();
@@ -231,8 +231,9 @@ public class MapAccessManager implements IMapAccessManager {
         return Optional.of(info);
     }
 
-    private static RouteInfo parseWayAndNodes(Document nodesViaOverpass) {
+    private static RouteInfo parseWayAndNodes(Document nodesViaOverpass, boolean notPedestrian) {
         final RouteInfo info = new RouteInfo();
+        final String tagType = notPedestrian ? "highway" : "crossing";
         Node osmRoot = nodesViaOverpass.getFirstChild();
         NodeList osmXMLNodes = osmRoot.getChildNodes();
         for (int i = 1; i < osmXMLNodes.getLength(); i++) {
@@ -246,7 +247,7 @@ public class MapAccessManager implements IMapAccessManager {
                 for (int j = 0; j < nodeChildren.getLength(); ++j) {
                     Node nodeChild = nodeChildren.item(j);
                     if (nodeChild.getNodeName().equals("tag") &&
-                            nodeChild.getAttributes().getNamedItem("k").getNodeValue().equals("crossing") &&
+                            nodeChild.getAttributes().getNamedItem("k").getNodeValue().equals(tagType) &&
                             nodeChild.getAttributes().getNamedItem("v").getNodeValue().equals("traffic_signals")) {
                         var id = Long.parseLong(item.getAttributes().getNamedItem("id").getNodeValue());
                         info.add(id);

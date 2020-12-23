@@ -8,7 +8,6 @@ import java.time.LocalTime;
 import java.time.temporal.ChronoUnit;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static testutils.ThreadHelper.trySleep;
 
 class TimeProviderTests {
 
@@ -19,17 +18,22 @@ class TimeProviderTests {
                 LocalTime.of(10, 10, 10));
         var timeProvider = new TimeProvider();
         int waitTimeMillis = 300;
-        int accuracyMillis = waitTimeMillis / 10;
+        int accuracyMillis = 10;
+        var timeScale = 10;
+        timeProvider.setTimeScale(timeScale);
 
         // Act
         timeProvider.setSimulationStartTime(startTime);
-        trySleep(waitTimeMillis);
+        var updateTime = timeProvider.getUpdateTimeTask(0);
+        for (int i = 0; i < waitTimeMillis / TimeProvider.MS_PER_TICK; ++i) {
+            updateTime.run();
+        }
         var resultTime = timeProvider.getCurrentSimulationTime();
 
         // Assert
         var resultTimeDiff = ChronoUnit.MILLIS.between(startTime, resultTime);
-        var min = TimeProvider.TIME_SCALE * (waitTimeMillis - accuracyMillis);
-        var max = TimeProvider.TIME_SCALE * (waitTimeMillis + accuracyMillis);
+        var min = timeScale * (waitTimeMillis - accuracyMillis);
+        var max = timeScale * (waitTimeMillis + accuracyMillis);
         assertTrue(resultTimeDiff >= min &&
                         resultTimeDiff <= max,
                 "Should be: [" + min + ", " + max + "], but is: " + resultTimeDiff + "[ms]");

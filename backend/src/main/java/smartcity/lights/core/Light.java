@@ -1,23 +1,27 @@
 package smartcity.lights.core;
 
-import agents.utilities.LightColor;
-import gui.CustomWaypointRenderer;
 import org.jetbrains.annotations.NotNull;
-import org.jxmapviewer.viewer.DefaultWaypoint;
-import org.jxmapviewer.viewer.Waypoint;
-import org.jxmapviewer.viewer.WaypointPainter;
 import routing.core.Position;
+import smartcity.lights.LightColor;
+import smartcity.lights.OptimizationResult;
+import smartcity.lights.core.data.LightInfo;
 import smartcity.stations.ArrivalInfo;
 
 import java.time.LocalDateTime;
-import java.util.*;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.Map;
+import java.util.Queue;
 
 public class Light extends Position {
+    private static final int TRAFFIC_JAM_THRESHOLD = 2;
+
     private LightColor carLightColor;
     private final long adjacentOsmWayId;
     private final String adjacentCrossingOsmId1;
     private final String adjacentCrossingOsmId2;
     private final long osmLightId;
+    private boolean trafficJamOngoing;
 
     private final Map<String, LocalDateTime> farAwayCarMap = new HashMap<>();
     private final Map<String, LocalDateTime> farAwayPedestrianMap = new HashMap<>();
@@ -31,14 +35,23 @@ public class Light extends Position {
         this.adjacentCrossingOsmId1 = info.adjacentCrossingOsmId1;
         this.adjacentCrossingOsmId2 = info.adjacentCrossingOsmId2;
         this.carLightColor = color;
+        this.trafficJamOngoing = false;
     }
 
     public long getOsmLightId() {
         return osmLightId;
     }
 
+    public void setTrafficJamOngoing(boolean trafficJamOngoing) {
+        this.trafficJamOngoing = trafficJamOngoing;
+    }
+
     public long getAdjacentWayId() {
         return adjacentOsmWayId;
+    }
+
+    public long uniqueId() {
+        return super.longHash();
     }
 
     @NotNull
@@ -50,41 +63,8 @@ public class Light extends Position {
         return adjacentCrossingOsmId2;
     }
 
-    public int getGreenGroupSize() {
-        if (isGreen()) {
-            return carQueue.size();
-        }
-
-        return pedestrianQueue.size();
-    }
-
-    public int getRedGroupSize() {
-        if (isGreen()) {
-            return pedestrianQueue.size();
-        }
-
-        return carQueue.size();
-    }
-
-    public Collection<LocalDateTime> getFarAwayTimeCollection() {
-        if (isGreen()) {
-            return farAwayCarMap.values();
-        }
-
-        return farAwayPedestrianMap.values();
-    }
-
     public boolean isGreen() {
         return carLightColor == LightColor.GREEN;
-    }
-
-    void draw(Collection<Waypoint> lightSet, WaypointPainter<Waypoint> painter) {
-        lightSet.add(new DefaultWaypoint(getLat(), getLng()));
-        switch (carLightColor) {
-            case RED -> painter.setRenderer(new CustomWaypointRenderer("light_red.png"));
-            case YELLOW -> painter.setRenderer(new CustomWaypointRenderer("light_yellow.png"));
-            case GREEN -> painter.setRenderer(new CustomWaypointRenderer("light_green.png"));
-        }
     }
 
     public void switchLight() {
@@ -101,7 +81,9 @@ public class Light extends Position {
     }
 
     void removeCarFromFarAwayQueue(String agentName) {
-        farAwayCarMap.remove(agentName);
+        if (!farAwayCarMap.containsKey(agentName)) {
+            farAwayCarMap.remove(agentName);
+        }
     }
 
     void addPedestrianToFarAwayQueue(ArrivalInfo arrivalInfo) {
@@ -132,7 +114,43 @@ public class Light extends Position {
         }
     }
 
+    private boolean trafficJamEmerged() {
+        return carQueue.size() >= TRAFFIC_JAM_THRESHOLD && !trafficJamOngoing;
+    }
 
+    private boolean trafficJamDisappeared() {
+        if (carQueue.size() <= TRAFFIC_JAM_THRESHOLD && trafficJamOngoing) {
+            trafficJamOngoing = false;
+            return true;
+        }
+        return false;
+    }
 
+    final void checkForTrafficJams(final OptimizationResult result) {
+        if (trafficJamEmerged()) {
+            result.setShouldNotifyCarAboutStartOfTrafficJamOnThisLight(this, carQueue.size(), getAdjacentWayId());
+            // TODO: consider making it a list of jammed traffic lights !!! or some more clever way
+            // just not to ignore it
+            result.setCarStuckInJam(carQueue.peek());
+        }
+        else if (trafficJamDisappeared()) {
+            result.setShouldNotifyCarAboutEndOfTrafficJamOnThisLight(getLat(), getLng(), getAdjacentWayId());
+        }
+    }
 
+    int[] getFarawayCarsAndPedestriansWithinInterval(LocalDateTime from, LocalDateTime to) {
+        int[] groups = new int[2];
+        for (var time : farAwayCarMap.values()) {
+            if (time.isAfter(from) && time.isBefore(to)) {
+                ++groups[0];
+            }
+        }
+        for (var time : farAwayPedestrianMap.values()) {
+            if (time.isAfter(from) && time.isBefore(to)) {
+                ++groups[1];
+            }
+        }
+
+        return groups;
+    }
 }

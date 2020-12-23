@@ -1,28 +1,38 @@
 package smartcity.lights.core;
 
-import agents.utilities.LightColor;
-import org.jxmapviewer.viewer.Waypoint;
-import org.jxmapviewer.viewer.WaypointPainter;
+import com.google.common.annotations.VisibleForTesting;
+import org.jetbrains.annotations.NotNull;
+import smartcity.lights.LightColor;
+import smartcity.lights.core.data.LightInfo;
 
 import java.util.*;
 
-class SimpleLightGroup {
+public class SimpleLightGroup implements Iterable<Light> {
     private final Set<Light> lights;
+    private final LightColor initialColor;
 
-    SimpleLightGroup(List<LightInfo> infoList, LightColor color) {
-        lights = new HashSet<>();
+    SimpleLightGroup(LightColor initColor, List<LightInfo> infoList) {
+        this.lights = new HashSet<>();
         for (LightInfo info : infoList) {
-            lights.add(new Light(info, color));
+            lights.add(new Light(info, initColor));
         }
+        initialColor = initColor;
     }
 
-    void drawLights(WaypointPainter<Waypoint> painter) {
-        HashSet<Waypoint> set = new HashSet<>();
-        for (Light light : lights) {
-            light.draw(set, painter);
-        }
+    @VisibleForTesting
+    public SimpleLightGroup(Collection<Light> lights) {
+        this.lights = new HashSet<>(lights);
 
-        painter.setWaypoints(set);
+        var light = lights.stream().findAny();
+        LightColor color = LightColor.RED;
+        if (light.isPresent()) {
+            color = light.get().isGreen() ? LightColor.GREEN : LightColor.RED;
+        }
+        this.initialColor = color;
+    }
+
+    public LightColor getInitialColor() {
+        return initialColor;
     }
 
     void switchLights() {
@@ -31,11 +41,13 @@ class SimpleLightGroup {
         }
     }
 
-    Map<? extends Long, ? extends Light> prepareMap() {
-        Map<Long, Light> lightMap = new HashMap<>();
-        for (Light light : lights) {
-            lightMap.put(light.getAdjacentWayId(), light);
-        }
-        return lightMap;
+    public Collection<? extends Light> getLights() {
+        return lights;
+    }
+
+    @NotNull
+    @Override
+    public Iterator<Light> iterator() {
+        return lights.iterator();
     }
 }

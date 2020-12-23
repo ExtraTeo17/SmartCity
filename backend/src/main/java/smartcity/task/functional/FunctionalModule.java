@@ -4,6 +4,7 @@ import com.google.inject.Binder;
 import com.google.inject.TypeLiteral;
 import com.google.inject.assistedinject.FactoryModuleBuilder;
 import genesis.AbstractModule;
+import smartcity.lights.core.LightSwitcher;
 import smartcity.task.data.ISwitchLightsContext;
 
 import java.util.function.Function;

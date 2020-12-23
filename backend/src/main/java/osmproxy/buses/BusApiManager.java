@@ -10,7 +10,7 @@ import osmproxy.abstractions.IMapAccessManager;
 import osmproxy.buses.abstractions.IBusApiManager;
 import routing.core.IZone;
 import utilities.ConditionalExecutor;
-import utilities.FileWriterWrapper;
+import utilities.FileWrapper;
 
 import java.net.URL;
 import java.util.List;
@@ -34,11 +34,10 @@ public class BusApiManager implements IBusApiManager {
         var overpassInfo = mapAccessManager.getNodesDocument(query);
 
         ConditionalExecutor.debug(() -> {
-            overpassInfo.ifPresent(info -> {
-                logger.info("Writing bus-data to: " + FileWriterWrapper.DEFAULT_OUTPUT_PATH_XML);
-                FileWriterWrapper.write(info);
-            });
-        });
+            logger.info("Writing bus-data to: " + FileWrapper.DEFAULT_OUTPUT_PATH_XML);
+            //noinspection OptionalGetWithoutIsPresent
+            FileWrapper.write(overpassInfo.get());
+        }, overpassInfo.isPresent());
 
         return overpassInfo;
     }
@@ -63,7 +62,7 @@ public class BusApiManager implements IBusApiManager {
         ConditionalExecutor.debug(() -> {
             String path = "target/line_" + busLine + "_stop_" + busStopId + "_" + busStopNr + ".json";
             logger.info("Writing bus-brigade-date to: " + path);
-            FileWriterWrapper.write(jsonString, path);
+            FileWrapper.write(jsonString, path);
         });
 
         return Optional.of(jsonString);
@@ -77,10 +76,10 @@ public class BusApiManager implements IBusApiManager {
         ConditionalExecutor.debug(() -> {
             //noinspection OptionalGetWithoutIsPresent
             var result = resultOpt.get();
-            String path = "busWays_" + waysIds.get(0) + "_" +
+            String path = "target/busWays_" + waysIds.get(0) + "_" +
                     waysIds.get(waysIds.size() - 1) + ".xml";
             logger.info("Writing bus-ways to: " + path);
-            FileWriterWrapper.write(result, path);
+            FileWrapper.write(result, path);
         }, resultOpt.isPresent());
 
         return resultOpt;
@@ -103,7 +102,10 @@ public class BusApiManager implements IBusApiManager {
      * @return Query string for downloading timetable for specified line from WarszawskieAPI
      */
     private static String getBusTimetablesWarszawskieQuery(String busStopId, String busStopNr, String busLine) {
-        return "https://api.um.warszawa.pl/api/action/dbtimetable_get/?id=e923fa0e-d96c-43f9-ae6e-60518c9f3238&busstopId=" +
-                busStopId + "&busstopNr=" + busStopNr + "&line=" + busLine + "&apikey=400dacf8-9cc4-4d6c-82cc-88d9311401a5";
+        var request = "https://api.um.warszawa.pl/api/action/dbtimetable_get/?id=e923fa0e-d96c-43f9-ae6e-60518c9f3238&busstopId" +
+                "=" + busStopId + "&busstopNr=" + busStopNr + "&line=" + busLine +
+                "&apikey=3320a2ff-9dc5-4492-83f1-255eaf6778d4";
+        logger.info(request);
+        return request;
     }
 }

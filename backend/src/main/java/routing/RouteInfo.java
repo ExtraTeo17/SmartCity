@@ -16,6 +16,18 @@ public class RouteInfo implements Iterable<OSMWay> {
         ways.add(way);
     }
 
+    public final boolean hasNoWays() {
+        return ways.isEmpty();
+    }
+
+    public final OSMWay getFirst() {
+        return ways.get(0);
+    }
+
+    public final OSMWay getLast() {
+        return ways.get(ways.size() - 1);
+    }
+
     boolean remove(long lightOsmId) {
         return lightOsmIds.remove(lightOsmId);
     }
@@ -27,8 +39,14 @@ public class RouteInfo implements Iterable<OSMWay> {
     // TODO: ways.size() == 1?
     // TODO: Add some tests for this function
     void determineRouteOrientationsAndFilterRelevantNodes(String startingOsmNodeRef, String finishingOsmNodeRef) {
-        if (ways.size() == 0 || ways.size() == 1) {
+        if (ways.size() == 0) {
             logger.info("No ways to determine for: " + startingOsmNodeRef + "-" + finishingOsmNodeRef);
+            return;
+        }
+        if (ways.size() == 1) {
+            logger.info("Determine route orientation for single way route info: " + startingOsmNodeRef + "-"
+                    + finishingOsmNodeRef);
+            ways.get(0).determineRouteOrientationAndFilterRelevantNodes(startingOsmNodeRef, finishingOsmNodeRef);
             return;
         }
 

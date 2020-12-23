@@ -1,7 +1,7 @@
 package routing.core;
 
 import org.jetbrains.annotations.NotNull;
-import org.jxmapviewer.viewer.GeoPosition;
+import routing.RoutingHelper;
 import utilities.NumericHelper;
 
 public interface IGeoPosition extends Comparable<IGeoPosition> {
@@ -26,8 +26,12 @@ public interface IGeoPosition extends Comparable<IGeoPosition> {
         };
     }
 
+
+    /**
+     * @return Distance in meters between two lat-lng points
+     */
     default double distance(IGeoPosition other) {
-        return Math.sqrt(this.diff(other).squaredSum());
+        return RoutingHelper.getDistance(this, other);
     }
 
     default IGeoPosition sum(IGeoPosition other) {
@@ -51,6 +55,23 @@ public interface IGeoPosition extends Comparable<IGeoPosition> {
         return new IGeoPosition() {
             private final double lat = IGeoPosition.this.getLat() - other.getLat();
             private final double lng = IGeoPosition.this.getLng() - other.getLng();
+
+            @Override
+            public double getLat() {
+                return lat;
+            }
+
+            @Override
+            public double getLng() {
+                return lng;
+            }
+        };
+    }
+
+    default IGeoPosition multiply(double multipler) {
+        return new IGeoPosition() {
+            private final double lat = IGeoPosition.this.getLat() * multipler;
+            private final double lng = IGeoPosition.this.getLng() * multipler;
 
             @Override
             public double getLat() {
@@ -98,12 +119,7 @@ public interface IGeoPosition extends Comparable<IGeoPosition> {
         return cmp != 0 ? cmp : Double.compare(getLng(), o.getLng());
     }
 
-    default String pointText(){
+    default String toText() {
         return "(" + getLat() + ", " + getLng() + ')';
-    }
-
-    @Deprecated
-    default GeoPosition toMapGeoPosition() {
-        return new GeoPosition(getLat(), getLng());
     }
 }

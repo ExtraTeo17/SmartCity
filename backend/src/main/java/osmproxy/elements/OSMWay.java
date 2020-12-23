@@ -8,20 +8,29 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
+import routing.core.IGeoPosition;
 import routing.core.IZone;
 import routing.core.Position;
+import utilities.ForSerialization;
 import utilities.IterableNodeList;
 import utilities.Siblings;
 
+import java.io.Serializable;
 import java.util.*;
 
-public class OSMWay extends OSMElement {
+public class OSMWay extends OSMElement implements Serializable {
     private static final Logger logger = LoggerFactory.getLogger(OSMWay.class);
     private final List<String> childNodeIds;
     private final boolean isOneWay;
     private List<OSMWaypoint> waypoints;
     private LightOrientation lightOrientation = null;
     private RouteOrientation routeOrientation = RouteOrientation.FRONT;
+
+    @ForSerialization
+    public OSMWay() {
+        childNodeIds = new ArrayList<>();
+        isOneWay = false;
+    }
 
     public OSMWay(Node item) {
         super(item.getAttributes().getNamedItem("id").getNodeValue());
@@ -65,11 +74,11 @@ public class OSMWay extends OSMElement {
     public String toString() {
         StringBuilder builder = new StringBuilder()
                 .append(super.toString())
-                .append(", waypoints:" + "\n");
+                .append(", waypoints: ");
         for (final OSMWaypoint waypoint : waypoints) {
             builder.append(waypoint).append(", ");
         }
-        return builder.append("\n").toString();
+        return builder.toString();
     }
 
     // TODO: Result is not queried anywhere, why are we adding it?
@@ -341,5 +350,29 @@ public class OSMWay extends OSMElement {
     public enum RouteOrientation {
         BACK,
         FRONT
+    }
+
+    public String findClosestNodeRefTo(IGeoPosition pointA) {
+        String closestNodeRef = null;
+        double minDist = Double.MAX_VALUE;
+        for (final OSMWaypoint point : waypoints) {
+            double currDist = point.distance(pointA);
+            if (currDist < minDist) {
+                minDist = currDist;
+                closestNodeRef = point.getOsmNodeRef();
+            }
+        }
+        return closestNodeRef;
+    }
+
+    // TODO: NEW function -- in case of new bugs start debugging here
+    public void determineRouteOrientationAndFilterRelevantNodes(String startingOsmNodeRef, String finishingOsmNodeRef) {
+        Optional<Integer> startingIndex = indexOf(startingOsmNodeRef);
+        Optional<Integer> finishingIndex = indexOf(finishingOsmNodeRef);
+        determineRouteOrientationAndFilterRelevantNodes(
+                startingIndex.orElseThrow(() -> new IllegalArgumentException(
+                        "Starting OSM node ref: " + startingOsmNodeRef + " was not on way: " + getId())),
+                finishingIndex.orElseThrow(() -> new IllegalArgumentException(
+                        "Starting OSM node ref: " + startingOsmNodeRef + " was not on way: " + getId())));
     }
 }

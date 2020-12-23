@@ -3,8 +3,8 @@ package smartcity.lights.core;
 import com.google.inject.Binder;
 import com.google.inject.Singleton;
 import genesis.AbstractModule;
-import smartcity.lights.abstractions.ICrossroad;
 import smartcity.lights.abstractions.ICrossroadFactory;
+import smartcity.lights.abstractions.ICrossroadParser;
 
 public class LightsModule extends AbstractModule {
     @Override

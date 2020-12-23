@@ -7,15 +7,17 @@ import routing.abstractions.IRoutingHelper;
 import routing.core.IZone;
 import routing.core.Position;
 import routing.core.Zone;
+import smartcity.config.abstractions.IGenerationConfigContainer;
+import smartcity.lights.LightColor;
 import smartcity.task.abstractions.ITaskProvider;
 import smartcity.task.runnable.abstractions.IRunnableFactory;
 import smartcity.task.runnable.abstractions.IVariableExecutionRunnable;
+import utilities.Siblings;
 
-import java.util.Arrays;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Supplier;
 
-import static mocks.TestInstanceCreator.createLight;
+import static mocks.TestInstanceCreator.createLightGroup;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
@@ -27,17 +29,19 @@ class TaskManagerTests {
     @Test
     void scheduleSwitchLightTask_shouldStartEndlessTask() {
         // Arrange
-        var lights = Arrays.asList(createLight(), createLight(), createLight());
+        var lightsA = createLightGroup(LightColor.RED);
+        var lightsB = createLightGroup(LightColor.GREEN);
+        var lights = Siblings.of(lightsA, lightsB);
         var taskProvider = mock(ITaskProvider.class);
         Supplier<Integer> switchLightTask = () -> 100;
-        when(taskProvider.getSwitchLightsTask(lights)).thenReturn(switchLightTask);
+        when(taskProvider.getSwitchLightsTask(1, lights)).thenReturn(switchLightTask);
 
         var runnableFactory = mock(IRunnableFactory.class);
         var runContext = new Object() {
             boolean ranOnce = false;
             boolean ranEndless = false;
         };
-        when(runnableFactory.create(ArgumentMatchers.<Supplier<Integer>>any(), any(boolean.class))).thenReturn(new IVariableExecutionRunnable() {
+        when(runnableFactory.createDelay(ArgumentMatchers.any(), any(boolean.class))).thenReturn(new IVariableExecutionRunnable() {
             @Override
             public void runOnce(int initialDelay, TimeUnit timeUnit) {
                 runContext.ranOnce = true;
@@ -52,7 +56,7 @@ class TaskManagerTests {
         var taskManager = getTaskManager(taskProvider, runnableFactory);
 
         // Act
-        taskManager.scheduleSwitchLightTask(lights);
+        taskManager.scheduleSwitchLightTask(1, lights);
 
         // Assert
         assertTrue(runContext.ranEndless, "RunEndless should be invoked");
@@ -63,7 +67,8 @@ class TaskManagerTests {
         IAgentsContainer agentsContainer = mock(IAgentsContainer.class);
         IRoutingHelper routingHelper = mock(IRoutingHelper.class);
         IZone zone = Zone.of(Position.of(1, 1), 1);
+        IGenerationConfigContainer configContainer = mock(IGenerationConfigContainer.class);
 
-        return new TaskManager(runnableFactory, agentsContainer, routingHelper, taskProvider, zone);
+        return new TaskManager(runnableFactory, agentsContainer, routingHelper, taskProvider, configContainer, zone);
     }
 }

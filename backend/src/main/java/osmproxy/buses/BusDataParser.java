@@ -57,14 +57,14 @@ public class BusDataParser implements IBusDataParser {
         for (var osmNode : osmXMLNodes) {
             var nodeName = osmNode.getNodeName();
             if (nodeName.equals("relation")) {
-                var busInfo = parseRelation(osmNode);
-                if (busInfo.isEmpty()) {
+                var busInfoData = parseRelation(osmNode);
+                if (busInfoData.isEmpty()) {
                     if (++errors < 5) {
                         continue;
                     }
-                    throw new RuntimeException("Too much errors when parsing busInfo");
+                    throw new RuntimeException("Too many errors when parsing busInfo");
                 }
-                busInfoDataSet.add(busInfo.get());
+                busInfoDataSet.add(busInfoData.get());
             }
             else if (nodeName.equals("node")) {
                 var station = parseNode(osmNode, busStopsMap::containsKey);
@@ -73,10 +73,19 @@ public class BusDataParser implements IBusDataParser {
         }
 
         var busInfos = busDataMerger.getBusInfosWithStops(busInfoDataSet, busStopsMap);
+        
+        List<String> busLinesOfInfosToRemoveCauseOfMissingTimetableInWarszawskieAPI = new ArrayList<>();
         for (var busInfo : busInfos) {
             var brigadeInfos = generateBrigadeInfos(busInfo.busLine, busInfo.stops);
-            busInfo.addBrigades(brigadeInfos);
-        }
+            if (brigadeInfos.size() > 0) {
+                busInfo.addBrigades(brigadeInfos);
+            } else {
+            	busLinesOfInfosToRemoveCauseOfMissingTimetableInWarszawskieAPI.add(busInfo.busLine);
+            	logger.info("Warning: Timetable for bus line " + busInfo.busLine + " is empty in Warszawskie API. Line will not be considered");
+            }
+		}
+		busInfos.removeIf(info -> busLinesOfInfosToRemoveCauseOfMissingTimetableInWarszawskieAPI.stream()
+				.anyMatch(line -> info.busLine.equals(line)));
 
         return new BusPreparationData(busInfos, busStopsMap);
     }
@@ -113,7 +122,7 @@ public class BusDataParser implements IBusDataParser {
             return Optional.empty();
         }
         logger.debug("Started parsing ways: " + waysIds.get(0) + "_" + waysIds.get(waysIds.size() - 1));
-        List<OSMWay> ways = parseOsmWays(waysDoc.get());
+        List<OSMWay> ways = parseOsmWays(waysDoc.get()); // TODO: reuse in car
 
         return Optional.of(new BusInfoData(new BusInfo(busLine, ways), stationIds));
     }
@@ -139,26 +148,35 @@ public class BusDataParser implements IBusDataParser {
         route.add(secondWay);
         String adjacentNodeRef = firstWay.orientateWith(secondWay);
         boolean failedToMatchPreviously = false;
-        while (nodesIter.hasNext()) {
-            Node item = nodesIter.next();
-            if (item.getNodeName().equals("way")) {
-                var way = new OSMWay(item);
-                // TODO: CORRECT POTENTIAL BUGS CAUSING ROUTE TO BE CUT INTO PIECES BECAUSE OF RZĄŻEWSKI CASE
-                if (way.startsInZone(zone)) {
-                    var referenceOpt = way.reverseTowardsNode(adjacentNodeRef);
-                    if (referenceOpt.isEmpty()) {
-                        logger.debug("Failed to match way: " + way + " with " + adjacentNodeRef);
-                        failedToMatchPreviously = true;
-                        continue;
-                    }
-                    else if (failedToMatchPreviously) {
-                        logger.info("Reconnected to way: " + way + " after failed match with " + adjacentNodeRef);
-                    }
 
-                    adjacentNodeRef = referenceOpt.get();
-                    route.add(way);
+        List<OSMWay> wayList = new ArrayList<>();
+        int lastIndexInZone = -1;
+        while (nodesIter.hasNext()) {
+            Node wayNode = nodesIter.next();
+            if (wayNode.getNodeName().equals("way")) {
+                var way = new OSMWay(wayNode);
+                // TODO: if not accurate enough, consider changing to node.isInZone (node-based)
+                if (way.isInZone(zone)) {
+                    lastIndexInZone = wayList.size();
                 }
+                wayList.add(way);
             }
+        }
+
+        for (int i = 0; i <= lastIndexInZone; ++i) {
+            var way = wayList.get(i);
+            var referenceOpt = way.reverseTowardsNode(adjacentNodeRef);
+            if (referenceOpt.isEmpty()) {
+                logger.debug("Failed to match way: " + way + " with " + adjacentNodeRef);
+                failedToMatchPreviously = true;
+                continue;
+            }
+            else if (failedToMatchPreviously) {
+                logger.info("Reconnected to way: " + way + " after failed match with " + adjacentNodeRef);
+            }
+
+            adjacentNodeRef = referenceOpt.get();
+            route.add(way);
         }
 
         return route;
@@ -197,29 +215,45 @@ public class BusDataParser implements IBusDataParser {
 
         boolean isPresentVal = isPresent.test(osmId);
         if (!isPresentVal && zone.contains(Position.of(lat, lon))) {
-            var stationNumberOpt = searchForStationNumber(node.getChildNodes());
-            if (stationNumberOpt.isPresent()) {
-                var stationNumber = stationNumberOpt.get();
+            var numberAndTypeOpt = searchForStationNumberAndType(node.getChildNodes());
+            if (numberAndTypeOpt.isPresent()) {
+                var numberAndType = numberAndTypeOpt.get();
+                var stationNumber = numberAndType.first;
+                var type = numberAndType.second;
+                var isPlatform = type.equals("platform");
 
                 logger.debug("Parsing station with number: " + stationNumber);
-                return Optional.of(new OSMStation(osmId, lat, lon, stationNumber));
+                return Optional.of(new OSMStation(osmId, lat, lon, stationNumber, isPlatform));
             }
         }
 
-        logger.debug("Station: " + osmId + " won't be included. IsPresent: " + isPresentVal);
+        logger.trace("Station: " + osmId + " won't be included. IsPresent: " + isPresentVal);
 
         return Optional.empty();
     }
 
-    private Optional<String> searchForStationNumber(NodeList nodes) {
-        return IterableNodeList.of(nodes)
+    private Optional<Siblings<String>> searchForStationNumberAndType(NodeList nodes) {
+        var filteredNodes = IterableNodeList.of(nodes)
                 .stream()
                 .filter(n -> n.getNodeName().equals("tag"))
                 .map(Node::getAttributes)
                 .dropWhile(attr -> !attr.getNamedItem("k").getNodeValue().equals("public_transport"))
-                .filter(attr -> attr.getNamedItem("k").getNodeValue().equals("ref"))
-                .findFirst()
-                .map(attr -> attr.getNamedItem("v").getNodeValue());
+                .collect(Collectors.toList());
+
+        if (filteredNodes.isEmpty()) {
+            return Optional.empty();
+        }
+
+        var type = filteredNodes.get(0).getNamedItem("v").getNodeValue();
+        for (int i = 1; i < filteredNodes.size(); ++i) {
+            var nodesMap = filteredNodes.get(i);
+            if (nodesMap.getNamedItem("k").getNodeValue().equals("ref")) {
+                var nodeNumber = nodesMap.getNamedItem("v").getNodeValue();
+                return Optional.of(Siblings.of(nodeNumber, type));
+            }
+        }
+
+        return Optional.empty();
     }
 
     private Collection<BrigadeInfo> generateBrigadeInfos(String busLine, Collection<OSMStation> osmStations) {

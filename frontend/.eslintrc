@@ -1,7 +1,17 @@
 {
   "parser": "babel-eslint",
-  "plugins": ["jest"],
-  "extends": ["eslint:recommended", "plugin:jest/recommended", "plugin:react/recommended"],
+  "plugins": [
+    "jest",
+    "prettier"
+  ],
+  "extends": [
+    "eslint:recommended",
+    "plugin:jest/recommended",
+    "plugin:react/recommended",
+    "airbnb",
+    "prettier",
+    "eslint-config-prettier"
+  ],
   "env": {
     "browser": true,
     "node": true,
@@ -27,7 +37,7 @@
     "global-require": 0,
     "max-len": [
       2,
-      130,
+      140,
       2, // tabs
       {
         "ignoreUrls": true,
@@ -36,21 +46,66 @@
         "ignoreTemplateLiterals": true
       }
     ],
-    "object-curly-spacing": 0,
+    "object-curly-spacing": 2,
+    "object-curly-newline": 0,
+    "react/jsx-curly-newline": 0,
+    "no-plusplus": 0,
     "camelcase": 1,
+    "arrow-parens": 0,
+    "comma-dangle": 0,
     "no-underscore-dangle": 0,
     "no-unused-vars": 1,
-    "no-undef": "error",
+    "no-undef": 2,
     "consistent-return": 1,
     "no-shadow": 0,
     "no-return-assign": 0,
     "new-cap": 0,
     "no-mixed-operators": 0,
+    "prefer-template": 1,
+    "no-console": 0,
+    "implicit-arrow-linebreak": 0,
+    "function-paren-newline": 0,
+    "no-nested-ternary": 0,
+    "import/prefer-default-export": 0,
+    "operator-linebreak": 0,
+    "radix": 0,
+    "brace-style": [
+      0,
+      "stroustrup"
+    ],
+    "linebreak-style": [
+      1,
+      "windows"
+    ],
+    "quotes": [
+      1,
+      "double"
+    ],
+    "prefer-const": [
+      2,
+      {
+        "destructuring": "all",
+        "ignoreReadBeforeAssign": true
+      }
+    ],
+    "no-bitwise": 0,
     "jest/no-disabled-tests": 1,
     "jest/no-focused-tests": 2,
     "jest/no-identical-title": 2,
     "jest/prefer-to-have-length": 1,
     "jest/valid-expect": 2,
-    "react/prop-types": 0
+    "react/prop-types": 0,
+    "react/jsx-filename-extension": [
+      1,
+      {
+        "extensions": [
+          "js",
+          "jsx"
+        ]
+      }
+    ],
+    "react/jsx-one-expression-per-line": 0,
+    "prettier/prettier": 2,
+    "jsx-a11y/label-has-associated-control": 0
   }
 }

@@ -6,11 +6,14 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.atomic.AtomicInteger;
 
+/**
+ * Generates ID for agents
+ */
 public class IdGenerator implements IRegistrable {
     public static final int resetValue = 1;
     private final ConcurrentMap<Class<?>, AtomicInteger> idMap;
 
-    IdGenerator() {
+    public IdGenerator() {
         this.idMap = new ConcurrentHashMap<>();
     }
 
@@ -33,7 +36,7 @@ public class IdGenerator implements IRegistrable {
     }
 
     public int get(Class<?> type) {
-        return idMap.get(type).getAndIncrement();
+        return idMap.get(type).incrementAndGet();
     }
 
     public void reset(Class<?> type) {

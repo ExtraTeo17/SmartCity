@@ -2,3 +2,31 @@
   border: 1px dotted bisque;
   padding: 1em;
 }
+
+.center-wrapper {
+  text-align: center;
+}
+
+.form-check {
+  display: flex;
+  align-items: center;
+}
+
+.form-check-input {
+  margin-top: 2px;
+}
+
+.small-text {
+  font-size: calc(7px + 0.8vmin);
+  line-height: calc(1.7 * (7px + 0.8vmin));
+}
+
+/* Height adjustment - relative to font-size */
+.custom-switch {
+  line-height: calc(1.1 * (10px + 1vmin));
+  margin-bottom: 0.8rem;
+}
+
+.invalid-input {
+  border: 3px solid red;
+}

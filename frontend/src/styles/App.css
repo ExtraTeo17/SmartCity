@@ -1,9 +1,5 @@
-.App {
-  text-align: center;
-}
-
 .App-header {
-  background-color: #282c34;
+  background-color: #284c44;
   min-height: 100vh;
   display: flex;
   flex-direction: column;
@@ -18,6 +14,18 @@
   color: #61dafb;
 }
 
-.main-container {
-  min-height: 95vh;
+.map-container {
+  min-height: 98vh;
+}
+
+.menu-container {
+  max-height: 95vh;
+  overflow-y: auto;
+}
+
+@media screen and (max-width: 960px) {
+  .menu-container {
+    flex: 0 0 0;
+    min-width: 220px;
+  }
 }

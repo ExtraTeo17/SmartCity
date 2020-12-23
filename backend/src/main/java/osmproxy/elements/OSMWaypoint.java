@@ -2,11 +2,18 @@ package osmproxy.elements;
 
 
 import routing.core.Position;
+import utilities.ForSerialization;
 
+import java.io.Serializable;
 import java.util.Objects;
 
-public class OSMWaypoint extends Position {
+public class OSMWaypoint extends Position implements Serializable {
     private final String osmNodeRef;
+
+    @ForSerialization
+    public OSMWaypoint() {
+        osmNodeRef = "";
+    }
 
     OSMWaypoint(String nodeRef, double lat, double lng) {
         super(lat, lng);

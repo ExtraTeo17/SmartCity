@@ -1,6 +1,5 @@
 package web.message.payloads.models;
 
-import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class Location {
@@ -9,9 +8,8 @@ public class Location {
     @JsonProperty("lng")
     public final double longitude;
 
-    @JsonCreator(mode = JsonCreator.Mode.PROPERTIES)
-    public Location(@JsonProperty("lat") double latitude,
-                    @JsonProperty("lng") double longitude) {
+    public Location(double latitude,
+                    double longitude) {
         this.latitude = latitude;
         this.longitude = longitude;
     }

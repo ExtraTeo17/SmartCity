@@ -2,6 +2,10 @@ package smartcity.stations;
 
 import java.time.LocalDateTime;
 
+/**
+ * Information regarding the forecasted car arrival, mainly the anticipated time
+ * when the car is going to arrive at an object.
+ */
 public class ArrivalInfo {
     public final String agentName;
     public final LocalDateTime arrivalTime;

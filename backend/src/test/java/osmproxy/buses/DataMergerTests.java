@@ -1,6 +1,6 @@
 package osmproxy.buses;
 
-import org.junit.Assert;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
@@ -37,7 +37,7 @@ class DataMergerTests {
                     .map(OSMElement::getId).mapToLong(l -> l).toArray();
             var line = info.busLine;
             var lineIndex = Integer.parseInt(line.substring(lineName.length()));
-            Assert.assertArrayEquals(testCaseName + ": Invalid set\n", stopIds, stopsSets[lineIndex]);
+            Assertions.assertArrayEquals(stopIds, stopsSets[lineIndex], testCaseName + ": Invalid set\n");
         }
     }
 
@@ -110,7 +110,7 @@ class DataMergerTests {
         for (var id : idsSet) {
             var lat = random.nextDouble();
             var lng = random.nextDouble();
-            result.put(id, new OSMStation(id, lat, lng, "ref" + id));
+            result.put(id, new OSMStation(id, lat, lng, "ref" + id, true));
         }
 
         return result;

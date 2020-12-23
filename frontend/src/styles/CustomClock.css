@@ -1,0 +1,9 @@
+/*https://codepen.io/jasonleewilson/pen/gPrxwX*/
+#clock {
+  font: small-caps lighter calc(10px + 2vw) "Segoe UI", Frutiger, "Frutiger Linotype", "Dejavu Sans", "Helvetica Neue", Arial,
+    sans-serif;
+  text-align: left;
+  color: #fff;
+  border-left: 3px solid #ed1f24;
+  padding-left: calc(10px + 0.5vw);
+}
