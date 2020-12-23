@@ -139,13 +139,8 @@ public class BusManagerAgent extends AbstractAgent {
             }
 
             private boolean checkCrashedBuses(String busLine, String brigadeId, ACLMessage rcv) {
-                for(CrashInfo crash : troubleCases)
-                {
-                    if(busLine.equals(crash.busLine) && brigadeId.equals(crash.brigade))
-                    {
-
-
-                        logger.info(rcv.getSender().getLocalName() + "------------------------------------busLine " + crash.busLine+" brigade " + crash.brigade);
+                for (CrashInfo crash : troubleCases) {
+                    if (busLine.equals(crash.busLine) && brigadeId.equals(crash.brigade)) {
                         return true;
                     }
                 }

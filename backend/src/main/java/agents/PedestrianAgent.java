@@ -77,10 +77,7 @@ public class PedestrianAgent extends AbstractAgent {
 
     @Override
     protected void setup() {
-        logger.info("osm start station"+ pedestrian.getStartingStation().getOsmId() + "osm finish station" + pedestrian.getStationFinish().getOsmId());
-        logger.info(pedestrian.getDisplayRouteAfterBus().get(pedestrian.getDisplayRouteAfterBus().size()-1)+"");
         informWhichBusLine();
-
         informLightManager(pedestrian);
 
         pedestrian.setState(DrivingState.MOVING);
@@ -231,6 +228,7 @@ public class PedestrianAgent extends AbstractAgent {
 
                             if (!pedestrian.isAtDestination()) {
                                 quitBus();
+                                pedestrian.setState(DrivingState.PASSING_STATION);
                             }
                             informLightManager(pedestrian);
                         }
@@ -485,7 +483,6 @@ public class PedestrianAgent extends AbstractAgent {
     private void quitBus(boolean shouldShowRoute) {
         print("Quit bus", LoggerLevel.DEBUG);
         pedestrian.move();
-        pedestrian.setState(DrivingState.PASSING_STATION);
         eventBus.post(new PedestrianAgentLeftBusEvent(this.getId(), pedestrian.getPosition(), shouldShowRoute));
     }
 
