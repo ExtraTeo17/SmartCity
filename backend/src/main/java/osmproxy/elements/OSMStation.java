@@ -13,6 +13,8 @@ public class OSMStation extends OSMNode implements Serializable {
     public OSMStation(long osmId, double lat, double lng,
                       final String stationRef, boolean isPlatform) {
         super(osmId, lat, lng);
+
+
         this.stopNumber = stationRef.substring(stationRef.length() - 2);
         this.stopId = stationRef.substring(0, stationRef.length() - 2);
         this.isPlatform = isPlatform;
