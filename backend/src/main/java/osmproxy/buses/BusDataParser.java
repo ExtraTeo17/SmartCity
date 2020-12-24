@@ -2,6 +2,10 @@ package osmproxy.buses;
 
 import com.google.common.base.Joiner;
 import com.google.inject.Inject;
+import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
+import org.json.simple.parser.ParseException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
@@ -65,27 +69,26 @@ public class BusDataParser implements IBusDataParser {
                     throw new RuntimeException("Too many errors when parsing busInfo");
                 }
                 busInfoDataSet.add(busInfoData.get());
-            }
-            else if (nodeName.equals("node")) {
+            } else if (nodeName.equals("node")) {
                 var station = parseNode(osmNode, busStopsMap::containsKey);
                 station.ifPresent(st -> busStopsMap.put(st.getId(), st));
             }
         }
 
         var busInfos = busDataMerger.getBusInfosWithStops(busInfoDataSet, busStopsMap);
-        
+
         List<String> busLinesOfInfosToRemoveCauseOfMissingTimetableInWarszawskieAPI = new ArrayList<>();
         for (var busInfo : busInfos) {
             var brigadeInfos = generateBrigadeInfos(busInfo.busLine, busInfo.stops);
             if (brigadeInfos.size() > 0) {
                 busInfo.addBrigades(brigadeInfos);
             } else {
-            	busLinesOfInfosToRemoveCauseOfMissingTimetableInWarszawskieAPI.add(busInfo.busLine);
-            	logger.info("Warning: Timetable for bus line " + busInfo.busLine + " is empty in Warszawskie API. Line will not be considered");
+                busLinesOfInfosToRemoveCauseOfMissingTimetableInWarszawskieAPI.add(busInfo.busLine);
+                logger.info("Warning: Timetable for bus line " + busInfo.busLine + " is empty in Warszawskie API. Line will not be considered");
             }
-		}
-		busInfos.removeIf(info -> busLinesOfInfosToRemoveCauseOfMissingTimetableInWarszawskieAPI.stream()
-				.anyMatch(line -> info.busLine.equals(line)));
+        }
+        busInfos.removeIf(info -> busLinesOfInfosToRemoveCauseOfMissingTimetableInWarszawskieAPI.stream()
+                .anyMatch(line -> info.busLine.equals(line)));
 
         return new BusPreparationData(busInfos, busStopsMap);
     }
@@ -101,13 +104,11 @@ public class BusDataParser implements IBusDataParser {
                 if (attributes.getNamedItem("role").getNodeValue().contains("stop") &&
                         attributes.getNamedItem("type").getNodeValue().equals("node")) {
                     stationIds.add(id);
-                }
-                else if (attributes.getNamedItem("role").getNodeValue().length() == 0 &&
+                } else if (attributes.getNamedItem("role").getNodeValue().length() == 0 &&
                         attributes.getNamedItem("type").getNodeValue().equals("way")) {
                     waysIds.add(id);
                 }
-            }
-            else if (node.getNodeName().equals("tag")) {
+            } else if (node.getNodeName().equals("tag")) {
                 NamedNodeMap attributes = node.getAttributes();
                 Node namedItemID = attributes.getNamedItem("k");
                 if (namedItemID.getNodeValue().equals("ref")) {
@@ -170,8 +171,7 @@ public class BusDataParser implements IBusDataParser {
                 logger.debug("Failed to match way: " + way + " with " + adjacentNodeRef);
                 failedToMatchPreviously = true;
                 continue;
-            }
-            else if (failedToMatchPreviously) {
+            } else if (failedToMatchPreviously) {
                 logger.info("Reconnected to way: " + way + " after failed match with " + adjacentNodeRef);
             }
 
@@ -193,8 +193,7 @@ public class BusDataParser implements IBusDataParser {
                     if (way.isInZone(zone)) {
                         firstWay = way;
                     }
-                }
-                else if (firstWay.isConnectedTo(way)) {
+                } else if (firstWay.isConnectedTo(way)) {
                     secondWay = way;
                 }
             }
@@ -265,6 +264,12 @@ public class BusDataParser implements IBusDataParser {
                 continue;
             }
 
+            if (!isDataInAPI(jsonStringOpt)) {
+                logger.info("Please choose another zone because Warszawskie API didn't provide with data for station id:" + station.getBusStopId());
+                continue;
+            }
+
+
             var jsonString = jsonStringOpt.get();
             var timetableRecords = apiSerializer.serializeTimetables(jsonString);
             var brigadeIdToRecords = timetableRecords.stream()
@@ -276,8 +281,7 @@ public class BusDataParser implements IBusDataParser {
                 var brigadeInfo = brigadeInfoMap.get(brigadeId);
                 if (brigadeInfo == null) {
                     brigadeInfoMap.put(brigadeId, new BrigadeInfo(brigadeId, stationId, brigadeTimeRecords));
-                }
-                else {
+                } else {
                     brigadeInfo.addTimetableRecords(stationId, brigadeTimeRecords);
                 }
 
@@ -286,6 +290,19 @@ public class BusDataParser implements IBusDataParser {
         }
 
         return brigadeInfoMap.values();
+    }
+
+    private boolean isDataInAPI(Optional<String> jsonStringOpt) {
+        JSONParser parser = new JSONParser();
+        JSONObject obj = null;
+        try {
+            obj = (JSONObject) parser.parse(jsonStringOpt.get());
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+        JSONArray result = (JSONArray) (obj.get("result"));
+
+        return result.size() == 0 ? false : true;
     }
 
     private void logBrigadeData(List<TimetableRecord> timetableRecords, OSMStation station, String busLine) {
