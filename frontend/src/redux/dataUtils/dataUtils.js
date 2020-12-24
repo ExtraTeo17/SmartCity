@@ -2,7 +2,7 @@ import { storageKey } from "../../constants/global";
 
 /**
  * @category Redux
- * @module helpers
+ * @module dataUtils
  */
 
 /**
@@ -13,7 +13,7 @@ import { storageKey } from "../../constants/global";
  */
 
 /**
- *
+ * @function
  * @param {String} type - Type of test object
  * @param {testObjectData} resultData - Test object
  */
@@ -33,8 +33,8 @@ export const getResultObj = (type, { id, travelTime, travelDistance }) => {
 };
 
 /**
- * @name localStorage
  * Local storage
+ * @constant localStorage
  */
 export const { localStorage } = window;
 
@@ -46,6 +46,7 @@ export const { localStorage } = window;
 
 /**
  * Used to create local-storage data from redux state
+ * @function
  * @param {Object} state - interaction reducer state
  * @param {module:ApiManager~PrepareSimulationData} state.prepareSimulationData
  * @param {module:ApiManager~StartSimulationData} state.startSimulationData
@@ -57,6 +58,7 @@ export const createLocalDataObject = state => {
 
 /**
  * Used to save data to local storage
+ * @function
  * @param {localStorageData} data
  */
 export const saveLocalData = data => {
@@ -66,6 +68,7 @@ export const saveLocalData = data => {
 
 /**
  * Used to load data from local storage
+ * @function
  * @returns {localStorageData}
  */
 export const loadLocalData = () => {
