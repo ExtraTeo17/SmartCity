@@ -1,7 +1,7 @@
 import { notify } from "react-notify-toast";
 import { NOTIFY_SHOW_MS } from "../../constants/global";
 import { LightColor } from "../../components/Models/LightColor";
-import { getResultObj } from "../dataUtils/helpers";
+import { getResultObj } from "../dataUtils/dataUtils";
 import { getRandomInt } from "../../utils/helpers";
 import {
   SIMULATION_PREPARE_STARTED,

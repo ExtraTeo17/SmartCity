@@ -10,6 +10,13 @@ import {
 
 /**
  * Handles bus-agent-related interaction
+ *  - SIMULATION_PREPARED
+ *  - BUS_UPDATED
+ *  - BATCHED_UPDATE
+ *  - BUS_FILL_STATE_UPDATED
+ *  - BUS_KILLED
+ *  - BUS_CRASHED
+ *
  * @category Redux
  * @subcategory Reducers
  * @module bus

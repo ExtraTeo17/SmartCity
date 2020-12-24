@@ -37,7 +37,7 @@ import {
   D_TRANSPORT_CHANGE_STRATEGY_ACTIVE,
 } from "../../constants/defaults";
 import { ConfigState, getNextConfigState } from "../models/states";
-import { createLocalDataObject, saveLocalData } from "../dataUtils/helpers";
+import { createLocalDataObject, saveLocalData } from "../dataUtils/dataUtils";
 
 /**
  * Handles interaction with user interface

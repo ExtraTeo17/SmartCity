@@ -9,6 +9,13 @@ import {
 
 /**
  * Handles pedestrian-agent-related interaction
+ *  - PEDESTRIAN_CREATED
+ *  - PEDESTRIAN_UPDATED
+ *  - BATCHED_UPDATE
+ *  - PEDESTRIAN_PUSHED
+ *  - PEDESTRIAN_PULLED_AWAY
+ *  - PEDESTRIAN_KILLED
+ *
  * @category Redux
  * @subcategory Reducers
  * @module pedestrian

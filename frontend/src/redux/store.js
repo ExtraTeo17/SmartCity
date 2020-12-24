@@ -30,7 +30,7 @@ import {
   D_DETECT_TRAFFIC_JAMS,
   D_TRANSPORT_CHANGE_STRATEGY_ACTIVE,
 } from "../constants/defaults";
-import { loadLocalData } from "./dataUtils/helpers";
+import { loadLocalData } from "./dataUtils/dataUtils";
 import { ConfigState } from "./models/states";
 import appReducer from "./reducers/index";
 
@@ -43,6 +43,7 @@ import appReducer from "./reducers/index";
 const initialState = {
   interaction: {
     configState: ConfigState.Initial,
+
     /**
      * @type {module:ApiManager~PrepareSimulationData}
      */
