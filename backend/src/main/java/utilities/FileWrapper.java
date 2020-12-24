@@ -94,6 +94,7 @@ public class FileWrapper {
         Object data = null;
         FileInputStream fileStream = null;
         ObjectInputStream objectStream = null;
+        boolean error = false;
         try {
             var file = new File(path);
             if (file.exists()) {
@@ -103,7 +104,7 @@ public class FileWrapper {
             }
         } catch (Exception e) {
             logger.warn("Could not read file: " + path, e);
-            tryDeleteFile(path);
+            error = true;
         }
 
         try {
@@ -115,6 +116,10 @@ public class FileWrapper {
             }
         } catch (Exception e) {
             logger.info("Failed to close file streams");
+        }
+
+        if (error) {
+            tryDeleteFile(path);
         }
 
         return data;
