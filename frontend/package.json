@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
-    "leaflet": "1.6.0",
+    "leaflet": "^1.7.1",
     "leaflet-rotatedmarker": "^0.2.0",
     "moment": "2.29.1",
     "react": "^16.14.0",
@@ -13,7 +13,7 @@
     "react-leaflet": "2.7.0",
     "react-leaflet-markercluster": "^2.0.0",
     "react-live-clock": "^5.0.13",
-    "react-notify-toast": "0.5.1",
+    "react-notify-toast": "^0.5.1",
     "react-redux": "^7.2.2",
     "react-scripts": "^3.4.4",
     "redux": "^4.0.5",
@@ -22,7 +22,7 @@
   },
   "devDependencies": {
     "@types/jest": "24.9.0",
-    "better-docs": "2.3.2",
+    "better-docs": "^2.3.2",
     "enzyme": "^3.11.0",
     "enzyme-adapter-react-16": "^1.15.5",
     "eslint": "^6.8.0",
@@ -35,11 +35,11 @@
     "eslint-plugin-jsx-a11y": "^6.4.1",
     "eslint-plugin-prettier": "^3.3.0",
     "eslint-plugin-react": "^7.21.5",
-    "jest": "24.9.0",
-    "jsdoc": "3.6.6",
+    "jest": "^24.9.0",
+    "jsdoc": "^3.6.6",
     "prettier": "^1.19.1",
     "prettier-eslint": "^11.0.0",
-    "redux-devtools-extension": "2.13.8"
+    "redux-devtools-extension": "^2.13.8"
   },
   "scripts": {
     "start": "react-scripts start",
