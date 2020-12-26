@@ -6,6 +6,7 @@
 
 /**
  * @enum {number} Light color
+ * @memberof module:Models
  */
 export const LightColor = {
   GREEN: 0,
