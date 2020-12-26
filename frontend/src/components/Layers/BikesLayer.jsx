@@ -5,6 +5,20 @@ import { FeatureGroup } from "react-leaflet";
 import Bike from "../Markers/Bike";
 import BikeRoute from "../Routes/BikeRoute";
 
+/**
+ * Bikes layer - contains all bike markers and routes
+ * @category Layers
+ * @module BikesLayer
+ */
+
+/**
+ * @typedef {Object} Props
+ * @property {Object[]} bikes
+ */
+
+/**
+ * @param {Props} props
+ */
 const BikesLayer = props => {
   const { bikes = [] } = props;
 
