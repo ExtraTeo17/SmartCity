@@ -1,5 +1,11 @@
 import L from "leaflet";
 
+/**
+ * Contains configuration of all marker icons
+ * @category Main
+ * @module Icons
+ */
+
 export const greenLightIcon = new L.Icon({
   iconUrl: "/images/light_green.png",
   iconRetinaUrl: "/images/light_green.png",
