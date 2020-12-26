@@ -13,9 +13,9 @@ import {
  *  - SIMULATION_PREPARED
  *  - BUS_UPDATED
  *  - BATCHED_UPDATE
- *  - BUS_FILL_STATE_UPDATED
+ *  - BUS_FILL_STATE_UPDATED - bus crowdedness level changed
  *  - BUS_KILLED
- *  - BUS_CRASHED
+ *  - BUS_CRASHED - bus is broken
  *
  * @category Redux
  * @subcategory Reducers

@@ -12,8 +12,8 @@ import {
  *  - PEDESTRIAN_CREATED
  *  - PEDESTRIAN_UPDATED
  *  - BATCHED_UPDATE
- *  - PEDESTRIAN_PUSHED
- *  - PEDESTRIAN_PULLED_AWAY
+ *  - PEDESTRIAN_PUSHED - pedestrian inside bus
+ *  - PEDESTRIAN_PULLED_AWAY - pedestrian outside bus
  *  - PEDESTRIAN_KILLED
  *
  * @category Redux
