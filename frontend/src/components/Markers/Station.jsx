@@ -4,7 +4,7 @@ import { STATIC_Z_INDEX } from "../../constants/markers";
 import { stationIcon } from "../../styles/icons";
 
 /**
- * Station marker
+ * Station marker.
  * @category Markers
  * @module Station
  */

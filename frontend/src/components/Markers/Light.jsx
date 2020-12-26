@@ -7,7 +7,7 @@ import { STATIC_Z_INDEX } from "../../constants/markers";
 import "../../styles/Light.css";
 
 /**
- * Light marker
+ * Light marker.
  * @category Markers
  * @module Light
  */

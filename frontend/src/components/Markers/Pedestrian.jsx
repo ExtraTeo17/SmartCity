@@ -7,7 +7,7 @@ import { getRotationReducer } from "./Extensions/reducers";
 import RotatedMarker from "./Extensions/RotatedMarker";
 
 /**
- * Pedestrian marker
+ * Pedestrian marker.
  * @category Markers
  * @module Pedestrian
  */

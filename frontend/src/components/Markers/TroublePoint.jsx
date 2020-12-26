@@ -4,7 +4,7 @@ import { STATIC_Z_INDEX } from "../../constants/markers";
 import { troublePointIcon, accidentIcon } from "../../styles/icons";
 
 /**
- * TroublePoint marker
+ * TroublePoint marker.
  * @category Markers
  * @module TroublePoint
  */

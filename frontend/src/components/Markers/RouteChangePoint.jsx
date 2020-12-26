@@ -3,7 +3,7 @@ import { Popup, CircleMarker } from "react-leaflet";
 import { STATIC_Z_INDEX } from "../../constants/markers";
 
 /**
- * RouteChangePoint marker - used with car routes
+ * RouteChangePoint marker - used with car routes.
  * @category Markers
  * @module RouteChangePoint
  */

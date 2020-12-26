@@ -10,7 +10,7 @@ import RotatedMarker from "./Extensions/RotatedMarker";
 import "../../styles/Bus.css";
 
 /**
- * Bus marker
+ * Bus marker.
  * @category Markers
  * @module Bus
  */

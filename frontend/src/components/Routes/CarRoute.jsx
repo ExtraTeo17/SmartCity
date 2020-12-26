@@ -6,7 +6,7 @@ import { generateRandomColor } from "../../utils/helpers";
 import { COLORS_NUMBER, DEFAULT_WEIGHT } from "./constants";
 
 /**
- * Car route
+ * Car route, also contains route change points.
  * @category Routes
  * @module CarRoute
  */
