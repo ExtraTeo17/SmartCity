@@ -7,9 +7,9 @@ import { storageKey } from "../../constants/global";
 
 /**
  * @typedef testObjectData
- * @property {Number} id
- * @property {Number} travelTime
- * @property {Number} travelDistance
+ * @property {number} id
+ * @property {number} travelTime
+ * @property {number} travelDistance
  */
 
 /**

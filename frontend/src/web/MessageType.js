@@ -167,7 +167,7 @@ const UPDATE_BIKE_INFO = 51;
 const KILL_BIKE_INFO = 52;
 
 /**
- * @typedef {Number} MessageType
+ * @typedef {number} MessageType
  * @enum {MessageType}
  */
 export {
