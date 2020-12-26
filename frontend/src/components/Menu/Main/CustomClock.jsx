@@ -2,17 +2,12 @@ import React, { useEffect, useState } from "react";
 import { connect } from "react-redux";
 import "../../../styles/CustomClock.css";
 
-/**
- *  Main menu tab, contains:
- *  - zone data, i.e. coordinates and radius
- *  - time and time-scale of simulation
- *  - use-fixed-routes checkbox - routes stay the same for each re-run at the same position
- * @category Menu
- * @module MainMenu
- */
-
 export const timeUpdateScaledThresholdMs = 999;
 export const timeUpdateThresholdMs = 49;
+
+/**
+ * @category Menu
+ */
 
 const dateFormat = new Intl.DateTimeFormat("pl-PL", {
   year: "numeric",
@@ -27,6 +22,7 @@ const timeFormat = new Intl.DateTimeFormat("pl-PL", {
 
 /**
  * @typedef {Object} Props - CustomClock parameters
+ * @memberof module:MainMenu
  * @prop {boolean} wasStarted - if simulation was started
  * @prop {Date} time - initial clock time
  * @prop {number} timeScale - time scale of the clock, i.e. clock will change `timeScale` seconds each 1 second
@@ -35,7 +31,8 @@ const timeFormat = new Intl.DateTimeFormat("pl-PL", {
 /**
  * Animated clock component shown after start of simulation <br/>
  * resources: {@link https://css-tricks.com/using-requestanimationframe-with-react-hooks/}
- * @class CustomClock
+ * @function CustomClock
+ * @memberof module:MainMenu
  * @param {Props} props
  */
 export const CustomClockObj = props => {
