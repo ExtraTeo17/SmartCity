@@ -3,7 +3,7 @@ import L from "leaflet";
 /**
  * Contains configuration of all marker icons
  * @category Main
- * @module Icons
+ * @module icons
  */
 
 export const greenLightIcon = new L.Icon({
