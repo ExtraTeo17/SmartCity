@@ -21,7 +21,6 @@ import org.slf4j.LoggerFactory;
 import routing.abstractions.IRouteGenerator;
 import routing.abstractions.IRoutingHelper;
 import routing.core.IGeoPosition;
-import routing.core.Position;
 import routing.nodes.RouteNode;
 import routing.nodes.StationNode;
 import smartcity.ITimeProvider;
@@ -119,7 +118,6 @@ public class TaskProvider implements ITaskProvider {
             }
         };
     }
-
 
     public Runnable getCreateBikeTask(IGeoPosition start, IGeoPosition end, boolean testBike) {
         return () -> {
