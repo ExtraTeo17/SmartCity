@@ -46,7 +46,7 @@ import static smartcity.config.StaticConfig.USE_BATCHED_UPDATES;
 public class CarAgent extends AbstractAgent {
     private static final int THRESHOLD_UNTIL_INDEX_CHANGE = 50;
     // Lower values provide risk of car ignoring the trouble point and passing through it
-    private static final int NO_CONSTRUCTION_SITE_STRATEGY_FACTOR = 30;
+    private static final int NO_CONSTRUCTION_SITE_STRATEGY_FACTOR = 70;
 
     private static final long CONSTRUCTION_SITE_GENERATION_SEED = 10002959;
     private static final long ID_GENERATION_SEED = 9973;

@@ -21,6 +21,7 @@ import org.slf4j.LoggerFactory;
 import routing.abstractions.IRouteGenerator;
 import routing.abstractions.IRoutingHelper;
 import routing.core.IGeoPosition;
+import routing.core.Position;
 import routing.nodes.RouteNode;
 import routing.nodes.StationNode;
 import smartcity.ITimeProvider;
@@ -91,6 +92,9 @@ public class TaskProvider implements ITaskProvider {
                     effectiveStart = startForBatches;
                     effectiveEnd = endForBatches;
                 }
+
+                effectiveStart = Position.of(52.23477,21.04876);
+                effectiveEnd = Position.of(52.2419,21.0615);
 
                 route = routeInfoCache.get(effectiveStart, effectiveEnd);
                 if (route == null) {

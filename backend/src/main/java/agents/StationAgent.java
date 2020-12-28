@@ -100,8 +100,6 @@ public class StationAgent extends AbstractAgent {
                     stationStrategy.addBusToQueue(agentName, scheduled, actual);
 
                     var msg = createMessage(ACLMessage.AGREE, rcv.getSender());
-                    // TODO: This is send to busAgent without type - won't be handled
-                    //  I am not sure if needed
                     logger.info("SEND AGREE in answer to REQUEST WHEN");
                     msg.setAllUserDefinedParameters(createProperties(MessageParameter.STATION));
                     send(msg);
@@ -175,14 +173,6 @@ public class StationAgent extends AbstractAgent {
 
                     stationStrategy.removeFromToWhomWaitMap(agentName, desiredBusLine);
 
-
-                    //var msg = createMessage(ACLMessage.REQUEST, rcv.getSender());
-                    // TODO: This is send to pedestrian without type - won't be handled
-                    //  But also needs busAgent name parameter or Pedestrian will die
-                    //  I am not sure if needed
-                    // var properties = createProperties(MessageParameter.STATION);
-                    // msg.setAllUserDefinedParameters(createProperties(MessageParameter.STATION));
-                    //send(msg);
                 }
                 else if (messageKind == ACLMessage.AGREE) {
                     print("-----GET AGREE from PEDESTRIAN------", LoggerLevel.DEBUG);
