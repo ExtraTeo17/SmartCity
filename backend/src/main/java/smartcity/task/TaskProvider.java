@@ -93,8 +93,6 @@ public class TaskProvider implements ITaskProvider {
                     effectiveEnd = endForBatches;
                 }
 
-                effectiveStart = Position.of(52.23477,21.04876);
-                effectiveEnd = Position.of(52.2419,21.0615);
 
                 route = routeInfoCache.get(effectiveStart, effectiveEnd);
                 if (route == null) {
