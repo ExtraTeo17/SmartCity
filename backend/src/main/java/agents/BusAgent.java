@@ -55,7 +55,7 @@ public class BusAgent extends AbstractAgent {
     private final Bus bus;
     private final IChangeTransportConfigContainer configContainer;
     private RouteNode troublePoint;
-    private int numberOfPassedStations = 0 ;
+    private int numberOfPassedStations = 0;
 
     BusAgent(int busId, Bus bus,
              ITimeProvider timeProvider,
@@ -291,7 +291,7 @@ public class BusAgent extends AbstractAgent {
                 }
 
                 private void sendMessageAboutCrashTroubleToBusManager(LocalDateTime timeOfCrash) {
-                    ACLMessage msg = createMessageAboutCrash(BusManagerAgent.NAME, false,timeOfCrash);
+                    ACLMessage msg = createMessageAboutCrash(BusManagerAgent.NAME, false, timeOfCrash);
                     logger.info("Send message about crash to BusManager ");
                     send(msg);
                 }
@@ -299,9 +299,8 @@ public class BusAgent extends AbstractAgent {
                 private void sendMessageAboutCrashTroubleToIncomingStations(LocalDateTime timeOfCrash) {
 
                     var stations = bus.getStationNodesOnRoute();
-                    for(int i = numberOfPassedStations;i< stations.size();i++ )
-                    {
-                        ACLMessage msg = createMessageAboutCrash(StationAgent.name+stations.get(i).getAgentId(), false,timeOfCrash);
+                    for (int i = numberOfPassedStations; i < stations.size(); i++) {
+                        ACLMessage msg = createMessageAboutCrash(StationAgent.name + stations.get(i).getAgentId(), false, timeOfCrash);
                         logger.info("Send message about crash to incoming stations ");
                         send(msg);
                     }
@@ -309,7 +308,7 @@ public class BusAgent extends AbstractAgent {
 
                 private void sendMessageAboutCrashTroubleToPedestrians(LocalDateTime timeOfCrash) {
                     for (String pedestrian : bus.getAllPassengers()) {
-                        ACLMessage msg = createMessageAboutCrash(pedestrian, false,timeOfCrash);
+                        ACLMessage msg = createMessageAboutCrash(pedestrian, false, timeOfCrash);
                         logger.info("Send message about crash to pedestrian: " + pedestrian);
                         send(msg);
                     }
@@ -326,7 +325,7 @@ public class BusAgent extends AbstractAgent {
                     properties.setProperty(MessageParameter.TROUBLE_LAT, Double.toString(troublePoint.getLat()));
                     properties.setProperty(MessageParameter.TROUBLE_LON, Double.toString(troublePoint.getLng()));
                     if (!isTroubleManager) {
-                    	properties.setProperty(MessageParameter.DESIRED_OSM_STATION_ID, ((StationNode) bus.findNextStop()).getOsmId() + "");
+                        properties.setProperty(MessageParameter.DESIRED_OSM_STATION_ID, ((StationNode) bus.findNextStop()).getOsmId() + "");
                         properties.setProperty(MessageParameter.AGENT_ID_OF_NEXT_CLOSEST_STATION, ((StationNode) bus.findNextStop()).getAgentId() + "");
                         //maybe not needed
                         properties.setProperty(MessageParameter.LAT_OF_NEXT_CLOSEST_STATION, bus.findNextStop().getLat() + "");

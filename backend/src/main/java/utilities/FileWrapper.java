@@ -24,7 +24,7 @@ public class FileWrapper {
 
     static {
         var dir = new File(DEFAULT_OUTPUT_PATH_CACHE);
-        if (!dir.exists()){
+        if (!dir.exists()) {
             //noinspection ResultOfMethodCallIgnored
             dir.mkdirs();
         }

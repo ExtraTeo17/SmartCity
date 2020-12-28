@@ -12,7 +12,6 @@ import jade.lang.acl.ACLMessage;
 import jade.util.leap.Properties;
 import org.javatuples.Pair;
 import osmproxy.elements.OSMStation;
-import routing.nodes.StationNode;
 import smartcity.ITimeProvider;
 import smartcity.lights.OptimizationResult;
 import smartcity.stations.StationStrategy;
@@ -73,7 +72,7 @@ public class StationAgent extends AbstractAgent {
                 var messageKind = rcv.getPerformative();
                 String agentName = rcv.getSender().getLocalName();
                 if (messageKind == ACLMessage.INFORM) {
-                    if(rcv.getUserDefinedParameter(MessageParameter.TYPEOFTROUBLE)!=null &&
+                    if (rcv.getUserDefinedParameter(MessageParameter.TYPEOFTROUBLE) != null &&
                             rcv.getUserDefinedParameter(MessageParameter.TYPEOFTROUBLE).equals(MessageParameter.CRASH)) {
 
                         handleCrashFromBusToConcernedPassengers(rcv);
@@ -120,12 +119,12 @@ public class StationAgent extends AbstractAgent {
                 ACLMessage responseToCrash = createResponseToCrash(rcv);
 
 
-                    for (Map.Entry<String, String> entry : station.getAgentMap().entrySet()) {
-                        if (entry.getValue().equals(crashedLine)) {
-                            responseToCrash.addReceiver(new AID(entry.getKey(),AID.ISLOCALNAME));
-                        }
+                for (Map.Entry<String, String> entry : station.getAgentMap().entrySet()) {
+                    if (entry.getValue().equals(crashedLine)) {
+                        responseToCrash.addReceiver(new AID(entry.getKey(), AID.ISLOCALNAME));
                     }
-                    send(responseToCrash);
+                }
+                send(responseToCrash);
             }
 
             private ACLMessage createResponseToCrash(ACLMessage rcv) {
@@ -137,21 +136,20 @@ public class StationAgent extends AbstractAgent {
                 properties.setProperty(MessageParameter.CRASH_TIME, crashTime);
                 properties.setProperty(MessageParameter.TYPEOFTROUBLE, MessageParameter.CRASH);
                 properties.setProperty(MessageParameter.TROUBLE, MessageParameter.SHOW);
-                properties.setProperty(MessageParameter.TROUBLE_LAT, station.getLat()+"");
-                properties.setProperty(MessageParameter.TROUBLE_LON,station.getLng()+"");
+                properties.setProperty(MessageParameter.TROUBLE_LAT, station.getLat() + "");
+                properties.setProperty(MessageParameter.TROUBLE_LON, station.getLng() + "");
                 properties.setProperty(MessageParameter.DESIRED_OSM_STATION_ID, station.getId() + "");
-                properties.setProperty(MessageParameter.AGENT_ID_OF_NEXT_CLOSEST_STATION, getId()+"" );
-                    //maybe not needed
-                properties.setProperty(MessageParameter.LAT_OF_NEXT_CLOSEST_STATION,station.getLat()+ "");
+                properties.setProperty(MessageParameter.AGENT_ID_OF_NEXT_CLOSEST_STATION, getId() + "");
+                //maybe not needed
+                properties.setProperty(MessageParameter.LAT_OF_NEXT_CLOSEST_STATION, station.getLat() + "");
                 properties.setProperty(MessageParameter.LON_OF_NEXT_CLOSEST_STATION, station.getLng() + "");
 
-                properties.setProperty(MessageParameter.BUS_LINE,rcv.getUserDefinedParameter(MessageParameter.BUS_LINE));
-                properties.setProperty(MessageParameter.BRIGADE,rcv.getUserDefinedParameter(MessageParameter.BRIGADE));
+                properties.setProperty(MessageParameter.BUS_LINE, rcv.getUserDefinedParameter(MessageParameter.BUS_LINE));
+                properties.setProperty(MessageParameter.BRIGADE, rcv.getUserDefinedParameter(MessageParameter.BRIGADE));
 
                 msg.setAllUserDefinedParameters(properties);
                 return msg;
             }
-
 
 
             private void handleMessageFromPedestrian(ACLMessage rcv) {

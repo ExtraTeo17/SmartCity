@@ -212,10 +212,10 @@ public class PedestrianAgent extends AbstractAgent {
                                 pedestrian.move();
                             }
                         }
-                        else if (rcv.getPerformative() == ACLMessage.INFORM){
+                        else if (rcv.getPerformative() == ACLMessage.INFORM) {
                             handleCrashOfTheBus(rcv);
                         }
-                            break;
+                        break;
                     case MessageParameter.BUS:
                         if (rcv.getPerformative() == ACLMessage.REQUEST) {
                             ACLMessage response = createMessage(ACLMessage.AGREE, rcv.getSender());
@@ -233,7 +233,7 @@ public class PedestrianAgent extends AbstractAgent {
                             informLightManager(pedestrian);
                         }
                         else if (rcv.getPerformative() == ACLMessage.INFORM) {
-                          handleCrashOfTheBus(rcv);
+                            handleCrashOfTheBus(rcv);
                         }
                         break;
                     case MessageParameter.BUS_MANAGER:
@@ -254,25 +254,25 @@ public class PedestrianAgent extends AbstractAgent {
 
                 expectedNewStationNode = parseCrashMessageFromBus(rcv);
 
-                var troublePoint =  Position.of(rcv.getUserDefinedParameter(MessageParameter.TROUBLE_LAT),
+                var troublePoint = Position.of(rcv.getUserDefinedParameter(MessageParameter.TROUBLE_LAT),
                         rcv.getUserDefinedParameter(MessageParameter.TROUBLE_LON));
                 IGeoPosition nextClosestStationPosition = Position.of(expectedNewStationNode.getLat() + "",
                         expectedNewStationNode.getLng() + "");
-                if(troublePoint.equals(nextClosestStationPosition)) {
+                if (troublePoint.equals(nextClosestStationPosition)) {
                     currentPosition = pedestrian.getPosition();
                 }
-                else{
+                else {
                     currentPosition = troublePoint;
                 }
 
 
-                LocalTime arrivalTime = LocalTime.of(0,0,0,0);
-                        if(currentPosition!=nextClosestStationPosition) {
+                LocalTime arrivalTime = LocalTime.of(0, 0, 0, 0);
+                if (currentPosition != nextClosestStationPosition) {
 
-                            arrivalTime = computeArrivalTime(currentPosition, nextClosestStationPosition,
-                                    expectedNewStationNode.getOsmId() + "");
-                        }
-                sendMessageToBusManager(rcv,arrivalTime.toString());
+                    arrivalTime = computeArrivalTime(currentPosition, nextClosestStationPosition,
+                            expectedNewStationNode.getOsmId() + "");
+                }
+                sendMessageToBusManager(rcv, arrivalTime.toString());
 
                 if (expectedNewStationNode.equals(pedestrian.getStationFinish())) {
                     performMetamorphosisToBike();
@@ -305,7 +305,7 @@ public class PedestrianAgent extends AbstractAgent {
             }
 
             private StationNode parseCrashMessageFromBus(ACLMessage rcv) {
-             return  new StationNode(rcv.getUserDefinedParameter(MessageParameter.LAT_OF_NEXT_CLOSEST_STATION),
+                return new StationNode(rcv.getUserDefinedParameter(MessageParameter.LAT_OF_NEXT_CLOSEST_STATION),
                         rcv.getUserDefinedParameter(MessageParameter.LON_OF_NEXT_CLOSEST_STATION),
                         rcv.getUserDefinedParameter(MessageParameter.DESIRED_OSM_STATION_ID),
                         rcv.getUserDefinedParameter(MessageParameter.AGENT_ID_OF_NEXT_CLOSEST_STATION));
@@ -391,8 +391,8 @@ public class PedestrianAgent extends AbstractAgent {
                 pedestrian.setTroubled(false);
                 pedestrian.setState(DrivingState.MOVING);
 
-              
-              if (!pedestrian.isAtStation()) {
+
+                if (!pedestrian.isAtStation()) {
                     quitBus(false);
                 }
             }

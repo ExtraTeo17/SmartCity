@@ -7,7 +7,6 @@ import com.google.common.eventbus.Subscribe;
 import com.google.inject.Inject;
 import events.web.DebugEvent;
 import events.web.roadblocks.TrafficJamFinishedEvent;
-import events.web.roadblocks.TrafficJamStartedEvent;
 import events.web.roadblocks.TroublePointCreatedEvent;
 import jade.core.Agent;
 import jade.core.behaviours.Behaviour;

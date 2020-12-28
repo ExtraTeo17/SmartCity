@@ -18,7 +18,6 @@ import routing.core.IGeoPosition;
 import routing.nodes.LightManagerNode;
 import routing.nodes.RouteNode;
 import routing.nodes.StationNode;
-import vehicles.MovingObject;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -160,10 +159,10 @@ final class Router implements
     }
 
     private boolean bus174wilanowska(List<StationNode> stationNodes) {
-		return stationNodes.size() == 2 && stationNodes.get(0).getOsmId() == 3039769685L && stationNodes.get(1).getOsmId() == 1704286049L;
-	}
+        return stationNodes.size() == 2 && stationNodes.get(0).getOsmId() == 3039769685L && stationNodes.get(1).getOsmId() == 1704286049L;
+    }
 
-	/////////////////////////////////////////////////////////////
+    /////////////////////////////////////////////////////////////
     //  HELPERS - Most are comfortable :(
     /////////////////////////////////////////////////////////////
 
