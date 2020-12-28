@@ -276,4 +276,11 @@ public class Bus extends MovingObject {
     public String getBrigade() {
         return brigadeNr;
     }
+
+	public void printDebugInfo() {
+		System.out.println("&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&");
+		System.out.println("Bus line: " + this.busLine);
+		displayRouteDebug(uniformRoute);
+		System.out.println("&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&");
+	}
 }

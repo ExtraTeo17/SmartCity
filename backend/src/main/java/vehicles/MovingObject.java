@@ -177,7 +177,7 @@ public abstract class MovingObject {
     }
 
     public void displayRouteDebug(List<RouteNode> route) {
-    	displayRouteDebugStatic(route);
+        MovingObject.displayRouteDebugStatic(route);
     }
 
     public boolean isAtTrafficLights() {
