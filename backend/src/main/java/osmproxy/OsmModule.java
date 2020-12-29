@@ -9,7 +9,6 @@ import osmproxy.abstractions.ILightAccessManager;
 import osmproxy.abstractions.IMapAccessManager;
 import osmproxy.abstractions.IOverpassApiManager;
 import osmproxy.utilities.CacheWrapper;
-import osmproxy.utilities.OverpassApiManager;
 
 public class OsmModule extends AbstractModule {
     @Override

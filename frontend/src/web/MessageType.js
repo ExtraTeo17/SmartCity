@@ -98,6 +98,12 @@ const BATCHED_UPDATE_INFO = 25;
  * @constant
  * @default
  */
+const API_OVERLOAD_INFO = 26;
+
+/**
+ * @constant
+ * @default
+ */
 const UPDATE_BUS_INFO = 30;
 
 /**
@@ -198,4 +204,5 @@ export {
   UPDATE_BIKE_INFO,
   KILL_BIKE_INFO,
   CRASH_BUS_INFO,
+  API_OVERLOAD_INFO,
 };
