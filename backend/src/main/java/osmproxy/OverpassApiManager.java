@@ -1,5 +1,6 @@
 package osmproxy;
 
+import com.google.common.annotations.VisibleForTesting;
 import com.google.common.eventbus.EventBus;
 import com.google.inject.name.Named;
 import events.web.ApiOverloadedEvent;
@@ -23,8 +24,8 @@ import java.util.Queue;
 public class OverpassApiManager implements IOverpassApiManager {
     private static final Logger logger = LoggerFactory.getLogger(OverpassApiManager.class);
 
-    private static final int API_SWITCH_NOTIFY_THRESHOLD_COUNT = 0;
-    private static final int API_OVERLOAD_THRESHOLD_TIME_SEC = 30;
+    public static final int API_SWITCH_NOTIFY_COUNT = 4;
+    public static final int API_SWITCH_NOTIFY_TIME_SEC = 30;
 
     private final EventBus eventBus;
     private final String[] overpassApis;
@@ -102,7 +103,8 @@ public class OverpassApiManager implements IOverpassApiManager {
         }
     }
 
-    private void switchApi() {
+    @VisibleForTesting
+    void switchApi() {
         currentApiIndex = (currentApiIndex + 1) % overpassApis.length;
         logger.info("Switching to " + getCurrentApi());
         enqueueSwitchTime();
@@ -111,17 +113,17 @@ public class OverpassApiManager implements IOverpassApiManager {
     private void enqueueSwitchTime() {
         int initSize = switchTimeQueue.size();
         var timeNow = LocalDateTime.now();
-        var timeNowThreshold = timeNow.minusSeconds(API_OVERLOAD_THRESHOLD_TIME_SEC);
+        var timeNowThreshold = timeNow.minusSeconds(API_SWITCH_NOTIFY_TIME_SEC);
         switchTimeQueue.add(timeNow);
         while (switchTimeQueue.size() > 0 && switchTimeQueue.peek().isBefore(timeNowThreshold)) {
             switchTimeQueue.poll();
         }
 
-        if (initSize <= API_SWITCH_NOTIFY_THRESHOLD_COUNT &&
-                switchTimeQueue.size() > API_SWITCH_NOTIFY_THRESHOLD_COUNT) {
+        if (initSize <= API_SWITCH_NOTIFY_COUNT &&
+                switchTimeQueue.size() > API_SWITCH_NOTIFY_COUNT) {
             eventBus.post(new ApiOverloadedEvent());
         }
         logger.info("Switched " + switchTimeQueue.size() + " times in the last " +
-                API_OVERLOAD_THRESHOLD_TIME_SEC + " seconds.");
+                API_SWITCH_NOTIFY_TIME_SEC + " seconds.");
     }
 }
