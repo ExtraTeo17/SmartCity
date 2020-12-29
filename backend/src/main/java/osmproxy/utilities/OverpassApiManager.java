@@ -1,9 +1,13 @@
 package osmproxy.utilities;
 
+import com.google.common.eventbus.EventBus;
+import com.google.inject.name.Named;
+import events.web.ApiOverloadedEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import osmproxy.abstractions.IOverpassApiManager;
 
+import javax.inject.Inject;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.HttpURLConnection;
@@ -11,27 +15,47 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
+import java.time.LocalDateTime;
+import java.util.LinkedList;
 import java.util.Optional;
+import java.util.Queue;
 
 public class OverpassApiManager implements IOverpassApiManager {
     private static final Logger logger = LoggerFactory.getLogger(OverpassApiManager.class);
 
-    private static final String OVERPASS_API = "https://lz4.overpass-api.de/api/interpreter";
-    private static final String ALTERNATE_OVERPASS_API_1 = "https://z.overpass-api.de/api/interpreter";
-    private static final String ALTERNATE_OVERPASS_API_2 = "https://overpass.kumi.systems/api/interpreter";
-    private static final String ALTERNATE_OVERPASS_API_3 = "https://overpass.openstreetmap.ru/api/interpreter";
+    private static final int API_SWITCH_NOTIFY_THRESHOLD_COUNT = 0;
+    private static final int API_OVERLOAD_THRESHOLD_TIME_SEC = 30;
 
-    private String CURRENT_API = ALTERNATE_OVERPASS_API_3;
+    private final EventBus eventBus;
+    private final String[] overpassApis;
+
+    private final Queue<LocalDateTime> switchTimeQueue;
+    private int currentApiIndex;
+
+    @Inject
+    public OverpassApiManager(@Named("OVERPASS_APIS") String[] overpassApis,
+                              EventBus eventBus) {
+        this.overpassApis = overpassApis;
+        this.eventBus = eventBus;
+
+        this.switchTimeQueue = new LinkedList<>();
+        this.currentApiIndex = 1;
+        logger.info("Starting with: " + getCurrentApi());
+    }
+
+    private String getCurrentApi() {
+        return overpassApis[currentApiIndex];
+    }
 
     @Override
     public Optional<HttpURLConnection> sendRequest(String query) {
-        HttpURLConnection connection = sendRequest(CURRENT_API, query);
+        HttpURLConnection connection = trySendRequest(query);
         try {
             int responseCode = connection.getResponseCode();
             while (responseCode == 429 || responseCode == 504) {
-                logger.warn("Current API: " + CURRENT_API + " is overloaded with our requests.");
+                logger.warn("Current API: " + getCurrentApi() + " is overloaded with our requests.");
                 switchApi();
-                connection = sendRequest(CURRENT_API, query);
+                connection = trySendRequest(query);
                 responseCode = connection.getResponseCode();
             }
         } catch (IOException e) {
@@ -42,8 +66,8 @@ public class OverpassApiManager implements IOverpassApiManager {
         return Optional.of(connection);
     }
 
-    private static HttpURLConnection sendRequest(String apiAddress, String query) {
-        HttpURLConnection connection = getConnection(apiAddress);
+    private HttpURLConnection trySendRequest(String query) {
+        HttpURLConnection connection = getConnection();
         connection.setDoInput(true);
         connection.setDoOutput(true);
         connection.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");
@@ -61,30 +85,43 @@ public class OverpassApiManager implements IOverpassApiManager {
         return connection;
     }
 
-    private void switchApi() {
-        switch (CURRENT_API) {
-            case OVERPASS_API -> CURRENT_API = ALTERNATE_OVERPASS_API_1;
-            case ALTERNATE_OVERPASS_API_1 -> CURRENT_API = ALTERNATE_OVERPASS_API_2;
-            case ALTERNATE_OVERPASS_API_2 -> CURRENT_API = ALTERNATE_OVERPASS_API_3;
-            case ALTERNATE_OVERPASS_API_3 -> CURRENT_API = OVERPASS_API;
-        }
-        logger.info("Switching to " + CURRENT_API);
-    }
-
-    private static HttpURLConnection getConnection(String apiAddress) {
+    private HttpURLConnection getConnection() {
         URL url;
         try {
-            url = new URL(apiAddress);
+            url = new URL(getCurrentApi());
         } catch (MalformedURLException e) {
-            logger.error("Error creating url: " + apiAddress);
+            logger.error("Error creating url: " + getCurrentApi());
             throw new RuntimeException(e);
         }
 
         try {
             return (HttpURLConnection) url.openConnection();
         } catch (IOException e) {
-            logger.error("Error opening connection to " + apiAddress);
+            logger.error("Error opening connection to " + getCurrentApi());
             throw new RuntimeException(e);
         }
+    }
+
+    private void switchApi() {
+        currentApiIndex = (currentApiIndex + 1) % overpassApis.length;
+        logger.info("Switching to " + getCurrentApi());
+        enqueueSwitchTime();
+    }
+
+    private void enqueueSwitchTime() {
+        int initSize = switchTimeQueue.size();
+        var timeNow = LocalDateTime.now();
+        var timeNowThreshold = timeNow.minusSeconds(API_OVERLOAD_THRESHOLD_TIME_SEC);
+        switchTimeQueue.add(timeNow);
+        while (switchTimeQueue.size() > 0 && switchTimeQueue.peek().isBefore(timeNowThreshold)) {
+            switchTimeQueue.poll();
+        }
+
+        if (initSize <= API_SWITCH_NOTIFY_THRESHOLD_COUNT &&
+                switchTimeQueue.size() > API_SWITCH_NOTIFY_THRESHOLD_COUNT) {
+            eventBus.post(new ApiOverloadedEvent());
+        }
+        logger.info("Switched " + switchTimeQueue.size() + " times in the last " +
+                API_OVERLOAD_THRESHOLD_TIME_SEC + " seconds.");
     }
 }

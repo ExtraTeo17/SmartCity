@@ -11,6 +11,7 @@ import web.abstractions.IWebService;
 import web.message.MessageType;
 import web.message.payloads.infos.create.*;
 import web.message.payloads.infos.kill.*;
+import web.message.payloads.infos.other.ApiOverloadInfo;
 import web.message.payloads.infos.other.ChangeCarRouteInfo;
 import web.message.payloads.infos.other.CrashBusInfo;
 import web.message.payloads.infos.other.SwitchLightsInfo;
@@ -132,6 +133,13 @@ class WebService implements IWebService {
     }
 
     @Override
+    public void crashBus(int id) {
+        var payload = new CrashBusInfo(id);
+
+        webConnector.broadcastMessage(MessageType.CRASH_BUS_INFO, payload);
+    }
+
+    @Override
     public void killBus(int id) {
         var payload = new KillBusInfo(id);
 
@@ -237,9 +245,8 @@ class WebService implements IWebService {
     }
 
     @Override
-    public void crashBus(int id) {
-        var payload = new CrashBusInfo(id);
-
-        webConnector.broadcastMessage(MessageType.CRASH_BUS_INFO, payload);
+    public void notifyApiOverload() {
+        var payload = new ApiOverloadInfo();
+        webConnector.broadcastMessage(MessageType.API_OVERLOAD_INFO, payload);
     }
 }
