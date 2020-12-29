@@ -15,7 +15,7 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-package osmproxy;
+package osmproxy.routes;
 
 import com.graphhopper.GHRequest;
 import com.graphhopper.GHResponse;
@@ -65,15 +65,15 @@ public class ExtendedGraphHopper extends GraphHopper {
 
     /* TODO: Utilize edge functions in the trouble generating strategy */
 
-    public static final void addForbiddenEdges(final Collection<Integer> edgeIds) {
+    public static void addForbiddenEdges(final Collection<Integer> edgeIds) {
         avoidEdgesWeighting.addEdgeIds(edgeIds);
     }
 
-    public static final void removeForbiddenEdges(final Collection<Integer> edgeIds) {
+    public static void removeForbiddenEdges(final Collection<Integer> edgeIds) {
         avoidEdgesWeighting.removeEdgeIds(edgeIds);
     }
 
-    public static final TIntSet getForbiddenEdges() {
+    public static TIntSet getForbiddenEdges() {
         return avoidEdgesWeighting.getEdgeIds();
     }
 

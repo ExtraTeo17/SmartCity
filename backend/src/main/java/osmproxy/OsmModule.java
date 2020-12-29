@@ -6,6 +6,7 @@ import genesis.AbstractModule;
 import osmproxy.abstractions.ICacheWrapper;
 import osmproxy.abstractions.ILightAccessManager;
 import osmproxy.abstractions.IMapAccessManager;
+import osmproxy.utilities.CacheWrapper;
 
 public class OsmModule extends AbstractModule {
     @Override

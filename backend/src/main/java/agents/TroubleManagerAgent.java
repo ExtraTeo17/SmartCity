@@ -16,7 +16,7 @@ import jade.lang.acl.ACLMessage;
 import jade.util.leap.Properties;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import osmproxy.ExtendedGraphHopper;
+import osmproxy.routes.ExtendedGraphHopper;
 import routing.core.Position;
 import smartcity.SimulationState;
 import smartcity.config.ConfigContainer;
