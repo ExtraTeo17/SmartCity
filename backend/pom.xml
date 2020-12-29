@@ -26,9 +26,10 @@
         <resources>
             <resource>
                 <directory>${resourceFolder}</directory>
-                <targetPath>${project.build.directory}</targetPath>
                 <includes>
                     <include>log4j.xml</include>
+                    <include>crossroads.xml</include>
+                    <include>graphHopper.properties</include>
                     <include>config.properties</include>
                 </includes>
             </resource>
@@ -67,7 +68,6 @@
                                 <resource>
                                     <directory>${basedir}</directory>
                                     <includes>
-                                        <include>config/**</include>
                                         <include>mazowieckie-latest.osm-gh/**</include>
                                     </includes>
                                 </resource>
