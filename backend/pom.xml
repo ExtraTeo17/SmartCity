@@ -26,12 +26,14 @@
         <resources>
             <resource>
                 <directory>${resourceFolder}</directory>
+                <filtering>false</filtering>
+            </resource>
+            <resource>
+                <directory>${project.basedir}</directory>
                 <includes>
-                    <include>log4j.xml</include>
-                    <include>crossroads.xml</include>
-                    <include>graphHopper.properties</include>
-                    <include>config.properties</include>
+                    <include>mazowieckie-latest.osm-gh/**</include>
                 </includes>
+                <filtering>false</filtering>
             </resource>
         </resources>
         <plugins>
@@ -63,13 +65,14 @@
                             <resources>
                                 <resource>
                                     <directory>${resourceFolder}</directory>
-                                    <filtering>true</filtering>
+                                    <filtering>false</filtering>
                                 </resource>
                                 <resource>
-                                    <directory>${basedir}</directory>
+                                    <directory>${project.basedir}</directory>
                                     <includes>
                                         <include>mazowieckie-latest.osm-gh/**</include>
                                     </includes>
+                                    <filtering>false</filtering>
                                 </resource>
                             </resources>
                         </configuration>
