@@ -124,6 +124,9 @@ class SchedulerTests {
 
         var shouldGenerateTP = true;
         var timeBeforeTrouble = 5006;
+        var thresholdUntilIndexChange = 101;
+        var noTroublePointStrategyIndexFactor = 333;
+
 
         var shouldGenerateBusFailures = false;
         var shouldDetectTrafficJams = true;
@@ -150,7 +153,8 @@ class SchedulerTests {
                 startTime, timeScale,
                 lightStrategyActive, extendLightTime,
                 stationStrategyActive, extendWaitTime,
-                troublePointStrategyActive, trafficJamStrategyActive, transportChangeStrategyActive
+                troublePointStrategyActive, thresholdUntilIndexChange, noTroublePointStrategyIndexFactor,
+                trafficJamStrategyActive, transportChangeStrategyActive
         );
 
         // Act
@@ -187,6 +191,9 @@ class SchedulerTests {
         assertEquals(extendWaitTime, configContainer.getExtendWaitTime());
 
         assertEquals(troublePointStrategyActive, configContainer.isConstructionSiteStrategyActive());
+        assertEquals(thresholdUntilIndexChange, configContainer.getThresholdUntilIndexChange());
+        assertEquals(noTroublePointStrategyIndexFactor, configContainer.getNoConstructionSiteStrategyIndexFactor());
+
         assertEquals(trafficJamStrategyActive, configContainer.isTrafficJamStrategyActive());
         assertEquals(transportChangeStrategyActive, configContainer.isTransportChangeStrategyActive());
     }
@@ -221,11 +228,15 @@ class SchedulerTests {
     }
 
     private StartSimulationEvent prepareStartEvent(LocalDateTime startTime) {
-        return new StartSimulationEvent(false, 111, 112, false, true, 444,
-                222, 5005, 222, true, 223, false,
-                true, false, true, startTime, 333, false,
-                354, false, 33,
-                false, true, false
+        return new StartSimulationEvent(false, 111, 112,
+                false, true, 444,
+                222, 5005, 222, true,
+                223, false, true,
+                false, true, startTime,
+                333, false, 354,
+                false, 33, false,
+                44, 42,
+                true, false
         );
     }
 

@@ -40,6 +40,9 @@ public class StartSimulationRequest extends AbstractPayload {
     public final int extendWaitTime;
 
     public final boolean troublePointStrategyActive;
+    public final int thresholdUntilIndexChange;
+    public final int noTroublePointStrategyIndexFactor;
+
     public final boolean trafficJamStrategyActive;
     public final boolean transportChangeStrategyActive;
 
@@ -75,6 +78,9 @@ public class StartSimulationRequest extends AbstractPayload {
                                   @JsonProperty("extendWaitTime") int extendWaitTime,
 
                                   @JsonProperty("troublePointStrategyActive") boolean troublePointStrategyActive,
+                                  @JsonProperty("thresholdUntilIndexChange") int thresholdUntilIndexChange,
+                                  @JsonProperty("noTroublePointStrategyIndexFactor") int noTroublePointStrategyIndexFactor,
+
                                   @JsonProperty("trafficJamStrategyActive") boolean trafficJamStrategyActive,
                                   @JsonProperty("transportChangeStrategyActive") boolean transportChangeStrategyActive) {
 
@@ -109,6 +115,9 @@ public class StartSimulationRequest extends AbstractPayload {
         this.extendWaitTime = extendWaitTime;
 
         this.troublePointStrategyActive = troublePointStrategyActive;
+        this.thresholdUntilIndexChange = thresholdUntilIndexChange;
+        this.noTroublePointStrategyIndexFactor = noTroublePointStrategyIndexFactor;
+
         this.trafficJamStrategyActive = trafficJamStrategyActive;
         this.transportChangeStrategyActive = transportChangeStrategyActive;
     }

@@ -201,7 +201,7 @@ public class CarAgent extends AbstractAgent {
                 constructionsEdgeId.add(edgeId);
                 Integer indexOfRouteNodeWithEdge = car.findIndexOfEdgeOnRoute(edgeId,
                         configContainer.getThresholdUntilIndexChange());
-                
+
                 if (indexOfRouteNodeWithEdge != null && indexOfRouteNodeWithEdge != car.getUniformRouteSize() - 1) {
                     handleConstructionSiteRouteChange(indexOfRouteNodeWithEdge);
                 }
