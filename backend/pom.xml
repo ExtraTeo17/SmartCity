@@ -145,16 +145,10 @@
             <artifactId>graphhopper-reader-osm</artifactId>
             <version>0.8.2</version>
         </dependency>
-
         <dependency>
             <groupId>org.javatuples</groupId>
             <artifactId>javatuples</artifactId>
             <version>1.2</version>
-        </dependency>
-        <dependency>
-            <groupId>com.googlecode.json-simple</groupId>
-            <artifactId>json-simple</artifactId>
-            <version>1.1.1</version>
         </dependency>
         <dependency>
             <groupId>com.tilab.jade</groupId>
