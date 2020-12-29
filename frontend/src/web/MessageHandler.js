@@ -177,7 +177,7 @@ export default {
         break;
 
       case API_OVERLOAD_INFO:
-        notify.show("Overpass API is overloaded. Simulation might be inaccurate.", "warning", NOTIFY_SHOW_MS);
+        notify.show("Overpass API is overloaded. Simulation might be inaccurate!", "warning", NOTIFY_SHOW_MS);
         break;
 
       default:
