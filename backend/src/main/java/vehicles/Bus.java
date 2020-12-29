@@ -196,8 +196,8 @@ public class Bus extends MovingObject {
         return VehicleType.BUS.toString();
     }
 
-    public Optional<StationNode> findNextStation() {
-        for (int i = moveIndex + 1; i < uniformRoute.size(); ++i) {
+    public Optional<StationNode> findNextStation(boolean isStart) {
+        for (int i = isStart ? 0 : moveIndex + 1; i < uniformRoute.size(); ++i) {
             if (uniformRoute.get(i) instanceof StationNode) {
                 closestStationIndex = i;
                 return Optional.of((StationNode) uniformRoute.get(i));
