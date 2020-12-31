@@ -51,7 +51,8 @@ public class TaskProvider implements ITaskProvider {
     private final ITimeProvider timeProvider;
     private final EventBus eventBus;
 
-    private final Table<IGeoPosition, IGeoPosition, List<RouteNode>> routeInfoCache;
+    private final Table<IGeoPosition, IGeoPosition, List<RouteNode>> carRouteInfoCache;
+    private final Table<IGeoPosition, IGeoPosition, List<RouteNode>> bikeRouteInfoCache;
 
     private IGeoPosition startForBatches;
     private IGeoPosition endForBatches;
@@ -72,7 +73,8 @@ public class TaskProvider implements ITaskProvider {
         this.timeProvider = timeProvider;
         this.eventBus = eventBus;
 
-        this.routeInfoCache = HashBasedTable.create();
+        this.carRouteInfoCache = HashBasedTable.create();
+        this.bikeRouteInfoCache = HashBasedTable.create();
     }
 
     public Runnable getCreateCarTask(IGeoPosition start, IGeoPosition end, boolean testCar) {
@@ -93,10 +95,13 @@ public class TaskProvider implements ITaskProvider {
                 }
 
 
-                route = routeInfoCache.get(effectiveStart, effectiveEnd);
+                route = carRouteInfoCache.get(effectiveStart, effectiveEnd);
                 if (route == null) {
                     route = routeGenerator.generateRouteInfo(effectiveStart, effectiveEnd, false);
-                    routeInfoCache.put(effectiveStart, effectiveEnd, route);
+                    carRouteInfoCache.put(effectiveStart, effectiveEnd, route);
+                }
+                else {
+                    logger.info("Successfully retrieved route from cache");
                 }
             } catch (Exception e) {
                 logger.warn("Error generating route info", e);
@@ -105,9 +110,7 @@ public class TaskProvider implements ITaskProvider {
 
             if (route.size() == 0) {
                 logger.warn("Generated route is empty, agent won't be created.");
-                if (startForBatches != null) {
-                    startForBatches = endForBatches = null;
-                }
+                startForBatches = endForBatches = null;
                 return;
             }
 
@@ -123,11 +126,10 @@ public class TaskProvider implements ITaskProvider {
         return () -> {
             List<RouteNode> route;
             try {
-                route = routeInfoCache.get(start, end);
+                route = bikeRouteInfoCache.get(start, end);
                 if (route == null) {
                     route = routeGenerator.generateRouteInfo(start, end, "bike");
-                    // TODO: If car start & end will be equal to bike, then car can receive bike route.
-                    routeInfoCache.put(start, end, route);
+                    bikeRouteInfoCache.put(start, end, route);
                 }
             } catch (Exception e) {
                 logger.warn("Error generating route info", e);

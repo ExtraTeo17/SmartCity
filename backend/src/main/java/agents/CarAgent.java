@@ -261,7 +261,7 @@ public class CarAgent extends AbstractAgent {
                         oldUniformRoute.get(oldUniformRoute.size() - 1),
                         bewareOfJammedEdge);
                 if (newSimpleRouteEnd.size() == 0) { // Case when GraphHopper has problems
-
+                    logger.warn("New route is empty. Will use old route.");
                     newSimpleRouteEnd = new ArrayList<>(oldUniformRoute.subList(indexAfterWhichRouteChanges,
                             oldUniformRoute.size()));
                 }
