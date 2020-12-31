@@ -84,8 +84,7 @@ public class BusDataParser implements IBusDataParser {
                 busInfo.addBrigades(brigadeInfos);
             } else {
             	busLinesOfInfosToRemoveCauseOfMissingTimetableInWarszawskieAPI.add(busInfo.busLine);
-            	logger.info("Warning: Timetable for bus line " + busInfo.busLine +
-            	        " is empty in Warszawskie API. Line will not be considered");
+            	logger.warn("Timetable for bus line " + busInfo.busLine + " is empty in Warszawskie API. Line will not be considered");
             }
 		}
 		busInfos.removeIf(info -> busLinesOfInfosToRemoveCauseOfMissingTimetableInWarszawskieAPI.stream()
@@ -154,7 +153,7 @@ public class BusDataParser implements IBusDataParser {
         var nodesIter = osmNodes.iterator();
         var twoFirstWaysOpt = findTwoFirstWaysInZone(nodesIter);
         if (twoFirstWaysOpt.isEmpty()) {
-            logger.error("Didn't find two connected ways in provided zone");
+            logger.warn("Didn't find two connected ways in provided zone");
             return route;
         }
 

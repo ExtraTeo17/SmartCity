@@ -92,6 +92,7 @@ public class TaskProvider implements ITaskProvider {
                     effectiveEnd = endForBatches;
                 }
 
+
                 route = routeInfoCache.get(effectiveStart, effectiveEnd);
                 if (route == null) {
                     route = routeGenerator.generateRouteInfo(effectiveStart, effectiveEnd, false);
@@ -117,7 +118,6 @@ public class TaskProvider implements ITaskProvider {
             }
         };
     }
-
 
     public Runnable getCreateBikeTask(IGeoPosition start, IGeoPosition end, boolean testBike) {
         return () -> {

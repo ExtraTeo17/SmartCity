@@ -15,6 +15,7 @@
  */
 package osmproxy;
 
+import org.apache.commons.io.IOUtils;
 import org.javatuples.Triplet;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -39,6 +40,7 @@ import javax.xml.parsers.ParserConfigurationException;
 import java.io.DataOutputStream;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -127,6 +129,16 @@ public class MapAccessManager implements IMapAccessManager {
         }
 
         return Optional.of(result);
+    }
+
+    @SuppressWarnings("unused")
+    private final void printStream(final InputStream stream) {
+        try {
+            logger.info(IOUtils.toString(stream));
+            stream.reset();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     private static HttpURLConnection sendRequest(String query) {
