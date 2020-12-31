@@ -373,6 +373,6 @@ public class OSMWay extends OSMElement implements Serializable {
                 startingIndex.orElseThrow(() -> new IllegalArgumentException(
                         "Starting OSM node ref: " + startingOsmNodeRef + " was not on way: " + getId())),
                 finishingIndex.orElseThrow(() -> new IllegalArgumentException(
-                        "Starting OSM node ref: " + startingOsmNodeRef + " was not on way: " + getId())));
+                        "Finishing OSM node ref: " + finishingOsmNodeRef + " was not on way: " + getId())));
     }
 }
