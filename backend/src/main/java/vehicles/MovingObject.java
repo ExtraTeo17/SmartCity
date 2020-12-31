@@ -6,6 +6,7 @@ import routing.RoutingConstants;
 import routing.core.IGeoPosition;
 import routing.nodes.LightManagerNode;
 import routing.nodes.RouteNode;
+import routing.nodes.StationNode;
 import smartcity.ITimeProvider;
 import vehicles.enums.DrivingState;
 
@@ -166,13 +167,13 @@ public abstract class MovingObject {
         return null;
     }
 
-    private void displayRouteDebug(List<RouteNode> route) {
-        logger.debug("Display route debug of size: " + route.size());
+    public static void displayRouteDebug(List<RouteNode> route) {
+        System.out.println(("Display route debug of size: " + route.size()));
         StringBuilder builder = new StringBuilder();
         for (int i = 0; i < route.size(); ++i) {
-            builder.append("R[" + i + "]: " + route.get(i).getDebugString(route.get(i) instanceof LightManagerNode) + "; ");
+            builder.append("R[" + i + "]: " + route.get(i).getDebugString(route.get(i) instanceof StationNode) + "; ");
         }
-        logger.debug(builder.toString());
+        System.out.println(builder.toString());
     }
 
     public boolean isAtTrafficLights() {

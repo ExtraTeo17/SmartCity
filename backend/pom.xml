@@ -46,6 +46,22 @@
                     <encoding>UTF-8</encoding>
                 </configuration>
             </plugin>
+            <!--  For javadoc -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-javadoc-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>attach-javadocs</id>
+                        <goals>
+                            <goal>jar</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <javadocExecutable>${java.home}/bin/javadoc</javadocExecutable>
+                </configuration>
+            </plugin>
             <!-- For copying folders -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
