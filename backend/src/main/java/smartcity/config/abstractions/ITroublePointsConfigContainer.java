@@ -20,9 +20,9 @@ public interface ITroublePointsConfigContainer {
      */
     void setTimeBeforeTrouble(int timeBeforeTrouble);
 
-    int getThresholdUntilIndexChange();
+    int getConstructionSiteThresholdUntilIndexChange();
 
-    void setThresholdUntilIndexChange(int thresholdUntilIndexChange);
+    void setConstructionSiteThresholdUntilIndexChange(int constructionSiteThresholdUntilIndexChange);
 
     int getNoConstructionSiteStrategyIndexFactor();
 

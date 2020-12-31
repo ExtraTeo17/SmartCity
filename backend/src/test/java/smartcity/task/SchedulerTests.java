@@ -124,7 +124,7 @@ class SchedulerTests {
 
         var shouldGenerateTP = true;
         var timeBeforeTrouble = 5006;
-        var thresholdUntilIndexChange = 101;
+        var troublePointThresholdUntilIndexChange = 101;
         var noTroublePointStrategyIndexFactor = 333;
 
 
@@ -153,7 +153,7 @@ class SchedulerTests {
                 startTime, timeScale,
                 lightStrategyActive, extendLightTime,
                 stationStrategyActive, extendWaitTime,
-                troublePointStrategyActive, thresholdUntilIndexChange, noTroublePointStrategyIndexFactor,
+                troublePointStrategyActive, troublePointThresholdUntilIndexChange, noTroublePointStrategyIndexFactor,
                 trafficJamStrategyActive, transportChangeStrategyActive
         );
 
@@ -191,7 +191,7 @@ class SchedulerTests {
         assertEquals(extendWaitTime, configContainer.getExtendWaitTime());
 
         assertEquals(troublePointStrategyActive, configContainer.isConstructionSiteStrategyActive());
-        assertEquals(thresholdUntilIndexChange, configContainer.getThresholdUntilIndexChange());
+        assertEquals(troublePointThresholdUntilIndexChange, configContainer.getConstructionSiteThresholdUntilIndexChange());
         assertEquals(noTroublePointStrategyIndexFactor, configContainer.getNoConstructionSiteStrategyIndexFactor());
 
         assertEquals(trafficJamStrategyActive, configContainer.isTrafficJamStrategyActive());

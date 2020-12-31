@@ -38,7 +38,7 @@ public class ConfigContainer extends ConfigMutator
     private int lightExtendTime = 30;
     private int extendWaitTime = 60;
     private int timeBeforeTrouble = 5;
-    private int thresholdUntilIndexChange = 50;
+    private int constructionSiteThresholdUntilIndexChange = 50;
     private int noConstructionSiteStrategyIndexFactor = 30;
 
     private final IZone zone;
@@ -229,13 +229,13 @@ public class ConfigContainer extends ConfigMutator
     }
 
     @Override
-    public int getThresholdUntilIndexChange() {
-        return thresholdUntilIndexChange;
+    public int getConstructionSiteThresholdUntilIndexChange() {
+        return constructionSiteThresholdUntilIndexChange;
     }
 
     @Override
-    public void setThresholdUntilIndexChange(int thresholdUntilIndexChange) {
-        this.thresholdUntilIndexChange = thresholdUntilIndexChange;
+    public void setConstructionSiteThresholdUntilIndexChange(int constructionSiteThresholdUntilIndexChange) {
+        this.constructionSiteThresholdUntilIndexChange = constructionSiteThresholdUntilIndexChange;
     }
 
     @Override

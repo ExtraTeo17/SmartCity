@@ -43,11 +43,6 @@ import javax.xml.parsers.ParserConfigurationException;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.net.URLEncoder;
-import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -97,6 +92,16 @@ public class MapAccessManager implements IMapAccessManager {
         return Triplet.with(id, latitude, longitude);
     }
 
+    @SuppressWarnings("unused")
+    private void printStream(final InputStream stream) {
+        try {
+            logger.info(IOUtils.toString(stream));
+            stream.reset();
+        } catch (IOException e) {
+            logger.warn("Exception while printing stream: " + e);
+        }
+    }
+
     /**
      * @param query the overpass query
      * @return the nodes in the formulated query
@@ -121,7 +126,7 @@ public class MapAccessManager implements IMapAccessManager {
 
         return Optional.of(result);
     }
-    
+
     @Override
     public List<OSMLight> getOsmLights(List<Long> osmWayIds) {
         var query = OsmQueryManager.getFullTrafficSignalQuery(osmWayIds);

@@ -200,7 +200,7 @@ public class CarAgent extends AbstractAgent {
                 }
                 constructionsEdgeId.add(edgeId);
                 Integer indexOfRouteNodeWithEdge = car.findIndexOfEdgeOnRoute(edgeId,
-                        configContainer.getThresholdUntilIndexChange());
+                        configContainer.getConstructionSiteThresholdUntilIndexChange());
 
                 if (indexOfRouteNodeWithEdge != null && indexOfRouteNodeWithEdge != car.getUniformRouteSize() - 1) {
                     handleConstructionSiteRouteChange(indexOfRouteNodeWithEdge);
@@ -210,10 +210,10 @@ public class CarAgent extends AbstractAgent {
                 }
             }
 
-            private void handleConstructionSiteRouteChange(final int indexOfRouteNodeWithEdge) {
+            private void handleConstructionSiteRouteChange(int indexOfRouteNodeWithEdge) {
                 int indexAfterWhichRouteChanges;
                 if (configContainer.isConstructionSiteStrategyActive()) {
-                    var threshold = configContainer.getThresholdUntilIndexChange();
+                    var threshold = configContainer.getConstructionSiteThresholdUntilIndexChange();
                     if (indexOfRouteNodeWithEdge - car.getMoveIndex() > threshold) {
                         indexAfterWhichRouteChanges = car.getNextNonVirtualIndex(threshold);
                     }
@@ -222,8 +222,9 @@ public class CarAgent extends AbstractAgent {
                     }
                 }
                 else {
-                    indexAfterWhichRouteChanges = car.getPrevNonVirtualIndexFromIndex(indexOfRouteNodeWithEdge
-                            - configContainer.getNoConstructionSiteStrategyIndexFactor());
+                    var initIndex = Math.max(indexOfRouteNodeWithEdge -
+                            configContainer.getNoConstructionSiteStrategyIndexFactor(), 1);
+                    indexAfterWhichRouteChanges = car.getPrevNonVirtualIndexFromIndex(initIndex);
                 }
 
                 borderlineIndex = indexAfterWhichRouteChanges;
@@ -242,7 +243,11 @@ public class CarAgent extends AbstractAgent {
                 addBehaviour(wrapErrors(factory.wrap(mergeUpdateBehaviour), onError));
             }
 
-            private RouteMergeInfo createMergedWithOldRouteAlternativeRouteFromIndex(final int indexAfterWhichRouteChanges,
+
+            /**
+             * @param indexAfterWhichRouteChanges >= 0
+             */
+            private RouteMergeInfo createMergedWithOldRouteAlternativeRouteFromIndex(int indexAfterWhichRouteChanges,
                                                                                      boolean bewareOfJammedEdge) {
                 final IGeoPosition positionAfterWhichRouteChanges = car
                         .getPositionOnIndex(indexAfterWhichRouteChanges);
@@ -345,7 +350,7 @@ public class CarAgent extends AbstractAgent {
                 double timeForTheEndWithoutJam = car.getMillisecondsFromAToB(car.getMoveIndex(),
                         car.getUniformRoute().size() - 1);
                 double timeForTheEndWithJam = timeForTheEndWithoutJam + howLongTakesJam;
-                int threshold = configContainer.getThresholdUntilIndexChange();
+                int threshold = configContainer.getConstructionSiteThresholdUntilIndexChange();
                 Integer indexOfRouteNodeWithEdge = car.findIndexOfEdgeOnRoute((long) edgeId,
                         threshold);
                 int indexAfterWhichRouteChanges;
@@ -443,13 +448,13 @@ public class CarAgent extends AbstractAgent {
 
                 private int getFixedRandomIndex() {
                     // Warn: Value inside nextInt must be constant for fixed generation to work
-                    var min = maxMoveIndexOnTP + configContainer.getThresholdUntilIndexChange() + magicNumber;
+                    var min = maxMoveIndexOnTP + configContainer.getConstructionSiteThresholdUntilIndexChange() + magicNumber;
                     var max = initialRouteSize - min;
                     return getRandomIndexInBounds(min, max);
                 }
 
                 private int getTrulyRandomIndex(int moveIndex, int routeSize) {
-                    var min = moveIndex + configContainer.getThresholdUntilIndexChange() + magicNumber;
+                    var min = moveIndex + configContainer.getConstructionSiteThresholdUntilIndexChange() + magicNumber;
                     var max = routeSize - min;
                     return getRandomIndexInBounds(min, max);
                 }

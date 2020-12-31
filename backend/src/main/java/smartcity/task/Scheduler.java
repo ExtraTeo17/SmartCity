@@ -60,7 +60,7 @@ public class Scheduler {
             configContainer.setTrafficJamStrategyActive(
                     agentsContainer.size(LightManagerAgent.class) > 0 && e.trafficJamStrategyActive);
             configContainer.setConstructionSiteStrategyActive(e.troublePointStrategyActive);
-            configContainer.setThresholdUntilIndexChange(e.thresholdUntilIndexChange);
+            configContainer.setConstructionSiteThresholdUntilIndexChange(e.troublePointThresholdUntilIndexChange);
             configContainer.setNoConstructionSiteStrategyIndexFactor(e.noTroublePointStrategyIndexFactor);
 
             taskManager.scheduleCarCreation(e.carsNum, e.testCarId);

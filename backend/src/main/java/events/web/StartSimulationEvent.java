@@ -35,7 +35,7 @@ public class StartSimulationEvent {
     public final int extendWaitTime;
 
     public final boolean troublePointStrategyActive;
-    public final int thresholdUntilIndexChange;
+    public final int troublePointThresholdUntilIndexChange;
     public final int noTroublePointStrategyIndexFactor;
 
     public final boolean trafficJamStrategyActive;
@@ -63,7 +63,7 @@ public class StartSimulationEvent {
                                 boolean stationStrategyActive,
                                 int extendWaitTime,
                                 boolean troublePointStrategyActive,
-                                int thresholdUntilIndexChange,
+                                int troublePointThresholdUntilIndexChange,
                                 int noTroublePointStrategyIndexFactor,
                                 boolean trafficJamStrategyActive,
                                 boolean transportChangeStrategyActive) {
@@ -90,7 +90,7 @@ public class StartSimulationEvent {
         this.stationStrategyActive = stationStrategyActive;
         this.extendWaitTime = extendWaitTime;
         this.troublePointStrategyActive = troublePointStrategyActive;
-        this.thresholdUntilIndexChange = thresholdUntilIndexChange;
+        this.troublePointThresholdUntilIndexChange = troublePointThresholdUntilIndexChange;
         this.noTroublePointStrategyIndexFactor = noTroublePointStrategyIndexFactor;
         this.trafficJamStrategyActive = trafficJamStrategyActive;
         this.transportChangeStrategyActive = transportChangeStrategyActive;
