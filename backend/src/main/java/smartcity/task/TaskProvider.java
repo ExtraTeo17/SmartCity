@@ -163,13 +163,13 @@ public class TaskProvider implements ITaskProvider {
                 List<RouteNode> routeToStation = routeGenerator.generateRouteForPedestrians(
                         pedestrianStartPoint,
                         startStation,
-                        null,
-                        String.valueOf(startStation.getOsmId()));
+                        startStation,
+                        null);
                 List<RouteNode> routeFromStation = routeGenerator.generateRouteForPedestrians(
                         endStation,
                         pedestrianFinishPoint,
-                        String.valueOf(endStation.getOsmId()),
-                        null);
+                        null,
+                        endStation);
                 if (routeToStation.size() == 0 || routeFromStation.size() == 0) {
                     logger.debug("Generated route is empty, agent won't be created.");
                     return;

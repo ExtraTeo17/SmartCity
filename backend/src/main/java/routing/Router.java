@@ -49,8 +49,9 @@ final class Router implements
     // TODO: now with new route generation there is sometimes "failed to get adjacent osmwayId" error, check it out
     @Override
     public List<RouteNode> generateRouteInfo(IGeoPosition pointA, IGeoPosition pointB,
-                                             String startingOsmNodeRef, String finishingOsmNodeRef,
                                              String typeOfVehicle,
+                                             StationNode startStation,
+                                             StationNode endStation,
                                              boolean bewareOfJammedEdge) {
         boolean notPedestrian = !typeOfVehicle.equals("foot");
         var osmWayIdsAndEdgeList = findRoute(pointA, pointB, typeOfVehicle, bewareOfJammedEdge);
@@ -70,12 +71,8 @@ final class Router implements
             return new ArrayList<>();
         }
 
-        if (startingOsmNodeRef == null) {
-            startingOsmNodeRef = routeInfo.getFirst().findClosestNodeRefTo(pointA);
-        }
-        if (finishingOsmNodeRef == null) {
-            finishingOsmNodeRef = routeInfo.getLast().findClosestNodeRefTo(pointB);
-        }
+        var startingOsmNodeRef = routeInfo.getFirst().findClosestNodeRefTo(pointA);
+        var finishingOsmNodeRef = routeInfo.getLast().findClosestNodeRefTo(pointB);
 
         try {
             routeInfo.determineRouteOrientationsAndFilterRelevantNodes(startingOsmNodeRef, finishingOsmNodeRef);
@@ -83,12 +80,18 @@ final class Router implements
             logger.info("GraphHopper API is not able to create route for provided points.");
             return new ArrayList<>();
         }
-        var route = createRouteNodeList(routeInfo, notPedestrian);
+        var route = createRouteNodeList(routeInfo, notPedestrian, startStation, endStation);
         return routeTransformer.uniformRouteNew(route, osmWayIdsAndEdgeList.getValue1());
     }
 
-    private List<RouteNode> createRouteNodeList(RouteInfo routeInfo, boolean isCar) {
+    private List<RouteNode> createRouteNodeList(RouteInfo routeInfo, boolean notPedestrian,
+            StationNode startStation, StationNode endStation) {
         List<RouteNode> routeNodes = new ArrayList<>();
+
+        if (!notPedestrian && endStation != null) {
+            routeNodes.add(endStation);
+        }
+
         for (var way : routeInfo) {
             int waypointCount = way.getWaypointCount();
             int lastLightManagerId = -1;
@@ -98,7 +101,7 @@ final class Router implements
             int lastIndex = straight ? waypointCount : -1;
             int increment = straight ? 1 : -1;
             for (int j = startingIndex; j != lastIndex; j += increment) {
-                var nodeOpt = getNode(way, way.getWaypoint(j), routeInfo, isCar);
+                var nodeOpt = getNode(way, way.getWaypoint(j), routeInfo, notPedestrian);
                 if (nodeOpt.isEmpty()) {
                     continue;
                 }
@@ -116,6 +119,10 @@ final class Router implements
                 }
 
             }
+        }
+
+        if (!notPedestrian && startStation != null) {
+            routeNodes.add(startStation);
         }
 
         return routeNodes;
