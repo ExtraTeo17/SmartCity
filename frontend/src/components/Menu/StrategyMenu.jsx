@@ -369,6 +369,8 @@ const StrategyMenu = props => {
               className="form-control"
               id="troublePointThresholdUntilIndexChange"
               defaultValue={troublePointThresholdUntilIndexChange}
+              min={TP_THRESHOLD_MIN}
+              max={TP_THRESHOLD_MAX}
               disabled={wasStarted}
               placeholder="Enter treshold until route changes on trouble point"
               onChange={evSetTroublePointThresholdUntilIndexChange}
@@ -384,6 +386,8 @@ const StrategyMenu = props => {
               className="form-control"
               id="noTroublePointStrategyIndexFactor"
               defaultValue={noTroublePointStrategyIndexFactor}
+              min={TP_NO_STRATEGY_FACTOR_MIN}
+              max={TP_NO_STRATEGY_FACTOR_MAX}
               disabled={wasStarted}
               placeholder="Enter threshold until car sees trouble point"
               onChange={evSetNoTroublePointStrategyIndexFactor}
