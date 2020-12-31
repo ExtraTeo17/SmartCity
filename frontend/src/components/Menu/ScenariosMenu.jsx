@@ -146,7 +146,7 @@ export const ScenariosMenuObj = props => {
 
     startData.useFixedRoutes = true;
     startData.startTime = new Date();
-    startData.timeScale = 10;
+    startData.timeScale = 3;
     startData.detectTrafficJams = true;
     startData.trafficJamStrategyActive = true;
 
