@@ -4,7 +4,16 @@ import React from "react";
 import { dispatch } from "../../redux/store";
 import { startSimulationDataUpdated, generatePedestriansUpdated } from "../../redux/core/actions";
 import { setIfValidInt } from "../../utils/helpers";
-import { LIGHT_EXTEND_MIN, LIGHT_EXTEND_MAX, STATION_EXTEND_MAX, STATION_EXTEND_MIN } from "../../constants/minMax";
+import {
+  LIGHT_EXTEND_MIN,
+  LIGHT_EXTEND_MAX,
+  STATION_EXTEND_MAX,
+  STATION_EXTEND_MIN,
+  TP_THRESHOLD_MIN,
+  TP_THRESHOLD_MAX,
+  TP_NO_STRATEGY_FACTOR_MIN,
+  TP_NO_STRATEGY_FACTOR_MAX,
+} from "../../constants/minMax";
 
 import "../../styles/Menu.css";
 
@@ -39,6 +48,9 @@ const StrategyMenu = props => {
       extendWaitTime,
 
       troublePointStrategyActive,
+      troublePointThresholdUntilIndexChange,
+      noTroublePointStrategyIndexFactor,
+
       trafficJamStrategyActive,
       transportChangeStrategyActive,
     },
@@ -81,6 +93,16 @@ const StrategyMenu = props => {
     dispatchUpdate({ troublePointStrategyActive: e.target.checked });
   }
 
+  function evSetTroublePointThresholdUntilIndexChange(e) {
+    setIfValidInt(e, TP_THRESHOLD_MIN, TP_THRESHOLD_MAX, val => dispatchUpdate({ troublePointThresholdUntilIndexChange: val }));
+  }
+
+  function evSetNoTroublePointStrategyIndexFactor(e) {
+    setIfValidInt(e, TP_NO_STRATEGY_FACTOR_MIN, TP_NO_STRATEGY_FACTOR_MAX, val =>
+      dispatchUpdate({ noTroublePointStrategyIndexFactor: val })
+    );
+  }
+
   function evSetTrafficJamStrategyActive(e) {
     dispatchUpdate({ trafficJamStrategyActive: e.target.checked });
   }
@@ -104,6 +126,8 @@ const StrategyMenu = props => {
   function evSetGeneratePedestrians(e) {
     dispatch(generatePedestriansUpdated(e.target.checked));
   }
+
+  const canUseLightStrategy = generateCars || generatePedestrians || generateBikes;
 
   return (
     <>
@@ -250,7 +274,7 @@ const StrategyMenu = props => {
             className="custom-control-input"
             id="lightStrategyActive"
             checked={lightStrategyActive}
-            disabled={!(generateCars || generatePedestrians || generateBikes) || wasStarted}
+            disabled={!canUseLightStrategy || wasStarted}
             onChange={evSetLightStrategyActive}
           />
           <label
@@ -264,7 +288,7 @@ const StrategyMenu = props => {
             Light strategy
           </label>
         </div>
-        {lightStrategyActive && (
+        {canUseLightStrategy && lightStrategyActive && (
           <div className="form-group mt-2" key={`ls-${configState}`}>
             <label htmlFor="extendLightTime">Extension time</label>
             <input
@@ -301,7 +325,7 @@ const StrategyMenu = props => {
             Bus station strategy
           </label>
         </div>
-        {stationStrategyActive && (
+        {generatePedestrians && stationStrategyActive && (
           <div className="form-group mt-2" key={`ss-${configState}`}>
             <label htmlFor="extendWaitTime">Extension time</label>
             <input
@@ -336,6 +360,36 @@ const StrategyMenu = props => {
             Trouble point strategy
           </label>
         </div>
+
+        {generateTroublePoints && troublePointStrategyActive && (
+          <div className="form-group mt-2" key={`tpA-${configState}`}>
+            <label htmlFor="troublePointThresholdUntilIndexChange">Threshold until route change</label>
+            <input
+              type="number"
+              className="form-control"
+              id="troublePointThresholdUntilIndexChange"
+              defaultValue={troublePointThresholdUntilIndexChange}
+              disabled={wasStarted}
+              placeholder="Enter treshold until route changes on trouble point"
+              onChange={evSetTroublePointThresholdUntilIndexChange}
+            />
+          </div>
+        )}
+
+        {generateTroublePoints && !troublePointStrategyActive && (
+          <div className="form-group mt-2" key={`tbB-${configState}`}>
+            <label htmlFor="noTroublePointStrategyIndexFactor">Trouble point visibility threshold</label>
+            <input
+              type="number"
+              className="form-control"
+              id="noTroublePointStrategyIndexFactor"
+              defaultValue={noTroublePointStrategyIndexFactor}
+              disabled={wasStarted}
+              placeholder="Enter threshold until car sees trouble point"
+              onChange={evSetNoTroublePointStrategyIndexFactor}
+            />
+          </div>
+        )}
 
         <div className="custom-control custom-switch user-select-none mt-4">
           <input

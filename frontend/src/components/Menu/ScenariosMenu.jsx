@@ -115,6 +115,8 @@ export const ScenariosMenuObj = props => {
     startData.generateTroublePoints = true;
     startData.timeBeforeTrouble = 5;
     startData.troublePointStrategyActive = true;
+    startData.troublePointThresholdUntilIndexChange = 50;
+    startData.noTroublePointStrategyIndexFactor = 30;
 
     prepareData.generatePedestrians = false;
     startData.generateBikes = false;

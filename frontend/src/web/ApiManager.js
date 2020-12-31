@@ -44,6 +44,9 @@ import WebServer from "./WebServer";
  * @property {boolean} stationStrategyActive - If should use stations strategy
  * @property {number} extendWaitTime - Extend time for each bus additionally waits for pedestrian
  * @property {boolean} troublePointStrategyActive - If should use trouble points strategy
+ * @property {number} troublePointThresholdUntilIndexChange - Number of car moves before it changes it's route when trouble point occurs
+ * @property {number} noTroublePointStrategyIndexFactor - Number of car moves before car see trouble point
+ *  and can change it's route (when strategy is off)
  * @property {boolean} trafficJamStrategyActive - If should use traffic jams strategy
  * @property {boolean} transportChangeStrategyActive - If should use transport change strategy
  */
@@ -110,6 +113,9 @@ export default {
     extendWaitTime,
 
     troublePointStrategyActive,
+    troublePointThresholdUntilIndexChange,
+    noTroublePointStrategyIndexFactor,
+
     trafficJamStrategyActive,
     transportChangeStrategyActive,
   }) {
@@ -147,6 +153,9 @@ export default {
         extendWaitTime,
 
         troublePointStrategyActive,
+        troublePointThresholdUntilIndexChange,
+        noTroublePointStrategyIndexFactor,
+
         trafficJamStrategyActive,
         transportChangeStrategyActive,
       },
