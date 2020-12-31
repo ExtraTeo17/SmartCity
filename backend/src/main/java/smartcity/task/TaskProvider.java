@@ -21,6 +21,7 @@ import org.slf4j.LoggerFactory;
 import routing.abstractions.IRouteGenerator;
 import routing.abstractions.IRoutingHelper;
 import routing.core.IGeoPosition;
+import routing.core.Position;
 import routing.nodes.RouteNode;
 import routing.nodes.StationNode;
 import smartcity.ITimeProvider;
@@ -79,34 +80,7 @@ public class TaskProvider implements ITaskProvider {
 
     public Runnable getCreateCarTask(IGeoPosition start, IGeoPosition end, boolean testCar) {
         return () -> {
-            List<RouteNode> route;
-
-            try {
-                var effectiveStart = start;
-                var effectiveEnd = end;
-                if (configContainer.shouldGenerateBatchesForCars()) {
-                    if (startForBatches == null && endForBatches == null) {
-                        startForBatches = start;
-                        endForBatches = end;
-                    }
-
-                    effectiveStart = startForBatches;
-                    effectiveEnd = endForBatches;
-                }
-
-
-                route = carRouteInfoCache.get(effectiveStart, effectiveEnd);
-                if (route == null) {
-                    route = routeGenerator.generateRouteInfo(effectiveStart, effectiveEnd, false);
-                    carRouteInfoCache.put(effectiveStart, effectiveEnd, route);
-                }
-                else {
-                    logger.info("Successfully retrieved route from cache");
-                }
-            } catch (Exception e) {
-                logger.warn("Error generating route info", e);
-                return;
-            }
+            List<RouteNode> route = tryRetrieveCarRoute(start, end);
 
             if (route.size() == 0) {
                 logger.warn("Generated route is empty, agent won't be created.");
@@ -122,19 +96,41 @@ public class TaskProvider implements ITaskProvider {
         };
     }
 
+    private List<RouteNode> tryRetrieveCarRoute(IGeoPosition start, IGeoPosition end) {
+        List<RouteNode> route;
+        try {
+            var effectiveStart = start;
+            var effectiveEnd = end;
+            if (configContainer.shouldGenerateBatchesForCars()) {
+                if (startForBatches == null && endForBatches == null) {
+                    startForBatches = start;
+                    endForBatches = end;
+                }
+
+                effectiveStart = startForBatches;
+                effectiveEnd = endForBatches;
+            }
+
+            route = carRouteInfoCache.get(effectiveStart, effectiveEnd);
+            if (route == null) {
+                route = routeGenerator.generateRouteInfo(effectiveStart, effectiveEnd, false);
+                carRouteInfoCache.put(effectiveStart, effectiveEnd, route);
+            }
+            else {
+                logger.info("Successfully retrieved car route from cache");
+            }
+        } catch (Exception e) {
+            logger.warn("Error generating route info", e);
+            return new ArrayList<>();
+        }
+
+        return route;
+    }
+
     public Runnable getCreateBikeTask(IGeoPosition start, IGeoPosition end, boolean testBike) {
         return () -> {
-            List<RouteNode> route;
-            try {
-                route = bikeRouteInfoCache.get(start, end);
-                if (route == null) {
-                    route = routeGenerator.generateRouteInfo(start, end, "bike");
-                    bikeRouteInfoCache.put(start, end, route);
-                }
-            } catch (Exception e) {
-                logger.warn("Error generating route info", e);
-                return;
-            }
+            List<RouteNode> route = tryRetrieveBikeRoute(start, end);
+
             if (route.size() == 0) {
                 logger.debug("Generated route is empty, agent won't be created.");
                 return;
@@ -147,6 +143,25 @@ public class TaskProvider implements ITaskProvider {
                 eventBus.post(new BikeAgentCreatedEvent(agent.getId(), agent.getPosition(), route, testBike));
             }
         };
+    }
+
+    private List<RouteNode> tryRetrieveBikeRoute(IGeoPosition start, IGeoPosition end) {
+        List<RouteNode> route;
+        try {
+            route = bikeRouteInfoCache.get(start, end);
+            if (route == null) {
+                route = routeGenerator.generateRouteInfo(start, end, "bike");
+                bikeRouteInfoCache.put(start, end, route);
+            }
+            else {
+                logger.info("Successfully retrieved bike route from cache");
+            }
+        } catch (Exception e) {
+            logger.warn("Error generating route info", e);
+            return new ArrayList<>();
+        }
+
+        return route;
     }
 
     @Override
