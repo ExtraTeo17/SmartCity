@@ -16,6 +16,7 @@ import routing.nodes.LightManagerNode;
 import smartcity.ITimeProvider;
 import utilities.ConditionalExecutor;
 import vehicles.MovingObject;
+import vehicles.Pedestrian;
 
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
@@ -99,10 +100,14 @@ public abstract class AbstractAgent extends Agent {
         var predictedTime = simulationTime.plus(msToNextLight, ChronoUnit.MILLIS);
         logger.info("I will be at next light at: " + predictedTime);
         properties.setProperty(MessageParameter.ARRIVAL_TIME, "" + predictedTime);
-        properties.setProperty(MessageParameter.ADJACENT_OSM_WAY_ID, "" + managerNode.getAdjacentWayId());
+        properties.setProperty(MessageParameter.ADJACENT_OSM_WAY_ID, getAdjacentIdParameter(managerNode));
         msg.setAllUserDefinedParameters(properties);
 
         return msg;
+    }
+
+    protected String getAdjacentIdParameter(final LightManagerNode node) {
+        return node.getAdjacentWayId() + "";
     }
 
     protected ACLMessage createMessageById(int type, String receiverName, int receiverId) {

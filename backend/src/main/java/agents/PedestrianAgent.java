@@ -493,4 +493,9 @@ public class PedestrianAgent extends AbstractAgent {
     public Pedestrian getPedestrian() {
         return pedestrian;
     }
+
+    @Override
+    protected final String getAdjacentIdParameter(final LightManagerNode node) {
+        return node.getCrossingOsmId1() + "";
+    }
 }
