@@ -16,7 +16,6 @@ import routing.nodes.LightManagerNode;
 import smartcity.ITimeProvider;
 import utilities.ConditionalExecutor;
 import vehicles.MovingObject;
-import vehicles.Pedestrian;
 
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;

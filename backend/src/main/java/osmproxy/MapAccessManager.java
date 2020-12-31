@@ -121,57 +121,7 @@ public class MapAccessManager implements IMapAccessManager {
 
         return Optional.of(result);
     }
-
-    @SuppressWarnings("unused")
-    private final void printStream(final InputStream stream) {
-        try {
-            logger.info(IOUtils.toString(stream));
-            stream.reset();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-
-    private static HttpURLConnection sendRequest(String query) {
-        return sendRequest(CURRENT_API, query);
-    }
-
-    private static HttpURLConnection sendRequest(String apiAddress, String query) {
-        HttpURLConnection connection = getConnection(apiAddress);
-        connection.setDoInput(true);
-        connection.setDoOutput(true);
-        connection.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");
-
-        try {
-            DataOutputStream printout = new DataOutputStream(connection.getOutputStream());
-            printout.writeBytes("data=" + URLEncoder.encode(query, StandardCharsets.UTF_8));
-            printout.flush();
-            printout.close();
-        } catch (IOException e) {
-            logger.error("Error sending data to connection", e);
-            throw new RuntimeException(e);
-        }
-
-        return connection;
-    }
-
-    private static HttpURLConnection getConnection(String apiAddress) {
-        URL url;
-        try {
-            url = new URL(apiAddress);
-        } catch (MalformedURLException e) {
-            logger.error("Error creating url: " + apiAddress);
-            throw new RuntimeException(e);
-        }
-
-        try {
-            return (HttpURLConnection) url.openConnection();
-        } catch (IOException e) {
-            logger.error("Error opening connection to " + apiAddress);
-            throw new RuntimeException(e);
-        }
-    }
-
+    
     @Override
     public List<OSMLight> getOsmLights(List<Long> osmWayIds) {
         var query = OsmQueryManager.getFullTrafficSignalQuery(osmWayIds);

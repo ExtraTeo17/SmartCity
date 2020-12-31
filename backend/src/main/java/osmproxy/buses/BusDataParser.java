@@ -79,13 +79,10 @@ public class BusDataParser implements IBusDataParser {
             var brigadeInfos = generateBrigadeInfos(busInfo.busLine, busInfo.stops);
             if (brigadeInfos.size() > 0) {
                 busInfo.addBrigades(brigadeInfos);
-            } else {
-            	busLinesOfInfosToRemoveCauseOfMissingTimetableInWarszawskieAPI.add(busInfo.busLine);
-            	logger.warn("Timetable for bus line " + busInfo.busLine + " is empty in Warszawskie API. Line will not be considered");
             }
             else {
                 busLinesOfInfosToRemoveCauseOfMissingTimetableInWarszawskieAPI.add(busInfo.busLine);
-                logger.info("Warning: Timetable for bus line " + busInfo.busLine + " is empty in Warszawskie API. Line will not be considered");
+                logger.warn("Timetable for bus line " + busInfo.busLine + " is empty in Warszawskie API. Line will not be considered");
             }
         }
         busInfos.removeIf(info -> busLinesOfInfosToRemoveCauseOfMissingTimetableInWarszawskieAPI.stream()
