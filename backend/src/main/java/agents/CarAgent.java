@@ -233,7 +233,7 @@ public class CarAgent extends AbstractAgent {
 
                     @Override
                     public void action() {
-                        final RouteMergeInfo mergeResult = createMergedWithOldRouteAlternativeRouteFromIndex(
+                        RouteMergeInfo mergeResult = createMergedWithOldRouteAlternativeRouteFromIndex(
                                 indexAfterWhichRouteChanges, true);
                         updateVehicleRouteAfterMerge(indexAfterWhichRouteChanges, mergeResult);
                         borderlineIndex = null;
@@ -245,22 +245,30 @@ public class CarAgent extends AbstractAgent {
 
 
             /**
-             * @param indexAfterWhichRouteChanges >= 0
+             * @param indexAfterWhichRouteChanges >= 0 && < uniformRoute.size()
              */
             private RouteMergeInfo createMergedWithOldRouteAlternativeRouteFromIndex(int indexAfterWhichRouteChanges,
                                                                                      boolean bewareOfJammedEdge) {
-                final IGeoPosition positionAfterWhichRouteChanges = car
-                        .getPositionOnIndex(indexAfterWhichRouteChanges);
+                var uniformRouteSize = car.getUniformRouteSize();
+                if (indexAfterWhichRouteChanges >= uniformRouteSize) {
+                    indexAfterWhichRouteChanges = uniformRouteSize - 1;
+                }
+
+                var positionAfterWhichRouteChanges = car.getPositionOnIndex(indexAfterWhichRouteChanges);
                 var oldUniformRoute = car.getUniformRoute();
+
                 var newSimpleRouteEnd = routeGenerator.generateRouteInfo(positionAfterWhichRouteChanges,
                         oldUniformRoute.get(oldUniformRoute.size() - 1),
                         bewareOfJammedEdge);
                 if (newSimpleRouteEnd.size() == 0) { // Case when GraphHopper has problems
-                    newSimpleRouteEnd = new ArrayList<>(oldUniformRoute.subList(indexAfterWhichRouteChanges, oldUniformRoute.size()));
+
+                    newSimpleRouteEnd = new ArrayList<>(oldUniformRoute.subList(indexAfterWhichRouteChanges,
+                            oldUniformRoute.size()));
                 }
+
                 List<RouteNode> route = oldUniformRoute.subList(0, indexAfterWhichRouteChanges);
                 route.addAll(newSimpleRouteEnd);
-                final RouteMergeInfo mergeResult = routeTransformer.mergeByDistance(car.getSimpleRoute(),
+                RouteMergeInfo mergeResult = routeTransformer.mergeByDistance(car.getSimpleRoute(),
                         newSimpleRouteEnd);
                 mergeResult.newUniformRoute = route;
 
