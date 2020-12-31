@@ -434,8 +434,7 @@ public class CarAgent extends AbstractAgent {
                     int index = configContainer.shouldUseFixedConstructionSites() ?
                             getFixedRandomIndex() :
                             getTrulyRandomIndex(car.getMoveIndex(), route.size());
-
-                    // TODO: If moveIndex + THRESHOLD_UNTIL_INDEX_CHANGE >= route.size() this can happen
+                    
                     if (index < route.size()) {
                         RouteNode troublePointTmp = route.get(index);
                         troublePoint = new RouteNode(troublePointTmp.getLat(), troublePointTmp.getLng(),
