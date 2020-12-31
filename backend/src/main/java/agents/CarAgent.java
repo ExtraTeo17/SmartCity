@@ -206,7 +206,7 @@ public class CarAgent extends AbstractAgent {
                     handleConstructionSiteRouteChange(indexOfRouteNodeWithEdge);
                 }
                 else {
-                    logger.info("Index of edge: " + indexOfRouteNodeWithEdge + " is not on the route");
+                    logger.debug("Index of edge: " + indexOfRouteNodeWithEdge + " is not on the route");
                 }
             }
 
@@ -434,7 +434,7 @@ public class CarAgent extends AbstractAgent {
                     int index = configContainer.shouldUseFixedConstructionSites() ?
                             getFixedRandomIndex() :
                             getTrulyRandomIndex(car.getMoveIndex(), route.size());
-                    
+
                     if (index < route.size()) {
                         RouteNode troublePointTmp = route.get(index);
                         troublePoint = new RouteNode(troublePointTmp.getLat(), troublePointTmp.getLng(),
