@@ -167,17 +167,13 @@ public abstract class MovingObject {
         return null;
     }
 
-    public static void displayRouteDebugStatic(List<RouteNode> route) {
+    public static void displayRouteDebug(List<RouteNode> route) {
         System.out.println(("Display route debug of size: " + route.size()));
         StringBuilder builder = new StringBuilder();
         for (int i = 0; i < route.size(); ++i) {
             builder.append("R[" + i + "]: " + route.get(i).getDebugString(route.get(i) instanceof StationNode) + "; ");
         }
         System.out.println(builder.toString());
-    }
-
-    public void displayRouteDebug(List<RouteNode> route) {
-        displayRouteDebugStatic(route);
     }
 
     public boolean isAtTrafficLights() {

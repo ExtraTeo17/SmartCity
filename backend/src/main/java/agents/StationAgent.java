@@ -44,6 +44,8 @@ public class StationAgent extends AbstractAgent {
         super(id, name, timeProvider, eventBus);
         this.station = station;
 
+        station.printDebugInfo(id);
+
         Behaviour communication = new CyclicBehaviour() {
             @SuppressWarnings("DuplicatedCode")
             @Override

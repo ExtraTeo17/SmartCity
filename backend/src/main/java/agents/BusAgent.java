@@ -69,7 +69,7 @@ public class BusAgent extends AbstractAgent {
 
     @Override
     protected void setup() {
-        informNextStation();
+        informNextStation(true);
         var firstStationOpt = bus.getCurrentStationNode();
         if (firstStationOpt.isEmpty()) {
             print("No stations on route!", LoggerLevel.ERROR);
@@ -154,7 +154,7 @@ public class BusAgent extends AbstractAgent {
                             if (node instanceof LightManagerNode) {
                                 informLightManager(bus);
                             }
-                            informNextStation();
+                            informNextStation(false);
                             numberOfPassedStations++;
                             bus.setState(DrivingState.MOVING);
                             move();
@@ -220,7 +220,7 @@ public class BusAgent extends AbstractAgent {
 
                                 response.setAllUserDefinedParameters(properties);
                                 send(response);
-                                informNextStation();
+                                informNextStation(false);
                                 bus.setState(DrivingState.PASSING_STATION);
                             }
                         }
@@ -362,9 +362,9 @@ public class BusAgent extends AbstractAgent {
         return bus.getPosition();
     }
 
-    private void informNextStation() {
+    private void informNextStation(boolean isStart) {
         // finds next station and announces his arrival
-        var stationOpt = bus.findNextStation();
+        var stationOpt = bus.findNextStation(isStart);
         if (stationOpt.isPresent()) {
             var station = stationOpt.get();
             var stationId = station.getAgentId();
