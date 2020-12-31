@@ -54,7 +54,7 @@ public class MapAccessManager implements IMapAccessManager {
     private static final String OVERPASS_API = "https://lz4.overpass-api.de/api/interpreter";
     private static final String ALTERNATE_OVERPASS_API_1 = "https://z.overpass-api.de/api/interpreter";
     private static final String ALTERNATE_OVERPASS_API_2 = "https://overpass.kumi.systems/api/interpreter";
-    private static String CURRENT_API = ALTERNATE_OVERPASS_API_1;
+    private static String CURRENT_API = OVERPASS_API;
     private static final String CROSSROADS_LOCATIONS_PATH = "config/crossroads.xml";
 
     private final DocumentBuilderFactory xmlBuilderFactory;

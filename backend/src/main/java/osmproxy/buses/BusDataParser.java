@@ -53,18 +53,14 @@ public class BusDataParser implements IBusDataParser {
 
         Set<BusInfoData> busInfoDataSet = new LinkedHashSet<>();
         HashMap<Long, OSMStation> busStopsMap = new LinkedHashMap<>();
-        int errors = 0;
         for (var osmNode : osmXMLNodes) {
             var nodeName = osmNode.getNodeName();
             if (nodeName.equals("relation")) {
                 var busInfoData = parseRelation(osmNode);
                 if (busInfoData.isEmpty()) {
-                    logger.info("busInfoData for relation " + osmNode.getAttributes().getNamedItem("id") + "was empty ");
+                    logger.info("Bus info data for relation " + osmNode.getAttributes().getNamedItem("id") +
+                            " was empty");
                     continue;
-                   // if (++errors < 5) {
-                   //
-                ///    }
-                   // throw new RuntimeException("Too many errors when parsing busInfo");
                 }
                 busInfoDataSet.add(busInfoData.get());
             }
@@ -79,7 +75,8 @@ public class BusDataParser implements IBusDataParser {
         List<String> busLinesOfInfosToRemoveCauseOfMissingTimetableInWarszawskieAPI = new ArrayList<>();
         for (var busInfo : busInfos) {
         	if (busInfo.stops.isEmpty()) {
-        		logger.info("Warning: Stops in the bus info are empty for line " + busInfo.busLine + ". Skip timetable preparation");
+        		logger.info("Warning: Stops in the bus info are empty for line " + busInfo.busLine +
+        		        ". Skip timetable preparation");
         		continue;
         	}
             var brigadeInfos = generateBrigadeInfos(busInfo.busLine, busInfo.stops);
@@ -87,7 +84,8 @@ public class BusDataParser implements IBusDataParser {
                 busInfo.addBrigades(brigadeInfos);
             } else {
             	busLinesOfInfosToRemoveCauseOfMissingTimetableInWarszawskieAPI.add(busInfo.busLine);
-            	logger.info("Warning: Timetable for bus line " + busInfo.busLine + " is empty in Warszawskie API. Line will not be considered");
+            	logger.info("Warning: Timetable for bus line " + busInfo.busLine +
+            	        " is empty in Warszawskie API. Line will not be considered");
             }
 		}
 		busInfos.removeIf(info -> busLinesOfInfosToRemoveCauseOfMissingTimetableInWarszawskieAPI.stream()
