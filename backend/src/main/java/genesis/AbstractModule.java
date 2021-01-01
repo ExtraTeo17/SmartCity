@@ -9,6 +9,11 @@ import com.google.inject.spi.InjectionListener;
 import com.google.inject.spi.TypeEncounter;
 import com.google.inject.spi.TypeListener;
 
+/**
+ * Abstract entity for DI Modules. <br/>
+ * All derived modules that will call {@link #configure(Binder binder)} will
+ *  automatically register all created types to {@link EventBus}
+ */
 public abstract class AbstractModule implements Module {
     protected static final EventBus eventBus;
 

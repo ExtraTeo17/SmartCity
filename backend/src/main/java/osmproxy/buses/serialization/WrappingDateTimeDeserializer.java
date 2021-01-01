@@ -12,7 +12,7 @@ import java.time.LocalTime;
 public class WrappingDateTimeDeserializer extends JsonDeserializer<LocalDateTime> {
 
     /**
-     * @return Date parsed from HH:mm:ss format, where HH >= 0, HH < 30
+     * @return Date parsed from HH:mm:ss format, where HH &#62;= 0, HH &#60; 30
      */
     @Override
     public LocalDateTime deserialize(JsonParser jsonParser, DeserializationContext deserializationContext)
