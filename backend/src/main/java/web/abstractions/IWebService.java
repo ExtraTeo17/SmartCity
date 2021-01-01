@@ -10,8 +10,18 @@ import vehicles.enums.BusFillState;
 
 import java.util.List;
 
+/**
+ * Used for interaction with frontend interface.
+ * Contains all method necessary to pass data or notify GUI.
+ */
 public interface IWebService extends IStartable {
 
+    /**
+     * Response to {@link web.message.payloads.requests.PrepareSimulationRequest}
+     * @param lights - all generated lights in provided zone
+     * @param stations - all generated bus stations in provided zone
+     * @param buses - all generated buses (for all possible schedules and lines) in provided zone
+     */
     void prepareSimulation(List<? extends Light> lights,
                            List<? extends OSMStation> stations,
                            List<? extends Bus> buses);

@@ -8,7 +8,15 @@ import web.abstractions.IWebConnector;
 import web.abstractions.IWebService;
 import web.serialization.SerializationModule;
 
-
+/**
+ * Used for instantiating Web package classes. <br/>
+ * Automatically starts
+ * {@link Communicator} &#8594;
+ * {@link WebService} &#8594;
+ * {@link WebConnector} &#8594;
+ * {@link SocketServer} &#8594;
+ * {@link MessageHandler}.
+ */
 public class WebModule extends AbstractModule {
     private final Integer port;
 

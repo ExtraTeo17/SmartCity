@@ -20,6 +20,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import web.abstractions.IWebService;
 
+/**
+ * Used for handling all events which result in some interaction with frontend. <br/>
+ * It is the highest layer of communication with frontend. <br/>
+ */
 @SuppressWarnings("OverlyCoupledClass")
 class Communicator {
     private static final Logger logger = LoggerFactory.getLogger(Communicator.class);

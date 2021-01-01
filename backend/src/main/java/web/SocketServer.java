@@ -13,6 +13,10 @@ import java.net.InetSocketAddress;
 import java.util.LinkedList;
 import java.util.List;
 
+/**
+ * Used for interaction with web sockets. <br/>
+ * It is the lowest layer of communication with frontend.
+ */
 class SocketServer extends WebSocketServer {
     public static final int CONNECTION_LOST_TIMEOUT = 600;
     private static final Logger logger = LoggerFactory.getLogger(SocketServer.class);
@@ -25,14 +29,17 @@ class SocketServer extends WebSocketServer {
                  MessageHandler messageHandler) {
         super(getSocketAddress(port));
         this.messageHandler = messageHandler;
-        this.setConnectionLostTimeout(CONNECTION_LOST_TIMEOUT);
-        sockets = new LinkedList<>();
+        this.sockets = new LinkedList<>();
+        setConnectionLostTimeout(CONNECTION_LOST_TIMEOUT);
     }
 
     private static InetSocketAddress getSocketAddress(int port) {
         return new InetSocketAddress(port);
     }
 
+    /**
+     * @return All connected sockets
+     */
     List<WebSocket> getMessageBuses() {
         return sockets;
     }
@@ -44,7 +51,6 @@ class SocketServer extends WebSocketServer {
      * @param handshake The handshake of the websocket instance
      */
     @Override
-
     public void onOpen(WebSocket socket, ClientHandshake handshake) {
         sockets.add(socket);
         logger.info("Connection established from: " + getSocketAddress(socket));

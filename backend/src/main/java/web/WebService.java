@@ -27,8 +27,8 @@ import java.util.List;
 /**
  * Used for interaction with frontend interface.
  * Contains all method necessary to pass data or notify GUI.
- * Each method has it's own payload (which extends {@link web.message.payloads.AbstractPayload} and {@link MessageType}
- * Class is responsible for types conversion and {@link MessageType} assigment.
+ * Each method has it's own payload (which extends {@link web.message.payloads.AbstractPayload} and {@link MessageType} <br/>
+ * Class is responsible for types conversion and {@link MessageType} assigment. <br/>
  */
 @SuppressWarnings("OverlyCoupledClass")
 class WebService implements IWebService {
