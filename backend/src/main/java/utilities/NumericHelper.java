@@ -8,6 +8,9 @@ public final class NumericHelper {
     public final static double PRECISION = 1e-6;
 
     /**
+     * @param a close side
+     * @param b close side
+     * @param c opposite side
      * @return cosine in radians, calculated from the Law of Cosines in triangle
      */
     @Contract(pure = true)
