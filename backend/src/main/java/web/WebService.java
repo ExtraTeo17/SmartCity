@@ -23,6 +23,13 @@ import web.serialization.Converter;
 
 import java.util.List;
 
+
+/**
+ * Used for interaction with frontend interface.
+ * Contains all method necessary to pass data or notify GUI.
+ * Each method has it's own payload (which extends {@link web.message.payloads.AbstractPayload} and {@link MessageType}
+ * Class is responsible for types conversion and {@link MessageType} assigment.
+ */
 @SuppressWarnings("OverlyCoupledClass")
 class WebService implements IWebService {
     private final WebConnector webConnector;

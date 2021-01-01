@@ -8,6 +8,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
+import osmproxy.elements.data.LightOrientation;
+import osmproxy.elements.data.Range;
+import osmproxy.elements.data.RouteOrientation;
 import routing.core.IGeoPosition;
 import routing.core.IZone;
 import routing.core.Position;
@@ -329,27 +332,6 @@ public class OSMWay extends OSMElement implements Serializable {
         }
 
         return Optional.empty();
-    }
-
-    private static class Range {
-        public final int from;
-        public final int to;
-
-        private Range(int from, int to) {
-            this.from = from;
-            this.to = to;
-        }
-    }
-
-    // TODO: Move enums to other file or make it package private
-    public enum LightOrientation {
-        LIGHT_AT_ENTRY,
-        LIGHT_AT_EXIT
-    }
-
-    public enum RouteOrientation {
-        BACK,
-        FRONT
     }
 
     public String findClosestNodeRefTo(IGeoPosition pointA) {
