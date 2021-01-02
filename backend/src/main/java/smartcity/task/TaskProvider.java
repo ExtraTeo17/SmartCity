@@ -21,7 +21,6 @@ import org.slf4j.LoggerFactory;
 import routing.abstractions.IRouteGenerator;
 import routing.abstractions.IRoutingHelper;
 import routing.core.IGeoPosition;
-import routing.core.Position;
 import routing.nodes.RouteNode;
 import routing.nodes.StationNode;
 import smartcity.ITimeProvider;
@@ -39,6 +38,12 @@ import java.util.function.Supplier;
 
 import static smartcity.config.StaticConfig.USE_BATCHED_UPDATES;
 
+
+/**
+ * Used for periodical tasks creation. <br/>
+ * Note that this entity only creates the tasks, not run them. You can treat this class as logic encapsulation mechanism. <br/>
+ * Each method has complexity of O(1).
+ */
 @SuppressWarnings({"OverlyCoupledClass", "ClassWithTooManyFields"})
 public class TaskProvider implements ITaskProvider {
     private static final Logger logger = LoggerFactory.getLogger(TaskProvider.class);
@@ -78,6 +83,15 @@ public class TaskProvider implements ITaskProvider {
         this.bikeRouteInfoCache = HashBasedTable.create();
     }
 
+    /**
+     * Used to create task, which creates car agent and adds him to the current {@link IAgentsContainer}
+     *
+     * @param start Start position
+     * @param end End position
+     * @param testCar If should be test car.
+     * @return -
+     */
+    @Override
     public Runnable getCreateCarTask(IGeoPosition start, IGeoPosition end, boolean testCar) {
         return () -> {
             List<RouteNode> route = tryRetrieveCarRoute(start, end);
@@ -127,6 +141,15 @@ public class TaskProvider implements ITaskProvider {
         return route;
     }
 
+    /**
+     * Used to create task, which creates bike agent and adds him to the current {@link IAgentsContainer}
+     *
+     * @param start    Start position
+     * @param end      End position
+     * @param testBike If should be test bike
+     * @return -
+     */
+    @Override
     public Runnable getCreateBikeTask(IGeoPosition start, IGeoPosition end, boolean testBike) {
         return () -> {
             List<RouteNode> route = tryRetrieveBikeRoute(start, end);
@@ -164,6 +187,15 @@ public class TaskProvider implements ITaskProvider {
         return route;
     }
 
+    /**
+     * Used to create task, which creates pedestrian agent and adds him to the current {@link IAgentsContainer}
+     *
+     * @param routingHelper  Used for start/end positions generation
+     * @param startStation   Station, which pedestrian will initially head to, to wait for bus.
+     * @param endStation     Station, at which pedestrian get off from bus.
+     * @param testPedestrian If should be test pedestrian.
+     * @return -
+     */
     @Override
     public Runnable getCreatePedestrianTask(IRoutingHelper routingHelper,
                                             StationNode startStation, StationNode endStation,
@@ -207,6 +239,11 @@ public class TaskProvider implements ITaskProvider {
         };
     }
 
+    /**
+     * Used to create task for starting bus agents on schedule.
+     *
+     * @return -
+     */
     @SuppressWarnings("FeatureEnvy")
     @Override
     public Runnable getScheduleBusControlTask() {
@@ -228,6 +265,13 @@ public class TaskProvider implements ITaskProvider {
         };
     }
 
+    /**
+     * Used to create task for light-group light-color updates.
+     *
+     * @param managerId Corresponding {@link agents.LightManagerAgent} id
+     * @param lights    All lights that should simultaneously be switched
+     * @return Task, which returns period after it (the Task) should be executed again.
+     */
     @Override
     public Supplier<Integer> getSwitchLightsTask(int managerId, Siblings<SimpleLightGroup> lights) {
         var switchLights = functionalTaskFactory
@@ -250,6 +294,16 @@ public class TaskProvider implements ITaskProvider {
         return () -> switchLights.apply(switchLightsContext);
     }
 
+    /**
+     * Used to create task for simulation time updates. <br/>
+     * If {@link smartcity.config.StaticConfig#USE_BATCHED_UPDATES} is true, then this method will return {@link Runnable},
+     * that will collect all agent positions from current {@link IAgentsContainer} and post event containing this data. <br/>
+     * Posted event is later used to update agent positions on GUI. <br/>
+     * It is important to notice that positions will be collected regardless whether position of agent changed or not.
+     *
+     * @param simulationStartTime Initial simulation time
+     * @return Task, which should be executed periodically to update simulation
+     */
     @Override
     public Runnable getSimulationControlTask(LocalDateTime simulationStartTime) {
         var updateTimeTask = timeProvider.getUpdateTimeTask(simulationStartTime);
