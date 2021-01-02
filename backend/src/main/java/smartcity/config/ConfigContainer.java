@@ -9,7 +9,10 @@ import smartcity.SimulationState;
 import smartcity.config.abstractions.*;
 
 
-@SuppressWarnings("ClassWithTooManyFields")
+/**
+ * Contains all configuration properties of application.
+ */
+@SuppressWarnings({"ClassWithTooManyFields", "RedundantFieldInitialization"})
 public class ConfigContainer extends ConfigMutator
         implements IZoneMutator,
         IGenerationConfigContainer,

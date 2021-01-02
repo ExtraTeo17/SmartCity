@@ -52,10 +52,10 @@ public class SmartCity {
             }
         }
 
-        props.forEach((key, value) -> setFinalStatic((String) key, value));
+        props.forEach((key, value) -> setStatic((String) key, value));
     }
 
-    private static void setFinalStatic(String fieldName, Object newValue) {
+    private static void setStatic(String fieldName, Object newValue) {
         try {
             var field = ConfigProperties.class.getField(fieldName);
             var parsedValue = getParsedValue(field, newValue);

@@ -1,5 +1,8 @@
 package smartcity.config.abstractions;
 
+/**
+ * Contains all trouble-point related configuration properties.
+ */
 public interface ITroublePointsConfigContainer {
 
     boolean shouldGenerateConstructionSites();

@@ -1,5 +1,8 @@
 package smartcity.config.abstractions;
 
+/**
+ * Contains all change-transport related configuration properties.
+ */
 public interface IChangeTransportConfigContainer {
 
     boolean shouldGenerateBusFailures();

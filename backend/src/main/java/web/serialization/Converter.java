@@ -15,6 +15,9 @@ import web.message.payloads.models.*;
 import web.message.payloads.requests.PrepareSimulationRequest;
 import web.message.payloads.requests.StartSimulationRequest;
 
+/**
+ * Used for backend &lt;-&gt; frontend type conversion.
+ */
 @SuppressWarnings("OverlyCoupledClass")
 public class Converter {
     public static Location convert(IGeoPosition geoPosition) {
