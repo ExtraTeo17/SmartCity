@@ -59,6 +59,7 @@ class WebService implements IWebService {
         webConnector.broadcastMessage(MessageType.PREPARE_SIMULATION_RESPONSE, payload);
     }
 
+    @Override
     public void startSimulation() {
         var payload = new StartResponse();
         webConnector.broadcastMessage(MessageType.START_SIMULATION_RESPONSE, payload);
