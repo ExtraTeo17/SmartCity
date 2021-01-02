@@ -46,7 +46,7 @@ public class OptimizationResult {
     }
 
     public void addBusAndPedestrianGrantedPassthrough(String busAgentName, List<String> pedestrians) {
-        busesAndPedestriansFreeToProceedNames.add(new Pair<String, List<String>>(busAgentName, pedestrians));
+        busesAndPedestriansFreeToProceedNames.add(new Pair<>(busAgentName, pedestrians));
     }
 
     public List<Pair<String, List<String>>> busesAndPedestriansFreeToProceed() {

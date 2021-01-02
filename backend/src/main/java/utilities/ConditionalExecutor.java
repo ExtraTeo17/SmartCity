@@ -7,7 +7,7 @@ import static smartcity.config.StaticConfig.DEBUG;
 import static smartcity.config.StaticConfig.TRACE;
 
 public class ConditionalExecutor {
-    private final static Logger logger = LoggerFactory.getLogger(ConditionalExecutor.class);
+    private static final Logger logger = LoggerFactory.getLogger(ConditionalExecutor.class);
 
     public static void debug(Runnable action) {
         debug(action, false);

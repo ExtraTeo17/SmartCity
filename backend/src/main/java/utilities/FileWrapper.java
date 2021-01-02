@@ -80,7 +80,7 @@ public class FileWrapper {
         }
     }
 
-    @SuppressWarnings(value = "unchecked")
+    @SuppressWarnings("unchecked")
     public static <T extends Serializable> T getFromCache(String fileName) {
         String path = DEFAULT_OUTPUT_PATH_CACHE + "/" + fileName + ".ser";
         Object data = tryReadFile(path);

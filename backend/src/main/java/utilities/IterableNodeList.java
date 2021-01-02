@@ -23,8 +23,8 @@ public class IterableNodeList implements Iterable<Node> {
     @NotNull
     @Override
     public Iterator<Node> iterator() {
-        return new Iterator<Node>() {
-            private int iter = 0;
+        return new Iterator<>() {
+            private int iter;
 
             @Override
             public boolean hasNext() {

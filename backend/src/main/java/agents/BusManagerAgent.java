@@ -131,7 +131,7 @@ public class BusManagerAgent extends AbstractAgent {
                 }
                 logger.info("Preferred bus line: " + preferredBusLine);
                 response.addUserDefinedParameter(MessageParameter.TIME_BETWEEN_PEDESTRIAN_AT_STATION_ARRIVAL_AND_REACHING_DESIRED_STOP,
-                        minimumTimeOverall + "");
+                        String.valueOf(minimumTimeOverall));
                 response.addUserDefinedParameter(MessageParameter.BUS_LINE, preferredBusLine);
                 response.addUserDefinedParameter(MessageParameter.TYPE, MessageParameter.BUS_MANAGER);
                 response.addUserDefinedParameter(MessageParameter.EVENT, event);

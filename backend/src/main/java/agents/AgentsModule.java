@@ -10,6 +10,7 @@ import com.google.inject.Singleton;
 import genesis.AbstractModule;
 import jade.wrapper.ContainerController;
 
+@SuppressWarnings("OverlyCoupledClass")
 public class AgentsModule extends AbstractModule {
     public static final Class<?>[] agentTypes = {
             CarAgent.class,

@@ -36,15 +36,15 @@ class WebConnector implements IWebConnector {
     @Override
     public void broadcastMessage(@NotNull MessageType type, @NotNull AbstractPayload payload) {
         var messageOpt = objectMapper.serialize(type, payload);
-        if (messageOpt.isPresent()) {
-            String serializedMessage = messageOpt.get();
-            for (var bus : socketServer.getMessageBuses()) {
-                bus.send(serializedMessage);
-            }
-        }
-        else {
+        if (messageOpt.isEmpty()) {
             logger.warn("Message of type: " + type + "and payload: " + payload +
                     "won't be sent because of serialization error.");
+            return;
+        }
+        
+        String serializedMessage = messageOpt.get();
+        for (var bus : socketServer.getMessageBuses()) {
+            bus.send(serializedMessage);
         }
     }
 }

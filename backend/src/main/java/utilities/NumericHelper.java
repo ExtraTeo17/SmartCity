@@ -5,7 +5,7 @@ import org.jetbrains.annotations.Contract;
 import java.util.List;
 
 public final class NumericHelper {
-    public final static double PRECISION = 1e-6;
+    public static final double PRECISION = 1e-6;
 
     /**
      * @param a close side

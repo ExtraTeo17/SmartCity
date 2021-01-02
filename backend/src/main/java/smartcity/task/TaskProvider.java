@@ -86,8 +86,8 @@ public class TaskProvider implements ITaskProvider {
     /**
      * Used to create task, which creates car agent and adds him to the current {@link IAgentsContainer}
      *
-     * @param start Start position
-     * @param end End position
+     * @param start   Start position
+     * @param end     End position
      * @param testCar If should be test car.
      * @return -
      */
@@ -278,7 +278,7 @@ public class TaskProvider implements ITaskProvider {
                 .createLightSwitcher(managerId, configContainer.getExtendLightTime(), lights);
         // Can be moved somewhere else if needed and passed as parameter
         var switchLightsContext = new ISwitchLightsContext() {
-            private boolean haveAlreadyExtended = false;
+            private boolean haveAlreadyExtended;
 
             @Override
             public boolean haveAlreadyExtended() {

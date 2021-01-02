@@ -26,7 +26,7 @@ public class OSMWay extends OSMElement implements Serializable {
     private final List<String> childNodeIds;
     private final boolean isOneWay;
     private List<OSMWaypoint> waypoints;
-    private LightOrientation lightOrientation = null;
+    private LightOrientation lightOrientation;
     private RouteOrientation routeOrientation = RouteOrientation.FRONT;
 
     @ForSerialization

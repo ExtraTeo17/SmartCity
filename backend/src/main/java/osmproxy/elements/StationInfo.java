@@ -11,7 +11,7 @@ public class StationInfo {
     private final List<StationNode> nodes;
 
     public StationInfo(List<StationNode> copyOf) {
-        nodes = new ArrayList<StationNode>(copyOf);
+        nodes = new ArrayList<>(copyOf);
     }
 
     public void addAll(List<StationNode> mergedStationNodes) {
