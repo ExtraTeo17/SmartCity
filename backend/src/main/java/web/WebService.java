@@ -2,8 +2,8 @@ package web;
 
 import com.google.inject.Inject;
 import events.web.models.UpdateObject;
-import osmproxy.elements.OSMStation;
 import routing.core.IGeoPosition;
+import routing.nodes.StationNode;
 import smartcity.lights.core.Light;
 import vehicles.Bus;
 import vehicles.enums.BusFillState;
@@ -46,11 +46,12 @@ class WebService implements IWebService {
 
     @Override
     public void prepareSimulation(List<? extends Light> lights,
-                                  List<? extends OSMStation> stations,
+                                  List<? extends StationNode> stations,
                                   List<? extends Bus> buses) {
         var lightDtos = lights.stream().map(Converter::convert)
                 .toArray(LightDto[]::new);
-        var stationDtos = stations.stream().map(Converter::convert)
+        var stationDtos = stations.stream()
+                .map(Converter::convert)
                 .toArray(StationDto[]::new);
         var busDtos = buses.stream().map(Converter::convert).
                 toArray(BusDto[]::new);

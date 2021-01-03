@@ -7,16 +7,19 @@ import java.util.Objects;
 public class StationNode extends RouteNode {
     private final long osmId;
     private int agentId;
+    private OSMStation correspondingPlatformStation;
 
     public StationNode(double lat, double lon,
-                       long osmId, int agentId) {
+                       long osmId,
+                       int agentId) {
         super(lat, lon);
         this.osmId = osmId;
         this.agentId = agentId;
     }
 
     public StationNode(String lat, String lon,
-                       String osmId, String agentId) {
+                       String osmId,
+                       String agentId) {
         super(Double.parseDouble(lat), Double.parseDouble(lon));
         this.osmId = Long.parseLong(osmId);
         this.agentId = Integer.parseInt(agentId);
@@ -38,6 +41,18 @@ public class StationNode extends RouteNode {
         return osmId;
     }
 
+    public OSMStation getCorrespondingPlatformStation() {
+        return correspondingPlatformStation;
+    }
+
+    public void setCorrespondingPlatformStation(OSMStation correspondingPlatformStation) {
+        this.correspondingPlatformStation = correspondingPlatformStation;
+    }
+
+    public boolean isPlatform() {
+        return correspondingPlatformStation == null;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) {
@@ -57,5 +72,4 @@ public class StationNode extends RouteNode {
     public int hashCode() {
         return Objects.hash(super.hashCode(), osmId);
     }
-
 }

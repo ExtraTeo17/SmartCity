@@ -11,11 +11,12 @@ import jade.core.behaviours.TickerBehaviour;
 import jade.lang.acl.ACLMessage;
 import jade.util.leap.Properties;
 import org.javatuples.Pair;
-import osmproxy.elements.OSMStation;
+import routing.nodes.StationNode;
 import smartcity.ITimeProvider;
 import smartcity.lights.OptimizationResult;
 import smartcity.stations.StationStrategy;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -34,19 +35,19 @@ import static agents.utilities.BehaviourWrapper.wrapErrors;
 public class StationAgent extends AbstractAgent {
     public static final String name = StationAgent.class.getSimpleName().replace("Agent", "");
 
-    private final OSMStation station;
+    private final StationNode station;
 
     StationAgent(int id,
-                 OSMStation station,
+                 StationNode station,
                  StationStrategy stationStrategy,
                  ITimeProvider timeProvider,
                  EventBus eventBus) { // REMEMBER TO PRUNE BEYOND CIRCLE
         super(id, name, timeProvider, eventBus);
         this.station = station;
 
-        station.printDebugInfo(id);
-
         Behaviour communication = new CyclicBehaviour() {
+            private final Map<String, String> pedestrianAgentIDPreferredBusLine = new HashMap<>();
+
             @SuppressWarnings("DuplicatedCode")
             @Override
             public void action() {
@@ -69,6 +70,27 @@ public class StationAgent extends AbstractAgent {
                 }
             }
 
+            public void addToAgentMap(String agentName, String desiredBusLine) {
+                pedestrianAgentIDPreferredBusLine.put(agentName, desiredBusLine);
+            }
+
+            public String getFromAgentMap(String agentName) {
+                return pedestrianAgentIDPreferredBusLine.get(agentName);
+            }
+
+            public Map<String, String> getAgentMap() {
+                return pedestrianAgentIDPreferredBusLine;
+            }
+
+            public void removeFromAgentMap(String agentName) {
+                pedestrianAgentIDPreferredBusLine.remove(agentName);
+            }
+
+            public void printDebugInfo(int id) {
+                System.out.println("%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%");
+                System.out.println("Station" + id + ": ID: " + station.getOsmId());
+                System.out.println("%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%");
+            }
 
             private void handleMessageFromBus(ACLMessage rcv) {
                 var messageKind = rcv.getPerformative();
@@ -119,9 +141,7 @@ public class StationAgent extends AbstractAgent {
                 String crashedLine = rcv.getUserDefinedParameter(MessageParameter.BUS_LINE);
 
                 ACLMessage responseToCrash = createResponseToCrash(rcv);
-
-
-                for (Map.Entry<String, String> entry : station.getAgentMap().entrySet()) {
+                for (var entry : pedestrianAgentIDPreferredBusLine.entrySet()) {
                     if (entry.getValue().equals(crashedLine)) {
                         responseToCrash.addReceiver(new AID(entry.getKey(), AID.ISLOCALNAME));
                     }
@@ -140,7 +160,7 @@ public class StationAgent extends AbstractAgent {
                 properties.setProperty(MessageParameter.TROUBLE, MessageParameter.SHOW);
                 properties.setProperty(MessageParameter.TROUBLE_LAT, String.valueOf(station.getLat()));
                 properties.setProperty(MessageParameter.TROUBLE_LON, String.valueOf(station.getLng()));
-                properties.setProperty(MessageParameter.DESIRED_OSM_STATION_ID, String.valueOf(station.getId()));
+                properties.setProperty(MessageParameter.DESIRED_OSM_STATION_ID, String.valueOf(station.getOsmId()));
                 properties.setProperty(MessageParameter.AGENT_ID_OF_NEXT_CLOSEST_STATION, String.valueOf(getId()));
                 //maybe not needed
                 properties.setProperty(MessageParameter.LAT_OF_NEXT_CLOSEST_STATION, String.valueOf(station.getLat()));
@@ -160,13 +180,13 @@ public class StationAgent extends AbstractAgent {
                 if (messageKind == ACLMessage.INFORM) {
                     print("Got INFORM from " + agentName);
                     String desiredBusLine = rcv.getUserDefinedParameter(MessageParameter.BUS_LINE);
-                    station.addToAgentMap(agentName, desiredBusLine);
+                    pedestrianAgentIDPreferredBusLine.put(agentName, desiredBusLine);
                     stationStrategy.addPedestrianToFarAwayQueue(agentName, desiredBusLine,
                             getDateParameter(rcv, MessageParameter.ARRIVAL_TIME));
                 }
                 else if (messageKind == ACLMessage.REQUEST_WHEN) {
                     print("Got REQUEST_WHEN from " + agentName);
-                    var desiredBusLine = station.getFromAgentMap(agentName);
+                    var desiredBusLine = pedestrianAgentIDPreferredBusLine.get(agentName);
                     stationStrategy.removePedestrianFromFarAwayQueue(agentName, desiredBusLine);
                     stationStrategy.addPedestrianToQueue(agentName, desiredBusLine,
                             getDateParameter(rcv, MessageParameter.ARRIVAL_TIME));
@@ -177,8 +197,7 @@ public class StationAgent extends AbstractAgent {
                 else if (messageKind == ACLMessage.AGREE) {
                     print("-----GET AGREE from PEDESTRIAN------", LoggerLevel.DEBUG);
 
-                    var desiredBusLine = station.getFromAgentMap(agentName);
-                    station.removeFromAgentMap(agentName);
+                    var desiredBusLine = pedestrianAgentIDPreferredBusLine.remove(agentName);
                     if (!stationStrategy.removePedestrianFromQueue(agentName, desiredBusLine)) {
                         stationStrategy.removePedestrianFromFarAwayQueue(agentName, desiredBusLine);
                     }
@@ -229,7 +248,9 @@ public class StationAgent extends AbstractAgent {
         addBehaviour(wrapErrors(checkState, onError));
     }
 
-    public OSMStation getStation() {
+    public StationNode getStation() {
         return station;
     }
+
+    public boolean isPlatformAgent() {return station.isPlatform();}
 }
