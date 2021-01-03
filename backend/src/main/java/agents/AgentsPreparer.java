@@ -155,22 +155,25 @@ public class AgentsPreparer {
     private List<StationNode> prepareStations(Collection<OSMStation> stations) {
         List<StationNode> stationNodes = new ArrayList<>();
         for (var stationsForBusStopId : stations.stream()
-                .collect(groupingBy(OSMStation::getBusStopId)).values()) {
-            var stationSiblings = getStationAndItsPlatform(stationsForBusStopId);
-            StationAgent agentMain = factory.create(stationSiblings.first);
-            boolean result = agentsContainer.tryAdd(agentMain);
-            if (!result) {
-                logger.warn("Station agent could not be added");
-                continue;
-            }
+                .collect(groupingBy(OSMStation::getBusStopNr, groupingBy(OSMStation::getBusStopId)))
+                .values()) {
+            for (var stationsForBusStopNr : stationsForBusStopId.values()) {
+                var stationSiblings = getStationAndItsPlatform(stationsForBusStopNr);
+                StationAgent agentMain = factory.create(stationSiblings.first);
+                boolean result = agentsContainer.tryAdd(agentMain);
+                if (!result) {
+                    logger.warn("Station agent could not be added");
+                    continue;
+                }
 
-            agentMain.start();
-            var mainStation = agentMain.getStation();
-            if (stationSiblings.first != stationSiblings.second) {
-                var platform = stationSiblings.second;
-                mainStation.setCorrespondingPlatformStation(platform);
+                agentMain.start();
+                var mainStation = agentMain.getStation();
+                if (stationSiblings.first != stationSiblings.second) {
+                    var platform = stationSiblings.second;
+                    mainStation.setCorrespondingPlatformStation(platform);
+                }
+                stationNodes.add(mainStation);
             }
-            stationNodes.add(mainStation);
         }
 
         logger.info("Number of station agents: " + stationNodes.size());
@@ -178,14 +181,14 @@ public class AgentsPreparer {
     }
 
     /**
-     * @param stationsForBusStopId - stations for single bus stop
+     * @param stationsForBusStopNr - stations for single bus stop [id and nr]
      * @return Stations, where first will not be platform if possible
      */
-    private Siblings<OSMStation> getStationAndItsPlatform(List<OSMStation> stationsForBusStopId) {
+    private Siblings<OSMStation> getStationAndItsPlatform(List<OSMStation> stationsForBusStopNr) {
         OSMStation main = null;
         OSMStation platform = null;
-        for (int i = 0; (main == null || platform == null) && i < stationsForBusStopId.size(); ++i) {
-            var station = stationsForBusStopId.get(i);
+        for (int i = 0; (main == null || platform == null) && i < stationsForBusStopNr.size(); ++i) {
+            var station = stationsForBusStopNr.get(i);
             if (station.isPlatform()) {
                 platform = station;
             }
@@ -196,6 +199,13 @@ public class AgentsPreparer {
 
         if (main == null) {
             main = platform;
+        }
+
+        if (stationsForBusStopNr.size() > 2) {
+            logger.warn("Stops for bus id size greater than 2!: " + stationsForBusStopNr.size() + " \n"
+                    + "Main: " + main + "\n"
+                    + "Platform: " + platform + "\n"
+                    + "All:\n" + stationsForBusStopNr.stream().map(OSMStation::toString).collect(Collectors.joining(" \n")));
         }
 
         return Siblings.of(main, platform);
@@ -238,7 +248,7 @@ public class AgentsPreparer {
             logger.warn("No buses were created");
         }
 
-        logger.info("Closest startTime: " + closestTime.toLocalTime() + "\nNumber of bus agents" + busCount);
+        logger.info("Closest startTime: " + closestTime.toLocalTime() + "\nNumber of bus : " + busCount);
     }
 
     private void prepareBusManagerAgent(HashSet<BusInfo> busInfos) {
@@ -255,15 +265,13 @@ public class AgentsPreparer {
                                         List<StationNode> allStations) {
         List<StationNode> mergedStationNodes = new ArrayList<>(osmStops.size());
 
-        boolean error = false;
         for (var osmStop : osmStops) {
             var stopId = osmStop.getId();
             var station = allStations.stream().filter(node -> node.getOsmId() == stopId).findAny();
             if (station.isEmpty()) {
                 logger.error("Stop present on way is not initiated as StationAgent:\n " + osmStop);
                 ConditionalExecutor.debug(() -> logger.info("All stations:\n" + allStations.stream()
-                        .map(StationNode::toString).collect(Collectors.joining("\n"))), !error);
-                error = true;
+                        .map(StationNode::toString).collect(Collectors.joining("\n"))));
                 continue;
             }
 

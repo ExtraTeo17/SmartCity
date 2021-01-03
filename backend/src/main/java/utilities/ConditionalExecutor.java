@@ -13,7 +13,6 @@ import static smartcity.config.StaticConfig.TRACE;
 public class ConditionalExecutor {
     private static final Logger logger = LoggerFactory.getLogger(ConditionalExecutor.class);
 
-
     /**
      * Executed when {@link smartcity.config.StaticConfig#DEBUG} or {@link smartcity.config.StaticConfig#TRACE} is true.
      *
@@ -23,6 +22,12 @@ public class ConditionalExecutor {
         debug(action, true);
     }
 
+    /**
+     * Executed when {@link smartcity.config.StaticConfig#DEBUG} or {@link smartcity.config.StaticConfig#TRACE} is true.
+     *
+     * @param action             Action to invoke
+     * @param necessaryCondition Additional condition necessary to execute action
+     */
     public static void debug(Runnable action, boolean necessaryCondition) {
         if ((DEBUG || TRACE) && necessaryCondition) {
             try {
@@ -33,13 +38,24 @@ public class ConditionalExecutor {
         }
     }
 
+
     /**
      * Executed when  {@link smartcity.config.StaticConfig#TRACE} is true.
      *
      * @param action Action to invoke
      */
     public static void trace(Runnable action) {
-        if (TRACE) {
+        trace(action, true);
+    }
+
+    /**
+     * Executed when {@link smartcity.config.StaticConfig#TRACE} is true.
+     *
+     * @param action             Action to action
+     * @param necessaryCondition Additional condition necessary to execute action
+     */
+    public static void trace(Runnable action, boolean necessaryCondition) {
+        if (TRACE && necessaryCondition) {
             try {
                 action.run();
             } catch (Exception e) {

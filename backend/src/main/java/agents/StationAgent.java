@@ -87,9 +87,9 @@ public class StationAgent extends AbstractAgent {
             }
 
             public void printDebugInfo(int id) {
-                System.out.println("%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%");
-                System.out.println("Station" + id + ": ID: " + station.getOsmId());
-                System.out.println("%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%");
+                logger.info("\n%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%" +
+                        "Station" + id + ": ID: " + station.getOsmId() +
+                        "%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%");
             }
 
             private void handleMessageFromBus(ACLMessage rcv) {

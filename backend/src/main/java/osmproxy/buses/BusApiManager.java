@@ -31,7 +31,7 @@ public class BusApiManager implements IBusApiManager {
         var query = OsmQueryManager.getBusQuery(zone.getCenter(), zone.getRadius());
         var overpassInfo = mapAccessManager.getNodesDocument(query);
 
-        ConditionalExecutor.debug(() -> {
+        ConditionalExecutor.trace(() -> {
             logger.info("Writing bus-data to: " + FileWrapper.DEFAULT_OUTPUT_PATH_XML);
             //noinspection OptionalGetWithoutIsPresent
             FileWrapper.write(overpassInfo.get());
@@ -57,7 +57,7 @@ public class BusApiManager implements IBusApiManager {
             return Optional.empty();
         }
 
-        ConditionalExecutor.debug(() -> {
+        ConditionalExecutor.trace(() -> {
             String path = "target/line_" + busLine + "_stop_" + busStopId + "_" + busStopNr + ".json";
             logger.info("Writing bus-brigade-date to: " + path);
             FileWrapper.write(jsonString, path);
@@ -71,7 +71,7 @@ public class BusApiManager implements IBusApiManager {
         var query = buildWaysQuery(waysIds);
         var resultOpt = mapAccessManager.getNodesDocument(query);
 
-        ConditionalExecutor.debug(() -> {
+        ConditionalExecutor.trace(() -> {
             //noinspection OptionalGetWithoutIsPresent
             var result = resultOpt.get();
             String path = "target/busWays_" + waysIds.get(0) + "_" +
