@@ -3,7 +3,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>agent.systems</groupId>
     <artifactId>smartCity</artifactId>
-    <version>0.0.1-SNAPSHOT</version>
+    <version>2.0</version>
     <repositories>
         <repository>
             <id>jade-repo</id>
@@ -20,8 +20,20 @@
         <slf4j.version>1.7.21</slf4j.version>
         <java.version>14</java.version>
         <resourceFolder>src/main/resources/</resourceFolder>
+        <packageFolder>${project.basedir}/package</packageFolder>
     </properties>
     <build>
+        <resources>
+            <resource>
+                <directory>${resourceFolder}</directory>
+                <includes>
+                    <include>log4j.xml</include>
+                    <include>crossroads.xml</include>
+                    <include>graphHopper.properties</include>
+                    <include>config.properties</include>
+                </includes>
+            </resource>
+        </resources>
         <plugins>
             <!-- For build -->
             <plugin>
@@ -50,37 +62,67 @@
                     <javadocExecutable>${java.home}/bin/javadoc</javadocExecutable>
                 </configuration>
             </plugin>
-            <!-- For copying dependencies -->
+            <!-- For copying folders -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-dependency-plugin</artifactId>
-                <version>2.4</version>
+                <artifactId>maven-resources-plugin</artifactId>
+                <version>3.1.0</version>
                 <executions>
                     <execution>
+                        <id>copy-resources</id>
                         <phase>package</phase>
                         <goals>
-                            <goal>copy-dependencies</goal>
+                            <goal>copy-resources</goal>
                         </goals>
                         <configuration>
-                            <outputDirectory>${project.build.directory}/lib</outputDirectory>
+                            <outputDirectory>${packageFolder}</outputDirectory>
+                            <resources>
+                                <resource>
+                                    <directory>${resourceFolder}</directory>
+                                    <filtering>true</filtering>
+                                </resource>
+                                <resource>
+                                    <directory>${basedir}</directory>
+                                    <includes>
+                                        <include>mazowieckie-latest.osm-gh/**</include>
+                                    </includes>
+                                </resource>
+                            </resources>
                         </configuration>
                     </execution>
                 </executions>
             </plugin>
-            <!-- For executable JAR -->
+            <!-- For assembly JAR -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-jar-plugin</artifactId>
-                <version>3.1.2</version>
+                <artifactId>maven-assembly-plugin</artifactId>
+                <version>3.3.0</version>
                 <configuration>
+                    <outputDirectory>${packageFolder}</outputDirectory>
                     <archive>
                         <manifest>
                             <addClasspath>true</addClasspath>
                             <classpathPrefix>lib/</classpathPrefix>
                             <mainClass>SmartCity</mainClass>
                         </manifest>
+                        <manifestEntries>
+                            <Class-Path>.</Class-Path>
+                        </manifestEntries>
                     </archive>
+                    <descriptorRefs>
+                        <descriptorRef>jar-with-dependencies</descriptorRef>
+                    </descriptorRefs>
+                    <appendAssemblyId>false</appendAssemblyId>
                 </configuration>
+                <executions>
+                    <execution>
+                        <id>make-assembly</id> <!-- this is used for inheritance merges -->
+                        <phase>package</phase> <!-- bind to the packaging phase -->
+                        <goals>
+                            <goal>single</goal>
+                        </goals>
+                    </execution>
+                </executions>
             </plugin>
             <!-- JUnit 5 requires Surefire version 2.22.0 or higher -->
             <plugin>

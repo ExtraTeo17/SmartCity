@@ -32,6 +32,7 @@ import routing.abstractions.IRouteTransformer;
 import routing.core.IGeoPosition;
 import routing.nodes.RouteNode;
 
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -44,14 +45,38 @@ import java.util.List;
  */
 public class HighwayAccessor {
     private static final Logger logger = LoggerFactory.getLogger(HighwayAccessor.class);
-    private static final String CONFIG_PATH = "config/graphHopper.properties";
-    private static final String[] args = new String[]{"config=" + CONFIG_PATH, "datareader.file=mazowieckie-latest.osm.pbf"};
     private static final ExtendedGraphHopper graphHopper;
 
     static {
-        graphHopper = new ExtendedGraphHopper();
-        graphHopper.init(CmdArgs.read(args));
-        graphHopper.importOrLoad();
+        var cmdArgs = readArgs();
+        try {
+            graphHopper = new ExtendedGraphHopper();
+            graphHopper.init(cmdArgs);
+            graphHopper.importOrLoad();
+        } catch (Exception e) {
+            logger.error("Error in graphHopper initialization", e);
+            throw e;
+        }
+    }
+
+    private static CmdArgs readArgs() {
+        try {
+            var configResource = HighwayAccessor.class.getClassLoader().getResource("");
+            if (configResource == null) {
+                logger.error("Didn't find the loader resource");
+                return new CmdArgs();
+            }
+
+            var mainPath = Paths.get(configResource.toURI()).toString();
+            var configPath = Paths.get(mainPath,  "graphHopper.properties");
+            var dataReaderPath = Paths.get(mainPath, "mazowieckie-latest.osm.pbf");
+            var args = new String[]{"config=" + configPath, "datareader.file=" + dataReaderPath};
+            return CmdArgs.read(args);
+        } catch (Exception e) {
+            logger.error("Error in reading args", e);
+        }
+
+        return new CmdArgs();
     }
 
     // TODO: tested manually, but add unit tests / integration tests
