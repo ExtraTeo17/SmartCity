@@ -50,7 +50,7 @@ import java.util.stream.Collectors;
 
 public class MapAccessManager implements IMapAccessManager {
     private static final Logger logger = LoggerFactory.getLogger(MapAccessManager.class);
-    private static final String CROSSROADS_LOCATIONS_PATH = "config/crossroads.xml";
+    private static final String CROSSROADS_LOCATIONS_PATH = "crossroads.xml";
 
     private final DocumentBuilderFactory xmlBuilderFactory;
     private final IOverpassApiManager manager;
