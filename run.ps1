@@ -5,11 +5,11 @@ function Check-Command($cmdname) {
 }
 
 $buildDir = "SmartCity-build";
-$jarFile="backend/smartCity-2.0.jar"
+$jarFile="backend\smartCity-2.0.jar"
 
-if  (!(Test-Path -Path $jarFile) -Or !(Test-Path -Path "frontend/index.html")) {
+if  (!(Test-Path -Path $jarFile) -Or !(Test-Path -Path "frontend\index.html")) {
     if (!(Test-Path -Path $buildDir)){
-        if (!(Test-Path -Path "scripts")){
+        if (Test-Path -Path "scripts"){
             Set-Location scripts
             .\build.ps1;
             Set-Location ..
