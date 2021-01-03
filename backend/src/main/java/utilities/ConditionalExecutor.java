@@ -20,7 +20,7 @@ public class ConditionalExecutor {
      * @param action Action to invoke
      */
     public static void debug(Runnable action) {
-        debug(action, false);
+        debug(action, true);
     }
 
     public static void debug(Runnable action, boolean necessaryCondition) {

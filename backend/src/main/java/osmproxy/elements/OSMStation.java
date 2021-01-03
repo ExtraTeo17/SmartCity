@@ -26,4 +26,16 @@ public class OSMStation extends OSMNode implements Serializable {
     public boolean isPlatform() {
         return isPlatform;
     }
+
+    @Override
+    public String toString() {
+        return "OSMStation{" +
+                "osmId=" + id +
+                ", lat=" + lat +
+                ", lon=" + lon +
+                ", stopId='" + stopId + '\'' +
+                ", stopNumber='" + stopNumber + '\'' +
+                ", isPlatform=" + isPlatform +
+                '}';
+    }
 }

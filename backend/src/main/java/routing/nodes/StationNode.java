@@ -72,4 +72,13 @@ public class StationNode extends RouteNode {
     public int hashCode() {
         return Objects.hash(super.hashCode(), osmId);
     }
+
+    @Override
+    public String toString() {
+        return "StationNode{" +
+                "osmId=" + osmId +
+                ", agentId=" + agentId +
+                ", correspondingPlatformStation=" + correspondingPlatformStation +
+                '}';
+    }
 }

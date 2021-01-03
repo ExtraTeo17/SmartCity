@@ -30,6 +30,7 @@ import routing.nodes.StationNode;
 import smartcity.SimulationState;
 import smartcity.TimeProvider;
 import smartcity.config.ConfigContainer;
+import utilities.ConditionalExecutor;
 import utilities.Siblings;
 
 import java.time.LocalDateTime;
@@ -254,11 +255,15 @@ public class AgentsPreparer {
                                         List<StationNode> allStations) {
         List<StationNode> mergedStationNodes = new ArrayList<>(osmStops.size());
 
+        boolean error = false;
         for (var osmStop : osmStops) {
             var stopId = osmStop.getId();
             var station = allStations.stream().filter(node -> node.getOsmId() == stopId).findAny();
             if (station.isEmpty()) {
-                logger.error("Stop present on way is not initiated as StationAgent: " + osmStop);
+                logger.error("Stop present on way is not initiated as StationAgent:\n " + osmStop);
+                ConditionalExecutor.debug(() -> logger.info("All stations:\n" + allStations.stream()
+                        .map(StationNode::toString).collect(Collectors.joining("\n"))), !error);
+                error = true;
                 continue;
             }
 
