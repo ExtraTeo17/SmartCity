@@ -248,7 +248,7 @@ public class AgentsPreparer {
             logger.warn("No buses were created");
         }
 
-        logger.info("Closest startTime: " + closestTime.toLocalTime() + "\nNumber of bus : " + busCount);
+        logger.info("Closest startTime: " + closestTime.toLocalTime() + "\nNumber of bus agents: " + busCount);
     }
 
     private void prepareBusManagerAgent(HashSet<BusInfo> busInfos) {
