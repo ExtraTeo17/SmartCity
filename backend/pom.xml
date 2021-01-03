@@ -26,12 +26,14 @@
         <resources>
             <resource>
                 <directory>${resourceFolder}</directory>
+                <filtering>false</filtering>
+            </resource>
+            <resource>
+                <directory>${project.basedir}</directory>
                 <includes>
-                    <include>log4j.xml</include>
-                    <include>crossroads.xml</include>
-                    <include>graphHopper.properties</include>
-                    <include>config.properties</include>
+                    <include>mazowieckie-latest.osm-gh/**</include>
                 </includes>
+                <filtering>false</filtering>
             </resource>
         </resources>
         <plugins>
@@ -44,22 +46,6 @@
                     <source>${java.version}</source>
                     <target>${java.version}</target>
                     <encoding>UTF-8</encoding>
-                </configuration>
-            </plugin>
-            <!--  For javadoc -->
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-javadoc-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <id>attach-javadocs</id>
-                        <goals>
-                            <goal>jar</goal>
-                        </goals>
-                    </execution>
-                </executions>
-                <configuration>
-                    <javadocExecutable>${java.home}/bin/javadoc</javadocExecutable>
                 </configuration>
             </plugin>
             <!-- For copying folders -->
@@ -79,13 +65,14 @@
                             <resources>
                                 <resource>
                                     <directory>${resourceFolder}</directory>
-                                    <filtering>true</filtering>
+                                    <filtering>false</filtering>
                                 </resource>
                                 <resource>
-                                    <directory>${basedir}</directory>
+                                    <directory>${project.basedir}</directory>
                                     <includes>
                                         <include>mazowieckie-latest.osm-gh/**</include>
                                     </includes>
+                                    <filtering>false</filtering>
                                 </resource>
                             </resources>
                         </configuration>
@@ -161,16 +148,10 @@
             <artifactId>graphhopper-reader-osm</artifactId>
             <version>0.8.2</version>
         </dependency>
-
         <dependency>
             <groupId>org.javatuples</groupId>
             <artifactId>javatuples</artifactId>
             <version>1.2</version>
-        </dependency>
-        <dependency>
-            <groupId>com.googlecode.json-simple</groupId>
-            <artifactId>json-simple</artifactId>
-            <version>1.1.1</version>
         </dependency>
         <dependency>
             <groupId>com.tilab.jade</groupId>

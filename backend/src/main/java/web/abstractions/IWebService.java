@@ -71,4 +71,6 @@ public interface IWebService extends IStartable {
                        List<UpdateObject> pedUpdates);
 
     void crashBus(int id);
+
+    void notifyApiOverload();
 }

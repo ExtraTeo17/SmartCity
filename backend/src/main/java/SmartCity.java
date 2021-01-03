@@ -74,6 +74,9 @@ public class SmartCity {
         else if (type == int.class) {
             return Integer.parseInt(stringValue);
         }
+        else if (type == String[].class) {
+            return stringValue.split(",");
+        }
 
         return newValue;
     }

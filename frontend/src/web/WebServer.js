@@ -100,7 +100,7 @@ export default {
 
   /**
    * Returns state of connection
-   * @returns {Boolean} True if connected, false otherwise
+   * @returns {boolean} True if connected, false otherwise
    */
   isConnected() {
     return socketContainer.connected;

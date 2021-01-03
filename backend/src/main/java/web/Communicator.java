@@ -2,10 +2,7 @@ package web;
 
 import com.google.common.eventbus.Subscribe;
 import com.google.inject.Inject;
-import events.web.BatchedUpdateEvent;
-import events.web.SimulationPreparedEvent;
-import events.web.SimulationStartedEvent;
-import events.web.SwitchLightsEvent;
+import events.web.*;
 import events.web.bike.BikeAgentCreatedEvent;
 import events.web.bike.BikeAgentDeadEvent;
 import events.web.bike.BikeAgentUpdatedEvent;
@@ -99,6 +96,11 @@ class Communicator {
     }
 
     @Subscribe
+    public void handle(BusAgentCrashedEvent e) {
+        webService.crashBus(e.id);
+    }
+
+    @Subscribe
     public void handle(BusAgentDeadEvent e) {
         onHandle(e);
         webService.killBus(e.id);
@@ -153,7 +155,6 @@ class Communicator {
         webService.updateBike(e.id, e.position);
     }
 
-
     @Subscribe
     public void handle(BikeAgentDeadEvent e) {
         onHandle(e);
@@ -166,9 +167,11 @@ class Communicator {
     }
 
     @Subscribe
-    public void handle(BusAgentCrashedEvent e) {
-        webService.crashBus(e.id);
+    public void handle(ApiOverloadedEvent e) {
+        onHandle(e);
+        webService.notifyApiOverload();
     }
+
 
     private void onHandle(Object obj) {
         logger.info("Handling " + obj.getClass().getSimpleName());

@@ -6,6 +6,20 @@ import busesSelector from "../../redux/selectors/busesSelector";
 import Bus from "../Markers/Bus";
 import BusRoute from "../Routes/BusRoute";
 
+/**
+ * Buses layer - contains all bus markers and routes
+ * @category Layers
+ * @module BusesLayer
+ */
+
+/**
+ * @typedef {Object} Props
+ * @property {Object[]} buses
+ */
+
+/**
+ * @param {Props} props
+ */
 const BusesLayer = props => {
   const { buses = [] } = props;
 

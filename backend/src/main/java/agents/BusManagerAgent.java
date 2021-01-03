@@ -51,7 +51,8 @@ public class BusManagerAgent extends AbstractAgent {
                         case ACLMessage.INFORM -> {
                             if (rcv.getSender().getLocalName().contains("Bus")) {
                                 initialiseCrash(rcv);
-                            } else {
+                            }
+                            else {
                                 handleRouteQuery(rcv);
                             }
                         }
@@ -61,9 +62,9 @@ public class BusManagerAgent extends AbstractAgent {
             }
 
             private void initialiseCrash(ACLMessage rcv) {
-                    troubleCases.add(new CrashInfo(LocalTime.parse(rcv.getUserDefinedParameter(MessageParameter.CRASH_TIME)),
-                            rcv.getUserDefinedParameter(MessageParameter.BUS_LINE),
-                            rcv.getUserDefinedParameter(MessageParameter.BRIGADE)));
+                troubleCases.add(new CrashInfo(LocalTime.parse(rcv.getUserDefinedParameter(MessageParameter.CRASH_TIME)),
+                        rcv.getUserDefinedParameter(MessageParameter.BUS_LINE),
+                        rcv.getUserDefinedParameter(MessageParameter.BRIGADE)));
 
             }
 
@@ -74,7 +75,7 @@ public class BusManagerAgent extends AbstractAgent {
                 String event = rcv.getUserDefinedParameter(MessageParameter.EVENT);
                 ACLMessage msg = getBestMatch(rcv.createReply(), stationOsmIdFrom, stationOsmIdTo, arrivalTime, event,
                         rcv.getUserDefinedParameter(MessageParameter.BUS_LINE),
-                        rcv.getUserDefinedParameter(MessageParameter.BRIGADE),rcv);
+                        rcv.getUserDefinedParameter(MessageParameter.BRIGADE), rcv);
                 send(msg);
 
 
@@ -101,7 +102,7 @@ public class BusManagerAgent extends AbstractAgent {
                         LocalTime minimumTimeOnStationTo = LocalTime.MIN;
 
                         for (BrigadeInfo brigInfo : info.brigadeList) {
-                            if (checkCrashedBuses(info.busLine,brigInfo.brigadeId,rcv)) {
+                            if (checkCrashedBuses(info.busLine, brigInfo.brigadeId, rcv)) {
                                 continue;
                             }
                             for (Timetable table : brigInfo.timetables) {

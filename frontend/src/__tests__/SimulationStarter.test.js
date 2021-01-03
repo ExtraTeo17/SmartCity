@@ -10,6 +10,7 @@ let message;
 WebServer.send = msg => {
   message = msg;
 };
+// @ts-ignore
 store.dispatch = () => {};
 
 let container = null;

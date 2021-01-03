@@ -4,6 +4,20 @@ import { connect } from "react-redux";
 
 import TroublePoint from "../Markers/TroublePoint";
 
+/**
+ * Trouble points layer - contains all trouble points markers.
+ * @category Layers
+ * @module TroublePointsLayer
+ */
+
+/**
+ * @typedef {Object} Props
+ * @property {Object[]} troublePoints
+ */
+
+/**
+ * @param {Props} props
+ */
 const TroublePointsLayer = props => {
   const { troublePoints = [] } = props;
   const troublePointMarkers = troublePoints.map(tp => <TroublePoint key={`tp${tp.id}`} troublePoint={tp} />);

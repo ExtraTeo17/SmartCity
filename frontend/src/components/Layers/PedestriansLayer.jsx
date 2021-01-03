@@ -6,6 +6,20 @@ import pedestrianSelector from "../../redux/selectors/pedestriansSelector";
 import Pedestrian from "../Markers/Pedestrian";
 import PedestrianRoute from "../Routes/PedestrianRoute";
 
+/**
+ * Pedestrians layer - contains all pedestrians markers and routes
+ * @category Layers
+ * @module PedestriansLayer
+ */
+
+/**
+ * @typedef {Object} Props
+ * @property {Object[]} pedestrians
+ */
+
+/**
+ * @param {Props} props
+ */
 const PedestriansLayer = props => {
   const { pedestrians = [] } = props;
 
