@@ -414,7 +414,6 @@ public class BusAgent extends AbstractAgent {
 
     // TODO: Fix situation where bus route contains only one station and pedestrians tries to choose two
     public final Optional<Siblings<StationNode>> getTwoSubsequentStations(final Random random) {
-
         List<StationNode> stationsOnRoute = bus.getStationNodesOnRoute();
         if (stationsOnRoute.size() <= 1) {
             return Optional.empty();
@@ -428,20 +427,15 @@ public class BusAgent extends AbstractAgent {
                 stationsOnRoute.get(secondIndex)));
     }
 
-    /**
-     * @return If busAgent finished execution
-     */
-    public boolean runBasedOnTimetable() {
+    public void runBasedOnTimetable() {
         var state = this.getAgentState().getValue();
         if (state != AgentState.cAGENT_STATE_INITIATED) {
-            return state == AgentState.cAGENT_STATE_ACTIVE && bus.isAtDestination();
+            return;
         }
 
         if (shouldStart()) {
             start();
         }
-
-        return false;
     }
 
     public boolean shouldStart() {
