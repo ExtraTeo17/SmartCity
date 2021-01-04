@@ -28,7 +28,10 @@ public class BusPreparationData implements Serializable {
         builder.append("All stations:\n[:");
         int i = 0;
         for (OSMStation station : stations.values()) {
-            builder.append("stations[" + i++ + "]=" + station.getBusStopId() + "/" + station.getBusStopNr() + "/" + station.getId() + ":");
+            builder.append("stations[").append(i++).append("]=")
+                    .append(station.getBusStopId()).append("/")
+                    .append(station.getBusStopNr()).append("/")
+                    .append(station.getId()).append(":");
         }
         builder.append("]\n");
         builder.append("#########################################");

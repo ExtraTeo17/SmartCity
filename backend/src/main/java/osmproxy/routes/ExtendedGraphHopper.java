@@ -46,7 +46,7 @@ public class ExtendedGraphHopper extends GraphHopper {
     // mapping of internal edge ID to OSM way ID
     private DataAccess edgeMapping;
     private BitUtil bitUtil;
-    private static AvoidEdgesRemovableWeighting avoidEdgesWeighting = null;
+    private static AvoidEdgesRemovableWeighting avoidEdgesWeighting;
 
     @Override
     public boolean load(String graphHopperFolder) {

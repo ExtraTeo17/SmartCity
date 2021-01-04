@@ -3,7 +3,6 @@ package agents;
 import agents.abstractions.AbstractAgent;
 import agents.abstractions.IAgentsContainer;
 import com.google.inject.Inject;
-import jade.wrapper.AgentController;
 import jade.wrapper.ContainerController;
 import jade.wrapper.StaleProxyException;
 import org.jetbrains.annotations.NotNull;
@@ -46,9 +45,8 @@ class HashAgentsContainer implements IAgentsContainer {
 
     @Override
     public boolean tryAccept(@NotNull AbstractAgent agent) {
-        AgentController agentController;
         try {
-            agentController = controller.acceptNewAgent(agent.getPredictedName(), agent);
+            controller.acceptNewAgent(agent.getPredictedName(), agent);
         } catch (StaleProxyException e) {
             logger.warn("Error adding agent: " + agent.getLocalName(), e);
             return false;

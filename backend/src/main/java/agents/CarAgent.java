@@ -57,7 +57,7 @@ public class CarAgent extends AbstractAgent {
     private final int initialRouteSize;
 
     private RouteNode troublePoint;
-    private Integer borderlineIndex = null;
+    private Integer borderlineIndex;
 
     CarAgent(int id, MovingObject car,
              ITimeProvider timeProvider,

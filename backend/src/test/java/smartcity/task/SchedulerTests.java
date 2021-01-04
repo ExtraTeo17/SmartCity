@@ -65,16 +65,16 @@ class SchedulerTests {
         var configContainer = new ConfigContainer();
         configContainer.setGeneratePedestriansAndBuses(true);
         var ref = new Object() {
-            private int carsLimit = 0;
-            private int testCarId = 0;
+            private int carsLimit;
+            private int testCarId;
 
-            private int bikesLimit = 0;
-            private int testBikeId = 0;
-            private int pedLimit = 0;
-            private int testPedId = 0;
+            private int bikesLimit;
+            private int testBikeId;
+            private int pedLimit;
+            private int testPedId;
 
-            private LocalDateTime startTime = null;
-            private int timeScale = 0;
+            private LocalDateTime startTime;
+            private int timeScale;
         };
         var taskManager = mock(ITaskManager.class);
         doAnswer(invocationOnMock -> {
@@ -203,7 +203,7 @@ class SchedulerTests {
         // Arrange
         var taskManager = mock(ITaskManager.class);
         var ref = new Object() {
-            private LocalDateTime timeSet = null;
+            private LocalDateTime timeSet;
         };
         doAnswer(invocationOnMock -> {
             ref.timeSet = invocationOnMock.getArgument(1);

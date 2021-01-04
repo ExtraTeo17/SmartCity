@@ -3,6 +3,9 @@ package web.message;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+/**
+ * Main message class.
+ */
 public class MessageDto {
     public final MessageType type;
     public final String payload;

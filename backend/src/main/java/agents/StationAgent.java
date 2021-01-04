@@ -138,13 +138,13 @@ public class StationAgent extends AbstractAgent {
                 properties.setProperty(MessageParameter.CRASH_TIME, crashTime);
                 properties.setProperty(MessageParameter.TYPEOFTROUBLE, MessageParameter.CRASH);
                 properties.setProperty(MessageParameter.TROUBLE, MessageParameter.SHOW);
-                properties.setProperty(MessageParameter.TROUBLE_LAT, station.getLat() + "");
-                properties.setProperty(MessageParameter.TROUBLE_LON, station.getLng() + "");
-                properties.setProperty(MessageParameter.DESIRED_OSM_STATION_ID, station.getId() + "");
-                properties.setProperty(MessageParameter.AGENT_ID_OF_NEXT_CLOSEST_STATION, getId() + "");
+                properties.setProperty(MessageParameter.TROUBLE_LAT, String.valueOf(station.getLat()));
+                properties.setProperty(MessageParameter.TROUBLE_LON, String.valueOf(station.getLng()));
+                properties.setProperty(MessageParameter.DESIRED_OSM_STATION_ID, String.valueOf(station.getId()));
+                properties.setProperty(MessageParameter.AGENT_ID_OF_NEXT_CLOSEST_STATION, String.valueOf(getId()));
                 //maybe not needed
-                properties.setProperty(MessageParameter.LAT_OF_NEXT_CLOSEST_STATION, station.getLat() + "");
-                properties.setProperty(MessageParameter.LON_OF_NEXT_CLOSEST_STATION, station.getLng() + "");
+                properties.setProperty(MessageParameter.LAT_OF_NEXT_CLOSEST_STATION, String.valueOf(station.getLat()));
+                properties.setProperty(MessageParameter.LON_OF_NEXT_CLOSEST_STATION, String.valueOf(station.getLng()));
 
                 properties.setProperty(MessageParameter.BUS_LINE, rcv.getUserDefinedParameter(MessageParameter.BUS_LINE));
                 properties.setProperty(MessageParameter.BRIGADE, rcv.getUserDefinedParameter(MessageParameter.BRIGADE));

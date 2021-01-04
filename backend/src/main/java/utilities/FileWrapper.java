@@ -13,6 +13,9 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
+/**
+ * Used for I/O interaction.
+ */
 public class FileWrapper {
     public static final String DEFAULT_OUTPUT_PATH_XML = "target/output.xml";
     public static final String DEFAULT_OUTPUT_PATH_JSON = "target/output.json";
@@ -80,7 +83,7 @@ public class FileWrapper {
         }
     }
 
-    @SuppressWarnings(value = "unchecked")
+    @SuppressWarnings("unchecked")
     public static <T extends Serializable> T getFromCache(String fileName) {
         String path = DEFAULT_OUTPUT_PATH_CACHE + "/" + fileName + ".ser";
         Object data = tryReadFile(path);

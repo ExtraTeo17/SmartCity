@@ -17,9 +17,9 @@ public class StationNode extends RouteNode {
 
     public StationNode(String lat, String lon,
                        String osmId, String agentId) {
-        super(Double.valueOf(lat), Double.valueOf(lon));
+        super(Double.parseDouble(lat), Double.parseDouble(lon));
         this.osmId = Long.parseLong(osmId);
-        this.agentId = Integer.valueOf(agentId);
+        this.agentId = Integer.parseInt(agentId);
     }
 
     public StationNode(OSMStation station, int agentId) {

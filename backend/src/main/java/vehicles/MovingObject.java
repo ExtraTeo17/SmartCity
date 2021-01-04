@@ -130,7 +130,7 @@ public abstract class MovingObject {
 
     /**
      * Checks whether an edge exists on the uniformRoute
-     *
+     * @param thresholdUntilIndexChange - added to moveIndex to acquire minimum index where route can change
      * @param edgeId of the edge checked for existence
      * @return Index of the RouteNode on uniformRoute
      * which contains the edge if edge is found, otherwise null

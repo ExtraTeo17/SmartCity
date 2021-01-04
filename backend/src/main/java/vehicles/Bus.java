@@ -40,7 +40,7 @@ public class Bus extends MovingObject {
 
     private BusFillState fillState;
     private int closestStationIndex = -1;
-    private int passengersCount = 0;
+    private int passengersCount;
 
     // TODO: Factory for vehicles - inject
     public Bus(EventBus eventBus, ITimeProvider timeProvider, int agentId, List<RouteNode> simpleRoute,
@@ -95,9 +95,9 @@ public class Bus extends MovingObject {
 
         if (positionOfStationPrev == null || Math.abs(currentPosition - positionOfStationNext) < Math
                 .abs(currentPosition - positionOfStationPrev)) {
-            return ((StationNode) uniformRoute.get(positionOfStationNext)).getOsmId() + "";
+            return String.valueOf(((StationNode) uniformRoute.get(positionOfStationNext)).getOsmId());
         }
-        return ((StationNode) uniformRoute.get(positionOfStationPrev)).getOsmId() + "";
+        return String.valueOf(((StationNode) uniformRoute.get(positionOfStationPrev)).getOsmId());
 
     }
 

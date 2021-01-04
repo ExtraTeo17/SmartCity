@@ -3,6 +3,9 @@ package web.message;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
 
+/**
+ * Contains all possible message types for interaction with frontend.
+ */
 @SuppressWarnings("ClassWithTooManyFields")
 public enum MessageType {
     PREPARE_SIMULATION_REQUEST(1),

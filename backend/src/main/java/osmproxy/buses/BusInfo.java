@@ -41,20 +41,18 @@ public class BusInfo implements
 
     @Override
     public String toString() {
-        StringBuilder builder = new StringBuilder();
-        builder.append("#########################################\n");
-        builder.append("Bus line: " + busLine + "\n");
-        builder.append("Route: " + getRouteString() + "\n");
-        builder.append("Stops: " + getStopsString() + "\n");
-        builder.append("#########################################");
-        return builder.toString();
+        return "#########################################\n" +
+                "Bus line: " + busLine + "\n" +
+                "Route: " + getRouteString() + "\n" +
+                "Stops: " + getStopsString() + "\n" +
+                "#########################################";
     }
 
     private String getRouteString() {
         StringBuilder builder = new StringBuilder();
         builder.append("[:");
         for (int i = 0; i < route.size(); ++i) {
-            builder.append("route[" + i + "]=" + route.get(i).getId() + ":");
+            builder.append("route[").append(i).append("]=").append(route.get(i).getId()).append(":");
         }
         builder.append("]");
         return builder.toString();
@@ -64,7 +62,7 @@ public class BusInfo implements
         StringBuilder builder = new StringBuilder();
         builder.append("[:");
         for (int i = 0; i < stops.size(); ++i) {
-            builder.append("stops[" + i + "]=" + stops.get(i).getBusStopId() + "/" + stops.get(i).getBusStopNr() + "/" + stops.get(i).getId() + ":");
+            builder.append("stops[").append(i).append("]=").append(stops.get(i).getBusStopId()).append("/").append(stops.get(i).getBusStopNr()).append("/").append(stops.get(i).getId()).append(":");
         }
         builder.append("]");
         return builder.toString();
