@@ -45,7 +45,6 @@ public class BusDataParser implements IBusDataParser {
         this.zone = zone;
     }
 
-    // TODO: Add tests for this function
     @Override
     public BusPreparationData parseBusData(Document busData) {
         Node osmRoot = busData.getFirstChild();
@@ -72,24 +71,27 @@ public class BusDataParser implements IBusDataParser {
 
         var busInfos = busDataMerger.getBusInfosWithStops(busInfoDataSet, busStopsMap);
 
-        List<String> busLinesOfInfosToRemoveCauseOfMissingTimetableInWarszawskieAPI = new ArrayList<>();
+        List<BusInfo> busInfosToRemove = new ArrayList<>();
         for (var busInfo : busInfos) {
-        	if (busInfo.stops.isEmpty()) {
-        		logger.info("Warning: Stops in the bus info are empty for line " + busInfo.busLine +
-        		        ". Skip timetable preparation");
-        		continue;
-        	}
+            if (busInfo.stops.size() < 2) {
+                logger.info("Warning: Less than 2 stops in the for line " + busInfo.busLine +
+                        ". Omitting timetable preparation");
+                busInfosToRemove.add(busInfo);
+                continue;
+            }
+
             var brigadeInfos = generateBrigadeInfos(busInfo.busLine, busInfo.stops);
-            if (brigadeInfos.size() > 0) {
-                busInfo.addBrigades(brigadeInfos);
+            if (brigadeInfos.size() < 1) {
+                busInfosToRemove.add(busInfo);
+                logger.info("Warning: Timetable for bus line " + busInfo.busLine + " is empty in Warszawskie API. " +
+                        "Line will not be considered");
+                continue;
             }
-            else {
-                busLinesOfInfosToRemoveCauseOfMissingTimetableInWarszawskieAPI.add(busInfo.busLine);
-                logger.warn("Timetable for bus line " + busInfo.busLine + " is empty in Warszawskie API. Line will not be considered");
-            }
+
+            busInfo.addBrigades(brigadeInfos);
         }
-        busInfos.removeIf(info -> busLinesOfInfosToRemoveCauseOfMissingTimetableInWarszawskieAPI.stream()
-                .anyMatch(info.busLine::equals));
+
+        busInfos.removeAll(busInfosToRemove);
 
         return new BusPreparationData(busInfos, busStopsMap);
     }
@@ -251,13 +253,13 @@ public class BusDataParser implements IBusDataParser {
     }
 
     private Optional<Siblings<String>> searchForStationNumberAndType(NodeList nodes) {
-    	var filteredNodes = IterableNodeList.of(nodes)
+        var filteredNodes = IterableNodeList.of(nodes)
                 .stream()
                 .filter(n -> n.getNodeName().equals("tag"))
                 .map(Node::getAttributes)
                 .filter(attr -> attr.getNamedItem("k").getNodeValue().equals("network") ||
-                		attr.getNamedItem("k").getNodeValue().equals("public_transport") ||
-                		attr.getNamedItem("k").getNodeValue().equals("ref"))
+                        attr.getNamedItem("k").getNodeValue().equals("public_transport") ||
+                        attr.getNamedItem("k").getNodeValue().equals("ref"))
                 .collect(Collectors.toList());
 
         if (filteredNodes.isEmpty()) {

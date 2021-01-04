@@ -136,18 +136,16 @@ public class AgentsPreparer {
     }
 
     private BusPreparationData getBusPreparationData() {
-        BusPreparationData busData;
         var cachedData = cacheWrapper.getBusPreparationData();
         if (cachedData.isPresent()) {
-            busData = cachedData.get();
+            return cachedData.get();
         }
-        else {
-            logger.info("Starting bus data preparation.");
-            long time = System.nanoTime();
-            busData = busLinesManager.getBusData();
-            logger.info("Bus data preparation finished! Took: " + TimeProvider.getTimeInMs(time) + "ms");
-            cacheWrapper.cacheData(busData);
-        }
+
+        logger.info("Starting bus data preparation.");
+        long time = System.nanoTime();
+        var busData = busLinesManager.getBusData();
+        logger.info("Bus data preparation finished! Took: " + TimeProvider.getTimeInMs(time) + "ms");
+        cacheWrapper.cacheData(busData);
 
         return busData;
     }
@@ -220,6 +218,7 @@ public class AgentsPreparer {
         for (var busInfo : busData.busInfos) {
             var busLine = busInfo.busLine;
             var route = getBusRoute(busInfo.route, busInfo.stops, allStations);
+
             for (var brigade : busInfo) {
                 var brigadeNr = brigade.brigadeId;
                 for (Timetable timetable : brigade) {
