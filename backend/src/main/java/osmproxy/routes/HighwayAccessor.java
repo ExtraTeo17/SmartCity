@@ -68,7 +68,7 @@ public class HighwayAccessor {
             }
 
             var mainPath = Paths.get(configResource.toURI()).toString();
-            var configPath = Paths.get(mainPath,  "graphHopper.properties");
+            var configPath = Paths.get(mainPath, "graphHopper.properties");
             var dataReaderPath = Paths.get(mainPath, "mazowieckie-latest.osm.pbf");
             var args = new String[]{"config=" + configPath, "datareader.file=" + dataReaderPath};
             return CmdArgs.read(args);

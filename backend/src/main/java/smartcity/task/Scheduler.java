@@ -49,7 +49,7 @@ public class Scheduler {
         configContainer.setShouldGenerateBusFailures(e.shouldGenerateBusFailures);
 
         configContainer.setUseFixedRoutes(e.useFixedRoutes);
-        configContainer.setUseFixedConstructionSites(e.useFixedRoutes && e.useFixedConstructionSites);
+        configContainer.setUseFixedConstructionSites(e.useFixedRoutes && e.useFixedTroublePoints);
 
         configContainer.setLightStrategyActive(e.lightStrategyActive);
         configContainer.setExtendLightTime(e.extendLightTime);
@@ -60,6 +60,9 @@ public class Scheduler {
             configContainer.setTrafficJamStrategyActive(
                     agentsContainer.size(LightManagerAgent.class) > 0 && e.trafficJamStrategyActive);
             configContainer.setConstructionSiteStrategyActive(e.troublePointStrategyActive);
+            configContainer.setConstructionSiteThresholdUntilIndexChange(e.troublePointThresholdUntilIndexChange);
+            configContainer.setNoConstructionSiteStrategyIndexFactor(e.noTroublePointStrategyIndexFactor);
+
             taskManager.scheduleCarCreation(e.carsNum, e.testCarId);
         }
 

@@ -20,6 +20,7 @@ import osmproxy.routes.ExtendedGraphHopper;
 import routing.core.Position;
 import smartcity.SimulationState;
 import smartcity.config.ConfigContainer;
+import utilities.ConditionalExecutor;
 
 import java.util.Collections;
 import java.util.HashMap;
@@ -185,7 +186,8 @@ public class TroubleManagerAgent extends Agent {
                 }
                 for (Map.Entry<Integer, String> entry : mapOfConstructionSiteBlockedEdges.entrySet()) {
                     // construction site
-                    logger.info("Edge id blocked: " + entry.getKey() + " length of jam: " + entry.getValue());
+                    ConditionalExecutor.debug(() ->
+                            logger.info("Edge id blocked: " + entry.getKey() + " length of jam: " + entry.getValue()));
                     sendBroadcast(generateMessageAboutTrafficJam(entry.getKey(), entry.getValue(),
                             MessageParameter.CONSTRUCTION, MessageParameter.SHOW));
                 }

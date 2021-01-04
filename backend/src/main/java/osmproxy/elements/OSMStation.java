@@ -48,9 +48,9 @@ public class OSMStation extends OSMNode implements Serializable {
         pedestrianAgentIDPreferredBusLine.remove(agentName);
     }
 
-	public void printDebugInfo(int id) {
-		System.out.println("%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%");
-		System.out.println("Station" + id + ": ID: " + stopId + " Number: " + stopNumber);
-		System.out.println("%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%");
-	}
+    public void printDebugInfo(int id) {
+        System.out.println("%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%");
+        System.out.println("Station" + id + ": ID: " + stopId + " Number: " + stopNumber);
+        System.out.println("%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%");
+    }
 }

@@ -5,6 +5,6 @@ import web.message.payloads.AbstractPayload;
 
 @JsonSerialize
 public class ApiOverloadInfo extends AbstractPayload {
-    public ApiOverloadInfo(){
+    public ApiOverloadInfo() {
     }
 }

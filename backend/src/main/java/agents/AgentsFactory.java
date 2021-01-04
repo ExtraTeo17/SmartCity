@@ -24,12 +24,12 @@ import vehicles.*;
 import java.util.HashSet;
 import java.util.List;
 
-@SuppressWarnings("OverlyCoupledClass")
+
 /**
  * The class responsible for creating all types of agents
  */
-public
-class AgentsFactory implements IAgentsFactory {
+@SuppressWarnings("OverlyCoupledClass")
+public class AgentsFactory implements IAgentsFactory {
     private static final Logger logger = LoggerFactory.getLogger(AgentsFactory.class);
 
     private final IdGenerator idGenerator;

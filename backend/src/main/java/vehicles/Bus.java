@@ -200,7 +200,7 @@ public class Bus extends MovingObject {
      * Find next stop belonging to the bus' route starting from the position
      * on which the bus is at the time being, assuming the bus is not just
      * starting its journey and is not at the beginning of its route.
-     
+     *
      * @return Station node of the next station, empty if no more stations
      * available on the route
      */
@@ -210,7 +210,7 @@ public class Bus extends MovingObject {
 
     /**
      * Find next stop belonging to the bus' route starting from the position
-     * on which the bus is at the time being. 
+     * on which the bus is at the time being.
      *
      * @param isStart Whether the bus is just starting its entire route.
      * @return Station node of the next station, empty if no more stations
@@ -297,10 +297,10 @@ public class Bus extends MovingObject {
         return brigadeNr;
     }
 
-	public void printDebugInfo() {
-		logger.info("&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&");
-		logger.info("Bus line: " + this.busLine);
-		MovingObject.displayRouteDebug(uniformRoute);
-		logger.info("&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&");
-	}
+    public void printDebugInfo() {
+        logger.info("&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&");
+        logger.info("Bus line: " + this.busLine);
+        MovingObject.displayRouteDebug(uniformRoute);
+        logger.info("&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&");
+    }
 }

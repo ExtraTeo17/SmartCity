@@ -175,6 +175,18 @@ const D_TP_STRATEGY_ACTIVE = true;
  * @constant
  * @default
  */
+const D_THRESHOLD_UNTIL_INDEX_CHANGE = 50;
+
+/**
+ * @constant
+ * @default
+ */
+const D_NO_TP_STRATEGY_INDEX_FACTOR = 30;
+
+/**
+ * @constant
+ * @default
+ */
 const D_TJ_STRATEGY_ACTIVE = false;
 
 /**
@@ -218,6 +230,8 @@ export {
   D_STATION_STRATEGY_ACTIVE,
   D_EXTEND_WAIT_TIME,
   D_TP_STRATEGY_ACTIVE,
+  D_THRESHOLD_UNTIL_INDEX_CHANGE,
+  D_NO_TP_STRATEGY_INDEX_FACTOR,
   D_TJ_STRATEGY_ACTIVE,
   D_TRANSPORT_CHANGE_STRATEGY_ACTIVE,
   D_HERE_MAP_STYLE,

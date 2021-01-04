@@ -108,6 +108,9 @@ public class Converter {
                 req.extendWaitTime,
 
                 req.troublePointStrategyActive,
+                req.troublePointThresholdUntilIndexChange,
+                req.noTroublePointStrategyIndexFactor,
+
                 req.trafficJamStrategyActive,
                 req.transportChangeStrategyActive
         );

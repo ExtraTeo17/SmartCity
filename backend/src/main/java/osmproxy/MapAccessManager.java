@@ -92,6 +92,16 @@ public class MapAccessManager implements IMapAccessManager {
         return Triplet.with(id, latitude, longitude);
     }
 
+    @SuppressWarnings("unused")
+    private void printStream(final InputStream stream) {
+        try {
+            logger.info(IOUtils.toString(stream));
+            stream.reset();
+        } catch (IOException e) {
+            logger.warn("Exception while printing stream: " + e);
+        }
+    }
+
     /**
      * @param query the overpass query
      * @return the nodes in the formulated query
@@ -115,16 +125,6 @@ public class MapAccessManager implements IMapAccessManager {
         }
 
         return Optional.of(result);
-    }
-
-    @SuppressWarnings("unused")
-    private void printStream(final InputStream stream) {
-        try {
-            logger.info(IOUtils.toString(stream));
-            stream.reset();
-        } catch (IOException e) {
-          logger.warn("Exception while printing stream: " + e);
-        }
     }
 
     @Override

@@ -40,7 +40,7 @@ public class OverpassApiManager implements IOverpassApiManager {
         this.eventBus = eventBus;
 
         this.switchTimeQueue = new LinkedList<>();
-        this.currentApiIndex = 1;
+        this.currentApiIndex = 0;
         logger.info("Starting with: " + getCurrentApi());
     }
 

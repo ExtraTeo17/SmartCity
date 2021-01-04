@@ -82,13 +82,14 @@ public class BusDataParser implements IBusDataParser {
             var brigadeInfos = generateBrigadeInfos(busInfo.busLine, busInfo.stops);
             if (brigadeInfos.size() > 0) {
                 busInfo.addBrigades(brigadeInfos);
-            } else {
-            	busLinesOfInfosToRemoveCauseOfMissingTimetableInWarszawskieAPI.add(busInfo.busLine);
-            	logger.warn("Timetable for bus line " + busInfo.busLine + " is empty in Warszawskie API. Line will not be considered");
+            }
+            else {
+                busLinesOfInfosToRemoveCauseOfMissingTimetableInWarszawskieAPI.add(busInfo.busLine);
+                logger.warn("Timetable for bus line " + busInfo.busLine + " is empty in Warszawskie API. Line will not be considered");
             }
         }
         busInfos.removeIf(info -> busLinesOfInfosToRemoveCauseOfMissingTimetableInWarszawskieAPI.stream()
-                .anyMatch(line -> info.busLine.equals(line)));
+                .anyMatch(info.busLine::equals));
 
         return new BusPreparationData(busInfos, busStopsMap);
     }

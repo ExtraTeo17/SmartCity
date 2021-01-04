@@ -29,6 +29,8 @@ import {
   D_GENERATE_BUS_FAILURES,
   D_DETECT_TRAFFIC_JAMS,
   D_TRANSPORT_CHANGE_STRATEGY_ACTIVE,
+  D_THRESHOLD_UNTIL_INDEX_CHANGE,
+  D_NO_TP_STRATEGY_INDEX_FACTOR,
 } from "../constants/defaults";
 import { loadLocalData } from "./dataUtils/dataUtils";
 import { ConfigState } from "./models/states";
@@ -87,6 +89,9 @@ const initialState = {
       extendWaitTime: D_EXTEND_WAIT_TIME,
 
       troublePointStrategyActive: D_TP_STRATEGY_ACTIVE,
+      troublePointThresholdUntilIndexChange: D_THRESHOLD_UNTIL_INDEX_CHANGE,
+      noTroublePointStrategyIndexFactor: D_NO_TP_STRATEGY_INDEX_FACTOR,
+
       trafficJamStrategyActive: D_TJ_STRATEGY_ACTIVE,
       transportChangeStrategyActive: D_TRANSPORT_CHANGE_STRATEGY_ACTIVE,
     },

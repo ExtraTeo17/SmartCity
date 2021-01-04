@@ -20,6 +20,16 @@ public interface ITroublePointsConfigContainer {
      */
     void setTimeBeforeTrouble(int timeBeforeTrouble);
 
+    int getConstructionSiteThresholdUntilIndexChange();
+
+    void setConstructionSiteThresholdUntilIndexChange(int constructionSiteThresholdUntilIndexChange);
+
+    int getNoConstructionSiteStrategyIndexFactor();
+
+    /**
+     * Lower values provide risk of car ignoring the trouble point and passing through it
+     */
+    void setNoConstructionSiteStrategyIndexFactor(int noConstructionSiteStrategyIndexFactor);
 
     boolean shouldUseFixedConstructionSites();
 
