@@ -10,6 +10,7 @@ import routing.core.Position;
 
 import java.util.List;
 import java.util.Optional;
+//TODO:dokumentacja
 
 public interface IMapAccessManager {
     List<OSMNode> parseNodes(Document xmlDocument);

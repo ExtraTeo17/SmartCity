@@ -8,6 +8,7 @@ import utilities.Siblings;
 
 import java.time.LocalDateTime;
 import java.util.function.Supplier;
+//TODO:dokumentacja
 
 public interface ITaskProvider {
     Runnable getCreateCarTask(IGeoPosition start, IGeoPosition end, boolean testCar);

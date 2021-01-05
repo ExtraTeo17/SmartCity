@@ -1,6 +1,7 @@
 package smartcity;
 
 import java.time.LocalDateTime;
+//TODO:dokumentacja
 
 public interface ITimeProvider {
     int getTimeScale();

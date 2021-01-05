@@ -5,6 +5,7 @@ import routing.core.IZone;
 
 import java.util.List;
 import java.util.Optional;
+//TODO:dokumentacja
 
 public interface IBusApiManager {
     Optional<Document> getBusDataXml(IZone zone);

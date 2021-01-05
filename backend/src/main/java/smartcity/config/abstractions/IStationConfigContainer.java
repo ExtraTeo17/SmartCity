@@ -1,4 +1,5 @@
 package smartcity.config.abstractions;
+//TODO:dokumentacja
 
 public interface IStationConfigContainer {
     boolean isStationStrategyActive();

@@ -1,4 +1,5 @@
 package smartcity.task.data;
+//TODO:dokumentacja
 
 public interface ISwitchLightsContext {
     boolean haveAlreadyExtended();

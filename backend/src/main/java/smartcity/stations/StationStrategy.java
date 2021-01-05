@@ -15,6 +15,8 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 @SuppressWarnings({"UnusedReturnValue", "ClassWithTooManyFields"})
+//TODO:dokumentacja
+
 public class StationStrategy {
     private final Logger logger;
     private final int waitPeriodSeconds;

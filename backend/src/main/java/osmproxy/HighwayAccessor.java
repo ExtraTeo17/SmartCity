@@ -55,6 +55,8 @@ public class HighwayAccessor {
     }
 
     // TODO: tested manually, but add unit tests / integration tests
+    //TODO:dokumentacja
+
     public static Pair<List<Long>, List<Integer>> getOsmWayIdsAndEdgeList(IGeoPosition from,
                                                                           IGeoPosition to,
                                                                           String typeOfVehicle,

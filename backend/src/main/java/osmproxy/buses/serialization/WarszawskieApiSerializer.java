@@ -26,6 +26,8 @@ public class WarszawskieApiSerializer implements IApiSerializer {
     }
 
     @Override
+    //TODO:dokumentacja
+
     public List<TimetableRecord> serializeTimetables(String jsonString) {
         var apiResult = serializeJsonString(jsonString);
         if (apiResult.isEmpty()) {

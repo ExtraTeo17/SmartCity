@@ -8,6 +8,7 @@ import routing.nodes.StationNode;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+//TODO:dokumentacja
 
 public interface ICacheWrapper {
     Optional<BusPreparationData> getBusPreparationData();
