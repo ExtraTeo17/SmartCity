@@ -207,6 +207,7 @@ public class MapAccessManager implements IMapAccessManager {
     }
 
     @Override
+
      public Optional<RouteInfo> getRouteInfo(List<Long> osmWayIds, boolean notPedestrian) {
         var query = OsmQueryManager.getMultipleWayAndItsNodesQuery(osmWayIds);
         var overpassNodes = getNodesDocument(query);

@@ -29,8 +29,6 @@ public class CacheWrapper implements ICacheWrapper {
     }
 
     @Override
-    //TODO:dokumentacja
-
     public Optional<BusPreparationData> getBusPreparationData() {
         if (USE_FRESH_DATA) {
             return Optional.empty();
@@ -51,8 +49,6 @@ public class CacheWrapper implements ICacheWrapper {
     }
 
     @Override
-    //TODO:dokumentacja
-
     public void cacheData(BusPreparationData data) {
         var zone = configContainer.getZone();
         String path = getBusDataFileName(zone);
@@ -60,8 +56,6 @@ public class CacheWrapper implements ICacheWrapper {
     }
 
     @Override
-    //TODO:dokumentacja
-
     public ArrayList<RouteNode> getBusRoute(List<OSMWay> route,
                                             List<StationNode> stationNodes) {
         if (USE_FRESH_DATA) {
