@@ -1,8 +1,10 @@
 package vehicles;
 
 import java.time.LocalDateTime;
-//TODO:dokumentacja
 
+/**
+ * Objects, for which time and distance will be measured
+ */
 public interface ITestable {
     LocalDateTime getStart();
 

@@ -1,6 +1,8 @@
 package smartcity.task.data;
-//TODO:dokumentacja
 
+/**
+ * Helps to control switching of the lights
+ */
 public interface ISwitchLightsContext {
     boolean haveAlreadyExtended();
 

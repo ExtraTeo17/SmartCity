@@ -1,6 +1,8 @@
 package smartcity.config.abstractions;
-//TODO:dokumentacja
 
+/**
+ * Configures trouble point(i.e. accidents, constructions)
+ */
 public interface ITroublePointsConfigContainer {
 
     boolean shouldGenerateConstructionSites();

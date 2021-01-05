@@ -2,7 +2,7 @@ package smartcity.config.abstractions;
 
 import routing.core.IGeoPosition;
 import routing.core.IZone;
-//TODO:dokumentacja
+
 
 public interface IZoneMutator {
     default void setZone(double lat, double lng, int radius) {

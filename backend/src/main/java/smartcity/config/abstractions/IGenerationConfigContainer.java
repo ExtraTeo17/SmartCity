@@ -1,6 +1,8 @@
 package smartcity.config.abstractions;
-//TODO:dokumentacja
 
+/**
+ * Controls generation of objects
+ */
 public interface IGenerationConfigContainer {
 
     boolean shouldGeneratePedestriansAndBuses();

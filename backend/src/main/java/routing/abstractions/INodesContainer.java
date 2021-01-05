@@ -4,8 +4,10 @@ import routing.nodes.LightManagerNode;
 import routing.nodes.StationNode;
 
 import javax.annotation.Nullable;
-//TODO:dokumentacja
 
+/**
+ * Manage nodes (i.e. lightManagers)
+ */
 public interface INodesContainer {
     void addStationNode(StationNode stationNode);
 

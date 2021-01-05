@@ -3,7 +3,6 @@ package routing.core;
 import smartcity.config.ConfigMutator;
 
 import java.util.Objects;
-//TODO:dokumentacja
 
 public interface IZone {
     IGeoPosition getCenter();

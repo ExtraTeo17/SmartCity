@@ -5,7 +5,6 @@ import osmproxy.buses.data.BusPreparationData;
 import osmproxy.elements.OSMWay;
 
 import java.util.List;
-//TODO:dokumentacja
 
 public interface IBusDataParser {
     BusPreparationData parseBusData(Document busData);

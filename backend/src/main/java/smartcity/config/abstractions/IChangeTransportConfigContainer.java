@@ -1,6 +1,8 @@
 package smartcity.config.abstractions;
-//TODO:dokumentacja
 
+/**
+ * Controls configuration in the case of crash of the bus
+ */
 public interface IChangeTransportConfigContainer {
 
     boolean shouldGenerateBusFailures();

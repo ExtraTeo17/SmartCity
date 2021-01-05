@@ -5,8 +5,10 @@ import routing.core.IZone;
 
 import java.util.List;
 import java.util.Optional;
-//TODO:dokumentacja
 
+/**
+ * Connects with external API, in order to get bus data
+ */
 public interface IBusApiManager {
     Optional<Document> getBusDataXml(IZone zone);
 

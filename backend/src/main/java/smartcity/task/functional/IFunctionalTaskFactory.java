@@ -6,8 +6,10 @@ import smartcity.task.data.ISwitchLightsContext;
 import utilities.Siblings;
 
 import java.util.function.Function;
-//TODO:dokumentacja
 
+/**
+ * Forces implementing functionality
+ */
 public interface IFunctionalTaskFactory {
     Function<ISwitchLightsContext, Integer> createLightSwitcher(@Assisted("managerId") int managerId,
                                                                 @Assisted("extendTime") int extendTimeSeconds,

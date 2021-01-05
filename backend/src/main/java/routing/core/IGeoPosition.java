@@ -3,7 +3,6 @@ package routing.core;
 import org.jetbrains.annotations.NotNull;
 import routing.RoutingHelper;
 import utilities.NumericHelper;
-//TODO:dokumentacja
 
 public interface IGeoPosition extends Comparable<IGeoPosition> {
     double getLat();

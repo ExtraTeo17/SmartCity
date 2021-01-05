@@ -6,8 +6,10 @@ import smartcity.lights.core.data.LightInfo;
 import utilities.Siblings;
 
 import java.util.List;
-//TODO:dokumentacja
 
+/**
+ * Parses data about crossroads
+ */
 public interface ICrossroadParser {
     Siblings<List<LightInfo>> getLightGroups(OSMNode crossroadCenter);
 
