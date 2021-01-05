@@ -170,8 +170,6 @@ public class MapAccessManager implements IMapAccessManager {
     }
 
     @Override
-    //TODO:dokumentacja
-
     public List<OSMLight> getOsmLights(List<Long> osmWayIds) {
         var query = OsmQueryManager.getFullTrafficSignalQuery(osmWayIds);
         var overpassNodes = getNodesDocument(query);
@@ -216,8 +214,6 @@ public class MapAccessManager implements IMapAccessManager {
     }
 
     @Override
-    //TODO:dokumentacja
-
     public Optional<RouteInfo> getRouteInfo(List<Long> osmWayIds, boolean notPedestrian) {
         var query = OsmQueryManager.getMultipleWayAndItsNodesQuery(osmWayIds);
         var overpassNodes = getNodesDocument(query);
@@ -263,9 +259,7 @@ public class MapAccessManager implements IMapAccessManager {
     }
 
     @Override
-    @Deprecated
-    //TODO:dokumentacja
-
+    @Deprecate
     public List<Node> getLightManagersNodes(IZone zone) {
         var lightManagersNodes = new ArrayList<Node>();
         Document xmlDocument = getXmlDocument(CROSSROADS_LOCATIONS_PATH);
@@ -295,8 +289,6 @@ public class MapAccessManager implements IMapAccessManager {
     }
 
     @Override
-    //TODO:dokumentacja
-
     public void parseChildNodesOfWays(Document childNodesOfWays, List<OSMNode> lightsOfTypeA) {
         Node osmRoot = childNodesOfWays.getFirstChild();
         NodeList osmXMLNodes = osmRoot.getChildNodes();
