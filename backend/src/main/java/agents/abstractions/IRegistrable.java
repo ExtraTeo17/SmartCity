@@ -1,5 +1,8 @@
 package agents.abstractions;
-//TODO:dokumentacja
+
+/**
+ * Interface which imposes registration on each class that implements it.
+ */
 public interface IRegistrable {
     default void register(Class<?>... types) {
         registerAll(types);

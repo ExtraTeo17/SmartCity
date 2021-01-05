@@ -77,7 +77,6 @@ public class AgentsPreparer {
 
     @SuppressWarnings("FeatureEnvy")
     @Subscribe
-    //TODO:dokumentacja
     public void handle(PrepareSimulationEvent e) {
         logger.info(PrepareSimulationEvent.class.getSimpleName() + " event occurred: " + e.toString());
         var state = configContainer.getSimulationState();
