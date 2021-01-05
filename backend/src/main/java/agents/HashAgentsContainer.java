@@ -28,6 +28,7 @@ class HashAgentsContainer implements IAgentsContainer {
     }
 
     @Override
+    //TODO:dokumentacja
     public boolean tryAdd(@NotNull AbstractAgent agent, boolean shouldTryAccept) {
         var type = agent.getClass();
         var collection = getOrThrow(type);
@@ -45,6 +46,7 @@ class HashAgentsContainer implements IAgentsContainer {
     }
 
     @Override
+    //TODO:dokumentacja
     public boolean tryAccept(@NotNull AbstractAgent agent) {
         AgentController agentController;
         try {
@@ -70,12 +72,14 @@ class HashAgentsContainer implements IAgentsContainer {
     }
 
     @Override
+    //TODO:dokumentacja
     public boolean contains(AbstractAgent agent) {
         var type = agent.getClass();
         return getOrThrow(type).containsKey(agent.getId());
     }
 
     @Override
+    //TODO:dokumentacja
     public <TAgent extends AbstractAgent> Optional<TAgent> get(Class<TAgent> type, Predicate<TAgent> predicate) {
         return getOrThrow(type).values().stream().map(type::cast)
                 .filter(predicate)
@@ -92,11 +96,13 @@ class HashAgentsContainer implements IAgentsContainer {
     }
 
     @Override
+    //TODO:dokumentacja
     public <TAgent extends AbstractAgent> boolean remove(TAgent agent) {
         return remove(agent.getClass(), agent.getId()).isPresent();
     }
 
     @Override
+    //TODO:dokumentacja
     public <TAgent extends AbstractAgent> Optional<TAgent> remove(Class<TAgent> type, int agentId) {
         var agent = getOrThrow(type).remove(agentId);
         if (agent != null) {
@@ -124,6 +130,7 @@ class HashAgentsContainer implements IAgentsContainer {
     }
 
     @Override
+    //TODO:dokumentacja
     public synchronized void clearAll() {
         for (var collection : container.values()) {
             tryDeleteAll(collection.values());
@@ -157,6 +164,7 @@ class HashAgentsContainer implements IAgentsContainer {
     }
 
     @Override
+    //TODO:dokumentacja
     public void registerAll(Class<?>[] types) {
         for (var type : types) {
             container.put(type, new ConcurrentHashMap<>());

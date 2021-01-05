@@ -72,7 +72,7 @@ public class PedestrianAgent extends AbstractAgent {
         this.router = router;
         this.troublePointsConfigContainer = troublePointsConfigContainer;
     }
-
+    //TODO:dokumentacja
     public boolean isInBus() { return DrivingState.IN_BUS == pedestrian.getState(); }
 
     @Override

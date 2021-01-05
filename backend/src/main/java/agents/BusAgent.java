@@ -413,6 +413,7 @@ public class BusAgent extends AbstractAgent {
     }
 
     // TODO: Fix situation where bus route contains only one station and pedestrians tries to choose two
+    //TODO:dokumentacja
     public final Optional<Siblings<StationNode>> getTwoSubsequentStations(final Random random) {
 
         List<StationNode> stationsOnRoute = bus.getStationNodesOnRoute();
