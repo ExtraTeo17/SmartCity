@@ -57,6 +57,7 @@ public abstract class AbstractAgent extends Agent {
         return id;
     }
 
+    //TODO:dokumentacja
     public void start() {
         try {
             this.getContainerController().getAgent(getLocalName()).start();

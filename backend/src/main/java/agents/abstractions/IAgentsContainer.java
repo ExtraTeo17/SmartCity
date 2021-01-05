@@ -12,6 +12,7 @@ import java.util.stream.Stream;
 
 
 // I hate Java generics.
+//TODO:dokumentacja
 public interface IAgentsContainer extends IRegistrable {
     boolean tryAdd(@NotNull AbstractAgent agent, boolean shouldTryAccept);
 
