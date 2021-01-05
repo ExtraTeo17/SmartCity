@@ -19,6 +19,7 @@ public class SingletonAgentsActivator {
     private final EventBus eventBus;
 
     @Inject
+    //TODO:dokumentacja
     public SingletonAgentsActivator(ContainerController controller,
                                     EventBus eventBus,
                                     SmartCityAgent smartCityAgent,
@@ -43,6 +44,7 @@ public class SingletonAgentsActivator {
 
     // Need timeScale, so possible only after simulation start
     @Subscribe
+    //TODO:dokumentacja
     public void handle(SimulationStartedEvent e) {
         activate(TroubleManagerAgent.name, troubleManagerAgent);
         this.eventBus.unregister(this);
