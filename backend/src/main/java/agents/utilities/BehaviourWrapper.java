@@ -8,8 +8,16 @@ import java.util.function.Consumer;
 import static smartcity.config.StaticConfig.HANDLE_UNPREDICTED_ERRORS;
 
 public class BehaviourWrapper {
-    //TODO:dokumentacja
 
+	/**
+	 * Construct a behaviour, which will perform a given function
+	 * if any exception happens and is supposed not to throw
+	 * the exception
+	 *
+	 * @param behaviour The behaviour to wrap over
+	 * @param onError The function to call upon exception in underlying behaviour
+	 * @return The constructed, wrapped behaviour
+	 */
     public static Behaviour wrapErrors(Behaviour behaviour, Consumer<Exception> onError) {
         return new WrapperBehaviour(behaviour) {
             @Override

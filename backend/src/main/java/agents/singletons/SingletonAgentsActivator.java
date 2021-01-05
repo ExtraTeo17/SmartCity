@@ -19,7 +19,14 @@ public class SingletonAgentsActivator {
     private final EventBus eventBus;
 
     @Inject
-    //TODO:dokumentacja
+    /**
+     * Initialize the activator of agents, which have only one instance in the smart city system.
+     *
+     * @param controller Controller of the container to which the agents are to be added
+     * @param eventBus Event bus for which the events are to be dispatched
+     * @param smartCityAgent Instance of {@link SmartCityAgent} to be added to the container
+     * @param troubleManagerAgent Instance of {@link TroubleManagerAgent} to be added to the container
+     */
     public SingletonAgentsActivator(ContainerController controller,
                                     EventBus eventBus,
                                     SmartCityAgent smartCityAgent,
@@ -44,7 +51,6 @@ public class SingletonAgentsActivator {
 
     // Need timeScale, so possible only after simulation start
     @Subscribe
-    //TODO:dokumentacja
     public void handle(SimulationStartedEvent e) {
         activate(TroubleManagerAgent.name, troubleManagerAgent);
         this.eventBus.unregister(this);

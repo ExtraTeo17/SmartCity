@@ -1,7 +1,7 @@
 package agents.abstractions;
 
 /**
- * Registers agents
+ * Interface which imposes registration on each class that implements it.
  */
 public interface IRegistrable {
     default void register(Class<?>... types) {
