@@ -49,7 +49,7 @@ public class MessageParameter {
     public static final String TEST_BIKE_AGENT_ID = "test_bike_agent_id";
     public static final String CRASH_TIME = "crash_time";
 
-
+    //TODO:dokumentacja
     public static String getTypeByMovingObject(MovingObject movingObject) {
         var type = movingObject.getVehicleType();
         var value = VehicleType.getValue(type);
