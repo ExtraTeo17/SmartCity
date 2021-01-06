@@ -12,8 +12,10 @@ export const SimulationStarterObj = props => {
   const { wasPrepared, wasStarted, startSimulationData } = props;
 
   const startSimulationInvoke = () => {
-    dispatch(shouldStartSimulation());
-    ApiManager.startSimulation(startSimulationData);
+    if (ApiManager.isConnected()) {
+      dispatch(shouldStartSimulation());
+      ApiManager.startSimulation(startSimulationData);
+    }
   };
 
   return (

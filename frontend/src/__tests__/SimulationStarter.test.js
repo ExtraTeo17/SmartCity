@@ -10,6 +10,7 @@ let message;
 WebServer.send = msg => {
   message = msg;
 };
+WebServer.isConnected = () => true;
 // @ts-ignore
 store.dispatch = () => {};
 

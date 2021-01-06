@@ -65,6 +65,11 @@ export default {
    * @param {PrepareSimulationData} prepareSimulationData - Data object
    */
   prepareSimulation({ center: { lat, lng, rad }, generatePedestrians }) {
+    if (!WebServer.isConnected()) {
+      console.warn("Server not connected. Cannot the send message");
+      return;
+    }
+
     const msg = {
       type: PREPARE_SIMULATION_REQUEST,
       payload: {
@@ -119,6 +124,11 @@ export default {
     trafficJamStrategyActive,
     transportChangeStrategyActive,
   }) {
+    if (!WebServer.isConnected()) {
+      console.warn("Server not connected. Cannot the send message");
+      return;
+    }
+
     const msg = {
       type: START_SIMULATION_REQUEST,
       payload: {
@@ -160,6 +170,7 @@ export default {
         transportChangeStrategyActive,
       },
     };
+
     WebServer.send(msg);
   },
 
@@ -167,6 +178,11 @@ export default {
    * Sends debug message with empty paylod
    */
   debug() {
+    if (!WebServer.isConnected()) {
+      console.warn("Server not connected. Cannot the send message");
+      return;
+    }
+
     const msg = {
       type: DEBUG_REQUEST,
       payload: {},
