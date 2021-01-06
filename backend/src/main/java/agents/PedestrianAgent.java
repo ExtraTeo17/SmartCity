@@ -50,6 +50,7 @@ import static smartcity.config.StaticConfig.USE_BATCHED_UPDATES;
  */
 public class PedestrianAgent extends AbstractAgent {
     public static final String name = PedestrianAgent.class.getSimpleName().replace("Agent", "");
+    public static final long CONVERTER = 1_000_000L;
 
     private final IRouteGenerator router;
     private final ITaskProvider taskProvider;
@@ -406,9 +407,10 @@ public class PedestrianAgent extends AbstractAgent {
 
             private LocalTime computeArrivalTime(IGeoPosition pointA, IGeoPosition pointB, String desiredOsmStationId) {
                 LocalTime now = timeProvider.getCurrentSimulationTime().toLocalTime();
+
                 arrivingRouteToClosestStation = router.generateRouteForPedestrians(pointA, pointB, null,
                         desiredOsmStationId);
-                return now.plusNanos(pedestrian.getMillisecondsOnRoute(arrivingRouteToClosestStation) * 1_000_000L);
+                return now.plusNanos(pedestrian.getMillisecondsOnRoute(arrivingRouteToClosestStation) * CONVERTER);
             }
         };
         var onError = createErrorConsumer(new PedestrianAgentDeadEvent(this.getId(),
@@ -439,7 +441,7 @@ public class PedestrianAgent extends AbstractAgent {
             ACLMessage msg = createMessageById(ACLMessage.INFORM, StationAgent.name, nextStation.getAgentId());
             Properties properties = createProperties(MessageParameter.PEDESTRIAN);
             var currentTime = timeProvider.getCurrentSimulationTime();
-            var predictedTime = currentTime.plusNanos(pedestrian.getMillisecondsToNextStation() * 1_000_000L);
+            var predictedTime = currentTime.plusNanos(pedestrian.getMillisecondsToNextStation() * CONVERTER);
             properties.setProperty(MessageParameter.ARRIVAL_TIME, predictedTime.toString());
             properties.setProperty(MessageParameter.BUS_LINE, busLine);
             msg.setAllUserDefinedParameters(properties);
@@ -455,7 +457,7 @@ public class PedestrianAgent extends AbstractAgent {
         ACLMessage msg = createMessage(ACLMessage.INFORM, BusManagerAgent.NAME);
 
         var currentTime = timeProvider.getCurrentSimulationTime();
-        var predictedTime = currentTime.plusNanos(pedestrian.getMillisecondsToNextStation() * 1_000_000L).toLocalTime();
+        var predictedTime = currentTime.plusNanos(pedestrian.getMillisecondsToNextStation() * CONVERTER).toLocalTime();
         msg.addUserDefinedParameter(MessageParameter.ARRIVAL_TIME, predictedTime.toString());
         msg.addUserDefinedParameter(MessageParameter.STATION_FROM_ID, String.valueOf(pedestrian.getStartingStation().getOsmId()));
         msg.addUserDefinedParameter(MessageParameter.STATION_TO_ID, String.valueOf(pedestrian.getStationFinish().getOsmId()));

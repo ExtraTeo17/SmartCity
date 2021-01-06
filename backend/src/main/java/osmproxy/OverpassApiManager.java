@@ -26,6 +26,8 @@ public class OverpassApiManager implements IOverpassApiManager {
 
     public static final int API_SWITCH_NOTIFY_COUNT = 4;
     public static final int API_SWITCH_NOTIFY_TIME_SEC = 30;
+    public static final int TOO_MANY_REQUESTS = 429;
+    public static final int TIMEOUT_ERROR = 504;
 
     private final EventBus eventBus;
     private final String[] overpassApis;
@@ -53,7 +55,7 @@ public class OverpassApiManager implements IOverpassApiManager {
         HttpURLConnection connection = trySendRequest(query);
         try {
             int responseCode = connection.getResponseCode();
-            while (responseCode == 429 || responseCode == 504) {
+            while (responseCode == TOO_MANY_REQUESTS || responseCode == TIMEOUT_ERROR) {
                 logger.warn("Current API: " + getCurrentApi() + " is overloaded with our requests.");
                 switchApi();
                 connection = trySendRequest(query);

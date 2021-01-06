@@ -11,6 +11,8 @@ import java.time.LocalTime;
 
 public class WrappingDateTimeDeserializer extends JsonDeserializer<LocalDateTime> {
 
+    public static final int HOURS_IN_DAY = 24;
+
     /**
      * @return Date parsed from HH:mm:ss format, where HH &#62;= 0, HH &#60; 30
      */
@@ -25,9 +27,9 @@ public class WrappingDateTimeDeserializer extends JsonDeserializer<LocalDateTime
 
         var date = LocalDate.now();
         int hours = Integer.parseInt(timeParts[0]);
-        if (hours > 23) {
+        if (hours > HOURS_IN_DAY - 1) {
             date = date.plusDays(1);
-            hours -= 24;
+            hours -= HOURS_IN_DAY;
         }
         int minutes = Integer.parseInt(timeParts[1]);
 

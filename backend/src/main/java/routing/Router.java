@@ -158,9 +158,6 @@ final class Router implements
         return data2;
     }
 
-    private boolean bus174wilanowska(List<StationNode> stationNodes) {
-        return stationNodes.size() == 2 && stationNodes.get(0).getOsmId() == 3039769685L && stationNodes.get(1).getOsmId() == 1704286049L;
-    }
 
     /////////////////////////////////////////////////////////////
     //  HELPERS - Most are comfortable :(
