@@ -1,7 +1,12 @@
 import { BIKE_KILLED, BIKE_CREATED, BIKE_UPDATED, BATCHED_UPDATE } from "../../core/constants";
 
 /**
- * Handles bike-agent-related interaction
+ * Handles bike-agent-related interaction, i.e.:
+ *  - BIKE_CREATED
+ *  - BIKE_UPDATED
+ *  - BATCHED_UPDATE
+ *  - BIKE_KILLED
+ *
  * @category Redux
  * @subcategory Reducers
  * @module bike

@@ -3,7 +3,7 @@ package smartcity;
 import java.time.LocalDateTime;
 
 /**
- * Manages time of the application
+ * Used for simulation time management.
  */
 public interface ITimeProvider {
     int getTimeScale();

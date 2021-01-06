@@ -6,6 +6,36 @@ import { STATIC_Z_INDEX } from "../../constants/markers";
 
 import "../../styles/Light.css";
 
+/**
+ * Light marker.
+ * @category Markers
+ * @module Light
+ */
+
+/**
+ * @typedef {Object} Props
+ * @property {Light} light
+ */
+
+/**
+ * @typedef {Object} Light
+ * @property {number} id
+ * @property {boolean} jammed - if traffic jam is present
+ * @property {Position} location
+ * @property {LightColor} color
+ */
+
+/**
+ * @typedef {Object} Position - Represents position on map
+ * @property {number} lat - Latitude in degrees
+ * @property {number} lng - Longitude in degrees
+ */
+
+/**
+ * Light component
+ * @function
+ * @param {Props} props
+ */
 const Light = props => {
   const {
     light: { id, jammed, location, color },

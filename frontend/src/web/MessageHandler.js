@@ -24,6 +24,7 @@ import {
   KILL_BIKE_INFO,
   BATCHED_UPDATE_INFO,
   CRASH_BUS_INFO,
+  API_OVERLOAD_INFO,
 } from "./MessageType";
 import { NOTIFY_SHOW_MS } from "../constants/global";
 import Dispatcher from "../redux/Dispatcher";
@@ -173,6 +174,10 @@ export default {
 
       case BATCHED_UPDATE_INFO:
         Dispatcher.updateBatched(payload.carUpdates, payload.bikeUpdates, payload.busUpdates, payload.pedUpdates);
+        break;
+
+      case API_OVERLOAD_INFO:
+        notify.show("Overpass API is overloaded. Simulation might be inaccurate!", "warning", NOTIFY_SHOW_MS);
         break;
 
       default:

@@ -1,4 +1,4 @@
-package osmproxy;
+package osmproxy.routes;
 
 import com.graphhopper.routing.weighting.AvoidEdgesWeighting;
 import com.graphhopper.routing.weighting.Weighting;
@@ -14,7 +14,7 @@ public class AvoidEdgesRemovableWeighting extends AvoidEdgesWeighting {
     public static final double NULL_DOUBLE = 0;
 
 
-    public AvoidEdgesRemovableWeighting(Weighting superWeighting) {
+    AvoidEdgesRemovableWeighting(Weighting superWeighting) {
         super(superWeighting);
     }
 
@@ -22,19 +22,20 @@ public class AvoidEdgesRemovableWeighting extends AvoidEdgesWeighting {
      * This method removes the specified path to this weighting which should be penalized in the
      * calcWeight method.
      */
-    public void removeEdgeIds(final Collection<Integer> edgeIds) {
+    void removeEdgeIds(final Collection<Integer> edgeIds) {
         for (int edgeId : edgeIds) {
             visitedEdges.remove(edgeId);
         }
     }
-    //TODO:dokumentacja
-    public void addEdgeIds(final Collection<Integer> edgeIds) {
+
+
+    void addEdgeIds(final Collection<Integer> edgeIds) {
         for (int edgeId : edgeIds) {
             visitedEdges.add(edgeId);
         }
     }
 
-    public final TIntSet getEdgeIds() {
+    final TIntSet getEdgeIds() {
         return visitedEdges;
     }
 

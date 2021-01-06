@@ -186,7 +186,7 @@ public class StationStrategy {
 
     private void logDebugArrivalInfos(final List<ArrivalInfo> arrivalInfos) {
         StringBuilder builder = new StringBuilder();
-        arrivalInfos.forEach(info -> builder.append(info.agentName + ", "));
+        arrivalInfos.forEach(info -> builder.append(info.agentName).append(", "));
         logger.info("Arrival infos size: " + arrivalInfos.size() + ", agent names inside: " + builder.toString());
     }
 

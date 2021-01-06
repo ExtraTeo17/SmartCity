@@ -38,8 +38,8 @@ class TaskManagerTests {
 
         var runnableFactory = mock(IRunnableFactory.class);
         var runContext = new Object() {
-            boolean ranOnce = false;
-            boolean ranEndless = false;
+            boolean ranOnce;
+            boolean ranEndless;
         };
         when(runnableFactory.createDelay(ArgumentMatchers.any(), any(boolean.class))).thenReturn(new IVariableExecutionRunnable() {
             @Override

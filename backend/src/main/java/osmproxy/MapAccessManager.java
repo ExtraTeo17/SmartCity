@@ -1,7 +1,8 @@
+package osmproxy;
 /*
-  (c) Jens Kbler
+  (c) Jens Kübler
   This software is public domain
-  <p>
+
   THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
   AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
   IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -13,8 +14,9 @@
   (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
   SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package osmproxy;
 
+
+import org.apache.commons.io.IOUtils;
 import org.javatuples.Triplet;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -24,6 +26,7 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 import osmproxy.abstractions.IMapAccessManager;
+import osmproxy.abstractions.IOverpassApiManager;
 import osmproxy.elements.OSMLight;
 import osmproxy.elements.OSMNode;
 import osmproxy.elements.OSMWay;
@@ -33,17 +36,13 @@ import routing.core.Position;
 import utilities.IterableNodeList;
 import utilities.NumericHelper;
 
+import javax.inject.Inject;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
-import java.io.DataOutputStream;
 import java.io.File;
 import java.io.IOException;
-import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.net.URLEncoder;
-import java.nio.charset.StandardCharsets;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -51,16 +50,15 @@ import java.util.stream.Collectors;
 
 public class MapAccessManager implements IMapAccessManager {
     private static final Logger logger = LoggerFactory.getLogger(MapAccessManager.class);
-    private static final String OVERPASS_API = "https://lz4.overpass-api.de/api/interpreter";
-    private static final String ALTERNATE_OVERPASS_API_1 = "https://z.overpass-api.de/api/interpreter";
-    private static final String ALTERNATE_OVERPASS_API_2 = "https://overpass.kumi.systems/api/interpreter";
-    private static String CURRENT_API = OVERPASS_API;
-    private static final String CROSSROADS_LOCATIONS_PATH = "config/crossroads.xml";
+    private static final String CROSSROADS_LOCATIONS_PATH = "crossroads.xml";
 
     private final DocumentBuilderFactory xmlBuilderFactory;
+    private final IOverpassApiManager manager;
 
-    public MapAccessManager() {
+    @Inject
+    public MapAccessManager(IOverpassApiManager overpassApiManager) {
         this.xmlBuilderFactory = DocumentBuilderFactory.newInstance();
+        this.manager = overpassApiManager;
     }
 
 
@@ -91,24 +89,28 @@ public class MapAccessManager implements IMapAccessManager {
     }
 
 
+    @SuppressWarnings("unused")
+    private void printStream(final InputStream stream) {
+        try {
+            logger.info(IOUtils.toString(stream));
+            stream.reset();
+        } catch (IOException e) {
+            logger.warn("Exception while printing stream: " + e);
+        }
+    }
+
+    /**
+     * @param query the overpass query
+     * @return the nodes in the formulated query
+     */
     @Override
     public Optional<Document> getNodesDocument(String query) {
-        var connection = sendRequest(query);
-        try {
-            var responseCode = connection.getResponseCode();
-            if (responseCode == 429 || responseCode == 504) {
-                logger.warn("Current API: " + CURRENT_API + " is overloaded with our requests.");
-                CURRENT_API = CURRENT_API.equals(ALTERNATE_OVERPASS_API_1) ? ALTERNATE_OVERPASS_API_2 :
-                        CURRENT_API.equals(ALTERNATE_OVERPASS_API_2) ? OVERPASS_API :
-                                ALTERNATE_OVERPASS_API_1;
-                logger.info("Switching to " + CURRENT_API);
-                connection = sendRequest(query);
-            }
-        } catch (IOException e) {
-            logger.error("Error getting response code from connection", e);
+        var connectionOpt = manager.sendRequest(query);
+        if (connectionOpt.isEmpty()) {
             return Optional.empty();
         }
 
+        var connection = connectionOpt.get();
         Document result;
         try {
             var xmlBuilder = xmlBuilderFactory.newDocumentBuilder();
@@ -120,46 +122,6 @@ public class MapAccessManager implements IMapAccessManager {
         }
 
         return Optional.of(result);
-    }
-
-    private static HttpURLConnection sendRequest(String query) {
-        return sendRequest(CURRENT_API, query);
-    }
-
-    private static HttpURLConnection sendRequest(String apiAddress, String query) {
-        HttpURLConnection connection = getConnection(apiAddress);
-        connection.setDoInput(true);
-        connection.setDoOutput(true);
-        connection.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");
-
-        try {
-            DataOutputStream printout = new DataOutputStream(connection.getOutputStream());
-            printout.writeBytes("data=" + URLEncoder.encode(query, StandardCharsets.UTF_8));
-            printout.flush();
-            printout.close();
-        } catch (IOException e) {
-            logger.error("Error sending data to connection", e);
-            throw new RuntimeException(e);
-        }
-
-        return connection;
-    }
-
-    private static HttpURLConnection getConnection(String apiAddress) {
-        URL url;
-        try {
-            url = new URL(apiAddress);
-        } catch (MalformedURLException e) {
-            logger.error("Error creating url: " + apiAddress);
-            throw new RuntimeException(e);
-        }
-
-        try {
-            return (HttpURLConnection) url.openConnection();
-        } catch (IOException e) {
-            logger.error("Error opening connection to " + apiAddress);
-            throw new RuntimeException(e);
-        }
     }
 
     @Override

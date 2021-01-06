@@ -9,7 +9,10 @@ import smartcity.SimulationState;
 import smartcity.config.abstractions.*;
 
 
-@SuppressWarnings("ClassWithTooManyFields")
+/**
+ * Contains all configuration properties of application.
+ */
+@SuppressWarnings({"ClassWithTooManyFields", "RedundantFieldInitialization"})
 public class ConfigContainer extends ConfigMutator
         implements IZoneMutator,
         IGenerationConfigContainer,
@@ -19,7 +22,7 @@ public class ConfigContainer extends ConfigMutator
         IChangeTransportConfigContainer {
 
     private SimulationState simulationState = SimulationState.INITIAL;
-    
+
     private boolean shouldGeneratePedestriansAndBuses = false;
     private boolean shouldGenerateConstructionSites = true;
     private boolean shouldDetectTrafficJams = false;
@@ -37,7 +40,9 @@ public class ConfigContainer extends ConfigMutator
 
     private int lightExtendTime = 30;
     private int extendWaitTime = 60;
-    private int timeBeforeTrouble = 100000;
+    private int timeBeforeTrouble = 5;
+    private int constructionSiteThresholdUntilIndexChange = 50;
+    private int noConstructionSiteStrategyIndexFactor = 30;
 
     private final IZone zone;
     private boolean busCrashGeneratedOnce = false;
@@ -224,5 +229,25 @@ public class ConfigContainer extends ConfigMutator
     @Override
     public void setTransportChangeStrategyActive(boolean transportChangeStrategyActive) {
         this.transportChangeStrategyActive = transportChangeStrategyActive;
+    }
+
+    @Override
+    public int getConstructionSiteThresholdUntilIndexChange() {
+        return constructionSiteThresholdUntilIndexChange;
+    }
+
+    @Override
+    public void setConstructionSiteThresholdUntilIndexChange(int constructionSiteThresholdUntilIndexChange) {
+        this.constructionSiteThresholdUntilIndexChange = constructionSiteThresholdUntilIndexChange;
+    }
+
+    @Override
+    public int getNoConstructionSiteStrategyIndexFactor() {
+        return noConstructionSiteStrategyIndexFactor;
+    }
+
+    @Override
+    public void setNoConstructionSiteStrategyIndexFactor(int noConstructionSiteStrategyIndexFactor) {
+        this.noConstructionSiteStrategyIndexFactor = noConstructionSiteStrategyIndexFactor;
     }
 }

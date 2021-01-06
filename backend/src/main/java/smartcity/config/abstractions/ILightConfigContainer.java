@@ -1,7 +1,7 @@
 package smartcity.config.abstractions;
 
 /**
- * Configure light
+ * Contains all light related configuration properties.
  */
 public interface ILightConfigContainer {
     boolean isLightStrategyActive();

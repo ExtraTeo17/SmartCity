@@ -11,7 +11,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 public class BrigadeInfo implements Iterable<Timetable>, Serializable {
-    private final static Logger logger = LoggerFactory.getLogger(BrigadeInfo.class);
+    private static final Logger logger = LoggerFactory.getLogger(BrigadeInfo.class);
 
     public final String brigadeId;
     public final List<Timetable> timetables;

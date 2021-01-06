@@ -63,7 +63,7 @@ public class OsmQueryManager {
         return getBusQuery(pos.getLat(), pos.getLng(), radius);
     }
 
-    public static String getBusQuery(double middleLat, double middleLon, int radius) {
+    private static String getBusQuery(double middleLat, double middleLon, int radius) {
         return "<osm-script>\r\n" +
                 "  <query into=\"_\" type=\"relation\">\r\n" +
                 "    <has-kv k=\"route\" modv=\"\" v=\"bus\"/>\r\n" +
@@ -79,7 +79,7 @@ public class OsmQueryManager {
         return getLightsAroundQuery(pos.getLat(), pos.getLng(), radius);
     }
 
-    static String getLightsAroundQuery(double lat, double lon, int radius) {
+    private static String getLightsAroundQuery(double lat, double lon, int radius) {
         return "<osm-script>\r\n" +
                 "  <query into=\"_\" type=\"node\">\r\n" +
                 "    <has-kv k=\"highway\" modv=\"\" v=\"traffic_signals\"/>\r\n" +

@@ -6,6 +6,36 @@ import { angleFromCoordinates } from "../../utils/helpers";
 import { getRotationReducer } from "./Extensions/reducers";
 import RotatedMarker from "./Extensions/RotatedMarker";
 
+/**
+ * Car marker.
+ * @category Markers
+ * @module Car
+ */
+
+/**
+ * @typedef {Object} Props
+ * @property {Car} car
+ */
+
+/**
+ * @typedef {Object} Car
+ * @property {number} id
+ * @property {Position[]} route
+ * @property {Position} location
+ * @property {boolean} isTestCar
+ */
+
+/**
+ * @typedef {Object} Position - Represents position on map
+ * @property {number} lat - Latitude in degrees
+ * @property {number} lng - Longitude in degrees
+ */
+
+/**
+ * Car component
+ * @function
+ * @param {Props} props
+ */
 const Car = props => {
   const {
     car: { id, route, location, isTestCar },
@@ -15,6 +45,7 @@ const Car = props => {
   const [state, dispatch] = useReducer(getRotationReducer(CAR_ROTATION_THRESHOLD), { loc: location, angle: defaultAngle });
 
   useEffect(() => {
+    // @ts-ignore
     dispatch({ payload: location });
   }, [location]);
 

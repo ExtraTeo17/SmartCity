@@ -35,12 +35,19 @@ import {
   D_GENERATE_BUS_FAILURES,
   D_DETECT_TRAFFIC_JAMS,
   D_TRANSPORT_CHANGE_STRATEGY_ACTIVE,
+  D_THRESHOLD_UNTIL_INDEX_CHANGE,
+  D_NO_TP_STRATEGY_INDEX_FACTOR,
 } from "../../constants/defaults";
 import { ConfigState, getNextConfigState } from "../models/states";
-import { createLocalDataObject, saveLocalData } from "../dataUtils/helpers";
+import { createLocalDataObject, saveLocalData } from "../dataUtils/dataUtils";
 
 /**
- * Handles interaction with user interface
+ * Handles interaction with user interface, i.e.:
+ * - CENTER_UPDATED - zone updates
+ * - GENERATE_PEDESTRIANS_UPDATED
+ * - START_SIMULATION_DATA_UPDATED - almost any configuration changes
+ * - SHOULD_START_SIMULATION
+ * - CONFIG_REPLACED - events from ScenariosMenu
  * @category Redux
  * @subcategory Reducers
  * @module interaction
@@ -85,6 +92,9 @@ export const initialInteractionState = {
     extendWaitTime: D_EXTEND_WAIT_TIME,
 
     troublePointStrategyActive: D_TP_STRATEGY_ACTIVE,
+    troublePointThresholdUntilIndexChange: D_THRESHOLD_UNTIL_INDEX_CHANGE,
+    noTroublePointStrategyIndexFactor: D_NO_TP_STRATEGY_INDEX_FACTOR,
+
     trafficJamStrategyActive: D_TJ_STRATEGY_ACTIVE,
     transportChangeStrategyActive: D_TRANSPORT_CHANGE_STRATEGY_ACTIVE,
   },

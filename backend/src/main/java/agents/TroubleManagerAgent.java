@@ -7,7 +7,6 @@ import com.google.common.eventbus.Subscribe;
 import com.google.inject.Inject;
 import events.web.DebugEvent;
 import events.web.roadblocks.TrafficJamFinishedEvent;
-import events.web.roadblocks.TrafficJamStartedEvent;
 import events.web.roadblocks.TroublePointCreatedEvent;
 import jade.core.Agent;
 import jade.core.behaviours.Behaviour;
@@ -17,10 +16,11 @@ import jade.lang.acl.ACLMessage;
 import jade.util.leap.Properties;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import osmproxy.ExtendedGraphHopper;
+import osmproxy.routes.ExtendedGraphHopper;
 import routing.core.Position;
 import smartcity.SimulationState;
 import smartcity.config.ConfigContainer;
+import utilities.ConditionalExecutor;
 
 import java.util.Collections;
 import java.util.HashMap;
@@ -46,7 +46,7 @@ import static agents.utilities.BehaviourWrapper.wrapErrors;
  */
 public class TroubleManagerAgent extends Agent {
     public static final String name = TroubleManagerAgent.class.getSimpleName().replace("Agent", "");
-    private final static Logger logger = LoggerFactory.getLogger(TroubleManagerAgent.class);
+    private static final Logger logger = LoggerFactory.getLogger(TroubleManagerAgent.class);
 
     private final IAgentsContainer agentsContainer;
     private final ConfigContainer configContainer;
@@ -186,7 +186,8 @@ public class TroubleManagerAgent extends Agent {
                 }
                 for (Map.Entry<Integer, String> entry : mapOfConstructionSiteBlockedEdges.entrySet()) {
                     // construction site
-                    logger.info("Edge id blocked: " + entry.getKey() + " length of jam: " + entry.getValue());
+                    ConditionalExecutor.debug(() ->
+                            logger.info("Edge id blocked: " + entry.getKey() + " length of jam: " + entry.getValue()));
                     sendBroadcast(generateMessageAboutTrafficJam(entry.getKey(), entry.getValue(),
                             MessageParameter.CONSTRUCTION, MessageParameter.SHOW));
                 }
@@ -212,6 +213,5 @@ public class TroubleManagerAgent extends Agent {
 
     @Subscribe
     void handle(DebugEvent e) {
-
     }
 }

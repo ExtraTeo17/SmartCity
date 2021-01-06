@@ -1,7 +1,7 @@
 package smartcity.config.abstractions;
 
 /**
- * Controls generation of objects
+ * Contains all generation related configuration properties.
  */
 public interface IGenerationConfigContainer {
 

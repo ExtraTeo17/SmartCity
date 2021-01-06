@@ -55,7 +55,7 @@ public class BusAgent extends AbstractAgent {
     private final Bus bus;
     private final IChangeTransportConfigContainer configContainer;
     private RouteNode troublePoint;
-    private int numberOfPassedStations = 0 ;
+    private int numberOfPassedStations;
 
     BusAgent(int busId, Bus bus,
              ITimeProvider timeProvider,
@@ -69,7 +69,7 @@ public class BusAgent extends AbstractAgent {
 
     @Override
     protected void setup() {
-        informNextStation();
+        informNextStation(true);
         var firstStationOpt = bus.getCurrentStationNode();
         if (firstStationOpt.isEmpty()) {
             print("No stations on route!", LoggerLevel.ERROR);
@@ -154,7 +154,7 @@ public class BusAgent extends AbstractAgent {
                             if (node instanceof LightManagerNode) {
                                 informLightManager(bus);
                             }
-                            informNextStation();
+                            informNextStation(false);
                             numberOfPassedStations++;
                             bus.setState(DrivingState.MOVING);
                             move();
@@ -220,7 +220,7 @@ public class BusAgent extends AbstractAgent {
 
                                 response.setAllUserDefinedParameters(properties);
                                 send(response);
-                                informNextStation();
+                                informNextStation(false);
                                 bus.setState(DrivingState.PASSING_STATION);
                             }
                         }
@@ -291,7 +291,7 @@ public class BusAgent extends AbstractAgent {
                 }
 
                 private void sendMessageAboutCrashTroubleToBusManager(LocalDateTime timeOfCrash) {
-                    ACLMessage msg = createMessageAboutCrash(BusManagerAgent.NAME, false,timeOfCrash);
+                    ACLMessage msg = createMessageAboutCrash(BusManagerAgent.NAME, false, timeOfCrash);
                     logger.info("Send message about crash to BusManager ");
                     send(msg);
                 }
@@ -299,9 +299,8 @@ public class BusAgent extends AbstractAgent {
                 private void sendMessageAboutCrashTroubleToIncomingStations(LocalDateTime timeOfCrash) {
 
                     var stations = bus.getStationNodesOnRoute();
-                    for(int i = numberOfPassedStations;i< stations.size();i++ )
-                    {
-                        ACLMessage msg = createMessageAboutCrash(StationAgent.name+stations.get(i).getAgentId(), false,timeOfCrash);
+                    for (int i = numberOfPassedStations; i < stations.size(); i++) {
+                        ACLMessage msg = createMessageAboutCrash(StationAgent.name + stations.get(i).getAgentId(), false, timeOfCrash);
                         logger.info("Send message about crash to incoming stations ");
                         send(msg);
                     }
@@ -309,7 +308,7 @@ public class BusAgent extends AbstractAgent {
 
                 private void sendMessageAboutCrashTroubleToPedestrians(LocalDateTime timeOfCrash) {
                     for (String pedestrian : bus.getAllPassengers()) {
-                        ACLMessage msg = createMessageAboutCrash(pedestrian, false,timeOfCrash);
+                        ACLMessage msg = createMessageAboutCrash(pedestrian, false, timeOfCrash);
                         logger.info("Send message about crash to pedestrian: " + pedestrian);
                         send(msg);
                     }
@@ -326,11 +325,12 @@ public class BusAgent extends AbstractAgent {
                     properties.setProperty(MessageParameter.TROUBLE_LAT, Double.toString(troublePoint.getLat()));
                     properties.setProperty(MessageParameter.TROUBLE_LON, Double.toString(troublePoint.getLng()));
                     if (!isTroubleManager) {
-                    	properties.setProperty(MessageParameter.DESIRED_OSM_STATION_ID, ((StationNode) bus.findNextStop()).getOsmId() + "");
-                        properties.setProperty(MessageParameter.AGENT_ID_OF_NEXT_CLOSEST_STATION, ((StationNode) bus.findNextStop()).getAgentId() + "");
+                        var nextStop = (StationNode) bus.findNextStop();
+                        properties.setProperty(MessageParameter.DESIRED_OSM_STATION_ID, String.valueOf((nextStop).getOsmId()));
+                        properties.setProperty(MessageParameter.AGENT_ID_OF_NEXT_CLOSEST_STATION, String.valueOf((nextStop).getAgentId()));
                         //maybe not needed
-                        properties.setProperty(MessageParameter.LAT_OF_NEXT_CLOSEST_STATION, bus.findNextStop().getLat() + "");
-                        properties.setProperty(MessageParameter.LON_OF_NEXT_CLOSEST_STATION, bus.findNextStop().getLng() + "");
+                        properties.setProperty(MessageParameter.LAT_OF_NEXT_CLOSEST_STATION, String.valueOf(nextStop.getLat()));
+                        properties.setProperty(MessageParameter.LON_OF_NEXT_CLOSEST_STATION, String.valueOf(nextStop.getLng()));
 
                         properties.setProperty(MessageParameter.BUS_LINE, getLine());
                         properties.setProperty(MessageParameter.BRIGADE, bus.getBrigade());
@@ -363,9 +363,9 @@ public class BusAgent extends AbstractAgent {
         return bus.getPosition();
     }
 
-    private void informNextStation() {
+    private void informNextStation(boolean isStart) {
         // finds next station and announces his arrival
-        var stationOpt = bus.findNextStation();
+        var stationOpt = bus.findNextStation(isStart);
         if (stationOpt.isPresent()) {
             var station = stationOpt.get();
             var stationId = station.getAgentId();

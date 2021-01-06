@@ -1,7 +1,7 @@
 package smartcity.config.abstractions;
 
 /**
- * Controls configuration in the case of crash of the bus
+ * Contains all change-transport related configuration properties.
  */
 public interface IChangeTransportConfigContainer {
 

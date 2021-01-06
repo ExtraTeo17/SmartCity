@@ -27,6 +27,11 @@ import {
   busCrashed,
 } from "./core/actions";
 
+/**
+ * @category Redux
+ * @namespace Dispatcher
+ */
+
 const fps = 20;
 const fpsInterval = 1000 / fps;
 let timer = null;
@@ -86,7 +91,6 @@ function update(now) {
 }
 
 let localWasPrepared = false;
-
 function onDetectStartedSimulation() {
   if (localWasPrepared === true) {
     return;
@@ -100,10 +104,6 @@ function onDetectStartedSimulation() {
   });
 }
 
-/**
- * @category Redux
- * @namespace Dispatcher
- */
 const Dispatcher = {
   /**
    * @param {any[]} lights

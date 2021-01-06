@@ -5,6 +5,20 @@ import { connect } from "react-redux";
 import Car from "../Markers/Car";
 import CarRoute from "../Routes/CarRoute";
 
+/**
+ * Cars layer - contains all car markers and routes
+ * @category Layers
+ * @module CarsLayer
+ */
+
+/**
+ * @typedef {Object} Props
+ * @property {Object[]} cars
+ */
+
+/**
+ * @param {Props} props
+ */
 const CarsLayer = props => {
   const { cars = [] } = props;
 
