@@ -325,12 +325,12 @@ public class BusAgent extends AbstractAgent {
                     properties.setProperty(MessageParameter.TROUBLE_LAT, Double.toString(troublePoint.getLat()));
                     properties.setProperty(MessageParameter.TROUBLE_LON, Double.toString(troublePoint.getLng()));
                     if (!isTroubleManager) {
-                        var nextStop = (StationNode) bus.findNextStop();
-                        properties.setProperty(MessageParameter.DESIRED_OSM_STATION_ID, String.valueOf((nextStop).getOsmId()));
-                        properties.setProperty(MessageParameter.AGENT_ID_OF_NEXT_CLOSEST_STATION, String.valueOf((nextStop).getAgentId()));
+                        var nextStop = bus.findNextStop();
+                        properties.setProperty(MessageParameter.DESIRED_OSM_STATION_ID, nextStop == null? "": String.valueOf(((StationNode)nextStop).getOsmId()));
+                        properties.setProperty(MessageParameter.AGENT_ID_OF_NEXT_CLOSEST_STATION, nextStop == null? "": String.valueOf(((StationNode)nextStop).getAgentId()));
                         //maybe not needed
-                        properties.setProperty(MessageParameter.LAT_OF_NEXT_CLOSEST_STATION, String.valueOf(nextStop.getLat()));
-                        properties.setProperty(MessageParameter.LON_OF_NEXT_CLOSEST_STATION, String.valueOf(nextStop.getLng()));
+                        properties.setProperty(MessageParameter.LAT_OF_NEXT_CLOSEST_STATION,  nextStop == null? "": String.valueOf(nextStop.getLat()));
+                        properties.setProperty(MessageParameter.LON_OF_NEXT_CLOSEST_STATION,  nextStop == null? "": String.valueOf(nextStop.getLng()));
 
                         properties.setProperty(MessageParameter.BUS_LINE, getLine());
                         properties.setProperty(MessageParameter.BRIGADE, bus.getBrigade());
