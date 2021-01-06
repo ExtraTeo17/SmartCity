@@ -7,6 +7,9 @@ import utilities.Siblings;
 
 import java.util.List;
 
+/**
+ * Parses data about crossroads
+ */
 public interface ICrossroadParser {
     Siblings<List<LightInfo>> getLightGroups(OSMNode crossroadCenter);
 

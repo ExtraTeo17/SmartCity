@@ -1,0 +1,1570 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<city name="warsaw">
+	<district name="srodmiescie">
+		<crossroads>
+			<crossroad>
+				<group>
+					<light way="23500646" light="254504849" lat="52.2595223"
+						lon="21.0076187" />
+				</group>
+				<group>
+					<light way="173870818" light="460050293" lat="52.2596693"
+						lon="21.0078944" />
+				</group>
+			</crossroad>
+			<crossroad>
+				<group>
+					<light way="121806330" light="1507263937" lat="52.258463"
+						lon="21.0016117" />
+				</group>
+				<group>
+				</group>
+			</crossroad>
+			<crossroad>
+				<group>
+					<light way="415970529" light="1412551904" lat="52.2583929"
+						lon="20.9969497" />
+					<light way="423101283" light="944569755" lat="52.2586026"
+						lon="20.9970726" />
+				</group>
+				<group>
+				</group>
+			</crossroad>
+			<crossroad>
+				<group>
+					<light way="415970531" light="4021163477" lat="52.2579436"
+						lon="20.9940169" />
+					<light way="263858883" light="4021163477" lat="52.25758"
+						lon="20.99390" />
+				</group>
+				<group>
+				</group>
+			</crossroad>
+			<crossroad>
+				<group>
+					<light way="229104859" light="3703610978" lat="52.2567284"
+						lon="20.9869536" />
+				</group>
+				<group>
+					<light way="415970530" light="3703610948" lat="52.2566154"
+						lon="20.9875149" />
+					<light way="229104873" light="3700296131" lat="52.256191"
+						lon="20.987057" />
+				</group>
+			</crossroad>
+			<crossroad>
+				<group>
+					<light way="228882925" light="3719956130" lat="52.2547949"
+						lon="20.9832538" />
+				</group>
+				<group>
+					<light way="453604039" light="2506189814" lat="52.2549935"
+						lon="20.9835264" />
+					<light way="519144620" light="3700293342" lat="52.2547349"
+						lon="20.983424" />
+				</group>
+			</crossroad>
+			<crossroad>
+				<group>
+					<light way="306462714" light="3719956131" lat="52.255233"
+						lon="20.9823383" />
+				</group>
+				<group>
+					<light way="5080468" light="3703015810" lat="52.2553147"
+						lon="20.9824531" />
+					<light way="203749083" light="3699970162" lat="52.2553622"
+						lon="20.9819627" />
+				</group>
+			</crossroad>
+			<crossroad>
+				<group>
+					<light way="229104869" light="3719956129" lat="52.2544232"
+						lon="20.9817986" />
+				</group>
+				<group>
+					<light way="4844111" light="3703015222" lat="52.2543475"
+						lon="20.9816432" />
+					<light way="138607785" light="3700182660" lat="52.2541315"
+						lon="20.9818678" />
+				</group>
+			</crossroad>
+			<crossroad>
+				<group>
+					<light way="228882922" light="3719956128" lat="52.2542539"
+						lon="20.9827446" />
+				</group>
+				<group>
+					<light way="4990686" light="3703015214" lat="52.254162"
+						lon="20.9826194" />
+					<light way="4990685" light="3699969952" lat="52.2541857"
+						lon="20.9831611" />
+				</group>
+			</crossroad>
+			<crossroad>
+				<group>
+					<light way="203749099" light="3707037587" lat="52.2533874"
+						lon="20.9838525" />
+					<light way="584012947" light="3703649220" lat="52.2534238"
+						lon="20.9833312 " />
+				</group>
+				<group>
+				</group>
+			</crossroad>
+			<crossroad>
+				<group>
+					<light way="330838169" light="3708559650" lat="52.2512508"
+						lon="20.9853076" />
+					<light way="683311793" light="3709129043" lat="52.2507936"
+						lon="20.986024" />
+				</group>
+				<group>
+					<light way="25865115" light="3708559533" lat="52.2508885"
+						lon="20.9852502" />
+					<light way="258458820" light="3709129101" lat="52.2511992"
+						lon="20.9860746" />
+				</group>
+			</crossroad>
+			<crossroad>
+				<group>
+					<light way="258458820" light="99408505" lat="52.2519431"
+						lon="20.9883485" />
+					<light way="366878186" light="282141338" lat="52.2518413"
+						lon="20.9884711" />
+				</group>
+				<group>
+				</group>
+			</crossroad>
+			<crossroad>
+				<group>
+					<light way="315672340" light="5184663782" lat="52.2540293"
+						lon="20.9976296" />
+					<light way="684564298" light="5184663783" lat="52.2532843"
+						lon="20.9977918" />
+				</group>
+				<group>
+					<light way="315672342" light="3187666312" lat="52.25382"
+						lon="20.9981487" />
+					<light way="585346438" light="3187666409" lat="52.2535028"
+						lon="20.9973972" />
+				</group>
+			</crossroad>
+			<crossroad>
+				<group>
+					<light way="302956204" light="5184663765" lat="52.2541448"
+						lon="20.999469" />
+					<light way="391572244" light="3947939086" lat="52.2536401"
+						lon="21.0001017" />
+				</group>
+				<group>
+					<light way="37971214" light="5184663766" lat="52.2537023"
+						lon="20.9995173" />
+					<light way="198517312" light="5184663767" lat="52.2539355"
+						lon="21.0001956" />
+				</group>
+			</crossroad>
+			<crossroad>
+				<group>
+					<light way="38789053" light="34522507" lat="52.25598"
+						lon="21.0053" />
+				</group>
+				<group>
+					<light way="5080128" light="34522507" lat="52.25575"
+						lon="21.00523" />
+					<light way="198514978" light="34522507" lat="52.25594"
+						lon="21.00571" />
+				</group>
+			</crossroad>
+			<crossroad>
+				<group>
+					<light way="174153230" light="34522515" lat="52.25617"
+						lon="21.01038" />
+				</group>
+				<group>
+					<light way="5080121" light="34522515" lat="52.25605"
+						lon="21.0106" />
+				</group>
+			</crossroad>
+			<crossroad>
+				<group>
+					<light way="85686013" light="3709127995" lat="52.2475887"
+						lon="20.9884877" />
+					<light way="659391997" light="3720272074" lat="52.247195"
+						lon="20.9891486" />
+				</group>
+				<group>
+					<light way="243159870" light="3720272098" lat="52.247272"
+						lon="20.9884829" />
+					<light way="684588905" light="3720272143" lat="52.2475186"
+						lon="20.9892311" />
+				</group>
+			</crossroad>
+			<crossroad>
+				<group>
+					<light way="570770327" light="212881041" lat="52.24904"
+						lon="20.99532" />
+					<light way="442453094" light="212881041" lat="52.24889"
+						lon="20.99544" />
+				</group>
+				<group>
+					<light way="186137540" light="212881041" lat="52.24896"
+						lon="20.99524" />
+					<light way="18466816" light="212881041" lat="52.249"
+						lon="20.99555" />
+				</group>
+			</crossroad>
+			<crossroad>
+				<group>
+					<light way="178860647" light="190490777" lat="52.24939"
+						lon="20.99867" />
+				</group>
+				<group>
+					<light way="684588904" light="190490777" lat="52.2493"
+						lon="20.99896" />
+				</group>
+			</crossroad>
+			<crossroad>
+				<group>
+					<light way="23008769" light="212881047" lat="52.25027"
+						lon="21.00393" />
+					<light way="20133461" light="212881047" lat="52.25007"
+						lon="21.00414" />
+				</group>
+				<group>
+					<light way="684588903" light="212881047" lat="52.25014"
+						lon="21.00391" />
+					<light way="38789051" light="212881047" lat="52.25023"
+						lon="21.00418" />
+				</group>
+			</crossroad>
+			<crossroad>
+				<group>
+					<light way="534653861" light="5184663734" lat="52.2519113"
+						lon="21.0018274" />
+					<light way="534653862" light="5184663727" lat="52.25168"
+						lon="21.0024483" />
+				</group>
+				<group>
+					<light way="169464922" light="5184663725" lat="52.2516885"
+						lon="21.001888" />
+					<light way="31091414" light="5184663726" lat="52.2519636"
+						lon="21.002488" />
+				</group>
+			</crossroad>
+			<crossroad>
+				<group>
+					<light way="239427753" light="212881065" lat="52.24874"
+						lon="21.00603" />
+					<light way="20133460" light="212881065" lat="52.24862"
+						lon="21.00627" />
+				</group>
+				<group>
+					<light way="20134007" light="212881065" lat="52.24863"
+						lon="21.0061" />
+					<light way="135770013" light="212881065" lat="52.24875"
+						lon="21.00624" />
+				</group>
+			</crossroad>
+			<crossroad>
+				<group>
+					<light way="368171392" light="190472433" lat="52.24471"
+						lon="20.99094" />
+					<light way="122225824" light="212881000" lat="52.24466"
+						lon="20.99142" />
+				</group>
+				<group>
+					<light way="18465092" light="190472433" lat="52.24459"
+						lon="20.99086" />
+					<light way="185058529" light="212881000" lat="52.24479"
+						lon="20.99147" />
+				</group>
+			</crossroad>
+			<crossroad>
+				<group>
+					<light way="683311788" light="31158788" lat="52.2418964"
+						lon="20.9933823" />
+					<light way="683311783" light="32913098" lat="52.2418683"
+						lon="20.9938377" />
+				</group>
+				<group>
+					<light way="132526994" light="32913095" lat="52.2417468"
+						lon="20.9934972" />
+					<light way="459422638" light="31158787" lat="52.2420142"
+						lon="20.9937094" />
+				</group>
+			</crossroad>
+			<crossroad>
+				<group>
+					<light way="5080033" light="31158727" lat="52.2443827"
+						lon="21.0008702" />
+					<light way="158059141" light="34520363" lat="52.2442517"
+						lon="21.001218" />
+				</group>
+				<group>
+					<light way="149726628" light="31158772" lat="52.2442218"
+						lon="21.0010195" />
+					<light way="459422643" light="34520362" lat="52.2444331"
+						lon="21.0010185" />
+				</group>
+			</crossroad>
+			<crossroad>
+				<group>
+					<light way="303165540" light="1118690303" lat="52.2452997"
+						lon="21.003338" />
+					<light way="302956188" light="251851753" lat="52.2449008"
+						lon="21.003684" />
+				</group>
+				<group />
+			</crossroad>
+			<crossroad>
+				<group>
+					<light way="98856470" light="1143664231" lat="52.2454993"
+						lon="21.0050433" />
+				</group>
+				<group>
+				</group>
+			</crossroad>
+			<crossroad>
+				<group>
+					<light way="4943362" light="226358296" lat="52.2462"
+						lon="21.01227" />
+				</group>
+				<group>
+					<light way="236453319" light="226358296" lat="52.24622"
+						lon="21.01248" />
+					<light way="507939460" light="226358296" lat="52.24634"
+						lon="21.01216" />
+				</group>
+			</crossroad>
+			<crossroad>
+				<group>
+					<light way="306458022" light="32572853" lat="52.24483"
+						lon="21.01092" />
+				</group>
+				<group>
+					<light way="186117730" light="32572853" lat="52.2448"
+						lon="21.01079" />
+					<light way="4943362" light="32572853" lat="52.24499"
+						lon="21.01093" />
+				</group>
+			</crossroad>
+			<crossroad>
+				<group>
+					<light way="330639325" light="35966362" lat="52.2485873"
+						lon="21.018233" />
+				</group>
+				<group>
+					<light way="174153236" light="35966363" lat="52.2486355"
+						lon="21.0181811" />
+					<light way="197595949" light="35966366" lat="52.2484312"
+						lon="21.0187118" />
+				</group>
+			</crossroad>
+			<crossroad>
+				<group>
+					<light way="441948258" light="4396351684" lat="52.2473409"
+						lon="21.0194964" />
+					<light way="187256331" light="1492368294" lat="52.2470412"
+						lon="21.0194831" />
+				</group>
+				<group>
+					<light way="601980011" light="1492368348" lat="52.2474306"
+						lon="21.01967" />
+					<light way="431741390" light="35966368" lat="52.2472589"
+						lon="21.0202259" />
+				</group>
+			</crossroad>
+			<crossroad>
+				<group>
+					<light way="122225818" light="32913585" lat="52.2395"
+						lon="20.99543" />
+					<light way="130196846" light="31158786" lat="52.2395"
+						lon="20.9958" />
+				</group>
+				<group>
+					<light way="112874505" light="32913585" lat="52.23944"
+						lon="20.99544" />
+					<light way="120535499" light="31158786" lat="52.23958"
+						lon="20.99584" />
+				</group>
+			</crossroad>
+			<crossroad>
+				<group>
+					<light way="4936858" light="280797034" lat="52.2387921"
+						lon="20.9957912" />
+					<light way="130196846" light="280797035" lat="52.2386909"
+						lon="20.9961727" />
+				</group>
+				<group />
+			</crossroad>
+			<crossroad>
+				<group>
+					<light way="4936858" light="90354602" lat="52.2359593"
+						lon="20.9970218" />
+					<light way="137455168" light="450852400" lat="52.2358833"
+						lon="20.9973093" />
+				</group>
+				<group>
+					<light way="19851825" light="1317157320" lat="52.2358333"
+						lon="20.9970743" />
+					<light way="428020620" light="90332394" lat="52.2360077"
+						lon="20.9972564" />
+				</group>
+			</crossroad>
+			<crossroad>
+				<group>
+					<light way="332052804" light="450852337" lat="52.23717"
+						lon="21.0033" />
+					<light way="27569984" light="32596650" lat="52.23741"
+						lon="21.00337" />
+				</group>
+				<group>
+					<light way="38243829" light="450852337" lat="52.23723"
+						lon="21.00326" />
+					<light way="427848606" light="32596650" lat="52.23736"
+						lon="21.00344" />
+				</group>
+			</crossroad>
+			<crossroad>
+				<group>
+					<light way="141316412" light="32572261" lat="52.2382284"
+						lon="21.0065673" />
+					<light way="405608029" light="32572240" lat="52.2382211"
+						lon="21.0068196" />
+				</group>
+				<group>
+					<light way="454675035" light="450852308" lat="52.2381565"
+						lon="21.0066275" />
+					<light way="236020204" light="32572260" lat="52.2382857"
+						lon="21.0067429" />
+				</group>
+			</crossroad>
+			<crossroad>
+				<group>
+					<light way="184744207" light="165115647" lat="52.23978"
+						lon="21.01228" />
+				</group>
+				<group>
+					<light way="185067276" light="165115647" lat="52.23982"
+						lon="21.01207" />
+					<light way="184744199" light="32572254" lat="52.2399996"
+						lon="21.0122973" />
+				</group>
+			</crossroad>
+			<crossroad>
+				<group>
+					<light way="236023343" light="32917756" lat="52.2404977"
+						lon="21.0138452" />
+				</group>
+				<group>
+					<light way="230770434" light="32917757" lat="52.2404116"
+						lon="21.013879" />
+					<light way="4968936" light="32572252" lat="52.2405151"
+						lon="21.0139699" />
+				</group>
+			</crossroad>
+			<crossroad>
+				<group>
+					<light way="4969141" light="416554658" lat="52.2419513"
+						lon="21.011911" />
+				</group>
+				<group />
+			</crossroad>
+			<crossroad>
+				<group>
+					<light way="28906701" light="7319246188" lat="52.2433684"
+						lon="21.0197233" />
+					<light way="490836559" light="7319246185" lat="52.243724"
+						lon="21.020237" />
+				</group>
+				<group>
+					<light way="385410545" light="7319246186" lat="52.2437453"
+						lon="21.0197576" />
+					<light way="20929085" light="7319246187" lat="52.2433172"
+						lon="21.0202312" />
+				</group>
+			</crossroad>
+			<crossroad>
+				<group>
+					<light way="448770033" light="209094006" lat="52.24429"
+						lon="21.02134" />
+					<light way="62300670" light="209094006" lat="52.24412"
+						lon="21.02152" />
+				</group>
+				<group>
+					<light way="490836557" light="209094006" lat="52.24415"
+						lon="21.0213" />
+					<light way="490836556" light="209094006" lat="52.24425"
+						lon="21.02152" />
+				</group>
+			</crossroad>
+			<crossroad>
+				<group>
+					<light way="19919306" light="224829889" lat="52.24115"
+						lon="21.02218" />
+				</group>
+				<group>
+					<light way="316067494" light="224829889" lat="52.24118"
+						lon="21.02203" />
+					<light way="236238463" light="224829889" lat="52.24106"
+						lon="21.02212" />
+				</group>
+			</crossroad>
+			<crossroad>
+				<group>
+					<light way="316067495" light="209094020" lat="52.24197"
+						lon="21.02457" />
+					<light way="184747266" light="209094020" lat="52.24181"
+						lon="21.02476" />
+				</group>
+				<group>
+					<light way="19919306" light="209094020" lat="52.24184"
+						lon="21.02458" />
+					<light way="236238470" light="209094020" lat="52.24191"
+						lon="21.02477" />
+				</group>
+			</crossroad>
+			<crossroad>
+				<group>
+					<light way="4936857" light="32528072" lat="52.23333"
+						lon="20.99868" />
+					<light way="173671303" light="308945771" lat="52.23296"
+						lon="20.99876" />
+					<light way="117358265" light="308945792" lat="52.23286"
+						lon="20.99795" />
+					<light way="173671300" light="308945749" lat="52.2333"
+						lon="20.99791" />
+				</group>
+				<group>
+					<light way="4936890" light="32528072" lat="52.23338"
+						lon="20.99871" />
+					<light way="137455167" light="308945771" lat="52.23292"
+						lon="20.99887" />
+					<light way="437082172" light="3110129351" lat="52.2327977"
+						lon="20.9978002" />
+					<light way="137455170" light="308945749" lat="52.23334"
+						lon="20.99779" />
+				</group>
+			</crossroad>
+			<crossroad>
+				<group>
+					<light way="5080041" light="3378411264" lat="52.23396"
+						lon="21.0022" />
+					<light way="301706286" light="3378411266" lat="52.2339"
+						lon="21.00255" />
+				</group>
+				<group>
+					<light way="352950103" light="3378411264" lat="52.23391"
+						lon="21.00217" />
+					<light way="331647913" light="3378411266" lat="52.23399"
+						lon="21.00257" />
+				</group>
+			</crossroad>
+			<crossroad>
+				<group>
+					<light way="408064632" light="3378411265" lat="52.23436"
+						lon="21.00442" />
+					<light way="117358268" light="3378411265" lat="52.23442"
+						lon="21.00464" />
+				</group>
+				<group>
+					<light way="332052791" light="3378411265" lat="52.23445"
+						lon="21.00449" />
+				</group>
+			</crossroad>
+			<crossroad>
+				<group>
+					<light way="426582805" light="3378411268" lat="52.23517"
+						lon="21.0083" />
+					<light way="331647914" light="3378411269" lat="52.23524"
+						lon="21.00871" />
+				</group>
+				<group>
+					<light way="161634979" light="3378411268" lat="52.23525"
+						lon="21.00835" />
+					<light way="161634980" light="3378411269" lat="52.23516"
+						lon="21.00868" />
+				</group>
+			</crossroad>
+			<crossroad>
+				<group>
+					<light way="442355018" light="1321790320" lat="52.23573"
+						lon="21.0108" />
+				</group>
+				<group>
+					<light way="426582806" light="1321790320" lat="52.23564"
+						lon="21.01073" />
+					<light way="117656398" light="1321790320" lat="52.23569"
+						lon="21.01101" />
+				</group>
+			</crossroad>
+			<crossroad>
+				<group>
+					<light way="709895408" light="32528268" lat="52.23709"
+						lon="21.01791" />
+					<light way="48279420" light="32528268" lat="52.23695"
+						lon="21.01796" />
+				</group>
+				<group>
+					<light way="346893830" light="32528268" lat="52.237"
+						lon="21.01783" />
+					<light way="237193611" light="32528268" lat="52.23704"
+						lon="21.01803" />
+				</group>
+			</crossroad>
+			<crossroad>
+				<group>
+					<light way="519173501" light="32627299" lat="52.2384"
+						lon="21.02525" />
+					<light way="519173351" light="32627299" lat="52.23831"
+						lon="21.02532" />
+				</group>
+				<group>
+					<light way="20929655" light="32627299" lat="52.23833"
+						lon="21.02522" />
+					<light way="509898487" light="32627299" lat="52.23839"
+						lon="21.02539" />
+				</group>
+			</crossroad>
+			<crossroad>
+				<group>
+					<light way="514418891" light="32627301" lat="52.23904"
+						lon="21.02757" />
+				</group>
+				<group>
+					<light way="448765967" light="32627301" lat="52.23907"
+						lon="21.02742" />
+					<light way="157916601" light="32627301" lat="52.23896"
+						lon="21.02753" />
+				</group>
+			</crossroad>
+			<crossroad>
+				<group>
+					<light way="20929336" light="32528275" lat="52.23742"
+						lon="21.02601" />
+					<light way="203484450" light="32528275" lat="52.23728"
+						lon="21.02612" />
+				</group>
+				<group>
+					<light way="224521541" light="32528275" lat="52.23732"
+						lon="21.02598" />
+					<light way="512366624" light="32528275" lat="52.23737"
+						lon="21.02619" />
+				</group>
+			</crossroad>
+			<crossroad>
+				<group>
+					<light way="216680787" light="32627303" lat="52.23821"
+						lon="21.02819" />
+				</group>
+				<group>
+					<light way="157916601" light="32627303" lat="52.23832"
+						lon="21.02822" />
+					<light way="448761124" light="32627303" lat="52.23819"
+						lon="21.02837" />
+				</group>
+			</crossroad>
+			<crossroad>
+				<group>
+					<light way="508644779" light="32893459" lat="52.24008"
+						lon="21.03" />
+				</group>
+				<group>
+					<light way="242607710" light="32893459" lat="52.24"
+						lon="21.02997" />
+					<light way="305764481" light="32893459" lat="52.24009"
+						lon="21.02984" />
+				</group>
+			</crossroad>
+			<crossroad>
+				<group>
+					<light way="514418887" light="32528278" lat="52.23949"
+						lon="21.03061" />
+				</group>
+				<group>
+				</group>
+			</crossroad>
+			<crossroad>
+				<group>
+					<light way="306287819" light="32528060" lat="52.2280145"
+						lon="21.0023979" />
+				</group>
+				<group>
+					<light way="148750405" light="2453705447" lat="52.2278744"
+						lon="21.0022352" />
+				</group>
+			</crossroad>
+			<crossroad>
+				<group>
+					<light way="306287818" light="3111554537" lat="52.2279622"
+						lon="21.0014402" />
+				</group>
+				<group>
+					<light way="147753134" light="3111554533" lat="52.2278878"
+						lon="21.0016853" />
+				</group>
+			</crossroad>
+			<crossroad>
+				<group>
+					<light way="271450002" light="3111554185" lat="52.2275577"
+						lon="21.0016135" />
+				</group>
+				<group>
+					<light way="306287820" light="308942577" lat="52.2274147"
+						lon="21.0014386" />
+				</group>
+			</crossroad>
+			<crossroad>
+				<group>
+					<light way="191552151" light="3111554178" lat="52.2275125"
+						lon="21.0022112" />
+				</group>
+				<group>
+					<light way="306287821" light="32528052" lat="52.2274819"
+						lon="21.0024801" />
+				</group>
+			</crossroad>
+			<crossroad>
+				<group>
+					<light way="184674429" light="3102110370" lat="52.228707"
+						lon="21.0052404" />
+				</group>
+				<group>
+					<light way="305569804" light="3102110371" lat="52.2286979"
+						lon="21.005916" />
+					<light way="305569805" light="3102110340" lat="52.2283235"
+						lon="21.0051108" />
+				</group>
+			</crossroad>
+			<crossroad>
+				<group>
+					<light way="494019470" light="248460731" lat="52.2295569"
+						lon="21.0047476" />
+				</group>
+				<group>
+					<light way="134646011" light="248460731" lat="52.22947"
+						lon="21.00461" />
+				</group>
+			</crossroad>
+			<crossroad>
+				<group>
+					<light way="305333775" light="312054648" lat="52.2300949"
+						lon="21.0112195" />
+				</group>
+				<group>
+					<light way="4968924" light="312054650" lat="52.2300618"
+						lon="21.0113993" />
+				</group>
+			</crossroad>
+			<crossroad>
+				<group>
+					<light way="305333773" light="308942575" lat="52.2295331"
+						lon="21.0112752" />
+				</group>
+				<group>
+					<light way="136989210" light="3099432313" lat="52.2296175"
+						lon="21.0113557" />
+				</group>
+			</crossroad>
+			<crossroad>
+				<group>
+					<light way="205342816" light="2308076641" lat="52.2295517"
+						lon="21.0122685" />
+				</group>
+				<group>
+					<light way="147753147" light="312054695" lat="52.2296216"
+						lon="21.0121124" />
+				</group>
+			</crossroad>
+			<crossroad>
+				<group>
+					<light way="4966688" light="32892163" lat="52.2308895"
+						lon="21.016246" />
+					<light way="686994635" light="6439949858" lat="52.2307537"
+						lon="21.0164613" />
+				</group>
+				<group>
+					<light way="4966679" light="32892164" lat="52.2307253"
+						lon="21.0163263" />
+					<light way="628994153" light="6439949857" lat="52.2309185"
+						lon="21.0163819" />
+				</group>
+			</crossroad>
+			<crossroad>
+				<group>
+					<light way="229399405" light="5076871232" lat="52.232027"
+						lon="21.0214998" />
+				</group>
+				<group>
+					<light way="149725205" light="5076871230" lat="52.2317663"
+						lon="21.0211342" />
+				</group>
+			</crossroad>
+			<crossroad>
+				<group>
+					<light way="4966683" light="2864390501" lat="52.2314698"
+						lon="21.0211245" />
+				</group>
+				<group>
+					<light way="136989200" light="5076871231" lat="52.2316278"
+						lon="21.0210024" />
+				</group>
+			</crossroad>
+			<crossroad>
+				<group>
+					<light way="180672351" light="3694922553" lat="52.2315304"
+						lon="21.0201862" />
+				</group>
+				<group>
+					<light way="136989197" light="300412670" lat="52.2316423"
+						lon="21.0205942" />
+				</group>
+			</crossroad>
+			<crossroad>
+				<group>
+					<light way="4966674" light="3694922569" lat="52.2319806"
+						lon="21.0203133" />
+				</group>
+				<group>
+					<light way="136989199" light="300412658" lat="52.2318868"
+						lon="21.020572" />
+				</group>
+			</crossroad>
+			<crossroad>
+				<group>
+					<light way="203497215" light="32627336" lat="52.2351"
+						lon="21.02951" />
+					<light way="4949086" light="32627336" lat="52.23517"
+						lon="21.02934" />
+				</group>
+				<group>
+					<light way="4949085" light="32627336" lat="52.23518"
+						lon="21.02952" />
+				</group>
+			</crossroad>
+			<crossroad>
+				<group>
+					<light way="406718922" light="32529958" lat="52.2346579"
+						lon="21.038381" />
+				</group>
+				<group>
+				</group>
+			</crossroad>
+			<crossroad>
+				<group>
+					<light way="4937126" light="28396133" lat="52.2336627"
+						lon="21.0389882" />
+				</group>
+				<group>
+					<light way="229164366" light="266864508" lat="52.23349"
+						lon="21.0390885" />
+				</group>
+			</crossroad>
+			<crossroad>
+				<group>
+					<light way="163271178" light="32529941" lat="52.23316"
+						lon="21.03832" />
+					<light way="4937126" light="32529941" lat="52.23329"
+						lon="21.03848" />
+				</group>
+				<group>
+					<light way="423063760" light="32529941" lat="52.23328"
+						lon="21.03832" />
+				</group>
+			</crossroad>
+			<crossroad>
+				<group>
+					<light way="205342807" light="105757899" lat="52.22795"
+						lon="21.01269" />
+					<light way="205342817" light="246806023" lat="52.22791"
+						lon="21.01303" />
+				</group>
+				<group>
+					<light way="22920747" light="246806023" lat="52.22789"
+						lon="21.01261" />
+				</group>
+			</crossroad>
+			<crossroad>
+				<group>
+					<light way="205342814" light="32629353" lat="52.22709"
+						lon="21.0132" />
+					<light way="205342805" light="32629352" lat="52.22706"
+						lon="21.01354" />
+				</group>
+				<group>
+					<light way="8114652" light="32629353" lat="52.22704"
+						lon="21.01315" />
+					<light way="229395605" light="32629352" lat="52.22711"
+						lon="21.01358" />
+				</group>
+			</crossroad>
+			<crossroad>
+				<group>
+					<light way="466325490" light="60937003" lat="52.22613"
+						lon="21.0137" />
+				</group>
+				<group>
+					<light way="205342804" light="60937003" lat="52.22619"
+						lon="21.01374" />
+					<light way="205342810" light="60937004" lat="52.22616"
+						lon="21.01408" />
+				</group>
+			</crossroad>
+			<crossroad>
+				<group>
+					<light way="205342809" light="32629255" lat="52.2247"
+						lon="21.01464" />
+					<light way="205342806" light="32629253" lat="52.22466"
+						lon="21.01497" />
+				</group>
+				<group>
+					<light way="205347892" light="32629253" lat="52.22473"
+						lon="21.01501" />
+				</group>
+			</crossroad>
+			<crossroad>
+				<group>
+					<light way="33196116" light="248564705" lat="52.22977"
+						lon="21.01699" />
+				</group>
+				<group>
+					<light way="760061584" light="248564705" lat="52.22981"
+						lon="21.01688" />
+					<light way="764595020" light="248564705" lat="52.22968"
+						lon="21.01694" />
+				</group>
+			</crossroad>
+			<crossroad>
+				<group>
+					<light way="423103099" light="246806033" lat="52.22877"
+						lon="21.01718" />
+				</group>
+				<group>
+					<light way="4966686" light="246806033" lat="52.22888"
+						lon="21.01733" />
+					<light way="764595025" light="246806033" lat="52.22875"
+						lon="21.01739" />
+				</group>
+			</crossroad>
+			<crossroad>
+				<group>
+					<light way="764595026" light="248564707" lat="52.22797"
+						lon="21.0178" />
+					<light way="423103087" light="248564707" lat="52.22784"
+						lon="21.01787" />
+				</group>
+				<group>
+					<light way="23039917" light="248564707" lat="52.22788"
+						lon="21.01771" />
+					<light way="120294201" light="248564707" lat="52.22793"
+						lon="21.01797" />
+				</group>
+			</crossroad>
+		</crossroads>
+	</district>
+	<district name="ochota">
+		<crossroads>
+			<crossroad lat="52.21" lon="20.94921">
+				<group>
+					<light way="416864566" light="35147448" lat="52.2099213"
+						lon="20.9494604" />
+					<light way="5113784" light="35147444" lat=" 52.2100138"
+						lon="20.9490320" />
+				</group>
+				<group>
+					<light way="240490491" light="35147450" lat=" 52.2101800"
+						lon="20.9492824" />
+					<light way="514108902" light="35147446" lat="52.2097507"
+						lon="20.9491957" />
+				</group>
+			</crossroad>
+			<crossroad lat="52.2151182" lon="20.9579227">
+				<group>
+					<light way="30683890" light="6718325144" lat="52.2151182"
+						lon="20.9579227" />
+				</group>
+				<group>
+				</group>
+			</crossroad>
+			<crossroad lat="52.2151897" lon=" 20.9580133">
+				<group>
+					<light way="714739539" light="6718325143" lat="52.2151897"
+						lon=" 20.9580133" />
+				</group>
+				<group>
+				</group>
+			</crossroad>
+			<crossroad lat="52.2171659" lon="20.9629349">
+				<group>
+					<light way="154492095" light="35150322" lat="52.2171659"
+						lon="20.9629349" />
+				</group>
+				<group>
+				</group>
+			</crossroad>
+			<crossroad lat="52.219994" lon="20.9710946">
+				<group>
+					<light way="242998754" light="344714883" lat="52.219994"
+						lon="20.9710946" />
+				</group>
+				<group>
+				</group>
+			</crossroad>
+			<crossroad lat="52.2196062" lon="20.9709335">
+				<group>
+					<light way="4946215" light="2136112306" lat="52.2196062"
+						lon="20.9709335" />
+				</group>
+				<group>
+				</group>
+			</crossroad>
+			<crossroad lat="52.2194943" lon="20.971226 ">
+				<group>
+					<light way="4925299" light="339975561" lat="52.2194943"
+						lon="20.971226 " />
+				</group>
+				<group>
+				</group>
+			</crossroad>
+			<crossroad lat="52.22441" lon="20.98899">
+
+				<group>
+					<light way="307485359" light="303205614" lat="52.2243199"
+						lon="20.9887466" />
+
+				</group>
+				<group>
+					<light way="175217853" light="830688327" lat="52.2246653"
+						lon="20.9887027" />
+
+				</group>
+			</crossroad>
+			<crossroad lat="52.22441" lon="20.98899">
+
+				<group>
+					<light way="137020833" light="3126573942" lat="52.2245683"
+						lon=" 20.9893911" />
+
+				</group>
+				<group>
+					<light way="307485362" light="3126573525" lat="52.2244657"
+						lon="20.9896181" />
+
+				</group>
+			</crossroad>
+			<crossroad lat="52.22497" lon="20.98858">
+
+				<group>
+					<light way="566771303" light="3126573993" lat="52.224891"
+						lon="20.9882603" />
+					<light way="137020855" light="3126574018" lat="52.22505"
+						lon="20.9887445 " />
+					<light way="740823014" light="32572884" lat="52.2247583"
+						lon="20.9884177" />
+
+				</group>
+				<group>
+					<light way="27612813" light="3126574144" lat="52.225141"
+						lon="20.9885372" />
+
+				</group>
+			</crossroad>
+			<crossroad lat="52.22516" lon="20.98922 ">
+
+				<group>
+					<light way="204389800" light="330286046" lat="52.22526"
+						lon="20.9896658 " />
+
+				</group>
+				<group>
+					<light way="175217854" light="303205621" lat="52.2250601"
+						lon="20.9893964 " />
+
+				</group>
+			</crossroad>
+			<crossroad lat="52.225549" lon="20.9924756 ">
+				<group>
+					<light way="4968925" light="3122426140" lat="52.225549"
+						lon="20.9924756 " />
+				</group>
+				<group>
+				</group>
+			</crossroad>
+			<crossroad lat="52.2258448" lon="20.9925381">
+				<group>
+					<light way="229263499" light="3122426551" lat="52.2258448"
+						lon="20.9925381" />
+				</group>
+				<group>
+				</group>
+			</crossroad>
+			<crossroad lat="" lon="">
+				<group>
+					<light way="306549244" light="3115012274" lat="52.2266548 "
+						lon="20.9956034 " />
+					<light way="4945808" light="3115009526" lat="52.2261644 "
+						lon="20.9960882" />
+				</group>
+				<group>
+					<light way="306549192" light="3115012036" lat="52.2262201"
+						lon="20.9952926 " />
+					<light way="4945614" light="3115012264" lat="52.2266313"
+						lon="20.9962662" />
+				</group>
+			</crossroad>
+			<crossroad lat="" lon="">
+				<group>
+					<light way="135437887" light="32601862" lat="52.20267"
+						lon="20.96893" />
+					<light way="191468209" light="32601861" lat="52.20253"
+						lon="20.96935" />
+				</group>
+				<group>
+					<light way="165548038" light="32601862" lat="52.20272"
+						lon="20.96908" />
+					<light way="135437880" light="32601861" lat="52.20249"
+						lon="20.96926" />
+				</group>
+			</crossroad>
+			<crossroad lat="" lon="">
+				<group>
+					<light way="135437886" light="32049450" lat="52.20565"
+						lon=" 20.9723" />
+					<light way="174991031" light="32049451" lat="52.20587"
+						lon="20.97165" />
+				</group>
+				<group>
+					<light way="135437883" light="32049450" lat="52.2056"
+						lon="20.97204" />
+					<light way="204389809" light="32049451" lat="52.20594"
+						lon="20.97194" />
+				</group>
+			</crossroad>
+			<crossroad lat="52.2258448" lon="20.9925381">
+				<group>
+					<light way="135437882" light="202032433" lat=" 52.2086566"
+						lon="20.9746935" />
+				</group>
+				<group>
+				</group>
+			</crossroad>
+			<crossroad lat="52.2258448" lon="20.9925381">
+				<group>
+					<light way="202032445" light="202032445" lat="52.2087518"
+						lon="20.9744079" />
+				</group>
+				<group>
+				</group>
+			</crossroad>
+
+			<crossroad lat="52.2258448" lon="20.9925381">
+				<group>
+					<light way="365971115" light="248664358" lat=" 52.2143612"
+						lon=" 20.9795855" />
+				</group>
+				<group>
+				</group>
+			</crossroad>
+			<crossroad lat="52.2258448" lon="20.9925381">
+				<group>
+					<light way="203601548" light="248664363" lat=" 52.2144533"
+						lon=" 20.9793109" />
+				</group>
+				<group>
+				</group>
+			</crossroad>
+			<crossroad lat="" lon="">
+				<group>
+					<light way="203601545" light="27167042" lat="52.2161819"
+						lon="20.9812314 " />
+					<light way="4925296" light="32329850" lat="52.2164071"
+						lon="20.9810162" />
+				</group>
+				<group>
+					<light way="392207214" light="32329851" lat="52.2162936"
+						lon="20.9813254 " />
+					<light way="203601549" light="27167044" lat="52.2162914"
+						lon="20.9809113" />
+				</group>
+			</crossroad>
+			<crossroad lat="52.2258448" lon="20.9925381">
+				<group>
+					<light way="243384446" light="3857814352" lat="52.218944"
+						lon="20.9832934" />
+				</group>
+				<group>
+				</group>
+			</crossroad>
+			<crossroad lat="52.2258448" lon="20.9925381">
+				<group>
+					<light way="243382591" light="308117243" lat="52.2189345"
+						lon="20.9849154 " />
+				</group>
+				<group>
+				</group>
+			</crossroad>
+			<crossroad lat="52.2194779" lon="20.9847974 ">
+				<group>
+					<light way="41455120" light="308117243" lat="52.21948"
+						lon="20.98482" />
+					<light way="243382591" light="308117243" lat="52.21946"
+						lon="20.98477" />
+
+				</group>
+				<group>
+				</group>
+			</crossroad>
+			<crossroad lat="52.2258448" lon="20.9925381">
+				<group>
+					<light way="4945618" light="3857814659" lat="52.2200187"
+						lon="20.9842424 " />
+				</group>
+				<group>
+				</group>
+			</crossroad>
+			<crossroad lat="" lon="">
+				<group>
+					<light way="28060187" light="3854139068" lat="52.2208227"
+						lon="20.985281" />
+					<light way="204389802" light="2378837187" lat="52.2213367"
+						lon="20.9853749" />
+
+				</group>
+				<group>
+					<light way="4946217" light="3854139100" lat="52.2211323"
+						lon="20.9848432 " />
+					<light way="382223458" light="3854139079" lat="52.2210453"
+						lon="20.9857813 " />
+
+				</group>
+			</crossroad>
+			<crossroad lat="52.2258448" lon="20.9925381">
+				<group>
+					<light way="4925295" light="54094226" lat="52.2227162"
+						lon="20.9869568" />
+				</group>
+				<group>
+				</group>
+			</crossroad>
+			<crossroad lat="52.2258448" lon="20.9925381">
+				<group>
+					<light way="4945611" light="3854140073" lat="52.2227618"
+						lon="20.9866491 " />
+				</group>
+				<group>
+				</group>
+			</crossroad>
+			<crossroad lat="" lon="">
+				<group>
+					<light way="595639092" light="786449299" lat="52.194276"
+						lon="20.9822855" />
+
+				</group>
+				<group>
+					<light way="595639097" light="786449299" lat="52.19428"
+						lon="20.98214" />
+
+				</group>
+			</crossroad>
+			<crossroad lat="52.2258448" lon="20.9925381">
+				<group>
+					<light way="595639074" light="1273635235" lat="52.1958552"
+						lon="20.9828075 " />
+				</group>
+				<group>
+				</group>
+			</crossroad>
+			<crossroad lat="" lon="">
+				<group>
+					<light way="615439314" light="32049219" lat="52.1985054"
+						lon="20.9840916" />
+					<light way="178699576" light="32049224" lat="52.1984058"
+						lon="20.9836798" />
+
+				</group>
+				<group>
+					<light way="4925286" light="32049218" lat="52.1983746"
+						lon="20.9840458" />
+					<light way="384791132" light="32049226" lat="52.1985126"
+						lon="20.9837265" />
+
+				</group>
+			</crossroad>
+			<crossroad lat="" lon="">
+				<group>
+					<light way="57728580" light="32049365" lat="52.2105"
+						lon="20.98779" />
+					<light way="384821648" light="32049365" lat="52.21015"
+						lon="20.98806" />
+
+				</group>
+				<group>
+					<light way="384793824" light="32049365" lat="52.21022"
+						lon="20.9875" />
+
+				</group>
+			</crossroad>
+			<crossroad lat="" lon="">
+				<group>
+					<light way="513506329" light="32329829" lat="52.216283"
+						lon="20.990275" />
+					<light way="57728572" light="32329830" lat="52.21627"
+						lon="20.99018" />
+
+				</group>
+				<group>
+					<light way="57728581" light="32329830" lat="52.2164644"
+						lon="20.9903067" />
+
+				</group>
+			</crossroad>
+			<crossroad lat="" lon="">
+				<group>
+					<light way="203601573" light="30902333" lat="52.21619"
+						lon="20.98795" />
+					<light way="429864802" light="30901479" lat="52.21651"
+						lon="52.21651" />
+
+				</group>
+				<group>
+					<light way="437082173" light="30901479" lat="52.21663"
+						lon="20.98815" />
+
+				</group>
+			</crossroad>
+			<crossroad lat="52.2258448" lon="20.9925381">
+				<group>
+					<light way="130205415" light="32329833" lat="52.2190942"
+						lon="20.9900988  " />
+				</group>
+				<group>
+				</group>
+			</crossroad>
+			<crossroad lat="52.2258448" lon="20.9925381">
+				<group>
+					<light way="149530796" light="30901480" lat="52.2191255 "
+						lon=" 20.9893246 " />
+				</group>
+				<group>
+				</group>
+			</crossroad>
+			<crossroad lat="" lon="">
+				<group>
+					<light way="162316254" light="3411278141" lat="52.2104476"
+						lon="21.0065371" />
+					<light way="128177612" light="3411278157" lat="52.2106949"
+						lon="21.0076135" />
+
+				</group>
+				<group>
+					<light way="500250867" light="1417004385" lat="52.2108066"
+						lon="21.0067643" />
+					<light way="331762058" light="3411278133" lat="52.2102612"
+						lon="21.0073472 " />
+
+				</group>
+			</crossroad>
+			<crossroad lat="52.2258448" lon="20.9925381">
+				<group>
+					<light way="237454003" light="26118696" lat="52.2131206"
+						lon=" 21.005989 " />
+				</group>
+				<group>
+				</group>
+			</crossroad>
+			<crossroad lat="" lon="">
+				<group>
+					<light way="119749676" light="1344373827" lat="52.22022"
+						lon="21.00476" />
+
+				</group>
+				<group>
+					<light way="4902312" light="1344373827" lat="52.22014"
+						lon="21.00463" />
+
+				</group>
+			</crossroad>
+			<crossroad lat="" lon="">
+				<group>
+					<light way="191552163" light="26118697" lat="52.22309"
+						lon="21.00459" />
+
+				</group>
+				<group>
+					<light way="4907782" light="26118697" lat="52.22304"
+						lon="21.0045" />
+
+				</group>
+			</crossroad>
+			<crossroad lat="" lon="">
+				<group>
+					<light way="229206834" light="3687531170" lat="52.214"
+						lon="20.96854" />
+					<light way="238377455" light="3687531170" lat="52.21382"
+						lon="20.96838" />
+
+				</group>
+				<group>
+					<light way="364707332" light="3687531170" lat="52.21386"
+						lon="20.96863" />
+					<light way="385080256" light="3687531170" lat="52.21396"
+						lon="20.96838" />
+				</group>
+			</crossroad>
+			<crossroad lat="" lon="">
+				<group>
+					<light way="229206834" light="27167059" lat="52.21882"
+						lon="20.9732" />
+					<light way="513721512" light="31156748" lat="52.21894"
+						lon="20.97352" />
+
+				</group>
+				<group>
+					<light way="31354366" light="27167059" lat="52.2189"
+						lon="20.97316" />
+					<light way="19407996" light="31156748" lat="52.21907"
+						lon=" 20.97348" />
+
+				</group>
+			</crossroad>
+			<crossroad lat="" lon="">
+				<group>
+					<light way="162919949" light="35172749" lat="52.20713"
+						lon="20.96784" />
+					<light way="164757386" light="35172749" lat="52.20703"
+						lon="20.96814" />
+
+				</group>
+				<group>
+					<light way="129412652" light="35172749" lat="52.20722"
+						lon="20.96809" />
+					<light way="5114535" light="35172749" lat="52.20697"
+						lon="20.96789" />
+
+				</group>
+			</crossroad>
+			<crossroad lat="" lon="">
+				<group>
+					<light way="364707334" light="3687531172" lat="52.21236"
+						lon="20.9729" />
+					<light way="364707337" light="3687531172" lat="52.21248"
+						lon="20.97252" />
+
+				</group>
+				<group>
+					<light way="365971112" light="3687531172" lat="52.21254"
+						lon="20.97281" />
+					<light way="503626470" light="3687531172" lat="52.21228"
+						lon="20.97258" />
+
+				</group>
+			</crossroad>
+
+			<crossroad lat="" lon="">
+				<group>
+					<light way="640286959" light="31156751" lat="52.21762"
+						lon="20.9774" />
+					<light way="203601562" light="27167053" lat="52.21761"
+						lon="20.97706" />
+
+				</group>
+				<group>
+					<light way="19408009" light="31156751" lat="52.21772"
+						lon="20.97736" />
+					<light way="365971112" light="27167053" lat="52.21761"
+						lon="20.97706" />
+
+				</group>
+			</crossroad>
+			<crossroad lat="" lon="">
+				<group>
+					<light way="135437875" light="32605650" lat="52.20125"
+						lon="20.9732" />
+					<light way="191468209" light="32605650" lat="52.20135"
+						lon="20.97285" />
+
+				</group>
+				<group>
+					<light way="4946817" light="32605650" lat="52.20137"
+						lon="20.97319" />
+
+				</group>
+			</crossroad>
+			<crossroad lat="" lon="">
+				<group>
+					<light way="191461050" light="32605642" lat="52.20453"
+						lon="20.97598" />
+					<light way="139014778" light="32605642" lat="52.20438"
+						lon="20.97584" />
+
+				</group>
+				<group>
+					<light way="135437886" light="32605642" lat="52.20451"
+						lon="20.97575" />
+
+				</group>
+			</crossroad>
+			<crossroad lat="" lon="">
+				<group>
+					<light way="237215318" light="311758163" lat="52.21052"
+						lon="20.97828" />
+
+				</group>
+				<group>
+
+				</group>
+			</crossroad>
+			<crossroad lat="" lon="">
+				<group>
+					<light way="474549448" light="32922344" lat="52.21052"
+						lon="20.98015" />
+
+				</group>
+				<group>
+					<light way="179534044" light="32922344" lat="52.21044"
+						lon="20.98030" />
+
+				</group>
+			</crossroad>
+			<crossroad lat="" lon="">
+				<group>
+					<light way="4907810" light="32922337" lat="52.21069"
+						lon="20.98083" />
+
+				</group>
+				<group>
+					<light way="4969828" light="32922337" lat="52.21077"
+						lon="20.98065" />
+
+				</group>
+			</crossroad>
+			<crossroad lat="" lon="">
+				<group>
+					<light way="203601569" light="27167032" lat="52.21604"
+						lon="20.98396" />
+					<light way="382576386" light="313665439" lat="52.21761"
+						lon="20.97706" />
+
+				</group>
+				<group>
+					<light way="203601560" light="313665439" lat="52.21761"
+						lon="20.97706" />
+
+				</group>
+			</crossroad>
+			<crossroad lat="" lon="">
+				<group>
+					<light way="114571803" light="32607793" lat="52.22326"
+						lon="21.00032" />
+					<light way="4907782" light="32607793" lat="52.22325"
+						lon="21.000547" />
+
+				</group>
+				<group>
+					<light way="5200605" light="32607793" lat="52.22319"
+						lon="21.00039" />
+
+				</group>
+			</crossroad>
+		</crossroads>
+	</district>
+</city>

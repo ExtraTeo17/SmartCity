@@ -5,6 +5,9 @@ import routing.nodes.StationNode;
 
 import javax.annotation.Nullable;
 
+/**
+ * Manage nodes (i.e. lightManagers)
+ */
 public interface INodesContainer {
     void addStationNode(StationNode stationNode);
 
