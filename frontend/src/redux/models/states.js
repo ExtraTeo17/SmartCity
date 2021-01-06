@@ -6,7 +6,7 @@
  */
 
 /**
- * @enum{Number} ConfigState
+ * @enum{number} ConfigState
  */
 export const ConfigState = {
   Initial: 1000,

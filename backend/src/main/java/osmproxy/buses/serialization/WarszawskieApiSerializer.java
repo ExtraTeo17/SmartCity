@@ -16,7 +16,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 public class WarszawskieApiSerializer implements IApiSerializer {
-    private final static Logger logger = LoggerFactory.getLogger(WarszawskieApiSerializer.class);
+    private static final Logger logger = LoggerFactory.getLogger(WarszawskieApiSerializer.class);
     private final ObjectMapper objectMapper;
 
     @Inject
@@ -26,6 +26,8 @@ public class WarszawskieApiSerializer implements IApiSerializer {
     }
 
     @Override
+    //TODO:dokumentacja
+
     public List<TimetableRecord> serializeTimetables(String jsonString) {
         var apiResult = serializeJsonString(jsonString);
         if (apiResult.isEmpty()) {

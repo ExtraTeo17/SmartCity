@@ -1,7 +1,7 @@
 import { notify } from "react-notify-toast";
 import { NOTIFY_SHOW_MS } from "../../constants/global";
 import { LightColor } from "../../components/Models/LightColor";
-import { getResultObj } from "../dataUtils/helpers";
+import { getResultObj } from "../dataUtils/dataUtils";
 import { getRandomInt } from "../../utils/helpers";
 import {
   SIMULATION_PREPARE_STARTED,
@@ -18,7 +18,13 @@ import {
 } from "../core/constants";
 
 /**
- * Handles interaction with from server
+ * Handles interaction with from server, i.e:
+ *  - SIMULATION_PREPARED
+ *  - SIMULATION_STARTED
+ *  - LIGHTS_SWITCHED
+ *  - TROUBLE_POINT_CREATED
+ *  - TRAFFIC_JAM_(STARTED|ENDED)
+ *  - (CAR|BIKE|PEDESTRIAN)_KILLED - for test objects results
  * @category Redux
  * @subcategory Reducers
  * @module message

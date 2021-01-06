@@ -51,6 +51,7 @@ export const configReplaced = createAction(CONFIG_REPLACED);
 export const centerUpdated = createAction(CENTER_UPDATED);
 
 /**
+ * Used to avoid re-rendering of prepare-menu components
  * @function
  */
 export const centerMenuUpdated = createAction(CENTER_MENU_UPDATED);

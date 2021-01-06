@@ -8,7 +8,7 @@ import org.slf4j.LoggerFactory;
 import routing.abstractions.INodesContainer;
 
 public class NodesCreator {
-    private final static Logger logger = LoggerFactory.getLogger(NodesCreator.class);
+    private static final Logger logger = LoggerFactory.getLogger(NodesCreator.class);
     private final INodesContainer nodesContainer;
 
     @Inject

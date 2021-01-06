@@ -57,6 +57,10 @@ public abstract class AbstractAgent extends Agent {
         return id;
     }
 
+    /**
+     * Activate the agent using the {@link jade.wrapper.AgentController#start() start} method,
+     * in case of problems print a warning.
+     */
     public void start() {
         try {
             this.getContainerController().getAgent(getLocalName()).start();
@@ -98,11 +102,15 @@ public abstract class AbstractAgent extends Agent {
         var msToNextLight = movingObject.getMillisecondsToNextLight();
         var predictedTime = simulationTime.plus(msToNextLight, ChronoUnit.MILLIS);
         logger.info("I will be at next light at: " + predictedTime);
-        properties.setProperty(MessageParameter.ARRIVAL_TIME, "" + predictedTime);
-        properties.setProperty(MessageParameter.ADJACENT_OSM_WAY_ID, "" + managerNode.getAdjacentWayId());
+        properties.setProperty(MessageParameter.ARRIVAL_TIME, String.valueOf(predictedTime));
+        properties.setProperty(MessageParameter.ADJACENT_OSM_WAY_ID, getAdjacentIdParameter(managerNode));
         msg.setAllUserDefinedParameters(properties);
 
         return msg;
+    }
+
+    protected String getAdjacentIdParameter(final LightManagerNode node) {
+        return String.valueOf(node.getAdjacentWayId());
     }
 
     protected ACLMessage createMessageById(int type, String receiverName, int receiverId) {

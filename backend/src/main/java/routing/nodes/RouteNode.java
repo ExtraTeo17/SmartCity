@@ -34,7 +34,7 @@ public class RouteNode extends Position {
 
     public int getInternalEdgeId() { return internalEdgeId;}
 
-    public final boolean isVirtual() {
+    public boolean isVirtual() {
         return virtual;
     }
 
@@ -43,13 +43,11 @@ public class RouteNode extends Position {
         return "(" + getLat() + ", " + getLng() + ")\n";
     }
 
-    public final String getDebugString(boolean isStationNode) {
-        final StringBuilder builder = new StringBuilder();
-        builder.append("[");
-        builder.append(isStationNode ? "SN" : "RN");
-        builder.append(": ");
-        builder.append("(" + getLat() + ", " + getLng() + ")");
-        builder.append("]");
-        return builder.toString();
+    public String getDebugString(boolean isStationNode) {
+        return "[" +
+                (isStationNode ? "SN" : "RN") +
+                ": " +
+                "(" + getLat() + ", " + getLng() + ")" +
+                "]";
     }
 }

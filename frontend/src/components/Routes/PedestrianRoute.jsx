@@ -4,11 +4,35 @@ import { Polyline } from "react-leaflet";
 import { generateRandomColor } from "../../utils/helpers";
 import { COLORS_NUMBER, DEFAULT_WEIGHT } from "./constants";
 
+/**
+ * Pedestrian route
+ * @category Routes
+ * @module PedestrianRoute
+ */
+
 const pathColors = new Map();
 for (let pathsIter = 0; pathsIter < COLORS_NUMBER * 2; ++pathsIter) {
   pathColors.set(pathsIter, generateRandomColor());
 }
 
+/**
+ * @typedef {Object} Props
+ * @property {number} pedestrianId
+ * @property {Position[]} route
+ * @property {boolean} isTestPedestrianRoute
+ */
+
+/**
+ * @typedef {Object} Position - Represents position on map
+ * @property {number} lat - Latitude in degrees
+ * @property {number} lng - Longitude in degrees
+ */
+
+/**
+ * Car route component
+ * @function
+ * @param {Props} props
+ */
 const PedestrianRoute = props => {
   const { pedestrianId, route, isTestPedestrianRoute } = props;
 

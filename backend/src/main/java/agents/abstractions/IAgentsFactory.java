@@ -13,7 +13,7 @@ import java.util.HashSet;
 import java.util.List;
 
 /**
- * Creates all agents
+ * Used to create all agents.
  */
 public interface IAgentsFactory {
     CarAgent create(List<RouteNode> route, boolean testCar);

@@ -38,6 +38,12 @@ import java.util.function.Supplier;
 
 import static smartcity.config.StaticConfig.USE_BATCHED_UPDATES;
 
+
+/**
+ * Used for periodical tasks creation. <br/>
+ * Note that this entity only creates the tasks, not run them. You can treat this class as logic encapsulation mechanism. <br/>
+ * Each method has complexity of O(1).
+ */
 @SuppressWarnings({"OverlyCoupledClass", "ClassWithTooManyFields"})
 public class TaskProvider implements ITaskProvider {
     private static final Logger logger = LoggerFactory.getLogger(TaskProvider.class);
@@ -51,7 +57,8 @@ public class TaskProvider implements ITaskProvider {
     private final ITimeProvider timeProvider;
     private final EventBus eventBus;
 
-    private final Table<IGeoPosition, IGeoPosition, List<RouteNode>> routeInfoCache;
+    private final Table<IGeoPosition, IGeoPosition, List<RouteNode>> carRouteInfoCache;
+    private final Table<IGeoPosition, IGeoPosition, List<RouteNode>> bikeRouteInfoCache;
 
     private IGeoPosition startForBatches;
     private IGeoPosition endForBatches;
@@ -72,41 +79,26 @@ public class TaskProvider implements ITaskProvider {
         this.timeProvider = timeProvider;
         this.eventBus = eventBus;
 
-        this.routeInfoCache = HashBasedTable.create();
+        this.carRouteInfoCache = HashBasedTable.create();
+        this.bikeRouteInfoCache = HashBasedTable.create();
     }
 
+    /**
+     * Used to create task, which creates car agent and adds him to the current {@link IAgentsContainer}
+     *
+     * @param start   Start position
+     * @param end     End position
+     * @param testCar If should be test car.
+     * @return -
+     */
+    @Override
     public Runnable getCreateCarTask(IGeoPosition start, IGeoPosition end, boolean testCar) {
         return () -> {
-            List<RouteNode> route;
-
-            try {
-                var effectiveStart = start;
-                var effectiveEnd = end;
-                if (configContainer.shouldGenerateBatchesForCars()) {
-                    if (startForBatches == null && endForBatches == null) {
-                        startForBatches = start;
-                        endForBatches = end;
-                    }
-
-                    effectiveStart = startForBatches;
-                    effectiveEnd = endForBatches;
-                }
-
-                route = routeInfoCache.get(effectiveStart, effectiveEnd);
-                if (route == null) {
-                    route = routeGenerator.generateRouteInfo(effectiveStart, effectiveEnd, false);
-                    routeInfoCache.put(effectiveStart, effectiveEnd, route);
-                }
-            } catch (Exception e) {
-                logger.warn("Error generating route info", e);
-                return;
-            }
+            List<RouteNode> route = tryRetrieveCarRoute(start, end);
 
             if (route.size() == 0) {
                 logger.warn("Generated route is empty, agent won't be created.");
-                if (startForBatches != null) {
-                    startForBatches = endForBatches = null;
-                }
+                startForBatches = endForBatches = null;
                 return;
             }
 
@@ -118,21 +110,50 @@ public class TaskProvider implements ITaskProvider {
         };
     }
 
+    private List<RouteNode> tryRetrieveCarRoute(IGeoPosition start, IGeoPosition end) {
+        List<RouteNode> route;
+        try {
+            var effectiveStart = start;
+            var effectiveEnd = end;
+            if (configContainer.shouldGenerateBatchesForCars()) {
+                if (startForBatches == null && endForBatches == null) {
+                    startForBatches = start;
+                    endForBatches = end;
+                }
 
+                effectiveStart = startForBatches;
+                effectiveEnd = endForBatches;
+            }
+
+            route = carRouteInfoCache.get(effectiveStart, effectiveEnd);
+            if (route == null) {
+                route = routeGenerator.generateRouteInfo(effectiveStart, effectiveEnd, false);
+                carRouteInfoCache.put(effectiveStart, effectiveEnd, route);
+            }
+            else {
+                logger.info("Successfully retrieved car route from cache");
+            }
+        } catch (Exception e) {
+            logger.warn("Error generating route info", e);
+            return new ArrayList<>();
+        }
+
+        return route;
+    }
+
+    /**
+     * Used to create task, which creates bike agent and adds him to the current {@link IAgentsContainer}
+     *
+     * @param start    Start position
+     * @param end      End position
+     * @param testBike If should be test bike
+     * @return -
+     */
+    @Override
     public Runnable getCreateBikeTask(IGeoPosition start, IGeoPosition end, boolean testBike) {
         return () -> {
-            List<RouteNode> route;
-            try {
-                route = routeInfoCache.get(start, end);
-                if (route == null) {
-                    route = routeGenerator.generateRouteInfo(start, end, "bike");
-                    // TODO: If car start & end will be equal to bike, then car can receive bike route.
-                    routeInfoCache.put(start, end, route);
-                }
-            } catch (Exception e) {
-                logger.warn("Error generating route info", e);
-                return;
-            }
+            List<RouteNode> route = tryRetrieveBikeRoute(start, end);
+
             if (route.size() == 0) {
                 logger.debug("Generated route is empty, agent won't be created.");
                 return;
@@ -147,6 +168,34 @@ public class TaskProvider implements ITaskProvider {
         };
     }
 
+    private List<RouteNode> tryRetrieveBikeRoute(IGeoPosition start, IGeoPosition end) {
+        List<RouteNode> route;
+        try {
+            route = bikeRouteInfoCache.get(start, end);
+            if (route == null) {
+                route = routeGenerator.generateRouteInfo(start, end, "bike");
+                bikeRouteInfoCache.put(start, end, route);
+            }
+            else {
+                logger.info("Successfully retrieved bike route from cache");
+            }
+        } catch (Exception e) {
+            logger.warn("Error generating route info", e);
+            return new ArrayList<>();
+        }
+
+        return route;
+    }
+
+    /**
+     * Used to create task, which creates pedestrian agent and adds him to the current {@link IAgentsContainer}
+     *
+     * @param routingHelper  Used for start/end positions generation
+     * @param startStation   Station, which pedestrian will initially head to, to wait for bus.
+     * @param endStation     Station, at which pedestrian get off from bus.
+     * @param testPedestrian If should be test pedestrian.
+     * @return -
+     */
     @Override
     public Runnable getCreatePedestrianTask(IRoutingHelper routingHelper,
                                             StationNode startStation, StationNode endStation,
@@ -190,6 +239,11 @@ public class TaskProvider implements ITaskProvider {
         };
     }
 
+    /**
+     * Used to create task for starting bus agents on schedule.
+     *
+     * @return -
+     */
     @SuppressWarnings("FeatureEnvy")
     @Override
     public Runnable getScheduleBusControlTask() {
@@ -211,13 +265,20 @@ public class TaskProvider implements ITaskProvider {
         };
     }
 
+    /**
+     * Used to create task for light-group light-color updates.
+     *
+     * @param managerId Corresponding {@link agents.LightManagerAgent} id
+     * @param lights    All lights that should simultaneously be switched
+     * @return Task, which returns period after it (the Task) should be executed again.
+     */
     @Override
     public Supplier<Integer> getSwitchLightsTask(int managerId, Siblings<SimpleLightGroup> lights) {
         var switchLights = functionalTaskFactory
                 .createLightSwitcher(managerId, configContainer.getExtendLightTime(), lights);
         // Can be moved somewhere else if needed and passed as parameter
         var switchLightsContext = new ISwitchLightsContext() {
-            private boolean haveAlreadyExtended = false;
+            private boolean haveAlreadyExtended;
 
             @Override
             public boolean haveAlreadyExtended() {
@@ -233,6 +294,16 @@ public class TaskProvider implements ITaskProvider {
         return () -> switchLights.apply(switchLightsContext);
     }
 
+    /**
+     * Used to create task for simulation time updates. <br/>
+     * If {@link smartcity.config.StaticConfig#USE_BATCHED_UPDATES} is true, then this method will return {@link Runnable},
+     * that will collect all agent positions from current {@link IAgentsContainer} and post event containing this data. <br/>
+     * Posted event is later used to update agent positions on GUI. <br/>
+     * It is important to notice that positions will be collected regardless whether position of agent changed or not.
+     *
+     * @param simulationStartTime Initial simulation time
+     * @return Task, which should be executed periodically to update simulation
+     */
     @Override
     public Runnable getSimulationControlTask(LocalDateTime simulationStartTime) {
         var updateTimeTask = timeProvider.getUpdateTimeTask(simulationStartTime);

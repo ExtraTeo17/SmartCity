@@ -13,6 +13,9 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
+/**
+ * Used for I/O interaction.
+ */
 public class FileWrapper {
     public static final String DEFAULT_OUTPUT_PATH_XML = "target/output.xml";
     public static final String DEFAULT_OUTPUT_PATH_JSON = "target/output.json";
@@ -21,6 +24,14 @@ public class FileWrapper {
     private static final Logger logger = LoggerFactory.getLogger(FileWrapper.class);
     private static final TransformerFactory transformerFactory = TransformerFactory.newInstance();
     private static final ObjectMapper mapper = new ObjectMapper();
+
+    static {
+        var dir = new File(DEFAULT_OUTPUT_PATH_CACHE);
+        if (!dir.exists()) {
+            //noinspection ResultOfMethodCallIgnored
+            dir.mkdirs();
+        }
+    }
 
     public static void write(Document xmlDoc) {
         write(xmlDoc, DEFAULT_OUTPUT_PATH_XML);
@@ -72,7 +83,7 @@ public class FileWrapper {
         }
     }
 
-    @SuppressWarnings(value = "unchecked")
+    @SuppressWarnings("unchecked")
     public static <T extends Serializable> T getFromCache(String fileName) {
         String path = DEFAULT_OUTPUT_PATH_CACHE + "/" + fileName + ".ser";
         Object data = tryReadFile(path);
@@ -94,6 +105,7 @@ public class FileWrapper {
         Object data = null;
         FileInputStream fileStream = null;
         ObjectInputStream objectStream = null;
+        boolean error = false;
         try {
             var file = new File(path);
             if (file.exists()) {
@@ -103,7 +115,7 @@ public class FileWrapper {
             }
         } catch (Exception e) {
             logger.warn("Could not read file: " + path, e);
-            tryDeleteFile(path);
+            error = true;
         }
 
         try {
@@ -115,6 +127,10 @@ public class FileWrapper {
             }
         } catch (Exception e) {
             logger.info("Failed to close file streams");
+        }
+
+        if (error) {
+            tryDeleteFile(path);
         }
 
         return data;

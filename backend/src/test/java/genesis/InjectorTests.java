@@ -100,12 +100,15 @@ class InjectorTests {
         eventBus.post(new LightManagersReadyEvent(null));
         eventBus.post(new SimulationPreparedEvent(new ArrayList<>(), new ArrayList<>(), new ArrayList<>()));
         eventBus.post("Test"); // Dead event
-        eventBus.post(new StartSimulationEvent(false, 0, 0, false,
-                false, 0, 0, 5000, 0, false, 1,
-                false, true, true, true,
-                LocalDateTime.now(), 11,
-                false, 30, false,
-                60, false, false, true
+        eventBus.post(new StartSimulationEvent(false, 0, 0,
+                false, false, 0,
+                0, 5000, 0,
+                false, 1, false,
+                true, true, true,
+                LocalDateTime.now(), 11, false,
+                30, false, 60,
+                false, 1, 1,
+                false, true
         ));
         eventBus.post(new SimulationStartedEvent());
         eventBus.post(new ClearSimulationEvent());

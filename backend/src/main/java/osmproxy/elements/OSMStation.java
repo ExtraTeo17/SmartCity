@@ -39,11 +39,18 @@ public class OSMStation extends OSMNode implements Serializable {
     public String getFromAgentMap(String agentName) {
         return pedestrianAgentIDPreferredBusLine.get(agentName);
     }
+
     public Map<String, String> getAgentMap() {
         return pedestrianAgentIDPreferredBusLine;
     }
 
     public void removeFromAgentMap(String agentName) {
         pedestrianAgentIDPreferredBusLine.remove(agentName);
+    }
+
+    public void printDebugInfo(int id) {
+        System.out.println("%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%");
+        System.out.println("Station" + id + ": ID: " + stopId + " Number: " + stopNumber);
+        System.out.println("%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%");
     }
 }

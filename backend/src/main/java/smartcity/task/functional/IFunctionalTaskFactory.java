@@ -7,6 +7,9 @@ import utilities.Siblings;
 
 import java.util.function.Function;
 
+/**
+ * Forces implementing functionality
+ */
 public interface IFunctionalTaskFactory {
     Function<ISwitchLightsContext, Integer> createLightSwitcher(@Assisted("managerId") int managerId,
                                                                 @Assisted("extendTime") int extendTimeSeconds,

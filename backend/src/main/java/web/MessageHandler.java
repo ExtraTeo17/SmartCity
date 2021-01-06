@@ -15,6 +15,17 @@ import web.serialization.Converter;
 import java.io.IOException;
 import java.util.Optional;
 
+/**
+ * Used for handling messages from frontend. <br/>
+ * Responsible for deserialization, type conversion and posting events
+ *  corresponding to each of requests. <br/>
+ * Handles: <br/>
+ * <ul>
+ *     <li>{@link web.message.MessageType#START_SIMULATION_REQUEST}</li>
+ *     <li>{@link web.message.MessageType#PREPARE_SIMULATION_REQUEST}</li>
+ *     <li>{@link web.message.MessageType#DEBUG_REQUEST}</li>
+ * </ul>
+ */
 class MessageHandler {
     private static final Logger logger = LoggerFactory.getLogger(MessageHandler.class);
     private final ObjectMapper objectMapper;
