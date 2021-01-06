@@ -218,6 +218,10 @@ public class AgentsPreparer {
         for (var busInfo : busData.busInfos) {
             var busLine = busInfo.busLine;
             var route = getBusRoute(busInfo.route, busInfo.stops, allStations);
+            if (route.size() == busInfo.stops.size()) {
+                logger.warn("Route contains only bus stops. Line: " + busInfo.busLine);
+                continue;
+            }
 
             for (var brigade : busInfo) {
                 var brigadeNr = brigade.brigadeId;

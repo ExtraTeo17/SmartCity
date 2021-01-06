@@ -73,15 +73,13 @@ public class BusDataParser implements IBusDataParser {
 
         List<BusInfo> busInfosToRemove = new ArrayList<>();
         for (var busInfo : busInfos) {
-            if (busInfo.stops.size() < 2) {
-                logger.info("Warning: Less than 2 stops in the for line " + busInfo.busLine +
-                        ". Omitting timetable preparation");
-                busInfosToRemove.add(busInfo);
+            if (busInfo.stops.isEmpty()) {
+                logger.info("Warning: No stops in the for line " + busInfo.busLine);
                 continue;
             }
 
             var brigadeInfos = generateBrigadeInfos(busInfo.busLine, busInfo.stops);
-            if (brigadeInfos.size() < 1) {
+            if (brigadeInfos.isEmpty()) {
                 busInfosToRemove.add(busInfo);
                 logger.info("Warning: Timetable for bus line " + busInfo.busLine + " is empty in Warszawskie API. " +
                         "Line will not be considered");
