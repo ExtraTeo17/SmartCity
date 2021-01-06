@@ -126,9 +126,7 @@ public class AgentsPreparer {
         logger.info("Stations are created! Took: " + TimeProvider.getTimeInMs(time) + "ms");
         logger.info("Buses creation started.");
         time = System.nanoTime();
-        if (!preparesBuses(busData, stationNodes)) { // prepareBuses always returns true at the time being
-            return false;
-        }
+        preparesBuses(busData, stationNodes);
         logger.info("Buses are created! Took: " + TimeProvider.getTimeInMs(time) + "ms");
 
         return true;
@@ -177,7 +175,7 @@ public class AgentsPreparer {
         return stationNodes;
     }
 
-    private boolean preparesBuses(BusPreparationData busData, List<StationNode> allStations) {
+    private void preparesBuses(BusPreparationData busData, List<StationNode> allStations) {
         int busCount = 0;
         var closestTime = LocalDateTime.now().plusDays(1);
         var currTime = LocalDateTime.now();
@@ -213,8 +211,8 @@ public class AgentsPreparer {
         if (busCount == 0) {
             logger.warn("No buses were created");
         }
+
         logger.info("Closest startTime: " + closestTime.toLocalTime() + ", number of bus agents: " + busCount);
-        return true;
     }
 
     private void prepareBusManagerAgent(HashSet<BusInfo> busInfos) {

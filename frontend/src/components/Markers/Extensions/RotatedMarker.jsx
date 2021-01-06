@@ -2,7 +2,18 @@ import React from "react";
 import { withLeaflet, Marker } from "react-leaflet";
 import "leaflet-rotatedmarker";
 
-// https://stackoverflow.com/questions/53778772/react-leaflet-rotatedmarkers-typeerror-super-expression-must-either-be-null-or
+/**
+ * @category Markers
+ * @subcategory Other
+ */
+
+/**
+ * Custom marker component used for rotation control. <br/>
+ * resources: {@link https://stackoverflow.com/questions/53778772/react-leaflet-rotatedmarkers-typeerror-super-expression-must-either-be-null-or}
+ * @function
+ * @memberof module:Extensions
+ * @param {*} props
+ */
 const RotatedMarker = props => {
   const setupMarker = marker => {
     if (marker) {

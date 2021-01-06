@@ -1,7 +1,6 @@
 package osmproxy.buses;
 
 import com.google.inject.Inject;
-import org.json.simple.parser.JSONParser;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
@@ -19,7 +18,6 @@ import java.util.Scanner;
 
 public class BusApiManager implements IBusApiManager {
     private static final Logger logger = LoggerFactory.getLogger(BusApiManager.class);
-    private static final JSONParser jsonParser = new JSONParser();
 
     private final IMapAccessManager mapAccessManager;
 

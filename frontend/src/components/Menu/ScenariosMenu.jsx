@@ -8,6 +8,13 @@ import { initialInteractionState } from "../../redux/reducers/interaction";
 
 import "../../styles/Menu.css";
 
+/**
+ * Menu tab, which holds all scenarios, i.e. predefined settings for all configurations. <br/>
+ * Each scenario has coresponding strategy in StrategyMenu.
+ * Each scenario button prepares the simulation automatically.
+ * @category Menu
+ * @module ScenariosMenu
+ */
 export const ScenariosMenuObj = props => {
   const { inPreparation, wasStarted, config = initialInteractionState } = props;
 
@@ -108,6 +115,8 @@ export const ScenariosMenuObj = props => {
     startData.generateTroublePoints = true;
     startData.timeBeforeTrouble = 5;
     startData.troublePointStrategyActive = true;
+    startData.troublePointThresholdUntilIndexChange = 50;
+    startData.noTroublePointStrategyIndexFactor = 30;
 
     prepareData.generatePedestrians = false;
     startData.generateBikes = false;
@@ -137,7 +146,7 @@ export const ScenariosMenuObj = props => {
 
     startData.useFixedRoutes = true;
     startData.startTime = new Date();
-    startData.timeScale = 10;
+    startData.timeScale = 3;
     startData.detectTrafficJams = true;
     startData.trafficJamStrategyActive = true;
 

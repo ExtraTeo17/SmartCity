@@ -7,6 +7,17 @@ import { MAX_NATIVE_ZOOM, MAX_ZOOM } from "../../constants/minMax";
 
 const { BaseLayer } = LayersControl;
 
+/**
+ * Contains all switchable base layers, i.e.:
+ *  - OpenStreetMap - default
+ *  - OpenStreetMap, Black & White
+ *  - MapTiler - with focus on streets
+ *  - Carto - colorful and nicely looking map
+ *  - Here - satellite map
+ * @category Layers
+ * @module BaseLayers
+ */
+
 export const BaseLayers = [
   <BaseLayer checked name="Map - Main" key="mapMain">
     <TileLayer

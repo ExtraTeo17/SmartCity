@@ -23,8 +23,8 @@ public class Pedestrian extends MovingObject {
     private StationNode stationStart;
     private final StationNode stationFinish;
 
-    private transient boolean troubled = false;
-    private transient int stationIndex = 0;
+    private transient boolean troubled;
+    private transient int stationIndex;
 
     public Pedestrian(int agentId,
                       List<RouteNode> routeToStation,

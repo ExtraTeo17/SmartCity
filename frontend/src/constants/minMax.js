@@ -127,6 +127,28 @@ const TIME_BEFORE_TP_MAX = 120;
  * @constant
  * @default
  */
+const TP_THRESHOLD_MIN = 45;
+/**
+ * @constant
+ * @default
+ */
+const TP_THRESHOLD_MAX = 250;
+
+/**
+ * @constant
+ * @default
+ */
+const TP_NO_STRATEGY_FACTOR_MIN = 25;
+/**
+ * @constant
+ * @default
+ */
+const TP_NO_STRATEGY_FACTOR_MAX = 250;
+
+/**
+ * @constant
+ * @default
+ */
 const TIME_SCALE_MIN = 1;
 /**
  * @constant
@@ -157,6 +179,10 @@ export {
   STATION_EXTEND_MAX,
   TIME_BEFORE_TP_MIN,
   TIME_BEFORE_TP_MAX,
+  TP_THRESHOLD_MIN,
+  TP_THRESHOLD_MAX,
+  TP_NO_STRATEGY_FACTOR_MIN,
+  TP_NO_STRATEGY_FACTOR_MAX,
   TIME_SCALE_MIN,
   TIME_SCALE_MAX,
 };

@@ -71,7 +71,7 @@ public class BusDataParser implements IBusDataParser {
         }
 
         var busInfos = busDataMerger.getBusInfosWithStops(busInfoDataSet, busStopsMap);
-        
+
         List<String> busLinesOfInfosToRemoveCauseOfMissingTimetableInWarszawskieAPI = new ArrayList<>();
         for (var busInfo : busInfos) {
         	if (busInfo.stops.isEmpty()) {
@@ -82,13 +82,14 @@ public class BusDataParser implements IBusDataParser {
             var brigadeInfos = generateBrigadeInfos(busInfo.busLine, busInfo.stops);
             if (brigadeInfos.size() > 0) {
                 busInfo.addBrigades(brigadeInfos);
-            } else {
-            	busLinesOfInfosToRemoveCauseOfMissingTimetableInWarszawskieAPI.add(busInfo.busLine);
-            	logger.warn("Timetable for bus line " + busInfo.busLine + " is empty in Warszawskie API. Line will not be considered");
             }
-		}
-		busInfos.removeIf(info -> busLinesOfInfosToRemoveCauseOfMissingTimetableInWarszawskieAPI.stream()
-				.anyMatch(line -> info.busLine.equals(line)));
+            else {
+                busLinesOfInfosToRemoveCauseOfMissingTimetableInWarszawskieAPI.add(busInfo.busLine);
+                logger.warn("Timetable for bus line " + busInfo.busLine + " is empty in Warszawskie API. Line will not be considered");
+            }
+        }
+        busInfos.removeIf(info -> busLinesOfInfosToRemoveCauseOfMissingTimetableInWarszawskieAPI.stream()
+                .anyMatch(info.busLine::equals));
 
         return new BusPreparationData(busInfos, busStopsMap);
     }
@@ -265,15 +266,14 @@ public class BusDataParser implements IBusDataParser {
 
         boolean ztmWarsaw = false;
         var type = filteredNodes.get(0).getNamedItem("v").getNodeValue();
-        Optional siblings = Optional.empty();
-        for (int i = 0; i < filteredNodes.size(); ++i) {
-            var nodesMap = filteredNodes.get(i);
+        Optional<Siblings<String>> siblings = Optional.empty();
+        for (NamedNodeMap nodesMap : filteredNodes) {
             if (nodesMap.getNamedItem("k").getNodeValue().equals("network")) {
-                 ztmWarsaw = isZTMWarsaw(nodesMap);
+                ztmWarsaw = isZTMWarsaw(nodesMap);
             }
             if (nodesMap.getNamedItem("k").getNodeValue().equals("ref")) {
                 var nodeNumber = nodesMap.getNamedItem("v").getNodeValue();
-                 siblings = Optional.of(Siblings.of(nodeNumber, type));
+                siblings = Optional.of(Siblings.of(nodeNumber, type));
             }
         }
 

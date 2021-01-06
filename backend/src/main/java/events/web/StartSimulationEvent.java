@@ -23,7 +23,7 @@ public class StartSimulationEvent {
     public final boolean shouldDetectTrafficJams;
 
     public final boolean useFixedRoutes;
-    public final boolean useFixedConstructionSites;
+    public final boolean useFixedTroublePoints;
 
     public final LocalDateTime startTime;
     public final int timeScale;
@@ -35,6 +35,9 @@ public class StartSimulationEvent {
     public final int extendWaitTime;
 
     public final boolean troublePointStrategyActive;
+    public final int troublePointThresholdUntilIndexChange;
+    public final int noTroublePointStrategyIndexFactor;
+
     public final boolean trafficJamStrategyActive;
     public final boolean transportChangeStrategyActive;
 
@@ -52,7 +55,7 @@ public class StartSimulationEvent {
                                 boolean shouldGenerateBusFailures,
                                 boolean shouldDetectTrafficJams,
                                 boolean useFixedRoutes,
-                                boolean useFixedConstructionSites,
+                                boolean useFixedTroublePoints,
                                 LocalDateTime startTime,
                                 int timeScale,
                                 boolean lightStrategyActive,
@@ -60,6 +63,8 @@ public class StartSimulationEvent {
                                 boolean stationStrategyActive,
                                 int extendWaitTime,
                                 boolean troublePointStrategyActive,
+                                int troublePointThresholdUntilIndexChange,
+                                int noTroublePointStrategyIndexFactor,
                                 boolean trafficJamStrategyActive,
                                 boolean transportChangeStrategyActive) {
 
@@ -77,7 +82,7 @@ public class StartSimulationEvent {
         this.shouldGenerateBusFailures = shouldGenerateBusFailures;
         this.shouldDetectTrafficJams = shouldDetectTrafficJams;
         this.useFixedRoutes = useFixedRoutes;
-        this.useFixedConstructionSites = useFixedConstructionSites;
+        this.useFixedTroublePoints = useFixedTroublePoints;
         this.startTime = startTime;
         this.timeScale = timeScale;
         this.lightStrategyActive = lightStrategyActive;
@@ -85,6 +90,8 @@ public class StartSimulationEvent {
         this.stationStrategyActive = stationStrategyActive;
         this.extendWaitTime = extendWaitTime;
         this.troublePointStrategyActive = troublePointStrategyActive;
+        this.troublePointThresholdUntilIndexChange = troublePointThresholdUntilIndexChange;
+        this.noTroublePointStrategyIndexFactor = noTroublePointStrategyIndexFactor;
         this.trafficJamStrategyActive = trafficJamStrategyActive;
         this.transportChangeStrategyActive = transportChangeStrategyActive;
     }

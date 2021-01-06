@@ -21,8 +21,10 @@ import "../styles/CityMap.css";
 const { Overlay } = LayersControl;
 
 /**
+ * Central map component. Holds all objects layers and zone center.
+ * Manages map control overlay (in the upper right corner).
+ * @module CityMap
  * @category Main
- * @component
  */
 const CityMap = props => {
   const { center, wasStarted } = props;

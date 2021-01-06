@@ -4,13 +4,13 @@ import com.google.inject.Inject;
 import org.javatuples.Pair;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import osmproxy.HighwayAccessor;
 import osmproxy.abstractions.ICacheWrapper;
 import osmproxy.abstractions.IMapAccessManager;
 import osmproxy.elements.OSMLight;
 import osmproxy.elements.OSMWay;
-import osmproxy.elements.OSMWay.RouteOrientation;
 import osmproxy.elements.OSMWaypoint;
+import osmproxy.elements.data.RouteOrientation;
+import osmproxy.routes.HighwayAccessor;
 import routing.abstractions.INodesContainer;
 import routing.abstractions.IRouteGenerator;
 import routing.abstractions.IRouteTransformer;
@@ -18,7 +18,6 @@ import routing.core.IGeoPosition;
 import routing.nodes.LightManagerNode;
 import routing.nodes.RouteNode;
 import routing.nodes.StationNode;
-import vehicles.MovingObject;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -169,10 +168,10 @@ final class Router implements
     }
 
     private boolean bus174wilanowska(List<StationNode> stationNodes) {
-		return stationNodes.size() == 2 && stationNodes.get(0).getOsmId() == 3039769685L && stationNodes.get(1).getOsmId() == 1704286049L;
-	}
+        return stationNodes.size() == 2 && stationNodes.get(0).getOsmId() == 3039769685L && stationNodes.get(1).getOsmId() == 1704286049L;
+    }
 
-	/////////////////////////////////////////////////////////////
+    /////////////////////////////////////////////////////////////
     //  HELPERS - Most are comfortable :(
     /////////////////////////////////////////////////////////////
 

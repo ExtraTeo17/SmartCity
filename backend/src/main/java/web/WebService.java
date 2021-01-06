@@ -11,6 +11,7 @@ import web.abstractions.IWebService;
 import web.message.MessageType;
 import web.message.payloads.infos.create.*;
 import web.message.payloads.infos.kill.*;
+import web.message.payloads.infos.other.ApiOverloadInfo;
 import web.message.payloads.infos.other.ChangeCarRouteInfo;
 import web.message.payloads.infos.other.CrashBusInfo;
 import web.message.payloads.infos.other.SwitchLightsInfo;
@@ -22,6 +23,13 @@ import web.serialization.Converter;
 
 import java.util.List;
 
+
+/**
+ * Used for interaction with frontend interface.
+ * Contains all method necessary to pass data or notify GUI.
+ * Each method has it's own payload (which extends {@link web.message.payloads.AbstractPayload} and {@link MessageType} <br/>
+ * Class is responsible for types conversion and {@link MessageType} assigment. <br/>
+ */
 @SuppressWarnings("OverlyCoupledClass")
 class WebService implements IWebService {
     private final WebConnector webConnector;
@@ -51,6 +59,7 @@ class WebService implements IWebService {
         webConnector.broadcastMessage(MessageType.PREPARE_SIMULATION_RESPONSE, payload);
     }
 
+    @Override
     public void startSimulation() {
         var payload = new StartResponse();
         webConnector.broadcastMessage(MessageType.START_SIMULATION_RESPONSE, payload);
@@ -129,6 +138,13 @@ class WebService implements IWebService {
         var payload = new UpdateBusFillStateInfo(id, fillStateDto);
 
         webConnector.broadcastMessage(MessageType.UPDATE_BUS_FILL_STATE_INFO, payload);
+    }
+
+    @Override
+    public void crashBus(int id) {
+        var payload = new CrashBusInfo(id);
+
+        webConnector.broadcastMessage(MessageType.CRASH_BUS_INFO, payload);
     }
 
     @Override
@@ -237,9 +253,8 @@ class WebService implements IWebService {
     }
 
     @Override
-    public void crashBus(int id) {
-        var payload = new CrashBusInfo(id);
-
-        webConnector.broadcastMessage(MessageType.CRASH_BUS_INFO, payload);
+    public void notifyApiOverload() {
+        var payload = new ApiOverloadInfo();
+        webConnector.broadcastMessage(MessageType.API_OVERLOAD_INFO, payload);
     }
 }

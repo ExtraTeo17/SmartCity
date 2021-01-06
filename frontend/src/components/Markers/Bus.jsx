@@ -9,6 +9,37 @@ import RotatedMarker from "./Extensions/RotatedMarker";
 
 import "../../styles/Bus.css";
 
+/**
+ * Bus marker.
+ * @category Markers
+ * @module Bus
+ */
+
+/**
+ * @typedef {Object} Props
+ * @property {Bus} bus
+ */
+
+/**
+ * @typedef {Object} Bus
+ * @property {number} id
+ * @property {Position[]} route
+ * @property {Position} location
+ * @property {BusFillState} fillState
+ * @property {boolean} crashed
+ */
+
+/**
+ * @typedef {Object} Position - Represents position on map
+ * @property {number} lat - Latitude in degrees
+ * @property {number} lng - Longitude in degrees
+ */
+
+/**
+ * Bus component
+ * @function
+ * @param {Props} props
+ */
 const Bus = props => {
   const {
     bus: { id, route, location, fillState, crashed },
@@ -18,10 +49,11 @@ const Bus = props => {
   const [state, dispatch] = useReducer(getRotationReducer(BUS_ROTATION_THRESHOLD), { loc: location, angle: defaultAngle });
 
   useEffect(() => {
+    // @ts-ignore
     dispatch({ payload: location });
   }, [location]);
 
-  const elemRef = React.useRef();
+  const elemRef = React.useRef(null);
   function initMarker(ref) {
     if (ref) {
       elemRef.current = ref;

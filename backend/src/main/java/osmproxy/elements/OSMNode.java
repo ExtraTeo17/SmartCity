@@ -60,7 +60,7 @@ public class OSMNode extends OSMElement
         builder.append(super.toString())
                 .append(", parent ways: ");
         for (final OSMWay way : parentWays) {
-            builder.append("[" + way.toString() + "], ");
+            builder.append("[").append(way.toString()).append("], ");
         }
         return builder.toString();
     }

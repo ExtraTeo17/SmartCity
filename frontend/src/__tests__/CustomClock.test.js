@@ -19,9 +19,10 @@ beforeEach(() => {
   jest.spyOn(window, "requestAnimationFrame").mockImplementation(cb => {
     currentTimeFrame += frameInterval;
     if (currentTimeFrame < maxFrameTimeElapsed) {
-      return cb(currentTimeFrame);
+      cb(currentTimeFrame);
+      return 1;
     }
-    return () => {};
+    return 1;
   });
 });
 
@@ -38,7 +39,7 @@ const timeStringLocale = "05.02.202113:00:00";
 const zeroPad = (num, places) => String(num).padStart(places, "0");
 const getTimeStringAfterStarted = (scale = 1) => {
   const cutLastTwo = timeStringLocale.slice(0, -2);
-  const scaledTimeSec = parseInt((scale * maxFrameTimeElapsed) / 1000);
+  const scaledTimeSec = Math.trunc((scale * maxFrameTimeElapsed) / 1000);
   return cutLastTwo + zeroPad(scaledTimeSec, 2);
 };
 

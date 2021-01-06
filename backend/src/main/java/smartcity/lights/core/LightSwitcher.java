@@ -15,6 +15,9 @@ import utilities.Siblings;
 
 import java.util.function.Function;
 
+/**
+ * Used for light-switching management along with light strategy.
+ */
 public class LightSwitcher implements Function<ISwitchLightsContext, Integer> {
     private static final int CAR_TO_PEDESTRIAN_LIGHT_RATE = 2;
     private final Logger logger;

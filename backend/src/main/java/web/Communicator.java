@@ -2,10 +2,7 @@ package web;
 
 import com.google.common.eventbus.Subscribe;
 import com.google.inject.Inject;
-import events.web.BatchedUpdateEvent;
-import events.web.SimulationPreparedEvent;
-import events.web.SimulationStartedEvent;
-import events.web.SwitchLightsEvent;
+import events.web.*;
 import events.web.bike.BikeAgentCreatedEvent;
 import events.web.bike.BikeAgentDeadEvent;
 import events.web.bike.BikeAgentUpdatedEvent;
@@ -23,6 +20,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import web.abstractions.IWebService;
 
+/**
+ * Used for handling all events which result in some interaction with frontend. <br/>
+ * It is the highest layer of communication with frontend. <br/>
+ */
 @SuppressWarnings("OverlyCoupledClass")
 class Communicator {
     private static final Logger logger = LoggerFactory.getLogger(Communicator.class);
@@ -99,6 +100,11 @@ class Communicator {
     }
 
     @Subscribe
+    public void handle(BusAgentCrashedEvent e) {
+        webService.crashBus(e.id);
+    }
+
+    @Subscribe
     public void handle(BusAgentDeadEvent e) {
         onHandle(e);
         webService.killBus(e.id);
@@ -153,7 +159,6 @@ class Communicator {
         webService.updateBike(e.id, e.position);
     }
 
-
     @Subscribe
     public void handle(BikeAgentDeadEvent e) {
         onHandle(e);
@@ -166,9 +171,11 @@ class Communicator {
     }
 
     @Subscribe
-    public void handle(BusAgentCrashedEvent e) {
-        webService.crashBus(e.id);
+    public void handle(ApiOverloadedEvent e) {
+        onHandle(e);
+        webService.notifyApiOverload();
     }
+
 
     private void onHandle(Object obj) {
         logger.info("Handling " + obj.getClass().getSimpleName());

@@ -15,7 +15,6 @@ import java.util.stream.Collectors;
 import static agents.AgentUtils.setupAgentsCreator;
 import static org.junit.jupiter.api.Assertions.*;
 
-@SuppressWarnings("OverlyCoupledClass")
 class AgentsPreparerTests {
 
 

@@ -1,4 +1,4 @@
-package osmproxy;
+package osmproxy.utilities;
 
 import com.google.inject.Inject;
 import org.javatuples.Pair;

@@ -12,6 +12,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import smartcity.SmartCityAgent;
 
+/**
+ * Used to dynamically activate {@link SmartCityAgent} and {@link TroubleManagerAgent}. <br/>
+ * {@link SmartCityAgent} is activated along with this entity creation, i.e. in constructor.  <br/>
+ * {@link TroubleManagerAgent} is activated on {@link SimulationStartedEvent}, because
+ * he needs simulation `timeScale` value, so activation is possible only after simulation start. <br/>
+ */
 public class SingletonAgentsActivator {
     private static final Logger logger = LoggerFactory.getLogger(SingletonAgentsActivator.class);
     private final ContainerController controller;
@@ -41,7 +47,6 @@ public class SingletonAgentsActivator {
         }
     }
 
-    // Need timeScale, so possible only after simulation start
     @Subscribe
     public void handle(SimulationStartedEvent e) {
         activate(TroubleManagerAgent.name, troubleManagerAgent);
