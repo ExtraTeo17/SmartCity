@@ -28,6 +28,7 @@ public class AvoidEdgesRemovableWeighting extends AvoidEdgesWeighting {
         }
     }
 
+
     void addEdgeIds(final Collection<Integer> edgeIds) {
         for (int edgeId : edgeIds) {
             visitedEdges.add(edgeId);
@@ -44,6 +45,8 @@ public class AvoidEdgesRemovableWeighting extends AvoidEdgesWeighting {
     }
 
     @Override
+    //TODO:dokumentacja
+
     public double calcWeight(EdgeIteratorState edgeState, boolean reverse, int prevOrNextEdgeId) {
         double weight = superWeighting.calcWeight(edgeState, reverse, prevOrNextEdgeId);
         if (visitedEdges.contains(edgeState.getEdge())) {

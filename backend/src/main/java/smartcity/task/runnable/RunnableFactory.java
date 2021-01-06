@@ -11,6 +11,7 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.function.BooleanSupplier;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
+//TODO:dokumentacja
 
 class RunnableFactory implements IRunnableFactory {
     private ScheduledExecutorService mainExecutor;

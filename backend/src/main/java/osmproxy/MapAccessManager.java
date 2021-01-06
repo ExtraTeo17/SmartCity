@@ -61,9 +61,7 @@ public class MapAccessManager implements IMapAccessManager {
         this.manager = overpassApiManager;
     }
 
-    /**
-     * @return a list of openseamap nodes extracted from xml
-     */
+
     @Override
     @SuppressWarnings("nls")
     public List<OSMNode> parseNodes(Document xmlDocument) {
@@ -80,9 +78,7 @@ public class MapAccessManager implements IMapAccessManager {
         return osmNodes;
     }
 
-    /**
-     * @return (id, lat, lng)
-     */
+
     private static Triplet<String, String, String> getNodeArgs(Node xmlNode) {
         NamedNodeMap attributes = xmlNode.getAttributes();
         String id = attributes.getNamedItem("id").getNodeValue();
@@ -91,6 +87,7 @@ public class MapAccessManager implements IMapAccessManager {
 
         return Triplet.with(id, latitude, longitude);
     }
+
 
     @SuppressWarnings("unused")
     private void printStream(final InputStream stream) {
@@ -172,7 +169,8 @@ public class MapAccessManager implements IMapAccessManager {
     }
 
     @Override
-    public Optional<RouteInfo> getRouteInfo(List<Long> osmWayIds, boolean notPedestrian) {
+
+     public Optional<RouteInfo> getRouteInfo(List<Long> osmWayIds, boolean notPedestrian) {
         var query = OsmQueryManager.getMultipleWayAndItsNodesQuery(osmWayIds);
         var overpassNodes = getNodesDocument(query);
         if (overpassNodes.isEmpty()) {
