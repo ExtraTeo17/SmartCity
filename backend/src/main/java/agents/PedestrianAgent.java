@@ -406,8 +406,8 @@ public class PedestrianAgent extends AbstractAgent {
 
             private LocalTime computeArrivalTime(IGeoPosition pointA, IGeoPosition pointB, StationNode desiredOsmStation) {
                 LocalTime now = timeProvider.getCurrentSimulationTime().toLocalTime();
-                arrivingRouteToClosestStation = router.generateRouteForPedestrians(pointA, pointB, desiredOsmStation,
-                        null);
+                arrivingRouteToClosestStation = router.generateRouteForPedestrians(pointA, pointB, null,
+                		desiredOsmStation);
                 return now.plusNanos(pedestrian.getMillisecondsOnRoute(arrivingRouteToClosestStation) * 1_000_000L);
             }
         };

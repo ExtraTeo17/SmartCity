@@ -53,12 +53,12 @@ final class Router implements
                                              StationNode startStation,
                                              StationNode endStation,
                                              boolean bewareOfJammedEdge) {
-        boolean notPedestrian = !typeOfVehicle.equals("foot");
+        boolean isNotPedestrian = !typeOfVehicle.equals("foot");
         var osmWayIdsAndEdgeList = findRoute(pointA, pointB, typeOfVehicle, bewareOfJammedEdge);
         var osmWayIds = osmWayIdsAndEdgeList.getValue0();
 
         // TODO: refactor inside to throw exception if not car or pedestrian
-        var routeInfoOpt = mapAccessManager.getRouteInfo(osmWayIds, notPedestrian);
+        var routeInfoOpt = mapAccessManager.getRouteInfo(osmWayIds, isNotPedestrian);
         if (routeInfoOpt.isEmpty()) {
             logger.warn("Generating route failed because of empty routeInfo");
             return new ArrayList<>();
@@ -80,16 +80,18 @@ final class Router implements
             logger.info("GraphHopper API is not able to create route for provided points.");
             return new ArrayList<>();
         }
-        var route = createRouteNodeList(routeInfo, notPedestrian, startStation, endStation);
+        var route = createRouteNodeList(routeInfo, isNotPedestrian, startStation, endStation,
+        		startingOsmNodeRef, finishingOsmNodeRef);
         return routeTransformer.uniformRouteNew(route, osmWayIdsAndEdgeList.getValue1());
     }
 
-    private List<RouteNode> createRouteNodeList(RouteInfo routeInfo, boolean notPedestrian,
-            StationNode startStation, StationNode endStation) {
+    private List<RouteNode> createRouteNodeList(RouteInfo routeInfo, boolean isNotPedestrian,
+            StationNode startStation, StationNode endStation, String startingOsmNodeRef,
+            String finishingOsmNodeRef) {
         List<RouteNode> routeNodes = new ArrayList<>();
 
-        if (!notPedestrian && endStation != null) {
-            routeNodes.add(endStation);
+        if (!isNotPedestrian && endStation != null && !startingOsmNodeRef.equals(endStation.getOsmId() + "")) {
+            routeNodes.add(new RouteNode(endStation));
         }
 
         for (var way : routeInfo) {
@@ -101,7 +103,7 @@ final class Router implements
             int lastIndex = straight ? waypointCount : -1;
             int increment = straight ? 1 : -1;
             for (int j = startingIndex; j != lastIndex; j += increment) {
-                var nodeOpt = getNode(way, way.getWaypoint(j), routeInfo, notPedestrian);
+                var nodeOpt = getNode(way, way.getWaypoint(j), routeInfo, isNotPedestrian);
                 if (nodeOpt.isEmpty()) {
                     continue;
                 }
@@ -121,8 +123,8 @@ final class Router implements
             }
         }
 
-        if (!notPedestrian && startStation != null) {
-            routeNodes.add(startStation);
+        if (!isNotPedestrian && startStation != null && !finishingOsmNodeRef.equals(startStation.getOsmId() + "")) {
+            routeNodes.add(new RouteNode(startStation));
         }
 
         return routeNodes;
