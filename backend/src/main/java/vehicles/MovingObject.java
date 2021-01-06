@@ -256,6 +256,10 @@ public abstract class MovingObject {
         return moveIndex + thresholdUntilIndexChange >= closestLightIndex;
     }
 
+    protected int findIndexOfNodeOnRoute(final RouteNode node) {
+    	return uniformRoute.indexOf(node);
+    }
+
     public int getNextNonVirtualIndex() {
         return getNextNonVirtualIndexFromIndex(moveIndex);
     }

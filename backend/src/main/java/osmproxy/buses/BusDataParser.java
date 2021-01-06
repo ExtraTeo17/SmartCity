@@ -265,10 +265,9 @@ public class BusDataParser implements IBusDataParser {
             }
 
             if (!isDataInAPI(jsonStringOpt)) {
-                logger.info("Please choose another zone because Warszawskie API didn't provide with data for station id:" + station.getBusStopId());
+                logger.debug("Warszawskie API didn't provide with data for station id:" + station.getBusStopId());
                 continue;
             }
-
 
             var jsonString = jsonStringOpt.get();
             var timetableRecords = apiSerializer.serializeTimetables(jsonString);
