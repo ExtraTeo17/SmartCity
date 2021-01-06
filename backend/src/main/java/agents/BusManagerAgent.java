@@ -121,11 +121,13 @@ public class BusManagerAgent extends AbstractAgent {
                             }
                         }
 
-                        long overallTravelTime = minimumTimeDistanceBetweenStationFromAndBusArrival
-                                + differenceInSeconds(minimumTimeOnStationTo, minimumTimeOnStationFrom);
-                        if (overallTravelTime < minimumTimeOverall) {
-                            minimumTimeOverall = overallTravelTime;
-                            preferredBusLine = info.busLine;
+                        if (minimumTimeDistanceBetweenStationFromAndBusArrival != Long.MAX_VALUE) {
+	                        long overallTravelTime = minimumTimeDistanceBetweenStationFromAndBusArrival
+	                                + differenceInSeconds(minimumTimeOnStationTo, minimumTimeOnStationFrom);
+	                        if (overallTravelTime < minimumTimeOverall) {
+	                            minimumTimeOverall = overallTravelTime;
+	                            preferredBusLine = info.busLine;
+	                        }
                         }
                     }
                 }
