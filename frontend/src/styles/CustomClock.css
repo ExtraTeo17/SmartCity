@@ -1,7 +1,7 @@
 /*https://codepen.io/jasonleewilson/pen/gPrxwX*/
 #clock {
   font-size: calc(10px + 2vw);
-  font-family: Frutiger, "Frutiger Linotype", "Dejavu Sans", "Helvetica Neue", Arial, sans-serif;
+  font-family: "Roboto", "Segoe UI", "Oxygen", "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue", sans-serif;
   font-variant: small-caps;
   font-weight: lighter;
   text-align: left;
