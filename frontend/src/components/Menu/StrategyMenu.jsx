@@ -150,7 +150,7 @@ const StrategyMenu = props => {
           <div className="custom-control custom-radio">
             <input
               type="radio"
-              disabled={!generateCars}
+              disabled={!generateCars || wasStarted}
               checked={!generateBatchesForCars}
               name="carsRadio"
               className="custom-control-input"
@@ -164,7 +164,7 @@ const StrategyMenu = props => {
           <div className="custom-control custom-radio">
             <input
               type="radio"
-              disabled={!generateCars}
+              disabled={!generateCars || wasStarted}
               checked={generateBatchesForCars}
               name="carsRadio"
               className="custom-control-input"
@@ -181,6 +181,7 @@ const StrategyMenu = props => {
           <input
             type="checkbox"
             checked={generatePedestrians}
+            disabled={wasStarted}
             className="form-check-input"
             id="generatePedestrians"
             onChange={evSetGeneratePedestrians}

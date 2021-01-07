@@ -5,6 +5,7 @@ import { dispatch } from "../../redux/store";
 import ApiManager from "../../web/ApiManager";
 import { IS_DEBUG } from "../../constants/global";
 import { initialInteractionState } from "../../redux/reducers/interaction";
+import { notifyWaitForConnection } from "../../utils/helpers";
 
 import "../../styles/Menu.css";
 
@@ -22,6 +23,8 @@ export const ScenariosMenuObj = props => {
     if (ApiManager.isConnected()) {
       dispatch(simulationPrepareStarted());
       ApiManager.prepareSimulation(data);
+    } else {
+      notifyWaitForConnection();
     }
   }
 
