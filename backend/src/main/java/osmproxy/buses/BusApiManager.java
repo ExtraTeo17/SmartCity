@@ -4,7 +4,7 @@ import com.google.inject.Inject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
-import osmproxy.OsmQueryManager;
+import osmproxy.OverpassQueryManager;
 import osmproxy.abstractions.IMapAccessManager;
 import osmproxy.buses.abstractions.IBusApiManager;
 import routing.core.IZone;
@@ -28,7 +28,7 @@ public class BusApiManager implements IBusApiManager {
 
     @Override
     public Optional<Document> getBusDataXml(IZone zone) {
-        var query = OsmQueryManager.getBusQuery(zone.getCenter(), zone.getRadius());
+        var query = OverpassQueryManager.getBusQuery(zone.getCenter(), zone.getRadius());
         var overpassInfo = mapAccessManager.getNodesDocument(query);
 
         ConditionalExecutor.debug(() -> {
@@ -86,10 +86,10 @@ public class BusApiManager implements IBusApiManager {
     private String buildWaysQuery(List<Long> waysIds) {
         StringBuilder busWayQueryBuilder = new StringBuilder();
         for (var id : waysIds) {
-            busWayQueryBuilder.append(OsmQueryManager.getSingleBusWayQuery(id));
+            busWayQueryBuilder.append(OverpassQueryManager.getSingleBusWayQuery(id));
         }
 
-        return OsmQueryManager.getQueryWithPayload(busWayQueryBuilder.toString());
+        return OverpassQueryManager.getQueryWithPayload(busWayQueryBuilder.toString());
     }
 
 

@@ -42,7 +42,7 @@ public class LightAccessManager implements ILightAccessManager {
     }
 
     private List<OSMNode> getLightNodesInZone() {
-        var lightsQuery = OsmQueryManager.getLightsAroundQuery(zone.getCenter(), zone.getRadius());
+        var lightsQuery = OverpassQueryManager.getLightsAroundQuery(zone.getCenter(), zone.getRadius());
         var nodes = mapAccessManager.getNodesDocument(lightsQuery);
         if (nodes.isEmpty()) {
             logger.warn("Failed to get lightNodes due to empty document");
@@ -98,9 +98,9 @@ public class LightAccessManager implements ILightAccessManager {
     private String getParentWaysOfLightsQuery(final List<OSMNode> lightsAround) {
         StringBuilder builder = new StringBuilder();
         for (final OSMNode light : lightsAround) {
-            builder.append(OsmQueryManager.getSingleParentWaysOfLightQuery(light.getId()));
+            builder.append(OverpassQueryManager.getSingleParentWaysOfLightQuery(light.getId()));
         }
 
-        return OsmQueryManager.getQueryWithPayload(builder.toString());
+        return OverpassQueryManager.getQueryWithPayload(builder.toString());
     }
 }
