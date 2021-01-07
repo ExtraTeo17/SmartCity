@@ -56,5 +56,5 @@ smartCity.eml
 .classpath
 
 ## Other
-package/
+package/**
 docs/

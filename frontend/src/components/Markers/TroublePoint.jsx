@@ -40,7 +40,7 @@ const TroublePoint = props => {
 
   return (
     <Marker position={location} opacity={0.95} icon={icon} zIndexOffset={STATIC_Z_INDEX}>
-      <Popup>I am a troublePoint!</Popup>
+      <Popup>I am {isConstruction ? "a construction site" : "an accident"}!</Popup>
     </Marker>
   );
 };

@@ -126,7 +126,7 @@ public class MapAccessManager implements IMapAccessManager {
 
     @Override
     public List<OSMLight> getOsmLights(List<Long> osmWayIds) {
-        var query = OsmQueryManager.getFullTrafficSignalQuery(osmWayIds);
+        var query = OverpassQueryManager.getFullTrafficSignalQuery(osmWayIds);
         var overpassNodes = getNodesDocument(query);
         if (overpassNodes.isEmpty()) {
             return new ArrayList<>();
@@ -170,8 +170,8 @@ public class MapAccessManager implements IMapAccessManager {
 
     @Override
 
-     public Optional<RouteInfo> getRouteInfo(List<Long> osmWayIds, boolean notPedestrian) {
-        var query = OsmQueryManager.getMultipleWayAndItsNodesQuery(osmWayIds);
+    public Optional<RouteInfo> getRouteInfo(List<Long> osmWayIds, boolean notPedestrian) {
+        var query = OverpassQueryManager.getMultipleWayAndItsNodesQuery(osmWayIds);
         var overpassNodes = getNodesDocument(query);
         if (overpassNodes.isEmpty()) {
             return Optional.empty();

@@ -3,10 +3,12 @@ import React from "react";
 
 import ApiManager from "../../../web/ApiManager";
 
-import "flatpickr/dist/themes/material_blue.css";
-import "../../../styles/Menu.css";
 import { dispatch } from "../../../redux/store";
 import { shouldStartSimulation } from "../../../redux/core/actions";
+import { notifyWaitForConnection } from "../../../utils/helpers";
+
+import "flatpickr/dist/themes/material_blue.css";
+import "../../../styles/Menu.css";
 
 export const SimulationStarterObj = props => {
   const { wasPrepared, wasStarted, startSimulationData } = props;
@@ -15,6 +17,8 @@ export const SimulationStarterObj = props => {
     if (ApiManager.isConnected()) {
       dispatch(shouldStartSimulation());
       ApiManager.startSimulation(startSimulationData);
+    } else {
+      notifyWaitForConnection();
     }
   };
 
