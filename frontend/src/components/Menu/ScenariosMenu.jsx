@@ -176,7 +176,11 @@ export const ScenariosMenuObj = props => {
     startData.testPedId = 5;
 
     startData.useFixedRoutes = true;
-    startData.startTime = new Date();
+    const date = new Date();
+    date.setHours(8);
+    date.setMinutes(40);
+    date.setSeconds(0);
+    startData.startTime = date;
     startData.timeScale = 10;
     startData.generateBusFailures = true;
     startData.transportChangeStrategyActive = true;
