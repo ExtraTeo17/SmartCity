@@ -368,7 +368,7 @@ public class BusAgent extends AbstractAgent {
 
     private void informNextStation(boolean isStart) {
         // finds next station and announces his arrival
-        final long CONVERTER = 1_000_000L;
+        final long NANO_IN_MILLISECONDS = 1_000_000L;
         var stationOpt = bus.findNextStation(isStart);
         if (stationOpt.isPresent()) {
             var station = stationOpt.get();
@@ -376,7 +376,7 @@ public class BusAgent extends AbstractAgent {
             ACLMessage msg = createMessageById(ACLMessage.INFORM, StationAgent.name, stationId);
             var properties = createProperties(MessageParameter.BUS);
             var currentTime = timeProvider.getCurrentSimulationTime();
-            var predictedTime = currentTime.plusNanos(bus.getMillisecondsToNextStation() * CONVERTER);
+            var predictedTime = currentTime.plusNanos(bus.getMillisecondsToNextStation() * NANO_IN_MILLISECONDS);
             properties.setProperty(MessageParameter.ARRIVAL_TIME, predictedTime.toString());
             properties.setProperty(MessageParameter.BUS_LINE, bus.getLine());
 

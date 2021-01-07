@@ -50,7 +50,8 @@ import static smartcity.config.StaticConfig.USE_BATCHED_UPDATES;
  */
 public class PedestrianAgent extends AbstractAgent {
     public static final String name = PedestrianAgent.class.getSimpleName().replace("Agent", "");
-    public static final long CONVERTER = 1_000_000L;
+    public static final long NANO_IN_MILLISECONDS = 1_000_000L;
+    private static final String EMPTY_STRING = "";
 
     private final IRouteGenerator router;
     private final ITaskProvider taskProvider;
@@ -306,6 +307,10 @@ public class PedestrianAgent extends AbstractAgent {
             }
 
             private StationNode parseCrashMessageFromBus(ACLMessage rcv) {
+                if(rcv.getUserDefinedParameter(MessageParameter.DESIRED_OSM_STATION_ID).equals(EMPTY_STRING))
+                {
+                    logger.warn("The information about crash was unexpected");
+                }
                 return new StationNode(rcv.getUserDefinedParameter(MessageParameter.LAT_OF_NEXT_CLOSEST_STATION),
                         rcv.getUserDefinedParameter(MessageParameter.LON_OF_NEXT_CLOSEST_STATION),
                         rcv.getUserDefinedParameter(MessageParameter.DESIRED_OSM_STATION_ID),
@@ -410,7 +415,7 @@ public class PedestrianAgent extends AbstractAgent {
 
                 arrivingRouteToClosestStation = router.generateRouteForPedestrians(pointA, pointB, null,
                         desiredOsmStationId);
-                return now.plusNanos(pedestrian.getMillisecondsOnRoute(arrivingRouteToClosestStation) * CONVERTER);
+                return now.plusNanos(pedestrian.getMillisecondsOnRoute(arrivingRouteToClosestStation) * NANO_IN_MILLISECONDS);
             }
         };
         var onError = createErrorConsumer(new PedestrianAgentDeadEvent(this.getId(),
@@ -441,7 +446,7 @@ public class PedestrianAgent extends AbstractAgent {
             ACLMessage msg = createMessageById(ACLMessage.INFORM, StationAgent.name, nextStation.getAgentId());
             Properties properties = createProperties(MessageParameter.PEDESTRIAN);
             var currentTime = timeProvider.getCurrentSimulationTime();
-            var predictedTime = currentTime.plusNanos(pedestrian.getMillisecondsToNextStation() * CONVERTER);
+            var predictedTime = currentTime.plusNanos(pedestrian.getMillisecondsToNextStation() * NANO_IN_MILLISECONDS);
             properties.setProperty(MessageParameter.ARRIVAL_TIME, predictedTime.toString());
             properties.setProperty(MessageParameter.BUS_LINE, busLine);
             msg.setAllUserDefinedParameters(properties);
@@ -457,7 +462,7 @@ public class PedestrianAgent extends AbstractAgent {
         ACLMessage msg = createMessage(ACLMessage.INFORM, BusManagerAgent.NAME);
 
         var currentTime = timeProvider.getCurrentSimulationTime();
-        var predictedTime = currentTime.plusNanos(pedestrian.getMillisecondsToNextStation() * CONVERTER).toLocalTime();
+        var predictedTime = currentTime.plusNanos(pedestrian.getMillisecondsToNextStation() * NANO_IN_MILLISECONDS).toLocalTime();
         msg.addUserDefinedParameter(MessageParameter.ARRIVAL_TIME, predictedTime.toString());
         msg.addUserDefinedParameter(MessageParameter.STATION_FROM_ID, String.valueOf(pedestrian.getStartingStation().getOsmId()));
         msg.addUserDefinedParameter(MessageParameter.STATION_TO_ID, String.valueOf(pedestrian.getStationFinish().getOsmId()));

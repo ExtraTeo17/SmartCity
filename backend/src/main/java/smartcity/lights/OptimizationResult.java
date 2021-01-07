@@ -8,7 +8,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class OptimizationResult {
-    public static final double CONVERTER = 1000.0;
+    public static final double MILLISECONDS_IN_SECONDS = 1000.0;
     private final List<String> carsFreeToProceedNames = new ArrayList<>();
     private final List<Pair<String, List<String>>> busesAndPedestriansFreeToProceedNames = new ArrayList<>();
     private final int extendTimeSeconds;
@@ -60,7 +60,7 @@ public class OptimizationResult {
         this.osmWayId = osmWayId;
         this.jammedLightPosition = jammedLightPosition;
         //TODO: change 2 na liczbe samochodów które przejzdzaja podczas jednego swiatla. Oraz change how long is green and red
-        lengthOfJam = Math.floor((numerOfCarsInTheQueue * CONVERTER / defaultExecutionDelay) *
+        lengthOfJam = Math.floor((numerOfCarsInTheQueue * MILLISECONDS_IN_SECONDS / defaultExecutionDelay) *
                 ((defaultExecutionDelay + defaultExecutionDelay) +
                         (defaultExecutionDelay + defaultExecutionDelay + extendTimeSeconds)) / 2); // TODO: Magic numbers
 
