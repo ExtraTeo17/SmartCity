@@ -141,8 +141,11 @@ public class BusDataParser implements IBusDataParser {
     }
 
     private boolean isZTMWarsaw(NamedNodeMap relation) {
-        Node network = relation.getNamedItem("v");
-        return network.getNodeValue().equals("ZTM Warszawa");
+        return isZTMWarsaw(relation.getNamedItem("v").getNodeValue());
+    }
+
+    private boolean isZTMWarsaw(String network) {
+        return network.equals("ZTM Warszawa");
     }
 
     @SuppressWarnings("FeatureEnvy")
@@ -250,34 +253,39 @@ public class BusDataParser implements IBusDataParser {
         return Optional.empty();
     }
 
+    /**
+     * @param nodes potential Station node
+     * @return (Station node number, type)
+     */
     private Optional<Siblings<String>> searchForStationNumberAndType(NodeList nodes) {
         var filteredNodes = IterableNodeList.of(nodes)
                 .stream()
                 .filter(n -> n.getNodeName().equals("tag"))
                 .map(Node::getAttributes)
-                .filter(attr -> attr.getNamedItem("k").getNodeValue().equals("network") ||
-                        attr.getNamedItem("k").getNodeValue().equals("public_transport") ||
-                        attr.getNamedItem("k").getNodeValue().equals("ref"))
                 .collect(Collectors.toList());
 
         if (filteredNodes.isEmpty()) {
             return Optional.empty();
         }
 
-        boolean ztmWarsaw = false;
-        var type = filteredNodes.get(0).getNamedItem("v").getNodeValue();
-        Optional<Siblings<String>> siblings = Optional.empty();
-        for (NamedNodeMap nodesMap : filteredNodes) {
-            if (nodesMap.getNamedItem("k").getNodeValue().equals("network")) {
-                ztmWarsaw = isZTMWarsaw(nodesMap);
-            }
-            if (nodesMap.getNamedItem("k").getNodeValue().equals("ref")) {
-                var nodeNumber = nodesMap.getNamedItem("v").getNodeValue();
-                siblings = Optional.of(Siblings.of(nodeNumber, type));
+        boolean isZtmWarsaw = false;
+        String type = null;
+        String nodeNumber = null;
+        for (var nodesMap : filteredNodes) {
+            var key = nodesMap.getNamedItem("k").getNodeValue();
+            var value = nodesMap.getNamedItem("v").getNodeValue();
+            switch (key) {
+                case "network" -> isZtmWarsaw = isZTMWarsaw(value);
+                case "ref" -> nodeNumber = value;
+                case "public_transport" -> type = value;
             }
         }
 
-        return ztmWarsaw ? siblings : Optional.empty();
+        if (type == null || nodeNumber == null || !isZtmWarsaw) {
+            return Optional.empty();
+        }
+
+        return Optional.of(Siblings.of(nodeNumber, type));
     }
 
     private Collection<BrigadeInfo> generateBrigadeInfos(String busLine, Collection<OSMStation> osmStations) {
