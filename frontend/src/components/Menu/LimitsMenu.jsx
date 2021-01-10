@@ -85,41 +85,6 @@ const LimitsMenu = props => {
 
   return (
     <div key={configState}>
-      {generatePedestrians && (
-        <div className="mb-4 form-border">
-          <div className="form-row mt-2 align-items-end">
-            <div className="form-group col-md-5">
-              <label htmlFor="pedLimit">Pedestrians limit</label>
-              <input
-                type="number"
-                className="form-control"
-                id="pedLimit"
-                disabled={wasStarted}
-                min={PED_MIN}
-                max={PED_MAX}
-                defaultValue={pedLimit}
-                placeholder="Enter limit for pedestrians"
-                onChange={evSetPedsLimit}
-              />
-            </div>
-            <div className="form-group col-md-7">
-              <label htmlFor="testPedId">Test pedestrian number</label>
-              <input
-                type="number"
-                className="form-control"
-                id="testPedId"
-                disabled={wasStarted}
-                min={TEST_ID_MIN}
-                max={TEST_ID_MAX}
-                defaultValue={testPedId}
-                placeholder="Enter test pedestrians number"
-                onChange={evSetTestPedId}
-              />
-            </div>
-          </div>
-        </div>
-      )}
-
       {generateCars && (
         <div className="mb-4 form-border">
           <div className="form-row  mt-2 align-items-end">
@@ -149,6 +114,41 @@ const LimitsMenu = props => {
                 defaultValue={testCarId}
                 placeholder="Enter test car number"
                 onChange={evSetTestCarId}
+              />
+            </div>
+          </div>
+        </div>
+      )}
+
+      {generatePedestrians && (
+        <div className="mb-4 form-border">
+          <div className="form-row mt-2 align-items-end">
+            <div className="form-group col-md-5">
+              <label htmlFor="pedLimit">Pedestrians limit</label>
+              <input
+                type="number"
+                className="form-control"
+                id="pedLimit"
+                disabled={wasStarted}
+                min={PED_MIN}
+                max={PED_MAX}
+                defaultValue={pedLimit}
+                placeholder="Enter limit for pedestrians"
+                onChange={evSetPedsLimit}
+              />
+            </div>
+            <div className="form-group col-md-7">
+              <label htmlFor="testPedId">Test pedestrian number</label>
+              <input
+                type="number"
+                className="form-control"
+                id="testPedId"
+                disabled={wasStarted}
+                min={TEST_ID_MIN}
+                max={TEST_ID_MAX}
+                defaultValue={testPedId}
+                placeholder="Enter test pedestrians number"
+                onChange={evSetTestPedId}
               />
             </div>
           </div>

@@ -7,9 +7,9 @@ import { dispatch } from "../../../redux/store";
 
 import { D_DECIMAL_PLACES } from "../../../constants/defaults";
 import { LAT_MIN, LAT_MAX, LNG_MIN, LNG_MAX, RAD_MIN, RAD_MAX } from "../../../constants/minMax";
+import { setIfValidFloat, notifyWaitForConnection } from "../../../utils/helpers";
 
 import "../../../styles/Menu.css";
-import { setIfValidFloat } from "../../../utils/helpers";
 
 const PrepareMenu = props => {
   const { configState, inPreparation, wasPrepared, wasStarted, prepareSimulationData } = props;
@@ -30,6 +30,8 @@ const PrepareMenu = props => {
     if (ApiManager.isConnected()) {
       dispatch(simulationPrepareStarted());
       ApiManager.prepareSimulation(prepareSimulationData);
+    } else {
+      notifyWaitForConnection();
     }
   }
 

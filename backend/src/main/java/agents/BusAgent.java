@@ -325,12 +325,15 @@ public class BusAgent extends AbstractAgent {
                     properties.setProperty(MessageParameter.TROUBLE_LAT, Double.toString(troublePoint.getLat()));
                     properties.setProperty(MessageParameter.TROUBLE_LON, Double.toString(troublePoint.getLng()));
                     if (!isTroubleManager) {
-                        var nextStop = (StationNode) bus.findNextStop();
-                        properties.setProperty(MessageParameter.DESIRED_OSM_STATION_ID, String.valueOf((nextStop).getOsmId()));
-                        properties.setProperty(MessageParameter.AGENT_ID_OF_NEXT_CLOSEST_STATION, String.valueOf((nextStop).getAgentId()));
-                        //maybe not needed
-                        properties.setProperty(MessageParameter.LAT_OF_NEXT_CLOSEST_STATION, String.valueOf(nextStop.getLat()));
-                        properties.setProperty(MessageParameter.LON_OF_NEXT_CLOSEST_STATION, String.valueOf(nextStop.getLng()));
+                        var nextStop = bus.findNextStop();
+                        if(nextStop instanceof StationNode) {
+                            var stationStop = (StationNode) nextStop;
+                            properties.setProperty(MessageParameter.DESIRED_OSM_STATION_ID, String.valueOf((stationStop).getOsmId()));
+                            properties.setProperty(MessageParameter.AGENT_ID_OF_NEXT_CLOSEST_STATION, String.valueOf((stationStop).getAgentId()));
+                            //maybe not needed
+                            properties.setProperty(MessageParameter.LAT_OF_NEXT_CLOSEST_STATION, String.valueOf(stationStop.getLat()));
+                            properties.setProperty(MessageParameter.LON_OF_NEXT_CLOSEST_STATION, String.valueOf(stationStop.getLng()));
+                        }
 
                         properties.setProperty(MessageParameter.BUS_LINE, getLine());
                         properties.setProperty(MessageParameter.BRIGADE, bus.getBrigade());
@@ -413,6 +416,17 @@ public class BusAgent extends AbstractAgent {
     }
 
     // TODO: Fix situation where bus route contains only one station and pedestrians tries to choose two
+
+    /**
+     * Find two subsequent stations from all the stations on this bus' route. The second returned
+     * station will always be after the first returned station. Example:
+     * Bus' stations: 1, 2, 3, 4, 5. Two subsequent stations then could be:
+     * (1, 3); (1, 5); (2, 3); (2, 4); (3, 5).
+     *
+     * @param random Instance of pseudorandom numbers generator
+     * @return Two subsequent station nodes. If the bus does not have more than one station on its route,
+     * then nothing will be returned.
+     */
     public final Optional<Siblings<StationNode>> getTwoSubsequentStations(final Random random) {
         List<StationNode> stationsOnRoute = bus.getStationNodesOnRoute();
         if (stationsOnRoute.size() <= 1) {
