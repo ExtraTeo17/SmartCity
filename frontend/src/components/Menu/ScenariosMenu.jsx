@@ -109,7 +109,7 @@ export const ScenariosMenuObj = props => {
 
     startData.generateCars = true;
     startData.carsLimit = 10;
-    startData.testCarId = 5;
+    startData.testCarId = 1;
     startData.generateBatchesForCars = false;
 
     startData.useFixedRoutes = true;
@@ -118,7 +118,7 @@ export const ScenariosMenuObj = props => {
     startData.generateTroublePoints = true;
     startData.timeBeforeTrouble = 5;
     startData.troublePointStrategyActive = true;
-    startData.troublePointThresholdUntilIndexChange = 50;
+    startData.troublePointThresholdUntilIndexChange = 130;
     startData.noTroublePointStrategyIndexFactor = 30;
 
     prepareData.generatePedestrians = false;
