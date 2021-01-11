@@ -44,7 +44,9 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -171,12 +173,16 @@ public class MapAccessManager implements IMapAccessManager {
     @Override
 
     public Optional<RouteInfo> getRouteInfo(List<Long> osmWayIds, boolean notPedestrian) {
+    	RouteInfo info = retrieveRouteInfoFromCache(osmWayIds);
+    	if (info != null) {
+    		return Optional.of(info);
+    	}
+
         var query = OverpassQueryManager.getMultipleWayAndItsNodesQuery(osmWayIds);
         var overpassNodes = getNodesDocument(query);
         if (overpassNodes.isEmpty()) {
             return Optional.empty();
         }
-        RouteInfo info;
         try {
             info = parseWayAndNodes(overpassNodes.get(), notPedestrian);
         } catch (Exception e) {
@@ -187,7 +193,22 @@ public class MapAccessManager implements IMapAccessManager {
         return Optional.of(info);
     }
 
-    private static RouteInfo parseWayAndNodes(Document nodesViaOverpass, boolean notPedestrian) {
+    private RouteInfo retrieveRouteInfoFromCache(List<Long> osmWayIds) {
+    	RouteInfo info = new RouteInfo();
+		for (long id : osmWayIds) {
+			if (!wayIdToWayOutput.containsKey(id)) {
+				return null;
+			}
+			info.addWay(new OSMWay(wayIdToWayOutput.get(id).way));
+			for (Node light : wayIdToWayOutput.get(id).lightIds) {
+				info.add(Long.parseLong(light.getAttributes().getNamedItem("id").getNodeValue()));
+			}
+		}
+		System.out.println("CREATED CAR ROUTE WITHOUT OVERPASS");
+		return info;
+	}
+
+	private static RouteInfo parseWayAndNodes(Document nodesViaOverpass, boolean notPedestrian) {
         final RouteInfo info = new RouteInfo();
         final String tagType = notPedestrian ? "highway" : "crossing";
         Node osmRoot = nodesViaOverpass.getFirstChild();
@@ -212,6 +233,33 @@ public class MapAccessManager implements IMapAccessManager {
             }
         }
         return info;
+    }
+
+	private void parseWayAndNodes2(Document nodesViaOverpass, boolean notPedestrian) {
+        final String tagType = notPedestrian ? "highway" : "crossing";
+        Node osmRoot = nodesViaOverpass.getFirstChild();
+        NodeList osmXMLNodes = osmRoot.getChildNodes();
+        WayWithLights wwl = null;
+        for (int i = 1; i < osmXMLNodes.getLength(); i++) {
+            Node item = osmXMLNodes.item(i);
+            if (item.getNodeName().equals("way")) {
+            	wwl = new WayWithLights();
+                wwl.addWay(item);
+                wayIdToWayOutput.put(Long.parseLong(item.getAttributes().getNamedItem("id").getNodeValue()), wwl);
+            }
+            else if (item.getNodeName().equals("node")) {
+                NodeList nodeChildren = item.getChildNodes();
+                for (int j = 0; j < nodeChildren.getLength(); ++j) {
+                    Node nodeChild = nodeChildren.item(j);
+                    if (nodeChild.getNodeName().equals("tag") &&
+                            nodeChild.getAttributes().getNamedItem("k").getNodeValue().equals(tagType) &&
+                            nodeChild.getAttributes().getNamedItem("v").getNodeValue().equals("traffic_signals")) {
+                        var id = Long.parseLong(item.getAttributes().getNamedItem("id").getNodeValue());
+                        wwl.add(item);
+                    }
+                }
+            }
+        }
     }
 
     @Override
@@ -308,4 +356,26 @@ public class MapAccessManager implements IMapAccessManager {
 
         return document;
     }
+
+    private Map<Long, WayWithLights> wayIdToWayOutput;
+
+	@Override
+	public void initializeWayCache(double lat, double lon, int radius) {
+		wayIdToWayOutput = new HashMap<>();
+		var query = OverpassQueryManager.getWaysQuery(lat, lon, radius);
+		List<Long> osmWayIdsInRadius = new ArrayList<>();
+		var overpassNodes = getNodesDocument(query).get();
+        Node osmRoot = overpassNodes.getFirstChild();
+        NodeList osmXMLNodes = osmRoot.getChildNodes();
+        for (int i = 0; i < osmXMLNodes.getLength(); i++) {
+            Node item = osmXMLNodes.item(i);
+            if (item.getNodeName().equals("way")) {
+            	osmWayIdsInRadius.add(Long.parseLong(item.getAttributes().getNamedItem("id").getNodeValue()));
+            }
+        }
+		var query2 = OverpassQueryManager.getMultipleWayAndItsNodesQuery(osmWayIdsInRadius);
+		var overpassNodes2 = getNodesDocument(query2).get();
+		parseWayAndNodes2(overpassNodes2, true);
+		System.out.println("lol");
+	}
 }

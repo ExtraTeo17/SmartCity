@@ -45,4 +45,6 @@ public interface IMapAccessManager {
     void parseChildNodesOfWays(Document childNodesOfWays, List<OSMNode> lightsOfTypeA);
 
     Position calculateLatLonBasedOnInternalLights(Node crossroad);
+
+	void initializeWayCache(double lat, double lon, int radius);
 }

@@ -25,6 +25,15 @@ public class OverpassQueryManager {
         return builder.toString();
     }
 
+    static String getWaysQuery(double lat, double lon, int radius) {
+    	return "<osm-script>\r\n"
+    			+ "  <query into=\"_\" type=\"way\">\r\n"
+    			+ "    <around radius=\"" + radius + "\" lat=\"" + lat + "\" lon=\"" + lon + "\"/>\r\n"
+    			+ "  </query>\r\n"
+    			+ "  <print e=\"\" from=\"_\" geometry=\"skeleton\" ids=\"yes\" limit=\"\" mode=\"ids_only\" n=\"\" order=\"id\" s=\"\" w=\"\"/>\r\n"
+    			+ "</osm-script>";
+    }
+
     private static String getSingleWayAndItsNodesQuery(long osmWayId) {
         return "<id-query type=\"way\" ref=\"" + osmWayId + "\" into=\"minor\"/>\r\n" +
                 "  <item from=\"minor\" into=\"_\"/>\r\n" +

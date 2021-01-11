@@ -98,6 +98,9 @@ public class AgentsPreparer {
                     StationAgent::getStation).filter(OSMStation::isPlatform).collect(Collectors.toList());
             var buses = agentsContainer.stream(BusAgent.class).map(
                     BusAgent::getBus).collect(Collectors.toList());
+
+            mapAccessManager.initializeWayCache(e.zone.getCenter().getLat(), e.zone.getCenter().getLng(), e.zone.getRadius());
+
             eventBus.post(new SimulationPreparedEvent(lights, stations, buses));
         }
     }
