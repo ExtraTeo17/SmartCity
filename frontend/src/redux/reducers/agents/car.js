@@ -1,3 +1,4 @@
+import { areLocationsEqual, calculateDistance } from "../../../utils/helpers";
 import { CAR_KILLED, CAR_CREATED, CAR_UPDATED, CAR_ROUTE_CHANGED, BATCHED_UPDATE } from "../../core/constants";
 
 /**
@@ -19,6 +20,38 @@ const initialState = {
 };
 
 const deletedCarIds = [];
+
+const maxMoveDelayMs = 400;
+const printIntervalMs = 5000;
+
+let prevPrintDate = Date.now();
+const speeds = [];
+const avgSpeeds = [];
+
+function savePartialSpeed(loc1, loc2, delta) {
+  const dist = calculateDistance(loc1, loc2);
+  // console.log(dist);
+  const speed = (1000 * dist) / delta; // speed in m/s
+  speeds.push(speed);
+}
+
+const sumFunc = (a, b) => a + b;
+
+function computeAverageSpeed(now) {
+  if (speeds.length === 0) {
+    return;
+  }
+
+  const sum = speeds.reduce(sumFunc, 0);
+  const avgKmph = (sum * 3600) / (1000 * speeds.length);
+  avgSpeeds.push(avgKmph);
+
+  const totalAvg = avgSpeeds.reduce(sumFunc, 0) / avgSpeeds.length;
+  console.info(`Avg speed of car = ${totalAvg}`);
+
+  speeds.length = 0;
+  prevPrintDate = now;
+}
 
 const car = (state = initialState, action) => {
   const { payload } = action;
@@ -50,13 +83,24 @@ const car = (state = initialState, action) => {
     case BATCHED_UPDATE: {
       const { carUpdates } = payload;
 
+      const now = Date.now();
+
       const newCars = state.cars.map(c => {
         const update = carUpdates.find(car => car.id === c.id);
-        if (update) {
-          return { ...c, location: update.location };
+        if (update && !areLocationsEqual(c.location, update.location)) {
+          if (c.time && now - c.time < maxMoveDelayMs) {
+            savePartialSpeed(c.location, update.location, now - c.time);
+          }
+
+          return { ...c, location: update.location, time: now };
         }
+
         return c;
       });
+
+      if (now - prevPrintDate > printIntervalMs) {
+        computeAverageSpeed(now);
+      }
 
       return { ...state, cars: newCars };
     }
