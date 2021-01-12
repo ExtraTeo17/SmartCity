@@ -186,6 +186,10 @@ public class Bus extends MovingObject {
         return stationNodesOnRoute;
     }
 
+    public int getStationNodesOnRouteSize() {
+        return stationNodesOnRoute.size();
+    }
+
     @Override
     public long getAdjacentOsmWayId() {
         return ((LightManagerNode) uniformRoute.get(moveIndex)).getAdjacentWayId();

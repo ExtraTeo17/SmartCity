@@ -13,6 +13,7 @@ import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 class HashAgentsContainer implements IAgentsContainer {
@@ -88,6 +89,21 @@ class HashAgentsContainer implements IAgentsContainer {
                 .skip(ind)
                 .findFirst();
     }
+
+    @Override
+    public <TAgent extends AbstractAgent> Optional<TAgent> getRandom(Class<TAgent> type, Random random,
+                                                                     Predicate<TAgent> filter) {
+        var collection = getOrThrow(type).values().stream()
+                .map(type::cast)
+                .filter(filter)
+                .collect(Collectors.toList());
+        int ind = random.nextInt(collection.size());
+
+        return collection.stream()
+                .skip(ind)
+                .findFirst();
+    }
+
 
     @Override
     public <TAgent extends AbstractAgent> boolean remove(TAgent agent) {
