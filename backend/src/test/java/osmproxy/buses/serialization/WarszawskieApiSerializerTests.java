@@ -319,6 +319,21 @@ class WarszawskieApiSerializerTests {
                 "M4", "Międzylesie", "TP-MIE", "28:21:00");
     }
 
+    @Test
+    void serializeJsonString_onEmptyResult_shouldReturnNoApiValues() {
+        // Arrange
+        var jsonString = "{\"result\":[]}";
+
+        // Act
+        var apiResultOpt = serializer.serializeJsonString(jsonString);
+
+        // Assert
+        Assertions.assertTrue(apiResultOpt.isPresent());
+
+        var apiValues = apiResultOpt.get().apiValues;
+        assertEquals(0, apiValues.size());
+    }
+
     private void assertValuesAreEqual(List<ApiKeyValue> keyValues, String brygada,
                                       String kierunek, String trasa, String czas) {
         assertValuesAreEqual(keyValues, brygada, kierunek, trasa, czas,
