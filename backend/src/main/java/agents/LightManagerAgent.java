@@ -34,6 +34,7 @@ import static agents.utilities.BehaviourWrapper.wrapErrors;
  */
 public class LightManagerAgent extends AbstractAgent {
     public static final String name = LightManagerAgent.class.getSimpleName().replace("Agent", "");
+    public static final int PERIOD_OF_NOTIFICATION_ABOUT_GREEN = 10_000;
     private final ICrossroad crossroad;
     private final Map<String, String> trafficJammedEdgeSet = new HashMap<>();
     private final ConfigContainer configContainer;
@@ -52,7 +53,8 @@ public class LightManagerAgent extends AbstractAgent {
         print("I'm a traffic manager.");
         crossroad.startLifetime();
 
-        var notifyCarAboutGreen = new TickerBehaviour(this, 10_000 / timeProvider.getTimeScale()) {
+
+        var notifyCarAboutGreen = new TickerBehaviour(this, PERIOD_OF_NOTIFICATION_ABOUT_GREEN / timeProvider.getTimeScale()) {
             @Override
             protected void onTick() {
                 //for all Light check
