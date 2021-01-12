@@ -274,9 +274,9 @@ public class PedestrianAgent extends AbstractAgent {
                 LocalTime arrivalTime = LocalTime.of(0, 0, 0, 0);
                 if (currentPosition != nextClosestStationPosition) {
 
-                    arrivalTime = computeArrivalTime(currentPosition, nextClosestStationPosition,
-                            String.valueOf(expectedNewStationNode.getOsmId()));
-                }
+                            arrivalTime = computeArrivalTime(currentPosition, nextClosestStationPosition,
+                                    expectedNewStationNode);
+                        }
                 sendMessageToBusManager(rcv, arrivalTime.toString());
 
                 if (expectedNewStationNode.equals(pedestrian.getStationFinish())) {
@@ -409,10 +409,10 @@ public class PedestrianAgent extends AbstractAgent {
                 bikeTimeMilliseconds = pedestrian.getMillisecondsOnRoute(bikeRoute, firstIndex, bikeSpeed);
             }
 
-            private LocalTime computeArrivalTime(IGeoPosition pointA, IGeoPosition pointB, String desiredOsmStationId) {
+            private LocalTime computeArrivalTime(IGeoPosition pointA, IGeoPosition pointB, StationNode desiredOsmStation) {
                 LocalTime now = timeProvider.getCurrentSimulationTime().toLocalTime();
                 arrivingRouteToClosestStation = router.generateRouteForPedestrians(pointA, pointB, null,
-                        desiredOsmStationId);
+                		desiredOsmStation);
                 return now.plusNanos(pedestrian.getMillisecondsOnRoute(arrivingRouteToClosestStation) * 1_000_000L);
             }
         };
