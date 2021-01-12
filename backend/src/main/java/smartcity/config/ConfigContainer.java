@@ -38,11 +38,11 @@ public class ConfigContainer extends ConfigMutator
     private boolean shouldUseFixedRoutes = false;
     private boolean shouldUseFixedConstructionSites = true;
 
-    private static int lightExtendTime = 30;
-    private static int extendWaitTime = 60;
-    private static int timeBeforeTrouble = 5;
-    private static int constructionSiteThresholdUntilIndexChange = 50;
-    private static int noConstructionSiteStrategyIndexFactor = 30;
+    private int lightExtendTime = 30;
+    private int extendWaitTime = 60;
+    private int timeBeforeTrouble = 5;
+    private int constructionSiteThresholdUntilIndexChange = 50;
+    private int noConstructionSiteStrategyIndexFactor = 30;
 
     private static final int defaultRadius = 600;
     private static final double defaultLat = 52.23682;

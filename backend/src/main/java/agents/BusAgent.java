@@ -112,8 +112,7 @@ public class BusAgent extends AbstractAgent {
                             bus.setState(DrivingState.MOVING);
                             break;
                     }
-                }
-                else if (bus.isAtStation()) {
+                } else if (bus.isAtStation()) {
                     switch (bus.getState()) {
                         case MOVING:
                             var stationOpt = bus.getCurrentStationNode();
@@ -162,8 +161,7 @@ public class BusAgent extends AbstractAgent {
                             move();
                             break;
                     }
-                }
-                else if (bus.isAtDestination()) {
+                } else if (bus.isAtDestination()) {
                     bus.setState(DrivingState.AT_DESTINATION);
                     logger.info("isAtDestination");
                     ACLMessage msg = createMessage(ACLMessage.INFORM, SmartCityAgent.name);
@@ -172,8 +170,7 @@ public class BusAgent extends AbstractAgent {
                     msg.setAllUserDefinedParameters(prop);
                     send(msg);
                     doDelete();
-                }
-                else {
+                } else {
                     move();
                 }
             }
@@ -225,8 +222,7 @@ public class BusAgent extends AbstractAgent {
                                 informNextStation(false);
                                 bus.setState(DrivingState.PASSING_STATION);
                             }
-                        }
-                        else if (rcv.getPerformative() == ACLMessage.AGREE) {
+                        } else if (rcv.getPerformative() == ACLMessage.AGREE) {
                             logger.info("GOT AGREE from station");
                             bus.setState(DrivingState.WAITING_AT_STATION);
                         }
@@ -247,8 +243,7 @@ public class BusAgent extends AbstractAgent {
                                 stationId = Integer.parseInt(rcv.getUserDefinedParameter(MessageParameter.STATION_ID));
                                 if (bus.removePassengerFromStation(stationId, rcv.getSender().getLocalName())) {
                                     print("Passengers: " + bus.getPassengersCount());
-                                }
-                                else {
+                                } else {
                                     print("Removing passenger failed");
                                 }
                                 break;
@@ -329,12 +324,16 @@ public class BusAgent extends AbstractAgent {
                     properties.setProperty(MessageParameter.TROUBLE_LON, Double.toString(troublePoint.getLng()));
                     if (!isTroubleManager) {
                         var nextStop = bus.findNextStop();
-                        properties.setProperty(MessageParameter.DESIRED_OSM_STATION_ID, nextStop == null? "": String.valueOf(((StationNode)nextStop).getOsmId()));
-                        properties.setProperty(MessageParameter.AGENT_ID_OF_NEXT_CLOSEST_STATION, nextStop == null? "": String.valueOf(((StationNode)nextStop).getAgentId()));
-                        //maybe not needed
-                        properties.setProperty(MessageParameter.LAT_OF_NEXT_CLOSEST_STATION,  nextStop == null? "": String.valueOf(nextStop.getLat()));
-                        properties.setProperty(MessageParameter.LON_OF_NEXT_CLOSEST_STATION,  nextStop == null? "": String.valueOf(nextStop.getLng()));
-
+                        logger.info("BABE I AM HERE");
+                        if (nextStop instanceof StationNode) {
+                            logger.info("------------AND NOW BABE I AM HERE");
+                            var stationStop = (StationNode) nextStop;
+                            properties.setProperty(MessageParameter.DESIRED_OSM_STATION_ID, String.valueOf((stationStop).getOsmId()));
+                            properties.setProperty(MessageParameter.AGENT_ID_OF_NEXT_CLOSEST_STATION, String.valueOf((stationStop).getAgentId()));
+                            //maybe not needed
+                            properties.setProperty(MessageParameter.LAT_OF_NEXT_CLOSEST_STATION, String.valueOf(stationStop.getLat()));
+                            properties.setProperty(MessageParameter.LON_OF_NEXT_CLOSEST_STATION, String.valueOf(stationStop.getLng()));
+                        }
                         properties.setProperty(MessageParameter.BUS_LINE, getLine());
                         properties.setProperty(MessageParameter.BRIGADE, bus.getBrigade());
                     }
@@ -379,13 +378,12 @@ public class BusAgent extends AbstractAgent {
             var predictedTime = currentTime.plusNanos(bus.getMillisecondsToNextStation() * NANO_IN_MILLISECONDS);
             properties.setProperty(MessageParameter.ARRIVAL_TIME, predictedTime.toString());
             properties.setProperty(MessageParameter.BUS_LINE, bus.getLine());
-
+            logger.info("Send INFORM to station " + stationId + " with OSMID");
             var osmId = station.getOsmId();
             var timeOnStation = bus.getTimeOnStation(osmId);
             if (timeOnStation.isPresent()) {
                 properties.setProperty(MessageParameter.SCHEDULE_ARRIVAL, timeOnStation.get().toString());
-            }
-            else {
+            } else {
                 ConditionalExecutor.debug(this::logAllStations);
             }
 
@@ -424,16 +422,12 @@ public class BusAgent extends AbstractAgent {
             return Optional.empty();
         }
 
-        int halfIndex = getHalfIndex(stationsOnRoute);
+        int halfIndex = (int) Math.ceil((double) stationsOnRoute.size() / 2);
         int firstIndex = random.nextInt(halfIndex);
         int secondIndex = firstIndex + random.nextInt(stationsOnRoute.size() - firstIndex - 1) + 1;
 
         return Optional.of(Siblings.of(stationsOnRoute.get(firstIndex),
                 stationsOnRoute.get(secondIndex)));
-    }
-    private int getHalfIndex(List<StationNode> stationsOnRoute){
-        final int half = 2;
-        return (int) Math.ceil((double) stationsOnRoute.size() / half);
     }
 
     /**
