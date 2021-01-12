@@ -17,6 +17,7 @@ import java.net.URL;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.LinkedList;
 import java.util.Optional;
 import java.util.Queue;
@@ -24,10 +25,12 @@ import java.util.Queue;
 public class OverpassApiManager implements IOverpassApiManager {
     private static final Logger logger = LoggerFactory.getLogger(OverpassApiManager.class);
 
+    public static final int API_SWITCH_MIN_INTERVAL_SEC = 1;
     public static final int API_SWITCH_NOTIFY_COUNT = 4;
     public static final int API_SWITCH_NOTIFY_TIME_SEC = 30;
     public static final int TOO_MANY_REQUESTS = 429;
     public static final int TIMEOUT_ERROR = 504;
+
 
     private final EventBus eventBus;
     private final String[] overpassApis;
@@ -55,9 +58,12 @@ public class OverpassApiManager implements IOverpassApiManager {
         HttpURLConnection connection = trySendRequest(query);
         try {
             int responseCode = connection.getResponseCode();
+
             while (responseCode == TOO_MANY_REQUESTS || responseCode == TIMEOUT_ERROR) {
-                logger.warn("Current API: " + getCurrentApi() + " is overloaded with our requests.");
-                switchApi();
+                logger.warn("Current API: " + getCurrentApi() + " is overloaded with our requests. Response code: " + responseCode);
+                if (apiNotSwitchedRecently()) {
+                    switchApi();
+                }
                 connection = trySendRequest(query);
                 responseCode = connection.getResponseCode();
             }
@@ -104,6 +110,12 @@ public class OverpassApiManager implements IOverpassApiManager {
             throw new RuntimeException(e);
         }
     }
+
+    private boolean apiNotSwitchedRecently() {
+        return switchTimeQueue.size() == 0 ||
+                ChronoUnit.SECONDS.between(switchTimeQueue.peek(), LocalDateTime.now()) > API_SWITCH_MIN_INTERVAL_SEC;
+    }
+
 
     @VisibleForTesting
     void switchApi() {

@@ -47,6 +47,7 @@ final class Router implements
 
     // TODO: now with new route generation there is sometimes "failed to get adjacent osmwayId" error, check it out
     @Override
+
     public List<RouteNode> generateRouteInfo(IGeoPosition pointA, IGeoPosition pointB,
                                              String startingOsmNodeRef, String finishingOsmNodeRef,
                                              String typeOfVehicle,

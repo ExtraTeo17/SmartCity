@@ -5,6 +5,7 @@ import { dispatch } from "../../redux/store";
 import ApiManager from "../../web/ApiManager";
 import { IS_DEBUG } from "../../constants/global";
 import { initialInteractionState } from "../../redux/reducers/interaction";
+import { notifyWaitForConnection } from "../../utils/helpers";
 
 import "../../styles/Menu.css";
 
@@ -22,6 +23,8 @@ export const ScenariosMenuObj = props => {
     if (ApiManager.isConnected()) {
       dispatch(simulationPrepareStarted());
       ApiManager.prepareSimulation(data);
+    } else {
+      notifyWaitForConnection();
     }
   }
 
@@ -176,7 +179,11 @@ export const ScenariosMenuObj = props => {
     startData.testPedId = 5;
 
     startData.useFixedRoutes = true;
-    startData.startTime = new Date();
+    const date = new Date();
+    date.setHours(8);
+    date.setMinutes(40);
+    date.setSeconds(0);
+    startData.startTime = date;
     startData.timeScale = 10;
     startData.generateBusFailures = true;
     startData.transportChangeStrategyActive = true;

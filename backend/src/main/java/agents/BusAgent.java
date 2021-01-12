@@ -412,6 +412,17 @@ public class BusAgent extends AbstractAgent {
     }
 
     // TODO: Fix situation where bus route contains only one station and pedestrians tries to choose two
+
+    /**
+     * Find two subsequent stations from all the stations on this bus' route. The second returned
+     * station will always be after the first returned station. Example:
+     * Bus' stations: 1, 2, 3, 4, 5. Two subsequent stations then could be:
+     * (1, 3); (1, 5); (2, 3); (2, 4); (3, 5).
+     *
+     * @param random Instance of pseudorandom numbers generator
+     * @return Two subsequent station nodes. If the bus does not have more than one station on its route,
+     * then nothing will be returned.
+     */
     public final Optional<Siblings<StationNode>> getTwoSubsequentStations(final Random random) {
 
         List<StationNode> stationsOnRoute = bus.getStationNodesOnRoute();

@@ -75,9 +75,16 @@ public class PedestrianAgent extends AbstractAgent {
         this.troublePointsConfigContainer = troublePointsConfigContainer;
     }
 
+
+    /**
+     * Tell whether the pedestrian is currently commuting via a bus or walking by foot.
+     *
+     * @return true if the pedestrian is travelling in the bus, false otherwise
+     */
     public boolean isInBus() {
         return DrivingState.IN_BUS == pedestrian.getState();
     }
+
 
     @Override
     protected void setup() {
@@ -302,7 +309,7 @@ public class PedestrianAgent extends AbstractAgent {
             }
 
             private StationNode parseCrashMessageFromBus(ACLMessage rcv) {
-              
+
                 return new StationNode(rcv.getUserDefinedParameter(MessageParameter.LAT_OF_NEXT_CLOSEST_STATION),
                         rcv.getUserDefinedParameter(MessageParameter.LON_OF_NEXT_CLOSEST_STATION),
                         rcv.getUserDefinedParameter(MessageParameter.DESIRED_OSM_STATION_ID),
