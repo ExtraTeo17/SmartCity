@@ -1,6 +1,8 @@
 package vehicles;
 
 import com.google.common.annotations.VisibleForTesting;
+
+import routing.RoutingConstants;
 import routing.nodes.LightManagerNode;
 import routing.nodes.RouteNode;
 import routing.nodes.StationNode;
@@ -26,6 +28,9 @@ public class Pedestrian extends MovingObject {
     private transient boolean troubled;
     private transient int stationIndex;
 
+    private int beforeDistance = 0;
+    private int savedDistance = 0;
+
     public Pedestrian(int agentId,
                       List<RouteNode> routeToStation,
                       List<RouteNode> uniformRouteToStation,
@@ -37,6 +42,7 @@ public class Pedestrian extends MovingObject {
                       ITaskProvider taskProvider) {
         super(timeProvider, agentId, DEFAULT_SPEED, createRoute(startStation, uniformRouteToStation,
                 finishStation, uniformRouteFromStation));
+        this.beforeDistance = uniformRouteToStation.size() * RoutingConstants.STEP_SIZE_METERS;
         this.displayRouteBeforeBus = routeToStation;
         this.routeBeforeBus = uniformRouteToStation;
         this.routeBeforeBus.add(startStation);
@@ -60,6 +66,7 @@ public class Pedestrian extends MovingObject {
 
     Pedestrian(Pedestrian ped) {
         super(ped.timeProvider, ped.agentId, ped.speed, ped.uniformRoute);
+        this.beforeDistance = ped.beforeDistance;
         this.displayRouteBeforeBus = ped.displayRouteBeforeBus;
         this.routeBeforeBus = ped.routeBeforeBus;
 
@@ -161,4 +168,15 @@ public class Pedestrian extends MovingObject {
         this.stationIndex = index;
     }
 
+    public int getDistance() {
+        return savedDistance + (getUniformRouteSize() * RoutingConstants.STEP_SIZE_METERS);
+    }
+
+    public void appendDistance(int dist) {
+        savedDistance += dist;
+    }
+
+    public int getBeforeDistance() {
+        return beforeDistance;
+    }
 }
