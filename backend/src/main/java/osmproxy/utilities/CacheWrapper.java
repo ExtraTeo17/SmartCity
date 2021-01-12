@@ -4,6 +4,9 @@ import com.google.inject.Inject;
 import org.javatuples.Pair;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import osmproxy.SimulationData;
+import osmproxy.WayWithLights;
 import osmproxy.abstractions.ICacheWrapper;
 import osmproxy.buses.data.BusPreparationData;
 import osmproxy.elements.OSMWay;
@@ -43,7 +46,27 @@ public class CacheWrapper implements ICacheWrapper {
         return Optional.of(cachedData);
     }
 
-    private static String getBusDataFileName(IZone zone) {
+    @Override
+    public Optional<SimulationData> getSimulationData() {
+    	if (USE_FRESH_DATA) {
+    		return Optional.empty();
+    	}
+
+    	var cachedData = FileWrapper.<SimulationData>getFromCache(getSimulationDataFileName(configContainer.getZone()));
+    	if (cachedData == null) {
+    		return Optional.empty();
+    	}
+
+    	logger.info("Successfully retrieved SIMULATION data from cache.");
+    	return Optional.of(cachedData);
+    }
+
+    private String getSimulationDataFileName(IZone zone) {
+        var center = zone.getCenter();
+        return "simulation_" + zone.getRadius() + "_" + center.getLng() + "_" + center.getLat();
+	}
+
+	private static String getBusDataFileName(IZone zone) {
         var center = zone.getCenter();
         return "zone_" + zone.getRadius() + "_" + center.getLng() + "_" + center.getLat();
     }
@@ -52,6 +75,13 @@ public class CacheWrapper implements ICacheWrapper {
     public void cacheData(BusPreparationData data) {
         var zone = configContainer.getZone();
         String path = getBusDataFileName(zone);
+        FileWrapper.cacheToFile(data, path);
+    }
+
+    @Override
+    public void cacheData(SimulationData data) {
+        var zone = configContainer.getZone();
+        String path = getSimulationDataFileName(zone);
         FileWrapper.cacheToFile(data, path);
     }
 

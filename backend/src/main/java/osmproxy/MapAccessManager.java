@@ -25,6 +25,8 @@ import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
+
+import osmproxy.abstractions.ICacheWrapper;
 import osmproxy.abstractions.IMapAccessManager;
 import osmproxy.abstractions.IOverpassApiManager;
 import osmproxy.elements.OSMLight;
@@ -173,10 +175,10 @@ public class MapAccessManager implements IMapAccessManager {
     @Override
 
     public Optional<RouteInfo> getRouteInfo(List<Long> osmWayIds, boolean notPedestrian) {
-    	RouteInfo info = retrieveRouteInfoFromCache(osmWayIds);
-    	if (info != null) {
-    		return Optional.of(info);
-    	}
+    	RouteInfo info;// = retrieveRouteInfoFromCache(osmWayIds);
+    	//if (info != null) {
+    	//	return Optional.of(info);
+    	//}
 
         var query = OverpassQueryManager.getMultipleWayAndItsNodesQuery(osmWayIds);
         var overpassNodes = getNodesDocument(query);
@@ -196,12 +198,12 @@ public class MapAccessManager implements IMapAccessManager {
     private RouteInfo retrieveRouteInfoFromCache(List<Long> osmWayIds) {
     	RouteInfo info = new RouteInfo();
 		for (long id : osmWayIds) {
-			if (!wayIdToWayOutput.containsKey(id)) {
+			if (!simData.wayIdToWayOutput.containsKey(id)) {
 				return null;
 			}
-			info.addWay(new OSMWay(wayIdToWayOutput.get(id).way));
-			for (Node light : wayIdToWayOutput.get(id).lightIds) {
-				info.add(Long.parseLong(light.getAttributes().getNamedItem("id").getNodeValue()));
+			info.addWay(new OSMWay(simData.wayIdToWayOutput.get(id).way));
+			for (Long light : simData.wayIdToWayOutput.get(id).lightIds) {
+				info.add(light);
 			}
 		}
 		System.out.println("CREATED CAR ROUTE WITHOUT OVERPASS");
@@ -244,8 +246,8 @@ public class MapAccessManager implements IMapAccessManager {
             Node item = osmXMLNodes.item(i);
             if (item.getNodeName().equals("way")) {
             	wwl = new WayWithLights();
-                wwl.addWay(item);
-                wayIdToWayOutput.put(Long.parseLong(item.getAttributes().getNamedItem("id").getNodeValue()), wwl);
+                wwl.addWay(new OSMWay(item));
+                simData.wayIdToWayOutput.put(Long.parseLong(item.getAttributes().getNamedItem("id").getNodeValue()), wwl);
             }
             else if (item.getNodeName().equals("node")) {
                 NodeList nodeChildren = item.getChildNodes();
@@ -255,7 +257,7 @@ public class MapAccessManager implements IMapAccessManager {
                             nodeChild.getAttributes().getNamedItem("k").getNodeValue().equals(tagType) &&
                             nodeChild.getAttributes().getNamedItem("v").getNodeValue().equals("traffic_signals")) {
                         var id = Long.parseLong(item.getAttributes().getNamedItem("id").getNodeValue());
-                        wwl.add(item);
+                        wwl.add(Long.parseLong(item.getAttributes().getNamedItem("id").getNodeValue()));
                     }
                 }
             }
@@ -357,11 +359,18 @@ public class MapAccessManager implements IMapAccessManager {
         return document;
     }
 
-    private Map<Long, WayWithLights> wayIdToWayOutput;
+    private SimulationData simData;
 
 	@Override
-	public void initializeWayCache(double lat, double lon, int radius) {
-		wayIdToWayOutput = new HashMap<>();
+	public void initializeWayCache(double lat, double lon, int radius, ICacheWrapper wrapper) {
+		var cachedData = wrapper.getSimulationData();
+		if (cachedData.isPresent()) {
+			simData = cachedData.get();
+			return;
+		}
+
+		simData = new SimulationData();
+		simData.wayIdToWayOutput = new HashMap<>();
 		var query = OverpassQueryManager.getWaysQuery(lat, lon, radius);
 		List<Long> osmWayIdsInRadius = new ArrayList<>();
 		var overpassNodes = getNodesDocument(query).get();
@@ -377,5 +386,7 @@ public class MapAccessManager implements IMapAccessManager {
 		var overpassNodes2 = getNodesDocument(query2).get();
 		parseWayAndNodes2(overpassNodes2, true);
 		System.out.println("lol");
+
+		wrapper.cacheData(simData);
 	}
 }

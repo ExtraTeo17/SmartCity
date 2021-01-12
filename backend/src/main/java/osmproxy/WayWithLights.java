@@ -1,5 +1,6 @@
 package osmproxy;
 
+import java.io.Serializable;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -7,16 +8,16 @@ import org.w3c.dom.Node;
 
 import osmproxy.elements.OSMWay;
 
-public class WayWithLights {
+public class WayWithLights implements Serializable {
 
-	public Node way;
-	public Set<Node> lightIds = new HashSet<>();
+	public OSMWay way;
+	public Set<Long> lightIds = new HashSet<>();
 	
-	public void addWay(Node osmWay) {
+	public void addWay(OSMWay osmWay) {
 		way = osmWay;
 	}
 
-	public void add(Node id) {
+	public void add(long id) {
 		lightIds.add(id);
 	}
 }

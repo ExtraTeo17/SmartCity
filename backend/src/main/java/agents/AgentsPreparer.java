@@ -99,7 +99,7 @@ public class AgentsPreparer {
             var buses = agentsContainer.stream(BusAgent.class).map(
                     BusAgent::getBus).collect(Collectors.toList());
 
-            mapAccessManager.initializeWayCache(e.zone.getCenter().getLat(), e.zone.getCenter().getLng(), e.zone.getRadius());
+            mapAccessManager.initializeWayCache(e.zone.getCenter().getLat(), e.zone.getCenter().getLng(), e.zone.getRadius(), cacheWrapper);
 
             eventBus.post(new SimulationPreparedEvent(lights, stations, buses));
         }
