@@ -30,6 +30,7 @@ import routing.nodes.StationNode;
 import smartcity.SimulationState;
 import smartcity.TimeProvider;
 import smartcity.config.ConfigContainer;
+import smartcity.config.StaticConfig;
 import utilities.ConditionalExecutor;
 import utilities.Siblings;
 
@@ -102,7 +103,9 @@ public class AgentsPreparer {
             var buses = agentsContainer.stream(BusAgent.class).map(
                     BusAgent::getBus).collect(Collectors.toList());
 
-            mapAccessManager.initializeWayCache(e.zone.getCenter().getLat(), e.zone.getCenter().getLng(), e.zone.getRadius(), cacheWrapper);
+            if (StaticConfig.USE_SIMULATION_CACHE) {
+                mapAccessManager.initializeWayCache(e.zone, cacheWrapper);
+            }
 
             eventBus.post(new SimulationPreparedEvent(lights, stations, buses));
         }

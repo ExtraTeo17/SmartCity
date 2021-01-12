@@ -6,7 +6,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import osmproxy.SimulationData;
-import osmproxy.WayWithLights;
 import osmproxy.abstractions.ICacheWrapper;
 import osmproxy.buses.data.BusPreparationData;
 import osmproxy.elements.OSMWay;

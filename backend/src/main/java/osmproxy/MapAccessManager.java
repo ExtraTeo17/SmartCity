@@ -58,6 +58,7 @@ public class MapAccessManager implements IMapAccessManager {
 
     private final DocumentBuilderFactory xmlBuilderFactory;
     private final IOverpassApiManager manager;
+    private SimulationData simulationData;
 
     @Inject
     public MapAccessManager(IOverpassApiManager overpassApiManager) {
@@ -198,11 +199,11 @@ public class MapAccessManager implements IMapAccessManager {
     private RouteInfo retrieveRouteInfoFromCache(List<Long> osmWayIds) {
     	RouteInfo info = new RouteInfo();
 		for (long id : osmWayIds) {
-			if (!simData.wayIdToWayOutput.containsKey(id)) {
+			if (!simulationData.wayIdToWayOutput.containsKey(id)) {
 				return null;
 			}
-			info.addWay(new OSMWay(simData.wayIdToWayOutput.get(id).way));
-			for (Long light : simData.wayIdToWayOutput.get(id).lightIds) {
+			info.addWay(new OSMWay(simulationData.wayIdToWayOutput.get(id).way));
+			for (Long light : simulationData.wayIdToWayOutput.get(id).lightIds) {
 				info.add(light);
 			}
 		}
@@ -247,7 +248,7 @@ public class MapAccessManager implements IMapAccessManager {
             if (item.getNodeName().equals("way")) {
             	wwl = new WayWithLights();
                 wwl.addWay(new OSMWay(item));
-                simData.wayIdToWayOutput.put(Long.parseLong(item.getAttributes().getNamedItem("id").getNodeValue()), wwl);
+                simulationData.wayIdToWayOutput.put(Long.parseLong(item.getAttributes().getNamedItem("id").getNodeValue()), wwl);
             }
             else if (item.getNodeName().equals("node")) {
                 NodeList nodeChildren = item.getChildNodes();
@@ -359,34 +360,50 @@ public class MapAccessManager implements IMapAccessManager {
         return document;
     }
 
-    private SimulationData simData;
-
 	@Override
-	public void initializeWayCache(double lat, double lon, int radius, ICacheWrapper wrapper) {
+	public void initializeWayCache(IZone zone, ICacheWrapper wrapper) {
+	    logger.info("Simulation caching enabled, start caching current zone");
+
 		var cachedData = wrapper.getSimulationData();
 		if (cachedData.isPresent()) {
-			simData = cachedData.get();
+			simulationData = cachedData.get();
 			return;
 		}
+		simulationData = new SimulationData();
 
-		simData = new SimulationData();
-		simData.wayIdToWayOutput = new HashMap<>();
-		var query = OverpassQueryManager.getWaysQuery(lat, lon, radius);
-		List<Long> osmWayIdsInRadius = new ArrayList<>();
-		var overpassNodes = getNodesDocument(query).get();
-        Node osmRoot = overpassNodes.getFirstChild();
+		var wayIdsQuery = OverpassQueryManager.getWaysQuery(zone.getCenter().getLat(),
+		        zone.getCenter().getLng(), zone.getRadius());
+		var osmWayIdsXmlDoc = getNodesDocument(wayIdsQuery);
+		if (osmWayIdsXmlDoc.isEmpty()) {
+		    logger.debug("Could not create XML document with way ids for parsing (simulation cache)");
+		    return;
+		}
+		List<Long> osmWayIdsInRadius = parseOsmWayIds(osmWayIdsXmlDoc.get());
+
+		var waysWithNodesQuery = OverpassQueryManager.getMultipleWayAndItsNodesQuery(osmWayIdsInRadius);
+		var waysWithNodesXmlDoc = getNodesDocument(waysWithNodesQuery);
+		if (waysWithNodesQuery.isEmpty()) {
+		    logger.debug("Could not create XML document with ways and its nodes for parsing (simulation cache)");
+		    return;
+		}
+		parseWayAndNodes2(waysWithNodesXmlDoc.get(), true);
+
+        logger.info("Cache current zone to file");
+		wrapper.cacheData(simulationData);
+        logger.info("Caching finished successfully");
+	}
+
+
+    private List<Long> parseOsmWayIds(Document xmlDoc) {
+        List<Long> osmWayIdsInRadius = new ArrayList<>();
+        Node osmRoot = xmlDoc.getFirstChild();
         NodeList osmXMLNodes = osmRoot.getChildNodes();
         for (int i = 0; i < osmXMLNodes.getLength(); i++) {
             Node item = osmXMLNodes.item(i);
             if (item.getNodeName().equals("way")) {
-            	osmWayIdsInRadius.add(Long.parseLong(item.getAttributes().getNamedItem("id").getNodeValue()));
+                osmWayIdsInRadius.add(Long.parseLong(item.getAttributes().getNamedItem("id").getNodeValue()));
             }
         }
-		var query2 = OverpassQueryManager.getMultipleWayAndItsNodesQuery(osmWayIdsInRadius);
-		var overpassNodes2 = getNodesDocument(query2).get();
-		parseWayAndNodes2(overpassNodes2, true);
-		System.out.println("lol");
-
-		wrapper.cacheData(simData);
-	}
+        return osmWayIdsInRadius;
+    }
 }

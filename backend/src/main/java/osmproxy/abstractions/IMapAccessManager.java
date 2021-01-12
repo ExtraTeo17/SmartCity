@@ -46,5 +46,5 @@ public interface IMapAccessManager {
 
     Position calculateLatLonBasedOnInternalLights(Node crossroad);
 
-	void initializeWayCache(double lat, double lon, int radius, ICacheWrapper wrapper);
+	void initializeWayCache(IZone zone, ICacheWrapper wrapper);
 }
