@@ -324,9 +324,7 @@ public class BusAgent extends AbstractAgent {
                     properties.setProperty(MessageParameter.TROUBLE_LON, Double.toString(troublePoint.getLng()));
                     if (!isTroubleManager) {
                         var nextStop = bus.findNextStop();
-                        logger.info("BABE I AM HERE");
                         if (nextStop instanceof StationNode) {
-                            logger.info("------------AND NOW BABE I AM HERE");
                             var stationStop = (StationNode) nextStop;
                             properties.setProperty(MessageParameter.DESIRED_OSM_STATION_ID, String.valueOf((stationStop).getOsmId()));
                             properties.setProperty(MessageParameter.AGENT_ID_OF_NEXT_CLOSEST_STATION, String.valueOf((stationStop).getAgentId()));
@@ -378,7 +376,6 @@ public class BusAgent extends AbstractAgent {
             var predictedTime = currentTime.plusNanos(bus.getMillisecondsToNextStation() * NANO_IN_MILLISECONDS);
             properties.setProperty(MessageParameter.ARRIVAL_TIME, predictedTime.toString());
             properties.setProperty(MessageParameter.BUS_LINE, bus.getLine());
-            logger.info("Send INFORM to station " + stationId + " with OSMID");
             var osmId = station.getOsmId();
             var timeOnStation = bus.getTimeOnStation(osmId);
             if (timeOnStation.isPresent()) {
