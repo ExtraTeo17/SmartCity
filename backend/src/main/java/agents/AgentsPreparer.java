@@ -30,11 +30,14 @@ import routing.nodes.StationNode;
 import smartcity.SimulationState;
 import smartcity.TimeProvider;
 import smartcity.config.ConfigContainer;
+import utilities.ConditionalExecutor;
+import utilities.Siblings;
 
 import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import static java.util.stream.Collectors.groupingBy;
 import static smartcity.config.StaticConfig.USE_DEPRECATED_XML_FOR_LIGHT_MANAGERS;
 
 /**
@@ -95,7 +98,7 @@ public class AgentsPreparer {
                     .flatMap(man -> man.getLights().stream())
                     .collect(Collectors.toList());
             var stations = agentsContainer.stream(StationAgent.class).map(
-                    StationAgent::getStation).filter(OSMStation::isPlatform).collect(Collectors.toList());
+                    StationAgent::getStation).collect(Collectors.toList());
             var buses = agentsContainer.stream(BusAgent.class).map(
                     BusAgent::getBus).collect(Collectors.toList());
             eventBus.post(new SimulationPreparedEvent(lights, stations, buses));
@@ -122,57 +125,88 @@ public class AgentsPreparer {
         logger.info("Stations creation started.");
         long time = System.nanoTime();
         var stationNodes = prepareStations(busData.stations.values());
+        logger.info("Stations are created! Took: " + TimeProvider.getTimeInMs(time) + "ms\n");
 
-        logger.info("Stations are created! Took: " + TimeProvider.getTimeInMs(time) + "ms");
         logger.info("Buses creation started.");
         time = System.nanoTime();
         preparesBuses(busData, stationNodes);
-        logger.info("Buses are created! Took: " + TimeProvider.getTimeInMs(time) + "ms");
+        logger.info("Buses are created! Took: " + TimeProvider.getTimeInMs(time) + "ms\n");
 
         return true;
     }
 
     private BusPreparationData getBusPreparationData() {
-        BusPreparationData busData;
         var cachedData = cacheWrapper.getBusPreparationData();
         if (cachedData.isPresent()) {
-            busData = cachedData.get();
+            return cachedData.get();
         }
-        else {
-            logger.info("Starting bus data preparation.");
-            long time = System.nanoTime();
-            busData = busLinesManager.getBusData();
-            logger.info("Bus data preparation finished! Took: " + TimeProvider.getTimeInMs(time) + "ms");
-            cacheWrapper.cacheData(busData);
-        }
+
+        logger.info("Starting bus data preparation.");
+        long time = System.nanoTime();
+        var busData = busLinesManager.getBusData();
+        logger.info("Bus data preparation finished! Took: " + TimeProvider.getTimeInMs(time) + "ms");
+        cacheWrapper.cacheData(busData);
 
         return busData;
     }
 
     private List<StationNode> prepareStations(Collection<OSMStation> stations) {
-        int stationsCount = 0;
         List<StationNode> stationNodes = new ArrayList<>();
-        for (var station : stations) {
-            StationAgent agent = factory.create(station);
-            boolean result = agentsContainer.tryAdd(agent);
-            if (result) {
-                ++stationsCount;
-                agent.start();
-                // Should probably be moved to nodesCreator if any extensions will be needed
-                stationNodes.add(new StationNode(agent.getStation(), agent.getId()));
+        for (var stationsForBusStopId : stations.stream()
+                .collect(groupingBy(OSMStation::getBusStopNr, groupingBy(OSMStation::getBusStopId)))
+                .values()) {
+            for (var stationsForBusStopNr : stationsForBusStopId.values()) {
+                var stationSiblings = getStationAndItsPlatform(stationsForBusStopNr);
+                StationAgent agentMain = factory.create(stationSiblings.first);
+                boolean result = agentsContainer.tryAdd(agentMain);
+                if (!result) {
+                    logger.warn("Station agent could not be added");
+                    continue;
+                }
+
+                agentMain.start();
+                var mainStation = agentMain.getStation();
+                if (stationSiblings.first != stationSiblings.second) {
+                    var platform = stationSiblings.second;
+                    mainStation.setCorrespondingPlatformStation(platform);
+                }
+                stationNodes.add(mainStation);
+            }
+        }
+
+        logger.info("Number of station agents: " + stationNodes.size());
+        return stationNodes;
+    }
+
+    /**
+     * @param stationsForBusStopNr - stations for single bus stop [id and nr]
+     * @return Stations, where first will not be platform if possible
+     */
+    private Siblings<OSMStation> getStationAndItsPlatform(List<OSMStation> stationsForBusStopNr) {
+        OSMStation main = null;
+        OSMStation platform = null;
+        for (int i = 0; (main == null || platform == null) && i < stationsForBusStopNr.size(); ++i) {
+            var station = stationsForBusStopNr.get(i);
+            if (station.isPlatform()) {
+                platform = station;
             }
             else {
-                logger.info("Station agent could not be added");
+                main = station;
             }
         }
 
-        if (stationsCount == 0) {
-            logger.warn("No stations are present in provided zone");
-            return stationNodes;
+        if (main == null) {
+            main = platform;
         }
 
-        logger.info("Number of station agents: " + stationsCount);
-        return stationNodes;
+        if (stationsForBusStopNr.size() > 2) {
+            logger.warn("Stops for bus id size greater than 2!: " + stationsForBusStopNr.size() + " \n"
+                    + "Main: " + main + "\n"
+                    + "Platform: " + platform + "\n"
+                    + "All:\n" + stationsForBusStopNr.stream().map(OSMStation::toString).collect(Collectors.joining(" \n")));
+        }
+
+        return Siblings.of(main, platform);
     }
 
     private void preparesBuses(BusPreparationData busData, List<StationNode> allStations) {
@@ -183,7 +217,12 @@ public class AgentsPreparer {
         Set<Pair<Pair<String, String>, String>> addedLinesBrigades = new HashSet<>();
         for (var busInfo : busData.busInfos) {
             var busLine = busInfo.busLine;
-            var route = getBusRoute(busInfo.route, busInfo.stops, allStations, busLine);
+            var route = getBusRoute(busInfo.route, busInfo.stops, allStations);
+            if (route.size() == busInfo.stops.size()) {
+                logger.warn("Route contains only bus stops. Line: " + busInfo.busLine);
+                continue;
+            }
+
             for (var brigade : busInfo) {
                 var brigadeNr = brigade.brigadeId;
                 for (Timetable timetable : brigade) {
@@ -212,7 +251,7 @@ public class AgentsPreparer {
             logger.warn("No buses were created");
         }
 
-        logger.info("Closest startTime: " + closestTime.toLocalTime() + ", number of bus agents: " + busCount);
+        logger.info("Closest startTime: " + closestTime.toLocalTime() + "\nNumber of bus agents: " + busCount);
     }
 
     private void prepareBusManagerAgent(HashSet<BusInfo> busInfos) {
@@ -226,20 +265,20 @@ public class AgentsPreparer {
     }
 
     private List<RouteNode> getBusRoute(List<OSMWay> osmRoute, List<OSMStation> osmStops,
-                                        List<StationNode> allStations, String busLine) {
+                                        List<StationNode> allStations) {
         List<StationNode> mergedStationNodes = new ArrayList<>(osmStops.size());
-        List<OSMStation> mergedOsmStops = new ArrayList<>(osmStops.size());
 
         for (var osmStop : osmStops) {
             var stopId = osmStop.getId();
             var station = allStations.stream().filter(node -> node.getOsmId() == stopId).findAny();
-            if (station.isPresent()) {
-                mergedStationNodes.add(station.get());
-                mergedOsmStops.add(osmStop); // TODO: mergedosmstops is not used wtf
+            if (station.isEmpty()) {
+                logger.error("Stop present on way is not initiated as StationAgent:\n " + osmStop);
+                ConditionalExecutor.debug(() -> logger.info("All stations:\n" + allStations.stream()
+                        .map(StationNode::toString).collect(Collectors.joining("\n"))));
+                continue;
             }
-            else {
-                logger.error("Stop present on way is not initiated as StationAgent: " + osmStop);
-            }
+
+            mergedStationNodes.add(station.get());
         }
 
         var timeNow = System.nanoTime();

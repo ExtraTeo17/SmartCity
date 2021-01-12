@@ -324,7 +324,8 @@ public class BusAgent extends AbstractAgent {
                     properties.setProperty(MessageParameter.TROUBLE_LON, Double.toString(troublePoint.getLng()));
                     if (!isTroubleManager) {
                         var nextStop = bus.findNextStop();
-                        if (nextStop instanceof StationNode) {
+
+                        if(nextStop instanceof StationNode) {
                             var stationStop = (StationNode) nextStop;
                             properties.setProperty(MessageParameter.DESIRED_OSM_STATION_ID, String.valueOf((stationStop).getOsmId()));
                             properties.setProperty(MessageParameter.AGENT_ID_OF_NEXT_CLOSEST_STATION, String.valueOf((stationStop).getAgentId()));
@@ -424,7 +425,6 @@ public class BusAgent extends AbstractAgent {
      * then nothing will be returned.
      */
     public final Optional<Siblings<StationNode>> getTwoSubsequentStations(final Random random) {
-
         List<StationNode> stationsOnRoute = bus.getStationNodesOnRoute();
         if (stationsOnRoute.size() <= 1) {
             return Optional.empty();
@@ -438,20 +438,15 @@ public class BusAgent extends AbstractAgent {
                 stationsOnRoute.get(secondIndex)));
     }
 
-    /**
-     * @return If busAgent finished execution
-     */
-    public boolean runBasedOnTimetable() {
+    public void runBasedOnTimetable() {
         var state = this.getAgentState().getValue();
         if (state != AgentState.cAGENT_STATE_INITIATED) {
-            return state == AgentState.cAGENT_STATE_ACTIVE && bus.isAtDestination();
+            return;
         }
 
         if (shouldStart()) {
             start();
         }
-
-        return false;
     }
 
     public boolean shouldStart() {

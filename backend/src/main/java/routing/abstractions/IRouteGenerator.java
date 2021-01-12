@@ -24,41 +24,34 @@ public interface IRouteGenerator {
      * @param pointA              The geographical coordinates of the departure
      *                            place.
      * @param pointB              The geographical coordinates of the arrival place.
-     * @param startingOsmNodeRef  The OSM Node ID of the node which should be the
-     *                            first on the route. If null is passed, then the
-     *                            generator will automatically find the best match
-     *                            among OSM nodes found on this route.
-     * @param finishingOsmNodeRef The OSM Node ID of the node which should be the
-     *                            last on the route. If null is passed, then the
-     *                            generator will automatically find the best match
-     *                            among OSM nodes found on this route.
      * @param typeOfVehicle       The type of vehicle to be passed to the
      *                            GraphHopper routing API, such as "foot", "car",
      *                            "bike".
+     * @param startStation        Concerns pedestrians' routes: the station to which
+     *                            the pedestrian goes to in order to enter a bus
+     *                            there
+     * @param endStation          Concerns pedestrians' routes: the station on which
+     *                            the pedestrian disembarks from the bus to continue
+     *                            the journey to the destination by foot.
      * @param bewareOfJammedEdge  Parameter which defines, whether the route should
      *                            avoid the GraphHopper edges, which are at the time
      *                            being added to the forbidden edge set.
      * @return List of {@link RouteNode} elements containing the desired route.
      */
-    List<RouteNode> generateRouteInfo(IGeoPosition pointA, IGeoPosition pointB, String startingOsmNodeRef,
-                                      String finishingOsmNodeRef, String typeOfVehicle, boolean bewareOfJammedEdge);
+    List<RouteNode> generateRouteInfo(IGeoPosition pointA, IGeoPosition pointB, String typeOfVehicle,
+            StationNode startStation, StationNode endStation, boolean bewareOfJammedEdge);
 
     default List<RouteNode> generateRouteInfo(IGeoPosition pointA, IGeoPosition pointB, String typeOfVehicle) {
-        return generateRouteInfo(pointA, pointB, typeOfVehicle, false);
-    }
-
-    default List<RouteNode> generateRouteInfo(IGeoPosition pointA, IGeoPosition pointB, String typeOfVehicle,
-                                              boolean bewareOfJammedEdge) {
-        return generateRouteInfo(pointA, pointB, null, null, typeOfVehicle, bewareOfJammedEdge);
+        return generateRouteInfo(pointA, pointB, typeOfVehicle, null, null, false);
     }
 
     default List<RouteNode> generateRouteInfo(IGeoPosition pointA, IGeoPosition pointB, boolean bewareOfJammedEdge) {
-        return generateRouteInfo(pointA, pointB, null, null, "car", bewareOfJammedEdge);
+        return generateRouteInfo(pointA, pointB, "car", null, null, bewareOfJammedEdge);
     }
 
-    default List<RouteNode> generateRouteForPedestrians(IGeoPosition pointA, IGeoPosition pointB,
-                                                        String startingOsmNodeRef, String finishingOsmNodeRef) {
-        return generateRouteInfo(pointA, pointB, startingOsmNodeRef, finishingOsmNodeRef, "foot", false);
+    default List<RouteNode> generateRouteForPedestrians(IGeoPosition pointA, IGeoPosition pointB, StationNode startStation,
+            StationNode endStation) {
+        return generateRouteInfo(pointA, pointB, "foot", startStation, endStation, false);
     }
 
     List<RouteNode> generateRouteInfoForBuses(List<OSMWay> route, List<StationNode> stationNodes);

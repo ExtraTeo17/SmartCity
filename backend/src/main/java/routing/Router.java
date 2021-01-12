@@ -49,15 +49,16 @@ final class Router implements
     @Override
 
     public List<RouteNode> generateRouteInfo(IGeoPosition pointA, IGeoPosition pointB,
-                                             String startingOsmNodeRef, String finishingOsmNodeRef,
                                              String typeOfVehicle,
+                                             StationNode startStation,
+                                             StationNode endStation,
                                              boolean bewareOfJammedEdge) {
-        boolean notPedestrian = !typeOfVehicle.equals("foot");
+        boolean isNotPedestrian = !typeOfVehicle.equals("foot");
         var osmWayIdsAndEdgeList = findRoute(pointA, pointB, typeOfVehicle, bewareOfJammedEdge);
         var osmWayIds = osmWayIdsAndEdgeList.getValue0();
 
         // TODO: refactor inside to throw exception if not car or pedestrian
-        var routeInfoOpt = mapAccessManager.getRouteInfo(osmWayIds, notPedestrian);
+        var routeInfoOpt = mapAccessManager.getRouteInfo(osmWayIds, isNotPedestrian);
         if (routeInfoOpt.isEmpty()) {
             logger.warn("Generating route failed because of empty routeInfo");
             return new ArrayList<>();
@@ -70,12 +71,8 @@ final class Router implements
             return new ArrayList<>();
         }
 
-        if (startingOsmNodeRef == null) {
-            startingOsmNodeRef = routeInfo.getFirst().findClosestNodeRefTo(pointA);
-        }
-        if (finishingOsmNodeRef == null) {
-            finishingOsmNodeRef = routeInfo.getLast().findClosestNodeRefTo(pointB);
-        }
+        var startingOsmNodeRef = routeInfo.getFirst().findClosestNodeRefTo(pointA);
+        var finishingOsmNodeRef = routeInfo.getLast().findClosestNodeRefTo(pointB);
 
         try {
             routeInfo.determineRouteOrientationsAndFilterRelevantNodes(startingOsmNodeRef, finishingOsmNodeRef);
@@ -83,12 +80,20 @@ final class Router implements
             logger.info("GraphHopper API is not able to create route for provided points.");
             return new ArrayList<>();
         }
-        var route = createRouteNodeList(routeInfo, notPedestrian);
+        var route = createRouteNodeList(routeInfo, isNotPedestrian, startStation, endStation,
+        		startingOsmNodeRef, finishingOsmNodeRef);
         return routeTransformer.uniformRouteNew(route, osmWayIdsAndEdgeList.getValue1());
     }
 
-    private List<RouteNode> createRouteNodeList(RouteInfo routeInfo, boolean isCar) {
+    private List<RouteNode> createRouteNodeList(RouteInfo routeInfo, boolean isNotPedestrian,
+            StationNode startStation, StationNode endStation, String startingOsmNodeRef,
+            String finishingOsmNodeRef) {
         List<RouteNode> routeNodes = new ArrayList<>();
+
+        if (!isNotPedestrian && endStation != null && !startingOsmNodeRef.equals(endStation.getOsmId() + "")) {
+            routeNodes.add(new RouteNode(endStation));
+        }
+
         for (var way : routeInfo) {
             int waypointCount = way.getWaypointCount();
             int lastLightManagerId = -1;
@@ -98,7 +103,7 @@ final class Router implements
             int lastIndex = straight ? waypointCount : -1;
             int increment = straight ? 1 : -1;
             for (int j = startingIndex; j != lastIndex; j += increment) {
-                var nodeOpt = getNode(way, way.getWaypoint(j), routeInfo, isCar);
+                var nodeOpt = getNode(way, way.getWaypoint(j), routeInfo, isNotPedestrian);
                 if (nodeOpt.isEmpty()) {
                     continue;
                 }
@@ -116,6 +121,10 @@ final class Router implements
                 }
 
             }
+        }
+
+        if (!isNotPedestrian && startStation != null && !finishingOsmNodeRef.equals(startStation.getOsmId() + "")) {
+            routeNodes.add(new RouteNode(startStation));
         }
 
         return routeNodes;
@@ -161,7 +170,7 @@ final class Router implements
 
 
     /////////////////////////////////////////////////////////////
-    //  HELPERS - Most are comfortable :(
+    //  HELPERS
     /////////////////////////////////////////////////////////////
 
     private boolean updateCacheDataAgentId(List<RouteNode> data, List<StationNode> stationNodes) {
@@ -169,13 +178,12 @@ final class Router implements
             if (node instanceof StationNode) {
                 var st = (StationNode) node;
                 var newStation = stationNodes.stream().filter(f -> f.getOsmId() == st.getOsmId()).findFirst();
-                if (newStation.isPresent()) {
-                    st.setAgentId(newStation.get().getAgentId());
-                }
-                else {
+                if (newStation.isEmpty()) {
                     logger.warn("Skipping cache because station not found on the route");
                     return false;
                 }
+
+                st.setAgentId(newStation.get().getAgentId());
             }
         }
 
@@ -262,6 +270,5 @@ final class Router implements
             this.route = route;
         }
     }
-
 
 }

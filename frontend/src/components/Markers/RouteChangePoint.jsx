@@ -30,7 +30,7 @@ const RouteChangePoint = props => {
   return point ? (
     <CircleMarker
       center={point}
-      radius={8}
+      radius={7}
       color="yellow"
       opacity={0.75}
       fillColor="yellow"

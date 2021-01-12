@@ -9,9 +9,9 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
-import osmproxy.elements.OSMStation;
 import routing.abstractions.IRouteGenerator;
 import routing.abstractions.IRouteTransformer;
+import routing.nodes.StationNode;
 import smartcity.config.ConfigContainer;
 import smartcity.config.abstractions.IChangeTransportConfigContainer;
 import smartcity.lights.abstractions.ICrossroad;
@@ -108,7 +108,7 @@ class HashAgentsContainerTest {
     }
 
     private StationAgent getStationAgent() {
-        return new StationAgent(idGenerator.get(StationAgent.class), mock(OSMStation.class),
+        return new StationAgent(idGenerator.get(StationAgent.class), mock(StationNode.class),
                 mock(StationStrategy.class), createTimeProvider(), createEventBus());
     }
 

@@ -19,7 +19,7 @@ Check by `mvn --version`
 
 2. Java >= 14   
 Download link: https://jdk.java.net/java-se-ri/14
-Check by `$JAVA_HOME/bin/java --version` for bash
+Check by `"$JAVA_HOME/bin/java" --version` for bash
 Check by `& "$Env:JAVA_HOME\bin\java.exe" --version` for powershell
 
 3. Node.js >= 14.15.1  
