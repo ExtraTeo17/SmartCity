@@ -51,8 +51,7 @@ public class BusManagerAgent extends AbstractAgent {
                         case ACLMessage.INFORM -> {
                             if (rcv.getSender().getLocalName().contains("Bus")) {
                                 initialiseCrash(rcv);
-                            }
-                            else {
+                            } else {
                                 handleRouteQuery(rcv);
                             }
                         }
@@ -122,24 +121,34 @@ public class BusManagerAgent extends AbstractAgent {
                         }
 
                         if (minimumTimeDistanceBetweenStationFromAndBusArrival != Long.MAX_VALUE) {
-	                        long overallTravelTime = minimumTimeDistanceBetweenStationFromAndBusArrival
-	                                + differenceInSeconds(minimumTimeOnStationTo, minimumTimeOnStationFrom);
-	                        if (overallTravelTime < minimumTimeOverall) {
-	                            minimumTimeOverall = overallTravelTime;
-	                            preferredBusLine = info.busLine;
-	                        }
+                            long overallTravelTime = minimumTimeDistanceBetweenStationFromAndBusArrival
+                                    + differenceInSeconds(minimumTimeOnStationTo, minimumTimeOnStationFrom);
+                            if (overallTravelTime < minimumTimeOverall) {
+                                minimumTimeOverall = overallTravelTime;
+                                preferredBusLine = info.busLine;
+                            }
                         }
                     }
                 }
                 logger.info("Preferred bus line: " + preferredBusLine);
+
+                response.addUserDefinedParameter(MessageParameter.TYPE, MessageParameter.BUS_MANAGER);
+                response.addUserDefinedParameter(MessageParameter.EVENT, event);
+                if (minimumTimeOverall == Long.MAX_VALUE || preferredBusLine == null) {
+                    
+                    logger.warn("Smth went wrong minimumTimeOverall: " + minimumTimeOverall + " preferredBusLine: null ");
+                    return response;
+                }
                 response.addUserDefinedParameter(MessageParameter.TIME_BETWEEN_PEDESTRIAN_AT_STATION_ARRIVAL_AND_REACHING_DESIRED_STOP,
                         String.valueOf(minimumTimeOverall));
                 response.addUserDefinedParameter(MessageParameter.BUS_LINE, preferredBusLine);
-                response.addUserDefinedParameter(MessageParameter.TYPE, MessageParameter.BUS_MANAGER);
-                response.addUserDefinedParameter(MessageParameter.EVENT, event);
+
                 logger.info("Prepared message for pedestrian");
+
+
                 return response;
             }
+
 
             private boolean checkCrashedBuses(String busLine, String brigadeId, ACLMessage rcv) {
                 for (CrashInfo crash : troubleCases) {
