@@ -344,9 +344,20 @@ public class Bus extends MovingObject {
     }
 
     public void printDebugInfo() {
-        logger.info("&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&");
-        logger.info("Bus line: " + this.busLine);
-        MovingObject.displayRouteDebug(uniformRoute);
-        logger.info("&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&");
+        StringBuilder builder = new StringBuilder();
+        for (int i = 0; i < uniformRoute.size(); ++i) {
+            builder.append("R[")
+                    .append(i)
+                    .append("]: ")
+                    .append(uniformRoute.get(i).getDebugString(uniformRoute.get(i) instanceof StationNode))
+                    .append("; ");
+        }
+
+        logger.info("\n&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&" +
+                "\nBus line: " + this.busLine +
+                "\nDisplay route debug of size: " + uniformRoute.size() +
+                "\n" + builder.toString() +
+                "\n&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&"
+        );
     }
 }

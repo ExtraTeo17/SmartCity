@@ -46,8 +46,7 @@ public class SmartCityAgent extends Agent {
     protected void setup() {
         addBehaviour(getReceiveMessageBehaviour());
     }
-
-    // TODO: Set simulationState to Finished when no longer needed and post event
+    
     private CyclicBehaviour getReceiveMessageBehaviour() {
         return new CyclicBehaviour() {
             @Override

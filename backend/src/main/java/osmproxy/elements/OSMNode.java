@@ -11,7 +11,7 @@ import java.util.List;
 public class OSMNode extends OSMElement
         implements IGeoPosition {
 
-    protected final List<OSMWay> parentWays;
+    private final List<OSMWay> parentWays;
     protected final double lat;
     protected final double lon;
 

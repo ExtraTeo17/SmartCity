@@ -2,8 +2,8 @@ package web.abstractions;
 
 
 import events.web.models.UpdateObject;
-import osmproxy.elements.OSMStation;
 import routing.core.IGeoPosition;
+import routing.nodes.StationNode;
 import smartcity.lights.core.Light;
 import vehicles.Bus;
 import vehicles.enums.BusFillState;
@@ -24,7 +24,7 @@ public interface IWebService extends IStartable {
      * @param buses    All generated buses (for all possible schedules and lines) in provided zone
      */
     void prepareSimulation(List<? extends Light> lights,
-                           List<? extends OSMStation> stations,
+                           List<? extends StationNode> stations,
                            List<? extends Bus> buses);
 
     /**

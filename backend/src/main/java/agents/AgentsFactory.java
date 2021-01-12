@@ -122,7 +122,8 @@ public class AgentsFactory implements IAgentsFactory {
     public StationAgent create(OSMStation station) {
         var id = idGenerator.get(StationAgent.class);
         var stationStrategy = new StationStrategy(id, configContainer, timeProvider);
-        return new StationAgent(id, station, stationStrategy, timeProvider, eventBus);
+        var stationNode = new StationNode(station, id);
+        return new StationAgent(id, stationNode, stationStrategy, timeProvider, eventBus);
     }
 
     /**
