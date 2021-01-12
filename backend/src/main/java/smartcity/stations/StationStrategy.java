@@ -14,10 +14,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-@SuppressWarnings({"UnusedReturnValue", "ClassWithTooManyFields"})
 /**
  * Manages strategy for buses
  */
+@SuppressWarnings({"UnusedReturnValue", "ClassWithTooManyFields"})
 public class StationStrategy {
     private final Logger logger;
     private final int waitPeriodSeconds;
