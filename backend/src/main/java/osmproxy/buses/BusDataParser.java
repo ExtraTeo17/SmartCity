@@ -62,8 +62,7 @@ public class BusDataParser implements IBusDataParser {
                     continue;
                 }
                 busInfoDataSet.add(busInfoData.get());
-            }
-            else if (nodeName.equals("node")) {
+            } else if (nodeName.equals("node")) {
                 var station = parseNode(osmNode, busStopsMap::containsKey);
                 station.ifPresent(st -> busStopsMap.put(st.getId(), st));
             }
@@ -85,7 +84,6 @@ public class BusDataParser implements IBusDataParser {
                         "Line will not be considered");
                 continue;
             }
-
             busInfo.addBrigades(brigadeInfos);
         }
 
@@ -106,13 +104,11 @@ public class BusDataParser implements IBusDataParser {
                 if (attributes.getNamedItem("role").getNodeValue().contains("stop") &&
                         attributes.getNamedItem("type").getNodeValue().equals("node")) {
                     stationIds.add(id);
-                }
-                else if (attributes.getNamedItem("role").getNodeValue().length() == 0 &&
+                } else if (attributes.getNamedItem("role").getNodeValue().length() == 0 &&
                         attributes.getNamedItem("type").getNodeValue().equals("way")) {
                     waysIds.add(id);
                 }
-            }
-            else if (node.getNodeName().equals("tag")) {
+            } else if (node.getNodeName().equals("tag")) {
                 NamedNodeMap attributes = node.getAttributes();
                 Node namedItemID = attributes.getNamedItem("k");
 
@@ -191,8 +187,7 @@ public class BusDataParser implements IBusDataParser {
                 logger.debug("Failed to match way: " + way + " with " + adjacentNodeRef);
                 failedToMatchPreviously = true;
                 continue;
-            }
-            else if (failedToMatchPreviously) {
+            } else if (failedToMatchPreviously) {
                 logger.info("Reconnected to way: " + way + " after failed match with " + adjacentNodeRef);
             }
 
@@ -214,8 +209,7 @@ public class BusDataParser implements IBusDataParser {
                     if (way.isInZone(zone)) {
                         firstWay = way;
                     }
-                }
-                else if (firstWay.isConnectedTo(way)) {
+                } else if (firstWay.isConnectedTo(way)) {
                     secondWay = way;
                 }
             }
@@ -308,8 +302,7 @@ public class BusDataParser implements IBusDataParser {
                 var brigadeInfo = brigadeInfoMap.get(brigadeId);
                 if (brigadeInfo == null) {
                     brigadeInfoMap.put(brigadeId, new BrigadeInfo(brigadeId, stationId, brigadeTimeRecords));
-                }
-                else {
+                } else {
                     brigadeInfo.addTimetableRecords(stationId, brigadeTimeRecords);
                 }
 
