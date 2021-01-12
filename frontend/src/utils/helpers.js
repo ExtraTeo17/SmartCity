@@ -1,5 +1,6 @@
 import { useEffect, useRef } from "react";
 import { notify } from "react-notify-toast";
+import { NOTIFY_SHOW_MS } from "../constants/global";
 
 /**
  * Global helpers
@@ -188,3 +189,7 @@ export const angleFromCoordinates = (loc1, loc2) => {
  * @function
  */
 export const showQueued = notify.createShowQueue;
+
+export const notifyWaitForConnection = () => {
+  notify.show("Please wait for connection", "warning", NOTIFY_SHOW_MS / 2);
+};

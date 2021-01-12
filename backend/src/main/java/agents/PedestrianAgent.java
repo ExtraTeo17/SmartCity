@@ -73,6 +73,11 @@ public class PedestrianAgent extends AbstractAgent {
         this.troublePointsConfigContainer = troublePointsConfigContainer;
     }
 
+    /**
+     * Tell whether the pedestrian is currently commuting via a bus or walking by foot.
+     *
+     * @return true if the pedestrian is travelling in the bus, false otherwise
+     */
     public boolean isInBus() { return DrivingState.IN_BUS == pedestrian.getState(); }
 
     @Override

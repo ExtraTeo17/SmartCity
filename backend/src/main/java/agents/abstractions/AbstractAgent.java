@@ -57,6 +57,10 @@ public abstract class AbstractAgent extends Agent {
         return id;
     }
 
+    /**
+     * Activate the agent using the {@link jade.wrapper.AgentController#start() start} method,
+     * in case of problems print a warning.
+     */
     public void start() {
         try {
             this.getContainerController().getAgent(getLocalName()).start();
