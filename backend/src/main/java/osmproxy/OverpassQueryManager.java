@@ -4,8 +4,7 @@ import routing.core.IGeoPosition;
 
 import java.util.List;
 
-// TODO: Not static, injected
-public class OsmQueryManager {
+public class OverpassQueryManager {
     static String getFullTrafficSignalQuery(List<Long> osmWayIds) {
         StringBuilder builder = new StringBuilder();
         builder.append("<osm-script>");

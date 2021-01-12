@@ -39,6 +39,10 @@ See above for instructions.
 Run `run.sh  \ run.ps1` script to boot the application.    
 By default it will be present on address: `localhost:5000` - it should open in your browser automatically.   
 
+### Browser
+See https://create-react-app.dev/docs/supported-browsers-features/ for browser compatibility guide.
+It is not guaranteed that app will work in IE 11, 10, 9 or older. 
+
 
 ## Docker
 To use in docker: 
