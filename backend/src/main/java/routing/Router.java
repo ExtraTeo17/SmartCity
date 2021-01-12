@@ -34,6 +34,9 @@ final class Router implements
     private final ICacheWrapper cacheWrapper;
     private final IRouteTransformer routeTransformer;
 
+    private int pedestriansRequests = 0;
+    private int carsRequests = 0;
+
     @Inject
     public Router(IMapAccessManager mapAccessManager,
                   INodesContainer nodesContainer,
@@ -45,20 +48,24 @@ final class Router implements
         this.routeTransformer = routeTransformer;
     }
 
+
     // TODO: now with new route generation there is sometimes "failed to get adjacent osmwayId" error, check it out
     @Override
-
     public List<RouteNode> generateRouteInfo(IGeoPosition pointA, IGeoPosition pointB,
                                              String typeOfVehicle,
                                              StationNode startStation,
                                              StationNode endStation,
                                              boolean bewareOfJammedEdge) {
+
+
         boolean isNotPedestrian = !typeOfVehicle.equals("foot");
         var osmWayIdsAndEdgeList = findRoute(pointA, pointB, typeOfVehicle, bewareOfJammedEdge);
         var osmWayIds = osmWayIdsAndEdgeList.getValue0();
 
         // TODO: refactor inside to throw exception if not car or pedestrian
         var routeInfoOpt = mapAccessManager.getRouteInfo(osmWayIds, isNotPedestrian);
+        incrementRequestsCount(typeOfVehicle);
+
         if (routeInfoOpt.isEmpty()) {
             logger.warn("Generating route failed because of empty routeInfo");
             return new ArrayList<>();
@@ -81,16 +88,27 @@ final class Router implements
             return new ArrayList<>();
         }
         var route = createRouteNodeList(routeInfo, isNotPedestrian, startStation, endStation,
-        		startingOsmNodeRef, finishingOsmNodeRef);
+                startingOsmNodeRef, finishingOsmNodeRef);
         return routeTransformer.uniformRouteNew(route, osmWayIdsAndEdgeList.getValue1());
     }
 
+    private void incrementRequestsCount(String typeOfVehicle) {
+        switch (typeOfVehicle) {
+            case "car" -> ++carsRequests;
+            getw
+            case "bike", "foot" -> ++pedestriansRequests;
+        }
+
+        logger.info("Pedestrian requests: " + pedestriansRequests);
+        logger.info("Cars requests: " + carsRequests);
+    }
+
     private List<RouteNode> createRouteNodeList(RouteInfo routeInfo, boolean isNotPedestrian,
-            StationNode startStation, StationNode endStation, String startingOsmNodeRef,
-            String finishingOsmNodeRef) {
+                                                StationNode startStation, StationNode endStation, String startingOsmNodeRef,
+                                                String finishingOsmNodeRef) {
         List<RouteNode> routeNodes = new ArrayList<>();
 
-        if (!isNotPedestrian && endStation != null && !startingOsmNodeRef.equals(endStation.getOsmId() + "")) {
+        if (!isNotPedestrian && endStation != null && !startingOsmNodeRef.equals(String.valueOf(endStation.getOsmId()))) {
             routeNodes.add(new RouteNode(endStation));
         }
 
@@ -123,7 +141,7 @@ final class Router implements
             }
         }
 
-        if (!isNotPedestrian && startStation != null && !finishingOsmNodeRef.equals(startStation.getOsmId() + "")) {
+        if (!isNotPedestrian && startStation != null && !finishingOsmNodeRef.equals(String.valueOf(startStation.getOsmId()))) {
             routeNodes.add(new RouteNode(startStation));
         }
 
