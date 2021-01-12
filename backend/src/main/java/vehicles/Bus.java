@@ -234,11 +234,12 @@ public class Bus extends MovingObject {
     public Optional<LocalDateTime> getTimeOnStation(long stationId) {
         var timeOnStation = timetable.getTimeOnStation(stationId);
         if (timeOnStation.isEmpty()) {
+            if (stationNodesOnRoute.size() <= 1) {
+                logger.info("Cannot interpolate arrival time on last station because it is the only station on bus route");
+                return Optional.empty();
+            }
             if (stationNodesOnRoute.get(stationNodesOnRoute.size() - 1).getOsmId() == stationId) {
             	timeOnStation = interpolateArrivalOnLastStation();
-            	logger.debug("Time on penultimate stop: " + timetable.getTimeOnStation(
-            			stationNodesOnRoute.get(stationNodesOnRoute.size() - 2).getOsmId()).get() +
-            			", interpolated time on last stop: " + timeOnStation);
             } else {
             	logger.warn("Could not retrieve time for non-last-on-route station of OSM ID: " + stationId);
             }
@@ -248,10 +249,6 @@ public class Bus extends MovingObject {
     }
 
     private Optional<LocalDateTime> interpolateArrivalOnLastStation() {
-    	if (stationNodesOnRoute.size() <= 1) {
-    		logger.info("Cannot interpolate arrival time on last station because it is the only station on bus route");
-    		return Optional.empty();
-    	}
         logger.info("Station with non-retrievable time is last on route, interpolate its arrival time");
         StationNode penultimateStation = stationNodesOnRoute.get(stationNodesOnRoute.size() - 2);
 		StationNode lastStation = stationNodesOnRoute.get(stationNodesOnRoute.size() - 1);
@@ -262,16 +259,31 @@ public class Bus extends MovingObject {
 					"OSM ID of penultimate stop: " + departureFromPenultimateStation);
 			return Optional.empty();
 		}
-		return Optional.of(interpolateArrivalOnLastStation(penultimateStation, lastStation, departureFromPenultimateStation.get()));
+
+		return Optional.ofNullable(interpolateArrivalOnLastStation(penultimateStation, lastStation, departureFromPenultimateStation.get()));
 	}
 
 	private LocalDateTime interpolateArrivalOnLastStation(StationNode penultimateStation,
 			StationNode lastStation, LocalDateTime departureFromPenultimateStation) {
 		int penultimateStopIndexOnRoute = findIndexOfNodeOnRoute(penultimateStation);
 		int lastStopIndexOnRoute = findIndexOfNodeOnRoute(lastStation);
+		if (penultimateStopIndexOnRoute == -1 || lastStopIndexOnRoute == -1) {
+		    logger.error("Could not find penultimate and last stations on bus route");
+		    return null;
+		}
+
 		double millisFromPenStopToLastStop = (double) getMillisecondsFromAToB(penultimateStopIndexOnRoute, lastStopIndexOnRoute);
-		logger.debug("Time in seconds journey between penultimate and last stop is estimated to be: " + (millisFromPenStopToLastStop / 1000 * timeProvider.getTimeScale()));
-		return departureFromPenultimateStation.plusMinutes(Math.round(millisFromPenStopToLastStop / 1000 / 60 * timeProvider.getTimeScale()));
+		double millisecondsInOneSecond = 1000;
+		double secondsInOneMinute = 60;
+		logger.debug("Time in seconds journey between penultimate and last stop is estimated to be: " +
+		        (millisFromPenStopToLastStop / millisecondsInOneSecond * timeProvider.getTimeScale()));
+
+		var timeOnStation = departureFromPenultimateStation.plusMinutes(Math.round(millisFromPenStopToLastStop /
+		        millisecondsInOneSecond / secondsInOneMinute * ((double) timeProvider.getTimeScale())));
+        logger.info("Time on penultimate stop: " + departureFromPenultimateStation +
+                ", interpolated time on last stop: " + timeOnStation);
+
+		return timeOnStation;
 	}
 
 	public RouteNode findNextStop() {

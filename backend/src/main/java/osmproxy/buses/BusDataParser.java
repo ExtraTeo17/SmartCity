@@ -2,10 +2,6 @@ package osmproxy.buses;
 
 import com.google.common.base.Joiner;
 import com.google.inject.Inject;
-import org.json.simple.JSONArray;
-import org.json.simple.JSONObject;
-import org.json.simple.parser.JSONParser;
-import org.json.simple.parser.ParseException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
@@ -287,11 +283,6 @@ public class BusDataParser implements IBusDataParser {
                 continue;
             }
 
-            if (!isDataInAPI(jsonStringOpt)) {
-                logger.debug("Warszawskie API didn't provide with data for station id:" + station.getBusStopId());
-                continue;
-            }
-
             var jsonString = jsonStringOpt.get();
             var timetableRecords = apiSerializer.serializeTimetables(jsonString);
             var brigadeIdToRecords = timetableRecords.stream()
@@ -312,19 +303,6 @@ public class BusDataParser implements IBusDataParser {
         }
 
         return brigadeInfoMap.values();
-    }
-
-    private boolean isDataInAPI(Optional<String> jsonStringOpt) {
-        JSONParser parser = new JSONParser();
-        JSONObject obj = null;
-        try {
-            obj = (JSONObject) parser.parse(jsonStringOpt.get());
-        } catch (ParseException e) {
-            e.printStackTrace();
-        }
-        JSONArray result = (JSONArray) (obj.get("result"));
-
-        return result.size() == 0 ? false : true;
     }
 
     private void logBrigadeData(List<TimetableRecord> timetableRecords, OSMStation station, String busLine) {
