@@ -6,7 +6,7 @@ import java.util.List;
 
 public class OverpassQueryManager {
     static String getFullTrafficSignalQuery(List<Long> osmWayIds) {
-        StringBuilder builder = new StringBuilder();
+        var builder = new StringBuilder();
         builder.append("<osm-script>");
         for (long id : osmWayIds) {
             builder.append(getSingleTrafficSignalQuery(id));
@@ -16,7 +16,7 @@ public class OverpassQueryManager {
     }
 
     static String getMultipleWayAndItsNodesQuery(List<Long> osmWayIds) {
-        StringBuilder builder = new StringBuilder();
+        var builder = new StringBuilder();
         builder.append("<osm-script>");
         for (long id : osmWayIds) {
             builder.append(getSingleWayAndItsNodesQuery(id));
