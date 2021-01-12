@@ -51,7 +51,7 @@ import static smartcity.config.StaticConfig.USE_BATCHED_UPDATES;
 public class PedestrianAgent extends AbstractAgent {
     public static final String name = PedestrianAgent.class.getSimpleName().replace("Agent", "");
     public static final long NANO_IN_MILLISECONDS = 1_000_000L;
-    private static final String EMPTY_STRING = "";
+
 
     private final IRouteGenerator router;
     private final ITaskProvider taskProvider;
@@ -302,9 +302,7 @@ public class PedestrianAgent extends AbstractAgent {
             }
 
             private StationNode parseCrashMessageFromBus(ACLMessage rcv) {
-                if (rcv.getUserDefinedParameter(MessageParameter.DESIRED_OSM_STATION_ID).equals(EMPTY_STRING)) {
-                    logger.warn("The information about crash was unexpected");
-                }
+              
                 return new StationNode(rcv.getUserDefinedParameter(MessageParameter.LAT_OF_NEXT_CLOSEST_STATION),
                         rcv.getUserDefinedParameter(MessageParameter.LON_OF_NEXT_CLOSEST_STATION),
                         rcv.getUserDefinedParameter(MessageParameter.DESIRED_OSM_STATION_ID),
