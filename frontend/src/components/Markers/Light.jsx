@@ -60,7 +60,9 @@ const Light = props => {
       icon={color === LightColor.GREEN ? greenLightIcon : redLightIcon}
       zIndexOffset={STATIC_Z_INDEX}
     >
-      <Popup>I am a light-{id}!</Popup>
+      <Popup>
+        I am a {jammed ? "jammed" : ""} light-{id}!
+      </Popup>
     </Marker>
   );
 };

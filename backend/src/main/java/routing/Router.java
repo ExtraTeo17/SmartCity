@@ -168,12 +168,8 @@ final class Router implements
         return data2;
     }
 
-    private boolean bus174wilanowska(List<StationNode> stationNodes) {
-        return stationNodes.size() == 2 && stationNodes.get(0).getOsmId() == 3039769685L && stationNodes.get(1).getOsmId() == 1704286049L;
-    }
-
     /////////////////////////////////////////////////////////////
-    //  HELPERS - Most are comfortable :(
+    //  HELPERS
     /////////////////////////////////////////////////////////////
 
     private boolean updateCacheDataAgentId(List<RouteNode> data, List<StationNode> stationNodes) {
@@ -181,13 +177,12 @@ final class Router implements
             if (node instanceof StationNode) {
                 var st = (StationNode) node;
                 var newStation = stationNodes.stream().filter(f -> f.getOsmId() == st.getOsmId()).findFirst();
-                if (newStation.isPresent()) {
-                    st.setAgentId(newStation.get().getAgentId());
-                }
-                else {
+                if (newStation.isEmpty()) {
                     logger.warn("Skipping cache because station not found on the route");
                     return false;
                 }
+
+                st.setAgentId(newStation.get().getAgentId());
             }
         }
 
@@ -274,6 +269,5 @@ final class Router implements
             this.route = route;
         }
     }
-
 
 }
