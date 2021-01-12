@@ -44,13 +44,18 @@ public class ConfigContainer extends ConfigMutator
     private int constructionSiteThresholdUntilIndexChange = 50;
     private int noConstructionSiteStrategyIndexFactor = 30;
 
+    private static final int defaultRadius = 600;
+    private static final double defaultLat = 52.23682;
+    private static final double defaultLng = 1.01681;
+
+
     private final IZone zone;
     private boolean busCrashGeneratedOnce = false;
 
     @Inject
     public ConfigContainer() {
-        IGeoPosition warsawPos = Position.of(52.23682, 21.01681);
-        int defaultRadius = 600;
+        IGeoPosition warsawPos = Position.of(defaultLat, defaultLng);
+
         this.zone = Zone.of(warsawPos, defaultRadius);
     }
 
