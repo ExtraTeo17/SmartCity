@@ -95,8 +95,8 @@ final class Router implements
     private void incrementRequestsCount(String typeOfVehicle) {
         switch (typeOfVehicle) {
             case "car" -> ++carsRequests;
-            getw
             case "bike", "foot" -> ++pedestriansRequests;
+            default -> {}
         }
 
         logger.info("Pedestrian requests: " + pedestriansRequests);
