@@ -56,7 +56,7 @@ public class CacheWrapper implements ICacheWrapper {
     		return Optional.empty();
     	}
 
-    	logger.info("Successfully retrieved SIMULATION data from cache.");
+    	logger.info("Successfully retrieved simulation data from cache.");
     	return Optional.of(cachedData);
     }
 

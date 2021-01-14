@@ -30,7 +30,7 @@ public class WayWithLights implements Serializable {
 		return way;
 	}
 
-	public Set<Long> getHighwayLightsIds() {
+	public Set<Long> getHighwayLightIds() {
 		return highwayLightIds;
 	}
 

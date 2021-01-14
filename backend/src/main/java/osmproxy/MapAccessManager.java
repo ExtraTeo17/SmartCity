@@ -34,6 +34,7 @@ import osmproxy.elements.OSMNode;
 import osmproxy.elements.OSMWay;
 import osmproxy.elements.data.SimulationData;
 import osmproxy.elements.data.WayWithLights;
+import osmproxy.utilities.ProgressBar;
 import routing.RouteInfo;
 import routing.core.IZone;
 import routing.core.Position;
@@ -52,6 +53,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
 public class MapAccessManager implements IMapAccessManager {
@@ -206,7 +211,7 @@ public class MapAccessManager implements IMapAccessManager {
 			}
 			WayWithLights wayWithLights = simulationData.get(id);
 			info.addWay(new OSMWay(wayWithLights.getWay()));
-			var lightIds = isNotPedestrian ? wayWithLights.getHighwayLightsIds() : wayWithLights.getCrossingLightIds();
+			var lightIds = isNotPedestrian ? wayWithLights.getHighwayLightIds() : wayWithLights.getCrossingLightIds();
 			for (Long light : lightIds) {
 				info.add(light);
 			}
@@ -342,12 +347,11 @@ public class MapAccessManager implements IMapAccessManager {
 		var cachedData = wrapper.getSimulationData();
 		if (cachedData.isPresent()) {
 			simulationData = cachedData.get();
-			logger.info("Successfully retrieved simulation data from cache");
 			return;
 		}
 
 		simulationData = new SimulationData();
-	    logger.info("Simulation caching enabled, start caching current zone");
+	    logger.info("Simulation caching enabled, start parsing current zone");
 
 		var wayIdsQuery = OverpassQueryManager.getWaysQuery(zone.getCenter().getLat(),
 		        zone.getCenter().getLng(), zone.getRadius());
@@ -357,19 +361,34 @@ public class MapAccessManager implements IMapAccessManager {
 		    return;
 		}
 		List<Long> osmWayIdsInRadius = parseOsmWayIds(osmWayIdsXmlDoc.get());
-
 		var waysWithNodesQuery = OverpassQueryManager.getMultipleWayAndItsNodesQuery(osmWayIdsInRadius);
+
+		ScheduledExecutorService executorService = Executors.newSingleThreadScheduledExecutor();
+		double timeLeftFactor = 0.0002;
+		timeLeft = new AtomicInteger((int) (timeLeftFactor * Math.PI * zone.getRadius() * zone.getRadius()));
+        executorService.scheduleAtFixedRate(MapAccessManager::displayProgress, 0, 1, TimeUnit.SECONDS);
 		var waysWithNodesXmlDoc = getNodesDocument(waysWithNodesQuery);
 		if (waysWithNodesQuery.isEmpty()) {
 		    logger.debug("Could not create XML document with ways and its nodes for parsing (simulation cache)");
 		    return;
 		}
+		executorService.shutdown();
 
 		parseWaysWithLightsAndFillWayCache(waysWithNodesXmlDoc.get());
 
-        logger.info("Cache current zone data to file");
+        logger.info("Cache parsed zone data to file");
 		wrapper.cacheData(simulationData);
         logger.info("Simulation data caching finished successfully");
+	}
+
+	private static AtomicInteger timeLeft;
+	private final static int DISPLAY_PROGRESS_DELTA = 5;
+
+	private static void displayProgress() {
+		int progress = timeLeft.getAndDecrement();
+		if (progress > 0 && progress % DISPLAY_PROGRESS_DELTA == 0) {
+			logger.info("Estimated completion time: less than " + progress + " seconds");
+		}
 	}
 
     private List<Long> parseOsmWayIds(Document xmlDoc) {
