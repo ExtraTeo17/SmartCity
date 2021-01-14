@@ -21,14 +21,12 @@ public class TestPedestrian extends Pedestrian implements ITestable {
     }
 
     public TestPedestrian(Pedestrian pedestrian) {
-        super(pedestrian);
+    	super(pedestrian);
     }
 
-    public TestPedestrian(Pedestrian pedestrian, DrivingState state, LocalDateTime startSaved, int savedDist) {
+    public TestPedestrian(TestPedestrian pedestrian) {
         super(pedestrian);
-        super.setState(state);
-        start = startSaved;
-        super.appendDistance(savedDist);
+        start = pedestrian.start;
     }
 
     @Override

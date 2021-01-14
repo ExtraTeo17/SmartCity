@@ -28,8 +28,8 @@ public class Pedestrian extends MovingObject {
     private transient boolean troubled;
     private transient int stationIndex;
 
-    private int beforeDistance = 0;
-    private int savedDistance = 0;
+    private int beforeDistance;
+    private int savedDistance;
 
     public Pedestrian(int agentId,
                       List<RouteNode> routeToStation,
@@ -66,7 +66,8 @@ public class Pedestrian extends MovingObject {
 
     Pedestrian(Pedestrian ped) {
         super(ped.timeProvider, ped.agentId, ped.speed, ped.uniformRoute);
-        this.beforeDistance = ped.beforeDistance;
+        this.setState(ped.getState());
+        this.appendDistance(ped.getBeforeDistance());
         this.displayRouteBeforeBus = ped.displayRouteBeforeBus;
         this.routeBeforeBus = ped.routeBeforeBus;
 
