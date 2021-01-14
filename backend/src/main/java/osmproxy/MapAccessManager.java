@@ -38,6 +38,7 @@ import osmproxy.utilities.ProgressBar;
 import routing.RouteInfo;
 import routing.core.IZone;
 import routing.core.Position;
+import smartcity.config.StaticConfig;
 import utilities.IterableNodeList;
 import utilities.NumericHelper;
 
@@ -182,12 +183,12 @@ public class MapAccessManager implements IMapAccessManager {
 
     @Override
     public Optional<RouteInfo> getRouteInfo(List<Long> osmWayIds, boolean isNotPedestrian) {
-      if (StaticConfig.USE_SIMULATION_CACHE) {
-    	  var optionalInfo = retrieveRouteInfoFromCache(osmWayIds, isNotPedestrian);
-    	  if (optionalInfo.isPresent()) {
-    		  return optionalInfo;
-    	  }
-      }
+	    if (StaticConfig.USE_SIMULATION_CACHE) {
+	    	var optionalInfo = retrieveRouteInfoFromCache(osmWayIds, isNotPedestrian);
+	    	if (optionalInfo.isPresent()) {
+	    		return optionalInfo;
+	    	}
+	    }
 
     	RouteInfo info;
         var query = OverpassQueryManager.getMultipleWayAndItsNodesQuery(osmWayIds);
