@@ -1,8 +1,8 @@
 package osmproxy.abstractions;
 
-import osmproxy.SimulationData;
 import osmproxy.buses.data.BusPreparationData;
 import osmproxy.elements.OSMWay;
+import osmproxy.elements.data.SimulationData;
 import routing.nodes.RouteNode;
 import routing.nodes.StationNode;
 

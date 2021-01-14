@@ -130,13 +130,13 @@ final class Router implements
         return routeNodes;
     }
 
-    private Optional<RouteNode> getNode(OSMWay way, OSMWaypoint waypoint, RouteInfo routeInfo, boolean isCar) {
+    private Optional<RouteNode> getNode(OSMWay way, OSMWaypoint waypoint, RouteInfo routeInfo, boolean isNotPedestrian) {
         long wayId = way.getId();
         long nodeRefId = Long.parseLong(waypoint.getOsmNodeRef());
 
         RouteNode result;
         if (routeInfo.remove(nodeRefId)) {
-            result = isCar ? nodesContainer.getLightManagerNode(wayId, nodeRefId) :
+            result = isNotPedestrian ? nodesContainer.getLightManagerNode(wayId, nodeRefId) :
                     nodesContainer.getLightManagerNode(nodeRefId);
         }
         else {

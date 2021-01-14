@@ -5,10 +5,10 @@ import org.javatuples.Pair;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import osmproxy.SimulationData;
 import osmproxy.abstractions.ICacheWrapper;
 import osmproxy.buses.data.BusPreparationData;
 import osmproxy.elements.OSMWay;
+import osmproxy.elements.data.SimulationData;
 import routing.core.IZone;
 import routing.nodes.RouteNode;
 import routing.nodes.StationNode;

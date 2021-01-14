@@ -32,6 +32,8 @@ import osmproxy.abstractions.IOverpassApiManager;
 import osmproxy.elements.OSMLight;
 import osmproxy.elements.OSMNode;
 import osmproxy.elements.OSMWay;
+import osmproxy.elements.data.SimulationData;
+import osmproxy.elements.data.WayWithLights;
 import routing.RouteInfo;
 import routing.core.IZone;
 import routing.core.Position;
@@ -174,20 +176,20 @@ public class MapAccessManager implements IMapAccessManager {
     }
 
     @Override
-
-    public Optional<RouteInfo> getRouteInfo(List<Long> osmWayIds, boolean notPedestrian) {
-    	RouteInfo info = retrieveRouteInfoFromCache(osmWayIds);
-    	if (info != null) {
-    		return Optional.of(info);
+    public Optional<RouteInfo> getRouteInfo(List<Long> osmWayIds, boolean isNotPedestrian) {
+    	var optionalInfo = retrieveRouteInfoFromCache(osmWayIds, isNotPedestrian);
+    	if (optionalInfo.isPresent()) {
+    		return optionalInfo;
     	}
 
+    	RouteInfo info;
         var query = OverpassQueryManager.getMultipleWayAndItsNodesQuery(osmWayIds);
         var overpassNodes = getNodesDocument(query);
         if (overpassNodes.isEmpty()) {
             return Optional.empty();
         }
         try {
-            info = parseWayAndNodes(overpassNodes.get(), notPedestrian);
+            info = parseWayAndNodes(overpassNodes.get(), isNotPedestrian);
         } catch (Exception e) {
             logger.warn("Error trying to get route info", e);
             return Optional.empty();
@@ -196,19 +198,21 @@ public class MapAccessManager implements IMapAccessManager {
         return Optional.of(info);
     }
 
-    private RouteInfo retrieveRouteInfoFromCache(List<Long> osmWayIds) {
+    private Optional<RouteInfo> retrieveRouteInfoFromCache(List<Long> osmWayIds, boolean isNotPedestrian) {
     	RouteInfo info = new RouteInfo();
 		for (long id : osmWayIds) {
-			if (!simulationData.wayIdToWayOutput.containsKey(id)) {
-				return null;
+			if (!simulationData.contains(id)) {
+				return Optional.empty();
 			}
-			info.addWay(new OSMWay(simulationData.wayIdToWayOutput.get(id).way));
-			for (Long light : simulationData.wayIdToWayOutput.get(id).lightIds) {
+			WayWithLights wayWithLights = simulationData.get(id);
+			info.addWay(new OSMWay(wayWithLights.getWay()));
+			var lightIds = isNotPedestrian ? wayWithLights.getHighwayLightsIds() : wayWithLights.getCrossingLightIds();
+			for (Long light : lightIds) {
 				info.add(light);
 			}
 		}
-		System.out.println("CREATED CAR ROUTE WITHOUT OVERPASS");
-		return info;
+		logger.debug("Successfully created route with cache instead of using Overpass API");
+		return Optional.of(info);
 	}
 
 	private static RouteInfo parseWayAndNodes(Document nodesViaOverpass, boolean notPedestrian) {
@@ -236,33 +240,6 @@ public class MapAccessManager implements IMapAccessManager {
             }
         }
         return info;
-    }
-
-	private void parseWayAndNodes2(Document nodesViaOverpass, boolean notPedestrian) {
-        final String tagType = notPedestrian ? "highway" : "crossing";
-        Node osmRoot = nodesViaOverpass.getFirstChild();
-        NodeList osmXMLNodes = osmRoot.getChildNodes();
-        WayWithLights wwl = null;
-        for (int i = 1; i < osmXMLNodes.getLength(); i++) {
-            Node item = osmXMLNodes.item(i);
-            if (item.getNodeName().equals("way")) {
-            	wwl = new WayWithLights();
-                wwl.addWay(new OSMWay(item));
-                simulationData.wayIdToWayOutput.put(Long.parseLong(item.getAttributes().getNamedItem("id").getNodeValue()), wwl);
-            }
-            else if (item.getNodeName().equals("node")) {
-                NodeList nodeChildren = item.getChildNodes();
-                for (int j = 0; j < nodeChildren.getLength(); ++j) {
-                    Node nodeChild = nodeChildren.item(j);
-                    if (nodeChild.getNodeName().equals("tag") &&
-                            nodeChild.getAttributes().getNamedItem("k").getNodeValue().equals(tagType) &&
-                            nodeChild.getAttributes().getNamedItem("v").getNodeValue().equals("traffic_signals")) {
-                        var id = Long.parseLong(item.getAttributes().getNamedItem("id").getNodeValue());
-                        wwl.add(Long.parseLong(item.getAttributes().getNamedItem("id").getNodeValue()));
-                    }
-                }
-            }
-        }
     }
 
     @Override
@@ -362,14 +339,15 @@ public class MapAccessManager implements IMapAccessManager {
 
 	@Override
 	public void initializeWayCache(IZone zone, ICacheWrapper wrapper) {
-	    logger.info("Simulation caching enabled, start caching current zone");
-
 		var cachedData = wrapper.getSimulationData();
 		if (cachedData.isPresent()) {
 			simulationData = cachedData.get();
+			logger.info("Successfully retrieved simulation data from cache");
 			return;
 		}
+
 		simulationData = new SimulationData();
+	    logger.info("Simulation caching enabled, start caching current zone");
 
 		var wayIdsQuery = OverpassQueryManager.getWaysQuery(zone.getCenter().getLat(),
 		        zone.getCenter().getLng(), zone.getRadius());
@@ -386,13 +364,13 @@ public class MapAccessManager implements IMapAccessManager {
 		    logger.debug("Could not create XML document with ways and its nodes for parsing (simulation cache)");
 		    return;
 		}
-		parseWayAndNodes2(waysWithNodesXmlDoc.get(), true);
 
-        logger.info("Cache current zone to file");
+		parseWaysWithLightsAndFillWayCache(waysWithNodesXmlDoc.get());
+
+        logger.info("Cache current zone data to file");
 		wrapper.cacheData(simulationData);
-        logger.info("Caching finished successfully");
+        logger.info("Simulation data caching finished successfully");
 	}
-
 
     private List<Long> parseOsmWayIds(Document xmlDoc) {
         List<Long> osmWayIdsInRadius = new ArrayList<>();
@@ -405,5 +383,33 @@ public class MapAccessManager implements IMapAccessManager {
             }
         }
         return osmWayIdsInRadius;
+    }
+
+	private void parseWaysWithLightsAndFillWayCache(Document nodesViaOverpass) {
+        Node osmRoot = nodesViaOverpass.getFirstChild();
+        NodeList osmXMLNodes = osmRoot.getChildNodes();
+        WayWithLights wayWithLights = null;
+        for (int i = 1; i < osmXMLNodes.getLength(); i++) {
+            Node item = osmXMLNodes.item(i);
+            if (item.getNodeName().equals("way")) {
+            	wayWithLights = new WayWithLights();
+                wayWithLights.addWay(new OSMWay(item));
+                simulationData.put(Long.parseLong(item.getAttributes().getNamedItem("id").getNodeValue()), wayWithLights);
+            } else if (item.getNodeName().equals("node")) {
+                NodeList nodeChildren = item.getChildNodes();
+                for (int j = 0; j < nodeChildren.getLength(); ++j) {
+                    Node nodeChild = nodeChildren.item(j);
+                    if (nodeChild.getNodeName().equals("tag") &&
+                            nodeChild.getAttributes().getNamedItem("k").getNodeValue().equals("highway") &&
+                            nodeChild.getAttributes().getNamedItem("v").getNodeValue().equals("traffic_signals")) {
+                        wayWithLights.addHighwayLight(Long.parseLong(item.getAttributes().getNamedItem("id").getNodeValue()));
+                    } else if (nodeChild.getNodeName().equals("tag") &&
+                            nodeChild.getAttributes().getNamedItem("k").getNodeValue().equals("crossing") &&
+                            nodeChild.getAttributes().getNamedItem("v").getNodeValue().equals("traffic_signals")) {
+                    	wayWithLights.addCrossingLight(Long.parseLong(item.getAttributes().getNamedItem("id").getNodeValue()));
+                    }
+                }
+            }
+        }
     }
 }
