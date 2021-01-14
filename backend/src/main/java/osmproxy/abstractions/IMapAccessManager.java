@@ -27,7 +27,7 @@ public interface IMapAccessManager {
 
     /**
      *
-     * @param osmWayIds
+     * @param osmWayIds - ids
      * @return lists of light nodes
      */
     List<OSMLight> getOsmLights(List<Long> osmWayIds);

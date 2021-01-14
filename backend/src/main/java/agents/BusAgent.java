@@ -50,6 +50,8 @@ import static smartcity.config.StaticConfig.USE_BATCHED_UPDATES;
  */
 public class BusAgent extends AbstractAgent {
     public static final String name = BusAgent.class.getSimpleName().replace("Agent", "");
+    public static final int PERIOD_FOR_TROUBLE_GENERATION = 8000;
+
 
     private final ITimeProvider timeProvider;
     private final Bus bus;
@@ -263,9 +265,10 @@ public class BusAgent extends AbstractAgent {
 
 
         if (configContainer.shouldGenerateBusFailures()) {
-            Behaviour troubleGenerator = new TickerBehaviour(this, 8000) {
+            Behaviour troubleGenerator = new TickerBehaviour(this, PERIOD_FOR_TROUBLE_GENERATION) {
 
                 @Override
+
                 public void onTick() {
                     if (configContainer.wasBusCrashGeneratedOnce()) {
                         logger.trace("Bus crash has already been generated once");
@@ -326,7 +329,8 @@ public class BusAgent extends AbstractAgent {
                     properties.setProperty(MessageParameter.TROUBLE_LON, Double.toString(troublePoint.getLng()));
                     if (!isTroubleManager) {
                         var nextStop = bus.findNextStop();
-                        if(nextStop instanceof StationNode) {
+
+                        if (nextStop instanceof StationNode) {
                             var stationStop = (StationNode) nextStop;
                             properties.setProperty(MessageParameter.DESIRED_OSM_STATION_ID, String.valueOf((stationStop).getOsmId()));
                             properties.setProperty(MessageParameter.AGENT_ID_OF_NEXT_CLOSEST_STATION, String.valueOf((stationStop).getAgentId()));
@@ -334,7 +338,6 @@ public class BusAgent extends AbstractAgent {
                             properties.setProperty(MessageParameter.LAT_OF_NEXT_CLOSEST_STATION, String.valueOf(stationStop.getLat()));
                             properties.setProperty(MessageParameter.LON_OF_NEXT_CLOSEST_STATION, String.valueOf(stationStop.getLng()));
                         }
-
                         properties.setProperty(MessageParameter.BUS_LINE, getLine());
                         properties.setProperty(MessageParameter.BRIGADE, bus.getBrigade());
                     }
@@ -368,6 +371,7 @@ public class BusAgent extends AbstractAgent {
 
     private void informNextStation(boolean isStart) {
         // finds next station and announces his arrival
+        final long NANO_IN_MILLISECONDS = 1_000_000L;
         var stationOpt = bus.findNextStation(isStart);
         if (stationOpt.isPresent()) {
             var station = stationOpt.get();
@@ -375,10 +379,9 @@ public class BusAgent extends AbstractAgent {
             ACLMessage msg = createMessageById(ACLMessage.INFORM, StationAgent.name, stationId);
             var properties = createProperties(MessageParameter.BUS);
             var currentTime = timeProvider.getCurrentSimulationTime();
-            var predictedTime = currentTime.plusNanos(bus.getMillisecondsToNextStation() * 1_000_000L);
+            var predictedTime = currentTime.plusNanos(bus.getMillisecondsToNextStation() * NANO_IN_MILLISECONDS);
             properties.setProperty(MessageParameter.ARRIVAL_TIME, predictedTime.toString());
             properties.setProperty(MessageParameter.BUS_LINE, bus.getLine());
-
             var osmId = station.getOsmId();
             var timeOnStation = bus.getTimeOnStation(osmId);
             if (timeOnStation.isPresent()) {
@@ -433,7 +436,7 @@ public class BusAgent extends AbstractAgent {
             return Optional.empty();
         }
 
-        int halfIndex = (int) Math.ceil((double) stationsOnRoute.size() / 2.0);
+        int halfIndex = (int) Math.ceil((double) stationsOnRoute.size() / 2);
         int firstIndex = random.nextInt(halfIndex);
         int secondIndex = firstIndex + random.nextInt(stationsOnRoute.size() - firstIndex - 1) + 1;
 
@@ -456,5 +459,5 @@ public class BusAgent extends AbstractAgent {
         return bus.shouldStart();
     }
 
-
+    public int getStationsNumber() {return bus.getStationNodesOnRouteSize();}
 }

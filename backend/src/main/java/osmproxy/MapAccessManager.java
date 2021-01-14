@@ -182,10 +182,12 @@ public class MapAccessManager implements IMapAccessManager {
 
     @Override
     public Optional<RouteInfo> getRouteInfo(List<Long> osmWayIds, boolean isNotPedestrian) {
-    	var optionalInfo = retrieveRouteInfoFromCache(osmWayIds, isNotPedestrian);
-    	if (optionalInfo.isPresent()) {
-    		return optionalInfo;
-    	}
+      if (StaticConfig.USE_SIMULATION_CACHE) {
+    	  var optionalInfo = retrieveRouteInfoFromCache(osmWayIds, isNotPedestrian);
+    	  if (optionalInfo.isPresent()) {
+    		  return optionalInfo;
+    	  }
+      }
 
     	RouteInfo info;
         var query = OverpassQueryManager.getMultipleWayAndItsNodesQuery(osmWayIds);
