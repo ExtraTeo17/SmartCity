@@ -2,6 +2,8 @@ package osmproxy;
 
 import routing.core.IGeoPosition;
 
+import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 
 public class OverpassQueryManager {
@@ -24,6 +26,20 @@ public class OverpassQueryManager {
         builder.append("</osm-script>");
         return builder.toString();
     }
+
+	static List<String> getMultipleWayAndItsNodesQuerySplit(List<Long> osmWayIds) {
+		int partitionSize = 1000;
+		List<List<Long>> partitions = new LinkedList<List<Long>>();
+		for (int i = 0; i < osmWayIds.size(); i += partitionSize) {
+		    partitions.add(osmWayIds.subList(i,
+		            Math.min(i + partitionSize, osmWayIds.size())));
+		}
+		List<String> queries = new ArrayList<>();
+		for (var part : partitions) {
+			queries.add(getMultipleWayAndItsNodesQuery(part));
+		}
+		return queries;
+	}
 
     static String getWaysQuery(double lat, double lon, int radius) {
     	return "<osm-script>\r\n"

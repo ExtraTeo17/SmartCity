@@ -364,20 +364,23 @@ public class MapAccessManager implements IMapAccessManager {
 		    return;
 		}
 		List<Long> osmWayIdsInRadius = parseOsmWayIds(osmWayIdsXmlDoc.get());
-		var waysWithNodesQuery = OverpassQueryManager.getMultipleWayAndItsNodesQuery(osmWayIdsInRadius);
+		var waysWithNodesQuerySplit = OverpassQueryManager.getMultipleWayAndItsNodesQuerySplit(osmWayIdsInRadius);
 
-		ScheduledExecutorService executorService = Executors.newSingleThreadScheduledExecutor();
-		double timeLeftFactor = 0.0002;
-		timeLeft = new AtomicInteger((int) (timeLeftFactor * Math.PI * zone.getRadius() * zone.getRadius()));
-        executorService.scheduleAtFixedRate(MapAccessManager::displayProgress, 0, 1, TimeUnit.SECONDS);
-		var waysWithNodesXmlDoc = getNodesDocument(waysWithNodesQuery);
-		if (waysWithNodesQuery.isEmpty()) {
-		    logger.debug("Could not create XML document with ways and its nodes for parsing (simulation cache)");
-		    return;
+		int queryNumber = 1;
+		for (String query : waysWithNodesQuerySplit) {
+			logger.info("Parsing query " + queryNumber++ + "/" + waysWithNodesQuerySplit.size());
+			ScheduledExecutorService executorService = Executors.newSingleThreadScheduledExecutor();
+			double timeLeftFactor = 0.0002;
+			timeLeft = new AtomicInteger((int) (timeLeftFactor * Math.PI * zone.getRadius() * zone.getRadius()));
+	        executorService.scheduleAtFixedRate(MapAccessManager::displayProgress, 0, 1, TimeUnit.SECONDS);
+			var waysWithNodesXmlDoc = getNodesDocument(query);
+			if (waysWithNodesXmlDoc.isEmpty()) {
+				logger.debug("Could not create XML document with ways and its nodes for parsing (simulation cache)");
+				return;
+			}
+			executorService.shutdown();
+			parseWaysWithLightsAndFillWayCache(waysWithNodesXmlDoc.get());
 		}
-		executorService.shutdown();
-
-		parseWaysWithLightsAndFillWayCache(waysWithNodesXmlDoc.get());
 
         logger.info("Cache parsed zone data to file");
 		wrapper.cacheData(simulationData);
