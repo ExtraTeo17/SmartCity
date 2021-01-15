@@ -32,6 +32,7 @@ import vehicles.Pedestrian;
 import vehicles.TestPedestrian;
 import vehicles.enums.DrivingState;
 
+import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.List;
 
@@ -379,6 +380,8 @@ public class PedestrianAgent extends AbstractAgent {
             }
 
             private void restartAgentWithNewBusLine(List<RouteNode> arrivingRouteToClosestStation, String busLine) {
+                boolean pedestrianTestable = pedestrian instanceof TestPedestrian;
+
                 pedestrian = new Pedestrian(pedestrian.getAgentId(),
                         arrivingRouteToClosestStation,
                         arrivingRouteToClosestStation,
@@ -388,6 +391,10 @@ public class PedestrianAgent extends AbstractAgent {
                         pedestrian.getStationFinish(),
                         timeProvider,
                         taskProvider);
+                if (pedestrianTestable) {
+                    pedestrian = new TestPedestrian(pedestrian);
+                }
+
                 getNextStation(busLine);
                 informLightManager(pedestrian);
                 pedestrian.setTroubled(false);
