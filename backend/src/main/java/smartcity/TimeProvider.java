@@ -14,6 +14,7 @@ import java.time.temporal.ChronoUnit;
 public class TimeProvider implements ITimeProvider {
     public static final int MS_PER_TICK = 50; // Cinematic 20 fps
     private static final Logger logger = LoggerFactory.getLogger(TimeProvider.class);
+    public static final int NANO_IN_MILLISECONDS = 1_000_000;
 
     private int timeScale;
     private LocalDateTime simulationStartTime;
@@ -64,7 +65,7 @@ public class TimeProvider implements ITimeProvider {
     }
 
     public static long getTimeInMs(long timeNanoStart) {
-        return (System.nanoTime() - timeNanoStart) / 1_000_000;
+        return (System.nanoTime() - timeNanoStart) / NANO_IN_MILLISECONDS;
     }
 
     public static LocalDateTime getCloser(LocalDateTime source, LocalDateTime a, LocalDateTime b) {

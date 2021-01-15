@@ -76,7 +76,7 @@ describe("Selector for buses without routes", () => {
     updateStateWithNewBuses(newBuses);
 
     // Act & Assert
-    const normalSelectMs = 20;
+    const normalSelectMs = 30;
     const memoizeSelectMs = 1;
 
     // First select - init - normal
@@ -227,7 +227,7 @@ describe("Selector for buses with routes", () => {
     updateStateWithNewBuses(newBuses);
 
     // Act & Assert
-    const normalSelectMs = 25;
+    const normalSelectMs = 50;
     const memoizeSelectMs = 1;
 
     // First select - init - normal

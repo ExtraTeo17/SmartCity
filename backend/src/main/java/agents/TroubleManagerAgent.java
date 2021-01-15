@@ -47,6 +47,7 @@ import static agents.utilities.BehaviourWrapper.wrapErrors;
 public class TroubleManagerAgent extends Agent {
     public static final String name = TroubleManagerAgent.class.getSimpleName().replace("Agent", "");
     private static final Logger logger = LoggerFactory.getLogger(TroubleManagerAgent.class);
+    public static final int PERIOD_OF_BROADCASTING = 5000;
 
     private final IAgentsContainer agentsContainer;
     private final ConfigContainer configContainer;
@@ -177,7 +178,7 @@ public class TroubleManagerAgent extends Agent {
         };
 
 
-        Behaviour sayAboutTroubles = new TickerBehaviour(this, 5000) {
+        Behaviour sayAboutTroubles = new TickerBehaviour(this, PERIOD_OF_BROADCASTING) {
             @Override
             protected void onTick() {
 

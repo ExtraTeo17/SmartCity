@@ -451,17 +451,17 @@ public class CarAgent extends AbstractAgent {
                 // TODO: from current index
                 //   choose trouble EdgeId
                 // TODO: magic numbers !!!
-                private final int magicNumber = 5;
+                private final int SAFE_BUFFOR = 5;
 
                 private int getFixedRandomIndex() {
                     // Warn: Value inside nextInt must be constant for fixed generation to work
-                    var min = maxMoveIndexOnTP + configContainer.getConstructionSiteThresholdUntilIndexChange() + magicNumber;
+                    var min = maxMoveIndexOnTP + configContainer.getConstructionSiteThresholdUntilIndexChange() + SAFE_BUFFOR;
                     var max = initialRouteSize - min;
                     return getRandomIndexInBounds(min, max);
                 }
 
                 private int getTrulyRandomIndex(int moveIndex, int routeSize) {
-                    var min = moveIndex + configContainer.getConstructionSiteThresholdUntilIndexChange() + magicNumber;
+                    var min = moveIndex + configContainer.getConstructionSiteThresholdUntilIndexChange() + SAFE_BUFFOR;
                     var max = routeSize - min;
                     return getRandomIndexInBounds(min, max);
                 }

@@ -190,6 +190,40 @@ export const angleFromCoordinates = (loc1, loc2) => {
  */
 export const showQueued = notify.createShowQueue;
 
+/**
+ * Used notifying about unconnected backend
+ * @function
+ */
 export const notifyWaitForConnection = () => {
   notify.show("Please wait for connection", "warning", NOTIFY_SHOW_MS / 2);
+};
+
+/**
+ * Used notifying about unconnected backend
+ * @param {Position} loc1
+ * @param {Position} loc2
+ * @function
+ */
+export const areLocationsEqual = (loc1, loc2) => {
+  return loc1.lat === loc2.lat && loc1.lng === loc2.lng;
+};
+
+const EARTH_RADIUS = 6378137; // metres
+/**
+ * Calculation using harvesine formulae.
+ * https://www.movable-type.co.uk/scripts/latlong.html
+ * @param {Position} loc1
+ * @param {Position} loc2
+ * @returns Distance between 2 latlng points in meters
+ */
+export const calculateDistance = (loc1, loc2) => {
+  const φ1 = degToRad(loc1.lat); // φ, λ in radians
+  const φ2 = degToRad(loc2.lat);
+  const Δφ = degToRad(loc2.lat - loc1.lat);
+  const Δλ = degToRad(loc2.lng - loc1.lng);
+
+  const a = Math.sin(Δφ / 2) * Math.sin(Δφ / 2) + Math.cos(φ1) * Math.cos(φ2) * Math.sin(Δλ / 2) * Math.sin(Δλ / 2);
+  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+
+  return EARTH_RADIUS * c;
 };

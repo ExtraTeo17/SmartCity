@@ -63,18 +63,18 @@ public interface IAgentsContainer extends IRegistrable {
      * @return Random agent from this container.
      */
     default <TAgent extends AbstractAgent> Optional<TAgent> getRandom(Class<TAgent> type, Random random) {
-        int ind = random.nextInt(size(type));
-        return stream(type)
-                .skip(ind)
-                .findFirst();
+        return getRandom(type, random, (a)-> true);
     }
+
+    <TAgent extends AbstractAgent> Optional<TAgent> getRandom(Class<TAgent> type, Random random,
+                                                              Predicate<TAgent> filter);
 
     /**
      * Remove an agent from this container.
      *
      * @param <TAgent> Type of the agent, extending {@link AbstractAgent}
      * @param agent The agent to be removed from this container
-     * @return true if the operation was sucessful, false otherwise
+     * @return true if the operation was successful, false otherwise
      */
     <TAgent extends AbstractAgent> boolean remove(TAgent agent);
 
@@ -85,7 +85,7 @@ public interface IAgentsContainer extends IRegistrable {
      * @param type Class of the type of the agent
      * @param agentId Identification number of the agent to be removed from
      * this container
-     * @return true if the operation was sucessful, false otherwise
+     * @return true if the operation was successful, false otherwise
      */
     <TAgent extends AbstractAgent> Optional<TAgent> remove(Class<TAgent> type, int agentId);
 
@@ -96,7 +96,7 @@ public interface IAgentsContainer extends IRegistrable {
      * @param type Class of the type of the agent
      * @param predicate The predicate which determines whether the agent shall be
      * removed from this container
-     * @return true if the operation was sucessful, false otherwise
+     * @return true if the operation was successful, false otherwise
      */
     default <TAgent extends AbstractAgent> boolean removeIf(Class<TAgent> type, Predicate<TAgent> predicate) {
         AtomicBoolean result = new AtomicBoolean(true);
