@@ -18,7 +18,6 @@ import events.web.bike.BikeAgentDeadEvent;
 import events.web.bike.BikeAgentUpdatedEvent;
 import events.web.bus.BusAgentDeadEvent;
 import events.web.bus.BusAgentFillStateUpdatedEvent;
-import events.web.bus.BusAgentStartedEvent;
 import events.web.bus.BusAgentUpdatedEvent;
 import events.web.car.CarAgentCreatedEvent;
 import events.web.car.CarAgentDeadEvent;
@@ -136,7 +135,6 @@ class InjectorTests {
         eventBus.post(new BusAgentDeadEvent(1));
         eventBus.post(new BusAgentFillStateUpdatedEvent(0, null));
         eventBus.post(new BusAgentUpdatedEvent(1, null));
-        eventBus.post(new BusAgentStartedEvent(1));
         eventBus.post(new BusAgentDeadEvent(1));
 
         // pedestrian

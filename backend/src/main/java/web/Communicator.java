@@ -6,7 +6,10 @@ import events.web.*;
 import events.web.bike.BikeAgentCreatedEvent;
 import events.web.bike.BikeAgentDeadEvent;
 import events.web.bike.BikeAgentUpdatedEvent;
-import events.web.bus.*;
+import events.web.bus.BusAgentCrashedEvent;
+import events.web.bus.BusAgentDeadEvent;
+import events.web.bus.BusAgentFillStateUpdatedEvent;
+import events.web.bus.BusAgentUpdatedEvent;
 import events.web.car.CarAgentCreatedEvent;
 import events.web.car.CarAgentDeadEvent;
 import events.web.car.CarAgentRouteChangedEvent;
@@ -83,10 +86,6 @@ class Communicator {
     @Subscribe
     public void handle(TroublePointVanishedEvent e) {
         webService.hideTroublePoint(e.id);
-    }
-
-    @Subscribe
-    public void handle(BusAgentStartedEvent e) {
     }
 
     @Subscribe
