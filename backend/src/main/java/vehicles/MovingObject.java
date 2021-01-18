@@ -29,8 +29,7 @@ public abstract class MovingObject {
     int moveIndex;
     int closestLightIndex;
     private DrivingState state;
-
-    // TODO: Change name to IVehicle/AbstractVehicle
+    
     MovingObject(ITimeProvider timeProvider, int agentId, int speed, List<RouteNode> uniformRoute, List<RouteNode> simpleRoute) {
         this.timeProvider = timeProvider;
         this.logger = LoggerFactory.getLogger(this.getClass().getSimpleName() + "Object" + agentId);
@@ -101,7 +100,7 @@ public abstract class MovingObject {
         return uniformRoute.get(index);
     }
 
-    //TODO: RETURN TO NORMAL  return uniformRoute.get(moveIndex-1);
+    //TODO: Return to normal: `return uniformRoute.get(moveIndex-1);`
     public RouteNode getRouteNodeBeforeLight() {
         if (moveIndex - 1 <= 0) {
             return uniformRoute.get(0);

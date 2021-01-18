@@ -22,7 +22,6 @@ public class TaskModule extends AbstractModule {
                 bind(ITaskManager.class).to(TaskManager.class).in(Singleton.class);
                 bind(Scheduler.class).asEagerSingleton();
 
-                // TODO: Delete it - used only by mapGui
                 expose(ITaskProvider.class);
             }
         });

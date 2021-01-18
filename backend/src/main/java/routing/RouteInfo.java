@@ -35,8 +35,7 @@ public class RouteInfo implements Iterable<OSMWay> {
     public final void add(long lightOsmId) {
         lightOsmIds.add(lightOsmId);
     }
-
-    // TODO: ways.size() == 1?
+    
     // TODO: Add some tests for this function
     void determineRouteOrientationsAndFilterRelevantNodes(String startingOsmNodeRef, String finishingOsmNodeRef) {
         if (ways.size() == 0) {

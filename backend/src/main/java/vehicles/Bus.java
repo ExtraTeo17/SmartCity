@@ -69,38 +69,6 @@ public class Bus extends MovingObject {
         }
     }
 
-    // TODO: unused?
-    public String findBestChoiceOfStation() {
-
-        int currentPosition = moveIndex;
-        Integer positionOfStationNext = null;
-        Integer positionOfStationPrev = null;
-        for (int i = currentPosition + 1; i < uniformRoute.size(); i++) {
-            if (uniformRoute.get(i) instanceof StationNode) {
-                positionOfStationNext = i;
-
-            }
-        }
-
-        for (int i = currentPosition; i > 0; i--) {
-            if (uniformRoute.get(i) instanceof StationNode) {
-                positionOfStationNext = i;
-
-            }
-        }
-
-        if (positionOfStationNext == null && positionOfStationPrev == null) {
-            return null;
-        }
-
-        if (positionOfStationPrev == null || Math.abs(currentPosition - positionOfStationNext) < Math
-                .abs(currentPosition - positionOfStationPrev)) {
-            return String.valueOf(((StationNode) uniformRoute.get(positionOfStationNext)).getOsmId());
-        }
-        return String.valueOf(((StationNode) uniformRoute.get(positionOfStationPrev)).getOsmId());
-
-    }
-
     public int getPassengersCount() {
         return passengersCount;
     }
@@ -277,8 +245,8 @@ public class Bus extends MovingObject {
 		}
 
 		double millisFromPenStopToLastStop = (double) getMillisecondsFromAToB(penultimateStopIndexOnRoute, lastStopIndexOnRoute);
-		double millisecondsInOneSecond = 1000;
-		double secondsInOneMinute = 60;
+		final double millisecondsInOneSecond = 1000;
+		final double secondsInOneMinute = 60;
 		logger.debug("Time in seconds journey between penultimate and last stop is estimated to be: " +
 		        (millisFromPenStopToLastStop / millisecondsInOneSecond * timeProvider.getTimeScale()));
 
@@ -321,7 +289,6 @@ public class Bus extends MovingObject {
         ++moveIndex;
     }
 
-    // TODO: Are they though?
     // Suppose Bus.move task is late by 5ms because of lags (performance issues)
     // Then his speed is actually 3600 / (9ms + 5ms) = 257 / TIME_SCALE = 25.7
     // instead of 40

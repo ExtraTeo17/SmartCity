@@ -25,8 +25,8 @@ public class BrigadeInfo implements Iterable<Timetable>, Serializable {
                 .collect(Collectors.toList());
     }
 
-    //TODO:dokumentacja
-    public void addTimetableRecords(long stationId, List<TimetableRecord> timetableRecords) {
+    //TODO: Docs
+    void addTimetableRecords(long stationId, List<TimetableRecord> timetableRecords) {
         if (timetables.size() != timetableRecords.size()) {
             logger.error("Initial timetables size different than current:\n" +
                     " initial: '" + timetables.size() +
