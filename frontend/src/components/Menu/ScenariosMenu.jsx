@@ -77,7 +77,7 @@ export const ScenariosMenuObj = props => {
     startData.useFixedRoutes = true;
     const date = new Date();
     date.setHours(8);
-    date.setMinutes(40);
+    date.setMinutes(42);
     date.setSeconds(0);
     startData.startTime = date;
     startData.timeScale = 10;
@@ -114,7 +114,7 @@ export const ScenariosMenuObj = props => {
 
     startData.useFixedRoutes = true;
     startData.startTime = new Date();
-    startData.timeScale = 10;
+    startData.timeScale = 7;
     startData.generateTroublePoints = true;
     startData.timeBeforeTrouble = 5;
     startData.troublePointStrategyActive = true;
