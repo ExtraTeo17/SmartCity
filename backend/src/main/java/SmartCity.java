@@ -6,6 +6,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import osmproxy.OsmModule;
 import osmproxy.buses.BusModule;
+import osmproxy.routes.OsmRoutesModule;
 import routing.RoutingModule;
 import smartcity.SmartCityModule;
 import smartcity.config.ConfigProperties;
@@ -40,6 +41,7 @@ public class SmartCity {
                 new WebModule(),
                 new BusModule(),
                 new OsmModule(),
+                new OsmRoutesModule(),
                 new RoutingModule(),
                 new SmartCityModule()
         );

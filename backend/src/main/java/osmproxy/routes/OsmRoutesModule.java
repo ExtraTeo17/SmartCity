@@ -2,20 +2,24 @@ package osmproxy.routes;
 
 import com.google.inject.Binder;
 import com.google.inject.Provides;
+import com.google.inject.Singleton;
 import com.graphhopper.util.CmdArgs;
 import genesis.AbstractModule;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import osmproxy.routes.abstractions.IGraphHopper;
+import osmproxy.routes.abstractions.IHighwayAccessor;
 
 import java.nio.file.Paths;
 
-public class RoutingModule extends AbstractModule {
-    private static final Logger logger = LoggerFactory.getLogger(RoutingModule.class);
+public class OsmRoutesModule extends AbstractModule {
+    private static final Logger logger = LoggerFactory.getLogger(OsmRoutesModule.class);
 
     @Override
     public void configure(Binder binder) {
         super.configure(binder);
-
+        binder.bind(IGraphHopper.class).to(ExtendedGraphHopper.class).in(Singleton.class);
+        binder.bind(IHighwayAccessor.class).to(HighwayAccessor.class).in(Singleton.class);
     }
 
     @Provides

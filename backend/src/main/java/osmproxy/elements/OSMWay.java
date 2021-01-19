@@ -347,7 +347,6 @@ public class OSMWay extends OSMElement implements Serializable {
         return closestNodeRef;
     }
 
-    // TODO: NEW function -- in case of new bugs start debugging here
     public void determineRouteOrientationAndFilterRelevantNodes(String startingOsmNodeRef, String finishingOsmNodeRef) {
         Optional<Integer> startingIndex = indexOf(startingOsmNodeRef);
         Optional<Integer> finishingIndex = indexOf(finishingOsmNodeRef);

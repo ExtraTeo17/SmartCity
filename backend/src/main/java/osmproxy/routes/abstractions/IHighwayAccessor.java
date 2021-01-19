@@ -1,6 +1,7 @@
-package osmproxy.routes;
+package osmproxy.routes.abstractions;
 
 import org.javatuples.Pair;
+import osmproxy.routes.AvoidEdgesRemovableWeighting;
 import routing.core.IGeoPosition;
 
 import java.util.List;

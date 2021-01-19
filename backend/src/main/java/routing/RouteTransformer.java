@@ -14,19 +14,12 @@ import java.util.stream.Collectors;
 
 import static utilities.NumericHelper.PRECISION;
 
-public final class RouteTransformer implements // TODO: We'll make it private other time, sorry
+class RouteTransformer implements
         IRouteTransformer {
     private static final Logger logger = LoggerFactory.getLogger(RouteTransformer.class);
 
-    // TODO: In some cases distance is 0 -> dx|dy is NaN -> same nodes?
-    @SuppressWarnings("FeatureEnvy")
     @Override
     public List<RouteNode> uniformRoute(List<RouteNode> route) {
-        return route; // TODO: CLEAN UP
-    }
-
-    @Override
-    public List<RouteNode> uniformRouteNext(List<RouteNode> route) {
         List<RouteNode> newRoute = new ArrayList<>();
         List<RouteNode> doubledNodes = new ArrayList<>();
 
@@ -79,8 +72,8 @@ public final class RouteTransformer implements // TODO: We'll make it private ot
     }
 
     @Override
-    public List<RouteNode> uniformRouteNew(List<RouteNode> route, List<Integer> edgeList) {
-        List<RouteNode> newRoute = uniformRouteNext(route);
+    public List<RouteNode> uniformRoute(List<RouteNode> route, List<Integer> edgeList) {
+        List<RouteNode> newRoute = uniformRoute(route);
 
         double denominator = newRoute.size();
         for (double nominator = 0; nominator < denominator; ++nominator) {

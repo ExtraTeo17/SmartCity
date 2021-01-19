@@ -1,16 +1,20 @@
-package osmproxy.routes;
+package osmproxy.routes.abstractions;
 
+import com.graphhopper.GHRequest;
+import com.graphhopper.GHResponse;
+import com.graphhopper.GraphHopperAPI;
+import com.graphhopper.routing.Path;
 import gnu.trove.set.TIntSet;
 
 import java.util.Collection;
+import java.util.List;
 
 public interface IGraphHopper {
-    // TODO: Utilize edge functions in the trouble generating strategy
     void addForbiddenEdges(Collection<Integer> edgeIds);
 
     void removeForbiddenEdges(Collection<Integer> edgeIds);
 
-    TIntSet getForbiddenEdges();
+    List<Path> calcPaths(GHRequest request, GHResponse ghRsp);
 
     long getOSMWay(int internalEdgeId);
 }

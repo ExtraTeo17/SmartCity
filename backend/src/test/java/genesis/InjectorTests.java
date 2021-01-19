@@ -32,6 +32,7 @@ import jade.wrapper.StaleProxyException;
 import org.junit.jupiter.api.Test;
 import osmproxy.OsmModule;
 import osmproxy.buses.BusModule;
+import osmproxy.routes.OsmRoutesModule;
 import routing.RoutingModule;
 import smartcity.SmartCityModule;
 import smartcity.config.ConfigMutator;
@@ -61,6 +62,7 @@ class InjectorTests {
                         new WebModule(4002),
                         new BusModule(),
                         new OsmModule(),
+                        new OsmRoutesModule(),
                         new RoutingModule(),
                         new SmartCityModule()
                 );

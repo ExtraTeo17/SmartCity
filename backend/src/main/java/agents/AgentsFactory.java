@@ -70,9 +70,8 @@ public class AgentsFactory implements IAgentsFactory {
     @Override
     public CarAgent create(List<RouteNode> route, boolean testCar) {
         var id = idGenerator.get(CarAgent.class);
-        var uniformRoute = routeTransformer.uniformRoute(route);
-        logger.trace("DisplayRoute size: " + route.size() + ", routeSize: " + uniformRoute.size());
-        var car = new Car(id, route, uniformRoute, timeProvider);
+        logger.trace("DisplayRoute size: " + route.size() + ", routeSize: " + route.size());
+        var car = new Car(id, route, route, timeProvider);
         if (testCar) {
             car = new TestCar(car, timeProvider);
         }
@@ -176,7 +175,6 @@ public class AgentsFactory implements IAgentsFactory {
      * @param testPedestrian   if the created agent, should be test
      * @return Filled {@link PedestrianAgent} object.
      */
-    // TODO: Simplify to avoid 6 arguments
     @Override
     public PedestrianAgent create(List<RouteNode> routeToStation, List<RouteNode> routeFromStation,
                                   StationNode startStation, StationNode finishStation,
