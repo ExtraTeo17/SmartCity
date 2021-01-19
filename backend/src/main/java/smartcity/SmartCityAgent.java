@@ -46,7 +46,7 @@ public class SmartCityAgent extends Agent {
     protected void setup() {
         addBehaviour(getReceiveMessageBehaviour());
     }
-    
+
     private CyclicBehaviour getReceiveMessageBehaviour() {
         return new CyclicBehaviour() {
             @Override

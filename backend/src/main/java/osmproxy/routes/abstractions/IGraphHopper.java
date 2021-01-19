@@ -2,9 +2,7 @@ package osmproxy.routes.abstractions;
 
 import com.graphhopper.GHRequest;
 import com.graphhopper.GHResponse;
-import com.graphhopper.GraphHopperAPI;
 import com.graphhopper.routing.Path;
-import gnu.trove.set.TIntSet;
 
 import java.util.Collection;
 import java.util.List;

@@ -31,7 +31,6 @@ import com.graphhopper.storage.DataAccess;
 import com.graphhopper.storage.Directory;
 import com.graphhopper.storage.GraphHopperStorage;
 import com.graphhopper.util.BitUtil;
-import gnu.trove.set.TIntSet;
 import osmproxy.routes.abstractions.IGraphHopper;
 
 import java.util.Collection;

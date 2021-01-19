@@ -19,14 +19,12 @@ public interface IMapAccessManager {
     List<OSMNode> parseNodes(Document xmlDocument);
 
     /**
-     *
      * @param query - query that needs to be sent
      * @return response from API
      */
     Optional<Document> getNodesDocument(String query);
 
     /**
-     *
      * @param osmWayIds - ids
      * @return lists of light nodes
      */
@@ -36,7 +34,6 @@ public interface IMapAccessManager {
     Optional<RouteInfo> getRouteInfo(List<Long> osmWayIds, boolean notPedestrian);
 
     /**
-     *
      * @param zone in which we are intrested to find lights
      * @return ligth manager nodes
      */

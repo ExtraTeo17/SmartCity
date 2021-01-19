@@ -14,11 +14,11 @@ import java.util.Optional;
  */
 public interface ICacheWrapper {
 
-	/**
-	 * Retrieve bus preparation data from the cache.
-	 *
-	 * @return Bus preparation data ready to be utilised
-	 */
+    /**
+     * Retrieve bus preparation data from the cache.
+     *
+     * @return Bus preparation data ready to be utilised
+     */
     Optional<BusPreparationData> getBusPreparationData();
 
     /**
@@ -31,8 +31,8 @@ public interface ICacheWrapper {
     /**
      * Retrieve the route consisting of route nodes from the cache.
      *
-     * @param route Route consisting of consecutive OSM ways to be used
-     * for calculating the hash code for this particular route
+     * @param route        Route consisting of consecutive OSM ways to be used
+     *                     for calculating the hash code for this particular route
      * @param stationNodes Station nodes residing on the route
      * @return Route consisting of route nodes ready to be utilised
      */
@@ -42,11 +42,11 @@ public interface ICacheWrapper {
     /**
      * Save the route consisting of route nodes to the cache.
      *
-     * @param route Route consisting of consecutive OSM ways to be used
-     * for calculating the hash code for this particular route
+     * @param route        Route consisting of consecutive OSM ways to be used
+     *                     for calculating the hash code for this particular route
      * @param stationNodes Station nodes residing on the route
-     * @param data Route to be cached consisting of route nodes, ready to be utilised
-     * after later retrieving from the cache
+     * @param data         Route to be cached consisting of route nodes, ready to be utilised
+     *                     after later retrieving from the cache
      */
     void cacheData(List<OSMWay> route, List<StationNode> stationNodes, ArrayList<RouteNode> data);
 }

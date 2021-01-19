@@ -21,7 +21,7 @@ public class TestPedestrian extends Pedestrian implements ITestable {
     }
 
     public TestPedestrian(Pedestrian pedestrian) {
-    	super(pedestrian);
+        super(pedestrian);
     }
 
     public TestPedestrian(TestPedestrian pedestrian) {

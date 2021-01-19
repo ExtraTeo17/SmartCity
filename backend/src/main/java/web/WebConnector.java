@@ -41,7 +41,7 @@ class WebConnector implements IWebConnector {
                     "won't be sent because of serialization error.");
             return;
         }
-        
+
         String serializedMessage = messageOpt.get();
         for (var bus : socketServer.getMessageBuses()) {
             bus.send(serializedMessage);

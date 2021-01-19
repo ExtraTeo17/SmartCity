@@ -51,7 +51,8 @@ public class BusManagerAgent extends AbstractAgent {
                         case ACLMessage.INFORM -> {
                             if (rcv.getSender().getLocalName().contains("Bus")) {
                                 initialiseCrash(rcv);
-                            } else {
+                            }
+                            else {
                                 handleRouteQuery(rcv);
                             }
                         }
@@ -135,7 +136,7 @@ public class BusManagerAgent extends AbstractAgent {
                 response.addUserDefinedParameter(MessageParameter.TYPE, MessageParameter.BUS_MANAGER);
                 response.addUserDefinedParameter(MessageParameter.EVENT, event);
                 if (minimumTimeOverall == Long.MAX_VALUE || preferredBusLine == null) {
-                    
+
                     logger.warn("Smth went wrong minimumTimeOverall: " + minimumTimeOverall + " preferredBusLine: null ");
                     return response;
                 }

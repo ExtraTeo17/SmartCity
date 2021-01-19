@@ -10,7 +10,8 @@ import web.message.payloads.AbstractPayload;
 public interface IWebConnector extends IStartable {
     /**
      * Sends message to all connected sockets
-     * @param type - type of message
+     *
+     * @param type    - type of message
      * @param payload - data of message, may be empty class
      */
     void broadcastMessage(@NotNull MessageType type, @NotNull AbstractPayload payload);

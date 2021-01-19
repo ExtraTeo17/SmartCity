@@ -53,7 +53,7 @@ public class MessageParameter {
      * Determine the subtype of the moving object agent.
      *
      * @param movingObject The agent for which the type is to be determined
-     * @return The string representation of the moving object supertype 
+     * @return The string representation of the moving object supertype
      */
     public static String getTypeByMovingObject(MovingObject movingObject) {
         var type = movingObject.getVehicleType();

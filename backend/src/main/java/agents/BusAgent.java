@@ -415,7 +415,7 @@ public class BusAgent extends AbstractAgent {
     private String getLine() {
         return bus.getLine();
     }
-    
+
     /**
      * Find two subsequent stations from all the stations on this bus' route. The second returned
      * station will always be after the first returned station. Example:

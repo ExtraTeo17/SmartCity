@@ -1,6 +1,5 @@
 package events.web;
 
-import osmproxy.elements.OSMStation;
 import routing.nodes.StationNode;
 import smartcity.lights.core.Light;
 import vehicles.Bus;

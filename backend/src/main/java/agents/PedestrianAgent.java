@@ -32,7 +32,6 @@ import vehicles.Pedestrian;
 import vehicles.TestPedestrian;
 import vehicles.enums.DrivingState;
 
-import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.List;
 
@@ -120,7 +119,8 @@ public class PedestrianAgent extends AbstractAgent {
                             pedestrian.setState(DrivingState.MOVING);
                             break;
                     }
-                } else if (pedestrian.isAtStation()) {
+                }
+                else if (pedestrian.isAtStation()) {
                     switch (pedestrian.getState()) {
                         case MOVING:
                             StationNode station = pedestrian.getStartingStation();
@@ -149,12 +149,14 @@ public class PedestrianAgent extends AbstractAgent {
                             pedestrian.setState(DrivingState.MOVING);
                             break;
                     }
-                } else if (pedestrian.isAtDestination()) {
+                }
+                else if (pedestrian.isAtDestination()) {
                     pedestrian.setState(DrivingState.AT_DESTINATION);
                     print("Reached destination.");
                     sendMessageAboutReachingDestinationToSmartCityAgent();
                     doDelete();
-                } else if (!pedestrian.isTroubled()) {
+                }
+                else if (!pedestrian.isTroubled()) {
                     move();
                 }
             }
@@ -220,7 +222,8 @@ public class PedestrianAgent extends AbstractAgent {
                             while (!pedestrian.isAtStation() && !pedestrian.isAtDestination()) {
                                 pedestrian.move();
                             }
-                        } else if (rcv.getPerformative() == ACLMessage.INFORM) {
+                        }
+                        else if (rcv.getPerformative() == ACLMessage.INFORM) {
                             handleCrashOfTheBus(rcv);
                         }
                         break;
@@ -239,7 +242,8 @@ public class PedestrianAgent extends AbstractAgent {
                                 pedestrian.setState(DrivingState.PASSING_STATION);
                             }
                             informLightManager(pedestrian);
-                        } else if (rcv.getPerformative() == ACLMessage.INFORM) {
+                        }
+                        else if (rcv.getPerformative() == ACLMessage.INFORM) {
                             handleCrashOfTheBus(rcv);
                         }
                         break;
@@ -247,7 +251,8 @@ public class PedestrianAgent extends AbstractAgent {
                         if (rcv.getPerformative() == ACLMessage.INFORM) {
                             if (rcv.getUserDefinedParameter(MessageParameter.EVENT).equals(MessageParameter.TROUBLE)) {
                                 handleTrouble(rcv);
-                            } else if (rcv.getUserDefinedParameter(MessageParameter.EVENT).equals(MessageParameter.START)) {
+                            }
+                            else if (rcv.getUserDefinedParameter(MessageParameter.EVENT).equals(MessageParameter.START)) {
                                 getNextStation(rcv.getUserDefinedParameter(MessageParameter.BUS_LINE));
                             }
                         }
@@ -266,7 +271,8 @@ public class PedestrianAgent extends AbstractAgent {
                         String.valueOf(expectedNewStationNode.getLng()));
                 if (troublePoint.equals(nextClosestStationPosition)) {
                     currentPosition = pedestrian.getPosition();
-                } else {
+                }
+                else {
                     currentPosition = troublePoint;
                 }
 
@@ -274,9 +280,9 @@ public class PedestrianAgent extends AbstractAgent {
                 LocalTime arrivalTime = LocalTime.of(0, 0, 0, 0);
                 if (currentPosition != nextClosestStationPosition) {
 
-                            arrivalTime = computeArrivalTime(currentPosition, nextClosestStationPosition,
-                                    expectedNewStationNode);
-                        }
+                    arrivalTime = computeArrivalTime(currentPosition, nextClosestStationPosition,
+                            expectedNewStationNode);
+                }
                 sendMessageToBusManager(rcv, arrivalTime.toString());
 
                 if (expectedNewStationNode.equals(pedestrian.getStationFinish())) {
@@ -327,7 +333,8 @@ public class PedestrianAgent extends AbstractAgent {
                         + (pedestrian.getMillisecondsOnRoute(pedestrian.getUniformRoute()));
                 if (troublePointsConfigContainer.isTransportChangeStrategyActive()) {
                     handleTransportChangeWithStrategy(rcv, busTimeMilliseconds);
-                } else {
+                }
+                else {
                     handleTransportChangeWithoutStrategy(rcv, busTimeMilliseconds);
                 }
             }
@@ -339,7 +346,8 @@ public class PedestrianAgent extends AbstractAgent {
                     logger.info("Choose bus because bike time in milliseconds: " + bikeTimeMilliseconds
                             + " vs bus time in milliseconds: " + busTimeMilliseconds);
                     restartAgentWithNewBusLine(arrivingRouteToClosestStation, rcv.getUserDefinedParameter(MessageParameter.BUS_LINE));
-                } else {
+                }
+                else {
                     logger.info("Choose bike because bike time in milliseconds: " + bikeTimeMilliseconds
                             + " vs bus time in milliseconds: " + busTimeMilliseconds);
                     performMetamorphosisToBike();
@@ -358,7 +366,8 @@ public class PedestrianAgent extends AbstractAgent {
                 var isTestPedestrian = pedestrian instanceof TestPedestrian;
                 if (isTestPedestrian) {
                     eventBus.register(this);
-                } else {
+                }
+                else {
                     pedestrian.setState(DrivingState.AT_DESTINATION);
                     sendMessageAboutReachingDestinationToSmartCityAgent();
                     myAgent.doDelete();
