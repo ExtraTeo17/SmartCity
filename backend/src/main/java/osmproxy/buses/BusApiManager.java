@@ -12,6 +12,8 @@ import utilities.ConditionalExecutor;
 import utilities.FileWrapper;
 
 import java.net.URL;
+import java.time.DayOfWeek;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 import java.util.Scanner;
@@ -100,10 +102,20 @@ public class BusApiManager implements IBusApiManager {
      * @return Query string for downloading timetable for specified line from WarszawskieAPI
      */
     private static String getBusTimetablesWarszawskieQuery(String busStopId, String busStopNr, String busLine) {
-        var request = "https://api.um.warszawa.pl/api/action/dbtimetable_get/?id=e923fa0e-d96c-43f9-ae6e-60518c9f3238&busstopId" +
-                "=" + busStopId + "&busstopNr=" + busStopNr + "&line=" + busLine +
+        var request = "https://api.um.warszawa.pl/api/action/dbtimetable_get/?id=de57d8ca-d1cf-4c79-a309-631902c55bbf&busstopId" +
+                "=" + busStopId + "&busstopNr=" + busStopNr + "&date=" + getDateOfLastWorkingDayOfCurrentWeek() + "&line=" + busLine +
                 "&apikey=3320a2ff-9dc5-4492-83f1-255eaf6778d4";
         logger.info(request);
         return request;
     }
+
+	private static String getDateOfLastWorkingDayOfCurrentWeek() {
+		LocalDate date = LocalDate.now();
+		if (date.getDayOfWeek().compareTo(DayOfWeek.SATURDAY) == 0) {
+			date = date.minusDays(1);
+		} else if (date.getDayOfWeek().compareTo(DayOfWeek.SUNDAY) == 0) {
+			date = date.minusDays(2);
+		}
+		return date.toString();
+	}
 }
