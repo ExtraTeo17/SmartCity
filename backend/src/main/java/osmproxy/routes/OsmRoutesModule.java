@@ -10,10 +10,13 @@ import org.slf4j.LoggerFactory;
 import osmproxy.routes.abstractions.IGraphHopper;
 import osmproxy.routes.abstractions.IHighwayAccessor;
 
+import java.nio.file.Files;
 import java.nio.file.Paths;
 
 public class OsmRoutesModule extends AbstractModule {
     private static final Logger logger = LoggerFactory.getLogger(OsmRoutesModule.class);
+    private static final String GRAPH_HOPPER_PROPERTIES_FILE = "graphHopper.properties";
+    private static final String OSM_DATA_FILE = "mazowieckie-latest.osm.pbf";
 
     @Override
     public void configure(Binder binder) {
@@ -38,16 +41,21 @@ public class OsmRoutesModule extends AbstractModule {
 
     private static CmdArgs readArgs() {
         try {
-            var configResource = HighwayAccessor.class.getClassLoader().getResource("");
+            var configResource = OsmRoutesModule.class.getClassLoader().getResource("");
             if (configResource == null) {
                 logger.error("Didn't find the loader resource");
                 return new CmdArgs();
             }
 
             var mainPath = Paths.get(configResource.toURI()).toString();
-            var configPath = Paths.get(mainPath, "graphHopper.properties");
-            var dataReaderPath = Paths.get(mainPath, "mazowieckie-latest.osm.pbf");
-            var args = new String[]{"config=" + configPath, "datareader.file=" + dataReaderPath};
+            var configPath = Paths.get(mainPath, GRAPH_HOPPER_PROPERTIES_FILE);
+            if (!Files.exists(configPath)) {
+                logger.error("Didn't find the " + GRAPH_HOPPER_PROPERTIES_FILE + " file");
+                return new CmdArgs();
+            }
+
+            var osmDataPath = Paths.get(mainPath, OSM_DATA_FILE);
+            var args = new String[]{"config=" + configPath, "datareader.file=" + osmDataPath};
             return CmdArgs.read(args);
         } catch (Exception e) {
             logger.error("Error in reading args", e);
