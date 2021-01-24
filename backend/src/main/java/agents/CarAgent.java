@@ -388,16 +388,9 @@ public class CarAgent extends AbstractAgent {
 
                         if (timeForTheEndWithJam > timeForOfDynamicRoute) {
 
-                            logger.info("Trip time through the jam: " + timeForTheEndWithJam + " vs "
-                                    + timeForOfDynamicRoute + ", so route WILL be changed");
                             // TODO: CHECK IF send refusal is on place // switchToNextLight was after this line
                             updateVehicleRouteAfterMerge(indexAfterWhichRouteChanges, mergeResult);
 
-                        }
-                        else {
-
-                            logger.info("Trip time through the jam: " + timeForTheEndWithJam + " vs "
-                                    + timeForOfDynamicRoute + ", so route will NOT be changed");
                         }
                         borderlineIndex = null;
                     }
