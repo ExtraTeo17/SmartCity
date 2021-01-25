@@ -100,7 +100,7 @@ public class LightSwitcher implements Function<ISwitchLightsContext, Integer> {
         if (configContainer.isLightStrategyActive()) {
             var closeGroups = getLightGroupsOnLight();
             if (shouldExtendByGroups(hadPreviouslyExtended, closeGroups)) {
-                logger.info("Should Extend Green Light Because Of Cars On Light");
+                logger.info("-----Should Extend Green Light Because Of Cars On Light-----");
                 return defaultExecutionDelay;
             }
 
@@ -110,7 +110,7 @@ public class LightSwitcher implements Function<ISwitchLightsContext, Integer> {
 
             var farGroups = getLightGroupsInFarawayQueue();
             if (shouldExtendByGroups(hadPreviouslyExtended, farGroups)) {
-                logger.info("Should Extend Because Of Far Away Queue");
+                logger.info("-----Should Extend Because Of Far Away Queue-----");
                 return defaultExecutionDelay;
             }
         }
