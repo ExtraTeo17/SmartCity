@@ -6,7 +6,6 @@ import routing.RoutingConstants;
 import routing.core.IGeoPosition;
 import routing.nodes.LightManagerNode;
 import routing.nodes.RouteNode;
-import routing.nodes.StationNode;
 import smartcity.ITimeProvider;
 import vehicles.enums.DrivingState;
 
@@ -30,7 +29,6 @@ public abstract class MovingObject {
     int closestLightIndex;
     private DrivingState state;
 
-    // TODO: Change name to IVehicle/AbstractVehicle
     MovingObject(ITimeProvider timeProvider, int agentId, int speed, List<RouteNode> uniformRoute, List<RouteNode> simpleRoute) {
         this.timeProvider = timeProvider;
         this.logger = LoggerFactory.getLogger(this.getClass().getSimpleName() + "Object" + agentId);
@@ -101,7 +99,7 @@ public abstract class MovingObject {
         return uniformRoute.get(index);
     }
 
-    //TODO: RETURN TO NORMAL  return uniformRoute.get(moveIndex-1);
+    //TODO: Return to normal: `return uniformRoute.get(moveIndex-1);`
     public RouteNode getRouteNodeBeforeLight() {
         if (moveIndex - 1 <= 0) {
             return uniformRoute.get(0);
@@ -130,8 +128,9 @@ public abstract class MovingObject {
 
     /**
      * Checks whether an edge exists on the uniformRoute
+     *
      * @param thresholdUntilIndexChange - added to moveIndex to acquire minimum index where route can change
-     * @param edgeId of the edge checked for existence
+     * @param edgeId                    of the edge checked for existence
      * @return Index of the RouteNode on uniformRoute
      * which contains the edge if edge is found, otherwise null
      */
@@ -243,7 +242,7 @@ public abstract class MovingObject {
     }
 
     protected int findIndexOfNodeOnRoute(final RouteNode node) {
-    	return uniformRoute.indexOf(node);
+        return uniformRoute.indexOf(node);
     }
 
     public int getNextNonVirtualIndex() {

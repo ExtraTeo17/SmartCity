@@ -179,10 +179,7 @@ export const ScenariosMenuObj = props => {
     startData.testPedId = 5;
 
     startData.useFixedRoutes = true;
-    const date = new Date();
-    date.setHours(8);
-    date.setMinutes(40);
-    date.setSeconds(0);
+    const date = getTransportChangeDate();
     startData.startTime = date;
     startData.timeScale = 10;
     startData.generateBusFailures = true;
@@ -201,6 +198,23 @@ export const ScenariosMenuObj = props => {
 
     dispatch(configReplaced(state));
     prepareSimulation(state.prepareSimulationData);
+  }
+
+  function getTransportChangeDate() {
+    const date = new Date();
+
+    const day = date.getDay();
+    const isWeekend = day === 6 || day === 0;
+    if (isWeekend) {
+      date.setHours(9);
+      date.setMinutes(5);
+    } else {
+      date.setHours(8);
+      date.setMinutes(40);
+    }
+    date.setSeconds(0);
+
+    return date;
   }
 
   return (

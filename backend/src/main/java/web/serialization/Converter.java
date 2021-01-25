@@ -43,7 +43,7 @@ public class Converter {
 
     public static StationDto convert(StationNode station) {
         var id = station.getAgentId();
-        Location location = convert((IGeoPosition) (station.isPlatform() ? station : station.getCorrespondingPlatformStation()));
+        Location location = convert(station.isPlatform() ? station : station.getCorrespondingPlatformStation());
 
         return new StationDto(id, location);
     }

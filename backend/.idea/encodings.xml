@@ -2,10 +2,10 @@
 <project version="4">
   <component name="Encoding" defaultCharsetForPropertiesFiles="UTF-8">
     <file url="file://$PROJECT_DIR$" charset="UTF-8" />
-    <file url="file://$PROJECT_DIR$/mazowieckie-latest.osm-gh" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/src/main/resources" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/src/main/resources/config.properties" charset="windows-1252" />
+    <file url="file://$PROJECT_DIR$/src/main/resources/mazowieckie-latest.osm-gh" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/src/test/java/osmproxy/buses/serialization/WarszawskieApiSerializerTests.java" charset="UTF-8" />
     <file url="PROJECT" charset="UTF-8" />
   </component>

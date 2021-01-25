@@ -28,13 +28,6 @@
                 <directory>${resourceFolder}</directory>
                 <filtering>false</filtering>
             </resource>
-            <resource>
-                <directory>${project.basedir}</directory>
-                <includes>
-                    <include>mazowieckie-latest.osm-gh/**</include>
-                </includes>
-                <filtering>false</filtering>
-            </resource>
         </resources>
         <plugins>
             <!-- For build -->
@@ -65,13 +58,6 @@
                             <resources>
                                 <resource>
                                     <directory>${resourceFolder}</directory>
-                                    <filtering>false</filtering>
-                                </resource>
-                                <resource>
-                                    <directory>${project.basedir}</directory>
-                                    <includes>
-                                        <include>mazowieckie-latest.osm-gh/**</include>
-                                    </includes>
                                     <filtering>false</filtering>
                                 </resource>
                             </resources>

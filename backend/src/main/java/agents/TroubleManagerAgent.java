@@ -16,7 +16,7 @@ import jade.lang.acl.ACLMessage;
 import jade.util.leap.Properties;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import osmproxy.routes.ExtendedGraphHopper;
+import osmproxy.routes.abstractions.IGraphHopper;
 import routing.core.Position;
 import smartcity.SimulationState;
 import smartcity.config.ConfigContainer;
@@ -50,6 +50,7 @@ public class TroubleManagerAgent extends Agent {
     public static final int PERIOD_OF_BROADCASTING = 5000;
 
     private final IAgentsContainer agentsContainer;
+    private final IGraphHopper graphHopper;
     private final ConfigContainer configContainer;
     private final EventBus eventBus;
 
@@ -59,9 +60,11 @@ public class TroubleManagerAgent extends Agent {
 
     @Inject
     TroubleManagerAgent(IAgentsContainer agentsContainer,
+                        IGraphHopper graphHopper,
                         ConfigContainer configContainer,
                         EventBus eventBus) {
         this.agentsContainer = agentsContainer;
+        this.graphHopper = graphHopper;
         this.configContainer = configContainer;
         this.eventBus = eventBus;
 
@@ -108,7 +111,7 @@ public class TroubleManagerAgent extends Agent {
         logger.debug("Got message about new troublePoint: " + troublePoint.getLat() + "  " + troublePoint.getLng());
         if (!mapOfConstructionSiteBlockedEdges.containsKey(edgeId)) {
             mapOfConstructionSiteBlockedEdges.put(edgeId, rcv.getUserDefinedParameter(MessageParameter.LENGTH_OF_JAM));
-            ExtendedGraphHopper.addForbiddenEdges(Collections.singletonList(edgeId));
+            graphHopper.addForbiddenEdges(Collections.singletonList(edgeId));
         }
         sendBroadcast(generateMessageAboutTrouble(rcv, MessageParameter.CONSTRUCTION, MessageParameter.SHOW));
     }
@@ -118,7 +121,7 @@ public class TroubleManagerAgent extends Agent {
         logger.debug("Got message about light traffic jam start on: " + edgeId);
         if (!mapOfLightTrafficJamBlockedEdges.containsKey(edgeId)) {
             mapOfLightTrafficJamBlockedEdges.put(edgeId, rcv.getUserDefinedParameter(MessageParameter.LENGTH_OF_JAM));
-            ExtendedGraphHopper.addForbiddenEdges(Collections.singletonList(edgeId));
+            graphHopper.addForbiddenEdges(Collections.singletonList(edgeId));
         }
         else {
             mapOfLightTrafficJamBlockedEdges.replace(edgeId, rcv.getUserDefinedParameter(MessageParameter.LENGTH_OF_JAM));
@@ -135,13 +138,14 @@ public class TroubleManagerAgent extends Agent {
         logger.debug("Got message about light traffic jam stop on: " + edgeId);
         if (mapOfLightTrafficJamBlockedEdges.containsKey(edgeId)) {
             mapOfLightTrafficJamBlockedEdges.remove(edgeId);
-            ExtendedGraphHopper.removeForbiddenEdges(Collections.singletonList(edgeId));
+            graphHopper.removeForbiddenEdges(Collections.singletonList(edgeId));
         }
         sendBroadcast(generateMessageAboutTrouble(rcv, MessageParameter.TRAFFIC_JAM, MessageParameter.STOP));
     }
 
+    // TODO: Send broadcasts when the trouble ends
     @Override
-    protected void setup() { // TODO: wysłać broadcact kiedy trouble się skończy
+    protected void setup() {
 
         Behaviour communication = new CyclicBehaviour() {
             @Override

@@ -100,6 +100,7 @@ public class StationStrategy {
 
     /**
      * Manages people and buses at the station
+     *
      * @return objects, that continue journey
      */
     public OptimizationResult requestBusesAndPeopleFreeToGo() {

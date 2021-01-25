@@ -6,12 +6,13 @@ import smartcity.stations.ArrivalInfo;
 
 import java.util.List;
 
+//TODO: Interface is too big and too specific, make it more general and move some methods to different interface
+
 /**
  * The crossroad object, which contains traffic signallers and holds information
  * about the traffic participants, such as cars, bikes, buses and pedestrians,
  * which are currently waiting at the lights of the crossroad.
  */
-@SuppressWarnings("UnusedReturnValue")
 public interface ICrossroad {
     List<Light> getLights();
 
@@ -76,5 +77,3 @@ public interface ICrossroad {
 
     void startLifetime();
 }
-
-//TODO: Interface is too big and too specific, make it more general and move some methods to different interface

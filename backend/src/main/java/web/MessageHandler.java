@@ -18,7 +18,7 @@ import java.util.Optional;
 /**
  * Used for handling messages from frontend. <br/>
  * Responsible for deserialization, type conversion and posting events
- *  corresponding to each of requests. <br/>
+ * corresponding to each of requests. <br/>
  * Handles: <br/>
  * <ul>
  *     <li>{@link web.message.MessageType#START_SIMULATION_REQUEST}</li>

@@ -14,12 +14,12 @@ public class OptimizationResult {
     private final int extendTimeSeconds;
     private final int defaultExecutionDelay;
 
-    private boolean shouldNotifyCarAboutStartOfTrafficJamOnThisLight = false;
-    private boolean shouldNotifyCarAboutStopOfTrafficJamOnThisLight = false;
-    private double lengthOfJam = 0;
-    private long osmWayId = 0;
-    private IGeoPosition jammedLightPosition = null;
-    private String agentStuckInJam = null;
+    private boolean shouldNotifyCarAboutStartOfTrafficJamOnThisLight;
+    private boolean shouldNotifyCarAboutStopOfTrafficJamOnThisLight;
+    private double lengthOfJam;
+    private long osmWayId;
+    private IGeoPosition jammedLightPosition;
+    private String agentStuckInJam;
 
     public OptimizationResult(int extendTimeSeconds, int defaultExecutionDelay) {
         this.extendTimeSeconds = extendTimeSeconds;
@@ -59,13 +59,11 @@ public class OptimizationResult {
         shouldNotifyCarAboutStartOfTrafficJamOnThisLight = true;
         this.osmWayId = osmWayId;
         this.jammedLightPosition = jammedLightPosition;
-        //TODO: change 2 na liczbe samochodów które przejzdzaja podczas jednego swiatla. Oraz change how long is green and red
+        //TODO: Change 2 for number of cars that passes through 1 light
+        //  And change how long is green and red
         lengthOfJam = Math.floor((numerOfCarsInTheQueue * MILLISECONDS_IN_SECONDS / defaultExecutionDelay) *
                 ((defaultExecutionDelay + defaultExecutionDelay) +
-                        (defaultExecutionDelay + defaultExecutionDelay + extendTimeSeconds)) / 2); // TODO: Magic numbers
-
-
-
+                        (defaultExecutionDelay + defaultExecutionDelay + extendTimeSeconds)) / 2);
     }
 
     public final double getLengthOfJam() {

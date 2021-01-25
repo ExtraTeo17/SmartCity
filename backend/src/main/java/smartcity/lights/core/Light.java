@@ -129,8 +129,7 @@ public class Light extends Position {
     final void checkForTrafficJams(final OptimizationResult result) {
         if (trafficJamEmerged()) {
             result.setShouldNotifyCarAboutStartOfTrafficJamOnThisLight(this, carQueue.size(), getAdjacentWayId());
-            // TODO: consider making it a list of jammed traffic lights !!! or some more clever way
-            // just not to ignore it
+            // TODO: Consider making it a list of jammed traffic lights ! or some more clever way, just not to ignore it
             result.setCarStuckInJam(carQueue.peek());
         }
         else if (trafficJamDisappeared()) {

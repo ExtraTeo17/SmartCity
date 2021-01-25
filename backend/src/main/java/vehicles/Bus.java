@@ -69,38 +69,6 @@ public class Bus extends MovingObject {
         }
     }
 
-    // TODO: unused?
-    public String findBestChoiceOfStation() {
-
-        int currentPosition = moveIndex;
-        Integer positionOfStationNext = null;
-        Integer positionOfStationPrev = null;
-        for (int i = currentPosition + 1; i < uniformRoute.size(); i++) {
-            if (uniformRoute.get(i) instanceof StationNode) {
-                positionOfStationNext = i;
-
-            }
-        }
-
-        for (int i = currentPosition; i > 0; i--) {
-            if (uniformRoute.get(i) instanceof StationNode) {
-                positionOfStationNext = i;
-
-            }
-        }
-
-        if (positionOfStationNext == null && positionOfStationPrev == null) {
-            return null;
-        }
-
-        if (positionOfStationPrev == null || Math.abs(currentPosition - positionOfStationNext) < Math
-                .abs(currentPosition - positionOfStationPrev)) {
-            return String.valueOf(((StationNode) uniformRoute.get(positionOfStationNext)).getOsmId());
-        }
-        return String.valueOf(((StationNode) uniformRoute.get(positionOfStationPrev)).getOsmId());
-
-    }
-
     public int getPassengersCount() {
         return passengersCount;
     }
@@ -243,9 +211,10 @@ public class Bus extends MovingObject {
                 return Optional.empty();
             }
             if (stationNodesOnRoute.get(stationNodesOnRoute.size() - 1).getOsmId() == stationId) {
-            	timeOnStation = interpolateArrivalOnLastStation();
-            } else {
-            	logger.warn("Could not retrieve time for non-last-on-route station of OSM ID: " + stationId);
+                timeOnStation = interpolateArrivalOnLastStation();
+            }
+            else {
+                logger.warn("Could not retrieve time for non-last-on-route station of OSM ID: " + stationId);
             }
         }
 
@@ -255,42 +224,42 @@ public class Bus extends MovingObject {
     private Optional<LocalDateTime> interpolateArrivalOnLastStation() {
         logger.info("Station with non-retrievable time is last on route, interpolate its arrival time");
         StationNode penultimateStation = stationNodesOnRoute.get(stationNodesOnRoute.size() - 2);
-		StationNode lastStation = stationNodesOnRoute.get(stationNodesOnRoute.size() - 1);
-		Optional<LocalDateTime> departureFromPenultimateStation =
-				timetable.getTimeOnStation(penultimateStation.getOsmId());
-		if (departureFromPenultimateStation.isEmpty()) {
-			logger.warn("Could not retrieve time for non-last-on-route station while interpolating last station arrival time," +
-					"OSM ID of penultimate stop: " + departureFromPenultimateStation);
-			return Optional.empty();
-		}
+        StationNode lastStation = stationNodesOnRoute.get(stationNodesOnRoute.size() - 1);
+        Optional<LocalDateTime> departureFromPenultimateStation =
+                timetable.getTimeOnStation(penultimateStation.getOsmId());
+        if (departureFromPenultimateStation.isEmpty()) {
+            logger.warn("Could not retrieve time for non-last-on-route station while interpolating last station arrival time," +
+                    "OSM ID of penultimate stop: " + departureFromPenultimateStation);
+            return Optional.empty();
+        }
 
-		return Optional.ofNullable(interpolateArrivalOnLastStation(penultimateStation, lastStation, departureFromPenultimateStation.get()));
-	}
+        return Optional.ofNullable(interpolateArrivalOnLastStation(penultimateStation, lastStation, departureFromPenultimateStation.get()));
+    }
 
-	private LocalDateTime interpolateArrivalOnLastStation(StationNode penultimateStation,
-			StationNode lastStation, LocalDateTime departureFromPenultimateStation) {
-		int penultimateStopIndexOnRoute = findIndexOfNodeOnRoute(penultimateStation);
-		int lastStopIndexOnRoute = findIndexOfNodeOnRoute(lastStation);
-		if (penultimateStopIndexOnRoute == -1 || lastStopIndexOnRoute == -1) {
-		    logger.error("Could not find penultimate and last stations on bus route");
-		    return null;
-		}
+    private LocalDateTime interpolateArrivalOnLastStation(StationNode penultimateStation,
+                                                          StationNode lastStation, LocalDateTime departureFromPenultimateStation) {
+        int penultimateStopIndexOnRoute = findIndexOfNodeOnRoute(penultimateStation);
+        int lastStopIndexOnRoute = findIndexOfNodeOnRoute(lastStation);
+        if (penultimateStopIndexOnRoute == -1 || lastStopIndexOnRoute == -1) {
+            logger.error("Could not find penultimate and last stations on bus route");
+            return null;
+        }
 
-		double millisFromPenStopToLastStop = (double) getMillisecondsFromAToB(penultimateStopIndexOnRoute, lastStopIndexOnRoute);
-		double millisecondsInOneSecond = 1000;
-		double secondsInOneMinute = 60;
-		logger.debug("Time in seconds journey between penultimate and last stop is estimated to be: " +
-		        (millisFromPenStopToLastStop / millisecondsInOneSecond * timeProvider.getTimeScale()));
+        double millisFromPenStopToLastStop = getMillisecondsFromAToB(penultimateStopIndexOnRoute, lastStopIndexOnRoute);
+        final double millisecondsInOneSecond = 1000;
+        final double secondsInOneMinute = 60;
+        logger.debug("Time in seconds journey between penultimate and last stop is estimated to be: " +
+                (millisFromPenStopToLastStop / millisecondsInOneSecond * timeProvider.getTimeScale()));
 
-		var timeOnStation = departureFromPenultimateStation.plusMinutes(Math.round(millisFromPenStopToLastStop /
-		        millisecondsInOneSecond / secondsInOneMinute * ((double) timeProvider.getTimeScale())));
+        var timeOnStation = departureFromPenultimateStation.plusMinutes(Math.round(millisFromPenStopToLastStop /
+                millisecondsInOneSecond / secondsInOneMinute * ((double) timeProvider.getTimeScale())));
         logger.info("Time on penultimate stop: " + departureFromPenultimateStation +
                 ", interpolated time on last stop: " + timeOnStation);
 
-		return timeOnStation;
-	}
+        return timeOnStation;
+    }
 
-	public RouteNode findNextStop() {
+    public RouteNode findNextStop() {
         for (int i = moveIndex + 1; i < uniformRoute.size(); i++) {
             if (uniformRoute.get(i) instanceof StationNode) {
                 return uniformRoute.get(i);
@@ -321,7 +290,6 @@ public class Bus extends MovingObject {
         ++moveIndex;
     }
 
-    // TODO: Are they though?
     // Suppose Bus.move task is late by 5ms because of lags (performance issues)
     // Then his speed is actually 3600 / (9ms + 5ms) = 257 / TIME_SCALE = 25.7
     // instead of 40

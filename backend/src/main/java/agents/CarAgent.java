@@ -387,10 +387,8 @@ public class CarAgent extends AbstractAgent {
                                 mergeResult.newUniformRoute.size() - 1);
 
                         if (timeForTheEndWithJam > timeForOfDynamicRoute) {
-
-                            // TODO: CHECK IF send refusal is on place // switchToNextLight was after this line
+                            // TODO: Check if send refusal is on place // switchToNextLight was after this line
                             updateVehicleRouteAfterMerge(indexAfterWhichRouteChanges, mergeResult);
-
                         }
                         borderlineIndex = null;
                     }
@@ -419,7 +417,9 @@ public class CarAgent extends AbstractAgent {
             var timeBeforeTroubleMs = this.configContainer.getTimeBeforeTrouble() * 1000;
 
             Behaviour troubleGenerator = new TickerBehaviour(this, timeBeforeTroubleMs) {
-                private final int maxMoveIndexOnTP = timeBeforeTroubleMs / movePeriodMs;
+                private final int MAX_MOVE_ON_TP = timeBeforeTroubleMs / movePeriodMs;
+                // TODO: From current index, choose trouble EdgeId
+                private final int SAFE_BUFFER = 5;
 
                 @Override
                 public void onTick() {
@@ -441,20 +441,16 @@ public class CarAgent extends AbstractAgent {
                     stop();
                 }
 
-                // TODO: from current index
-                //   choose trouble EdgeId
-                // TODO: magic numbers !!!
-                private final int SAFE_BUFFOR = 5;
 
                 private int getFixedRandomIndex() {
                     // Warn: Value inside nextInt must be constant for fixed generation to work
-                    var min = maxMoveIndexOnTP + configContainer.getConstructionSiteThresholdUntilIndexChange() + SAFE_BUFFOR;
+                    var min = MAX_MOVE_ON_TP + configContainer.getConstructionSiteThresholdUntilIndexChange() + SAFE_BUFFER;
                     var max = initialRouteSize - min;
                     return getRandomIndexInBounds(min, max);
                 }
 
                 private int getTrulyRandomIndex(int moveIndex, int routeSize) {
-                    var min = moveIndex + configContainer.getConstructionSiteThresholdUntilIndexChange() + SAFE_BUFFOR;
+                    var min = moveIndex + configContainer.getConstructionSiteThresholdUntilIndexChange() + SAFE_BUFFER;
                     var max = routeSize - min;
                     return getRandomIndexInBounds(min, max);
                 }

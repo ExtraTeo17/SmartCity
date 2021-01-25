@@ -46,6 +46,7 @@
         "ignoreTemplateLiterals": true
       }
     ],
+    "no-use-before-define": [2, {"functions": false, "classes": false}],
     "object-curly-spacing": 2,
     "object-curly-newline": 0,
     "react/jsx-curly-newline": 0,

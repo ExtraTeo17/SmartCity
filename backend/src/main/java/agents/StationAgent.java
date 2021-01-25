@@ -111,7 +111,7 @@ public class StationAgent extends AbstractAgent {
                         var actual = getDateParameter(rcv, MessageParameter.ARRIVAL_TIME);
                         stationStrategy.addBusToFarAwayQueue(agentName, scheduled, actual);
 
-                        // TODO: SEND MESSAGE ABOUT PASSENGERS
+                        // TODO: Send message about passengers
                     }
                 }
                 else if (messageKind == ACLMessage.REQUEST_WHEN) {

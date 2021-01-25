@@ -17,22 +17,20 @@
  */
 package osmproxy.routes;
 
+import com.google.inject.Inject;
 import com.graphhopper.GHRequest;
 import com.graphhopper.GHResponse;
 import com.graphhopper.routing.Path;
 import com.graphhopper.routing.VirtualEdgeIteratorState;
-import com.graphhopper.util.CmdArgs;
 import com.graphhopper.util.EdgeIteratorState;
 import com.graphhopper.util.PointList;
 import org.javatuples.Pair;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import routing.RouteTransformer;
+import osmproxy.routes.abstractions.IGraphHopper;
+import osmproxy.routes.abstractions.IHighwayAccessor;
 import routing.abstractions.IRouteTransformer;
 import routing.core.IGeoPosition;
 import routing.nodes.RouteNode;
 
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -43,59 +41,25 @@ import java.util.List;
  *
  * @author Peter Karich
  */
-public class HighwayAccessor {
-    private static final Logger logger = LoggerFactory.getLogger(HighwayAccessor.class);
-    private static final ExtendedGraphHopper graphHopper;
+class HighwayAccessor implements IHighwayAccessor {
+    private final IGraphHopper graphHopper;
+    private final IRouteTransformer routeTransformer;
 
-    static {
-        var cmdArgs = readArgs();
-        try {
-            graphHopper = new ExtendedGraphHopper();
-            graphHopper.init(cmdArgs);
-            graphHopper.importOrLoad();
-        } catch (Exception e) {
-            logger.error("Error in graphHopper initialization", e);
-            throw e;
-        }
-    }
-
-    private static CmdArgs readArgs() {
-        try {
-            var configResource = HighwayAccessor.class.getClassLoader().getResource("");
-            if (configResource == null) {
-                logger.error("Didn't find the loader resource");
-                return new CmdArgs();
-            }
-
-            var mainPath = Paths.get(configResource.toURI()).toString();
-            var configPath = Paths.get(mainPath, "graphHopper.properties");
-            var dataReaderPath = Paths.get(mainPath, "mazowieckie-latest.osm.pbf");
-            var args = new String[]{"config=" + configPath, "datareader.file=" + dataReaderPath};
-            return CmdArgs.read(args);
-        } catch (Exception e) {
-            logger.error("Error in reading args", e);
-        }
-
-        return new CmdArgs();
+    @Inject
+    HighwayAccessor(IGraphHopper graphHopper,
+                    IRouteTransformer routeTransformer) {
+        this.graphHopper = graphHopper;
+        this.routeTransformer = routeTransformer;
     }
 
     /**
-     * Generate a route from point A to point B and return consecutive OSM way IDs throughout
-     * generated route alongside the consecutive route edge IDs from the graph the route was
-     * calculated on.
-     *
-     * @param from The point from which the route shall be generated.
-     * @param to The point to which the route shall be generated.
-     * @param typeOfVehicle String representation of the transportation mode, e.g. "foot", "car", "bike"
-     * @param bewareOfJammedRoutes Whether the graph edges forbidden in the
-     * {@link AvoidEdgesRemovableWeighting} should be avoided throughout the generated route
-     * @return A pair, in which first element is the consecutive OSM way ID list and the second
-     * element is the consecutive GraphHopper graph edge ID list
+     * {@inheritDoc}
      */
-    public static Pair<List<Long>, List<Integer>> getOsmWayIdsAndEdgeList(IGeoPosition from,
-                                                                          IGeoPosition to,
-                                                                          String typeOfVehicle,
-                                                                          boolean bewareOfJammedRoutes) {
+    @Override
+    public Pair<List<Long>, List<Integer>> getOsmWayIdsAndEdgeList(IGeoPosition from,
+                                                                   IGeoPosition to,
+                                                                   String typeOfVehicle,
+                                                                   boolean bewareOfJammedRoutes) {
         GHResponse response = new GHResponse();
         GHRequest request = new GHRequest(from.getLat(), from.getLng(), to.getLat(), to.getLng()).setVehicle(typeOfVehicle);
         String weighting = bewareOfJammedRoutes ? AvoidEdgesRemovableWeighting.NAME : "fastest";
@@ -103,7 +67,7 @@ public class HighwayAccessor {
         return calculatePaths(request, response);
     }
 
-    private static Pair<List<Long>, List<Integer>> calculatePaths(GHRequest req, GHResponse resp) {
+    private Pair<List<Long>, List<Integer>> calculatePaths(GHRequest req, GHResponse resp) {
         List<Long> osmWayIds = new ArrayList<>();
         List<Integer> edgeList = new ArrayList<>();
         List<Path> paths = graphHopper.calcPaths(req, resp);
@@ -130,11 +94,10 @@ public class HighwayAccessor {
         return new Pair<>(osmWayIds, edgeList);
     }
 
-    private static List<Integer> getEdgeList(int edgeId, PointList pointList) {
+    private List<Integer> getEdgeList(int edgeId, PointList pointList) {
         List<Integer> edgeList = new ArrayList<>();
         List<RouteNode> temporaryList = pointListToNodeList(pointList);
-        IRouteTransformer transformer = new RouteTransformer();
-        temporaryList = transformer.uniformRouteNext(temporaryList);
+        temporaryList = routeTransformer.uniformRoute(temporaryList);
         for (int i = 0; i < temporaryList.size(); ++i) {
             edgeList.add(edgeId);
         }

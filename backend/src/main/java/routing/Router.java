@@ -10,7 +10,7 @@ import osmproxy.elements.OSMLight;
 import osmproxy.elements.OSMWay;
 import osmproxy.elements.OSMWaypoint;
 import osmproxy.elements.data.RouteOrientation;
-import osmproxy.routes.HighwayAccessor;
+import osmproxy.routes.abstractions.IHighwayAccessor;
 import routing.abstractions.INodesContainer;
 import routing.abstractions.IRouteGenerator;
 import routing.abstractions.IRouteTransformer;
@@ -33,16 +33,19 @@ final class Router implements
     private final INodesContainer nodesContainer;
     private final ICacheWrapper cacheWrapper;
     private final IRouteTransformer routeTransformer;
+    private final IHighwayAccessor highwayAccessor;
 
     @Inject
     public Router(IMapAccessManager mapAccessManager,
                   INodesContainer nodesContainer,
                   ICacheWrapper cacheWrapper,
-                  IRouteTransformer routeTransformer) {
+                  IRouteTransformer routeTransformer,
+                  IHighwayAccessor highwayAccessor) {
         this.mapAccessManager = mapAccessManager;
         this.nodesContainer = nodesContainer;
         this.cacheWrapper = cacheWrapper;
         this.routeTransformer = routeTransformer;
+        this.highwayAccessor = highwayAccessor;
     }
 
     // TODO: now with new route generation there is sometimes "failed to get adjacent osmwayId" error, check it out
@@ -65,7 +68,6 @@ final class Router implements
         }
 
         var routeInfo = routeInfoOpt.get();
-        // TODO: This sometimes happen when generating new route for car (construction site)
         if (routeInfo.hasNoWays()) {
             logger.warn("No ways on route");
             return new ArrayList<>();
@@ -81,13 +83,13 @@ final class Router implements
             return new ArrayList<>();
         }
         var route = createRouteNodeList(routeInfo, isNotPedestrian, startStation, endStation,
-        		startingOsmNodeRef, finishingOsmNodeRef);
-        return routeTransformer.uniformRouteNew(route, osmWayIdsAndEdgeList.getValue1());
+                startingOsmNodeRef, finishingOsmNodeRef);
+        return routeTransformer.uniformRoute(route, osmWayIdsAndEdgeList.getValue1());
     }
 
     private List<RouteNode> createRouteNodeList(RouteInfo routeInfo, boolean isNotPedestrian,
-            StationNode startStation, StationNode endStation, String startingOsmNodeRef,
-            String finishingOsmNodeRef) {
+                                                StationNode startStation, StationNode endStation, String startingOsmNodeRef,
+                                                String finishingOsmNodeRef) {
         List<RouteNode> routeNodes = new ArrayList<>();
 
         if (!isNotPedestrian && endStation != null && !startingOsmNodeRef.equals(endStation.getOsmId() + "")) {
@@ -162,7 +164,7 @@ final class Router implements
         managersNodes.addAll(stationNodes);
 
         data = getRouteWithAdditionalNodes(busRouteData.route, managersNodes);
-        ArrayList<RouteNode> data2 = (ArrayList<RouteNode>) routeTransformer.uniformRouteNext(data);
+        ArrayList<RouteNode> data2 = (ArrayList<RouteNode>) routeTransformer.uniformRoute(data);
         cacheWrapper.cacheData(route, stationNodes, data2);
 
         return data2;
@@ -190,10 +192,10 @@ final class Router implements
         return true;
     }
 
-    private static Pair<List<Long>, List<Integer>> findRoute(IGeoPosition pointA,
-                                                             IGeoPosition pointB,
-                                                             String typeOfVehicle, boolean bewareOfJammedEdge) {
-        return HighwayAccessor.getOsmWayIdsAndEdgeList(pointA, pointB, typeOfVehicle, bewareOfJammedEdge);
+    private Pair<List<Long>, List<Integer>> findRoute(IGeoPosition pointA,
+                                                      IGeoPosition pointB,
+                                                      String typeOfVehicle, boolean bewareOfJammedEdge) {
+        return highwayAccessor.getOsmWayIdsAndEdgeList(pointA, pointB, typeOfVehicle, bewareOfJammedEdge);
     }
 
     private List<RouteNode> getManagersNodesForLights(List<OSMLight> lights) {

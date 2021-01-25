@@ -84,8 +84,6 @@ public class BusAgent extends AbstractAgent {
         print("Started at station " + firstStation.getAgentId() + ".");
         bus.setState(DrivingState.MOVING);
 
-        // TODO: Executed each x = 3600 / bus.getSpeed() = 3600m / (40 * TIME_SCALE) = 3600 / 400 = 9ms
-        //   Maybe decrease the interval? - I don't think processor can keep up with all of this.
         Behaviour move = new TickerBehaviour(this, RoutingConstants.STEP_CONSTANT / bus.getSpeed()) {
             @Override
             public void onTick() {
@@ -417,8 +415,6 @@ public class BusAgent extends AbstractAgent {
     private String getLine() {
         return bus.getLine();
     }
-
-    // TODO: Fix situation where bus route contains only one station and pedestrians tries to choose two
 
     /**
      * Find two subsequent stations from all the stations on this bus' route. The second returned

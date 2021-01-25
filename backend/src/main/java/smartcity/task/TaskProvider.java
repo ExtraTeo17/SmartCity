@@ -12,7 +12,6 @@ import com.google.common.eventbus.EventBus;
 import com.google.inject.Inject;
 import events.web.BatchedUpdateEvent;
 import events.web.bike.BikeAgentCreatedEvent;
-import events.web.bus.BusAgentStartedEvent;
 import events.web.car.CarAgentCreatedEvent;
 import events.web.models.UpdateObject;
 import events.web.pedestrian.PedestrianAgentCreatedEvent;
@@ -252,7 +251,6 @@ public class TaskProvider implements ITaskProvider {
                 agentsContainer.forEach(BusAgent.class, (busAgent) -> {
                     // Agent was created but not accepted.
                     if (busAgent.shouldStart()) {
-                        eventBus.post(new BusAgentStartedEvent(busAgent.getId()));
                         if (busAgent.getAID() == null) {
                             agentsContainer.tryAccept(busAgent);
                         }

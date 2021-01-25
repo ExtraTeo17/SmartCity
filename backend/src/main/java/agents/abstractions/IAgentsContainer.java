@@ -16,14 +16,14 @@ import java.util.stream.Stream;
  */
 public interface IAgentsContainer extends IRegistrable {
 
-	/**
-	 * Perform an attempt to add agent to the container.
-	 *
-	 * @param agent The agent to be added to this container
-	 * @param shouldTryAccept Whether the agent should also be accepted
-	 * by the agent controller.
-	 * @return true if the operation was sucessful, false otherwise
-	 */
+    /**
+     * Perform an attempt to add agent to the container.
+     *
+     * @param agent           The agent to be added to this container
+     * @param shouldTryAccept Whether the agent should also be accepted
+     *                        by the agent controller.
+     * @return true if the operation was sucessful, false otherwise
+     */
     boolean tryAdd(@NotNull AbstractAgent agent, boolean shouldTryAccept);
 
     /**
@@ -58,12 +58,12 @@ public interface IAgentsContainer extends IRegistrable {
      * Retrieve a random agent from this container.
      *
      * @param <TAgent> Type of the agent, extending {@link AbstractAgent}
-     * @param type Class of the type of the agent
-     * @param random Instance of pseudorandom numbers generator
+     * @param type     Class of the type of the agent
+     * @param random   Instance of pseudorandom numbers generator
      * @return Random agent from this container.
      */
     default <TAgent extends AbstractAgent> Optional<TAgent> getRandom(Class<TAgent> type, Random random) {
-        return getRandom(type, random, (a)-> true);
+        return getRandom(type, random, (a) -> true);
     }
 
     <TAgent extends AbstractAgent> Optional<TAgent> getRandom(Class<TAgent> type, Random random,
@@ -73,7 +73,7 @@ public interface IAgentsContainer extends IRegistrable {
      * Remove an agent from this container.
      *
      * @param <TAgent> Type of the agent, extending {@link AbstractAgent}
-     * @param agent The agent to be removed from this container
+     * @param agent    The agent to be removed from this container
      * @return true if the operation was successful, false otherwise
      */
     <TAgent extends AbstractAgent> boolean remove(TAgent agent);
@@ -82,9 +82,9 @@ public interface IAgentsContainer extends IRegistrable {
      * Remove an agent from this container.
      *
      * @param <TAgent> Type of the agent, extending {@link AbstractAgent}
-     * @param type Class of the type of the agent
-     * @param agentId Identification number of the agent to be removed from
-     * this container
+     * @param type     Class of the type of the agent
+     * @param agentId  Identification number of the agent to be removed from
+     *                 this container
      * @return true if the operation was successful, false otherwise
      */
     <TAgent extends AbstractAgent> Optional<TAgent> remove(Class<TAgent> type, int agentId);
@@ -92,10 +92,10 @@ public interface IAgentsContainer extends IRegistrable {
     /**
      * Remove an agent from this container if a given predicate is satisfied.
      *
-     * @param <TAgent> Type of the agent, extending {@link AbstractAgent}
-     * @param type Class of the type of the agent
+     * @param <TAgent>  Type of the agent, extending {@link AbstractAgent}
+     * @param type      Class of the type of the agent
      * @param predicate The predicate which determines whether the agent shall be
-     * removed from this container
+     *                  removed from this container
      * @return true if the operation was successful, false otherwise
      */
     default <TAgent extends AbstractAgent> boolean removeIf(Class<TAgent> type, Predicate<TAgent> predicate) {
@@ -112,7 +112,7 @@ public interface IAgentsContainer extends IRegistrable {
      * Perform given operation on each of the agents in this container.
      *
      * @param <TAgent> Type of the agent, extending {@link AbstractAgent}
-     * @param type Class of the type of the agent
+     * @param type     Class of the type of the agent
      * @param consumer The operation to perform on the agents
      */
     default <TAgent extends AbstractAgent> void forEach(Class<TAgent> type, Consumer<TAgent> consumer) {

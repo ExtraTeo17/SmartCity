@@ -3,19 +3,11 @@ package web;
 import com.google.common.eventbus.Subscribe;
 import com.google.inject.Inject;
 import events.web.*;
-import events.web.bike.BikeAgentCreatedEvent;
-import events.web.bike.BikeAgentDeadEvent;
-import events.web.bike.BikeAgentUpdatedEvent;
+import events.web.bike.*;
 import events.web.bus.*;
-import events.web.car.CarAgentCreatedEvent;
-import events.web.car.CarAgentDeadEvent;
-import events.web.car.CarAgentRouteChangedEvent;
-import events.web.car.CarAgentUpdatedEvent;
+import events.web.car.*;
 import events.web.pedestrian.*;
-import events.web.roadblocks.TrafficJamFinishedEvent;
-import events.web.roadblocks.TrafficJamStartedEvent;
-import events.web.roadblocks.TroublePointCreatedEvent;
-import events.web.roadblocks.TroublePointVanishedEvent;
+import events.web.roadblocks.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import web.abstractions.IWebService;
@@ -83,10 +75,6 @@ class Communicator {
     @Subscribe
     public void handle(TroublePointVanishedEvent e) {
         webService.hideTroublePoint(e.id);
-    }
-
-    @Subscribe
-    public void handle(BusAgentStartedEvent e) {
     }
 
     @Subscribe

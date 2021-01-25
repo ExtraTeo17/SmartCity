@@ -31,22 +31,19 @@ import com.graphhopper.storage.DataAccess;
 import com.graphhopper.storage.Directory;
 import com.graphhopper.storage.GraphHopperStorage;
 import com.graphhopper.util.BitUtil;
-import gnu.trove.set.TIntSet;
+import osmproxy.routes.abstractions.IGraphHopper;
 
 import java.util.Collection;
 import java.util.List;
 
-/**
- * @author Peter Karich
- */
-public class ExtendedGraphHopper extends GraphHopper {
-
+class ExtendedGraphHopper extends GraphHopper implements IGraphHopper {
     private static final double HEAVY_EDGE_PENALTY_FACTOR = 99999999;
+    private final long pointerFactor = 8L;
 
     // mapping of internal edge ID to OSM way ID
     private DataAccess edgeMapping;
     private BitUtil bitUtil;
-    private static AvoidEdgesRemovableWeighting avoidEdgesWeighting;
+    private AvoidEdgesRemovableWeighting avoidEdgesWeighting;
 
     @Override
     public boolean load(String graphHopperFolder) {
@@ -63,18 +60,15 @@ public class ExtendedGraphHopper extends GraphHopper {
         return loaded;
     }
 
-    /* TODO: Utilize edge functions in the trouble generating strategy */
-
-    public static void addForbiddenEdges(final Collection<Integer> edgeIds) {
+    // TODO: Utilize edge functions in the trouble generating strategy
+    @Override
+    public void addForbiddenEdges(final Collection<Integer> edgeIds) {
         avoidEdgesWeighting.addEdgeIds(edgeIds);
     }
 
-    public static void removeForbiddenEdges(final Collection<Integer> edgeIds) {
+    @Override
+    public void removeForbiddenEdges(final Collection<Integer> edgeIds) {
         avoidEdgesWeighting.removeEdgeIds(edgeIds);
-    }
-
-    public static TIntSet getForbiddenEdges() {
-        return avoidEdgesWeighting.getEdgeIds();
     }
 
     @Override
@@ -94,7 +88,7 @@ public class ExtendedGraphHopper extends GraphHopper {
 
     @Override
     protected DataReader createReader(GraphHopperStorage ghStorage) {
-        OSMReader reader = new OSMReader(ghStorage) {
+        var reader = new OSMReader(ghStorage) {
             {
                 edgeMapping.create(1000);
             }
@@ -104,8 +98,8 @@ public class ExtendedGraphHopper extends GraphHopper {
             protected void storeOsmWayID(int edgeId, long osmWayId) {
                 super.storeOsmWayID(edgeId, osmWayId);
 
-                long pointer = 8L * edgeId;
-                edgeMapping.ensureCapacity(pointer + 8L);
+                long pointer = pointerFactor * edgeId;
+                edgeMapping.ensureCapacity(pointer + pointerFactor);
 
                 edgeMapping.setInt(pointer, bitUtil.getIntLow(osmWayId));
                 edgeMapping.setInt(pointer + 4, bitUtil.getIntHigh(osmWayId));
@@ -122,13 +116,14 @@ public class ExtendedGraphHopper extends GraphHopper {
         return initDataReader(reader);
     }
 
-    long getOSMWay(int internalEdgeId) {
-        long pointer = 8L * internalEdgeId;
-        return bitUtil.combineIntsToLong(edgeMapping.getInt(pointer), edgeMapping.getInt(pointer + 4L));
+    @Override
+    public List<Path> calcPaths(GHRequest request, GHResponse ghRsp) {
+        return super.calcPaths(request, ghRsp);
     }
 
     @Override
-    public List<Path> calcPaths(GHRequest request, GHResponse rsp) {
-        return super.calcPaths(request, rsp);
+    public long getOSMWay(int internalEdgeId) {
+        long pointer = pointerFactor * internalEdgeId;
+        return bitUtil.combineIntsToLong(edgeMapping.getInt(pointer), edgeMapping.getInt(pointer + 4L));
     }
 }
