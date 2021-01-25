@@ -42,14 +42,19 @@ public class MessageParameter {
     public static final String LAT_OF_NEXT_CLOSEST_STATION = "lat_of_next_closest_station";
     public static final String LON_OF_NEXT_CLOSEST_STATION = "lon_of_next_closest_station";
     public static final String TIME = "time";
-    public static final String TIME_BETWEEN_PEDESTRIAN_AT_STATION_ARRIVAL_AND_REACHING_DESIRED_STOP = "time_between_pedestrian_at_station_arrival_and_reaching_desired_stop";
+    public static final String TIME_BETWEEN_PEDESTRIAN_AT_STATION_ARRIVAL_AND_REACHING_DESIRED_STOP = "time__desired_stop";
     public static final String EVENT = "event";
     public static final String START = "start";
     public static final String BRIGADE = "brigade";
     public static final String TEST_BIKE_AGENT_ID = "test_bike_agent_id";
     public static final String CRASH_TIME = "crash_time";
 
-
+    /**
+     * Determine the subtype of the moving object agent.
+     *
+     * @param movingObject The agent for which the type is to be determined
+     * @return The string representation of the moving object supertype
+     */
     public static String getTypeByMovingObject(MovingObject movingObject) {
         var type = movingObject.getVehicleType();
         var value = VehicleType.getValue(type);

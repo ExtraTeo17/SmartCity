@@ -3,7 +3,6 @@ package agents;
 import agents.abstractions.AbstractAgent;
 import agents.abstractions.IAgentsContainer;
 import com.google.inject.Inject;
-import jade.wrapper.AgentController;
 import jade.wrapper.ContainerController;
 import jade.wrapper.StaleProxyException;
 import org.jetbrains.annotations.NotNull;
@@ -14,6 +13,7 @@ import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 class HashAgentsContainer implements IAgentsContainer {
@@ -46,9 +46,8 @@ class HashAgentsContainer implements IAgentsContainer {
 
     @Override
     public boolean tryAccept(@NotNull AbstractAgent agent) {
-        AgentController agentController;
         try {
-            agentController = controller.acceptNewAgent(agent.getPredictedName(), agent);
+            controller.acceptNewAgent(agent.getPredictedName(), agent);
         } catch (StaleProxyException e) {
             logger.warn("Error adding agent: " + agent.getLocalName(), e);
             return false;
@@ -90,6 +89,21 @@ class HashAgentsContainer implements IAgentsContainer {
                 .skip(ind)
                 .findFirst();
     }
+
+    @Override
+    public <TAgent extends AbstractAgent> Optional<TAgent> getRandom(Class<TAgent> type, Random random,
+                                                                     Predicate<TAgent> filter) {
+        var collection = getOrThrow(type).values().stream()
+                .map(type::cast)
+                .filter(filter)
+                .collect(Collectors.toList());
+        int ind = random.nextInt(collection.size());
+
+        return collection.stream()
+                .skip(ind)
+                .findFirst();
+    }
+
 
     @Override
     public <TAgent extends AbstractAgent> boolean remove(TAgent agent) {

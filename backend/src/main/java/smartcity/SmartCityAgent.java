@@ -47,7 +47,6 @@ public class SmartCityAgent extends Agent {
         addBehaviour(getReceiveMessageBehaviour());
     }
 
-    // TODO: Set simulationState to Finished when no longer needed and post event
     private CyclicBehaviour getReceiveMessageBehaviour() {
         return new CyclicBehaviour() {
             @Override
@@ -84,13 +83,13 @@ public class SmartCityAgent extends Agent {
             var pedestrian = agent.getPedestrian();
 
             Long resultTime = getTimeIfTestable(pedestrian);
-            int distance = pedestrian.getUniformRouteSize() * RoutingConstants.STEP_SIZE_METERS;
+            int distance = pedestrian.getDistance();
             var testBikeId = rcv.getUserDefinedParameter(MessageParameter.TEST_BIKE_AGENT_ID);
             var isMetamorphosis = !Strings.isNullOrEmpty(testBikeId);
             if (isMetamorphosis) {
                 transformedTestBikeId = Integer.parseInt(testBikeId);
                 transformedPedestrianResultTime = resultTime;
-                transformedPedestrianDistance = distance;
+                transformedPedestrianDistance = pedestrian.getBeforeDistance();
             }
 
             if (agentsContainer.remove(agent)) {

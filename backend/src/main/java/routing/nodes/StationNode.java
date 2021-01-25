@@ -7,19 +7,22 @@ import java.util.Objects;
 public class StationNode extends RouteNode {
     private final long osmId;
     private int agentId;
+    private OSMStation correspondingPlatformStation;
 
     public StationNode(double lat, double lon,
-                       long osmId, int agentId) {
+                       long osmId,
+                       int agentId) {
         super(lat, lon);
         this.osmId = osmId;
         this.agentId = agentId;
     }
 
     public StationNode(String lat, String lon,
-                       String osmId, String agentId) {
-        super(Double.valueOf(lat), Double.valueOf(lon));
+                       String osmId,
+                       String agentId) {
+        super(Double.parseDouble(lat), Double.parseDouble(lon));
         this.osmId = Long.parseLong(osmId);
-        this.agentId = Integer.valueOf(agentId);
+        this.agentId = Integer.parseInt(agentId);
     }
 
     public StationNode(OSMStation station, int agentId) {
@@ -36,6 +39,18 @@ public class StationNode extends RouteNode {
 
     public long getOsmId() {
         return osmId;
+    }
+
+    public OSMStation getCorrespondingPlatformStation() {
+        return correspondingPlatformStation;
+    }
+
+    public void setCorrespondingPlatformStation(OSMStation correspondingPlatformStation) {
+        this.correspondingPlatformStation = correspondingPlatformStation;
+    }
+
+    public boolean isPlatform() {
+        return correspondingPlatformStation == null;
     }
 
     @Override
@@ -58,4 +73,12 @@ public class StationNode extends RouteNode {
         return Objects.hash(super.hashCode(), osmId);
     }
 
+    @Override
+    public String toString() {
+        return "StationNode{" +
+                "osmId=" + osmId +
+                ", agentId=" + agentId +
+                ", correspondingPlatformStation=" + correspondingPlatformStation +
+                '}';
+    }
 }

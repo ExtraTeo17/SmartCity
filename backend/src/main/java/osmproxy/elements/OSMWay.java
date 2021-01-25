@@ -8,6 +8,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
+import osmproxy.elements.data.LightOrientation;
+import osmproxy.elements.data.Range;
+import osmproxy.elements.data.RouteOrientation;
 import routing.core.IGeoPosition;
 import routing.core.IZone;
 import routing.core.Position;
@@ -20,21 +23,18 @@ import java.util.*;
 
 public class OSMWay extends OSMElement implements Serializable {
     private static final Logger logger = LoggerFactory.getLogger(OSMWay.class);
-    private final List<String> childNodeIds;
     private final boolean isOneWay;
     private List<OSMWaypoint> waypoints;
-    private LightOrientation lightOrientation = null;
+    private LightOrientation lightOrientation;
     private RouteOrientation routeOrientation = RouteOrientation.FRONT;
 
     @ForSerialization
     public OSMWay() {
-        childNodeIds = new ArrayList<>();
         isOneWay = false;
     }
 
     public OSMWay(Node item) {
         super(item.getAttributes().getNamedItem("id").getNodeValue());
-        this.childNodeIds = new ArrayList<>();
 
         Boolean oneWayValue = null;
         this.waypoints = new ArrayList<>();
@@ -66,7 +66,6 @@ public class OSMWay extends OSMElement implements Serializable {
     OSMWay(long id, final List<OSMWaypoint> waypoints) {
         super(id);
         this.waypoints = waypoints;
-        this.childNodeIds = new ArrayList<>();
         this.isOneWay = false;
     }
 
@@ -79,11 +78,6 @@ public class OSMWay extends OSMElement implements Serializable {
             builder.append(waypoint).append(", ");
         }
         return builder.toString();
-    }
-
-    // TODO: Result is not queried anywhere, why are we adding it?
-    void addChildNodeId(final String id) {
-        childNodeIds.add(id);
     }
 
     public List<OSMWaypoint> getWaypoints() {
@@ -331,27 +325,6 @@ public class OSMWay extends OSMElement implements Serializable {
         return Optional.empty();
     }
 
-    private static class Range {
-        public final int from;
-        public final int to;
-
-        private Range(int from, int to) {
-            this.from = from;
-            this.to = to;
-        }
-    }
-
-    // TODO: Move enums to other file or make it package private
-    public enum LightOrientation {
-        LIGHT_AT_ENTRY,
-        LIGHT_AT_EXIT
-    }
-
-    public enum RouteOrientation {
-        BACK,
-        FRONT
-    }
-
     public String findClosestNodeRefTo(IGeoPosition pointA) {
         String closestNodeRef = null;
         double minDist = Double.MAX_VALUE;
@@ -365,7 +338,6 @@ public class OSMWay extends OSMElement implements Serializable {
         return closestNodeRef;
     }
 
-    // TODO: NEW function -- in case of new bugs start debugging here
     public void determineRouteOrientationAndFilterRelevantNodes(String startingOsmNodeRef, String finishingOsmNodeRef) {
         Optional<Integer> startingIndex = indexOf(startingOsmNodeRef);
         Optional<Integer> finishingIndex = indexOf(finishingOsmNodeRef);
@@ -373,6 +345,6 @@ public class OSMWay extends OSMElement implements Serializable {
                 startingIndex.orElseThrow(() -> new IllegalArgumentException(
                         "Starting OSM node ref: " + startingOsmNodeRef + " was not on way: " + getId())),
                 finishingIndex.orElseThrow(() -> new IllegalArgumentException(
-                        "Starting OSM node ref: " + startingOsmNodeRef + " was not on way: " + getId())));
+                        "Finishing OSM node ref: " + finishingOsmNodeRef + " was not on way: " + getId())));
     }
 }

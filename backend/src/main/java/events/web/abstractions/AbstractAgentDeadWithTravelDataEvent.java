@@ -5,7 +5,7 @@ import javax.annotation.Nullable;
 public abstract class AbstractAgentDeadWithTravelDataEvent extends AbstractAgentDeadEvent {
     public final int travelDistance;
     @Nullable
-    public Long travelTime;
+    public final Long travelTime;
 
     protected AbstractAgentDeadWithTravelDataEvent(int id, int travelDistance, @Nullable Long travelTime) {
         super(id);

@@ -44,10 +44,6 @@ import static smartcity.config.StaticConfig.USE_BATCHED_UPDATES;
  * therefore, change the initial route.
  */
 public class CarAgent extends AbstractAgent {
-    private static final int THRESHOLD_UNTIL_INDEX_CHANGE = 50;
-    // Lower values provide risk of car ignoring the trouble point and passing through it
-    private static final int NO_CONSTRUCTION_SITE_STRATEGY_FACTOR = 30;
-
     private static final long CONSTRUCTION_SITE_GENERATION_SEED = 10002959;
     private static final long ID_GENERATION_SEED = 9973;
 
@@ -61,7 +57,7 @@ public class CarAgent extends AbstractAgent {
     private final int initialRouteSize;
 
     private RouteNode troublePoint;
-    private Integer borderlineIndex = null;
+    private Integer borderlineIndex;
 
     CarAgent(int id, MovingObject car,
              ITimeProvider timeProvider,
@@ -197,36 +193,38 @@ public class CarAgent extends AbstractAgent {
 
             private void handleConstructionJam(ACLMessage rcv) {
                 Long edgeId = Long.parseLong(rcv.getUserDefinedParameter(MessageParameter.EDGE_ID));
-                logger.info("Got propose to change the route and exclude: " + edgeId);
+                logger.debug("Got propose to change the route and exclude: " + edgeId);
                 if (constructionsEdgeId.contains(edgeId)) {
-                    logger.info("Already notified about construction place on edge: " + edgeId);
+                    logger.debug("Already notified about construction place on edge: " + edgeId);
                     return;
                 }
                 constructionsEdgeId.add(edgeId);
-                final Integer indexOfRouteNodeWithEdge = car.findIndexOfEdgeOnRoute(edgeId,
-                        THRESHOLD_UNTIL_INDEX_CHANGE);
-
+                Integer indexOfRouteNodeWithEdge = car.findIndexOfEdgeOnRoute(edgeId,
+                        configContainer.getConstructionSiteThresholdUntilIndexChange());
 
                 if (indexOfRouteNodeWithEdge != null && indexOfRouteNodeWithEdge != car.getUniformRouteSize() - 1) {
                     handleConstructionSiteRouteChange(indexOfRouteNodeWithEdge);
                 }
                 else {
-                    logger.info("Index of edge: " + indexOfRouteNodeWithEdge + " is not on the route");
+                    logger.debug("Index of edge: " + indexOfRouteNodeWithEdge + " is not on the route");
                 }
             }
 
-            private void handleConstructionSiteRouteChange(final int indexOfRouteNodeWithEdge) {
+            private void handleConstructionSiteRouteChange(int indexOfRouteNodeWithEdge) {
                 int indexAfterWhichRouteChanges;
                 if (configContainer.isConstructionSiteStrategyActive()) {
-                    if (indexOfRouteNodeWithEdge - car.getMoveIndex() > THRESHOLD_UNTIL_INDEX_CHANGE) {
-                        indexAfterWhichRouteChanges = car.getNextNonVirtualIndex(THRESHOLD_UNTIL_INDEX_CHANGE);
+                    var threshold = configContainer.getConstructionSiteThresholdUntilIndexChange();
+                    if (indexOfRouteNodeWithEdge - car.getMoveIndex() > threshold) {
+                        indexAfterWhichRouteChanges = car.getNextNonVirtualIndex(threshold);
                     }
                     else {
                         indexAfterWhichRouteChanges = car.getNextNonVirtualIndex();
                     }
                 }
                 else {
-                    indexAfterWhichRouteChanges = car.getPrevNonVirtualIndexFromIndex(indexOfRouteNodeWithEdge - NO_CONSTRUCTION_SITE_STRATEGY_FACTOR);
+                    var initIndex = Math.max(indexOfRouteNodeWithEdge -
+                            configContainer.getNoConstructionSiteStrategyIndexFactor(), 1);
+                    indexAfterWhichRouteChanges = car.getPrevNonVirtualIndexFromIndex(initIndex);
                 }
 
                 borderlineIndex = indexAfterWhichRouteChanges;
@@ -235,7 +233,7 @@ public class CarAgent extends AbstractAgent {
 
                     @Override
                     public void action() {
-                        final RouteMergeInfo mergeResult = createMergedWithOldRouteAlternativeRouteFromIndex(
+                        RouteMergeInfo mergeResult = createMergedWithOldRouteAlternativeRouteFromIndex(
                                 indexAfterWhichRouteChanges, true);
                         updateVehicleRouteAfterMerge(indexAfterWhichRouteChanges, mergeResult);
                         borderlineIndex = null;
@@ -245,20 +243,32 @@ public class CarAgent extends AbstractAgent {
                 addBehaviour(wrapErrors(factory.wrap(mergeUpdateBehaviour), onError));
             }
 
-            private RouteMergeInfo createMergedWithOldRouteAlternativeRouteFromIndex(final int indexAfterWhichRouteChanges,
+
+            /**
+             * @param indexAfterWhichRouteChanges >= 0 && < uniformRoute.size()
+             */
+            private RouteMergeInfo createMergedWithOldRouteAlternativeRouteFromIndex(int indexAfterWhichRouteChanges,
                                                                                      boolean bewareOfJammedEdge) {
-                final IGeoPosition positionAfterWhichRouteChanges = car
-                        .getPositionOnIndex(indexAfterWhichRouteChanges);
+                var uniformRouteSize = car.getUniformRouteSize();
+                if (indexAfterWhichRouteChanges >= uniformRouteSize) {
+                    indexAfterWhichRouteChanges = uniformRouteSize - 1;
+                }
+
+                var positionAfterWhichRouteChanges = car.getPositionOnIndex(indexAfterWhichRouteChanges);
                 var oldUniformRoute = car.getUniformRoute();
+
                 var newSimpleRouteEnd = routeGenerator.generateRouteInfo(positionAfterWhichRouteChanges,
                         oldUniformRoute.get(oldUniformRoute.size() - 1),
                         bewareOfJammedEdge);
                 if (newSimpleRouteEnd.size() == 0) { // Case when GraphHopper has problems
-                    newSimpleRouteEnd = new ArrayList<>(oldUniformRoute.subList(indexAfterWhichRouteChanges, oldUniformRoute.size()));
+                    logger.warn("New route is empty. Will use old route.");
+                    newSimpleRouteEnd = new ArrayList<>(oldUniformRoute.subList(indexAfterWhichRouteChanges,
+                            oldUniformRoute.size()));
                 }
+
                 List<RouteNode> route = oldUniformRoute.subList(0, indexAfterWhichRouteChanges);
                 route.addAll(newSimpleRouteEnd);
-                final RouteMergeInfo mergeResult = routeTransformer.mergeByDistance(car.getSimpleRoute(),
+                RouteMergeInfo mergeResult = routeTransformer.mergeByDistance(car.getSimpleRoute(),
                         newSimpleRouteEnd);
                 mergeResult.newUniformRoute = route;
 
@@ -348,11 +358,12 @@ public class CarAgent extends AbstractAgent {
                 double timeForTheEndWithoutJam = car.getMillisecondsFromAToB(car.getMoveIndex(),
                         car.getUniformRoute().size() - 1);
                 double timeForTheEndWithJam = timeForTheEndWithoutJam + howLongTakesJam;
-                final Integer indexOfRouteNodeWithEdge = car.findIndexOfEdgeOnRoute((long) edgeId,
-                        THRESHOLD_UNTIL_INDEX_CHANGE);
+                int threshold = configContainer.getConstructionSiteThresholdUntilIndexChange();
+                Integer indexOfRouteNodeWithEdge = car.findIndexOfEdgeOnRoute((long) edgeId,
+                        threshold);
                 int indexAfterWhichRouteChanges;
                 if (indexOfRouteNodeWithEdge != null || !jamStart) {
-                    indexAfterWhichRouteChanges = car.getNextNonVirtualIndex(THRESHOLD_UNTIL_INDEX_CHANGE);
+                    indexAfterWhichRouteChanges = car.getNextNonVirtualIndex(threshold);
                     if (indexAfterWhichRouteChanges >= car.getUniformRouteSize() - 1) {
                         return;
                     }
@@ -376,17 +387,8 @@ public class CarAgent extends AbstractAgent {
                                 mergeResult.newUniformRoute.size() - 1);
 
                         if (timeForTheEndWithJam > timeForOfDynamicRoute) {
-
-                            logger.info("Trip time through the jam: " + timeForTheEndWithJam + " vs "
-                                    + timeForOfDynamicRoute + ", so route WILL be changed");
-                            // TODO: CHECK IF send refusal is on place // switchToNextLight was after this line
+                            // TODO: Check if send refusal is on place // switchToNextLight was after this line
                             updateVehicleRouteAfterMerge(indexAfterWhichRouteChanges, mergeResult);
-
-                        }
-                        else {
-
-                            logger.info("Trip time through the jam: " + timeForTheEndWithJam + " vs "
-                                    + timeForOfDynamicRoute + ", so route will NOT be changed");
                         }
                         borderlineIndex = null;
                     }
@@ -415,7 +417,9 @@ public class CarAgent extends AbstractAgent {
             var timeBeforeTroubleMs = this.configContainer.getTimeBeforeTrouble() * 1000;
 
             Behaviour troubleGenerator = new TickerBehaviour(this, timeBeforeTroubleMs) {
-                private final int maxMoveIndexOnTP = timeBeforeTroubleMs / movePeriodMs;
+                private final int MAX_MOVE_ON_TP = timeBeforeTroubleMs / movePeriodMs;
+                // TODO: From current index, choose trouble EdgeId
+                private final int SAFE_BUFFER = 5;
 
                 @Override
                 public void onTick() {
@@ -424,7 +428,6 @@ public class CarAgent extends AbstractAgent {
                             getFixedRandomIndex() :
                             getTrulyRandomIndex(car.getMoveIndex(), route.size());
 
-                    // TODO: If moveIndex + THRESHOLD_UNTIL_INDEX_CHANGE >= route.size() this can happen
                     if (index < route.size()) {
                         RouteNode troublePointTmp = route.get(index);
                         troublePoint = new RouteNode(troublePointTmp.getLat(), troublePointTmp.getLng(),
@@ -438,20 +441,16 @@ public class CarAgent extends AbstractAgent {
                     stop();
                 }
 
-                // TODO: from current index
-                //   choose trouble EdgeId
-                // TODO: magic numbers !!!
-                private final int magicNumber = 5;
 
                 private int getFixedRandomIndex() {
                     // Warn: Value inside nextInt must be constant for fixed generation to work
-                    var min = maxMoveIndexOnTP + THRESHOLD_UNTIL_INDEX_CHANGE + magicNumber;
+                    var min = MAX_MOVE_ON_TP + configContainer.getConstructionSiteThresholdUntilIndexChange() + SAFE_BUFFER;
                     var max = initialRouteSize - min;
                     return getRandomIndexInBounds(min, max);
                 }
 
                 private int getTrulyRandomIndex(int moveIndex, int routeSize) {
-                    var min = moveIndex + THRESHOLD_UNTIL_INDEX_CHANGE + magicNumber;
+                    var min = moveIndex + configContainer.getConstructionSiteThresholdUntilIndexChange() + SAFE_BUFFER;
                     var max = routeSize - min;
                     return getRandomIndexInBounds(min, max);
                 }
@@ -496,7 +495,7 @@ public class CarAgent extends AbstractAgent {
         return car;
     }
 
-    public void move() {
+    private void move() {
         if (borderlineIndex == null || car.getMoveIndex() < borderlineIndex) {
             car.move();
             if (!USE_BATCHED_UPDATES) {

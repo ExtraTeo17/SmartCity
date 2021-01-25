@@ -50,6 +50,8 @@ import static smartcity.config.StaticConfig.USE_BATCHED_UPDATES;
  */
 public class PedestrianAgent extends AbstractAgent {
     public static final String name = PedestrianAgent.class.getSimpleName().replace("Agent", "");
+    public static final long NANO_IN_MILLISECONDS = 1_000_000L;
+
 
     private final IRouteGenerator router;
     private final ITaskProvider taskProvider;
@@ -73,7 +75,16 @@ public class PedestrianAgent extends AbstractAgent {
         this.troublePointsConfigContainer = troublePointsConfigContainer;
     }
 
-    public boolean isInBus() { return DrivingState.IN_BUS == pedestrian.getState(); }
+
+    /**
+     * Tell whether the pedestrian is currently commuting via a bus or walking by foot.
+     *
+     * @return true if the pedestrian is travelling in the bus, false otherwise
+     */
+    public boolean isInBus() {
+        return DrivingState.IN_BUS == pedestrian.getState();
+    }
+
 
     @Override
     protected void setup() {
@@ -115,7 +126,7 @@ public class PedestrianAgent extends AbstractAgent {
                             StationNode station = pedestrian.getStartingStation();
                             ACLMessage msg = createMessageById(ACLMessage.REQUEST_WHEN, StationAgent.name, station.getAgentId());
                             Properties properties = createProperties(MessageParameter.PEDESTRIAN);
-                            properties.setProperty(MessageParameter.DESIRED_OSM_STATION_ID, pedestrian.getTargetStation().getOsmId() + "");
+                            properties.setProperty(MessageParameter.DESIRED_OSM_STATION_ID, String.valueOf(pedestrian.getTargetStation().getOsmId()));
                             properties.setProperty(MessageParameter.ARRIVAL_TIME, timeProvider.getCurrentSimulationTime()
                                     .toString());
                             msg.setAllUserDefinedParameters(properties);
@@ -145,7 +156,7 @@ public class PedestrianAgent extends AbstractAgent {
                     sendMessageAboutReachingDestinationToSmartCityAgent();
                     doDelete();
                 }
-                else if (!pedestrian.isTroubled()) {
+                else  {
                     move();
                 }
             }
@@ -195,7 +206,7 @@ public class PedestrianAgent extends AbstractAgent {
                         if (rcv.getPerformative() == ACLMessage.REQUEST) {
                             ACLMessage response = createMessage(ACLMessage.AGREE, rcv.getSender());
                             var properties = createProperties(MessageParameter.PEDESTRIAN);
-                            properties.setProperty(MessageParameter.DESIRED_OSM_STATION_ID, pedestrian.getTargetStation().getOsmId() + "");
+                            properties.setProperty(MessageParameter.DESIRED_OSM_STATION_ID, String.valueOf(pedestrian.getTargetStation().getOsmId()));
                             response.setAllUserDefinedParameters(properties);
                             send(response);
 
@@ -212,10 +223,10 @@ public class PedestrianAgent extends AbstractAgent {
                                 pedestrian.move();
                             }
                         }
-                        else if (rcv.getPerformative() == ACLMessage.INFORM){
+                        else if (rcv.getPerformative() == ACLMessage.INFORM) {
                             handleCrashOfTheBus(rcv);
                         }
-                            break;
+                        break;
                     case MessageParameter.BUS:
                         if (rcv.getPerformative() == ACLMessage.REQUEST) {
                             ACLMessage response = createMessage(ACLMessage.AGREE, rcv.getSender());
@@ -233,7 +244,7 @@ public class PedestrianAgent extends AbstractAgent {
                             informLightManager(pedestrian);
                         }
                         else if (rcv.getPerformative() == ACLMessage.INFORM) {
-                          handleCrashOfTheBus(rcv);
+                            handleCrashOfTheBus(rcv);
                         }
                         break;
                     case MessageParameter.BUS_MANAGER:
@@ -249,30 +260,29 @@ public class PedestrianAgent extends AbstractAgent {
             }
 
             private void handleCrashOfTheBus(ACLMessage rcv) {
-                pedestrian.setTroubled(true);
                 logger.info("Get info about trouble from bus");
 
                 expectedNewStationNode = parseCrashMessageFromBus(rcv);
 
-                var troublePoint =  Position.of(rcv.getUserDefinedParameter(MessageParameter.TROUBLE_LAT),
+                var troublePoint = Position.of(rcv.getUserDefinedParameter(MessageParameter.TROUBLE_LAT),
                         rcv.getUserDefinedParameter(MessageParameter.TROUBLE_LON));
-                IGeoPosition nextClosestStationPosition = Position.of(expectedNewStationNode.getLat() + "",
-                        expectedNewStationNode.getLng() + "");
-                if(troublePoint.equals(nextClosestStationPosition)) {
+                IGeoPosition nextClosestStationPosition = Position.of(String.valueOf(expectedNewStationNode.getLat()),
+                        String.valueOf(expectedNewStationNode.getLng()));
+                if (troublePoint.equals(nextClosestStationPosition)) {
                     currentPosition = pedestrian.getPosition();
                 }
-                else{
+                else {
                     currentPosition = troublePoint;
                 }
 
 
-                LocalTime arrivalTime = LocalTime.of(0,0,0,0);
-                        if(currentPosition!=nextClosestStationPosition) {
+                LocalTime arrivalTime = LocalTime.of(0, 0, 0, 0);
+                if (currentPosition != nextClosestStationPosition) {
 
-                            arrivalTime = computeArrivalTime(currentPosition, nextClosestStationPosition,
-                                    expectedNewStationNode.getOsmId() + "");
-                        }
-                sendMessageToBusManager(rcv,arrivalTime.toString());
+                    arrivalTime = computeArrivalTime(currentPosition, nextClosestStationPosition,
+                            expectedNewStationNode);
+                }
+                sendMessageToBusManager(rcv, arrivalTime.toString());
 
                 if (expectedNewStationNode.equals(pedestrian.getStationFinish())) {
                     performMetamorphosisToBike();
@@ -305,7 +315,8 @@ public class PedestrianAgent extends AbstractAgent {
             }
 
             private StationNode parseCrashMessageFromBus(ACLMessage rcv) {
-             return  new StationNode(rcv.getUserDefinedParameter(MessageParameter.LAT_OF_NEXT_CLOSEST_STATION),
+
+                return new StationNode(rcv.getUserDefinedParameter(MessageParameter.LAT_OF_NEXT_CLOSEST_STATION),
                         rcv.getUserDefinedParameter(MessageParameter.LON_OF_NEXT_CLOSEST_STATION),
                         rcv.getUserDefinedParameter(MessageParameter.DESIRED_OSM_STATION_ID),
                         rcv.getUserDefinedParameter(MessageParameter.AGENT_ID_OF_NEXT_CLOSEST_STATION));
@@ -377,6 +388,8 @@ public class PedestrianAgent extends AbstractAgent {
             }
 
             private void restartAgentWithNewBusLine(List<RouteNode> arrivingRouteToClosestStation, String busLine) {
+                boolean pedestrianTestable = pedestrian instanceof TestPedestrian;
+
                 pedestrian = new Pedestrian(pedestrian.getAgentId(),
                         arrivingRouteToClosestStation,
                         arrivingRouteToClosestStation,
@@ -386,13 +399,15 @@ public class PedestrianAgent extends AbstractAgent {
                         pedestrian.getStationFinish(),
                         timeProvider,
                         taskProvider);
+                if (pedestrianTestable) {
+                    pedestrian = new TestPedestrian(pedestrian);
+                }
+
                 getNextStation(busLine);
                 informLightManager(pedestrian);
-                pedestrian.setTroubled(false);
                 pedestrian.setState(DrivingState.MOVING);
 
-              
-              if (!pedestrian.isAtStation()) {
+                if (!pedestrian.isAtStation()) {
                     quitBus(false);
                 }
             }
@@ -404,11 +419,13 @@ public class PedestrianAgent extends AbstractAgent {
                 bikeTimeMilliseconds = pedestrian.getMillisecondsOnRoute(bikeRoute, firstIndex, bikeSpeed);
             }
 
-            private LocalTime computeArrivalTime(IGeoPosition pointA, IGeoPosition pointB, String desiredOsmStationId) {
+            private LocalTime computeArrivalTime(IGeoPosition pointA, IGeoPosition pointB, StationNode desiredOsmStation) {
                 LocalTime now = timeProvider.getCurrentSimulationTime().toLocalTime();
-                arrivingRouteToClosestStation = router.generateRouteForPedestrians(pointA, pointB, null,
-                        desiredOsmStationId);
-                return now.plusNanos(pedestrian.getMillisecondsOnRoute(arrivingRouteToClosestStation) * 1_000_000L);
+
+                arrivingRouteToClosestStation = router.generateRouteForPedestrians(pointA, pointB,
+                        desiredOsmStation, null);
+                return now.plusNanos(pedestrian.getMillisecondsOnRoute(arrivingRouteToClosestStation) * NANO_IN_MILLISECONDS);
+
             }
         };
         var onError = createErrorConsumer(new PedestrianAgentDeadEvent(this.getId(),
@@ -439,7 +456,7 @@ public class PedestrianAgent extends AbstractAgent {
             ACLMessage msg = createMessageById(ACLMessage.INFORM, StationAgent.name, nextStation.getAgentId());
             Properties properties = createProperties(MessageParameter.PEDESTRIAN);
             var currentTime = timeProvider.getCurrentSimulationTime();
-            var predictedTime = currentTime.plusNanos(pedestrian.getMillisecondsToNextStation() * 1_000_000L);
+            var predictedTime = currentTime.plusNanos(pedestrian.getMillisecondsToNextStation() * NANO_IN_MILLISECONDS);
             properties.setProperty(MessageParameter.ARRIVAL_TIME, predictedTime.toString());
             properties.setProperty(MessageParameter.BUS_LINE, busLine);
             msg.setAllUserDefinedParameters(properties);
@@ -455,10 +472,10 @@ public class PedestrianAgent extends AbstractAgent {
         ACLMessage msg = createMessage(ACLMessage.INFORM, BusManagerAgent.NAME);
 
         var currentTime = timeProvider.getCurrentSimulationTime();
-        var predictedTime = currentTime.plusNanos(pedestrian.getMillisecondsToNextStation() * 1_000_000L).toLocalTime();
+        var predictedTime = currentTime.plusNanos(pedestrian.getMillisecondsToNextStation() * NANO_IN_MILLISECONDS).toLocalTime();
         msg.addUserDefinedParameter(MessageParameter.ARRIVAL_TIME, predictedTime.toString());
-        msg.addUserDefinedParameter(MessageParameter.STATION_FROM_ID, pedestrian.getStartingStation().getOsmId() + "");
-        msg.addUserDefinedParameter(MessageParameter.STATION_TO_ID, pedestrian.getStationFinish().getOsmId() + "");
+        msg.addUserDefinedParameter(MessageParameter.STATION_FROM_ID, String.valueOf(pedestrian.getStartingStation().getOsmId()));
+        msg.addUserDefinedParameter(MessageParameter.STATION_TO_ID, String.valueOf(pedestrian.getStationFinish().getOsmId()));
         msg.addUserDefinedParameter(MessageParameter.EVENT, MessageParameter.START);
         send(msg);
     }
@@ -492,5 +509,10 @@ public class PedestrianAgent extends AbstractAgent {
 
     public Pedestrian getPedestrian() {
         return pedestrian;
+    }
+
+    @Override
+    protected final String getAdjacentIdParameter(final LightManagerNode node) {
+        return String.valueOf(node.getCrossingOsmId1());
     }
 }

@@ -45,7 +45,6 @@ public class BusDataParser implements IBusDataParser {
         this.zone = zone;
     }
 
-    // TODO: Add tests for this function
     @Override
     public BusPreparationData parseBusData(Document busData) {
         Node osmRoot = busData.getFirstChild();
@@ -53,16 +52,14 @@ public class BusDataParser implements IBusDataParser {
 
         Set<BusInfoData> busInfoDataSet = new LinkedHashSet<>();
         HashMap<Long, OSMStation> busStopsMap = new LinkedHashMap<>();
-        int errors = 0;
         for (var osmNode : osmXMLNodes) {
             var nodeName = osmNode.getNodeName();
             if (nodeName.equals("relation")) {
                 var busInfoData = parseRelation(osmNode);
                 if (busInfoData.isEmpty()) {
-                    if (++errors < 5) {
-                        continue;
-                    }
-                    throw new RuntimeException("Too many errors when parsing busInfo");
+                    logger.info("Bus info data for relation " + osmNode.getAttributes().getNamedItem("id") +
+                            " was empty");
+                    continue;
                 }
                 busInfoDataSet.add(busInfoData.get());
             }
@@ -73,19 +70,25 @@ public class BusDataParser implements IBusDataParser {
         }
 
         var busInfos = busDataMerger.getBusInfosWithStops(busInfoDataSet, busStopsMap);
-        
-        List<String> busLinesOfInfosToRemoveCauseOfMissingTimetableInWarszawskieAPI = new ArrayList<>();
+
+        List<BusInfo> busInfosToRemove = new ArrayList<>();
         for (var busInfo : busInfos) {
-            var brigadeInfos = generateBrigadeInfos(busInfo.busLine, busInfo.stops);
-            if (brigadeInfos.size() > 0) {
-                busInfo.addBrigades(brigadeInfos);
-            } else {
-            	busLinesOfInfosToRemoveCauseOfMissingTimetableInWarszawskieAPI.add(busInfo.busLine);
-            	logger.info("Warning: Timetable for bus line " + busInfo.busLine + " is empty in Warszawskie API. Line will not be considered");
+            if (busInfo.stops.isEmpty()) {
+                logger.info("Warning: No stops in the for line " + busInfo.busLine);
+                continue;
             }
-		}
-		busInfos.removeIf(info -> busLinesOfInfosToRemoveCauseOfMissingTimetableInWarszawskieAPI.stream()
-				.anyMatch(line -> info.busLine.equals(line)));
+
+            var brigadeInfos = generateBrigadeInfos(busInfo.busLine, busInfo.stops);
+            if (brigadeInfos.isEmpty()) {
+                busInfosToRemove.add(busInfo);
+                logger.info("Warning: Timetable for bus line " + busInfo.busLine + " is empty in Warszawskie API. " +
+                        "Line will not be considered");
+                continue;
+            }
+            busInfo.addBrigades(brigadeInfos);
+        }
+
+        busInfos.removeAll(busInfosToRemove);
 
         return new BusPreparationData(busInfos, busStopsMap);
     }
@@ -94,6 +97,7 @@ public class BusDataParser implements IBusDataParser {
         List<Long> stationIds = new ArrayList<>();
         String busLine = "";
         List<Long> waysIds = new ArrayList<>();
+        boolean ztmWarsaw = false;
         for (var node : IterableNodeList.of(relation.getChildNodes())) {
             if (node.getNodeName().equals("member")) {
                 NamedNodeMap attributes = node.getAttributes();
@@ -110,11 +114,19 @@ public class BusDataParser implements IBusDataParser {
             else if (node.getNodeName().equals("tag")) {
                 NamedNodeMap attributes = node.getAttributes();
                 Node namedItemID = attributes.getNamedItem("k");
+
+                if (namedItemID.getNodeValue().equals("network")) {
+                    ztmWarsaw = isZTMWarsaw(attributes);
+
+                }
                 if (namedItemID.getNodeValue().equals("ref")) {
                     Node lineNumber = attributes.getNamedItem("v");
                     busLine = lineNumber.getNodeValue();
                 }
             }
+        }
+        if (!ztmWarsaw) {
+            return Optional.empty();
         }
 
         var waysDoc = busApiManager.getBusWays(waysIds);
@@ -122,9 +134,17 @@ public class BusDataParser implements IBusDataParser {
             return Optional.empty();
         }
         logger.debug("Started parsing ways: " + waysIds.get(0) + "_" + waysIds.get(waysIds.size() - 1));
-        List<OSMWay> ways = parseOsmWays(waysDoc.get()); // TODO: reuse in car
+        List<OSMWay> ways = parseOsmWays(waysDoc.get());
 
         return Optional.of(new BusInfoData(new BusInfo(busLine, ways), stationIds));
+    }
+
+    private boolean isZTMWarsaw(NamedNodeMap relation) {
+        return isZTMWarsaw(relation.getNamedItem("v").getNodeValue());
+    }
+
+    private boolean isZTMWarsaw(String network) {
+        return network.equals("ZTM Warszawa");
     }
 
     @SuppressWarnings("FeatureEnvy")
@@ -136,7 +156,7 @@ public class BusDataParser implements IBusDataParser {
         var nodesIter = osmNodes.iterator();
         var twoFirstWaysOpt = findTwoFirstWaysInZone(nodesIter);
         if (twoFirstWaysOpt.isEmpty()) {
-            logger.error("Didn't find two connected ways in provided zone");
+            logger.warn("Didn't find two connected ways in provided zone");
             return route;
         }
 
@@ -232,28 +252,39 @@ public class BusDataParser implements IBusDataParser {
         return Optional.empty();
     }
 
+    /**
+     * @param nodes potential Station node
+     * @return (Station node number, type)
+     */
     private Optional<Siblings<String>> searchForStationNumberAndType(NodeList nodes) {
         var filteredNodes = IterableNodeList.of(nodes)
                 .stream()
                 .filter(n -> n.getNodeName().equals("tag"))
                 .map(Node::getAttributes)
-                .dropWhile(attr -> !attr.getNamedItem("k").getNodeValue().equals("public_transport"))
                 .collect(Collectors.toList());
 
         if (filteredNodes.isEmpty()) {
             return Optional.empty();
         }
 
-        var type = filteredNodes.get(0).getNamedItem("v").getNodeValue();
-        for (int i = 1; i < filteredNodes.size(); ++i) {
-            var nodesMap = filteredNodes.get(i);
-            if (nodesMap.getNamedItem("k").getNodeValue().equals("ref")) {
-                var nodeNumber = nodesMap.getNamedItem("v").getNodeValue();
-                return Optional.of(Siblings.of(nodeNumber, type));
+        boolean isZtmWarsaw = false;
+        String type = null;
+        String nodeNumber = null;
+        for (var nodesMap : filteredNodes) {
+            var key = nodesMap.getNamedItem("k").getNodeValue();
+            var value = nodesMap.getNamedItem("v").getNodeValue();
+            switch (key) {
+                case "network" -> isZtmWarsaw = isZTMWarsaw(value);
+                case "ref" -> nodeNumber = value;
+                case "public_transport" -> type = value;
             }
         }
 
-        return Optional.empty();
+        if (type == null || nodeNumber == null || !isZtmWarsaw) {
+            return Optional.empty();
+        }
+
+        return Optional.of(Siblings.of(nodeNumber, type));
     }
 
     private Collection<BrigadeInfo> generateBrigadeInfos(String busLine, Collection<OSMStation> osmStations) {

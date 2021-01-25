@@ -7,7 +7,6 @@ import com.google.common.eventbus.Subscribe;
 import com.google.inject.Inject;
 import events.web.DebugEvent;
 import events.web.roadblocks.TrafficJamFinishedEvent;
-import events.web.roadblocks.TrafficJamStartedEvent;
 import events.web.roadblocks.TroublePointCreatedEvent;
 import jade.core.Agent;
 import jade.core.behaviours.Behaviour;
@@ -17,10 +16,11 @@ import jade.lang.acl.ACLMessage;
 import jade.util.leap.Properties;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import osmproxy.ExtendedGraphHopper;
+import osmproxy.routes.abstractions.IGraphHopper;
 import routing.core.Position;
 import smartcity.SimulationState;
 import smartcity.config.ConfigContainer;
+import utilities.ConditionalExecutor;
 
 import java.util.Collections;
 import java.util.HashMap;
@@ -46,9 +46,11 @@ import static agents.utilities.BehaviourWrapper.wrapErrors;
  */
 public class TroubleManagerAgent extends Agent {
     public static final String name = TroubleManagerAgent.class.getSimpleName().replace("Agent", "");
-    private final static Logger logger = LoggerFactory.getLogger(TroubleManagerAgent.class);
+    private static final Logger logger = LoggerFactory.getLogger(TroubleManagerAgent.class);
+    public static final int PERIOD_OF_BROADCASTING = 5000;
 
     private final IAgentsContainer agentsContainer;
+    private final IGraphHopper graphHopper;
     private final ConfigContainer configContainer;
     private final EventBus eventBus;
 
@@ -58,9 +60,11 @@ public class TroubleManagerAgent extends Agent {
 
     @Inject
     TroubleManagerAgent(IAgentsContainer agentsContainer,
+                        IGraphHopper graphHopper,
                         ConfigContainer configContainer,
                         EventBus eventBus) {
         this.agentsContainer = agentsContainer;
+        this.graphHopper = graphHopper;
         this.configContainer = configContainer;
         this.eventBus = eventBus;
 
@@ -107,7 +111,7 @@ public class TroubleManagerAgent extends Agent {
         logger.debug("Got message about new troublePoint: " + troublePoint.getLat() + "  " + troublePoint.getLng());
         if (!mapOfConstructionSiteBlockedEdges.containsKey(edgeId)) {
             mapOfConstructionSiteBlockedEdges.put(edgeId, rcv.getUserDefinedParameter(MessageParameter.LENGTH_OF_JAM));
-            ExtendedGraphHopper.addForbiddenEdges(Collections.singletonList(edgeId));
+            graphHopper.addForbiddenEdges(Collections.singletonList(edgeId));
         }
         sendBroadcast(generateMessageAboutTrouble(rcv, MessageParameter.CONSTRUCTION, MessageParameter.SHOW));
     }
@@ -117,7 +121,7 @@ public class TroubleManagerAgent extends Agent {
         logger.debug("Got message about light traffic jam start on: " + edgeId);
         if (!mapOfLightTrafficJamBlockedEdges.containsKey(edgeId)) {
             mapOfLightTrafficJamBlockedEdges.put(edgeId, rcv.getUserDefinedParameter(MessageParameter.LENGTH_OF_JAM));
-            ExtendedGraphHopper.addForbiddenEdges(Collections.singletonList(edgeId));
+            graphHopper.addForbiddenEdges(Collections.singletonList(edgeId));
         }
         else {
             mapOfLightTrafficJamBlockedEdges.replace(edgeId, rcv.getUserDefinedParameter(MessageParameter.LENGTH_OF_JAM));
@@ -134,13 +138,14 @@ public class TroubleManagerAgent extends Agent {
         logger.debug("Got message about light traffic jam stop on: " + edgeId);
         if (mapOfLightTrafficJamBlockedEdges.containsKey(edgeId)) {
             mapOfLightTrafficJamBlockedEdges.remove(edgeId);
-            ExtendedGraphHopper.removeForbiddenEdges(Collections.singletonList(edgeId));
+            graphHopper.removeForbiddenEdges(Collections.singletonList(edgeId));
         }
         sendBroadcast(generateMessageAboutTrouble(rcv, MessageParameter.TRAFFIC_JAM, MessageParameter.STOP));
     }
 
+    // TODO: Send broadcasts when the trouble ends
     @Override
-    protected void setup() { // TODO: wysłać broadcact kiedy trouble się skończy
+    protected void setup() {
 
         Behaviour communication = new CyclicBehaviour() {
             @Override
@@ -177,7 +182,7 @@ public class TroubleManagerAgent extends Agent {
         };
 
 
-        Behaviour sayAboutTroubles = new TickerBehaviour(this, 5000) {
+        Behaviour sayAboutTroubles = new TickerBehaviour(this, PERIOD_OF_BROADCASTING) {
             @Override
             protected void onTick() {
 
@@ -186,7 +191,8 @@ public class TroubleManagerAgent extends Agent {
                 }
                 for (Map.Entry<Integer, String> entry : mapOfConstructionSiteBlockedEdges.entrySet()) {
                     // construction site
-                    logger.info("Edge id blocked: " + entry.getKey() + " length of jam: " + entry.getValue());
+                    ConditionalExecutor.debug(() ->
+                            logger.info("Edge id blocked: " + entry.getKey() + " length of jam: " + entry.getValue()));
                     sendBroadcast(generateMessageAboutTrafficJam(entry.getKey(), entry.getValue(),
                             MessageParameter.CONSTRUCTION, MessageParameter.SHOW));
                 }
@@ -205,13 +211,8 @@ public class TroubleManagerAgent extends Agent {
         addBehaviour(wrapErrors(communication, onError));
         addBehaviour(wrapErrors(sayAboutTroubles, onError));
     }
-
-    private void handleBusAccident(ACLMessage rcv) {
-
-    }
-
+    
     @Subscribe
     void handle(DebugEvent e) {
-
     }
 }

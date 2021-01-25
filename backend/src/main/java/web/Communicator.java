@@ -2,14 +2,14 @@ package web;
 
 import com.google.common.eventbus.Subscribe;
 import com.google.inject.Inject;
-import events.web.BatchedUpdateEvent;
-import events.web.SimulationPreparedEvent;
-import events.web.SimulationStartedEvent;
-import events.web.SwitchLightsEvent;
+import events.web.*;
 import events.web.bike.BikeAgentCreatedEvent;
 import events.web.bike.BikeAgentDeadEvent;
 import events.web.bike.BikeAgentUpdatedEvent;
-import events.web.bus.*;
+import events.web.bus.BusAgentCrashedEvent;
+import events.web.bus.BusAgentDeadEvent;
+import events.web.bus.BusAgentFillStateUpdatedEvent;
+import events.web.bus.BusAgentUpdatedEvent;
 import events.web.car.CarAgentCreatedEvent;
 import events.web.car.CarAgentDeadEvent;
 import events.web.car.CarAgentRouteChangedEvent;
@@ -23,6 +23,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import web.abstractions.IWebService;
 
+/**
+ * Used for handling all events which result in some interaction with frontend. <br/>
+ * It is the highest layer of communication with frontend. <br/>
+ */
 @SuppressWarnings("OverlyCoupledClass")
 class Communicator {
     private static final Logger logger = LoggerFactory.getLogger(Communicator.class);
@@ -85,10 +89,6 @@ class Communicator {
     }
 
     @Subscribe
-    public void handle(BusAgentStartedEvent e) {
-    }
-
-    @Subscribe
     public void handle(BusAgentUpdatedEvent e) {
         webService.updateBus(e.id, e.position);
     }
@@ -96,6 +96,11 @@ class Communicator {
     @Subscribe
     public void handle(BusAgentFillStateUpdatedEvent e) {
         webService.updateBusFillState(e.id, e.fillState);
+    }
+
+    @Subscribe
+    public void handle(BusAgentCrashedEvent e) {
+        webService.crashBus(e.id);
     }
 
     @Subscribe
@@ -153,7 +158,6 @@ class Communicator {
         webService.updateBike(e.id, e.position);
     }
 
-
     @Subscribe
     public void handle(BikeAgentDeadEvent e) {
         onHandle(e);
@@ -166,9 +170,11 @@ class Communicator {
     }
 
     @Subscribe
-    public void handle(BusAgentCrashedEvent e) {
-        webService.crashBus(e.id);
+    public void handle(ApiOverloadedEvent e) {
+        onHandle(e);
+        webService.notifyApiOverload();
     }
+
 
     private void onHandle(Object obj) {
         logger.info("Handling " + obj.getClass().getSimpleName());

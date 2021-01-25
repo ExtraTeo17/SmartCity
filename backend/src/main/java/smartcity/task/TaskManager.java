@@ -106,7 +106,7 @@ public class TaskManager implements ITaskManager {
         Consumer<Integer> createPedestrians = (runCount) -> {
             var busAgentOpt = getRandomBusAgent(random);
             if (busAgentOpt.isEmpty()) {
-                logger.error("No buses exist");
+                logger.warn("No buses with at least 2 stations exists");
                 return;
             }
 
@@ -132,7 +132,7 @@ public class TaskManager implements ITaskManager {
     }
 
     private Optional<BusAgent> getRandomBusAgent(Random random) {
-        return agentsContainer.getRandom(BusAgent.class, random);
+        return agentsContainer.getRandom(BusAgent.class, random, (b) -> b.getStationsNumber() > 1);
     }
 
     @Override

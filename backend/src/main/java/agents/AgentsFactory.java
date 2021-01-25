@@ -24,12 +24,12 @@ import vehicles.*;
 import java.util.HashSet;
 import java.util.List;
 
-@SuppressWarnings("OverlyCoupledClass")
+
 /**
  * The class responsible for creating all types of agents
  */
-public
-class AgentsFactory implements IAgentsFactory {
+@SuppressWarnings("OverlyCoupledClass")
+public class AgentsFactory implements IAgentsFactory {
     private static final Logger logger = LoggerFactory.getLogger(AgentsFactory.class);
 
     private final IdGenerator idGenerator;
@@ -70,9 +70,8 @@ class AgentsFactory implements IAgentsFactory {
     @Override
     public CarAgent create(List<RouteNode> route, boolean testCar) {
         var id = idGenerator.get(CarAgent.class);
-        var uniformRoute = routeTransformer.uniformRoute(route);
-        logger.trace("DisplayRoute size: " + route.size() + ", routeSize: " + uniformRoute.size());
-        var car = new Car(id, route, uniformRoute, timeProvider);
+        logger.trace("DisplayRoute size: " + route.size() + ", routeSize: " + route.size());
+        var car = new Car(id, route, route, timeProvider);
         if (testCar) {
             car = new TestCar(car, timeProvider);
         }
@@ -122,7 +121,8 @@ class AgentsFactory implements IAgentsFactory {
     public StationAgent create(OSMStation station) {
         var id = idGenerator.get(StationAgent.class);
         var stationStrategy = new StationStrategy(id, configContainer, timeProvider);
-        return new StationAgent(id, station, stationStrategy, timeProvider, eventBus);
+        var stationNode = new StationNode(station, id);
+        return new StationAgent(id, stationNode, stationStrategy, timeProvider, eventBus);
     }
 
     /**
@@ -175,7 +175,6 @@ class AgentsFactory implements IAgentsFactory {
      * @param testPedestrian   if the created agent, should be test
      * @return Filled {@link PedestrianAgent} object.
      */
-    // TODO: Simplify to avoid 6 arguments
     @Override
     public PedestrianAgent create(List<RouteNode> routeToStation, List<RouteNode> routeFromStation,
                                   StationNode startStation, StationNode finishStation,

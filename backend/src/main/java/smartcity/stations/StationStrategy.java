@@ -14,6 +14,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+/**
+ * Manages strategy for buses
+ */
 @SuppressWarnings({"UnusedReturnValue", "ClassWithTooManyFields"})
 public class StationStrategy {
     private final Logger logger;
@@ -95,6 +98,11 @@ public class StationStrategy {
         return arrivalInfos.removeIf(arrivalInfo -> arrivalInfo.agentName.equals(agentName));
     }
 
+    /**
+     * Manages people and buses at the station
+     *
+     * @return objects, that continue journey
+     */
     public OptimizationResult requestBusesAndPeopleFreeToGo() {
         var result = OptimizationResult.empty();
         for (var entry : busAgentOnStationToArrivalTime.entrySet()) {
@@ -179,7 +187,7 @@ public class StationStrategy {
 
     private void logDebugArrivalInfos(final List<ArrivalInfo> arrivalInfos) {
         StringBuilder builder = new StringBuilder();
-        arrivalInfos.forEach(info -> builder.append(info.agentName + ", "));
+        arrivalInfos.forEach(info -> builder.append(info.agentName).append(", "));
         logger.info("Arrival infos size: " + arrivalInfos.size() + ", agent names inside: " + builder.toString());
     }
 

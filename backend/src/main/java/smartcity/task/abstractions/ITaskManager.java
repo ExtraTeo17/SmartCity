@@ -6,6 +6,9 @@ import utilities.Siblings;
 import java.time.LocalDateTime;
 import java.util.function.BooleanSupplier;
 
+/**
+ * Schedules and cancels tasks
+ */
 public interface ITaskManager {
     void scheduleCarCreation(int carsLimit, int testCarId);
 

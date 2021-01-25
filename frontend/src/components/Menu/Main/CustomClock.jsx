@@ -4,20 +4,43 @@ import "../../../styles/CustomClock.css";
 
 export const timeUpdateScaledThresholdMs = 999;
 export const timeUpdateThresholdMs = 49;
+
+/**
+ * @category Menu
+ */
+
 const dateFormat = new Intl.DateTimeFormat("pl-PL", {
-  dateStyle: "short",
+  year: "numeric",
+  month: "2-digit",
+  day: "2-digit",
 });
 const timeFormat = new Intl.DateTimeFormat("pl-PL", {
-  timeStyle: "medium",
+  hour: "2-digit",
+  minute: "2-digit",
+  second: "2-digit",
 });
 
-// https://css-tricks.com/using-requestanimationframe-with-react-hooks/
+/**
+ * @typedef {Object} Props - CustomClock parameters
+ * @memberof module:MainMenu
+ * @prop {boolean} wasStarted - if simulation was started
+ * @prop {Date} time - initial clock time
+ * @prop {number} timeScale - time scale of the clock, i.e. clock will change `timeScale` seconds each 1 second
+ */
+
+/**
+ * Animated clock component shown after start of simulation <br/>
+ * resources: {@link https://css-tricks.com/using-requestanimationframe-with-react-hooks/}
+ * @function CustomClock
+ * @memberof module:MainMenu
+ * @param {Props} props
+ */
 export const CustomClockObj = props => {
   const { wasStarted, time, timeScale } = props;
   const [currTime, setCurrTime] = useState(time);
 
-  const requestRef = React.useRef();
-  const previousTimeRef = React.useRef();
+  const requestRef = React.useRef(0);
+  const previousTimeRef = React.useRef(0);
 
   useEffect(() => {
     setCurrTime(time);

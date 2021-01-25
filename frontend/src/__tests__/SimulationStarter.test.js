@@ -10,6 +10,8 @@ let message;
 WebServer.send = msg => {
   message = msg;
 };
+WebServer.isConnected = () => true;
+// @ts-ignore
 store.dispatch = () => {};
 
 let container = null;
@@ -56,6 +58,9 @@ const startSimulationData = {
   extendWaitTime: 60,
 
   troublePointStrategyActive: true,
+  troublePointThresholdUntilIndexChange: 60,
+  noTroublePointStrategyIndexFactor: 20,
+
   trafficJamStrategyActive: false,
   transportChangeStrategyActive: true,
 };
@@ -104,6 +109,9 @@ it("Passes correct data to ApiManager", () => {
     extendWaitTime: startSimulationData.extendWaitTime,
 
     troublePointStrategyActive: startSimulationData.troublePointStrategyActive,
+    troublePointThresholdUntilIndexChange: startSimulationData.troublePointThresholdUntilIndexChange,
+    noTroublePointStrategyIndexFactor: startSimulationData.noTroublePointStrategyIndexFactor,
+
     trafficJamStrategyActive: startSimulationData.trafficJamStrategyActive,
     transportChangeStrategyActive: startSimulationData.transportChangeStrategyActive,
   });

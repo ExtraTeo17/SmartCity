@@ -2,6 +2,7 @@ package osmproxy.elements;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+import osmproxy.elements.data.RouteOrientation;
 import testutils.FileLoader;
 import utilities.IterableNodeList;
 
@@ -30,7 +31,7 @@ class OSMWay_determineRouteOrientationAndFilterRelevantNodes_Tests {
 
         // Assert
         Assertions.assertEquals(3, result);
-        Assertions.assertEquals(OSMWay.RouteOrientation.FRONT, firstWay.getRouteOrientation());
+        Assertions.assertEquals(RouteOrientation.FRONT, firstWay.getRouteOrientation());
     }
 
     @Test
@@ -54,6 +55,6 @@ class OSMWay_determineRouteOrientationAndFilterRelevantNodes_Tests {
 
         // Assert
         Assertions.assertEquals(3, result);
-        Assertions.assertEquals(OSMWay.RouteOrientation.BACK, firstWay.getRouteOrientation());
+        Assertions.assertEquals(RouteOrientation.BACK, firstWay.getRouteOrientation());
     }
 }

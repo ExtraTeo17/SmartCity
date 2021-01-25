@@ -1,11 +1,10 @@
 package osmproxy.buses;
 
 import com.google.inject.Inject;
-import org.json.simple.parser.JSONParser;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
-import osmproxy.OsmQueryManager;
+import osmproxy.OverpassQueryManager;
 import osmproxy.abstractions.IMapAccessManager;
 import osmproxy.buses.abstractions.IBusApiManager;
 import routing.core.IZone;
@@ -19,7 +18,6 @@ import java.util.Scanner;
 
 public class BusApiManager implements IBusApiManager {
     private static final Logger logger = LoggerFactory.getLogger(BusApiManager.class);
-    private static final JSONParser jsonParser = new JSONParser();
 
     private final IMapAccessManager mapAccessManager;
 
@@ -30,10 +28,10 @@ public class BusApiManager implements IBusApiManager {
 
     @Override
     public Optional<Document> getBusDataXml(IZone zone) {
-        var query = OsmQueryManager.getBusQuery(zone.getCenter(), zone.getRadius());
+        var query = OverpassQueryManager.getBusQuery(zone.getCenter(), zone.getRadius());
         var overpassInfo = mapAccessManager.getNodesDocument(query);
 
-        ConditionalExecutor.debug(() -> {
+        ConditionalExecutor.trace(() -> {
             logger.info("Writing bus-data to: " + FileWrapper.DEFAULT_OUTPUT_PATH_XML);
             //noinspection OptionalGetWithoutIsPresent
             FileWrapper.write(overpassInfo.get());
@@ -59,7 +57,7 @@ public class BusApiManager implements IBusApiManager {
             return Optional.empty();
         }
 
-        ConditionalExecutor.debug(() -> {
+        ConditionalExecutor.trace(() -> {
             String path = "target/line_" + busLine + "_stop_" + busStopId + "_" + busStopNr + ".json";
             logger.info("Writing bus-brigade-date to: " + path);
             FileWrapper.write(jsonString, path);
@@ -73,7 +71,7 @@ public class BusApiManager implements IBusApiManager {
         var query = buildWaysQuery(waysIds);
         var resultOpt = mapAccessManager.getNodesDocument(query);
 
-        ConditionalExecutor.debug(() -> {
+        ConditionalExecutor.trace(() -> {
             //noinspection OptionalGetWithoutIsPresent
             var result = resultOpt.get();
             String path = "target/busWays_" + waysIds.get(0) + "_" +
@@ -88,10 +86,10 @@ public class BusApiManager implements IBusApiManager {
     private String buildWaysQuery(List<Long> waysIds) {
         StringBuilder busWayQueryBuilder = new StringBuilder();
         for (var id : waysIds) {
-            busWayQueryBuilder.append(OsmQueryManager.getSingleBusWayQuery(id));
+            busWayQueryBuilder.append(OverpassQueryManager.getSingleBusWayQuery(id));
         }
 
-        return OsmQueryManager.getQueryWithPayload(busWayQueryBuilder.toString());
+        return OverpassQueryManager.getQueryWithPayload(busWayQueryBuilder.toString());
     }
 
 

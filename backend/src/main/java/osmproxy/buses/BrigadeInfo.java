@@ -11,7 +11,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 public class BrigadeInfo implements Iterable<Timetable>, Serializable {
-    private final static Logger logger = LoggerFactory.getLogger(BrigadeInfo.class);
+    private static final Logger logger = LoggerFactory.getLogger(BrigadeInfo.class);
 
     public final String brigadeId;
     public final List<Timetable> timetables;
@@ -25,7 +25,8 @@ public class BrigadeInfo implements Iterable<Timetable>, Serializable {
                 .collect(Collectors.toList());
     }
 
-    public void addTimetableRecords(long stationId, List<TimetableRecord> timetableRecords) {
+    //TODO: Docs
+    void addTimetableRecords(long stationId, List<TimetableRecord> timetableRecords) {
         if (timetables.size() != timetableRecords.size()) {
             logger.error("Initial timetables size different than current:\n" +
                     " initial: '" + timetables.size() +

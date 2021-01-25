@@ -7,7 +7,7 @@ public class OSMLight extends OSMNode {
         super(id, lat, lon);
     }
 
-    public final void setAdherentWayId(long value) {
+    private void setAdherentWayId(long value) {
         adherentWayId = value;
     }
 

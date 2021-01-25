@@ -4,38 +4,52 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import routing.abstractions.IRouteTransformer;
 import routing.data.RouteMergeInfo;
+import routing.nodes.LightManagerNode;
 import routing.nodes.RouteNode;
+import routing.nodes.StationNode;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import static utilities.NumericHelper.PRECISION;
 
-public final class RouteTransformer implements // TODO: We'll make it private other time, sorry
+class RouteTransformer implements
         IRouteTransformer {
     private static final Logger logger = LoggerFactory.getLogger(RouteTransformer.class);
 
-    // TODO: In some cases distance is 0 -> dx|dy is NaN -> same nodes?
-    @SuppressWarnings("FeatureEnvy")
     @Override
     public List<RouteNode> uniformRoute(List<RouteNode> route) {
-        return route; // TODO: CLEAN UP
-    }
-
-    @Override
-    public List<RouteNode> uniformRouteNext(List<RouteNode> route) {
         List<RouteNode> newRoute = new ArrayList<>();
+        List<RouteNode> doubledNodes = new ArrayList<>();
+
         for (int i = 0; i < route.size() - 1; ++i) {
             RouteNode nodeA = route.get(i);
             RouteNode nodeB = route.get(i + 1);
 
-            double x = nodeB.getLng() - nodeA.getLng();
-            double y = nodeB.getLat() - nodeA.getLat();
-
             double distance = RoutingHelper.getDistance(nodeA, nodeB);
             if (distance == 0) {
+                if (doubledNodes.isEmpty()) {
+                    doubledNodes.add(nodeA);
+                }
+                doubledNodes.add(nodeB);
                 continue;
             }
+            else if (!doubledNodes.isEmpty()) {
+                List<RouteNode> specialNodes = doubledNodes.stream()
+                        .filter(node -> node instanceof LightManagerNode || node instanceof StationNode)
+                        .collect(Collectors.toList());
+                nodeA = switch (specialNodes.size()) {
+                    case 0 -> doubledNodes.get(0);
+                    case 1 -> specialNodes.get(0);
+                    default -> throw new IllegalStateException("There is more than one special node of same position on the route");
+                };
+                distance = RoutingHelper.getDistance(nodeA, nodeB);
+                doubledNodes.clear();
+            }
+
+            double x = nodeB.getLng() - nodeA.getLng();
+            double y = nodeB.getLat() - nodeA.getLat();
 
             double dx = x / distance;
             double dy = y / distance;
@@ -58,8 +72,8 @@ public final class RouteTransformer implements // TODO: We'll make it private ot
     }
 
     @Override
-    public List<RouteNode> uniformRouteNew(List<RouteNode> route, List<Integer> edgeList) {
-        List<RouteNode> newRoute = uniformRouteNext(route);
+    public List<RouteNode> uniformRoute(List<RouteNode> route, List<Integer> edgeList) {
+        List<RouteNode> newRoute = uniformRoute(route);
 
         double denominator = newRoute.size();
         for (double nominator = 0; nominator < denominator; ++nominator) {

@@ -129,7 +129,7 @@ public class BikeAgent extends AbstractAgent {
         return vehicle;
     }
 
-    public void move() {
+    private void move() {
         vehicle.move();
         if (!USE_BATCHED_UPDATES) {
             eventBus.post(new BikeAgentUpdatedEvent(this.getId(), vehicle.getPosition()));

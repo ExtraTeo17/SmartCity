@@ -4,10 +4,30 @@ import React from "react";
 import { dispatch } from "../../redux/store";
 import { startSimulationDataUpdated, generatePedestriansUpdated } from "../../redux/core/actions";
 import { setIfValidInt } from "../../utils/helpers";
-import { LIGHT_EXTEND_MIN, LIGHT_EXTEND_MAX, STATION_EXTEND_MAX, STATION_EXTEND_MIN } from "../../constants/minMax";
+import {
+  LIGHT_EXTEND_MIN,
+  LIGHT_EXTEND_MAX,
+  STATION_EXTEND_MAX,
+  STATION_EXTEND_MIN,
+  TP_THRESHOLD_MIN,
+  TP_THRESHOLD_MAX,
+  TP_NO_STRATEGY_FACTOR_MIN,
+  TP_NO_STRATEGY_FACTOR_MAX,
+} from "../../constants/minMax";
 
 import "../../styles/Menu.css";
 
+/**
+ * Menu tab, which holds all strategy and generation switches. <br/>
+ * Each strategy requires some generation checkboxes on:
+ * - light -> car | bike | pedestrian generation
+ * - station -> bus generation
+ * - trouble points -> car generation
+ * - traffic jams -> car generation
+ * - bus failure -> bus generation
+ * @category Menu
+ * @module StrategyMenu
+ */
 const StrategyMenu = props => {
   const {
     configState,
@@ -28,6 +48,9 @@ const StrategyMenu = props => {
       extendWaitTime,
 
       troublePointStrategyActive,
+      troublePointThresholdUntilIndexChange,
+      noTroublePointStrategyIndexFactor,
+
       trafficJamStrategyActive,
       transportChangeStrategyActive,
     },
@@ -70,6 +93,16 @@ const StrategyMenu = props => {
     dispatchUpdate({ troublePointStrategyActive: e.target.checked });
   }
 
+  function evSetTroublePointThresholdUntilIndexChange(e) {
+    setIfValidInt(e, TP_THRESHOLD_MIN, TP_THRESHOLD_MAX, val => dispatchUpdate({ troublePointThresholdUntilIndexChange: val }));
+  }
+
+  function evSetNoTroublePointStrategyIndexFactor(e) {
+    setIfValidInt(e, TP_NO_STRATEGY_FACTOR_MIN, TP_NO_STRATEGY_FACTOR_MAX, val =>
+      dispatchUpdate({ noTroublePointStrategyIndexFactor: val })
+    );
+  }
+
   function evSetTrafficJamStrategyActive(e) {
     dispatchUpdate({ trafficJamStrategyActive: e.target.checked });
   }
@@ -94,6 +127,8 @@ const StrategyMenu = props => {
     dispatch(generatePedestriansUpdated(e.target.checked));
   }
 
+  const canUseLightStrategy = generateCars || generatePedestrians || generateBikes;
+
   return (
     <>
       <div className="mb-4 form-border">
@@ -115,7 +150,7 @@ const StrategyMenu = props => {
           <div className="custom-control custom-radio">
             <input
               type="radio"
-              disabled={!generateCars}
+              disabled={!generateCars || wasStarted}
               checked={!generateBatchesForCars}
               name="carsRadio"
               className="custom-control-input"
@@ -129,7 +164,7 @@ const StrategyMenu = props => {
           <div className="custom-control custom-radio">
             <input
               type="radio"
-              disabled={!generateCars}
+              disabled={!generateCars || wasStarted}
               checked={generateBatchesForCars}
               name="carsRadio"
               className="custom-control-input"
@@ -146,6 +181,7 @@ const StrategyMenu = props => {
           <input
             type="checkbox"
             checked={generatePedestrians}
+            disabled={wasStarted}
             className="form-check-input"
             id="generatePedestrians"
             onChange={evSetGeneratePedestrians}
@@ -239,7 +275,7 @@ const StrategyMenu = props => {
             className="custom-control-input"
             id="lightStrategyActive"
             checked={lightStrategyActive}
-            disabled={!(generateCars || generatePedestrians || generateBikes) || wasStarted}
+            disabled={!canUseLightStrategy || wasStarted}
             onChange={evSetLightStrategyActive}
           />
           <label
@@ -253,7 +289,7 @@ const StrategyMenu = props => {
             Light strategy
           </label>
         </div>
-        {lightStrategyActive && (
+        {canUseLightStrategy && lightStrategyActive && (
           <div className="form-group mt-2" key={`ls-${configState}`}>
             <label htmlFor="extendLightTime">Extension time</label>
             <input
@@ -290,7 +326,7 @@ const StrategyMenu = props => {
             Bus station strategy
           </label>
         </div>
-        {stationStrategyActive && (
+        {generatePedestrians && stationStrategyActive && (
           <div className="form-group mt-2" key={`ss-${configState}`}>
             <label htmlFor="extendWaitTime">Extension time</label>
             <input
@@ -325,6 +361,40 @@ const StrategyMenu = props => {
             Trouble point strategy
           </label>
         </div>
+
+        {generateTroublePoints && troublePointStrategyActive && (
+          <div className="form-group mt-2" key={`tpA-${configState}`}>
+            <label htmlFor="troublePointThresholdUntilIndexChange">Threshold until route change</label>
+            <input
+              type="number"
+              className="form-control"
+              id="troublePointThresholdUntilIndexChange"
+              defaultValue={troublePointThresholdUntilIndexChange}
+              min={TP_THRESHOLD_MIN}
+              max={TP_THRESHOLD_MAX}
+              disabled={wasStarted}
+              placeholder="Enter treshold until route changes on trouble point"
+              onChange={evSetTroublePointThresholdUntilIndexChange}
+            />
+          </div>
+        )}
+
+        {generateTroublePoints && !troublePointStrategyActive && (
+          <div className="form-group mt-2" key={`tbB-${configState}`}>
+            <label htmlFor="noTroublePointStrategyIndexFactor">Trouble point visibility threshold</label>
+            <input
+              type="number"
+              className="form-control"
+              id="noTroublePointStrategyIndexFactor"
+              defaultValue={noTroublePointStrategyIndexFactor}
+              min={TP_NO_STRATEGY_FACTOR_MIN}
+              max={TP_NO_STRATEGY_FACTOR_MAX}
+              disabled={wasStarted}
+              placeholder="Enter threshold until car sees trouble point"
+              onChange={evSetNoTroublePointStrategyIndexFactor}
+            />
+          </div>
+        )}
 
         <div className="custom-control custom-switch user-select-none mt-4">
           <input

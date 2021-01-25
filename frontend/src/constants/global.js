@@ -5,12 +5,6 @@
  */
 
 /**
- * Backend web-socket address
- * @constant
- */
-export const SERVER_ADDRESS = "ws://localhost:9000";
-
-/**
  * Time before attempting to reconnect to server again in case of failure
  * @constant
  */

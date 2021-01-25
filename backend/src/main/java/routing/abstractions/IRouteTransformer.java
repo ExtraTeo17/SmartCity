@@ -11,9 +11,6 @@ import java.util.List;
  */
 public interface IRouteTransformer {
 
-    @Deprecated
-    List<RouteNode> uniformRoute(List<RouteNode> route);
-
     /**
      * Add additional nodes between existing nodes on the route, called virtual
      * nodes. The virtual nodes are added for brevity so that the distances between
@@ -23,9 +20,9 @@ public interface IRouteTransformer {
      * @param route The route for which the virtual nodes are to be added
      * @return Uniformed route with almost equal distances between consecutive nodes
      */
-    List<RouteNode> uniformRouteNext(List<RouteNode> route);
+    List<RouteNode> uniformRoute(List<RouteNode> route);
 
-    List<RouteNode> uniformRouteNew(List<RouteNode> route, List<Integer> edgeList);
+    List<RouteNode> uniformRoute(List<RouteNode> route, List<Integer> edgeList);
 
     RouteMergeInfo mergeByDistance(List<RouteNode> oldRoute,
                                    List<RouteNode> newRoute);

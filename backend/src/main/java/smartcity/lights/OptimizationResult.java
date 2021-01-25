@@ -8,17 +8,18 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class OptimizationResult {
+    public static final double MILLISECONDS_IN_SECONDS = 1000.0;
     private final List<String> carsFreeToProceedNames = new ArrayList<>();
     private final List<Pair<String, List<String>>> busesAndPedestriansFreeToProceedNames = new ArrayList<>();
     private final int extendTimeSeconds;
     private final int defaultExecutionDelay;
 
-    private boolean shouldNotifyCarAboutStartOfTrafficJamOnThisLight = false;
-    private boolean shouldNotifyCarAboutStopOfTrafficJamOnThisLight = false;
-    private double lengthOfJam = 0;
-    private long osmWayId = 0;
-    private IGeoPosition jammedLightPosition = null;
-    private String agentStuckInJam = null;
+    private boolean shouldNotifyCarAboutStartOfTrafficJamOnThisLight;
+    private boolean shouldNotifyCarAboutStopOfTrafficJamOnThisLight;
+    private double lengthOfJam;
+    private long osmWayId;
+    private IGeoPosition jammedLightPosition;
+    private String agentStuckInJam;
 
     public OptimizationResult(int extendTimeSeconds, int defaultExecutionDelay) {
         this.extendTimeSeconds = extendTimeSeconds;
@@ -46,7 +47,7 @@ public class OptimizationResult {
     }
 
     public void addBusAndPedestrianGrantedPassthrough(String busAgentName, List<String> pedestrians) {
-        busesAndPedestriansFreeToProceedNames.add(new Pair<String, List<String>>(busAgentName, pedestrians));
+        busesAndPedestriansFreeToProceedNames.add(new Pair<>(busAgentName, pedestrians));
     }
 
     public List<Pair<String, List<String>>> busesAndPedestriansFreeToProceed() {
@@ -58,12 +59,11 @@ public class OptimizationResult {
         shouldNotifyCarAboutStartOfTrafficJamOnThisLight = true;
         this.osmWayId = osmWayId;
         this.jammedLightPosition = jammedLightPosition;
-        //TODO: change 2 na liczbe samochodów które przejzdzaja podczas jednego swiatla. Oraz change how long is green and red
-        lengthOfJam = Math.floor((numerOfCarsInTheQueue * 1000.0 / defaultExecutionDelay) *
+        //TODO: Change 2 for number of cars that passes through 1 light
+        //  And change how long is green and red
+        lengthOfJam = Math.floor((numerOfCarsInTheQueue * MILLISECONDS_IN_SECONDS / defaultExecutionDelay) *
                 ((defaultExecutionDelay + defaultExecutionDelay) +
-                        (defaultExecutionDelay + defaultExecutionDelay + extendTimeSeconds)) / 2); // TODO: Magic numbers
-
-
+                        (defaultExecutionDelay + defaultExecutionDelay + extendTimeSeconds)) / 2);
     }
 
     public final double getLengthOfJam() {

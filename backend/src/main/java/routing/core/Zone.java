@@ -36,7 +36,6 @@ public class Zone implements IZone {
         this.radius = radius;
     }
 
-    @SuppressWarnings("FeatureEnvy")
     // source: https://stackoverflow.com/a/27943/6841224
     @Override
     public boolean contains(IGeoPosition pos, int radiusTolerance) {

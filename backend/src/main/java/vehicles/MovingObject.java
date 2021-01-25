@@ -6,7 +6,6 @@ import routing.RoutingConstants;
 import routing.core.IGeoPosition;
 import routing.nodes.LightManagerNode;
 import routing.nodes.RouteNode;
-import routing.nodes.StationNode;
 import smartcity.ITimeProvider;
 import vehicles.enums.DrivingState;
 
@@ -20,17 +19,15 @@ import static routing.RoutingConstants.CALCULATION_DELTA_PER_INDEX;
  * predefined speed.
  */
 public abstract class MovingObject {
-    final ITimeProvider timeProvider;
     final Logger logger;
+    final ITimeProvider timeProvider;
     final int agentId;
     final int speed;
     List<RouteNode> simpleRoute;
     List<RouteNode> uniformRoute;
     int moveIndex;
     int closestLightIndex;
-    DrivingState state;
-
-    // TODO: Change name to IVehicle/AbstractVehicle
+    private DrivingState state;
 
     MovingObject(ITimeProvider timeProvider, int agentId, int speed, List<RouteNode> uniformRoute, List<RouteNode> simpleRoute) {
         this.timeProvider = timeProvider;
@@ -102,7 +99,7 @@ public abstract class MovingObject {
         return uniformRoute.get(index);
     }
 
-    //TODO: RETURN TO NORMAL  return uniformRoute.get(moveIndex-1);
+    //TODO: Return to normal: `return uniformRoute.get(moveIndex-1);`
     public RouteNode getRouteNodeBeforeLight() {
         if (moveIndex - 1 <= 0) {
             return uniformRoute.get(0);
@@ -132,7 +129,8 @@ public abstract class MovingObject {
     /**
      * Checks whether an edge exists on the uniformRoute
      *
-     * @param edgeId of the edge checked for existence
+     * @param thresholdUntilIndexChange - added to moveIndex to acquire minimum index where route can change
+     * @param edgeId                    of the edge checked for existence
      * @return Index of the RouteNode on uniformRoute
      * which contains the edge if edge is found, otherwise null
      */
@@ -167,19 +165,6 @@ public abstract class MovingObject {
         return null;
     }
 
-    public static void displayRouteDebugStatic(List<RouteNode> route) {
-        System.out.println(("Display route debug of size: " + route.size()));
-        StringBuilder builder = new StringBuilder();
-        for (int i = 0; i < route.size(); ++i) {
-            builder.append("R[" + i + "]: " + route.get(i).getDebugString(route.get(i) instanceof StationNode) + "; ");
-        }
-        System.out.println(builder.toString());
-    }
-
-    public void displayRouteDebug(List<RouteNode> route) {
-    	displayRouteDebugStatic(route);
-    }
-
     public boolean isAtTrafficLights() {
         if (isAtDestination()) {
             return false;
@@ -197,7 +182,7 @@ public abstract class MovingObject {
     }
 
     // TODO: Sometimes index goes to 0
-    public long getAdjacentOsmWayId(int indexFar) {
+    long getAdjacentOsmWayId(int indexFar) {
         int index = moveIndex + indexFar;
         if (index >= uniformRoute.size()) {
             return -1;
@@ -242,7 +227,7 @@ public abstract class MovingObject {
         return getMillisecondsOnRoute(route, 0);
     }
 
-    public int getMillisecondsOnRoute(List<RouteNode> route, int index) {
+    int getMillisecondsOnRoute(List<RouteNode> route, int index) {
         return getMillisecondsOnRoute(route, index, getSpeed());
     }
 
@@ -256,6 +241,10 @@ public abstract class MovingObject {
         return moveIndex + thresholdUntilIndexChange >= closestLightIndex;
     }
 
+    int findIndexOfNodeOnRoute(final RouteNode node) {
+        return uniformRoute.indexOf(node);
+    }
+
     public int getNextNonVirtualIndex() {
         return getNextNonVirtualIndexFromIndex(moveIndex);
     }
@@ -264,7 +253,7 @@ public abstract class MovingObject {
         return getNextNonVirtualIndexFromIndex(moveIndex + threshold);
     }
 
-    public int getNextNonVirtualIndexFromIndex(int index) {
+    private int getNextNonVirtualIndexFromIndex(int index) {
         while (index < uniformRoute.size() - 1 && uniformRoute.get(index).isVirtual()) {
             ++index;
         }

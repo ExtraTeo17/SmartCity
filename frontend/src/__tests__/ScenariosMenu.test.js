@@ -1,9 +1,11 @@
+// @ts-nocheck
 import React from "react";
 import { render, unmountComponentAtNode } from "react-dom";
 import { act } from "react-dom/test-utils";
 import { ScenariosMenuObj } from "../components/Menu/ScenariosMenu";
 import { ConfigState } from "../redux/models/states";
 import { PREPARE_SIMULATION_REQUEST } from "../web/MessageType";
+
 // eslint-disable-next-line no-unused-vars
 import WebServer from "../web/WebServer";
 import * as actions from "../redux/core/actions";

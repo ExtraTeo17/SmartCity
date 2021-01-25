@@ -50,12 +50,14 @@ import static smartcity.config.StaticConfig.USE_BATCHED_UPDATES;
  */
 public class BusAgent extends AbstractAgent {
     public static final String name = BusAgent.class.getSimpleName().replace("Agent", "");
+    public static final int PERIOD_FOR_TROUBLE_GENERATION = 8000;
+
 
     private final ITimeProvider timeProvider;
     private final Bus bus;
     private final IChangeTransportConfigContainer configContainer;
     private RouteNode troublePoint;
-    private int numberOfPassedStations = 0 ;
+    private int numberOfPassedStations;
 
     BusAgent(int busId, Bus bus,
              ITimeProvider timeProvider,
@@ -69,7 +71,7 @@ public class BusAgent extends AbstractAgent {
 
     @Override
     protected void setup() {
-        informNextStation();
+        informNextStation(true);
         var firstStationOpt = bus.getCurrentStationNode();
         if (firstStationOpt.isEmpty()) {
             print("No stations on route!", LoggerLevel.ERROR);
@@ -82,8 +84,6 @@ public class BusAgent extends AbstractAgent {
         print("Started at station " + firstStation.getAgentId() + ".");
         bus.setState(DrivingState.MOVING);
 
-        // TODO: Executed each x = 3600 / bus.getSpeed() = 3600m / (40 * TIME_SCALE) = 3600 / 400 = 9ms
-        //   Maybe decrease the interval? - I don't think processor can keep up with all of this.
         Behaviour move = new TickerBehaviour(this, RoutingConstants.STEP_CONSTANT / bus.getSpeed()) {
             @Override
             public void onTick() {
@@ -154,7 +154,7 @@ public class BusAgent extends AbstractAgent {
                             if (node instanceof LightManagerNode) {
                                 informLightManager(bus);
                             }
-                            informNextStation();
+                            informNextStation(false);
                             numberOfPassedStations++;
                             bus.setState(DrivingState.MOVING);
                             move();
@@ -220,7 +220,7 @@ public class BusAgent extends AbstractAgent {
 
                                 response.setAllUserDefinedParameters(properties);
                                 send(response);
-                                informNextStation();
+                                informNextStation(false);
                                 bus.setState(DrivingState.PASSING_STATION);
                             }
                         }
@@ -263,9 +263,10 @@ public class BusAgent extends AbstractAgent {
 
 
         if (configContainer.shouldGenerateBusFailures()) {
-            Behaviour troubleGenerator = new TickerBehaviour(this, 8000) {
+            Behaviour troubleGenerator = new TickerBehaviour(this, PERIOD_FOR_TROUBLE_GENERATION) {
 
                 @Override
+
                 public void onTick() {
                     if (configContainer.wasBusCrashGeneratedOnce()) {
                         logger.trace("Bus crash has already been generated once");
@@ -291,7 +292,7 @@ public class BusAgent extends AbstractAgent {
                 }
 
                 private void sendMessageAboutCrashTroubleToBusManager(LocalDateTime timeOfCrash) {
-                    ACLMessage msg = createMessageAboutCrash(BusManagerAgent.NAME, false,timeOfCrash);
+                    ACLMessage msg = createMessageAboutCrash(BusManagerAgent.NAME, false, timeOfCrash);
                     logger.info("Send message about crash to BusManager ");
                     send(msg);
                 }
@@ -299,9 +300,8 @@ public class BusAgent extends AbstractAgent {
                 private void sendMessageAboutCrashTroubleToIncomingStations(LocalDateTime timeOfCrash) {
 
                     var stations = bus.getStationNodesOnRoute();
-                    for(int i = numberOfPassedStations;i< stations.size();i++ )
-                    {
-                        ACLMessage msg = createMessageAboutCrash(StationAgent.name+stations.get(i).getAgentId(), false,timeOfCrash);
+                    for (int i = numberOfPassedStations; i < stations.size(); i++) {
+                        ACLMessage msg = createMessageAboutCrash(StationAgent.name + stations.get(i).getAgentId(), false, timeOfCrash);
                         logger.info("Send message about crash to incoming stations ");
                         send(msg);
                     }
@@ -309,7 +309,7 @@ public class BusAgent extends AbstractAgent {
 
                 private void sendMessageAboutCrashTroubleToPedestrians(LocalDateTime timeOfCrash) {
                     for (String pedestrian : bus.getAllPassengers()) {
-                        ACLMessage msg = createMessageAboutCrash(pedestrian, false,timeOfCrash);
+                        ACLMessage msg = createMessageAboutCrash(pedestrian, false, timeOfCrash);
                         logger.info("Send message about crash to pedestrian: " + pedestrian);
                         send(msg);
                     }
@@ -326,12 +326,16 @@ public class BusAgent extends AbstractAgent {
                     properties.setProperty(MessageParameter.TROUBLE_LAT, Double.toString(troublePoint.getLat()));
                     properties.setProperty(MessageParameter.TROUBLE_LON, Double.toString(troublePoint.getLng()));
                     if (!isTroubleManager) {
-                    	properties.setProperty(MessageParameter.DESIRED_OSM_STATION_ID, ((StationNode) bus.findNextStop()).getOsmId() + "");
-                        properties.setProperty(MessageParameter.AGENT_ID_OF_NEXT_CLOSEST_STATION, ((StationNode) bus.findNextStop()).getAgentId() + "");
-                        //maybe not needed
-                        properties.setProperty(MessageParameter.LAT_OF_NEXT_CLOSEST_STATION, bus.findNextStop().getLat() + "");
-                        properties.setProperty(MessageParameter.LON_OF_NEXT_CLOSEST_STATION, bus.findNextStop().getLng() + "");
+                        var nextStop = bus.findNextStop();
 
+                        if (nextStop instanceof StationNode) {
+                            var stationStop = (StationNode) nextStop;
+                            properties.setProperty(MessageParameter.DESIRED_OSM_STATION_ID, String.valueOf((stationStop).getOsmId()));
+                            properties.setProperty(MessageParameter.AGENT_ID_OF_NEXT_CLOSEST_STATION, String.valueOf((stationStop).getAgentId()));
+                            //maybe not needed
+                            properties.setProperty(MessageParameter.LAT_OF_NEXT_CLOSEST_STATION, String.valueOf(stationStop.getLat()));
+                            properties.setProperty(MessageParameter.LON_OF_NEXT_CLOSEST_STATION, String.valueOf(stationStop.getLng()));
+                        }
                         properties.setProperty(MessageParameter.BUS_LINE, getLine());
                         properties.setProperty(MessageParameter.BRIGADE, bus.getBrigade());
                     }
@@ -352,7 +356,7 @@ public class BusAgent extends AbstractAgent {
         }
     }
 
-    public void move() {
+    private void move() {
         bus.move();
         if (!USE_BATCHED_UPDATES) {
             eventBus.post(new BusAgentUpdatedEvent(this.getId(), bus.getPosition()));
@@ -363,19 +367,19 @@ public class BusAgent extends AbstractAgent {
         return bus.getPosition();
     }
 
-    private void informNextStation() {
+    private void informNextStation(boolean isStart) {
         // finds next station and announces his arrival
-        var stationOpt = bus.findNextStation();
+        final long NANO_IN_MILLISECONDS = 1_000_000L;
+        var stationOpt = bus.findNextStation(isStart);
         if (stationOpt.isPresent()) {
             var station = stationOpt.get();
             var stationId = station.getAgentId();
             ACLMessage msg = createMessageById(ACLMessage.INFORM, StationAgent.name, stationId);
             var properties = createProperties(MessageParameter.BUS);
             var currentTime = timeProvider.getCurrentSimulationTime();
-            var predictedTime = currentTime.plusNanos(bus.getMillisecondsToNextStation() * 1_000_000L);
+            var predictedTime = currentTime.plusNanos(bus.getMillisecondsToNextStation() * NANO_IN_MILLISECONDS);
             properties.setProperty(MessageParameter.ARRIVAL_TIME, predictedTime.toString());
             properties.setProperty(MessageParameter.BUS_LINE, bus.getLine());
-
             var osmId = station.getOsmId();
             var timeOnStation = bus.getTimeOnStation(osmId);
             if (timeOnStation.isPresent()) {
@@ -412,15 +416,23 @@ public class BusAgent extends AbstractAgent {
         return bus.getLine();
     }
 
-    // TODO: Fix situation where bus route contains only one station and pedestrians tries to choose two
+    /**
+     * Find two subsequent stations from all the stations on this bus' route. The second returned
+     * station will always be after the first returned station. Example:
+     * Bus' stations: 1, 2, 3, 4, 5. Two subsequent stations then could be:
+     * (1, 3); (1, 5); (2, 3); (2, 4); (3, 5).
+     *
+     * @param random Instance of pseudorandom numbers generator
+     * @return Two subsequent station nodes. If the bus does not have more than one station on its route,
+     * then nothing will be returned.
+     */
     public final Optional<Siblings<StationNode>> getTwoSubsequentStations(final Random random) {
-
         List<StationNode> stationsOnRoute = bus.getStationNodesOnRoute();
         if (stationsOnRoute.size() <= 1) {
             return Optional.empty();
         }
 
-        int halfIndex = (int) Math.ceil((double) stationsOnRoute.size() / 2.0);
+        int halfIndex = (int) Math.ceil((double) stationsOnRoute.size() / 2);
         int firstIndex = random.nextInt(halfIndex);
         int secondIndex = firstIndex + random.nextInt(stationsOnRoute.size() - firstIndex - 1) + 1;
 
@@ -428,25 +440,20 @@ public class BusAgent extends AbstractAgent {
                 stationsOnRoute.get(secondIndex)));
     }
 
-    /**
-     * @return If busAgent finished execution
-     */
-    public boolean runBasedOnTimetable() {
+    public void runBasedOnTimetable() {
         var state = this.getAgentState().getValue();
         if (state != AgentState.cAGENT_STATE_INITIATED) {
-            return state == AgentState.cAGENT_STATE_ACTIVE && bus.isAtDestination();
+            return;
         }
 
         if (shouldStart()) {
             start();
         }
-
-        return false;
     }
 
     public boolean shouldStart() {
         return bus.shouldStart();
     }
 
-
+    public int getStationsNumber() {return bus.getStationNodesOnRouteSize();}
 }

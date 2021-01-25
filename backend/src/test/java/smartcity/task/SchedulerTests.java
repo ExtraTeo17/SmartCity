@@ -65,16 +65,16 @@ class SchedulerTests {
         var configContainer = new ConfigContainer();
         configContainer.setGeneratePedestriansAndBuses(true);
         var ref = new Object() {
-            private int carsLimit = 0;
-            private int testCarId = 0;
+            private int carsLimit;
+            private int testCarId;
 
-            private int bikesLimit = 0;
-            private int testBikeId = 0;
-            private int pedLimit = 0;
-            private int testPedId = 0;
+            private int bikesLimit;
+            private int testBikeId;
+            private int pedLimit;
+            private int testPedId;
 
-            private LocalDateTime startTime = null;
-            private int timeScale = 0;
+            private LocalDateTime startTime;
+            private int timeScale;
         };
         var taskManager = mock(ITaskManager.class);
         doAnswer(invocationOnMock -> {
@@ -124,6 +124,9 @@ class SchedulerTests {
 
         var shouldGenerateTP = true;
         var timeBeforeTrouble = 5006;
+        var troublePointThresholdUntilIndexChange = 101;
+        var noTroublePointStrategyIndexFactor = 333;
+
 
         var shouldGenerateBusFailures = false;
         var shouldDetectTrafficJams = true;
@@ -150,7 +153,8 @@ class SchedulerTests {
                 startTime, timeScale,
                 lightStrategyActive, extendLightTime,
                 stationStrategyActive, extendWaitTime,
-                troublePointStrategyActive, trafficJamStrategyActive, transportChangeStrategyActive
+                troublePointStrategyActive, troublePointThresholdUntilIndexChange, noTroublePointStrategyIndexFactor,
+                trafficJamStrategyActive, transportChangeStrategyActive
         );
 
         // Act
@@ -187,6 +191,9 @@ class SchedulerTests {
         assertEquals(extendWaitTime, configContainer.getExtendWaitTime());
 
         assertEquals(troublePointStrategyActive, configContainer.isConstructionSiteStrategyActive());
+        assertEquals(troublePointThresholdUntilIndexChange, configContainer.getConstructionSiteThresholdUntilIndexChange());
+        assertEquals(noTroublePointStrategyIndexFactor, configContainer.getNoConstructionSiteStrategyIndexFactor());
+
         assertEquals(trafficJamStrategyActive, configContainer.isTrafficJamStrategyActive());
         assertEquals(transportChangeStrategyActive, configContainer.isTransportChangeStrategyActive());
     }
@@ -196,7 +203,7 @@ class SchedulerTests {
         // Arrange
         var taskManager = mock(ITaskManager.class);
         var ref = new Object() {
-            private LocalDateTime timeSet = null;
+            private LocalDateTime timeSet;
         };
         doAnswer(invocationOnMock -> {
             ref.timeSet = invocationOnMock.getArgument(1);
@@ -221,11 +228,15 @@ class SchedulerTests {
     }
 
     private StartSimulationEvent prepareStartEvent(LocalDateTime startTime) {
-        return new StartSimulationEvent(false, 111, 112, false, true, 444,
-                222, 5005, 222, true, 223, false,
-                true, false, true, startTime, 333, false,
-                354, false, 33,
-                false, true, false
+        return new StartSimulationEvent(false, 111, 112,
+                false, true, 444,
+                222, 5005, 222, true,
+                223, false, true,
+                false, true, startTime,
+                333, false, 354,
+                false, 33, false,
+                44, 42,
+                true, false
         );
     }
 

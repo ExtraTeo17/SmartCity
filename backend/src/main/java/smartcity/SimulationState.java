@@ -9,7 +9,7 @@ public enum SimulationState {
 
     public boolean isOneOf(SimulationState... states) {
         for (var state : states) {
-            if (state.equals(this)) {
+            if (state == this) {
                 return true;
             }
         }

@@ -6,6 +6,36 @@ import { angleFromCoordinates } from "../../utils/helpers";
 import { getRotationReducer } from "./Extensions/reducers";
 import RotatedMarker from "./Extensions/RotatedMarker";
 
+/**
+ * Pedestrian marker.
+ * @category Markers
+ * @module Pedestrian
+ */
+
+/**
+ * @typedef {Object} Props
+ * @property {Pedestrian} pedestrian
+ */
+
+/**
+ * @typedef {Object} Pedestrian
+ * @property {number} id
+ * @property {Position[]} route
+ * @property {Position} location
+ * @property {boolean} isTestPedestrian
+ */
+
+/**
+ * @typedef {Object} Position - Represents position on map
+ * @property {number} lat - Latitude in degrees
+ * @property {number} lng - Longitude in degrees
+ */
+
+/**
+ * Pedestrian component
+ * @function
+ * @param {Props} props
+ */
 const Pedestrian = props => {
   const {
     pedestrian: { id, route, location, isTestPedestrian },
@@ -15,6 +45,7 @@ const Pedestrian = props => {
   const [state, dispatch] = useReducer(getRotationReducer(PEDESTRIAN_ROTATION_THRESHOLD), { loc: location, angle: defaultAngle });
 
   useEffect(() => {
+    // @ts-ignore
     dispatch({ payload: location });
   }, [location]);
 

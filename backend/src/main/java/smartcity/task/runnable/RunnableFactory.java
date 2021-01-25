@@ -12,6 +12,7 @@ import java.util.function.BooleanSupplier;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
+//TODO: Docs
 class RunnableFactory implements IRunnableFactory {
     private ScheduledExecutorService mainExecutor;
     private List<ScheduledExecutorService> executors;
@@ -66,7 +67,6 @@ class RunnableFactory implements IRunnableFactory {
     }
 
     private ScheduledExecutorService getNewThreadExecutor() {
-        // TODO: Not sure if performance wise
         var executor = Executors.newSingleThreadScheduledExecutor();
         executors.add(executor);
         return executor;

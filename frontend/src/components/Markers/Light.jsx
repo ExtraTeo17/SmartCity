@@ -6,6 +6,36 @@ import { STATIC_Z_INDEX } from "../../constants/markers";
 
 import "../../styles/Light.css";
 
+/**
+ * Light marker.
+ * @category Markers
+ * @module Light
+ */
+
+/**
+ * @typedef {Object} Props
+ * @property {Light} light
+ */
+
+/**
+ * @typedef {Object} Light
+ * @property {number} id
+ * @property {boolean} jammed - if traffic jam is present
+ * @property {Position} location
+ * @property {LightColor} color
+ */
+
+/**
+ * @typedef {Object} Position - Represents position on map
+ * @property {number} lat - Latitude in degrees
+ * @property {number} lng - Longitude in degrees
+ */
+
+/**
+ * Light component
+ * @function
+ * @param {Props} props
+ */
 const Light = props => {
   const {
     light: { id, jammed, location, color },
@@ -30,7 +60,9 @@ const Light = props => {
       icon={color === LightColor.GREEN ? greenLightIcon : redLightIcon}
       zIndexOffset={STATIC_Z_INDEX}
     >
-      <Popup>I am a light-{id}!</Popup>
+      <Popup>
+        I am a {jammed ? "jammed" : ""} light-{id}!
+      </Popup>
     </Marker>
   );
 };

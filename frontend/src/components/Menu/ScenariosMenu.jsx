@@ -5,9 +5,17 @@ import { dispatch } from "../../redux/store";
 import ApiManager from "../../web/ApiManager";
 import { IS_DEBUG } from "../../constants/global";
 import { initialInteractionState } from "../../redux/reducers/interaction";
+import { notifyWaitForConnection } from "../../utils/helpers";
 
 import "../../styles/Menu.css";
 
+/**
+ * Menu tab, which holds all scenarios, i.e. predefined settings for all configurations. <br/>
+ * Each scenario has coresponding strategy in StrategyMenu.
+ * Each scenario button prepares the simulation automatically.
+ * @category Menu
+ * @module ScenariosMenu
+ */
 export const ScenariosMenuObj = props => {
   const { inPreparation, wasStarted, config = initialInteractionState } = props;
 
@@ -15,6 +23,8 @@ export const ScenariosMenuObj = props => {
     if (ApiManager.isConnected()) {
       dispatch(simulationPrepareStarted());
       ApiManager.prepareSimulation(data);
+    } else {
+      notifyWaitForConnection();
     }
   }
 
@@ -67,7 +77,7 @@ export const ScenariosMenuObj = props => {
     startData.useFixedRoutes = true;
     const date = new Date();
     date.setHours(8);
-    date.setMinutes(40);
+    date.setMinutes(42);
     date.setSeconds(0);
     startData.startTime = date;
     startData.timeScale = 10;
@@ -104,10 +114,12 @@ export const ScenariosMenuObj = props => {
 
     startData.useFixedRoutes = true;
     startData.startTime = new Date();
-    startData.timeScale = 10;
+    startData.timeScale = 7;
     startData.generateTroublePoints = true;
     startData.timeBeforeTrouble = 5;
     startData.troublePointStrategyActive = true;
+    startData.troublePointThresholdUntilIndexChange = 50;
+    startData.noTroublePointStrategyIndexFactor = 30;
 
     prepareData.generatePedestrians = false;
     startData.generateBikes = false;
@@ -137,7 +149,7 @@ export const ScenariosMenuObj = props => {
 
     startData.useFixedRoutes = true;
     startData.startTime = new Date();
-    startData.timeScale = 10;
+    startData.timeScale = 3;
     startData.detectTrafficJams = true;
     startData.trafficJamStrategyActive = true;
 
@@ -167,7 +179,8 @@ export const ScenariosMenuObj = props => {
     startData.testPedId = 5;
 
     startData.useFixedRoutes = true;
-    startData.startTime = new Date();
+    const date = getTransportChangeDate();
+    startData.startTime = date;
     startData.timeScale = 10;
     startData.generateBusFailures = true;
     startData.transportChangeStrategyActive = true;
@@ -185,6 +198,23 @@ export const ScenariosMenuObj = props => {
 
     dispatch(configReplaced(state));
     prepareSimulation(state.prepareSimulationData);
+  }
+
+  function getTransportChangeDate() {
+    const date = new Date();
+
+    const day = date.getDay();
+    const isWeekend = day === 6 || day === 0;
+    if (isWeekend) {
+      date.setHours(9);
+      date.setMinutes(5);
+    } else {
+      date.setHours(8);
+      date.setMinutes(40);
+    }
+    date.setSeconds(0);
+
+    return date;
   }
 
   return (

@@ -11,12 +11,12 @@ import jade.core.behaviours.TickerBehaviour;
 import jade.lang.acl.ACLMessage;
 import jade.util.leap.Properties;
 import org.javatuples.Pair;
-import osmproxy.elements.OSMStation;
 import routing.nodes.StationNode;
 import smartcity.ITimeProvider;
 import smartcity.lights.OptimizationResult;
 import smartcity.stations.StationStrategy;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -35,10 +35,10 @@ import static agents.utilities.BehaviourWrapper.wrapErrors;
 public class StationAgent extends AbstractAgent {
     public static final String name = StationAgent.class.getSimpleName().replace("Agent", "");
 
-    private final OSMStation station;
+    private final StationNode station;
 
     StationAgent(int id,
-                 OSMStation station,
+                 StationNode station,
                  StationStrategy stationStrategy,
                  ITimeProvider timeProvider,
                  EventBus eventBus) { // REMEMBER TO PRUNE BEYOND CIRCLE
@@ -46,7 +46,8 @@ public class StationAgent extends AbstractAgent {
         this.station = station;
 
         Behaviour communication = new CyclicBehaviour() {
-            @SuppressWarnings("DuplicatedCode")
+            private final Map<String, String> pedestrianAgentIDPreferredBusLine = new HashMap<>();
+
             @Override
             public void action() {
                 ACLMessage rcv = receive();
@@ -68,12 +69,33 @@ public class StationAgent extends AbstractAgent {
                 }
             }
 
+            public void addToAgentMap(String agentName, String desiredBusLine) {
+                pedestrianAgentIDPreferredBusLine.put(agentName, desiredBusLine);
+            }
+
+            public String getFromAgentMap(String agentName) {
+                return pedestrianAgentIDPreferredBusLine.get(agentName);
+            }
+
+            public Map<String, String> getAgentMap() {
+                return pedestrianAgentIDPreferredBusLine;
+            }
+
+            public void removeFromAgentMap(String agentName) {
+                pedestrianAgentIDPreferredBusLine.remove(agentName);
+            }
+
+            public void printDebugInfo(int id) {
+                logger.info("\n%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%" +
+                        "Station" + id + ": ID: " + station.getOsmId() +
+                        "%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%");
+            }
 
             private void handleMessageFromBus(ACLMessage rcv) {
                 var messageKind = rcv.getPerformative();
                 String agentName = rcv.getSender().getLocalName();
                 if (messageKind == ACLMessage.INFORM) {
-                    if(rcv.getUserDefinedParameter(MessageParameter.TYPEOFTROUBLE)!=null &&
+                    if (rcv.getUserDefinedParameter(MessageParameter.TYPEOFTROUBLE) != null &&
                             rcv.getUserDefinedParameter(MessageParameter.TYPEOFTROUBLE).equals(MessageParameter.CRASH)) {
 
                         handleCrashFromBusToConcernedPassengers(rcv);
@@ -88,7 +110,7 @@ public class StationAgent extends AbstractAgent {
                         var actual = getDateParameter(rcv, MessageParameter.ARRIVAL_TIME);
                         stationStrategy.addBusToFarAwayQueue(agentName, scheduled, actual);
 
-                        // TODO: SEND MESSAGE ABOUT PASSENGERS
+                        // TODO: Send message about passengers
                     }
                 }
                 else if (messageKind == ACLMessage.REQUEST_WHEN) {
@@ -100,8 +122,6 @@ public class StationAgent extends AbstractAgent {
                     stationStrategy.addBusToQueue(agentName, scheduled, actual);
 
                     var msg = createMessage(ACLMessage.AGREE, rcv.getSender());
-                    // TODO: This is send to busAgent without type - won't be handled
-                    //  I am not sure if needed
                     logger.info("SEND AGREE in answer to REQUEST WHEN");
                     msg.setAllUserDefinedParameters(createProperties(MessageParameter.STATION));
                     send(msg);
@@ -120,14 +140,12 @@ public class StationAgent extends AbstractAgent {
                 String crashedLine = rcv.getUserDefinedParameter(MessageParameter.BUS_LINE);
 
                 ACLMessage responseToCrash = createResponseToCrash(rcv);
-
-
-                    for (Map.Entry<String, String> entry : station.getAgentMap().entrySet()) {
-                        if (entry.getValue().equals(crashedLine)) {
-                            responseToCrash.addReceiver(new AID(entry.getKey(),AID.ISLOCALNAME));
-                        }
+                for (var entry : pedestrianAgentIDPreferredBusLine.entrySet()) {
+                    if (entry.getValue().equals(crashedLine)) {
+                        responseToCrash.addReceiver(new AID(entry.getKey(), AID.ISLOCALNAME));
                     }
-                    send(responseToCrash);
+                }
+                send(responseToCrash);
             }
 
             private ACLMessage createResponseToCrash(ACLMessage rcv) {
@@ -139,21 +157,20 @@ public class StationAgent extends AbstractAgent {
                 properties.setProperty(MessageParameter.CRASH_TIME, crashTime);
                 properties.setProperty(MessageParameter.TYPEOFTROUBLE, MessageParameter.CRASH);
                 properties.setProperty(MessageParameter.TROUBLE, MessageParameter.SHOW);
-                properties.setProperty(MessageParameter.TROUBLE_LAT, station.getLat()+"");
-                properties.setProperty(MessageParameter.TROUBLE_LON,station.getLng()+"");
-                properties.setProperty(MessageParameter.DESIRED_OSM_STATION_ID, station.getId() + "");
-                properties.setProperty(MessageParameter.AGENT_ID_OF_NEXT_CLOSEST_STATION, getId()+"" );
-                    //maybe not needed
-                properties.setProperty(MessageParameter.LAT_OF_NEXT_CLOSEST_STATION,station.getLat()+ "");
-                properties.setProperty(MessageParameter.LON_OF_NEXT_CLOSEST_STATION, station.getLng() + "");
+                properties.setProperty(MessageParameter.TROUBLE_LAT, String.valueOf(station.getLat()));
+                properties.setProperty(MessageParameter.TROUBLE_LON, String.valueOf(station.getLng()));
+                properties.setProperty(MessageParameter.DESIRED_OSM_STATION_ID, String.valueOf(station.getOsmId()));
+                properties.setProperty(MessageParameter.AGENT_ID_OF_NEXT_CLOSEST_STATION, String.valueOf(getId()));
+                //maybe not needed
+                properties.setProperty(MessageParameter.LAT_OF_NEXT_CLOSEST_STATION, String.valueOf(station.getLat()));
+                properties.setProperty(MessageParameter.LON_OF_NEXT_CLOSEST_STATION, String.valueOf(station.getLng()));
 
-                properties.setProperty(MessageParameter.BUS_LINE,rcv.getUserDefinedParameter(MessageParameter.BUS_LINE));
-                properties.setProperty(MessageParameter.BRIGADE,rcv.getUserDefinedParameter(MessageParameter.BRIGADE));
+                properties.setProperty(MessageParameter.BUS_LINE, rcv.getUserDefinedParameter(MessageParameter.BUS_LINE));
+                properties.setProperty(MessageParameter.BRIGADE, rcv.getUserDefinedParameter(MessageParameter.BRIGADE));
 
                 msg.setAllUserDefinedParameters(properties);
                 return msg;
             }
-
 
 
             private void handleMessageFromPedestrian(ACLMessage rcv) {
@@ -162,33 +179,24 @@ public class StationAgent extends AbstractAgent {
                 if (messageKind == ACLMessage.INFORM) {
                     print("Got INFORM from " + agentName);
                     String desiredBusLine = rcv.getUserDefinedParameter(MessageParameter.BUS_LINE);
-                    station.addToAgentMap(agentName, desiredBusLine);
+                    pedestrianAgentIDPreferredBusLine.put(agentName, desiredBusLine);
                     stationStrategy.addPedestrianToFarAwayQueue(agentName, desiredBusLine,
                             getDateParameter(rcv, MessageParameter.ARRIVAL_TIME));
                 }
                 else if (messageKind == ACLMessage.REQUEST_WHEN) {
                     print("Got REQUEST_WHEN from " + agentName);
-                    var desiredBusLine = station.getFromAgentMap(agentName);
+                    var desiredBusLine = pedestrianAgentIDPreferredBusLine.get(agentName);
                     stationStrategy.removePedestrianFromFarAwayQueue(agentName, desiredBusLine);
                     stationStrategy.addPedestrianToQueue(agentName, desiredBusLine,
                             getDateParameter(rcv, MessageParameter.ARRIVAL_TIME));
 
                     stationStrategy.removeFromToWhomWaitMap(agentName, desiredBusLine);
 
-
-                    //var msg = createMessage(ACLMessage.REQUEST, rcv.getSender());
-                    // TODO: This is send to pedestrian without type - won't be handled
-                    //  But also needs busAgent name parameter or Pedestrian will die
-                    //  I am not sure if needed
-                    // var properties = createProperties(MessageParameter.STATION);
-                    // msg.setAllUserDefinedParameters(createProperties(MessageParameter.STATION));
-                    //send(msg);
                 }
                 else if (messageKind == ACLMessage.AGREE) {
                     print("-----GET AGREE from PEDESTRIAN------", LoggerLevel.DEBUG);
 
-                    var desiredBusLine = station.getFromAgentMap(agentName);
-                    station.removeFromAgentMap(agentName);
+                    var desiredBusLine = pedestrianAgentIDPreferredBusLine.remove(agentName);
                     if (!stationStrategy.removePedestrianFromQueue(agentName, desiredBusLine)) {
                         stationStrategy.removePedestrianFromFarAwayQueue(agentName, desiredBusLine);
                     }
@@ -239,7 +247,9 @@ public class StationAgent extends AbstractAgent {
         addBehaviour(wrapErrors(checkState, onError));
     }
 
-    public OSMStation getStation() {
+    public StationNode getStation() {
         return station;
     }
+
+    public boolean isPlatformAgent() {return station.isPlatform();}
 }

@@ -3,10 +3,6 @@ package osmproxy.buses.serialization;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.inject.Guice;
 import genesis.SharedModule;
-import org.json.simple.JSONArray;
-import org.json.simple.JSONObject;
-import org.json.simple.parser.JSONParser;
-import org.json.simple.parser.ParseException;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -18,8 +14,8 @@ import osmproxy.buses.models.ApiResult;
 import osmproxy.buses.models.ApiValues;
 import osmproxy.buses.models.TimetableRecord;
 import testutils.FileLoader;
-import utilities.IterableJsonArray;
 
+import java.io.IOException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
@@ -33,14 +29,15 @@ import static testutils.WarszawskieApiJsonCreator.createResultFromManyOrderedKey
 
 @SuppressWarnings("SpellCheckingInspection")
 class WarszawskieApiSerializerTests {
-    private static final JSONParser jsonParser = new JSONParser();
+    private static ObjectMapper objectMapper;
     private static WarszawskieApiSerializer serializer;
     private static LocalDate dateNow;
 
     @BeforeAll
     static void setUpAll() {
         var injector = Guice.createInjector(new SharedModule());
-        serializer = new WarszawskieApiSerializer(injector.getInstance(ObjectMapper.class));
+        objectMapper = injector.getInstance(ObjectMapper.class);
+        serializer = new WarszawskieApiSerializer(objectMapper);
         dateNow = LocalDate.now();
     }
 
@@ -115,24 +112,12 @@ class WarszawskieApiSerializerTests {
     }
 
     private ApiResult createApiResultFromJson(String jsonString) {
-        JSONObject jsonObject;
         try {
-            jsonObject = (JSONObject) jsonParser.parse(jsonString);
-        } catch (ParseException e) {
+            return objectMapper.readValue(jsonString, ApiResult.class);
+        } catch (IOException e) {
             e.printStackTrace();
             throw new RuntimeException(e);
         }
-
-        var resultArray = (JSONArray) jsonObject.get("result");
-        var orderedKeyValues = new ArrayList<String>(resultArray.size());
-        for (var valuesArray : IterableJsonArray.of(jsonObject, "result")) {
-            for (var keyValue : IterableJsonArray.of(valuesArray, "values")) {
-                orderedKeyValues.add((String) keyValue.get("key"));
-                orderedKeyValues.add((String) keyValue.get("value"));
-            }
-        }
-
-        return createApiResult(orderedKeyValues.toArray(String[]::new));
     }
 
     @Test
@@ -332,6 +317,21 @@ class WarszawskieApiSerializerTests {
                 "06", "PKP Gołąbki", "TX-GOLV", "18:38:00", "null", "#");
         assertValuesAreEqual(apiValues.get(2).values,
                 "M4", "Międzylesie", "TP-MIE", "28:21:00");
+    }
+
+    @Test
+    void serializeJsonString_onEmptyResult_shouldReturnNoApiValues() {
+        // Arrange
+        var jsonString = "{\"result\":[]}";
+
+        // Act
+        var apiResultOpt = serializer.serializeJsonString(jsonString);
+
+        // Assert
+        Assertions.assertTrue(apiResultOpt.isPresent());
+
+        var apiValues = apiResultOpt.get().apiValues;
+        assertEquals(0, apiValues.size());
     }
 
     private void assertValuesAreEqual(List<ApiKeyValue> keyValues, String brygada,

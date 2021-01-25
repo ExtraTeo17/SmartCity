@@ -2,6 +2,12 @@ import { CAR_KILLED, CAR_CREATED, CAR_UPDATED, CAR_ROUTE_CHANGED, BATCHED_UPDATE
 
 /**
  * Handles car-agent-related interaction
+ *  - CAR_CREATED
+ *  - CAR_UPDATED
+ *  - BATCHED_UPDATE
+ *  - CAR_ROUTE_CHANGED
+ *  - CAR_KILLED
+ *
  * @category Redux
  * @subcategory Reducers
  * @module car
@@ -55,14 +61,6 @@ const car = (state = initialState, action) => {
       return { ...state, cars: newCars };
     }
 
-    case CAR_KILLED: {
-      const { id } = action.payload;
-      const newCars = state.cars.filter(c => c.id !== id);
-      deletedCarIds.push(id);
-
-      return { ...state, cars: newCars };
-    }
-
     case CAR_ROUTE_CHANGED: {
       const { id, routeStart, routeEnd, location } = payload;
       const newCars = state.cars.map(c => {
@@ -71,6 +69,14 @@ const car = (state = initialState, action) => {
         }
         return c;
       });
+
+      return { ...state, cars: newCars };
+    }
+
+    case CAR_KILLED: {
+      const { id } = action.payload;
+      const newCars = state.cars.filter(c => c.id !== id);
+      deletedCarIds.push(id);
 
       return { ...state, cars: newCars };
     }

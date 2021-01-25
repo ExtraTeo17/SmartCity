@@ -4,8 +4,8 @@ package web.serialization;
 import events.web.PrepareSimulationEvent;
 import events.web.StartSimulationEvent;
 import events.web.models.UpdateObject;
-import osmproxy.elements.OSMNode;
 import routing.core.IGeoPosition;
+import routing.nodes.StationNode;
 import smartcity.TimeProvider;
 import smartcity.lights.LightColor;
 import smartcity.lights.core.Light;
@@ -15,6 +15,9 @@ import web.message.payloads.models.*;
 import web.message.payloads.requests.PrepareSimulationRequest;
 import web.message.payloads.requests.StartSimulationRequest;
 
+/**
+ * Used for backend &lt;-&gt; frontend type conversion.
+ */
 @SuppressWarnings("OverlyCoupledClass")
 public class Converter {
     public static Location convert(IGeoPosition geoPosition) {
@@ -38,9 +41,9 @@ public class Converter {
         };
     }
 
-    public static StationDto convert(OSMNode station) {
-        var id = station.getId();
-        var location = convert((IGeoPosition) station);
+    public static StationDto convert(StationNode station) {
+        var id = station.getAgentId();
+        Location location = convert(station.isPlatform() ? station : station.getCorrespondingPlatformStation());
 
         return new StationDto(id, location);
     }
@@ -108,6 +111,9 @@ public class Converter {
                 req.extendWaitTime,
 
                 req.troublePointStrategyActive,
+                req.troublePointThresholdUntilIndexChange,
+                req.noTroublePointStrategyIndexFactor,
+
                 req.trafficJamStrategyActive,
                 req.transportChangeStrategyActive
         );

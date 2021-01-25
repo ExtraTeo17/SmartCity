@@ -15,6 +15,9 @@ import utilities.Siblings;
 
 import java.util.function.Function;
 
+/**
+ * Used for light-switching management along with light strategy.
+ */
 public class LightSwitcher implements Function<ISwitchLightsContext, Integer> {
     private static final int CAR_TO_PEDESTRIAN_LIGHT_RATE = 2;
     private final Logger logger;
@@ -97,7 +100,7 @@ public class LightSwitcher implements Function<ISwitchLightsContext, Integer> {
         if (configContainer.isLightStrategyActive()) {
             var closeGroups = getLightGroupsOnLight();
             if (shouldExtendByGroups(hadPreviouslyExtended, closeGroups)) {
-                logger.info("Should Extend Green Light Because Of Cars On Light");
+                logger.info("-----Should Extend Green Light Because Of Cars On Light-----");
                 return defaultExecutionDelay;
             }
 
@@ -107,7 +110,7 @@ public class LightSwitcher implements Function<ISwitchLightsContext, Integer> {
 
             var farGroups = getLightGroupsInFarawayQueue();
             if (shouldExtendByGroups(hadPreviouslyExtended, farGroups)) {
-                logger.info("Should Extend Because Of Far Away Queue");
+                logger.info("-----Should Extend Because Of Far Away Queue-----");
                 return defaultExecutionDelay;
             }
         }
