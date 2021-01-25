@@ -6,7 +6,7 @@ import java.io.Serializable;
 import java.util.Objects;
 
 public class OSMElement implements Serializable {
-    protected final long id;
+    final long id;
 
     @ForSerialization
     OSMElement() {

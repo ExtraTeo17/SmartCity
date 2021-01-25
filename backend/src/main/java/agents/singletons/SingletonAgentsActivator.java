@@ -24,15 +24,15 @@ public class SingletonAgentsActivator {
     private final TroubleManagerAgent troubleManagerAgent;
     private final EventBus eventBus;
 
-    @Inject
     /**
      * Initialize the activator of agents, which have only one instance in the smart city system.
      *
-     * @param controller Controller of the container to which the agents are to be added
-     * @param eventBus Event bus for which the events are to be dispatched
-     * @param smartCityAgent Instance of {@link SmartCityAgent} to be added to the container
+     * @param controller          Controller of the container to which the agents are to be added
+     * @param eventBus            Event bus for which the events are to be dispatched
+     * @param smartCityAgent      Instance of {@link SmartCityAgent} to be added to the container
      * @param troubleManagerAgent Instance of {@link TroubleManagerAgent} to be added to the container
      */
+    @Inject
     public SingletonAgentsActivator(ContainerController controller,
                                     EventBus eventBus,
                                     SmartCityAgent smartCityAgent,

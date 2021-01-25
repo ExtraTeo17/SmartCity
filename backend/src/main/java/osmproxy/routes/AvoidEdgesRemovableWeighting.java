@@ -3,7 +3,6 @@ package osmproxy.routes;
 import com.graphhopper.routing.weighting.AvoidEdgesWeighting;
 import com.graphhopper.routing.weighting.Weighting;
 import com.graphhopper.util.EdgeIteratorState;
-import gnu.trove.set.TIntSet;
 
 import java.util.Collection;
 
@@ -33,10 +32,6 @@ public class AvoidEdgesRemovableWeighting extends AvoidEdgesWeighting {
         for (int edgeId : edgeIds) {
             visitedEdges.add(edgeId);
         }
-    }
-
-    final TIntSet getEdgeIds() {
-        return visitedEdges;
     }
 
     @Override

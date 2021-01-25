@@ -156,7 +156,7 @@ public class PedestrianAgent extends AbstractAgent {
                     sendMessageAboutReachingDestinationToSmartCityAgent();
                     doDelete();
                 }
-                else if (!pedestrian.isTroubled()) {
+                else  {
                     move();
                 }
             }
@@ -260,7 +260,6 @@ public class PedestrianAgent extends AbstractAgent {
             }
 
             private void handleCrashOfTheBus(ACLMessage rcv) {
-                pedestrian.setTroubled(true);
                 logger.info("Get info about trouble from bus");
 
                 expectedNewStationNode = parseCrashMessageFromBus(rcv);
@@ -406,9 +405,7 @@ public class PedestrianAgent extends AbstractAgent {
 
                 getNextStation(busLine);
                 informLightManager(pedestrian);
-                pedestrian.setTroubled(false);
                 pedestrian.setState(DrivingState.MOVING);
-
 
                 if (!pedestrian.isAtStation()) {
                     quitBus(false);

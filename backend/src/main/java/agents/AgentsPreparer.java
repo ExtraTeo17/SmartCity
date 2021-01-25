@@ -112,14 +112,13 @@ public class AgentsPreparer {
 
     private boolean prepareAgents() {
         if (configContainer.shouldGeneratePedestriansAndBuses()) {
-            if (!prepareStationsAndBuses()) {
-                return false;
-            }
+            prepareStationsAndBuses();
         }
+
         return prepareLightManagers();
     }
 
-    private boolean prepareStationsAndBuses() {
+    private void prepareStationsAndBuses() {
         var busData = getBusPreparationData();
 
         logger.info("Stations creation started.");
@@ -131,8 +130,6 @@ public class AgentsPreparer {
         time = System.nanoTime();
         preparesBuses(busData, stationNodes);
         logger.info("Buses are created! Took: " + TimeProvider.getTimeInMs(time) + "ms\n");
-
-        return true;
     }
 
     private BusPreparationData getBusPreparationData() {
@@ -336,7 +333,6 @@ public class AgentsPreparer {
         if (managersCounter == 0) {
             logger.warn("No managers were created");
         }
-
 
         return true;
     }

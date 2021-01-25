@@ -25,7 +25,6 @@ class SimpleCrossroad implements ICrossroad {
     private final ILightConfigContainer configContainer;
     private final int managerId;
 
-    @SuppressWarnings("MismatchedQueryAndUpdateOfCollection")
     private final Map<Long, Light> wayIdToLightMap;
     private final Map<Long, Light> crossroadIdToLightMap;
     private final Siblings<SimpleLightGroup> lightGroups;

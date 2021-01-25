@@ -48,7 +48,6 @@ public class StationAgent extends AbstractAgent {
         Behaviour communication = new CyclicBehaviour() {
             private final Map<String, String> pedestrianAgentIDPreferredBusLine = new HashMap<>();
 
-            @SuppressWarnings("DuplicatedCode")
             @Override
             public void action() {
                 ACLMessage rcv = receive();

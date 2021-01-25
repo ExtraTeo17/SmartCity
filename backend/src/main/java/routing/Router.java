@@ -92,7 +92,7 @@ final class Router implements
                                                 String finishingOsmNodeRef) {
         List<RouteNode> routeNodes = new ArrayList<>();
 
-        if (!isNotPedestrian && endStation != null && !startingOsmNodeRef.equals(endStation.getOsmId() + "")) {
+        if (!isNotPedestrian && endStation != null && !startingOsmNodeRef.equals(String.valueOf(endStation.getOsmId()))) {
             routeNodes.add(new RouteNode(endStation));
         }
 
@@ -125,7 +125,7 @@ final class Router implements
             }
         }
 
-        if (!isNotPedestrian && startStation != null && !finishingOsmNodeRef.equals(startStation.getOsmId() + "")) {
+        if (!isNotPedestrian && startStation != null && !finishingOsmNodeRef.equals(String.valueOf(startStation.getOsmId()))) {
             routeNodes.add(new RouteNode(startStation));
         }
 

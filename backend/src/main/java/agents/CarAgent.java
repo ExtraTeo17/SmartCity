@@ -495,7 +495,7 @@ public class CarAgent extends AbstractAgent {
         return car;
     }
 
-    public void move() {
+    private void move() {
         if (borderlineIndex == null || car.getMoveIndex() < borderlineIndex) {
             car.move();
             if (!USE_BATCHED_UPDATES) {

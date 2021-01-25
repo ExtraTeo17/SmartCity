@@ -31,12 +31,12 @@ public class BusManagerAgent extends AbstractAgent {
     public static final String NAME = NAME_PREFIX + ID;
 
     private final HashSet<BusInfo> busInfos;
-
-    List<CrashInfo> troubleCases = new ArrayList<>();
+    private final List<CrashInfo> troubleCases;
 
     BusManagerAgent(ITimeProvider timeProvider, EventBus eventBus, HashSet<BusInfo> busInfos) {
         super(ID, NAME_PREFIX, timeProvider, eventBus);
         this.busInfos = busInfos;
+        this.troubleCases = new ArrayList<>();
     }
 
     @Override
@@ -73,9 +73,8 @@ public class BusManagerAgent extends AbstractAgent {
                 long stationOsmIdTo = Long.parseLong(rcv.getUserDefinedParameter(MessageParameter.STATION_TO_ID));
                 LocalTime arrivalTime = LocalTime.parse(rcv.getUserDefinedParameter(MessageParameter.ARRIVAL_TIME));
                 String event = rcv.getUserDefinedParameter(MessageParameter.EVENT);
-                ACLMessage msg = getBestMatch(rcv.createReply(), stationOsmIdFrom, stationOsmIdTo, arrivalTime, event,
-                        rcv.getUserDefinedParameter(MessageParameter.BUS_LINE),
-                        rcv.getUserDefinedParameter(MessageParameter.BRIGADE), rcv);
+                ACLMessage msg = getBestMatch(rcv.createReply(), stationOsmIdFrom, stationOsmIdTo, arrivalTime,
+                        event, rcv);
                 send(msg);
 
 
@@ -83,7 +82,7 @@ public class BusManagerAgent extends AbstractAgent {
             }
 
             private ACLMessage getBestMatch(ACLMessage response, long stationOsmIdFrom, long stationOsmIdTo,
-                                            LocalTime timeOnStation, String event, String troubledLine, String troubledBrigade, ACLMessage rcv) {
+                                            LocalTime timeOnStation, String event, ACLMessage rcv) {
                 long minimumTimeOverall = Long.MAX_VALUE;
                 String preferredBusLine = null;
                 for (BusInfo info : busInfos) {

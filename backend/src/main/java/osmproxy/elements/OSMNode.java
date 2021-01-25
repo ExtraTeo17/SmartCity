@@ -12,8 +12,8 @@ public class OSMNode extends OSMElement
         implements IGeoPosition {
 
     private final List<OSMWay> parentWays;
-    protected final double lat;
-    protected final double lon;
+    final double lat;
+    final double lon;
 
     OSMNode(long id, double lat, double lon) {
         super(id);
@@ -63,10 +63,6 @@ public class OSMNode extends OSMElement
             builder.append("[").append(way.toString()).append("], ");
         }
         return builder.toString();
-    }
-
-    public final void addChildNodeIdForParentWay(int parentWayIndex, String id) {
-        parentWays.get(parentWayIndex).addChildNodeId(id);
     }
 
     // TODO: Change name to define the purpose, not the implementation - isLightOriented?

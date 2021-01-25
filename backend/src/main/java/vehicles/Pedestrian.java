@@ -18,15 +18,13 @@ public class Pedestrian extends MovingObject {
 
     private static final int DEFAULT_SPEED = (int) (10 * SPEED_SCALE);
 
-    private List<RouteNode> displayRouteBeforeBus;
+    private final List<RouteNode> displayRouteBeforeBus;
     private final List<RouteNode> displayRouteAfterBus;
-    private List<RouteNode> routeBeforeBus;
-    private StationNode stationStart;
+    private final List<RouteNode> routeBeforeBus;
+    private final StationNode stationStart;
     private final StationNode stationFinish;
 
-    private transient boolean troubled;
     private transient int stationIndex;
-
     private int beforeDistance;
     private int savedDistance;
 
@@ -66,7 +64,7 @@ public class Pedestrian extends MovingObject {
     Pedestrian(Pedestrian ped) {
         super(ped.timeProvider, ped.agentId, ped.speed, ped.uniformRoute);
         this.setState(ped.getState());
-        this.appendDistance(ped.getBeforeDistance());
+
         this.displayRouteBeforeBus = ped.displayRouteBeforeBus;
         this.routeBeforeBus = ped.routeBeforeBus;
 
@@ -75,6 +73,8 @@ public class Pedestrian extends MovingObject {
 
         this.stationStart = ped.stationStart;
         this.stationFinish = ped.stationFinish;
+        this.beforeDistance = ped.beforeDistance;
+        this.savedDistance = ped.beforeDistance;
     }
 
     @VisibleForTesting
@@ -99,7 +99,7 @@ public class Pedestrian extends MovingObject {
 
     @Override
     public long getAdjacentOsmWayId() {
-        // TODO: Remember to consider the crossingOsmId2!
+        // TODO: Consider the crossingOsmId2
         return ((LightManagerNode) uniformRoute.get(moveIndex)).getCrossingOsmId1();
     }
 
@@ -127,14 +127,9 @@ public class Pedestrian extends MovingObject {
         return uniformRoute.get(moveIndex) instanceof StationNode;
     }
 
-    public List<RouteNode> getDisplayRouteBeforeBus() {
-        return displayRouteBeforeBus;
-    }
-
     public List<RouteNode> getDisplayRouteAfterBus() {
         return displayRouteAfterBus;
     }
-
 
     public int getMillisecondsToNextStation() {
         return getMillisecondsOnRoute(routeBeforeBus, moveIndex);
@@ -144,37 +139,10 @@ public class Pedestrian extends MovingObject {
         return stationStart;
     }
 
-    public void setTroubled(boolean troubled) {
-        this.troubled = troubled;
-    }
-
-    public boolean isTroubled() {
-        return false;
-    }
-
-    public void setDisplayRouteBeforeBus(List<RouteNode> displayRouteToStation) {
-        this.displayRouteBeforeBus = displayRouteToStation;
-    }
-
-    public void setRouteBeforeBus(List<RouteNode> routeBeforeBus) {
-        this.routeBeforeBus = routeBeforeBus;
-    }
-
-    public void setStationStart(StationNode newStationStart) {
-        this.stationStart = newStationStart;
-    }
-
-    public void setStationIndex(int index) {
-        this.stationIndex = index;
-    }
-
     public int getDistance() {
         return savedDistance + (getUniformRouteSize() * RoutingConstants.STEP_SIZE_METERS);
     }
 
-    public void appendDistance(int dist) {
-        savedDistance += dist;
-    }
 
     public int getBeforeDistance() {
         return beforeDistance;

@@ -241,7 +241,7 @@ public abstract class MovingObject {
         return moveIndex + thresholdUntilIndexChange >= closestLightIndex;
     }
 
-    protected int findIndexOfNodeOnRoute(final RouteNode node) {
+    int findIndexOfNodeOnRoute(final RouteNode node) {
         return uniformRoute.indexOf(node);
     }
 

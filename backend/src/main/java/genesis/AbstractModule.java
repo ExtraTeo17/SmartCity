@@ -15,7 +15,7 @@ import com.google.inject.spi.TypeListener;
  * automatically register all created types to {@link EventBus}
  */
 public abstract class AbstractModule implements Module {
-    protected static final EventBus eventBus;
+    private static final EventBus eventBus;
 
     static {
         eventBus = new EventBus();

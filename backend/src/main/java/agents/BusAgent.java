@@ -356,7 +356,7 @@ public class BusAgent extends AbstractAgent {
         }
     }
 
-    public void move() {
+    private void move() {
         bus.move();
         if (!USE_BATCHED_UPDATES) {
             eventBus.post(new BusAgentUpdatedEvent(this.getId(), bus.getPosition()));

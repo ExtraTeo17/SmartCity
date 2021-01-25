@@ -12,8 +12,8 @@ import java.time.LocalDateTime;
  * The pedestrian for which measurements of its travel time shall be performed.
  */
 public class TestPedestrian extends Pedestrian implements ITestable {
-    private LocalDateTime start;
-    private LocalDateTime end;
+    private transient LocalDateTime start;
+    private transient LocalDateTime end;
 
     @VisibleForTesting
     public TestPedestrian(ITimeProvider timeProvider) {

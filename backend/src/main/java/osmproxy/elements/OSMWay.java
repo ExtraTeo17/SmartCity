@@ -23,7 +23,6 @@ import java.util.*;
 
 public class OSMWay extends OSMElement implements Serializable {
     private static final Logger logger = LoggerFactory.getLogger(OSMWay.class);
-    private final List<String> childNodeIds;
     private final boolean isOneWay;
     private List<OSMWaypoint> waypoints;
     private LightOrientation lightOrientation;
@@ -31,13 +30,11 @@ public class OSMWay extends OSMElement implements Serializable {
 
     @ForSerialization
     public OSMWay() {
-        childNodeIds = new ArrayList<>();
         isOneWay = false;
     }
 
     public OSMWay(Node item) {
         super(item.getAttributes().getNamedItem("id").getNodeValue());
-        this.childNodeIds = new ArrayList<>();
 
         Boolean oneWayValue = null;
         this.waypoints = new ArrayList<>();
@@ -69,7 +66,6 @@ public class OSMWay extends OSMElement implements Serializable {
     OSMWay(long id, final List<OSMWaypoint> waypoints) {
         super(id);
         this.waypoints = waypoints;
-        this.childNodeIds = new ArrayList<>();
         this.isOneWay = false;
     }
 
@@ -82,11 +78,6 @@ public class OSMWay extends OSMElement implements Serializable {
             builder.append(waypoint).append(", ");
         }
         return builder.toString();
-    }
-
-    // TODO: Result is not queried anywhere, why are we adding it?
-    void addChildNodeId(final String id) {
-        childNodeIds.add(id);
     }
 
     public List<OSMWaypoint> getWaypoints() {

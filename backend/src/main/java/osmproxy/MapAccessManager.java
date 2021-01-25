@@ -244,27 +244,6 @@ public class MapAccessManager implements IMapAccessManager {
     }
 
     @Override
-    public void parseChildNodesOfWays(Document childNodesOfWays, List<OSMNode> lightsOfTypeA) {
-        Node osmRoot = childNodesOfWays.getFirstChild();
-        NodeList osmXMLNodes = osmRoot.getChildNodes();
-        int lightIndex = 0, parentWayIndex = 0;
-        for (int i = 1; i < osmXMLNodes.getLength(); i++) {
-            final Node item = osmXMLNodes.item(i);
-            switch (item.getNodeName()) {
-                case "node" -> {
-                    String id = item.getAttributes().getNamedItem("id").getNodeValue();
-                    lightsOfTypeA.get(lightIndex).addChildNodeIdForParentWay(parentWayIndex, id);
-                }
-                case "relation" -> ++parentWayIndex;
-                case "way" -> {
-                    ++lightIndex;
-                    parentWayIndex = 0;
-                }
-            }
-        }
-    }
-
-    @Override
     public Position calculateLatLonBasedOnInternalLights(Node crossroad) {
         var crossroadA = getCrossroadGroup(crossroad, 1);
         var crossroadB = getCrossroadGroup(crossroad, 3);

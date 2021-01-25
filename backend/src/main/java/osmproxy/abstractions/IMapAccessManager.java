@@ -34,12 +34,10 @@ public interface IMapAccessManager {
     Optional<RouteInfo> getRouteInfo(List<Long> osmWayIds, boolean notPedestrian);
 
     /**
-     * @param zone in which we are intrested to find lights
-     * @return ligth manager nodes
+     * @param zone in which we are interested to find lights
+     * @return light manager nodes
      */
     List<Node> getLightManagersNodes(IZone zone);
-
-    void parseChildNodesOfWays(Document childNodesOfWays, List<OSMNode> lightsOfTypeA);
 
     Position calculateLatLonBasedOnInternalLights(Node crossroad);
 }

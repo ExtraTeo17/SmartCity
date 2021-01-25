@@ -27,8 +27,6 @@ import events.web.pedestrian.*;
 import events.web.roadblocks.TrafficJamFinishedEvent;
 import events.web.roadblocks.TrafficJamStartedEvent;
 import events.web.roadblocks.TroublePointCreatedEvent;
-import jade.wrapper.ContainerController;
-import jade.wrapper.StaleProxyException;
 import org.junit.jupiter.api.Test;
 import osmproxy.OsmModule;
 import osmproxy.buses.BusModule;
@@ -70,8 +68,6 @@ class InjectorTests {
         // Act & Assert
         assertInstancesNotNull(injector);
         assertEventsHandled(injector);
-
-        // cleanUp(injector);
     }
 
     private void assertInstancesNotNull(Injector injector) {
@@ -148,14 +144,5 @@ class InjectorTests {
 
         int expectedDeadEvents = 3;
         assertEquals(expectedDeadEvents, counter.get(), "All events should be handled somewhere");
-    }
-
-    private void cleanUp(Injector injector) {
-        var controller = injector.getInstance(ContainerController.class);
-        try {
-            controller.kill();
-        } catch (StaleProxyException e) {
-            e.printStackTrace();
-        }
     }
 }

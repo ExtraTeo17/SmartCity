@@ -211,11 +211,7 @@ public class TroubleManagerAgent extends Agent {
         addBehaviour(wrapErrors(communication, onError));
         addBehaviour(wrapErrors(sayAboutTroubles, onError));
     }
-
-    private void handleBusAccident(ACLMessage rcv) {
-
-    }
-
+    
     @Subscribe
     void handle(DebugEvent e) {
     }

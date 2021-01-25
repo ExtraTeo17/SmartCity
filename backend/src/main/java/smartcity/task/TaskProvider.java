@@ -243,7 +243,6 @@ public class TaskProvider implements ITaskProvider {
      *
      * @return -
      */
-    @SuppressWarnings("FeatureEnvy")
     @Override
     public Runnable getScheduleBusControlTask() {
         return () -> {
