@@ -28,9 +28,24 @@ public class OSMWay extends OSMElement implements Serializable {
     private LightOrientation lightOrientation;
     private RouteOrientation routeOrientation = RouteOrientation.FRONT;
 
-    @ForSerialization
+    /*@ForSerialization
     public OSMWay() {
         isOneWay = false;
+    }*/
+
+    public OSMWay(OSMWay way) {
+    	super(way.id);
+    	childNodeIds = new ArrayList<>();
+    	for (var id : way.childNodeIds) {
+    		childNodeIds.add(id);
+    	}
+    	isOneWay = way.isOneWay;
+    	waypoints = new ArrayList<>();
+    	for (var p : way.waypoints) {
+    		waypoints.add(p);
+    	}
+    	lightOrientation = way.lightOrientation;
+    	routeOrientation = way.routeOrientation;
     }
 
     public OSMWay(Node item) {

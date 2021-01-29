@@ -2,6 +2,7 @@ package osmproxy.abstractions;
 
 import osmproxy.buses.data.BusPreparationData;
 import osmproxy.elements.OSMWay;
+import osmproxy.elements.data.SimulationData;
 import routing.nodes.RouteNode;
 import routing.nodes.StationNode;
 
@@ -21,12 +22,16 @@ public interface ICacheWrapper {
      */
     Optional<BusPreparationData> getBusPreparationData();
 
+    Optional<SimulationData> getSimulationData();
+
     /**
      * Save the bus preparation data to the cache
      *
      * @param data Bus preparation data ready to be utilised
      */
     void cacheData(BusPreparationData data);
+
+    void cacheData(SimulationData data);
 
     /**
      * Retrieve the route consisting of route nodes from the cache.

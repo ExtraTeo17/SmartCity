@@ -40,4 +40,6 @@ public interface IMapAccessManager {
     List<Node> getLightManagersNodes(IZone zone);
 
     Position calculateLatLonBasedOnInternalLights(Node crossroad);
+
+	void initializeWayCache(IZone zone, ICacheWrapper wrapper);
 }
